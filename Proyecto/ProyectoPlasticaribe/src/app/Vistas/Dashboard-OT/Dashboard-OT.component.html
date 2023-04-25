@@ -1,0 +1,298 @@
+
+<div class="fondo">
+ <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+  <!-- Tabla de Procesos -->
+  <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <p-card header="">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción"></p-button>
+      </div>
+      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
+      <p-table
+        #dt1
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-sm p-datatable-striped"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="400px"
+        [rowHover]="true"
+        [value]="procesosOrdenesMes">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Proceso</th>
+            <th>Kg</th>
+            <th>Und</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+          <tr>
+            <td style="padding : 11px">{{rowIndex + 1}}</td>
+            <td><b>{{item.Nombre}}</b></td>
+            <td>{{item.cantidad | number : '1.2-2'}}</td>
+            <td>{{item.und | number : '1.2-2'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!--Estados de ordenes de trabajo-->
+  <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <p-card header="">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción"></p-button>
+      </div>
+      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
+      <p-table
+        #dt2
+        responsiveLayout="stack"
+        [rowHover]="true"
+        styleClass="p-datatable-sm"
+        [value]="estadosOrdenes">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Proceso</th>
+            <th>Cantidad</th>
+            <th>Ver</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td><span class="badge {{item.Class}}">{{item.Nombre | uppercase}}</span></td>
+            <td>{{item.Cantidad | number}}</td>
+            <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-success" [style]="{width: '40px', height: '40px'}" (click)="mostrarModalEstados(item.Nombre)"></p-button></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+   <!-- Tabla de Cantidad de ordenes y Materiales -->
+   <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <p-card>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción"></p-button>
+      </div>
+      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
+
+      <p-toolbar>
+        <div class="p-toolbar-group-start">
+          <p class="font-size-15">En el mes actual se han creado un total de <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
+        </div>
+        <div class="p-toolbar-group-start">
+          <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+        </div>
+      </p-toolbar>
+      <p-table
+        #dt1
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="400px"
+        [rowHover]="true"
+        [value]="materialesOrdenesMes">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="max-width:8%">#</th>
+            <th style="max-width:50%; min-width:30%">Material</th>
+            <th style="max-width:12%; min-width:12%">Cant.</th>
+            <th style="max-width:30%; min-width:30%">Costo</th>
+            <th style="max-width:20%">Peso (Kg)</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+          <tr>
+            <td style="max-width:8%">{{rowIndex + 1}}</td>
+            <td style="max-width:30%; min-width:30%"><b>{{item.extMaterialNom}}</b></td>
+            <td style="max-width:12%; min-width:12%">{{item.cantidad | number}}</td>
+            <td style="max-width:30%; min-width:30%"><b>{{item.costo | currency : '$'}}</b></td>
+            <td style="max-width:20%">{{item.peso | number}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+ </div>
+
+  <!-- Tablas de Ordenes de Trabajo -->
+  <div class="row g-2 fila-3" *ngIf="ValidarRol == 1">
+
+    <!-- Ranking de Clientes -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
+
+        <p-table
+          #dt1
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
+          [value]="clientesOrdenesMes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="max-width:8%">#</th>
+              <th pSortableColumn="clienteNom" style="max-width:50%; min-width:50%"><p-sortIcon field="clienteNom"></p-sortIcon> Cliente</th>
+              <th pSortableColumn="cantidad" style="max-width:8%; min-width:8%"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
+              <th pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="peso" style="max-width:14%"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="max-width:8%">{{rowIndex + 1}}</td>
+              <td style="max-width:50%; min-width:50%"><b>{{item.clienteNom}}</b></td>
+              <td style="max-width:8%; min-width:8%">{{item.cantidad | number}}</td>
+              <td style="max-width:20%; min-width:20%"><b>{{item.costo | currency : '$'}}</b></td>
+              <td style="max-width:14%">{{item.peso | number}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaClientes()"></button>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <!-- Ranking de Productos -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
+
+        <p-table
+          #dt2
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [value]="productosOrdenesMes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="max-width:10%">#</th>
+              <th pSortableColumn="prod_Nombre"style="max-width:70%; min-width:70%"><p-sortIcon field="prod_Nombre"></p-sortIcon> Producto</th>
+              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="max-width:10%">{{rowIndex + 1}}</td>
+              <td style="max-width:70%; min-width:70%"><b>{{item.prod_Nombre}}</b></td>
+              <td style="max-width:20%; min-width:20%">{{item.cantidad | number}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- Ranking de Vendedores -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
+
+        <p-table
+          #dt3
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
+          [value]="vendedorOrdenesMes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">#</th>
+              <th pSortableColumn="nombreCompleto"><p-sortIcon field="nombreCompleto"></p-sortIcon> Vendedor</th>
+              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
+              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th pSortableColumn="peso"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td>{{rowIndex + 1}}</td>
+              <td><b>{{item.nombreCompleto}}</b></td>
+              <td>{{item.cantidad | number}}</td>
+              <td><b>{{item.costo | currency : ' COP $'}}</b></td>
+              <td>{{item.peso | number}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaVendedores()"></button>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+</div>
+<!-- Modal donde se podrán ver las ordenes de trabajo -->
+<p-dialog [modal]="true" [draggable]="false" [(visible)]="modalEstadosOrdenes" [style]="{width: '80%'}">
+  <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+</p-dialog>
+
+<!-- Modal donde se podrá ver algunas graficas -->
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '130rem'}">
+  <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
+</p-dialog>
+<br>
+
+<!-- style="background-color: rgba(39, 39, 39, 0.9)"-->
+<p-overlayPanel [showCloseIcon]="true" #op [style]="{background: 'rgba(45,45,45,0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >
+
+  <ng-container *ngIf="nroCard == 'card-1' then card1;"></ng-container>
+  <ng-template #card1>
+    En esta sección se puede apreciar <b>la cantidad producida en Kilogramos/Unidades</b> en cada <b>proceso de producción</b> en la empresa durante el mes en curso.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-2' then card2;"></ng-container>
+  <ng-template #card2>
+    Aquí puedes ver la <b>cantidad de ordenes de trabajo creadas durante el mes</b> y su estado actual<br><br>
+    Adicionalmente haciendo clic sobre <img src="assets/Iconos_Menu/lupa.PNG" alt="" style="width: 30px; height: 30px">, puedes verificar <b>cuanto se ha pesado</b> en cada proceso y el <b>reporte de costos de cada OT.</b>
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-3' then card3;"></ng-container>
+  <ng-template #card3>
+    Listado con la <b>cantidad de veces que se han usado los materiales de producción</b> para la creación de ordenes de trabajo, su costo, y la cantidad en kilos.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-4' then card4;"></ng-container>
+  <ng-template #card4>
+    En esta sección podrás ver el listado de clientes con <b>más ordenes de trabajo creadas durante el mes actual</b> y el costo total de las mismas<br><br>
+    Además puedes <b>graficar la tabla</b> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-5' then card5;"></ng-container>
+  <ng-template #card5>
+    En este apartado <b>podrá visualizar el listado de productos</b> a los cuales se les ha realizado más<b> ordenes de trabajo</b> durante el mes.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-6' then card6;" ></ng-container>
+  <ng-template #card6>
+    En este listado se puede apreciar <b>la cantidad de ordenes de trabajo realizadas a cada asesor comercial durante el mes actual</b>, el costo total y la cantidad en kilos.<br><br>
+    Además puedes <b>graficar la tabla</b> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
+  </ng-template>
+
+</p-overlayPanel>
+

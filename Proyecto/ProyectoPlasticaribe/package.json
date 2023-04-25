@@ -59,6 +59,7 @@
     "ngx-cookie-service": "^15.0.0",
     "ngx-mat-select-search": "^7.0.1",
     "ngx-pagination": "^6.0.3",
+    "ngx-quill": "^21.0.0",
     "ngx-webstorage-service": "^5.0.0",
     "notifyme": "^0.2.1",
     "npm": "^9.6.4",

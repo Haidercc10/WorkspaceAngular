@@ -1,290 +1,104 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="fondo">
   <!-- Cards de Costos -->
-  <div class="row g-2 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
-    <div class="p-2 col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-      <p-card>
-        <div class="header">
-          <h3><i class="pi pi-truck"></i> Ventas del Mes</h3>
-        </div>
-        <div class="body">
-          <h4><b>{{totalFacuturadoMes | currency : ' COP $'}}</b></h4>
-        </div>
-      </p-card>
-    </div>
-
-    <div class="p-2 col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-      <p-card>
-        <div class="header">
-          <h3><i class="pi pi-wallet"></i> Iva Ventas del Mes</h3>
-        </div>
-        <div class="body">
-          <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
-        </div>
-      </p-card>
-    </div>
-
-    <div class="p-2 col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-      <p-card>
-        <div class="header">
-          <h3><i class="pi pi-money-bill"></i> Total Ventas del Mes</h3>
-        </div>
-        <div class="body">
-          <h4><b>{{totalFacuturadoMes +  totalIvaVentaMes | currency : ' COP $'}}</b></h4>
-        </div>
-      </p-card>
-    </div>
-
-    <div class="p-2 col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-      <p-card>
-        <div class="header">
-          <h3><i class="pi pi-dollar"></i> Ventas del Día</h3>
-        </div>
-        <div class="body">
-          <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
-        </div>
-      </p-card>
-    </div>
-  </div>
-
-  <!-- Grafica y Estados de Ordenes -->
-  <div class="row g-2 fila-2" *ngIf="ValidarRol == 1 || ValidarRol == 60">
-    <div class="p-4 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Facturación Mensual">
-        <p-toolbar>
-          <div class="p-toolbar-group-left">
-            <h5>¡Elige el año que deseas graficar!</h5>
+  <div class="row g-3 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+    <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+      <div class="p-3">
+        <p-card >
+          <div class="header mb-4">
+            <h3><i class="pi pi-truck"></i> Ventas del Mes</h3>
           </div>
-          <div class="p-toolbar-group-right">
-            <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
+          <div class="mb-3">
+            <h4><b>{{totalFacuturadoMes | currency : ' COP $'}}</b></h4>
           </div>
-        </p-toolbar>
-        <p-chart type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions"></p-chart>
-      </p-card>
-    </div>
+        </p-card>
+      </div>
 
-    <div class="p-4 col-xl-4 col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Estados Ordenes de Trabajo">
-        <p-table
-          #dt2
-          responsiveLayout="stack"
-          [rowHover]="true"
-          [value]="estadosOrdenes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Proceso</th>
-              <th>Cantidad</th>
-              <th>Ver</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item>
-            <tr>
-              <td><span class="badge {{item.Class}}">{{item.Nombre | uppercase}}</span></td>
-              <td>{{item.Cantidad | number}}</td>
-              <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-success" (click)="mostrarModalEstados(item.Nombre)"></p-button></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
-    </div>
-  </div>
-
-  <!-- Tablas de Ordenes de Trabajo -->
-  <div class="row g-2 fila-3" *ngIf="ValidarRol == 1">
-    <!-- Ranking de Clientes -->
-    <div class="p-2 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Ranking de Clientes">
-        <p-table
-          #dt1
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [scrollable]="true"
-          scrollHeight="400px"
-          [rowHover]="true"
-          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
-          [value]="clientesOrdenesMes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="max-width:8%">#</th>
-              <th pSortableColumn="clienteNom" style="max-width:50%; min-width:50%"><p-sortIcon field="clienteNom"></p-sortIcon> Cliente</th>
-              <th pSortableColumn="cantidad" style="max-width:8%; min-width:8%"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
-              <th pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
-              <th pSortableColumn="peso" style="max-width:14%"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
-              <td style="max-width:8%">{{rowIndex + 1}}</td>
-              <td style="max-width:50%; min-width:50%">{{item.clienteNom}}</td>
-              <td style="max-width:8%; min-width:8%">{{item.cantidad | number}}</td>
-              <td style="max-width:20%; min-width:20%">{{item.costo | currency : '$'}}</td>
-              <td style="max-width:14%">{{item.peso | number}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-        <ng-template pTemplate="footer">
-          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaClientes()"></button>
-        </ng-template>
-      </p-card>
-    </div>
-
-    <!-- Ranking de Productos -->
-    <div class="p-2 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Ranking de Productos">
-        <p-table
-          #dt2
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [scrollable]="true"
-          scrollHeight="400px"
-          [rowHover]="true"
-          [value]="productosOrdenesMes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="max-width:10%">#</th>
-              <th pSortableColumn="prod_Nombre"style="max-width:70%; min-width:70%"><p-sortIcon field="prod_Nombre"></p-sortIcon> Producto</th>
-              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
-              <td style="max-width:10%">{{rowIndex + 1}}</td>
-              <td style="max-width:70%; min-width:70%">{{item.prod_Nombre}}</td>
-              <td style="max-width:20%; min-width:20%">{{item.cantidad | number}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
-    </div>
-
-    <!-- Ranking de Vendedores -->
-    <div class="p-2 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Ranking de Vendedores">
-        <p-table
-          #dt3
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [scrollable]="true"
-          scrollHeight="400px"
-          [rowHover]="true"
-          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
-          [value]="vendedorOrdenesMes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th scope="col">#</th>
-              <th pSortableColumn="nombreCompleto"><p-sortIcon field="nombreCompleto"></p-sortIcon> Vendedor</th>
-              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
-              <th pSortableColumn="peso"><p-sortIcon field="peso"></p-sortIcon> Peso (Kg)</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
-              <td>{{rowIndex + 1}}</td>
-              <td>{{item.nombreCompleto}}</td>
-              <td>{{item.cantidad | number}}</td>
-              <td>{{item.costo | currency : ' COP $'}}</td>
-              <td>{{item.peso | number}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-        <ng-template pTemplate="footer">
-          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaVendedores()"></button>
-        </ng-template>
-      </p-card>
-    </div>
-  </div>
-
-  <!-- Tablas de Cantidad de Ordenes y Procesos -->
-  <div class="row g-2 fila-4" *ngIf="ValidarRol == 1">
-    <!-- Tabla de Cantidad de ordenes y Materiales -->
-    <div class="p-4 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Ordenes de Trabajo Creadas">
-        <p-toolbar>
-          <div class="p-toolbar-group-center">
-            <p class="font-size-15">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
-            <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+      <div class="p-3">
+        <p-card>
+          <div class="header mb-4">
+            <h3><i class="pi pi-wallet"></i> Iva Ventas del Mes</h3>
           </div>
-        </p-toolbar>
-        <p-table
-          #dt1
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [scrollable]="true"
-          scrollHeight="400px"
-          [rowHover]="true"
-          [value]="materialesOrdenesMes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="max-width:8%">#</th>
-              <th style="max-width:50%; min-width:30%">Material</th>
-              <th style="max-width:12%; min-width:12%">Cant.</th>
-              <th style="max-width:30%; min-width:30%">Costo</th>
-              <th style="max-width:20%">Peso (Kg)</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
-              <td style="max-width:8%">{{rowIndex + 1}}</td>
-              <td style="max-width:30%; min-width:30%">{{item.extMaterialNom}}</td>
-              <td style="max-width:12%; min-width:12%">{{item.cantidad | number}}</td>
-              <td style="max-width:30%; min-width:30%">{{item.costo | currency : '$'}}</td>
-              <td style="max-width:20%">{{item.peso | number}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
+          <div class="mb-3">
+            <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="p-3">
+        <p-card>
+          <div class="header mb-4">
+            <h3><i class="pi pi-money-bill"></i> Total Ventas del Mes</h3>
+          </div>
+          <div class="mb-3">
+            <h4><b>{{totalFacuturadoMes +  totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="p-3">
+        <p-card>
+          <div class="header mb-4">
+            <h3><i class="pi pi-dollar"></i> Ventas del Día</h3>
+          </div>
+          <div class="mb-3">
+            <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
+          </div>
+        </p-card>
+      </div>
     </div>
 
-    <!-- Tabla de Procesos -->
-    <div class="p-4 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Cantidad Producida Por Procesos">
-        <p-table
-          #dt1
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [scrollable]="true"
-          scrollHeight="400px"
-          [rowHover]="true"
-          [value]="procesosOrdenesMes">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>#</th>
-              <th>Proceso</th>
-              <th>Kg</th>
-              <th>Und</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
-              <td>{{rowIndex + 1}}</td>
-              <td>{{item.Nombre}}</td>
-              <td>{{item.cantidad | number : '1.2-2'}}</td>
-              <td>{{item.und | number : '1.2-2'}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
+
+    <!-- Grafica y Estados de Ordenes -->
+    <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12">
+      <div class="p-3">
+        <p-card header="Facturación Mensual">
+          <p-toolbar>
+            <div class="p-toolbar-group-left">
+              <h5>¡Elige el año que deseas graficar!</h5>
+            </div>
+            <div class="p-toolbar-group-right">
+              <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
+            </div>
+          </p-toolbar>
+          <p-chart type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions"></p-chart>
+        </p-card>
+      </div>
     </div>
   </div>
 </div>
-
-<!-- Modal donde se podrán ver las ordenes de trabajo -->
-<p-dialog [modal]="true" [draggable]="false" [(visible)]="modalEstadosOrdenes" [style]="{width: '90%'}">
-  <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
-</p-dialog>
 
 <!-- Modal donde se podrá ver algunas graficas -->
 <p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '150rem'}">
   <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
 </p-dialog>
 <br>
+<!--style="background-color: rgb(255, 252, 222);" -->
+<p-overlayPanel #op  [style]="{background: 'rgb(255, 252, 222)', width: '450px'}" >
+  <!--<ng-template pTemplate>
+    En este apartado encontrarás el <span class="badge bg-naranja">valor total facturado</span> en  <b>cada mes del año.</b><br>
+    Aparte <b>podrás graficar el año que desees</b>, desde la lista desplegable <img src="assets/Iconos_Menu/combo.PNG" alt="" class="imagen"> que se encuentra en la parte superior de la gráfica.
+  </ng-template>-->
+  <!--<ng-template pTemplate>
+    Aquí puedes ver la <b>cantidad de ordenes de trabajo creadas durante el mes</b> y su estado actual<br><br>
+    Adicionalmente haciendo clic sobre <img src="assets/Iconos_Menu/lupa.PNG" alt="" style="width: 30px; height: 30px">, puedes verificar <b>cuanto se ha pesado</b> en cada proceso y el <b>reporte de costos de cada OT.</b>
+  </ng-template>
+  <ng-template pTemplate>
+    En esta sección podrás ver el listado de clientes con <b>más ordenes de trabajo creadas durante el mes actual y el costo total de las mismas</b><br><br>
+    Además puedes <span class="badge bg-naranja">graficar la tabla</span> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
+  </ng-template>
+  <ng-template pTemplate>
+    En este listado se puede apreciar <b>la cantidad de ordenes de trabajo realizadas a cada asesor comercial durante el mes actual</b>, el costo total y cantidad en kilos.<br><br>
+    Además puedes <span class="badge bg-rojo">graficar la tabla</span> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
+  </ng-template>
+  <ng-template pTemplate>
+    En este apartado <b>podrá visualizar el listado de productos</b> a los cuales se les ha realizado más<span class="badge bg-verde"> ordenes de trabajo</span> durante el mes.
+  </ng-template>
+  <ng-template pTemplate>
+    En esta sección se puede apreciar <b>la cantidad producida en Kilogramos/Unidades</b> en cada <span class="badge bg-azul"></span> proceso de producción en la empresa durante el mes en curso.
+  </ng-template>-->
+
+  <ng-template pTemplate>
+    Listado con la <b>cantidad de veces que se han usado los materiales de producción</b> para la creación de <span class="badge bg-rojo">ordenes de trabajo</span>, su costo, y la cantidad en kilos.
+  </ng-template>
+</p-overlayPanel>

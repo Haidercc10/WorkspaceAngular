@@ -61,6 +61,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
+import {OverlayPanelModule} from 'primeng/overlaypanel';
 import { MaterialExampleModule } from '../material.module';
 import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
@@ -166,6 +167,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
 
 export const routes: Routes = [
 
@@ -268,7 +270,6 @@ export const routes: Routes = [
   {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
   {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Facturacion_OrdenMaquilaComponent},
   {path: 'Reporte-Maquilas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Reporte_MaquilasComponent},
-  {path: 'dashboard-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Dashboard_MatPrimaComponent},
 
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,3,4,5,6,7,8,9,10,11,12,13,59,60]}, component: TicketsComponent},
@@ -372,6 +373,7 @@ export const routes: Routes = [
     DashBoard_PedidosComponent,
     TicketsComponent,
     Gestion_TicketsComponent,
+    DashboardOTComponent,
   ],
 
   imports: [
@@ -453,6 +455,7 @@ export const routes: Routes = [
     EditorModule,
     ImageModule,
     GalleriaModule,
+    OverlayPanelModule,
   ],
 
   providers: [

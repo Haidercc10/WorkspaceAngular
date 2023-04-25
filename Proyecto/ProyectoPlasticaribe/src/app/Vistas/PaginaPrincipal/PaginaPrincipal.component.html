@@ -7,9 +7,18 @@
     <p-tabView [scrollable]="true">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
-        header="Facturación y Ordenes de Trabajo"
+        header="Ordenes de Trabajo"
         leftIcon="pi pi-sliders-h"
-        tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
+        tooltip="Información de las Ordenes de Trabajo"
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
+        <app-Dashboard-OT></app-Dashboard-OT>
+      </p-tabPanel>
+
+      <!--FACTURACIÓN-->
+      <p-tabPanel
+        header="Facturación"
+        leftIcon="pi pi-sliders-h"
+        tooltip="Información de la Facturación Mensual"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
         <app-DashBoard_Facturacion></app-DashBoard_Facturacion>
       </p-tabPanel>

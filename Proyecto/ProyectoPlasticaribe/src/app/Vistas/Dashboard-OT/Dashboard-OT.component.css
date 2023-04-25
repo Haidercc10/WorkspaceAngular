@@ -1,6 +1,6 @@
 .fondo {
-  background-color: #ffd9c3;
-  background-image: linear-gradient(62deg, #ffd9c3 0%, #f9e9d4 100%);
+  background-color: #fcd3d3;
+  background-image: linear-gradient(45deg, #fcd3d3 0%, #fff3df 100%);
   height: 100%;
 }
 
@@ -74,8 +74,18 @@ p-chart ::ng-deep div ::ng-deep canvas {
   height: 100%;
 }
 
+::ng-deep .p-datatable-sm ::ng-deep .p-datatable-striped {
+  padding: 1rem;
+}
+
+::ng-deep .p-card ::ng-deep .p-card-content {
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
 @media (max-width: 600px) {
-  .p-3 {
+  .p-4 {
     padding: 0.5rem !important;
   }
 }
+
+
