@@ -11,6 +11,7 @@ import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.s
 import Swal from 'sweetalert2';
 import { Movimientos_MantenimientoComponent } from '../Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
   @ViewChild(Movimientos_MantenimientoComponent) movimientosActivos : Movimientos_MantenimientoComponent;
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private activosService : ActivosService,
                     private tipoActivoService : Tipo_ActivoService,
                       private messageService: MessageService) {
@@ -61,9 +62,9 @@ export class Reporte_MantenimientoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que exportará a excel todo el contenido de la tabla

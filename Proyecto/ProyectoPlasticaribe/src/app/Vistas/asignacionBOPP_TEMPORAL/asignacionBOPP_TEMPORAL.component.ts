@@ -7,6 +7,7 @@ import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignac
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -34,7 +35,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private AppComponent : AppComponent,
                     private boppService : EntradaBOPPService,
                       private asignacionBOPPService : AsignacionBOPPService,
                         private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
@@ -70,9 +71,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // funcion que limpiara los campos donde se selecciona en bopp

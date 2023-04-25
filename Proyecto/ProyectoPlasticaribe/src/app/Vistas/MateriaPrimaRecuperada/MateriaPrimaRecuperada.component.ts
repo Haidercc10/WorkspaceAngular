@@ -10,6 +10,7 @@ import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.servi
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app_MateriaPrimaRecuperada',
@@ -51,7 +52,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                   private unidadMedidaService : UnidadMedidaService,
                     private usuarioService : UsuarioService,
                       private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                        private AppComponent : AppComponent,
                           private recuperadoService : RecuperadoService,
                             private recuperadoMPService : RecuperadoMPService,
                               private turnosService : TurnosService,
@@ -85,9 +86,9 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

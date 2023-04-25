@@ -10,6 +10,7 @@ import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePed
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
@@ -39,7 +40,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   infoPdf : any [] = []; //Variable que tendrá la información los activos de un pedido un mantenimiento consultados
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private activosService : ActivosService,
                     private tipoMantenimientoService : Tipo_MantenimientoService,
                       private estadosService : EstadosService,
@@ -70,9 +71,9 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a limpiar todos los campos de la vista
@@ -307,7 +308,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
   crearPdfMantenimiento(data : any){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     this.dtMantenimientoService.GetPDFMantenimiento(data.Consecutivo).subscribe(datos_mantenimiento => {
       for (let i = 0; i < datos_mantenimiento.length; i++) {
         const pdfDefinicion : any = {

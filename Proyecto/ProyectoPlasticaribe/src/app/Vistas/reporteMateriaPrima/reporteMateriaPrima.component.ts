@@ -5,6 +5,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table/table';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
@@ -68,7 +69,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
-                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private AppComponent : AppComponent,
                       private boppService : EntradaBOPPService,
                         private messageService: MessageService) {
   }
@@ -96,9 +97,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion para obtener las diferentes categorias de materia prima existentes

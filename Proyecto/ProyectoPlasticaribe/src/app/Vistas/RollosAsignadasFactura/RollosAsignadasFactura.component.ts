@@ -8,6 +8,7 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -34,7 +35,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   Productos : any [] = [];
   rollosAsignados : any [] = [];
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
                   private messageService: MessageService,
                     private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
@@ -57,10 +58,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-    this.storage_Rol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

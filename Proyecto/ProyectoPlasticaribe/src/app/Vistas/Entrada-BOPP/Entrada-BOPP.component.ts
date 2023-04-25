@@ -15,6 +15,7 @@ import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remis
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Entrada-BOPP',
@@ -48,7 +49,7 @@ export class EntradaBOPPComponent implements OnInit {
   tipoDoc : any = null;
   boppSeleccionado : any = [];
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
                   private unidadMedidaService : UnidadMedidaService,
                     private entradaBOPPService : EntradaBOPPService,
@@ -101,9 +102,9 @@ export class EntradaBOPPComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Funcion para  obtener las unidades de medidas

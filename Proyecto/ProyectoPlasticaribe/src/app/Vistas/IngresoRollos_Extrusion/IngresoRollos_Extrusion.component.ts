@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngresoRollosBodegaExtrusion/IngRollos_Extrusuion.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -33,7 +34,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   rollosPDF : any [] = [];
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private bagProService : BagproService,
                     private IngRollosService : IngRollos_ExtrusuionService,
                       private dtIngRollosService : DtIngRollos_ExtrusionService,
@@ -62,9 +63,9 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // funcion que va a limpiar los campos del formulario
@@ -320,7 +321,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(id : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     this.dtIngRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         for (let j = 0; j < this.rollosPDF.length; j++) {

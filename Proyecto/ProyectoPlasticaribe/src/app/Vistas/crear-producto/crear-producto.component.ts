@@ -14,6 +14,7 @@ import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-product
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -50,7 +51,7 @@ export class CrearProductoComponent implements OnInit {
                         private existenciasService : ExistenciasProductosService,
                           private clientesService : ClientesService,
                             private usuarioService : UsuarioService,
-                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                              private AppComponent : AppComponent,
                                 private materialService : MaterialProductoService,
                                   private pigmentoServices : PigmentoProductoService,
                                     private tipoSelladoService : TiposSelladoService,
@@ -97,9 +98,9 @@ export class CrearProductoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a limpiar los campos del formulario de producto
@@ -127,7 +128,7 @@ export class CrearProductoComponent implements OnInit {
 
   // Funcion que consultará y almacenará los clientes
   clientesComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
           if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);

@@ -8,6 +8,7 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-EliminarRollos_Extrusion',
@@ -42,7 +43,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   scrollx : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private dtIngRollosService : DtIngRollos_ExtrusionService,
                     private bagproService : BagproService,
                       private servicioProcesos : ProcesosService,
@@ -80,9 +81,9 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // funcion que va a limpiar los campos del formulario

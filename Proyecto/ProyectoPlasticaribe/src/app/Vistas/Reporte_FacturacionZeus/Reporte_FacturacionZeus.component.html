@@ -145,7 +145,7 @@
       </ng-template>
       <ng-template pTemplate="groupheader" let-consolidado>
         <tr pRowGroupHeader style="background-color: #83D3FF;">
-          <td colspan="9">
+          <td colspan="10">
             <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
           </td>
         </tr>
@@ -166,14 +166,7 @@
       </ng-template>
       <ng-template pTemplate="groupfooter" let-consolidado>
         <tr style="background-color: palegreen;">
-          <td colspan="8" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="9" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
           <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
           <ng-template #Filtro>
             <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
@@ -182,15 +175,7 @@
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
-          <td>Totales</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td colspan="9">Totales</td>
           <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
         </tr>
       </ng-template>

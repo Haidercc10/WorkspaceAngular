@@ -6,6 +6,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-menuLateral',
@@ -43,7 +44,7 @@ export class MenuLateralComponent implements OnInit {
   subir15 : boolean = true;
   subir16 : boolean = true;
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
@@ -55,12 +56,12 @@ export class MenuLateralComponent implements OnInit {
   }
 
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    let rol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerLista().subscribe(datos_roles => {
       for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
+        if (datos_roles[index].rolUsu_Id == parseInt(this.AppComponent.storage_Rol)) {
           this.ValidarRol = rol;
           this.storage_Rol = datos_roles[index].rolUsu_Nombre;
         }

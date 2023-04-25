@@ -11,6 +11,7 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { OcompraComponent } from '../ocompra/ocompra.component';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -36,7 +37,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private estadosService : EstadosService,
                     private dtOrdenCompraService : DetallesOrdenesCompraService,
                       private messageService: MessageService) {
@@ -56,9 +57,9 @@ export class Reporte_OrdenCompraComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -251,7 +252,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(oc : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
     this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {

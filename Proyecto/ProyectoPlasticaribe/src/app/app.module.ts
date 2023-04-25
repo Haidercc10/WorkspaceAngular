@@ -276,7 +276,7 @@ export const routes: Routes = [
   {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent},
 
   /** */
-  {path: 'ReporteVentas', component: ReporteFacturacion_VendedoresComponent},
+  {path: 'ReporteVentas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReporteFacturacion_VendedoresComponent},
 ]
 
 @NgModule({

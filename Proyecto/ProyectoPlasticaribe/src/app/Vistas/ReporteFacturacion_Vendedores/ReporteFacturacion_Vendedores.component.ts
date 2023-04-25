@@ -1,10 +1,10 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
-import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-ReporteFacturacion_Vendedores',
@@ -28,10 +28,10 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   facturacionPlugins = [ DataLabelsPlugin ];
   datosConsultados : any [] = []; //Variable que almacenará los años y los vendedores que se han consultado
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private usuarioService : UsuarioService,
-                    private messageService: MessageService) { }
+                    private messageService: MessageService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -41,7 +41,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   }
 
   // Funcion que va a llenar el array de años
-  llenarArrayAnios(){
+  llenarArrayAnios() : void{
     for (let i = 0; i < this.anios.length; i++) {
       let num_Mayor : number = Math.max(...this.anios);
       if (num_Mayor == moment().year()) break;
@@ -51,57 +51,48 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a consultar la información de los vendedores
-  consultarVendedores = () => this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
+  consultarVendedores(){
+    if (this.ValidarRol == 1 || this.ValidarRol == 60) this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
+    else if (this.ValidarRol == 2) this.vendedores = [ { usua_Id : this.storage_Id, usua_Nombre : this.storage_Nombre, } ];
+  }
 
   // Función que va a consultar cuanto fue el costo facturado de los vendedores que se indiquen
   consultarFacturacionVendedor(){
     this.cargando = true;
-    let vendedor : any;
-    if (`${this.vendedorSeleccionado}`.length == 2) vendedor = `0${this.vendedorSeleccionado}`;
-    else if (`${this.vendedorSeleccionado}`.length == 1) vendedor = `00${this.vendedorSeleccionado}`;
-
-    let enero : number = 0;
-    let febrero : number = 0;
-    let marzo : number = 0;
-    let abril : number = 0;
-    let mayo : number = 0;
-    let junio : number = 0;
-    let julio : number = 0;
-    let agosto : number = 0
-    let septiembre : number = 0;
-    let octubre : number = 0;
-    let noviembre : number = 0;
-    let diciembre : number = 0;
-
+    let vendedor : any = `${this.vendedorSeleccionado}`;
+    if (vendedor.length == 2) vendedor = `0${vendedor}`;
+    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+    let ene : number = 0, feb : number = 0, mar : number = 0, abr : number = 0, may : number = 0, jun : number = 0, jul : number = 0, ago : number = 0, sep : number = 0, oct : number = 0, nov : number = 0, dic : number = 0;
     let validar : any = this.datosConsultados.filter((item) => item.Anio == `${this.anioSeleccionado}` && item.Vendedor == vendedor);
+
     if (validar.length == 0){
       for (let i = 0; i < 12; i++) {
         let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
         this.zeusService.GetCostoFacturado_Vendedor(vendedor, mes, this.anioSeleccionado).subscribe(data => {
-          enero = mes == '01' ? data : enero;
-          febrero = mes == '02' ? data : febrero;
-          marzo = mes == '03' ? data : marzo;
-          abril = mes == '04' ? data : abril;
-          mayo = mes == '05' ? data : mayo;
-          junio = mes == '06' ? data : junio;
-          julio = mes == '07' ? data : julio;
-          agosto = mes == '08' ? data : agosto;
-          septiembre = mes == '09' ? data : septiembre;
-          octubre = mes == '10' ? data : octubre;
-          noviembre = mes == '11' ? data : noviembre;
-          diciembre = mes == '12' ? data : diciembre;
+          ene = mes == '01' ? data : ene;
+          feb = mes == '02' ? data : feb;
+          mar = mes == '03' ? data : mar;
+          abr = mes == '04' ? data : abr;
+          may = mes == '05' ? data : may;
+          jun = mes == '06' ? data : jun;
+          jul = mes == '07' ? data : jul;
+          ago = mes == '08' ? data : ago;
+          sep = mes == '09' ? data : sep;
+          oct = mes == '10' ? data : oct;
+          nov = mes == '11' ? data : nov;
+          dic = mes == '12' ? data : dic;
         });
       }
       setTimeout(() => {
         let info : any = {
-          label: `${this.anioSeleccionado}`,
-          data: [enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre],
+          label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
+          data: [ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic],
           yAxisID: 'y',
           borderColor: "#"+((1<<24)*Math.random()|0).toString(16),
           backgroundColor: "#"+((1<<24)*Math.random()|0).toString(16),

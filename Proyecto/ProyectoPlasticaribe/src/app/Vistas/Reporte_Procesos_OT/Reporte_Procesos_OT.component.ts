@@ -16,6 +16,7 @@ import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { MessageService } from 'primeng/api';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import moment from 'moment';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -63,7 +64,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   estadoModal : any; //Variablke que se utilizará para validar el estado en el que se encuentra la orden de trabajo y actualziar el estado
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private fallasTecnicasService : FallasTecnicasService,
                     private estadosProcesos_OTService : EstadosProcesos_OTService,
                       private srvEstadosOTVendedores : EstadosProcesosOTxVendedoresService,
@@ -99,9 +100,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

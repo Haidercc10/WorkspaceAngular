@@ -17,6 +17,7 @@ import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { RemisionFacturaService } from 'src/app/Servicios/Remisiones_Facturas/remisionFactura.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app_pedidomateriaprima_component',
@@ -64,7 +65,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private rolService : RolesService,
                   private frmBuilderMateriaPrima : FormBuilder,
-                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private AppComponent : AppComponent,
                       private proveedorservices : ProveedorService,
                         private facturaMpComService : FactuaMpCompradaService,
                           private facturaMpService : FacturaMpService,
@@ -104,9 +105,9 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

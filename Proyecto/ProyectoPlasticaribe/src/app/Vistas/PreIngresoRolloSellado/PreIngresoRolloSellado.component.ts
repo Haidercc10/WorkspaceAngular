@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -32,7 +33,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private bagProService : BagproService,
                     private dtPreEntRollosService : DtPreEntregaRollosService,
                       private preEntRollosService : PreEntregaRollosService,
@@ -64,9 +65,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
     if (this.ValidarRol == 8) this.FormConsultarRollos.patchValue({ Proceso : '2', });
     else if (this.ValidarRol == 9) this.FormConsultarRollos.patchValue({ Proceso : '1', });
     else this.FormConsultarRollos.patchValue({ Proceso : '1', });
@@ -265,7 +266,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(id : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
     this.dtPreEntRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {

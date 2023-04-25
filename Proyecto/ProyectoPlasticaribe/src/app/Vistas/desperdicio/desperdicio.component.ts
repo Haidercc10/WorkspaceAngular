@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -38,7 +39,7 @@ export class DesperdicioComponent implements OnInit {
   registroSeleccionado : any =[]; /** Variable que contendrá el registro a quitar de la tabla. */
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private bagProService : BagproService,
                     private operariosService : UsuarioService,
                       private procesosService : ProcesosService,
@@ -80,9 +81,9 @@ export class DesperdicioComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -298,7 +299,7 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que creará un PDF del desperdicio ingresado
   crearPdf(){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
       for (let i = 0; i < datos_desperdicios.length; i++) {
         const pdfDefinicion : any = {

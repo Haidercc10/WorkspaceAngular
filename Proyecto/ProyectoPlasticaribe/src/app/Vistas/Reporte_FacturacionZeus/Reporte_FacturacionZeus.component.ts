@@ -7,6 +7,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -36,7 +37,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
                     private messageService: MessageService) {
 
@@ -60,9 +61,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colocará la puntuacion a los numeros que se le pasen a la funcion

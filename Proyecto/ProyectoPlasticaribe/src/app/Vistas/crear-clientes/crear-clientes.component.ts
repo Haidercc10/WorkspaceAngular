@@ -11,6 +11,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { OpedidoproductoComponent } from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
 import Swal from 'sweetalert2';
 import { CrearProductoComponent } from '../crear-producto/crear-producto.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -36,14 +37,15 @@ export class ClientesComponent implements OnInit {
   cliente = []; //Variable que almacenará el nombre de los clientes
 
   constructor(private rolService : RolesService,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,private formBuilderCrearClientes : FormBuilder,
-                  private tiposClientesService : TipoClienteService,
-                    private tipoIdentificacionService : TipoIdentificacionService,
-                      private usuarioService : UsuarioService,
-                        private pedidoCliente : OpedidoproductoComponent,
-                          private crearProducto : CrearProductoComponent,
-                            private clientesService :ClientesService,
-                              private sedesClientesService: SedeClienteService,) {
+                private AppComponent : AppComponent,
+                  private formBuilderCrearClientes : FormBuilder,
+                    private tiposClientesService : TipoClienteService,
+                      private tipoIdentificacionService : TipoIdentificacionService,
+                        private usuarioService : UsuarioService,
+                          private pedidoCliente : OpedidoproductoComponent,
+                            private crearProducto : CrearProductoComponent,
+                              private clientesService :ClientesService,
+                                private sedesClientesService: SedeClienteService,) {
 
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: [null, Validators.required],
@@ -73,17 +75,9 @@ export class ClientesComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que limipiará los campos deñ formulario de clientes
@@ -130,7 +124,7 @@ export class ClientesComponent implements OnInit {
 
   // Funcion que consultará y almacneará los vendedores
   usuarioComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
       if (datos_usuarios.rolUsu_Id == 2) this.usuario.push(datos_usuarios);
       else {
         this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
@@ -161,7 +155,7 @@ export class ClientesComponent implements OnInit {
 
   // Funcion que consulta´ra y almacenará los clientes
   clientesComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
           if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);

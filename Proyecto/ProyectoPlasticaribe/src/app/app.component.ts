@@ -10,6 +10,7 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
+import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 
 @Component({
   selector: 'app-root',
@@ -43,7 +44,8 @@ export class AppComponent implements OnInit{
                     private authenticationContaZeusService : authentication_ContaZeus,
                       private authenticationBagProService : authentication_BagPro,
                         private cookieService: CookieService,
-                          private config: PrimeNGConfig,) {
+                          private config: PrimeNGConfig,
+                            private encriptacion : EncriptacionService,) {
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
@@ -87,12 +89,12 @@ export class AppComponent implements OnInit{
     });
   }
 
-
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');    ;
+    this.storage_Id = this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id'));
+    this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
+    this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
+    this.storage_Rol = this.ValidarRol;
     this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
     if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 1;
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));

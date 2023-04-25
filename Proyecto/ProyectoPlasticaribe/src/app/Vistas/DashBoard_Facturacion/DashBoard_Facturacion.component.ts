@@ -1,11 +1,10 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { AppComponent } from 'src/app/app.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Component({
@@ -71,7 +70,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private bagProService : BagproService,
                     private ordenTrabajoService : EstadosProcesos_OTService,) { }
@@ -84,9 +83,9 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards

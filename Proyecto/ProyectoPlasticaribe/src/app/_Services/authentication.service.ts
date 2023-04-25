@@ -12,6 +12,7 @@ import { AuthenticationService_InvZeus } from './authentication_InvZeus.service'
 import { authentication_ContaZeus } from './authentication_ContaZeus.service';
 import { authentication_BagPro } from './authentication_BagPro.service';
 import Swal from 'sweetalert2';
+import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 
 @Injectable({ providedIn: 'root' })
 
@@ -28,9 +29,10 @@ export class AuthenticationService {
                     private movAplicacionService : MovimientosAplicacionService,
                       private authenticationInvZeusService : AuthenticationService_InvZeus,
                         private authenticationContaZeusService : authentication_ContaZeus,
-                          private authenticationBagPro : authentication_BagPro,) {
+                          private authenticationBagPro : authentication_BagPro,
+                            private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('user')!));
+    this.userSubject = new BehaviorSubject(JSON.parse(this.encriptacion.decrypt(localStorage.getItem('user'))!));
     this.user = this.userSubject.asObservable();
   }
 
@@ -45,8 +47,8 @@ export class AuthenticationService {
 
   login(datos : any) {
     return this.http.post<any>(`${this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
-      this.saveInLocal('Token', user.token);
-      localStorage.setItem('user', JSON.stringify(user));
+      this.saveInLocal('Token', this.encriptacion.encrypt(user.token));
+      localStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));

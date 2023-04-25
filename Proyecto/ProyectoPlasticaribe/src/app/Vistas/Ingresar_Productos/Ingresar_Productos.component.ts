@@ -9,6 +9,7 @@ import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoR
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -43,7 +44,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   minDate: Date = new Date(); //Variable que validará la fecha minima para los campos Date en el HTML
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private ExistenciasProdService : ExistenciasProductosService,
                     private entradaRolloService : EntradaRollosService,
                       private dtEntradaRollosService : DetallesEntradaRollosService,
@@ -76,9 +77,9 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion para limpiar los campos de la vista
@@ -384,7 +385,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(id : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     this.dtEntradaRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {

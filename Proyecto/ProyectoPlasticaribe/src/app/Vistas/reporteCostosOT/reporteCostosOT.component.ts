@@ -14,6 +14,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -78,7 +79,7 @@ export class ReporteCostosOTComponent implements OnInit {
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private AppComponent : AppComponent,
                     private detallesAsignacionService : DetallesAsignacionService,
                       private materiaPrimaService : MateriaPrimaService,
                         private devolucionesService : DevolucionesService,
@@ -148,9 +149,9 @@ export class ReporteCostosOTComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -490,7 +491,7 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
     if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {

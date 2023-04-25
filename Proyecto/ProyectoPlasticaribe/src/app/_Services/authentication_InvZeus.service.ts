@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { User_Inv_Zeus } from '../_Models/user_Inv_Zeus';
 import { rutaZeus } from 'src/polyfills';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 
 @Injectable({ providedIn: 'root' })
 
@@ -17,9 +18,10 @@ export class AuthenticationService_InvZeus {
 
   constructor(private router: Router,
                 private http: HttpClient,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,) {
+                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('user_Inv_Zeus')!));
+    this.userSubject = new BehaviorSubject(JSON.parse(this.encriptacion.decrypt(localStorage.getItem('user_Inv_Zeus'))!));
     this.user = this.userSubject.asObservable();
   }
 
@@ -35,8 +37,10 @@ export class AuthenticationService_InvZeus {
   login() {
     let datos : any = { "Id_Usuario" : 123456798, "Contrasena" : "", }
     return this.http.post<any>(`${this.rutaZeus}/Authentication/login`, datos).pipe(map(user => {
-      this.saveInLocal('Token_Inv_Zeus', user.token);
-      localStorage.setItem('user_Inv_Zeus', JSON.stringify(user));
+      this.saveInLocal('Token_Inv_Zeus', this.encriptacion.encrypt(user.token));
+      localStorage.setItem('user_Inv_Zeus', this.encriptacion.encrypt(JSON.stringify(user)));
+      this.saveInLocal('', user.token);
+      localStorage.setItem('', JSON.stringify(user));
       this.userSubject.next(user);
       return user;
     }));
