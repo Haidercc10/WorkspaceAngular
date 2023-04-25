@@ -22,7 +22,8 @@ export class authentication_BagPro {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(this.encriptacion.decrypt(localStorage.getItem('user_BagPro'))!));
+    let token = this.encriptacion.decrypt(localStorage.getItem('user_BagPro') == undefined ? '' : localStorage.getItem('user_BagPro'))
+    this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
 

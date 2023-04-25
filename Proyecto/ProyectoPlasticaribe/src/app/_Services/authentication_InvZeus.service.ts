@@ -21,7 +21,8 @@ export class AuthenticationService_InvZeus {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(this.encriptacion.decrypt(localStorage.getItem('user_Inv_Zeus'))!));
+    let token = this.encriptacion.decrypt(localStorage.getItem('user_Inv_Zeus') == null ? '' : localStorage.getItem('user_Inv_Zeus'))
+    this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
 

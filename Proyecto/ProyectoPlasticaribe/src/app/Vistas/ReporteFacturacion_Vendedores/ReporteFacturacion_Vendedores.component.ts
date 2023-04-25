@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
@@ -13,6 +14,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
+  @ViewChild('dt') dt: Table | undefined;
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -27,6 +29,8 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   facturasOptions: any; //Variable que almacenará los estilos que tendrá la grafica de lo facturado cada mes
   facturacionPlugins = [ DataLabelsPlugin ];
   datosConsultados : any [] = []; //Variable que almacenará los años y los vendedores que se han consultado
+  consolidado : any [] = []; //Variable que almcanerá la información de los pedidos y costos de cada vendedor
+  costoTotal : number = 0;  //Variable que almacenará la cantidad total facturada
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -90,20 +94,22 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
         });
       }
       setTimeout(() => {
+        let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
         let info : any = {
           label: `Año ${this.anioSeleccionado} - Vendedor ${vendedor}`,
           data: [ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic],
           yAxisID: 'y',
-          borderColor: "#"+((1<<24)*Math.random()|0).toString(16),
-          backgroundColor: "#"+((1<<24)*Math.random()|0).toString(16),
-          pointStyle: 'rectRot',
+          borderColor: color.substring(0, 4),
+          backgroundColor: color.substring(0, 4) + "2",
+          pointStyle: 'circle',
           pointRadius: 10,
           pointHoverRadius: 15,
+          fill : true,
           tension: 0.3
         };
         this.facturasData.datasets.push(info);
         this.datosConsultados.push({Anio : `${this.anioSeleccionado}`, Vendedor : vendedor});
-        this.cargando = false;
+        this.consultarConsolidado();
       }, 1500);
     } else {
       this.mensajeAdvertencia(`¡Ya se ha graficado la información del vendedor con el código ${vendedor} en el año ${this.anioSeleccionado}!`);
@@ -111,9 +117,62 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     }
   }
 
+  // Funcion que consultará y almacenará la información consolidada de la facturación de los vendedores
+  consultarConsolidado(){
+    let anoInicial : number = this.anioSeleccionado;
+    let anoFinal : number = this.anioSeleccionado;
+    let vendedor : any = `${this.vendedorSeleccionado}`;
+    if (vendedor.length == 2) vendedor = `0${vendedor}`;
+    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+
+    this.zeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, `?vendedor=${vendedor}`).subscribe(datos_consolidado => {
+      if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+      else {
+        for (let i = 0; i < datos_consolidado.length; i++) {
+          this.llenarConsolidado(datos_consolidado[i]);
+        }
+      }
+      setTimeout(() => { this.cargando = false; }, datos_consolidado.length);
+    });
+  }
+
+  // Funcion que va a llenar el array que contendrá la informacion del consolidado
+  llenarConsolidado(data : any){
+    if (data.mes == 1) data.mes = 'Enero';
+    if (data.mes == 2) data.mes = 'Febrero';
+    if (data.mes == 3) data.mes = 'Marzo';
+    if (data.mes == 4) data.mes = 'Abril';
+    if (data.mes == 5) data.mes = 'Mayo';
+    if (data.mes == 6) data.mes = 'Junio';
+    if (data.mes == 7) data.mes = 'Julio';
+    if (data.mes == 8) data.mes = 'Agosto';
+    if (data.mes == 9) data.mes = 'Septiembre';
+    if (data.mes == 10) data.mes = 'Octubre';
+    if (data.mes == 11) data.mes = 'Noviembre';
+    if (data.mes == 12) data.mes = 'Diciembre';
+    let info : any = {
+      Mes : data.mes,
+      Ano : `${data.ano} - ${data.mes} - ${data.vendedor}`,
+      Id_Cliente : data.id_Cliente,
+      Cliente : data.cliente,
+      Id_Producto : data.id_Producto,
+      Producto : data.producto,
+      Cantidad : data.cantidad,
+      Presentacion : data.presentacion,
+      Precio : data.precio,
+      SubTotal : data.subTotal,
+      Id_Vendedor : data.id_Vendedor,
+      Vendedor : data.vendedor,
+    }
+    this.costoTotal += data.subTotal;
+    this.consolidado.push(info);
+  }
+
   // Funcion que va a inicializar la informacion de los arrays que almacenan la info de la grafica
   graficarDatos(){
     this.datosConsultados = [];
+    this.consolidado = [];
+    this.costoTotal = 0;
     this.facturasData = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
@@ -147,6 +206,20 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
+  }
+
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  }
+
+  // Funcion que va a calcular el subtotal de lo vendido en un año
+  calcularTotalVendidoAno(ano : any){
+    let total : number = 0;
+    for (let i = 0; i < this.consolidado.length; i++) {
+      if (this.consolidado[i].Ano == ano) total += this.consolidado[i].SubTotal;
+    }
+    return total;
   }
 
   /** Mostrar mensaje de advertencia */

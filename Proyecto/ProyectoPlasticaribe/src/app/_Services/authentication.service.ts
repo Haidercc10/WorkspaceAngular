@@ -32,7 +32,8 @@ export class AuthenticationService {
                           private authenticationBagPro : authentication_BagPro,
                             private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(this.encriptacion.decrypt(localStorage.getItem('user'))!));
+    let token = this.encriptacion.decrypt(localStorage.getItem('user') == undefined ? '' : localStorage.getItem('user'));
+    this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
 
@@ -55,10 +56,12 @@ export class AuthenticationService {
   }
 
   logout() {
+    let id = this.encriptacion.decrypt(this.storage.get('Id'));
+    let Nombre = this.encriptacion.decrypt(this.storage.get('Nombre'));
     let infoMovimientoAplicacion : any = {
-      "Usua_Id" : this.storage.get('Id'),
+      "Usua_Id" : id,
       "MovApp_Nombre" : `Cierre de sesión`,
-      "MovApp_Descripcion" : `El usuario "${this.storage.get('Nombre')}" con el ID ${this.storage.get('Id')} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+      "MovApp_Descripcion" : `El usuario "${Nombre}" con el ID ${id} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
       "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }

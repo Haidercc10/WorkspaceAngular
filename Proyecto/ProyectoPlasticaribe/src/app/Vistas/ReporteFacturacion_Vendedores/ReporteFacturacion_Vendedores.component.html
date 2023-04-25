@@ -1,9 +1,9 @@
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
-<div class="fondo">
-  <div class="row" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 2">
+<div class="formulario" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 2">
+  <div class="row">
     <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Facturación Mensual">
+      <p-card header="Facturación Vendedores">
         <p-toolbar>
           <div class="p-toolbar-group-start">
             <h5>¡Elige el año y vendedor que deseas graficar y presione el botón!</h5>
@@ -17,6 +17,89 @@
         </p-toolbar>
 
         <p-chart type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions" *ngIf="!cargando"></p-chart>
+      </p-card>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="Consolidado de Facturación">
+        <p-table
+          #dt
+          [value]="consolidado"
+          sortField="Ano"
+          sortMode="single"
+          [scrollable]="true"
+          scrollHeight="900px"
+          rowGroupMode="subheader"
+          groupRowsBy="Ano"
+          [rowHover]="true"
+          styleClass="p-datatable-sm"
+          columnResizeMode="expand"
+          responsiveLayout="scroll"
+          *ngIf="!cargando">
+          <ng-template pTemplate="header">
+            <tr class="font-size-16">
+              <th></th>
+              <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Producto', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+            </tr>
+            <tr>
+              <th>#</th>
+              <th>Mes</th>
+              <th>Vendedor</th>
+              <th>Cliente</th>
+              <th>Id Producto</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Presentación</th>
+              <th>Precio</th>
+              <th>SubTotal</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupheader" let-consolidado>
+            <tr pRowGroupHeader style="background-color: #83D3FF;">
+              <td colspan="10">
+                <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
+            <tr class="font-size-15">
+              <td>{{rowIndex + 1}}</td>
+              <td><b>{{consolidado.Mes}}</b></td>
+              <td>{{consolidado.Vendedor}}</td>
+              <td>{{consolidado.Cliente}}</td>
+              <td>{{consolidado.Id_Producto}}</td>
+              <td>{{consolidado.Producto}}</td>
+              <td><b>{{consolidado.Cantidad | number}}</b></td>
+              <td>{{consolidado.Presentacion}}</td>
+              <td>{{consolidado.Precio | number}}</td>
+              <td><b>{{consolidado.SubTotal | number}}</b></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupfooter" let-consolidado>
+            <tr style="background-color: palegreen;">
+              <td colspan="9" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
+              <td class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="9">Totales</td>
+              <td>{{costoTotal | currency : 'COP $'}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
       </p-card>
     </div>
   </div>
