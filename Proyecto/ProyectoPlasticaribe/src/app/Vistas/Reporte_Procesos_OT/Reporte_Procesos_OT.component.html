@@ -303,19 +303,19 @@
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila1">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="ext" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext == 0 ? 'NO' : ArrayDocumento.ext | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="ext" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext == 0 ? 'NO' : ArrayDocumento.ext | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="ext" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext == 0 ? 'NO' : ArrayDocumento.ext | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila1>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext == 0 ? 'NO' : ArrayDocumento.ext | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext == 0 ? 'NO' : ArrayDocumento.ext | number}}</td>
               </ng-template>
 
               <!-- Impresion -->
@@ -330,19 +330,19 @@
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila2">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="imp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp == 0 ? 'NO' : ArrayDocumento.imp | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="imp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp == 0 ? 'NO' : ArrayDocumento.imp | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="imp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp == 0 ? 'NO' : ArrayDocumento.imp | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila2>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp == 0 ? 'NO' : ArrayDocumento.imp | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp == 0 ? 'NO' : ArrayDocumento.imp | number}}</td>
               </ng-template>
 
               <!-- Rotograbado -->
@@ -357,19 +357,19 @@
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila3">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="rot" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot == 0 ? 'NO' : ArrayDocumento.rot | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="rot" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot == 0 ? 'NO' : ArrayDocumento.rot | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="rot" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot == 0 ? 'NO' : ArrayDocumento.rot | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila3>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot == 0 ? 'NO' : ArrayDocumento.rot | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot == 0 ? 'NO' : ArrayDocumento.rot | number}}</td>
               </ng-template>
 
               <!-- Doblado -->
@@ -384,19 +384,19 @@
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila4">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="dbl" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl == 0 ? 'NO' : ArrayDocumento.dbl | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="dbl" scope="col" style="background-color: #F6D45D;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #F6D45D;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl == 0 ? 'NO' : ArrayDocumento.dbl | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="dbl" scope="col" style="background-color: #FF7878;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #FF7878;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl == 0 ? 'NO' : ArrayDocumento.dbl | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila4>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl == 0 ? 'NO' : ArrayDocumento.dbl | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl == 0 ? 'NO' : ArrayDocumento.dbl | number}}</td>
               </ng-template>
 
               <!-- laminado -->
@@ -411,19 +411,19 @@
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila5">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="lam" scope="col" style="background-color: #83D3FF" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #83D3FF" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam == 0 ? 'NO' : ArrayDocumento.lam | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="lam" scope="col" style="background-color: #F6D45D" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #F6D45D" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam == 0 ? 'NO' : ArrayDocumento.lam | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam == 0 ? 'NO' : ArrayDocumento.lam | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila5>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam == 0 ? 'NO' : ArrayDocumento.lam | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam == 0 ? 'NO' : ArrayDocumento.lam | number}}</td>
               </ng-template>
 
               <!-- Corte -->
@@ -438,19 +438,19 @@
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila6">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="cor" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor == 0 ? 'NO' : ArrayDocumento.cor | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="cor" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor == 0 ? 'NO' : ArrayDocumento.cor | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="cor" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor == 0 ? 'NO' : ArrayDocumento.cor | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila6>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor == 0 ? 'NO' : ArrayDocumento.cor | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor == 0 ? 'NO' : ArrayDocumento.cor | number}}</td>
               </ng-template>
 
               <!-- Empaque -->
@@ -465,19 +465,19 @@
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila7">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="emp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp == 0 ? 'NO' : ArrayDocumento.emp | number}}</b></td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="emp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp == 0 ? 'NO' : ArrayDocumento.emp | number}}</b></td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="emp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')"><b>{{ArrayDocumento.emp == 0 ? 'NO' : ArrayDocumento.emp | number}}</b></td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila7>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp == 0 ? 'NO' : ArrayDocumento.emp | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp == 0 ? 'NO' : ArrayDocumento.emp | number}}</td>
               </ng-template>
 
               <!-- Sellado -->
@@ -492,19 +492,19 @@
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila8">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel == 0 ? 'NO' : ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd == 0 ? 'NO' : ArrayDocumento.selUnd | number}} Und</b></td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel == 0 ? 'NO' : ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd == 0 ? 'NO' : ArrayDocumento.selUnd | number}} Und</b></td>
                 </ng-container>
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="sel" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')"><b>{{ArrayDocumento.sel == 0 ? 'NO' : ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd == 0 ? 'NO' : ArrayDocumento.selUnd | number}} Und</b></td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila8>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel == 0 ? 'NO' : ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd == 0 ? 'NO' : ArrayDocumento.selUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel == 0 ? 'NO' : ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd == 0 ? 'NO' : ArrayDocumento.selUnd | number}} Und</td>
               </ng-template>
 
               <!-- Wiketiado -->
@@ -519,21 +519,21 @@
               <!-- Asignada -->
               <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila9">
                 <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                  <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd == 0 ? 'NO' : ArrayDocumento.wikUnd | number}} Und</td>
                 </ng-container>
                 <!-- Abierta -->
                 <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                  <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd == 0 ? 'NO' : ArrayDocumento.wikUnd | number}} Und</td>
                 </ng-container>
                 <!-- Anulada -->
                 <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                  <td id="wik" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd == 0 ? 'NO' : ArrayDocumento.wikUnd | number}} Und</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila9>
-                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd == 0 ? 'NO' : ArrayDocumento.wikUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd == 0 ? 'NO' : ArrayDocumento.wikUnd | number}} Und</td>
               </ng-template>
 
               <td id="cant" scope="col"><b>{{ArrayDocumento.cantUnd}}</b></td>

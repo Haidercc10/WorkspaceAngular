@@ -376,7 +376,6 @@ export class OcompraComponent implements OnInit {
         this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
-    if(!error) this.mostrarEleccion(0, 'pdf');
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso

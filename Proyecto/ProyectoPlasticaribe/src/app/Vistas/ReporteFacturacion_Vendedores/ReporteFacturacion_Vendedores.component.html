@@ -1,6 +1,6 @@
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
-<div class="formulario" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 2">
+<div class="fondo" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 2">
   <div class="row">
     <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <p-card header="Facturación Vendedores">
@@ -11,7 +11,7 @@
           <div class="p-toolbar-group-center">
             <p-dropdown class="mr-2" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
             <p-dropdown class="mr-2" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [(ngModel)]="vendedorSeleccionado"></p-dropdown>
-            <button class="mr-2" pButton pTooltip="Graficar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="consultarFacturacionVendedor()"></button>
+            <button class="mr-2" pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="consultarFacturacionVendedor()"></button>
             <button class="mr-2" pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary" (click)="graficarDatos()"></button>
           </div>
         </p-toolbar>
@@ -46,12 +46,13 @@
               <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Producto', 'contains')"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Devolucion', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
             </tr>
             <tr>
               <th>#</th>
@@ -61,6 +62,7 @@
               <th>Id Producto</th>
               <th>Producto</th>
               <th>Cantidad</th>
+              <th>Devolución</th>
               <th>Presentación</th>
               <th>Precio</th>
               <th>SubTotal</th>
@@ -68,7 +70,7 @@
           </ng-template>
           <ng-template pTemplate="groupheader" let-consolidado>
             <tr pRowGroupHeader style="background-color: #83D3FF;">
-              <td colspan="10">
+              <td colspan="11">
                 <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
               </td>
             </tr>
@@ -82,6 +84,7 @@
               <td>{{consolidado.Id_Producto}}</td>
               <td>{{consolidado.Producto}}</td>
               <td><b>{{consolidado.Cantidad | number}}</b></td>
+              <td><b>{{consolidado.Devolucion | number}}</b></td>
               <td>{{consolidado.Presentacion}}</td>
               <td>{{consolidado.Precio | number}}</td>
               <td><b>{{consolidado.SubTotal | number}}</b></td>
@@ -89,13 +92,13 @@
           </ng-template>
           <ng-template pTemplate="groupfooter" let-consolidado>
             <tr style="background-color: palegreen;">
-              <td colspan="9" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
+              <td colspan="10" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
               <td class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
             </tr>
           </ng-template>
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="9">Totales</td>
+              <td colspan="10">Totales</td>
               <td>{{costoTotal | currency : 'COP $'}}</td>
             </tr>
           </ng-template>

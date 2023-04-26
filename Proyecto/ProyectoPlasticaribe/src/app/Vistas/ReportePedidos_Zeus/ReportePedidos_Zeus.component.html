@@ -167,7 +167,8 @@
                         'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
                         'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
                         'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
-                        'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
+                        'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho',
+                        'negrita font-size-16' : data.producto == ''}">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                     </td>
                     <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                   </tr>
@@ -184,7 +185,8 @@
                                       'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
                                       'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
                                       'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
-                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
+                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho',
+                                      'negrita font-size-16' : data.producto == '' }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                     </td>
                     <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                   </tr>
@@ -202,7 +204,8 @@
                                       'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
                                       'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
                                       'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
-                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
+                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho',
+                                      'negrita font-size-16' : data.producto == '' }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                   </td>
                   <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 </tr>
@@ -216,7 +219,8 @@
                 <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)" [ngClass]="{'text-center': col.field != 'consecutivo'}">
                   <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
                   <span [ngClass]="{'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
-                                    'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
+                                    'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho',
+                                    'negrita font-size-16' : data.producto == '' }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                 </td>
                 <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="productosPedido(data.consecutivo)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>

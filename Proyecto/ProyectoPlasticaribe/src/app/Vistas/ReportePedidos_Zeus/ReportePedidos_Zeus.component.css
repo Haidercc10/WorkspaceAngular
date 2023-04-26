@@ -8,7 +8,6 @@
   width: 100%;
 }
 
-
 .amarillo, .verde2, .gris, .azul, .verde, .rojo, .naranja {
   font-size: calc(var(--font-size) * 14px);
   color: black;
@@ -103,4 +102,9 @@ p-treeTable::-webkit-scrollbar-thumb:hover{
 /* Cambiamos el fondo cuando esté en active */
 p-treeTable::-webkit-scrollbar-thumb:active{
   background-color: #E5E8E8;
+}
+
+
+.negrita {
+  font-weight: bold;
 }
