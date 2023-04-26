@@ -158,13 +158,14 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
       Id_Producto : data.id_Producto,
       Producto : data.producto,
       Cantidad : data.cantidad,
+      Devolucion : data.devolucion,
       Presentacion : data.presentacion,
       Precio : data.precio,
-      SubTotal : data.subTotal,
+      SubTotal : data.subTotal - data.subTotal_Devolucion,
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
-    this.costoTotal += data.subTotal;
+    this.costoTotal += info.SubTotal;
     this.consolidado.push(info);
   }
 

@@ -40,6 +40,14 @@
         *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
         <app-DashBoard_Pedidos></app-DashBoard_Pedidos>
       </p-tabPanel>
+
+      <p-tabPanel
+        header="Facturación Vendedores"
+        leftIcon="pi pi-chart-line"
+        tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
+        <app-ReporteFacturacion_Vendedores></app-ReporteFacturacion_Vendedores>
+      </p-tabPanel>
     </p-tabView>
   </div>
 
