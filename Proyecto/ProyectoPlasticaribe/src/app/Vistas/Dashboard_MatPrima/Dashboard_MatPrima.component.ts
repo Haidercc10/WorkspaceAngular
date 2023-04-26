@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
@@ -13,6 +14,8 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./Dashboard_MatPrima.component.css']
 })
 export class Dashboard_MatPrimaComponent implements OnInit {
+
+  @ViewChild('op') op: OverlayPanel | undefined;
 
   /** Variables generales */
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -42,6 +45,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   chartOptions : any;
   mesActual ;
   cargando : boolean = false;
+  nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
 
   /* GRAFICA */
   ComparativoData: any;
@@ -141,7 +145,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
               } else if (info.id >= 4000) {
                 if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
                 else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
-                else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 300) info.estado = 'Medio';
+                else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
                 else info.estado = 'Alto';
               }
               info.nombre = info.nombre.split(' -');
@@ -285,5 +289,13 @@ export class Dashboard_MatPrimaComponent implements OnInit {
         key: 'nested.value'
       }
     }
+  }
+
+  mostrarDescripcion($event, card : string){
+    this.nroCard = card;
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
   }
 }

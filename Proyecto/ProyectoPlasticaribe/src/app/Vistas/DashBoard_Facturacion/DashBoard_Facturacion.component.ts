@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -10,6 +11,9 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./DashBoard_Facturacion.component.css']
 })
 export class DashBoard_FacturacionComponent implements OnInit {
+
+  @ViewChild('op') op: OverlayPanel | undefined;
+
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -171,4 +175,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
     };
   }
 
+  mostrarDescripcion($event){
+    this.op!.toggle($event);
+    //$event.stopPropagation();
+  }
 }

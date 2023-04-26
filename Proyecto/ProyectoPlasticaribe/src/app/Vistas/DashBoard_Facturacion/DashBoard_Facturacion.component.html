@@ -5,7 +5,7 @@
     <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12">
       <div class="p-3">
         <p-card >
-          <div class="header mb-4">
+          <div class="header mb-5">
             <h3><i class="pi pi-truck"></i> Ventas del Mes</h3>
           </div>
           <div class="mb-3">
@@ -16,7 +16,7 @@
 
       <div class="p-3">
         <p-card>
-          <div class="header mb-4">
+          <div class="header mb-5">
             <h3><i class="pi pi-wallet"></i> Iva Ventas del Mes</h3>
           </div>
           <div class="mb-3">
@@ -27,7 +27,7 @@
 
       <div class="p-3">
         <p-card>
-          <div class="header mb-4">
+          <div class="header mb-5">
             <h3><i class="pi pi-money-bill"></i> Total Ventas del Mes</h3>
           </div>
           <div class="mb-3">
@@ -38,7 +38,7 @@
 
       <div class="p-3">
         <p-card>
-          <div class="header mb-4">
+          <div class="header mb-5">
             <h3><i class="pi pi-dollar"></i> Ventas del Día</h3>
           </div>
           <div class="mb-3">
@@ -52,7 +52,11 @@
     <!-- Grafica y Estados de Ordenes -->
     <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12">
       <div class="p-3">
-        <p-card header="Facturación Mensual">
+        <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event)" pTooltip="Ver descripción"></p-button>
+          </div>
+          <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Facturación Mensual</h2>
           <p-toolbar>
             <div class="p-toolbar-group-left">
               <h5>¡Elige el año que deseas graficar!</h5>
@@ -74,31 +78,9 @@
 </p-dialog>
 <br>
 <!--style="background-color: rgb(255, 252, 222);" -->
-<p-overlayPanel #op  [style]="{background: 'rgb(255, 252, 222)', width: '450px'}" >
-  <!--<ng-template pTemplate>
-    En este apartado encontrarás el <span class="badge bg-naranja">valor total facturado</span> en  <b>cada mes del año.</b><br>
+<p-overlayPanel #op [style]="{background: 'rgba(45,45,45,0.9)', width: '350px', color : 'rgb(247, 247, 247)' }">
+  <ng-template pTemplate>
+    En este apartado encontrarás el <b>valor total facturado</b> en cada mes del año.<br><br>
     Aparte <b>podrás graficar el año que desees</b>, desde la lista desplegable <img src="assets/Iconos_Menu/combo.PNG" alt="" class="imagen"> que se encuentra en la parte superior de la gráfica.
-  </ng-template>-->
-  <!--<ng-template pTemplate>
-    Aquí puedes ver la <b>cantidad de ordenes de trabajo creadas durante el mes</b> y su estado actual<br><br>
-    Adicionalmente haciendo clic sobre <img src="assets/Iconos_Menu/lupa.PNG" alt="" style="width: 30px; height: 30px">, puedes verificar <b>cuanto se ha pesado</b> en cada proceso y el <b>reporte de costos de cada OT.</b>
-  </ng-template>
-  <ng-template pTemplate>
-    En esta sección podrás ver el listado de clientes con <b>más ordenes de trabajo creadas durante el mes actual y el costo total de las mismas</b><br><br>
-    Además puedes <span class="badge bg-naranja">graficar la tabla</span> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
-  </ng-template>
-  <ng-template pTemplate>
-    En este listado se puede apreciar <b>la cantidad de ordenes de trabajo realizadas a cada asesor comercial durante el mes actual</b>, el costo total y cantidad en kilos.<br><br>
-    Además puedes <span class="badge bg-rojo">graficar la tabla</span> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">
-  </ng-template>
-  <ng-template pTemplate>
-    En este apartado <b>podrá visualizar el listado de productos</b> a los cuales se les ha realizado más<span class="badge bg-verde"> ordenes de trabajo</span> durante el mes.
-  </ng-template>
-  <ng-template pTemplate>
-    En esta sección se puede apreciar <b>la cantidad producida en Kilogramos/Unidades</b> en cada <span class="badge bg-azul"></span> proceso de producción en la empresa durante el mes en curso.
-  </ng-template>-->
-
-  <ng-template pTemplate>
-    Listado con la <b>cantidad de veces que se han usado los materiales de producción</b> para la creación de <span class="badge bg-rojo">ordenes de trabajo</span>, su costo, y la cantidad en kilos.
   </ng-template>
 </p-overlayPanel>

@@ -42,4 +42,12 @@ p-knob ::ng-deep .p-knob-text {
   padding-bottom: 2%;
 }
 
+::ng-deep .p-card ::ng-deep .p-card-content {
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.boldAmarillo {
+  color: palegoldenrod;
+}
+
 

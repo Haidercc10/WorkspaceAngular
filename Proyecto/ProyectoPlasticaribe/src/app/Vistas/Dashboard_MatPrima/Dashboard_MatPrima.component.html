@@ -13,6 +13,9 @@
       <!--Materias Primas más usadas en el mes-->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-up"></i> Materias primas más usadas en el mes actual</h2>
           <ng-container *ngIf="materiasPrimasMasUtilizadasMes.length > 0; then Tabla1 else Texto1;" ></ng-container>
           <ng-template #Tabla1>
@@ -51,6 +54,9 @@
       <!-- Grafica Asignada vs Extruida -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo"><i class="pi pi-bolt"></i> Mat. Prima Asignada vs Extruida</h2>
           <p-chart type="bar" width="100%" height="320px" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
         </p-card>
@@ -59,6 +65,9 @@
       <!--Inventario de Materias Primas -->
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción" tooltipPosition="left"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-box"></i> Inventario de Materias Primas</h2>
             <ng-container *ngIf="inventarioMateriaPrima.length > 0; then Tabla5; else Texto5"></ng-container>
              <ng-template #Tabla5>
@@ -119,6 +128,9 @@
        <!--Asignadas hoy-->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo tituloRojo mb-4"><i class="pi pi-cloud-upload"></i> Ranking de materias primas asignadas hoy</h2>
           <ng-container *ngIf="materiasPrimasMovidasHoy.length > 0; then Tabla2 else Texto2;"></ng-container>
           <ng-template #Tabla2>
@@ -160,6 +172,9 @@
       <!--Tintas creadas en el mes actual-->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-4"><i class="pi pi-palette"></i> Ranking de Tintas creadas en el mes actual</h2>
           <ng-container *ngIf="tintasCreadas.length > 0; then Tabla3 else Texto3;"></ng-container>
           <ng-template #Tabla3>
@@ -199,6 +214,9 @@
       <!-- Cantidades BOPP's actualmente -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-4"><i class="pi pi-database"></i> Cantidad de rollos <br>de polipropileno biorientado</h2>
           <!--<p-chart type="pie" [data]="this.arrayBopps" [options]="chartOptions" [style]="{width: '100%', height: '200px'}"></p-chart>-->
 
@@ -247,6 +265,9 @@
        <!-- Mas usada para crear tintas -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
         <p-card>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-7')" pTooltip="Ver descripción" tooltipPosition="left"></p-button>
+          </div>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-4"><i class="pi pi-palette"></i> Materias primas más usadas en el mes para crear tintas.</h2>
           <ng-container *ngIf="materiasPrimasMasUtilizadasCrearTintaMes.length > 0; then Tabla4 else Texto4 ;"></ng-container>
           <ng-template #Tabla4>
@@ -285,5 +306,58 @@
 
     </div>
   </div>
-
 </div>
+
+<p-overlayPanel [showCloseIcon]="true" #op [style]="{background: 'rgba(45,45,45,0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >
+
+  <ng-container *ngIf="nroCard == 'card-1' then card1;"></ng-container>
+  <ng-template #card1>
+    En esta sección se puede apreciar el <b >listado de materias primas más usadas / asignadas durante el mes actual</b> ordenado por la cantidad en kilogramos
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-2' then card2;"></ng-container>
+  <ng-template #card2>
+    En este apartado podrás visualizar una grafica comparativa entre <b>la cantidad en kilos de materia prima que se ha asignado y la cantidad que ha sido extruida.</b><br><br>
+    <b>Nota:</b> Colocando el puntero del mouse <b>sobre la grafica</b> podrás ver la cantidad asignada / extruida en kilos.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-3' then card3;"></ng-container>
+  <ng-template #card3>
+    Aquí puedes ver de forma rápida <b  >el estado, la cantidad con la que inició el día y el stock actual</b> de cada polietileno, tinta y BOPP. <br><br>
+    Los estados están distribuidos así: <br><br>
+      <b>Si es polietileno:</b><br>
+      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
+      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 1000.<br>
+      <span class="badge bg-warning1">Medio:</span> Cantidades entre 1000 y 3000.<br>
+      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 3000.<br><br>
+      <b>Si es Tinta y/o BOPP:</b><br>
+      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
+      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 100.<br>
+      <span class="badge bg-warning1">Medio:</span> Cantidades entre 100 y 200<br>
+      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 200.<br><br>
+      Nota: Sujeto a cambios de gerencia.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-4' then card4;"></ng-container>
+  <ng-template #card4>
+    En esta card se puede visualizar la <b >lista ordenada por kilogramos</b> de las materias primas asignadas el día de hoy.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-5' then card5;"></ng-container>
+  <ng-template #card5>
+    En esta sección podrás ver un <b>listado ordenado por kilogramos de las tintas creadas en este mes.</b>
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-6' then card6;" ></ng-container>
+  <ng-template #card6>
+    Este apartado muestra la cantidad de rollos de <b>BOPP, BOPA y poliester disponibles.</b><br><br>
+    Además se muestra el total de <b>rollos ingresados y utilizados</b> en el mes en curso.
+  </ng-template>
+
+  <ng-container *ngIf="nroCard == 'card-7' then card7;" ></ng-container>
+  <ng-template #card7>
+    Aquí podrás ver el <b>ranking de materias primas que más se han utilizado en el mes en curso</b> para crear tintas.
+  </ng-template>
+
+</p-overlayPanel>
+

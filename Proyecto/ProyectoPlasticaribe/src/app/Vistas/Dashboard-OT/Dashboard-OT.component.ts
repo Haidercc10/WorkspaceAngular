@@ -46,7 +46,7 @@ export class DashboardOTComponent implements OnInit {
   multiAxisData: any;
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
-  nroCard : string = '';
+  nroCard : string = '';  /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
 
   constructor(private AppComponent : AppComponent,
                   private bagProService : BagproService,
