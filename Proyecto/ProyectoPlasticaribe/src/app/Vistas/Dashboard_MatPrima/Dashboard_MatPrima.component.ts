@@ -291,6 +291,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     }
   }
 
+  /** Función que mostrará la descripción de cada una de las card de los dashboard's */
   mostrarDescripcion($event, card : string){
     this.nroCard = card;
     setTimeout(() => {

@@ -27,3 +27,20 @@ p-dialog ::ng-deep div span {
   color: var(--rojo);
   align-items: center;
 }
+
+::ng-deep .p-card ::ng-deep .p-card-content {
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.rosado {
+  color: #FF87B6;
+}
+
+.azul {
+  color: #87B6FF;
+}
+
+.imagen {
+  width: 10%;
+  height: 100%;
+}

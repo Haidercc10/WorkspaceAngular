@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
@@ -11,7 +12,7 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./DashBoard_Pedidos.component.css']
 })
 export class DashBoard_PedidosComponent implements OnInit {
-
+  @ViewChild('op') op: OverlayPanel | undefined;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -50,6 +51,7 @@ export class DashBoard_PedidosComponent implements OnInit {
   opcionesPedidosVendedores : any;
 
   infoTablaModal : any [] = [];
+  nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -171,8 +173,8 @@ export class DashBoard_PedidosComponent implements OnInit {
 
     this.multiAxisOptions = {
       plugins: {
-        legend: {  labels: { color: '#000', font: { size: 20 } } },
-        tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 }, },
+        legend: {  labels: { color: '#000', font: { size: 18 } } },
+        tooltip: { titleFont: { size: 25, }, bodyFont: { size: 20 }, },
       },
     };
   }
@@ -198,15 +200,15 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.opcionesPedidosClientes = {
       stacked: false,
         plugins: {
-          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
-          tooltip: { titleFont: { size: 25, }, usePointStyle: true, bodyFont: { size: 20 } }
+          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+          tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
         },
         tooltip: { usePointStyle: true, },
         scales: {
           x: {
             ticks: {
               color: '#495057',
-              font: { size: 20 },
+              font: { size: 18 },
               callback: function(value) {
                 if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
                 else return this.getLabelForValue(value);
@@ -218,18 +220,17 @@ export class DashBoard_PedidosComponent implements OnInit {
             type: 'linear',
             display: true,
             position: 'left',
-            ticks: { color: '#495057', font: { size: 20 }, },
+            ticks: { color: '#495057', font: { size: 18 }, },
             grid: { color: '#ebedef' }
           },
           y1: {
             type: 'linear',
             display: true,
             position: 'right',
-            ticks: { color: '#495057', font: { size: 20 } },
+            ticks: { color: '#495057', font: { size: 18 } },
             grid: { color: '#ebedef' }
           },
         },
-        datalabels: { anchor: 'end', align: 'end' }
     };
   }
 
@@ -246,20 +247,20 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosProductos = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos hechos ', backgroundColor: [ '#FF646E' ], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#A453FD', ], yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Pedidos vigentes ', backgroundColor: [ '#FF646E' ], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#A453FD', ], yAxisID: 'y1', data: costo },
       ]
     };
     this.opcionesPedidosProductos = {
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
-          tooltip: { titleFont: { size: 25, }, usePointStyle: true, bodyFont: { size: 20 } }
+        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+          tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       scales: {
         x: {
           ticks: {
             color: '#495057',
-            font: { size: 20 },
+            font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
               else return this.getLabelForValue(value);
@@ -271,7 +272,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 20 }, },
+          ticks: { color: '#495057', font: { size: 18 }, },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -279,9 +280,9 @@ export class DashBoard_PedidosComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { color: '#495057', font: { size: 20 }, },
+          ticks: { color: '#495057', font: { size: 18 }, },
         }
-      }
+      },
     };
   }
 
@@ -308,14 +309,14 @@ export class DashBoard_PedidosComponent implements OnInit {
     };
     this.opcionesPedidosVendedores = {
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
-        tooltip: { titleFont: { size: 25, }, usePointStyle: true, bodyFont: { size: 20 } }
+        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       scales: {
         x: {
           ticks: {
             color: '#495057',
-            font: { size: 20 },
+            font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
               else return this.getLabelForValue(value);
@@ -327,7 +328,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 20 }, },
+          ticks: { color: '#495057', font: { size: 18 }, },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -335,7 +336,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { color: '#495057', font: { size: 20 }, },
+          ticks: { color: '#495057', font: { size: 18 }, },
         }
       }
     };
@@ -377,5 +378,14 @@ export class DashBoard_PedidosComponent implements OnInit {
       }
     }
     this.infoTablaModal.sort((a,b) => Number(b.Cantidad) - Number(a.Cantidad));
+  }
+
+   /** Función que mostrará la descripción de cada una de las card de los dashboard's */
+  mostrarDescripcion($event, card : string){
+    this.nroCard = card;
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
   }
 }
