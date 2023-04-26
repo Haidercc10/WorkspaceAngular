@@ -1,9 +1,8 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -47,9 +46,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
   multiAxisData: any;
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
-  AppComponent: any;
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,) { }
 
   ngOnInit() {

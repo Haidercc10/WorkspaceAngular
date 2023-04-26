@@ -145,9 +145,11 @@
           </ng-template>
           <!-- Cuerpo de la tabla con los datos -->
           <ng-template pTemplate="body" let-rowNode let-data="rowData">
+
             <!-- Validará que sea o no un pedido de Zeus -->
             <ng-container *ngIf="data.Zeus == 1; then EnZeus; else NoZeus"></ng-container>
             <ng-template #EnZeus>
+
               <ng-container *ngIf="data.ExistenciaMayor; then thenTemplate; else elseTemplate"></ng-container>
               <!-- Existencias mayores o iguales a la cantidad pendiente -->
               <ng-template #thenTemplate>
@@ -205,7 +207,9 @@
                   <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 </tr>
               </ng-template>
+
             </ng-template>
+
             <!-- Se muestra cuando no es un pedido de zeus -->
             <ng-template #NoZeus>
               <tr style="background-color: #FAACAC;">
