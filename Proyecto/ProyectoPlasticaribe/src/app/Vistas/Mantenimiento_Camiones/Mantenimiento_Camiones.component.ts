@@ -10,6 +10,7 @@ import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenim
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { MantenimientoService } from 'src/app/Servicios/Mantenimiento/Mantenimiento.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -46,7 +47,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   tipoMovimientos : any [] = [{Id : 1, Nombre: 'Pedido de Mantenimiento'}, {Id : 2, Nombre: 'Mantenimiento'}];
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private servicioDetPedMtto : DetallePedido_MantenimientoService,
                     private servicioMtto : MantenimientoService,
                       private servicioDetMtto : Detalle_MantenimientoService,
@@ -66,9 +67,9 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   /** cargar la información de los proveedores al momento de llamar el modal */

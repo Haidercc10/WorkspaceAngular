@@ -1,8 +1,8 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MenuItem, MessageService } from 'primeng/api';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
+import { AppComponent } from 'src/app/app.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { vistasDisponibles } from './VistasDisponibles';
 
@@ -33,7 +33,7 @@ export class PaginaPrincipalComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes: string = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
                   private messageService: MessageService,) { }
 
@@ -51,11 +51,11 @@ export class PaginaPrincipalComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas

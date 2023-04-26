@@ -5,6 +5,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -23,7 +24,7 @@ export class TicketsComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   archivoSeleccionado : any;
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private frmBuiler : FormBuilder,
                   private ticketService : TicketsService,
                     private messageService: MessageService,) {
@@ -41,10 +42,9 @@ export class TicketsComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-    this.storage_Rol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a limpiar los campos y todas las variables

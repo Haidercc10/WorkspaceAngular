@@ -11,6 +11,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
@@ -52,7 +53,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 private unidadMedidaService : UnidadMedidaService,
                   private procesosService : ProcesosService,
                     private frmBuilderMateriaPrima : FormBuilder,
-                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                      private AppComponent : AppComponent,
                         private asignacionMPService : AsignacionMPService,
                           private detallesAsignacionService : DetallesAsignacionService,
                             private bagProServices : BagproService,
@@ -90,9 +91,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

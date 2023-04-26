@@ -15,6 +15,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { OrdenMaquila_FacturacionService } from 'src/app/Servicios/OrdenMaquila_Facturacion/OrdenMaquila_Facturacion.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -38,7 +39,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
   documento : number = 0;
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
                   private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                     private ordenMaquila_facService : OrdenMaquila_FacturacionService,
@@ -66,9 +67,9 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -376,7 +377,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
 
   // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
   crearPDF(id : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
       for (let i = 0; i < datos_facturacion.length; i++) {
         const pdfDefinicion : any = {

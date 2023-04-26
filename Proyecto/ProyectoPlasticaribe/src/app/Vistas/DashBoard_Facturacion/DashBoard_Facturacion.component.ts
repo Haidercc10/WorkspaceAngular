@@ -47,6 +47,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   multiAxisData: any;
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
+  AppComponent: any;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private zeusService : InventarioZeusService,) { }
@@ -59,9 +60,9 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
@@ -89,7 +90,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
       for (let i = 0; i < 12; i++) {
-        this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
+        let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
+        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
           if (i == 0) this.totalFacturado1 = datos_facturacion;
           if (i == 1) this.totalFacturado2 = datos_facturacion;
           if (i == 2) this.totalFacturado3 = datos_facturacion;

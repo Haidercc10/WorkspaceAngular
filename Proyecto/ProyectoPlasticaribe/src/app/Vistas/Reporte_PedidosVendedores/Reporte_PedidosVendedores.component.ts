@@ -12,6 +12,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import Swal from 'sweetalert2';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -46,7 +47,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   costoCantidadPendiente : number = 0;
 
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private servicioDtlPedidos : PedidoProductosService,
                   private pedidoExternoService : OpedidoproductoService,
                     private servicioZeus : InventarioZeusService,
@@ -59,9 +60,9 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -898,7 +899,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   /** Mostrar el PDF que contiene la información detallada del pedido. */
   mostrarPedidoPdf(item : any){
     this.llenarArrayPdf(item);
-    let usuario : string = this.storage.get('Nombre');
+    let usuario : string = this.storage_Nombre;
     this.servicioZeus.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
       for (let index = 0; index < dataPedidos.length; index++) {
         const infoPdf : any = {

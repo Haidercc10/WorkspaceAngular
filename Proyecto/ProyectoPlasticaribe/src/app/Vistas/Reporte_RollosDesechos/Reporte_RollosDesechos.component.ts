@@ -12,6 +12,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import Swal from 'sweetalert2';
 
@@ -57,7 +58,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                     private servicioProducto : ProductoService,
                       private servicioBagPro : BagproService,
                         private servicioRollos : SrvRollosEliminadosService,
-                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                          private AppComponent : AppComponent,
                             private servicioProcesos : ProcesosService,
                               private messageService: MessageService) {
 
@@ -80,9 +81,9 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   /** Seleccionar el id del producto luego de seleccionar su nombre */
@@ -699,7 +700,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Exportar reporte de rollos en PDF */
   exportarPdf() {
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
       const pdfDefinicion : any = {
         info: {
           title: `Rollos eliminados`

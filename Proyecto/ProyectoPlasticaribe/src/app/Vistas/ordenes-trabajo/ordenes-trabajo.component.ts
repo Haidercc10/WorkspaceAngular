@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
@@ -120,7 +121,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   nroCapasOT : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private bagProService : BagproService,
                     private pedidoExternoService : OpedidoproductoService,
                       private servicioTintas : TintasService,
@@ -376,9 +377,9 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colocará los campos del formulario principal con datos predeterminados
@@ -1504,7 +1505,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot : number = this.FormOrdenTrabajo.value.OT_Id){
-    let usuario : string = this.storage.get('Nombre');
+    let usuario : string = this.AppComponent.storage_Nombre;
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         if (datos_ot[i].cyrel) {

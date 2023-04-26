@@ -12,6 +12,7 @@ import { authentication_ContaZeus } from 'src/app/_Services/authentication_Conta
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -39,7 +40,8 @@ export class LoginComponentComponent implements OnInit {
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,
                                 private http : HttpClient,
-                                  private messageService: MessageService) {
+                                  private messageService: MessageService,
+                                    private encriptacion : EncriptacionService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -105,9 +107,9 @@ export class LoginComponentComponent implements OnInit {
               "MovApp_Hora" : moment().format('H:mm:ss'),
             }
             this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos_Mov => {
-              this.saveInLocal('Id', idUsuario);
-              this.saveInLocal('Nombre', nombre);
-              this.saveInLocal('Rol', rol);
+              this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
+              this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
+              this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
               window.location.pathname = '/home';
             }, err => { this.mensajeError(`¡Error al registrar el inicio de sesión!`); });
           }, err => { this.mensajeError(`¡Error al conectarse con BagPro!`); });

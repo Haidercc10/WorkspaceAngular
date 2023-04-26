@@ -33,11 +33,9 @@ export class ArchivosComponent implements OnInit {
   validarArchivo_Carpeta : boolean;
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private rolService : RolesService,
-                    private archivosService : ArchivosService,
-                      private rutaArchivos : AppComponent,
-                        private categoriaArchivosService : Categorias_ArchivosService) {
+                private AppComponent : AppComponent,
+                  private archivosService : ArchivosService,
+                    private categoriaArchivosService : Categorias_ArchivosService) {
 
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
@@ -55,9 +53,9 @@ export class ArchivosComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Funcion que traerá las categorias existentes
@@ -75,7 +73,7 @@ export class ArchivosComponent implements OnInit {
   }
 
   //Funcion que mostrará los archivos que estan sobre la carpeta seleccionada
-  cargarArchivos(ruta : string = this.rutaArchivos.rutaCarpetaArchivos){
+  cargarArchivos(ruta : string = this.AppComponent.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.archivosService.mostrarArchivos(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
@@ -94,7 +92,7 @@ export class ArchivosComponent implements OnInit {
   }
 
   // Funcion que mostrará todas las subcarpetas
-  mostrarCarpetas(ruta : string = this.rutaArchivos.rutaCarpetaArchivos){
+  mostrarCarpetas(ruta : string = this.AppComponent.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.nombreCarpeta = ruta;
     this.ruta = ruta.replace(`D:\\Calidad\\`, 'Calidad\\');

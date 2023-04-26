@@ -61,14 +61,14 @@ export let rutaPlasticaribeAPI = "http://192.168.0.187:9060/api"; //Ruta al serv
  export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
 //export let rutaBagPro = "https://localhost:7160/api";
 // export let rutaBagPro = "http://192.168.0.195:9056/api"; //Ruta al servidor de la base de datos de BagPro --- LOCAL
-//export let rutaBagPro = "http://192.168.0.153:9095/api"; //Ruta al servidor de la base de datos de BagPro --- PRUEBA  LOCAL
+// export let rutaBagPro = "http://192.168.0.153:9095/api"; //Ruta al servidor de la base de datos de BagPro --- PRUEBA  LOCAL
 
 
 /* RUTA PRINCIPAL DE API ZEUS */
-export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
+// export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
 //export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 // export let rutaZeus = "http://192.168.0.195:9055/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-// export let rutaZeus = "http://192.168.0.153:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
+export let rutaZeus = "http://192.168.0.153:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 
 /* RUTA PRINCIPAL API ZEUS CONSTABILIDAD */
 export let rutaZeusContabilidad = "http://192.168.0.85:9065/api"; //Ruta de prueba del API

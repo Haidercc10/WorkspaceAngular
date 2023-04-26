@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
@@ -36,7 +37,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   tipoDocumento : string [] = ['Ingreso de Rollos', 'Salida de Rollos'];
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private estadosService : EstadosService,
                     private ingRollosService : DtIngRollos_ExtrusionService,
                       private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
@@ -59,9 +60,9 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -278,7 +279,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   // Funcion que creará el pdf del ingreso
   crearPdfEntrada(id : any){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
     this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         for (let j = 0; j < this.rollosPdf.length; j++) {
@@ -415,7 +416,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   //Funcion que creará el pdf de la asignacion
   crearPDFSalida(id : number){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.storage_Nombre;
     this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         for (let j = 0; j < this.rollosPdf.length; j++) {

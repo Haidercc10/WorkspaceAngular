@@ -6,6 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -32,7 +33,7 @@ export class MovimientoMPComponent implements OnInit {
   datosPdf : any [] = []; //Variable en la que se almacenará la información que se verá en el pdf
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private messageService: MessageService,
                     private materiaPrimaService : MateriaPrimaService,) {
 
@@ -290,7 +291,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a crear un PDF para las asignaciones de materia prima
   crearPDFAsignaciones(data : any){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     for (let i = 0; i < data.length; i++) {
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
@@ -453,7 +454,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a crear un PDF para las devoluciones de materia prima
   crearPDFDevoluciones(data : any){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     for (let i = 0; i < data.length; i++) {
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
@@ -608,7 +609,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a crear un PDF para las creaciones de tintas
   crearPDFCreacionTinta(data : any) {
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     for (let i = 0; i < data.length; i++) {
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
@@ -757,7 +758,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a crear un PDF para las entradas de materias primas
   crearPDFEntradasMateriasPrimas(data : any) {
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     for (let i = 0; i < data.length; i++) {
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].codigo}` },

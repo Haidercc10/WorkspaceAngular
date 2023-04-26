@@ -9,6 +9,7 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-devolucionesMP',
@@ -31,7 +32,7 @@ export class DevolucionesMPComponent implements OnInit {
   load : boolean = true;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private frmBuilderMateriaPrima : FormBuilder,
                     private devolucionService : DevolucionesService,
                       private devolucionMPService : DevolucionesMPService,
@@ -53,9 +54,9 @@ export class DevolucionesMPComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

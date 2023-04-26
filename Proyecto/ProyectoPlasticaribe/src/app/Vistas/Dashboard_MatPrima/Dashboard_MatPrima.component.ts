@@ -1,16 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
-import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -55,7 +50,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
 
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                     private ordenTrabajoService : EstadosProcesos_OTService,
                         private materiaPrimaService : MateriaPrimaService,
                           private boppService : EntradaBOPPService,
@@ -66,11 +61,11 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.lecturaStorage();
   }
 
-   //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   /** Función para recargar el tab de materias primas */

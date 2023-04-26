@@ -7,6 +7,7 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,7 +29,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   observacionFactura : string = ''; //Variable que almacenará la observcación añadida de la devolución de factura
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
                   private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
                     private rollosService : DetallesEntradaRollosService,
@@ -42,10 +43,9 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-    this.storage_Rol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

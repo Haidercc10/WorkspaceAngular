@@ -17,6 +17,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import Swal from 'sweetalert2';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -78,7 +79,7 @@ export class PedidoExternoComponent implements OnInit {
                           private frmBuilderPedExterno : FormBuilder,
                             private existenciasProductosServices : ExistenciasProductosService,
                               private PedidoProductosService : PedidoProductosService,
-                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                private AppComponent : AppComponent,
                                   private ClientesProductosService : ClientesProductosService,
                                     private zeusService : InventarioZeusService,
                                       private zeusCobtabilidadService : ZeusContabilidadService,) {
@@ -122,9 +123,9 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
@@ -192,11 +193,11 @@ export class PedidoExternoComponent implements OnInit {
   /* EMPIEZA A HACE LAS RESPECTIVAS VALIDACIONES PARA MOSTRAR DATOS EN LOS COMBOBOX DESDE QUE ARRANCA LA PAGINA */
   clientesComboBox() {
     this.cliente = [];
-    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
           if (datos_usuarios.rolUsu_Id == 2) {
-            if (datos_clientes[index].usua_Id == this.storage.get('Id')) this.cliente.push(datos_clientes[index]);
+            if (datos_clientes[index].usua_Id == this.storage_Id) this.cliente.push(datos_clientes[index]);
           } else this.cliente.push(datos_clientes[index]);
           this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
         }

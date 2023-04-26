@@ -12,6 +12,7 @@ import { AuthenticationService_InvZeus } from './authentication_InvZeus.service'
 import { authentication_ContaZeus } from './authentication_ContaZeus.service';
 import { authentication_BagPro } from './authentication_BagPro.service';
 import Swal from 'sweetalert2';
+import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 
 @Injectable({ providedIn: 'root' })
 
@@ -28,9 +29,11 @@ export class AuthenticationService {
                     private movAplicacionService : MovimientosAplicacionService,
                       private authenticationInvZeusService : AuthenticationService_InvZeus,
                         private authenticationContaZeusService : authentication_ContaZeus,
-                          private authenticationBagPro : authentication_BagPro,) {
+                          private authenticationBagPro : authentication_BagPro,
+                            private encriptacion : EncriptacionService,) {
 
-    this.userSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('user')!));
+    let token = this.encriptacion.decrypt(localStorage.getItem('user') == undefined ? '' : localStorage.getItem('user'));
+    this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
     this.user = this.userSubject.asObservable();
   }
 
@@ -45,18 +48,20 @@ export class AuthenticationService {
 
   login(datos : any) {
     return this.http.post<any>(`${this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
-      this.saveInLocal('Token', user.token);
-      localStorage.setItem('user', JSON.stringify(user));
+      this.saveInLocal('Token', this.encriptacion.encrypt(user.token));
+      localStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);
       return user;
     }));
   }
 
   logout() {
+    let id = this.encriptacion.decrypt(this.storage.get('Id'));
+    let Nombre = this.encriptacion.decrypt(this.storage.get('Nombre'));
     let infoMovimientoAplicacion : any = {
-      "Usua_Id" : this.storage.get('Id'),
+      "Usua_Id" : id,
       "MovApp_Nombre" : `Cierre de sesión`,
-      "MovApp_Descripcion" : `El usuario "${this.storage.get('Nombre')}" con el ID ${this.storage.get('Id')} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+      "MovApp_Descripcion" : `El usuario "${Nombre}" con el ID ${id} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
       "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }

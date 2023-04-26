@@ -9,6 +9,7 @@ import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCr
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-asignacion-Tintas',
@@ -33,7 +34,7 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
   mpSeleccionada : any = [];
 
-  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+  constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
                   private unidadMedidaService : UnidadMedidaService,
                     private materiaPrimaService : MateriaPrimaService,
@@ -69,9 +70,9 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

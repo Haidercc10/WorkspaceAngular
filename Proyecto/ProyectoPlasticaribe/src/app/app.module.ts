@@ -168,6 +168,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
+import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
 
 export const routes: Routes = [
 
@@ -273,7 +274,10 @@ export const routes: Routes = [
 
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,3,4,5,6,7,8,9,10,11,12,13,59,60]}, component: TicketsComponent},
-  {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent}
+  {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent},
+
+  /** */
+  {path: 'ReporteVentas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReporteFacturacion_VendedoresComponent},
 ]
 
 @NgModule({
@@ -374,6 +378,7 @@ export const routes: Routes = [
     TicketsComponent,
     Gestion_TicketsComponent,
     DashboardOTComponent,
+    ReporteFacturacion_VendedoresComponent
   ],
 
   imports: [

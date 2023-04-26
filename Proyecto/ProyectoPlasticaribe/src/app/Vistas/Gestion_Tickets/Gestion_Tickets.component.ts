@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { Tickets_ResueltosService } from 'src/app/Servicios/Tickets_Resueltos/Tickets_Resueltos.service';
+import { AppComponent } from 'src/app/app.component';
 @Component({
   selector: 'app-Gestion_Tickets',
   templateUrl: './Gestion_Tickets.component.html',
@@ -30,7 +31,7 @@ export class Gestion_TicketsComponent implements OnInit {
   visible : boolean = false; //Variable que validará cuando se verá el modal de ticket resuelto y cuando no
 
   constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private ticketService : TicketsService,
                     private messageService: MessageService,
                       private ticketsResueltosService : Tickets_ResueltosService,) {
@@ -47,10 +48,9 @@ export class Gestion_TicketsComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-    this.storage_Rol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a limpiar los campos y llamar a todas las funciones de consulta iniciales a que se ejecuten de nuevo

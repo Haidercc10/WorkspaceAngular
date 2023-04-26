@@ -8,6 +8,7 @@ import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service'
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-consultaFac_Rem_MP',
@@ -37,7 +38,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   load: boolean = true;;
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private AppComponent : AppComponent,
                   private tipoDocuemntoService : TipoDocumentoService,
                     private proveedorService : ProveedorService,
                       private remisionMpService : RemisionesMPService,
@@ -73,9 +74,9 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //
@@ -363,7 +364,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
-    let nombre : string = this.storage.get('Nombre');
+    let nombre : string = this.AppComponent.storage_Nombre;
     if (formulario.tipoDoc == 'Factura') {
       this.facturaCompraMPService.srvObtenerpdfMovimientos(formulario.codigo).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
