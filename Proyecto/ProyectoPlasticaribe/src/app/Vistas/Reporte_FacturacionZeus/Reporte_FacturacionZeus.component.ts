@@ -272,15 +272,18 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
       else {
         for (let i = 0; i < datos_consolidado.length; i++) {
-          this.llenarConsolidado(datos_consolidado[i]);
+          this.llenarConsolidado(datos_consolidado[i], i);
         }
       }
-      setTimeout(() => { this.cargando = false; }, datos_consolidado.length);
+      setTimeout(() => {
+        this.cargando = false;
+        this.calcularSubTotal();
+      }, datos_consolidado.length * 2);
     });
   }
 
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
-  llenarConsolidado(data : any){
+  llenarConsolidado(data : any, i : any){
     if (data.mes == 1) data.mes = 'Enero';
     if (data.mes == 2) data.mes = 'Febrero';
     if (data.mes == 3) data.mes = 'Marzo';
@@ -295,6 +298,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (data.mes == 12) data.mes = 'Diciembre';
 
     let info : any = {
+      Id : i,
       Mes : data.mes,
       Ano : `${data.ano}`,
       Id_Cliente : data.id_Cliente,
@@ -306,12 +310,40 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Presentacion : data.presentacion,
       Precio : data.precio,
       SubTotal : data.subTotal,
+      SubTotalDev : data.cantidad == 0 ? data.subTotal : 0,
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
     if (info.Devolucion == 0) this.valorTotalConsulta += info.SubTotal;
-    else if (info.Devolucion > 0) this.valorTotalConsulta -= info.SubTotal;
     this.arrayConsolidado.push(info);
+  }
+
+  // Funcion que va a calcular el subtotal real de cada producto
+  calcularSubTotal(){
+    let items : number [] = [];
+    let nuevo : any [] = [];
+    let devolucion : number = 0;
+    for (let i = 0; i < this.arrayConsolidado.length; i++) {
+      if (!items.includes(this.arrayConsolidado[i].Id)) {
+        nuevo = this.arrayConsolidado.filter((item) =>
+          item.Ano == this.arrayConsolidado[i].Ano
+          && item.Mes == this.arrayConsolidado[i].Mes
+          && item.Id_Cliente == this.arrayConsolidado[i].Id_Cliente
+          && item.Cantidad == 0
+          && item.SubTotal == this.arrayConsolidado[i].SubTotal
+          && item.SubTotalDev > 0
+        );
+        for (let j = 0; j < nuevo.length; j++) {
+          this.arrayConsolidado[nuevo[j].Id].SubTotal = nuevo[j].Devolucion * nuevo[j].Precio;
+          items.push(nuevo[j].Id);
+        }
+        if (nuevo.length) {
+          this.valorTotalConsulta -= nuevo[0].SubTotalDev;
+        devolucion += nuevo[0].SubTotalDev
+        }
+      }
+    }
+    console.log(devolucion)
   }
 
   // Funcion que va a calcular el subtotal de lo vendido en un año
