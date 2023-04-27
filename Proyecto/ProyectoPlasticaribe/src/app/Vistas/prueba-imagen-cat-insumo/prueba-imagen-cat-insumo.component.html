@@ -1,3 +1,190 @@
-<input type="text" [(ngModel)]="data" (keyup)="encriptar()">
-<input type="text" [(ngModel)]="encriptada">
-<input type="text" [(ngModel)]="desencriptada">
+<app-menuLateral></app-menuLateral>
+
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Pedidos de Productos</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="formulario">
+  <div class="d-grid d-md-flex justify-content-md-center">
+    <div class="table-responsive">
+      <table class="table table-borderless table-hover mt-2 tableColores font-size-14">
+        <thead class="TitulosTabla">
+          <td class="verde">
+            <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar todo el pedido</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample4">
+                  <div class="card card-body">
+                    Este color indica que todos los item del pedido pueden ser facturados y enviados dado que la cantidad que hay en existencias es igual o superior a la cantidad pendiente del respectivo item.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="azul">
+            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar minimo un item del pedido</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample5">
+                  <div class="card card-body">
+                    Este color indica que minimo uno de los items del pedido puede ser facturado, ese siempre estará para pedidos con más de un item.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="rojo">
+            <a class="btn rojo" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Pedidos que no han sido aprobados</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample6">
+                  <div class="card card-body">
+                    Este color indica que un pedido no ha sido revisado por una persona autorizada, al ser revisado el pedido será aprobado o anulado.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <p-toolbar>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
+    </ng-template>
+
+    <ng-template pTemplate="left">
+      <h3 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
+    </ng-template>
+  </p-toolbar>
+  <br>
+
+  <div *ngIf="!cargando" id="tableProcesos" class="font-size-14">
+    <div class="mb-4 ">
+      <div class="row g-3">
+        <p-table
+          [value]="ArrayDocumento"
+          [columns]="columnasSeleccionada"
+          sortField="consecutivo"
+          sortMode="single"
+          dataKey="representative.name"
+          rowGroupMode="subheader"
+          groupRowsBy="representative.name"
+          [tableStyle]="{'min-width': '70rem'}">
+          <ng-template pTemplate="caption">
+            <div style="text-align:left">
+              <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width:20%">Name</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded">
+            <tr>
+              <td colspan="5">
+                <button type="button" pButton pRipple [pRowToggler]="pedido" class="p-button-text p-button-rounded p-button-plain mr-2" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                <span class="font-bold ml-2">{{pedido.consecutivo}}</span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupfooter" let-customer>
+            <tr class="p-rowgroup-footer">
+              <td colspan="4" style="text-align: right">Total Customers</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="rowexpansion" let-customer>
+            <tr>
+              <td>{{customer.name}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal desde el que se podrá editar un pedido -->
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel2">Editar Pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="ngOnInit()"></button>
+      </div>
+      <div class="modal-body">
+        <app-Pedido-Externo></app-Pedido-Externo>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="aceptar" (onClose)="onReject('aceptar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="aceptarPedido(itemSeleccionado)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('aceptar')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="cancelar" (onClose)="onReject('cancelar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="cancelarPedido(itemSeleccionado)" icon="pi pi-exclamation-circle" label="Si" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('cancelar')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

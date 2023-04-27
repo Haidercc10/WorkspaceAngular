@@ -138,6 +138,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
   llenarConsolidado(data : any){
+    let num_Mes : number = data.mes;
     if (data.mes == 1) data.mes = 'Enero';
     if (data.mes == 2) data.mes = 'Febrero';
     if (data.mes == 3) data.mes = 'Marzo';
@@ -150,9 +151,11 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     if (data.mes == 10) data.mes = 'Octubre';
     if (data.mes == 11) data.mes = 'Noviembre';
     if (data.mes == 12) data.mes = 'Diciembre';
+
     let info : any = {
+      Num_Mes : num_Mes,
       Mes : data.mes,
-      Ano : `${data.ano} - ${data.mes} - ${data.vendedor}`,
+      Ano : ` ${data.mes} - ${data.ano} - ${data.vendedor}`,
       Id_Cliente : data.id_Cliente,
       Cliente : data.cliente,
       Id_Producto : data.id_Producto,
@@ -161,11 +164,12 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
       Devolucion : data.devolucion,
       Presentacion : data.presentacion,
       Precio : data.precio,
-      SubTotal : data.subTotal - data.subTotal_Devolucion,
+      SubTotal : data.subTotal,
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
-    this.costoTotal += info.SubTotal;
+    if (info.Devolucion == 0) this.costoTotal += info.SubTotal;
+    else if (info.Devolucion > 0) this.costoTotal -= info.SubTotal;
     this.consolidado.push(info);
   }
 
@@ -218,7 +222,10 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   calcularTotalVendidoAno(ano : any){
     let total : number = 0;
     for (let i = 0; i < this.consolidado.length; i++) {
-      if (this.consolidado[i].Ano == ano) total += this.consolidado[i].SubTotal;
+      if (this.consolidado[i].Ano == ano) {
+        if (this.consolidado[i].Devolucion == 0) total += this.consolidado[i].SubTotal;
+        else if (this.consolidado[i].Devolucion > 0) total -= this.consolidado[i].SubTotal;
+      }
     }
     return total;
   }

@@ -209,8 +209,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       if(this.dt.filteredValue != null) {
         this.totalAnio = false;
         this.totalConsulta = 0;
+        this.valorTotalConsulta = 0;
         for (let i = 0; i < this.dt.filteredValue.length; i++) {
           this.totalConsulta += this.dt.filteredValue[i].SubTotal;
+          this.valorTotalConsulta += this.dt.filteredValue[i].SubTotal;
         }
       } else {
         this.totalAnio = true;
@@ -291,21 +293,24 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (data.mes == 10) data.mes = 'Octubre';
     if (data.mes == 11) data.mes = 'Noviembre';
     if (data.mes == 12) data.mes = 'Diciembre';
+
     let info : any = {
       Mes : data.mes,
-      Ano : data.ano,
+      Ano : `${data.ano}`,
       Id_Cliente : data.id_Cliente,
       Cliente : data.cliente,
       Id_Producto : data.id_Producto,
       Producto : data.producto,
       Cantidad : data.cantidad,
+      Devolucion : data.devolucion,
       Presentacion : data.presentacion,
       Precio : data.precio,
       SubTotal : data.subTotal,
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
-    this.valorTotalConsulta += data.subTotal;
+    if (info.Devolucion == 0) this.valorTotalConsulta += info.SubTotal;
+    else if (info.Devolucion > 0) this.valorTotalConsulta -= info.SubTotal;
     this.arrayConsolidado.push(info);
   }
 
@@ -313,7 +318,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   calcularTotalVendidoAno(ano : any){
     let total : number = 0;
     for (let i = 0; i < this.arrayConsolidado.length; i++) {
-      if (this.arrayConsolidado[i].Ano == ano) total += this.arrayConsolidado[i].SubTotal;
+      if (this.arrayConsolidado[i].Ano == ano) {
+        if (this.arrayConsolidado[i].Devolucion == 0) total += this.arrayConsolidado[i].SubTotal;
+        else if (this.arrayConsolidado[i].Devolucion > 0) total -= this.arrayConsolidado[i].SubTotal;
+      }
     }
     return total;
   }
