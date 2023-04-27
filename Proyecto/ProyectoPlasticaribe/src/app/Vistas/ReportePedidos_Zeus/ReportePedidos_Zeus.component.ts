@@ -1,9 +1,8 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { TreeTable } from 'primeng/treetable';
@@ -12,11 +11,11 @@ import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProducto
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import Swal from 'sweetalert2';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -150,6 +149,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         "CantPedidaKg_OT" : '',
         "CantPedidaUnd_OT" : '',
         "ExistenciaMayor" : false,
+        "Existencias_Completas" : 0,
         "Cant_Items_ExistenciaMayor" : 0,
         "Cant_Items" : 0,
         "Zeus" : 1,
@@ -200,6 +200,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           this.ArrayDocumento[i].data.ExistenciaMayor = true;
           this.ArrayDocumento[i].data.Cant_Items_ExistenciaMayor += 1;
         }
+        if (this.ArrayDocumento[i].data.Cant_Items == this.ArrayDocumento[i].data.Cant_Items_ExistenciaMayor) this.ArrayDocumento[i].data.Existencias_Completas = 1;
+        else this.ArrayDocumento[i].data.Existencias_Completas = 0;
 
         this.ArrayDocumento[i].data.costo_Cant_Pendiente += datos.costo_Cant_Pendiente;
         this.ArrayDocumento[i].data.costo_Cant_Total += datos.costo_Cant_Total;
@@ -279,6 +281,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         this.ArrayDocumento[i].children.push(dataPedidos);
         this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
         this.ArrayDocumento.sort((a,b) => Number(b.data.ExistenciaMayor) - Number(a.data.ExistenciaMayor));
+        this.ArrayDocumento.sort((a,b) => Number(b.data.Existencias_Completas) - Number(a.data.Existencias_Completas));
       }
     }
   }
@@ -323,6 +326,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         "CantPedidaKg_OT" : '',
         "CantPedidaUnd_OT" : '',
         "ExistenciaMayor" : false,
+        "Existencias_Completas" : false,
         "Cant_Items_ExistenciaMayor" : 0,
         "Cant_Items" : 0,
         "Zeus" : 0,

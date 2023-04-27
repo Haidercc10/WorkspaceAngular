@@ -123,12 +123,13 @@
           <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Producto', 'contains')"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Devolucion', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
-          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
         </tr>
         <tr>
           <th>#</th>
@@ -138,6 +139,7 @@
           <th>Id Producto</th>
           <th>Producto</th>
           <th>Cantidad</th>
+          <th>Devolución</th>
           <th>Presentación</th>
           <th>Precio</th>
           <th>SubTotal</th>
@@ -145,7 +147,7 @@
       </ng-template>
       <ng-template pTemplate="groupheader" let-consolidado>
         <tr pRowGroupHeader style="background-color: #83D3FF;">
-          <td colspan="10">
+          <td colspan="11">
             <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
           </td>
         </tr>
@@ -159,6 +161,7 @@
           <td>{{consolidado.Id_Producto}}</td>
           <td>{{consolidado.Producto}}</td>
           <td><b>{{consolidado.Cantidad | number}}</b></td>
+          <td><b>{{consolidado.Devolucion | number}}</b></td>
           <td>{{consolidado.Presentacion}}</td>
           <td>{{consolidado.Precio | number}}</td>
           <td><b>{{consolidado.SubTotal | number}}</b></td>
@@ -166,7 +169,7 @@
       </ng-template>
       <ng-template pTemplate="groupfooter" let-consolidado>
         <tr style="background-color: palegreen;">
-          <td colspan="9" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
+          <td colspan="10" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
           <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
           <ng-template #Filtro>
             <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
@@ -175,7 +178,7 @@
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
-          <td colspan="9">Totales</td>
+          <td colspan="10">Totales</td>
           <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
         </tr>
       </ng-template>

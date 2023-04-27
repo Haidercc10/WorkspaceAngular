@@ -79,6 +79,7 @@
             <tr>
               <th>#</th>
               <th pSortableColumn="consecutivo"><p-sortIcon field="consecutivo"></p-sortIcon> Pedido</th>
+              <th pSortableColumn="consecutivo"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
               <th pSortableColumn="producto"><p-sortIcon field="producto"></p-sortIcon> Producto</th>
               <th pSortableColumn="existencias"><p-sortIcon field="existencias"></p-sortIcon> Existencias</th>
               <th pSortableColumn="cant_Pendiente"><p-sortIcon field="cant_Pendiente"></p-sortIcon> Cant. Pendiente</th>
@@ -88,6 +89,7 @@
             <tr>
               <td>{{rowIndex + 1}}</td>
               <td><b>{{item.consecutivo}}</b></td>
+              <td>{{item.cliente}}</td>
               <td>{{item.producto}}</td>
               <td><b>{{item.existencias | number : '1.2-2'}}</b></td>
               <td>{{item.cant_Pendiente | number : '1.2-2'}}</td>
