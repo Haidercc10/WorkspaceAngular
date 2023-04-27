@@ -170,6 +170,7 @@
             <th scope="col">Und. Medida</th>
             <th scope="col">Precio Unitario</th>
             <th scope="col">Subtotal</th>
+            <th scope="col">Acción</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimas>
@@ -192,7 +193,7 @@
             <td>{{catidadTotalPeso | number}}</td>
             <td>Kg</td>
             <td></td>
-            <td colspan="2" class="text-right">{{cantidadTotalPrecio | number}}</td>
+            <td colspan="2" class="text-left">{{cantidadTotalPrecio | number}}</td>
           </tr>
         </ng-template>
       </p-table>
