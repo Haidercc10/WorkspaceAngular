@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -14,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
+  @ViewChild('op') op: OverlayPanel | undefined;
   @ViewChild('dt') dt: Table | undefined;
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -31,6 +33,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   datosConsultados : any [] = []; //Variable que almacenará los años y los vendedores que se han consultado
   consolidado : any [] = []; //Variable que almcanerá la información de los pedidos y costos de cada vendedor
   costoTotal : number = 0;  //Variable que almacenará la cantidad total facturada
+  nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -232,4 +235,13 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   /** Mostrar mensaje de advertencia */
   mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
+
+   /** Función que mostrará la descripción de cada una de las card de los dashboard's */
+   mostrarDescripcion($event, card : string){
+    this.nroCard = card;
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
+  }
 }

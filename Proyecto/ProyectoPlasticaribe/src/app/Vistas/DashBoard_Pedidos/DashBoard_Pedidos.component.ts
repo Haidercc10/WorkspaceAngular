@@ -228,7 +228,7 @@ export class DashBoard_PedidosComponent implements OnInit {
             display: true,
             position: 'right',
             ticks: { color: '#495057', font: { size: 18 } },
-            grid: { color: '#ebedef' }
+            grid: { drawOnChartArea: false, color: '#ebedef' }
           },
         },
     };
