@@ -1,5 +1,5 @@
-
 <div class="fondo">
+  <!--  -->
  <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
   <!-- Tabla de Procesos -->
   <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
@@ -119,7 +119,6 @@
  </div>
 
   <!-- Tablas de Ordenes de Trabajo -->
-
   <div class="row g-2 fila-2" *ngIf="ValidarRol == 1">
     <!-- Ranking de Clientes -->
     <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
@@ -138,22 +137,21 @@
           [scrollable]="true"
           scrollHeight="400px"
           [rowHover]="true"
-          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
           [value]="clientesFacturados">
           <ng-template pTemplate="header">
             <tr>
-              <th style="max-width:8%">#</th>
-              <th pSortableColumn="clienteNom" style="max-width:50%; min-width:50%"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
-              <th pSortableColumn="cantidad" style="max-width:8%; min-width:8%"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
-              <th pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+              <th>#</th>
+              <th pSortableColumn="clienteNom"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
+              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
+              <th pSortableColumn="costo" ><p-sortIcon field="costo"></p-sortIcon> Costo</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr>
-              <td style="max-width:8%">{{rowIndex + 1}}</td>
-              <td style="max-width:50%; min-width:50%"><b>{{item.cliente}}</b></td>
-              <td style="max-width:8%; min-width:8%">{{item.cantidad | number}}</td>
-              <td style="max-width:20%; min-width:20%"><b>{{item.costo | currency : '$'}}</b></td>
+              <td>{{rowIndex + 1}}</td>
+              <td><b>{{item.cliente}}</b></td>
+              <td>{{item.cantidad | number}}</td>
+              <td><b>{{item.costo | currency : '$'}}</b></td>
             </tr>
           </ng-template>
         </p-table>
@@ -180,18 +178,18 @@
           [value]="productosFacturas">
           <ng-template pTemplate="header">
             <tr>
-              <th style="max-width:10%">#</th>
-              <th pSortableColumn="prod_Nombre"style="max-width:70%; min-width:70%"><p-sortIcon field="producto"></p-sortIcon> Producto</th>
-              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
-              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Costo</th>
+              <th>#</th>
+              <th pSortableColumn="prod_Nombre"><p-sortIcon field="producto"></p-sortIcon> Producto</th>
+              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
+              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Costo</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr>
-              <td style="max-width:10%">{{rowIndex + 1}}</td>
-              <td style="max-width:70%; min-width:70%"><b>{{item.producto}}</b></td>
-              <td style="max-width:20%; min-width:20%">{{item.cantidad | number}}</td>
-              <td style="max-width:20%; min-width:20%">{{item.costo | number}}</td>
+              <td>{{rowIndex + 1}}</td>
+              <td><b>{{item.producto}}</b></td>
+              <td>{{item.cantidad | number}}</td>
+              <td><b>{{item.costo | number}}</b></td>
             </tr>
           </ng-template>
         </p-table>
@@ -215,7 +213,6 @@
           [scrollable]="true"
           scrollHeight="400px"
           [rowHover]="true"
-          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
           [value]="vendedoresFacturas">
           <ng-template pTemplate="header">
             <tr>
@@ -239,6 +236,7 @@
 
   </div>
 
+  <!--  -->
   <div class="row g-2 fila-3" *ngIf="ValidarRol == 1">
 
     <!-- Ranking de Clientes -->
@@ -416,4 +414,3 @@
   </ng-template>
 
 </p-overlayPanel>
-
