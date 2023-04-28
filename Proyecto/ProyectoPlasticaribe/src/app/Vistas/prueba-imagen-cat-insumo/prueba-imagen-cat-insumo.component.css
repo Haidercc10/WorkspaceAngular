@@ -1,0 +1,114 @@
+.modal{
+  overflow-x: scroll;
+  min-width: 300px;
+}
+
+.id {
+  border: none;
+  width: 100%;
+}
+
+.amarillo, .verde2, .gris, .azul, .verde, .rojo, .naranja {
+  font-size: calc(var(--font-size) * 14px);
+  color: black;
+}
+
+.blanco {
+  background-color: white;
+}
+
+.amarillo {
+  background-color: #F3FC20;
+}
+
+.naranja {
+  background-color: #F6D45D;
+}
+
+.rojo {
+  background-color: #FF7878;
+}
+
+.verde {
+  background-color: #8AFC9B;
+}
+
+.azul {
+  background-color: #83D3FF;
+}
+
+.gris{
+  background-color: #DDDDDD;
+}
+
+.verde2 {
+  background-color: #53CC48;
+}
+
+a {
+  color: #000;
+}
+
+a:hover {
+  color: #555;
+}
+
+#tableProcesos td{
+ /* max-width: 50px; */
+  font-size: calc(var(--font-size) * 13px);
+}
+
+.bg-danger1 {
+  color: white;
+  background-color: palevioletred;
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-danger2 {
+  color: palevioletred;
+  font-size: calc(var(--font-size) * 13px);
+}
+
+.bg-success1 {
+  color: black;
+  background-color: palegreen;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-warning1 {
+  color: black;
+  background-color: rgba(255, 228, 78, 0.877);
+  font-size: calc(var(--font-size) * 14px);
+}
+
+p-treeTable{
+  overflow-x: scroll;
+  min-width: 300px;
+}
+
+p-treeTable::-webkit-scrollbar{
+  width: 8px;     /* Tamaño del scroll en vertical */
+  height: 8px;    /* Tamaño del scroll en horizontal */
+}
+
+/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
+p-treeTable::-webkit-scrollbar-thumb{
+  background: #EBEDEF;
+  border-radius: 4px;
+}
+
+/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
+p-treeTable::-webkit-scrollbar-thumb:hover{
+  background: #D5DBDB;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Cambiamos el fondo cuando esté en active */
+p-treeTable::-webkit-scrollbar-thumb:active{
+  background-color: #E5E8E8;
+}
+
+
+.negrita {
+  font-weight: bold;
+}
