@@ -122,6 +122,7 @@ export class OcompraComponent implements OnInit {
     this.catidadTotalPeso = 0;
     this.generarConsecutivo();
     this.mpSeleccionada = [];
+    this.informacionPDF = [];
   }
 
   // Funcion que va a limpiar los campos de materia prima
