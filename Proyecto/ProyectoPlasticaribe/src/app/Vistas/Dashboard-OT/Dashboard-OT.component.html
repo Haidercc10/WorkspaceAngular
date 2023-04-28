@@ -116,10 +116,129 @@
       </p-table>
     </p-card>
   </div>
-
  </div>
 
   <!-- Tablas de Ordenes de Trabajo -->
+
+  <div class="row g-2 fila-2" *ngIf="ValidarRol == 1">
+    <!-- Ranking de Clientes -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
+
+        <p-table
+          #dt1
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
+          [value]="clientesFacturados">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="max-width:8%">#</th>
+              <th pSortableColumn="clienteNom" style="max-width:50%; min-width:50%"><p-sortIcon field="cliente"></p-sortIcon> Cliente</th>
+              <th pSortableColumn="cantidad" style="max-width:8%; min-width:8%"><p-sortIcon field="cantidad"></p-sortIcon> Cant.</th>
+              <th pSortableColumn="costo" style="max-width:20%; min-width:20%"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="max-width:8%">{{rowIndex + 1}}</td>
+              <td style="max-width:50%; min-width:50%"><b>{{item.cliente}}</b></td>
+              <td style="max-width:8%; min-width:8%">{{item.cantidad | number}}</td>
+              <td style="max-width:20%; min-width:20%"><b>{{item.costo | currency : '$'}}</b></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- Ranking de Productos -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
+
+        <p-table
+          #dt2
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [value]="productosFacturas">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="max-width:10%">#</th>
+              <th pSortableColumn="prod_Nombre"style="max-width:70%; min-width:70%"><p-sortIcon field="producto"></p-sortIcon> Producto</th>
+              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
+              <th pSortableColumn="cantidad"style="max-width:20%; min-width:20%"><p-sortIcon field="cantidad"></p-sortIcon> Costo</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="max-width:10%">{{rowIndex + 1}}</td>
+              <td style="max-width:70%; min-width:70%"><b>{{item.producto}}</b></td>
+              <td style="max-width:20%; min-width:20%">{{item.cantidad | number}}</td>
+              <td style="max-width:20%; min-width:20%">{{item.costo | number}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- Ranking de Vendedores -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
+
+        <p-table
+          #dt3
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [tableStyle]="{'max-width': '80rem', 'min-width': '50rem'}"
+          [value]="vendedoresFacturas">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">#</th>
+              <th pSortableColumn="nombreCompleto"><p-sortIcon field="nombreCompleto"></p-sortIcon> Vendedor</th>
+              <th pSortableColumn="cantidad"><p-sortIcon field="cantidad"></p-sortIcon> Cantidad</th>
+              <th pSortableColumn="costo"><p-sortIcon field="costo"></p-sortIcon> Costo</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td>{{rowIndex + 1}}</td>
+              <td><b>{{item.vendedor}}</b></td>
+              <td>{{item.cantidad | number}}</td>
+              <td><b>{{item.costo | currency : ' COP $'}}</b></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+  </div>
+
   <div class="row g-2 fila-3" *ngIf="ValidarRol == 1">
 
     <!-- Ranking de Clientes -->
@@ -248,6 +367,7 @@
 
   </div>
 </div>
+
 <!-- Modal donde se podrán ver las ordenes de trabajo -->
 <p-dialog [modal]="true" [draggable]="false" [(visible)]="modalEstadosOrdenes" [style]="{width: '80%'}">
   <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>

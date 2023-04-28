@@ -6,6 +6,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Component({
   selector: 'app-Dashboard-OT',
@@ -40,6 +41,9 @@ export class DashboardOTComponent implements OnInit {
   modalEstadosOrdenes : boolean = false; //Variable que mostrará el modal de los etsados de las ordenes o no
   nombreModalEstados : string = ''; //Variable que tendrá el nombre del estado seleccionado
   materialesOrdenesMes : any [] = []; //Variable que almacenará la informacion de los materiales en ordenes de trabajo
+  clientesFacturados : any [] = []; //Variable que almacenará la informacion de los clientes a los que se les ha facturado en el mes
+  productosFacturas : any [] = []; //Variable que almacenará la informacion de los productos a los que se les ha facturado en el mes
+  vendedoresFacturas : any [] = []; //Variable que almacenará la informacion de los vendedores a los que se les ha facturado en el mes
 
   mostrarGrafica : boolean = false; //Variable que mostrará o no la información graficada
   nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
@@ -49,8 +53,9 @@ export class DashboardOTComponent implements OnInit {
   nroCard : string = '';  /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
 
   constructor(private AppComponent : AppComponent,
-                  private bagProService : BagproService,
-                    private ordenTrabajoService : EstadosProcesos_OTService,) { }
+                private bagProService : BagproService,
+                  private ordenTrabajoService : EstadosProcesos_OTService,
+                    private zeusService : InventarioZeusService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -173,9 +178,14 @@ export class DashboardOTComponent implements OnInit {
           this.costoTotalOrdenesMes += datos_ordenes[i].costo;
         }
       });
+
+      this.zeusService.GetClienteFacturadosMes().subscribe(data => this.clientesFacturados = data);
+
+      this.zeusService.GetProductosFaturadosMes().subscribe(data => this.productosFacturas = data);
+
+      this.zeusService.GetVendedoresFacturasMes().subscribe(data => this.vendedoresFacturas = data);
     }
   }
-
 
   // Funcion que va a llenar la grafica con la información de los vendedores
   llenarGraficaVendedores(){
@@ -386,24 +396,6 @@ export class DashboardOTComponent implements OnInit {
     }
   }
 
-  // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesCostoOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
-
-  // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesCantOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-  // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesPesoOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
-
-  // Funcion que va a ordenar el ranking de vendedores
-  ordenarVendedoresCostoOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
-
-  // Funcion que va a ordenar el ranking de clientes
-  ordenarVendedoresCantOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-  // Funcion que va a ordenar el ranking de clientes
-  ordenarVendedoresPesoOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
-
   mostrarDescripcion($event, card : string){
     this.nroCard = card;
     setTimeout(() => {
@@ -412,5 +404,4 @@ export class DashboardOTComponent implements OnInit {
     }, 500);
   }
 
-  }
-
+}

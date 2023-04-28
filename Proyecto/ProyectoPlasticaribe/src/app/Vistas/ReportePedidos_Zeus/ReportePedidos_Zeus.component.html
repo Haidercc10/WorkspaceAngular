@@ -117,7 +117,7 @@
             <!-- Propiedades de las columnas -->
             <tr>
               <th *ngFor="let col of columns">
-                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.fieldd, 'contains')">
+                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
               </th>
               <th style="width: 100px">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
@@ -134,8 +134,8 @@
             </tr>
             <!-- Titulos -->
             <tr>
-              <th *ngFor="let col of columnasSeleccionada" class="text-center" [ttSortableColumn]="col.fieldd" ttReorderableColumn ttResizableColumn>{{col.header}}
-                <p-treeTableSortIcon [field]="col.fieldd"></p-treeTableSortIcon>
+              <th *ngFor="let col of columnasSeleccionada" class="text-center" [ttSortableColumn]="col.field" ttReorderableColumn ttResizableColumn>{{col.header}}
+                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
               </th>
               <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Ver PDF</th>
               <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Editar</th>

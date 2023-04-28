@@ -65,10 +65,10 @@ export let rutaPlasticaribeAPI = "http://192.168.0.85:9086/api"; //Ruta al servi
 
 
 /* RUTA PRINCIPAL DE API ZEUS */
- export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
+//export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
 //export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 // export let rutaZeus = "http://192.168.0.195:9055/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-//export let rutaZeus = "http://192.168.0.153:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
+export let rutaZeus = "http://192.168.0.153:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 
 /* RUTA PRINCIPAL API ZEUS CONSTABILIDAD */
 export let rutaZeusContabilidad = "http://192.168.0.85:9065/api"; //Ruta de prueba del API

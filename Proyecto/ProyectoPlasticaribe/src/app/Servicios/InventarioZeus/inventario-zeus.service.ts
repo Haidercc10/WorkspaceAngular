@@ -139,9 +139,19 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getConsolidadoClientesArticulo/${ano1}/${ano2}/${ruta}`);
   }
 
+  GetDevoluciones(ano1 : any, ano2 : any) {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getDevoluciones/${ano1}/${ano2}`);
+  }
+
   GetInfoPedido_Consecutivo(id : any) : Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getInfoPedido_Consecutivo/${id}`);
   }
 
   GetCostoFacturado_Vendedor = (vendedor : string, mes : any, anio : any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getCostoFacturado_Vendedor/${vendedor}/${mes}/${anio}`);
+
+  GetClienteFacturadosMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getClienteFacturadosMes`);
+
+  GetProductosFaturadosMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes`);
+
+  GetVendedoresFacturasMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes`);
 }

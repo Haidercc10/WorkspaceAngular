@@ -277,8 +277,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       }
       setTimeout(() => {
         this.cargando = false;
-        this.calcularSubTotal();
-      }, datos_consolidado.length * 2);
+        this.calcularSubTotal(anoInicial, anoFinal);
+      }, datos_consolidado.length);
     });
   }
 
@@ -319,10 +319,11 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   // Funcion que va a calcular el subtotal real de cada producto
-  calcularSubTotal(){
+  calcularSubTotal(anio1 : number, anio2 : number){
     let items : number [] = [];
     let nuevo : any [] = [];
-    let devolucion : number = 0;
+    this.invetarioZeusService.GetDevoluciones(anio1, anio2).subscribe(data => this.valorTotalConsulta -= data);
+
     for (let i = 0; i < this.arrayConsolidado.length; i++) {
       if (!items.includes(this.arrayConsolidado[i].Id)) {
         nuevo = this.arrayConsolidado.filter((item) =>
@@ -337,23 +338,17 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           this.arrayConsolidado[nuevo[j].Id].SubTotal = nuevo[j].Devolucion * nuevo[j].Precio;
           items.push(nuevo[j].Id);
         }
-        if (nuevo.length) {
-          this.valorTotalConsulta -= nuevo[0].SubTotalDev;
-        devolucion += nuevo[0].SubTotalDev
-        }
       }
     }
-    console.log(devolucion)
   }
 
   // Funcion que va a calcular el subtotal de lo vendido en un año
   calcularTotalVendidoAno(ano : any){
     let total : number = 0;
-    for (let i = 0; i < this.arrayConsolidado.length; i++) {
-      if (this.arrayConsolidado[i].Ano == ano) {
-        if (this.arrayConsolidado[i].Devolucion == 0) total += this.arrayConsolidado[i].SubTotal;
-        else if (this.arrayConsolidado[i].Devolucion > 0) total -= this.arrayConsolidado[i].SubTotal;
-      }
+    let nuevo = this.arrayConsolidado.filter((item) => item.Ano == ano);
+    for (let i = 0; i < nuevo.length; i++) {
+      if (nuevo[i].Devolucion == 0) total += nuevo[i].SubTotal;
+      else if (nuevo[i].Devolucion > 0) total -= nuevo[i].SubTotal;
     }
     return total;
   }
@@ -443,10 +438,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     }
   }
 
-  /** Mostrar mensaje de confirmación  */
+  // Mostrar mensaje de confirmación
   mensajeConfirmacion(titulo : string, mensaje : any) {
     this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-   }
+  }
 
   /** Mostrar mensaje de error  */
   mensajeError(titulo : string, mensaje : string) {
