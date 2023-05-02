@@ -56,18 +56,18 @@
       [value]="ArrayPedidos"
       rowGroupMode="subheader"
       groupRowsBy="consecutivo"
-      sortField="id_color"
-      sortMode="single"
       [resizableColumns]="true"
       [reorderableColumns]="true"
       columnResizeMode="expand"
       styleClass="p-datatable-gridlines p-datatable-sm"
       responsiveLayout="scroll"
       [rowHover]="true"
-      dataKey="consecutivo"
+      dataKey="id"
       [scrollable]="true"
       scrollHeight="50rem"
-      *ngIf="!cargando">
+      *ngIf="!cargando"
+      sortField="consecutivo"
+      [expandedRowKeys]="expandedRows">
       <!-- Buscador de columnas -->
       <ng-template pTemplate="caption">
         <p-multiSelect
@@ -100,20 +100,24 @@
       <!-- Titulo de Agrupacion -->
       <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded">
         <tr>
-          <td colspan="23" class="font-size-16" [ngClass]="{'verde' : pedido.color == 'verde', 'azul' : pedido.color == 'azul', 'rojo' : pedido.color == 'rojo', 'blanco' : pedido.color == 'blanco'}">
+          <td [attr.colspan]="columnasSeleccionadas.length" class="font-size-16" [ngClass]="{'verde' : pedido.color == 'verde', 'azul' : pedido.color == 'azul', 'rojo' : pedido.color == 'rojo', 'blanco' : pedido.color == 'blanco'}">
             <button type="button" pButton pRipple [pRowToggler]="pedido" class="p-button-text p-button-rounded p-button-plain mr-2" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
             <span class="font-bold">
               {{pedido.consecutivo}}
             </span>
             <span class="font-bold"> {{pedido.cliente}} </span>
           </td>
+          <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+          <td style="text-align: center;" scope="col" title="Editar Pedido"><button [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" style="width: 30px; height: 30px;"></button></td>
+          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
         </tr>
       </ng-template>
       <!-- Footer de los agrupado -->
       <ng-template pTemplate="groupfooter" let-pedidos>
         <tr class="p-rowgroup-footer">
-          <td colspan="23" style="text-align: right">Total Pedido</td>
-          <!-- <td>{{calculateCustomerTotal(customer.representative.name)}}</td> -->
+          <td style="text-align: left">Total Pendiente Pedido</td>
+          <td [attr.colspan]="columnasSeleccionadas.length + 3">{{calcularCostoPedido(pedidos.consecutivo) | currency : 'COP $'}}</td>
         </tr>
       </ng-template>
       <!-- Cuerpo con informacion dellada -->
@@ -130,10 +134,6 @@
             'badge bg-warning1' : col.field === 'estado' && pedidos.estado === 'Parcialmente Satisfecho',
             'negrita font-size-16' : pedidos.producto == '' }">{{col.tipo == 'numero' ? (pedidos[col.field] | number : '1.2-2') : (pedidos[col.field])}}</span>
           </td>
-          <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Editar Pedido"><button [disabled]="pedidos.color != 'rojo'" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedidos.color != 'rojo'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedidos.color != 'rojo'" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
         </tr>
       </ng-template>
     </p-table>

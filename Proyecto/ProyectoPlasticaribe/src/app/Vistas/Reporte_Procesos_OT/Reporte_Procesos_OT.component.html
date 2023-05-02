@@ -568,7 +568,7 @@
 
               <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
 
-              <td *ngIf="ValidarRol == 1">
+              <td *ngIf="ValidarRol == 1 && storage_Id != 101">
                 <button pButton pRipple icon="pi pi-pencil" [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2" (click)="editProduct(ArrayDocumento)"></button>
               </td>
             </tr>

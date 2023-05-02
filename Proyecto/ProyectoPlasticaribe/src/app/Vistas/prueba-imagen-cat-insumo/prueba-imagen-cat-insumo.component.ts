@@ -40,6 +40,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ArrayPedidos = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   columnas : any [] = [];
   columnasSeleccionadas : any [] = [];
+  expandedRows : {} = {};
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -82,20 +83,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
     setTimeout(() => {
       this.cargando = false;
-      // this.ArrayPedidos.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
       this.ArrayPedidos.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+
+      const thisRef = this;
+      this.ArrayPedidos.forEach(function(pedido) {
+        thisRef.expandedRows[pedido.id] = true;
+      });
     }, 3500);
   }
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos(){
-    this.pedidoProductosService.GetPedidosPendientesAgrupados().subscribe(datos_pedidos => {
+    this.pedidoProductosService.getPedidoPendiente().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
-          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarArrayPedidos(datos_pedidos[i]);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i]);
+          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarArrayPedidos(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i], i);
       }
     });
+    setTimeout(() => {
+      this.cargando = false;
+      this.ArrayPedidos.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+    }, 1500);
   }
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos en zeus
@@ -224,12 +233,59 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
-  llenarArrayPedidos(datos : any){
+  llenarArrayPedidos(datos : any, index : number){
+    if(datos.undMed_Id == 'Und') datos.undMed_Id = 'UND';
+    if(datos.undMed_Id == 'Kg') datos.undMed_Id = 'KLS';
+    if(datos.undMed_Id == 'Paquete') datos.undMed_Id = 'PAQ';
+
+    let info : any = {
+      id : index,
+      id_color : 3,
+      color : 'rojo',
+      consecutivo : datos.pedExt_Id,
+      cliente: datos.cli_Nombre,
+      producto: datos.prod_Nombre,
+      id_Producto: datos.prod_Id,
+      cant_Pedida: datos.pedExtProd_Cantidad.toFixed(2),
+      cant_Pendiente: datos.cant_Pendiente.toFixed(2),
+      cant_Facturada: datos.cant_Facturada.toFixed(2),
+      existencias: datos.existencias.toFixed(2),
+      presentacion: datos.undMed_Id,
+      estado: datos.estado_Nombre,
+      vendedor: datos.usua_Nombre,
+      precioUnidad : datos.pedExtProd_PrecioUnitario.toFixed(2),
+      orden_Compra_CLiente: datos.orden_Compra_CLiente,
+      costo_Cant_Pendiente: datos.costo_Cant_Pendiente.toFixed(2),
+      costo_Cant_Total: datos.pedExtProd_Cantidad.toFixed(2) * datos.pedExtProd_PrecioUnitario.toFixed(2),
+      fecha_Creacion: datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
+      fecha_Entrega: datos.pedExtProd_FechaEntrega.replace('T00:00:00', ''),
+      OT : '',
+      Proceso_OT: '',
+      CantPesada : '',
+      Estado_OT: '',
+      CantPedidaKg_OT : '',
+      CantPedidaUnd_OT : '',
+      Zeus : 0,
+    };
+
+    this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(dataZeus => {
+      for (let index = 0; index < dataZeus.length; index++) {
+        info.data.existencias = dataZeus[index].existencias;
+      }
+    });
+
+    this.ArrayPedidos.push(info);
+    this.ArrayPedidos.sort((a,b) => Number(a.id) - Number(b.id));
   }
 
-  // Funcion que le va a colocar los colores al array de pedidos
-  validarColoresArray(){
-
+  // Funcion que va a calcular el costo total del pedido
+  calcularCostoPedido(consecutivo : number) : number {
+    let nuevo = this.ArrayPedidos.filter((item) => item.consecutivo == consecutivo);
+    let total : number = 0;
+    for (let i = 0; i < nuevo.length; i++) {
+      total += nuevo[i].cant_Pendiente * nuevo[i].precioUnidad;
+    }
+    return total;
   }
 
   // Funcion que creará un archivo de excel con base de lo que esté en la tabla

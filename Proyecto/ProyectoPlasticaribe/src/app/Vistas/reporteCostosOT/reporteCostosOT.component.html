@@ -170,7 +170,7 @@
 
         <div class="col-md">
           <span class="d-grid gap-2 d-md-flex justify-content-md">
-            <button pButton class="p-button-warning" type="button" label="Cambiar Estado" icon="pi pi-sync" *ngIf="ValidarRol == 1" (click)="cambiarEstado()"></button>
+            <button pButton class="p-button-warning" type="button" label="Cambiar Estado" icon="pi pi-sync" *ngIf="ValidarRol == 1 && storage_Id != 101" (click)="cambiarEstado()"></button>
           </span>
         </div>
 
@@ -183,7 +183,7 @@
         <button pButton class="p-button-danger" type="button" label="Consultar OT" icon="pi pi-search" (click)="consultaOTBagPro()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton class="p-button-danger" type="button" label="Reporte en PDF" icon="pi pi-file-pdf" *ngIf="ValidarRol == 1" (click)="CargarPDF()"></button>
-        <button pButton class="p-button-success" type="button" label="Revisada" icon="pi pi-check-square" *ngIf="ValidarRol == 1" (click)="cerrarOrden()"></button>
+        <button pButton class="p-button-success" type="button" label="Revisada" icon="pi pi-check-square" *ngIf="ValidarRol == 1 && storage_Id != 101" (click)="cerrarOrden()"></button>
       </div>
     </div>
   </form>
