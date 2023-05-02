@@ -19,10 +19,16 @@
 
 .amarillo {
   background-color: #F3FC20;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .naranja {
   background-color: #F6D45D;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .rojo {
@@ -43,6 +49,16 @@
 
 .verde2 {
   background-color: #53CC48;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
+}
+
+.verde3 {
+  background-color: #2bd31c;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 a {
@@ -62,6 +78,9 @@ a:hover {
   color: white;
   background-color: palevioletred;
   font-size: calc(var(--font-size) * 14px);
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .bg-danger2 {

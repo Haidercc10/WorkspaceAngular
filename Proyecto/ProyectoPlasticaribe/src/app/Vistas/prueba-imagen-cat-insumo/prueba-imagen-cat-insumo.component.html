@@ -66,8 +66,9 @@
       [scrollable]="true"
       scrollHeight="50rem"
       *ngIf="!cargando"
-      sortField="consecutivo"
-      [expandedRowKeys]="expandedRows">
+      [expandedRowKeys]="expandedRows"
+      sortField="id_color"
+      [sortOrder]="1">
       <!-- Buscador de columnas -->
       <ng-template pTemplate="caption">
         <p-multiSelect
@@ -124,7 +125,8 @@
       <ng-template pTemplate="rowexpansion" let-pedidos let-columns="columns">
         <tr>
           <td *ngFor="let col of columns" [ngClass]="{'verde' : pedidos.color == 'verde' || (pedidos.color == 'verde'), 'azul' : pedidos.color == 'azul', 'rojo' : pedidos.color == 'rojo', 'blanco' : pedidos.color == 'blanco'}">
-            <span [ngClass]="{'badge verde': (col.field === 'OT' || col.field === 'Proceso_OT') && pedidos.Estado_OT === 17,
+            <span [ngClass]="{
+            'badge verde3': (col.field === 'OT' || col.field === 'Proceso_OT') && pedidos.Estado_OT === 17,
             'badge verde2': col.field === 'OT' && pedidos.Estado_OT === 18,
             'badge rojo' : col.field === 'OT' && pedidos.Estado_OT === 3,
             'badge azul': col.field === 'OT' && pedidos.Estado_OT === 14,

@@ -83,13 +83,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
     setTimeout(() => {
       this.cargando = false;
-      this.ArrayPedidos.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+      this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
 
       const thisRef = this;
       this.ArrayPedidos.forEach(function(pedido) {
         thisRef.expandedRows[pedido.id] = true;
       });
     }, 3500);
+  }
+
+  onSort(){
+    console.log(this.dt.sortField)
   }
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
@@ -467,7 +471,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color : string){
-    if (color == 'verde') this.infoColor = `El color verde indica que todos los items de un pedido se pueden faturar o en su defecto este tambien indica cuando el item de un pedido se puede facturar. Esta facturación se basa en la existencia que tiene el producto actualmente`;
+    if (color == 'verde') this.infoColor = `${'El color verde indica que todos los items de un pedido pueden ser facturados. Debido a que las existencias del item son mayores que las cantidades pedidas.'}`;
     setTimeout(() => {
       this.op!.toggle($event);
       $event.stopPropagation();
