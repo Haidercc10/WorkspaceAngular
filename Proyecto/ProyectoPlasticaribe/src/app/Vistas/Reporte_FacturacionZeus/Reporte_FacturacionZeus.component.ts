@@ -15,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 
 export class Reporte_FacturacionZeusComponent implements OnInit {
+
   @ViewChild('dt') dt: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   arrayDocumento : any = []; /** Array para cargar la información que se verá en la vista. */

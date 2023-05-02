@@ -742,12 +742,22 @@
             </div>
           </ng-container>
 
-          <!-- Reporte de Procesos de Ordenes de trabajo Para Vendedores-->
+          <!-- Reporte consolidado de facturación -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
             <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/rpt-facturacion-zeus" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-dollar font-size-15" style="margin-right: 2%;"></i>
                 Consolidado Facturación
+              </a>
+            </div>
+          </ng-container>
+
+          <!-- Reporte consolidado de facturación 2 -->
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+            <div class="mb-2 sangria">
+              <a class="fst-normal" data-bs-toggle="" href="/Reporte-Facturacion" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-wallet font-size-15" style="margin-right: 2%;"></i>
+                Consolidado Facturación 2
               </a>
             </div>
           </ng-container>

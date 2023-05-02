@@ -169,6 +169,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
 import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
+import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 
 export const routes: Routes = [
 
@@ -277,7 +278,7 @@ export const routes: Routes = [
   {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent},
 
   /** */
-  {path: 'ReporteVentas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReporteFacturacion_VendedoresComponent},
+  {path: 'Reporte-Facturacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_Consolidado_FacturacionComponent},
 ]
 
 @NgModule({
@@ -378,7 +379,8 @@ export const routes: Routes = [
     TicketsComponent,
     Gestion_TicketsComponent,
     DashboardOTComponent,
-    ReporteFacturacion_VendedoresComponent
+    ReporteFacturacion_VendedoresComponent,
+    Reporte_Consolidado_FacturacionComponent
   ],
 
   imports: [
