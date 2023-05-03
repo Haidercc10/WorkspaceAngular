@@ -130,7 +130,7 @@
             <td>{{data.Usuario}}</td>
             <td>{{data.Materia_Prima}}</td>
             <td>{{data.Cantidad | number : '1.2-2'}}</td>
-            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
+            <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger botonPdf" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
       </p-table>

@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<div [ngClass]="{'formulario' : !edicionOrdenCompra || edicionOrdenCompra && sombra, 'formularioModal' : edicionOrdenCompra && !sombra}">
 
   <!-- Botones que llamaran los modeles -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">

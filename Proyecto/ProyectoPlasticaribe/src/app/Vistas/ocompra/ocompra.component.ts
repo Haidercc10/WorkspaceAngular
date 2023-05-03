@@ -58,6 +58,7 @@ export class OcompraComponent implements OnInit {
   edicionOrdenCompra : boolean = false;
   llave : string = 'pdf';
   ordenCreada : number;
+  sombra : boolean = false;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -123,6 +124,7 @@ export class OcompraComponent implements OnInit {
     this.generarConsecutivo();
     this.mpSeleccionada = [];
     this.informacionPDF = [];
+    this.sombra = false;
   }
 
   // Funcion que va a limpiar los campos de materia prima
@@ -277,6 +279,7 @@ export class OcompraComponent implements OnInit {
       if (datos_orden.length > 0) {
         this.ordenCreada = ordenCompra
         this.edicionOrdenCompra = true;
+        this.sombra = true;
         this.FormOrdenCompra.reset();
         this.FormMateriaPrima.reset();
         this.materiasPrimasSeleccionadas = [];
