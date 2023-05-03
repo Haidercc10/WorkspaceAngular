@@ -27,13 +27,13 @@
   <!-- Informacion sobre los colores -->
   <p-toolbar>
     <ng-template pTemplate="right">
-      <p-button icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="mostrarDescripcion($event, 'verde')"></p-button>
-      <p-button icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-info" (click)="mostrarDescripcion($event, 'azul')"></p-button>
-      <p-button icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="mostrarDescripcion($event, 'rojo')"></p-button>
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-info" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
     </ng-template>
 
     <ng-template pTemplate="left">
-      <h6>¡Si deseas saber que indica cada color, presiona el botón con el color que quieres conocer!</h6>
+      <h6>¡Si deseas saber que indica cada color, <b>presiona el botón con el color que quieres conocer!</b></h6>
     </ng-template>
   </p-toolbar>
 
@@ -142,9 +142,9 @@
   </div>
 </div>
 
-
+<!-- Mensajes de descripción en los botones de la parte superior -->
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >
-  <ng-template #infoColor>
-    {{infoColor}}
+  <ng-template pTemplate>
+    <div [innerHTML]="infoColor"></div>
   </ng-template>
 </p-overlayPanel>

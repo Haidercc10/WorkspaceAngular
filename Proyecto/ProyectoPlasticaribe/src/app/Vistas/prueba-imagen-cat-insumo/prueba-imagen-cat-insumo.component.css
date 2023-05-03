@@ -56,6 +56,8 @@
 
 .verde3 {
   background-color: #2bd31c;
+  color: rgb(0, 0, 0);
+  font-size: calc(var(--font-size) * 14px);
   padding: 2% 3%;
   font-weight: 700;
   border-radius: 5px;
@@ -131,3 +133,8 @@ p-treeTable::-webkit-scrollbar-thumb:active{
 .negrita {
   font-weight: bold;
 }
+
+#iconos ::ng-deep .pi {
+  font-size: calc(var(--font-size) * 22px);
+}
+

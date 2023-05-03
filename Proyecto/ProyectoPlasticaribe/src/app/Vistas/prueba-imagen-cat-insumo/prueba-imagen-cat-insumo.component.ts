@@ -51,8 +51,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.consultarPedidosZeus();
-    this.consultarPedidos();
+    //this.consultarPedidosZeus();
+    //this.consultarPedidos();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -471,7 +471,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color : string){
-    if (color == 'verde') this.infoColor = `${'El color verde indica que todos los items de un pedido pueden ser facturados. Debido a que las existencias del item son mayores que las cantidades pedidas.'}`;
+    if (color == 'verde') this.infoColor = `El color verde indica que <b>${'todos los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'las existencias de el/los item(s) son mayores que las cantidades pedidas.'}</b>`;
+    if (color == 'azul') this.infoColor = `El color azul indica que <b>${'al menos uno de los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'el stock de dicho(s) producto(s) es mayor que las cantidad solicitada.'}</b><br><br>
+    <b>${'Nota:'}</b> Si encuentra filas de color verde dentro de encabezados de pedidos de color azul <b>${'es porque ese item en específico está listo para ser facturado!'}</b>`;
+    if (color == 'rojo') this.infoColor = `El color rojo muestra los pedidos <b>${'que aún no han sido aprobados por gerencia para ser creados en Zeus'}</b>`;
+
     setTimeout(() => {
       this.op!.toggle($event);
       $event.stopPropagation();
