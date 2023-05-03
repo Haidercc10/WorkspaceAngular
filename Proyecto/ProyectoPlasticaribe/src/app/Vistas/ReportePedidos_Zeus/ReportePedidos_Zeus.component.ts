@@ -404,6 +404,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           fs.saveAs(blob, `Reporte de Pedidos Zeus - ${this.today}.xlsx`);
         });
         setTimeout(() => {  this.mostrarConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!'); }, 3100);
+        this.datosExcel = this.ArrayPedidos;
         this.cargando = false;
       }, 2000);
     }
