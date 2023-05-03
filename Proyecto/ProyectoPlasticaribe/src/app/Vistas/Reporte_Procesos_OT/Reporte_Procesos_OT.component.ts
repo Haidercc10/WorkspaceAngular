@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
+import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
   @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
+  @ViewChild(ReportePedidos_ZeusComponent) ReportePedidos_Zeus : ReportePedidos_ZeusComponent;
 
   modeModal : boolean = false; //Variable que validará cuando el componente aparezca en un modal
 

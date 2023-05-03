@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<div [ngClass]="{'formularioModal' : modeModal, 'formulario' : !modeModal }">
 
   <div class="mb-4">
     <h3 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT's</h3>

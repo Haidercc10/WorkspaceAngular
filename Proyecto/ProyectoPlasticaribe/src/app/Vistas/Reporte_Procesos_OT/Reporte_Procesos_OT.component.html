@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<div [ngClass]="{'formularioModal' : modeModal, 'formulario' : !modeModal }">
   <div class="mb-4">
     <h4 class="tituloRojo font-size-24"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
   </div>

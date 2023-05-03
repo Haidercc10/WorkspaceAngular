@@ -13,12 +13,22 @@
   color: black;
 }
 
+.blanco {
+  background-color: white;
+}
+
 .amarillo {
   background-color: #F3FC20;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .naranja {
   background-color: #F6D45D;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .rojo {
@@ -39,6 +49,19 @@
 
 .verde2 {
   background-color: #53CC48;
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
+}
+
+.verde3 {
+  background-color: rgb(78, 255, 78);
+  border: #53CC48 solid 1px;
+  color: rgb(0, 0, 0);
+  font-size: calc(var(--font-size) * 14px);
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 a {
@@ -58,6 +81,9 @@ a:hover {
   color: white;
   background-color: palevioletred;
   font-size: calc(var(--font-size) * 14px);
+  padding: 2% 3%;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .bg-danger2 {
@@ -77,34 +103,11 @@ a:hover {
   font-size: calc(var(--font-size) * 14px);
 }
 
-p-treeTable{
-  overflow-x: scroll;
-  min-width: 300px;
-}
-
-p-treeTable::-webkit-scrollbar{
-  width: 8px;     /* Tamaño del scroll en vertical */
-  height: 8px;    /* Tamaño del scroll en horizontal */
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
-p-treeTable::-webkit-scrollbar-thumb{
-  background: #EBEDEF;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
-p-treeTable::-webkit-scrollbar-thumb:hover{
-  background: #D5DBDB;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-/* Cambiamos el fondo cuando esté en active */
-p-treeTable::-webkit-scrollbar-thumb:active{
-  background-color: #E5E8E8;
-}
-
-
 .negrita {
   font-weight: bold;
 }
+
+#iconos ::ng-deep .pi {
+  font-size: calc(var(--font-size) * 22px);
+}
+
