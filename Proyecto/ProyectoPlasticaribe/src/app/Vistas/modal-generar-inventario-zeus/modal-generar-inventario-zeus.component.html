@@ -50,9 +50,8 @@
             [rowHover]="true"
             [rows]="ArrayProductoZeus.length"
             [showCurrentPageReport]="true"
-            [paginator]="true"
-            [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayProductoZeus.length]"
             currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
             scrollHeight="1000px">
 
             <ng-template pTemplate="caption">

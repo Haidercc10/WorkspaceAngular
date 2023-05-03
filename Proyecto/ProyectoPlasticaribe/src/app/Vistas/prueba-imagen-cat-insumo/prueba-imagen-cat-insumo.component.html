@@ -101,30 +101,34 @@
       <!-- Titulo de Agrupacion -->
       <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded">
         <tr>
-          <td [attr.colspan]="columnasSeleccionadas.length" class="font-size-16" [ngClass]="{'verde' : pedido.color == 'verde', 'azul' : pedido.color == 'azul', 'rojo' : pedido.color == 'rojo', 'blanco' : pedido.color == 'blanco'}">
+          <td [attr.colspan]="columnasSeleccionadas.length" class="font-size-16" [ngClass]="{'verde' : pedido.id_color == 1, 'azul' : pedido.id_color == 2, 'rojo' : pedido.Zeus == 0, 'blanco' : pedido.id_color == 4}">
             <button type="button" pButton pRipple [pRowToggler]="pedido" class="p-button-text p-button-rounded p-button-plain mr-2" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
             <span class="font-bold">
               {{pedido.consecutivo}}
             </span>
             <span class="font-bold"> {{pedido.cliente}} </span>
           </td>
-          <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Editar Pedido"><button [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button  [disabled]="pedido.color != 'rojo'" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
+          <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 1 ? mostrarPedidoPdf(pedido) : productosPedido(pedido.consecutivo)"></button></td>
+          <td style="text-align: center;" scope="col" title="Editar Pedido"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 0 ? editarPedido(pedido) : ''"></button></td>
+          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'aceptar')"></button></td>
+          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'cancelar')"></button></td>
         </tr>
       </ng-template>
       <!-- Footer de los agrupado -->
       <ng-template pTemplate="groupfooter" let-pedidos>
-        <tr class="p-rowgroup-footer">
+        <tr class="negrita font-size-16 p-rowgroup-footer">
           <td style="text-align: left">Total Pendiente Pedido</td>
-          <td [attr.colspan]="columnasSeleccionadas.length + 3">{{calcularCostoPedido(pedidos.consecutivo) | currency : 'COP $'}}</td>
+          <td [attr.colspan]="columnasSeleccionadas.length">{{calcularCostoPedido(pedidos.consecutivo) | currency : 'COP $'}}</td>
         </tr>
       </ng-template>
       <!-- Cuerpo con informacion dellada -->
       <ng-template pTemplate="rowexpansion" let-pedidos let-columns="columns">
         <tr>
-          <td *ngFor="let col of columns" [ngClass]="{'verde' : pedidos.color == 'verde' || (pedidos.color == 'verde'), 'azul' : pedidos.color == 'azul', 'rojo' : pedidos.color == 'rojo', 'blanco' : pedidos.color == 'blanco'}">
+          <td *ngFor="let col of columns" [ngClass]="{
+            'azul' : pedidos.color == 'azul',
+            'verde' : pedidos.color == 'verde' || (pedidos.color == 'verde'),
+            'rojo' : pedidos.Zeus == 0,
+            'blanco' : pedidos.color == 'blanco'}">
             <span [ngClass]="{
             'badge verde3': (col.field === 'OT' || col.field === 'Proceso_OT') && pedidos.Estado_OT === 17,
             'badge verde2': col.field === 'OT' && pedidos.Estado_OT === 18,
@@ -134,7 +138,7 @@
             'badge naranja' : col.field === 'OT' && pedidos.Estado_OT === 15,
             'badge bg-danger1' : col.field === 'estado' && pedidos.estado === 'Pendiente',
             'badge bg-warning1' : col.field === 'estado' && pedidos.estado === 'Parcialmente Satisfecho',
-            'negrita font-size-16' : pedidos.producto == '' }">{{col.tipo == 'numero' ? (pedidos[col.field] | number : '1.2-2') : (pedidos[col.field])}}</span>
+            'negrita font-size-16' : pedidos.producto == '' }" (dblclick)="varOrdenTranajo(pedidos)">{{col.tipo == 'numero' ? (pedidos[col.field] | number : '1.2-2') : (pedidos[col.field])}}</span>
           </td>
         </tr>
       </ng-template>
@@ -148,3 +152,59 @@
     <div [innerHTML]="infoColor"></div>
   </ng-template>
 </p-overlayPanel>
+
+<!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal desde el que se podrá editar un pedido -->
+<p-dialog [(visible)]="modalEditar" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-Pedido-Externo></app-Pedido-Externo>
+  </ng-template>
+</p-dialog>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="aceptar" (onClose)="onReject('aceptar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="aceptarPedido(itemSeleccionado)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('aceptar')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="cancelar" (onClose)="onReject('cancelar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="cancelarPedido(itemSeleccionado)" icon="pi pi-exclamation-circle" label="Si" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('cancelar')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

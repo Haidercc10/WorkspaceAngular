@@ -1,11 +1,11 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { TreeTable } from 'primeng/treetable';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { Table } from 'primeng/table';
 import { modelOpedido } from 'src/app/Modelo/modelOpedido';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
@@ -13,10 +13,8 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import Swal from 'sweetalert2';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-
 @Component({
   selector: 'app-ReportePedidos_Zeus',
   templateUrl: './ReportePedidos_Zeus.component.html',
@@ -24,51 +22,38 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
 })
 export class ReportePedidos_ZeusComponent implements OnInit {
 
-  @ViewChild('tt') tt: TreeTable | undefined;
+  @ViewChild('op') op: OverlayPanel | undefined;
+  @ViewChild('dt') dt: Table | undefined;
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
   @ViewChild(PedidoExternoComponent) modalPedidoExterno : PedidoExternoComponent;
 
   cargando : boolean = false;
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  ArrayDocumento = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
+  infoColor : string = ''; //Varable que almcanerá la descripcion del un color
+  ArrayPedidos = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   modalEditar : boolean = false; //Variable que validará si el pedido está en edición o no
-  _columnasSeleccionada : any [] = []; //Variable que almacenará las columnas que se han elegido para ver adicionalmente a las que ya se cargan incialmente
-  columnas : any [] = []; //Variable que almacenará las columnas que podrán ser selecciondas para ver adicionales a las iniciales
-  formFiltros !: FormGroup;
-  titlePendiente : string = 'Estado que indica que no se ha realizado entrega de ninguno de los items del pedido.';
-  titleParcial : string = 'Estado que indica que se ha realizado entrega de al menos uno de los items del pedido.';
+  columnas : any [] = [];
+  columnasSeleccionadas : any [] = [];
+  expandedRows : {} = {};
+  itemSeleccionado : any;
+  modalEstadosOrdenes : boolean = false;
+  consecutivoPedido : any = '';
+  productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
   costoCantidadTotal : number = 0;
   costoCantidadPendiente : number = 0;
   arrayPedidosIndividuales : any = [];
-  modalEstadosOrdenes : boolean = false;
-  consecutivoPedido : any = '';
-  sumaCostoPendiente : number = 0;
-  sumaCostoTotal : number = 0;
-  itemSeleccionado : any;
+  datosExcel : any [] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
 
   constructor(private AppComponent : AppComponent,
-                private inventarioZeusService : InventarioZeusService,
-                  private FormBuild : FormBuilder,
-                    private estadosProcesos_OTService : EstadosProcesos_OTService,
-                      private pedidoProductosService : PedidoProductosService,
-                        private pedidoExternoService : OpedidoproductoService,
-                          private messageService: MessageService) {
-
-    this.formFiltros = this.FormBuild.group({
-      IdVendedor : [null],
-      Vendedor: [null],
-      IdCliente: [null],
-      Cliente: [null],
-      IdItem: [null],
-      Item: [null],
-      Fecha1: [null],
-      Fecha2 : [null],
-    });
+                private messageService: MessageService,
+                  private inventarioZeusService : InventarioZeusService,
+                    private pedidoProductosService : PedidoProductosService,
+                      private pedidoExternoService : OpedidoproductoService,
+                        private estadosProcesos_OTService : EstadosProcesos_OTService,) {
   }
 
   ngOnInit() {
@@ -94,334 +79,393 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   // Funcion que va a consultar los pedidos de zeus
   consultarPedidosZeus(){
     this.cargando = true;
-    this.ArrayDocumento = [];
+    this.ArrayPedidos = [];
+    this.datosExcel = [];
 
-    this.inventarioZeusService.GetPedidosAgrupados().subscribe(datos_pedidos => {
+    this.inventarioZeusService.GetPedidos().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
-          if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarEncabezadoPedidosZeus(datos_pedidos[i]);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.llenarEncabezadoPedidosZeus(datos_pedidos[i]);
+          if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
       }
     });
-
     setTimeout(() => {
-      this.inventarioZeusService.GetPedidos().subscribe(datos_pedidos => {
-        for (let i = 0; i < datos_pedidos.length; i++) {
-          this.llenarDetallesPedidosZeus(datos_pedidos[i]);
-          this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
-        }
+      this.cargando = false;
+      this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+
+      const thisRef = this;
+      this.ArrayPedidos.forEach(function(pedido) {
+        thisRef.expandedRows[pedido.id] = true;
       });
-    }, 1500);
-    setTimeout(() => { this.cargando = false; }, 2500);
-  }
-
-  // Funcion que va llenar el encabezado de los pedidos de zeus
-  llenarEncabezadoPedidosZeus(datos : any){
-    if(datos.fecha_Creacion == null) datos.fecha_Creacion = datos.fecha_Creacion
-    else datos.fecha_Creacion = datos.fecha_Creacion.replace('T00:00:00', '');
-
-    if(datos.fecha_Entrega == null) datos.fecha_Entrega = datos.fecha_Entrega
-    else datos.fecha_Entrega = datos.fecha_Entrega.replace('T00:00:00', '');
-
-    const info : any = {
-      "data":{
-        "consecutivo": datos.consecutivo,
-        "cliente": datos.cliente,
-        "producto": '',
-        "id_Producto": '',
-        "cant_Pedida": '',
-        "cant_Pendiente": '',
-        "cant_Facturada": '',
-        "existencias": '',
-        "presentacion": '',
-        "estado": datos.estado,
-        "vendedor": datos.vendedor,
-        "precioUnidad" : '',
-        "orden_Compra_CLiente": datos.orden_Compra_CLiente,
-        "costo_Cant_Pendiente": 0,
-        "costo_Cant_Total": 0,
-        "fecha_Creacion": datos.fecha_Creacion.replace('T00:00:00', ''),
-        "fecha_Entrega": datos.fecha_Entrega.replace('T00:00:00', ''),
-        "OT" : '',
-        "Proceso_OT": '',
-        "CantPesada" : '',
-        "Estado_OT": '',
-        "CantPedidaKg_OT" : '',
-        "CantPedidaUnd_OT" : '',
-        "ExistenciaMayor" : false,
-        "Existencias_Completas" : 0,
-        "Cant_Items_ExistenciaMayor" : 0,
-        "Cant_Items" : 0,
-        "Zeus" : 1,
-      },
-      expanded: true,
-      "children":[]
-    }
-    this.ArrayDocumento.push(info);
-  }
-
-  // Funcion que va a llenar los detalles de cada uno de los pedidos de zeus
-  llenarDetallesPedidosZeus(datos : any){
-    for (let i = 0; i < this.ArrayDocumento.length; i++) {
-      if (this.ArrayDocumento[i].data.consecutivo == datos.consecutivo) {
-        const dataPedidos : any = {
-          "data":{
-            "consecutivo": datos.consecutivo,
-            "cliente": datos.cliente,
-            "producto": datos.producto,
-            "id_Producto": datos.id_Producto,
-            "cant_Pedida": datos.cant_Pedida.toFixed(2),
-            "cant_Pendiente": datos.cant_Pendiente.toFixed(2),
-            "cant_Facturada": datos.cant_Facturada.toFixed(2),
-            "existencias": datos.existencias.toFixed(2),
-            "presentacion": datos.presentacion,
-            "estado": datos.estado,
-            "vendedor": datos.vendedor,
-            "precioUnidad" : datos.precioUnidad.toFixed(2),
-            "orden_Compra_CLiente": datos.orden_Compra_CLiente,
-            "costo_Cant_Pendiente": datos.costo_Cant_Pendiente.toFixed(2),
-            "costo_Cant_Total": datos.costo_Cant_Total.toFixed(2),
-            "fecha_Creacion": datos.fecha_Creacion.replace('T00:00:00', ''),
-            "fecha_Entrega": datos.fecha_Entrega.replace('T00:00:00', ''),
-            "OT" : '',
-            "Proceso_OT": '',
-            "CantPesada" : '',
-            "Estado_OT": '',
-            "CantPedidaKg_OT" : '',
-            "CantPedidaUnd_OT" : '',
-            "ExistenciaMayor" : false,
-            "Zeus" : 1,
-          },
-        }
-        this.ArrayDocumento[i].data.Cant_Items += 1;
-
-        if (datos.existencias >= datos.cant_Pendiente) {
-          dataPedidos.data.ExistenciaMayor = true;
-          this.ArrayDocumento[i].data.ExistenciaMayor = true;
-          this.ArrayDocumento[i].data.Cant_Items_ExistenciaMayor += 1;
-        }
-        if (this.ArrayDocumento[i].data.Cant_Items == this.ArrayDocumento[i].data.Cant_Items_ExistenciaMayor) this.ArrayDocumento[i].data.Existencias_Completas = 1;
-        else this.ArrayDocumento[i].data.Existencias_Completas = 0;
-
-        this.ArrayDocumento[i].data.costo_Cant_Pendiente += datos.costo_Cant_Pendiente;
-        this.ArrayDocumento[i].data.costo_Cant_Total += datos.costo_Cant_Total;
-
-        this.sumaCostoPendiente += datos.costo_Cant_Pendiente;
-        this.sumaCostoTotal += datos.costo_Cant_Total;
-
-        this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
-          for (let i = 0; i < datos_orden.length; i++) {
-            if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
-              dataPedidos.data.OT = datos_orden[i].estProcOT_OrdenTrabajo;
-              if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
-                dataPedidos.data.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_ImpresionKg > 0) {
-                dataPedidos.data.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
-                dataPedidos.data.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_LaminadoKg > 0) {
-                dataPedidos.data.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_CorteKg > 0) {
-                dataPedidos.data.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_DobladoKg > 0) {
-                dataPedidos.data.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
-                dataPedidos.data.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_SelladoKg > 0) {
-                dataPedidos.data.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
-              }
-              if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
-                dataPedidos.data.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
-                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
-              }
-              dataPedidos.data.Estado_OT = datos_orden[i].estado_Id;
-              dataPedidos.data.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;
-              dataPedidos.data.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
-            }
-          }
-        });
-
-        this.columnas = [
-          { header: 'Pedido', field: 'consecutivo', tipo: '' },
-          { header: 'Cliente', field: 'cliente', tipo: '' },
-          { header: 'Id Producto', field: 'id_Producto', tipo: '' },
-          { header: 'Producto', field: 'producto', tipo: '' },
-          { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
-          { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
-          { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
-          { header: 'Stock', field: 'existencias', tipo: 'numero' },
-          { header: 'Und', field: 'presentacion', tipo: '' },
-          { header: 'Estado', field: 'estado', tipo: '' },
-          { header: 'Vendedor', field: 'vendedor', tipo: '' },
-          { header: 'OT', field: 'OT', tipo: '' },
-          { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
-          { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
-          { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
-          { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
-          { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
-          { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
-          { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
-        ];
-        this.columnasSeleccionada = this.columnas
-        this.ArrayDocumento[i].children.push(dataPedidos);
-        this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
-        this.ArrayDocumento.sort((a,b) => Number(b.data.ExistenciaMayor) - Number(a.data.ExistenciaMayor));
-        this.ArrayDocumento.sort((a,b) => Number(b.data.Existencias_Completas) - Number(a.data.Existencias_Completas));
-      }
-    }
+    }, 3500);
   }
 
   // Funcion que va a consultar los pedidos que no han sido cargados a zeus
   consultarPedidos(){
-    this.pedidoProductosService.GetPedidosPendientesAgrupados().subscribe(datos_pedidos => {
-      for (let i = 0; i < datos_pedidos.length; i++) {
-        if (this.ValidarRol == 2){
-          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarEncabezadoPedidos(datos_pedidos[i]);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarEncabezadoPedidos(datos_pedidos[i]);
-      }
-    });
-    setTimeout(() => { this.llenarDetallesPedidos(); }, 1500);
-  }
-
-  // Funcion que va a llena el encabezado de los pedidos que no han sido enviados a zeus
-  llenarEncabezadoPedidos(datos : any){
-    let info : any = {
-      "data" : {
-        "consecutivo": datos.pedExt_Id,
-        "cliente": datos.cli_Nombre,
-        "producto": '',
-        "id_Producto": '',
-        "cant_Pedida": '',
-        "cant_Pendiente": '',
-        "cant_Facturada": '',
-        "existencias": '',
-        "presentacion": '',
-        "estado": datos.estado_Nombre,
-        "vendedor": datos.usua_Nombre,
-        "precioUnidad" : '',
-        "orden_Compra_CLiente": '',
-        "costo_Cant_Pendiente": 0,
-        "costo_Cant_Total": datos.pedExt_PrecioTotalFinal,
-        "fecha_Creacion": datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
-        "fecha_Entrega": '',
-        "OT" : '',
-        "Proceso_OT": '',
-        "CantPesada" : '',
-        "Estado_OT": '',
-        "CantPedidaKg_OT" : '',
-        "CantPedidaUnd_OT" : '',
-        "ExistenciaMayor" : false,
-        "Existencias_Completas" : false,
-        "Cant_Items_ExistenciaMayor" : 0,
-        "Cant_Items" : 0,
-        "Zeus" : 0,
-      },
-      expanded: true,
-      "children" : []
-    }
-    this.sumaCostoTotal += datos.pedExt_PrecioTotalFinal;
-    this.ArrayDocumento.push(info);
-  }
-
-  // Funcion que va a llenar los detalles de cada uno de los pedidos que no han sido confirmados
-  llenarDetallesPedidos(){
     this.pedidoProductosService.getPedidoPendiente().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-        for (let j = 0; j < this.ArrayDocumento.length; j++) {
-          if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
-            let info : any = {
-              "data" : {
-                "consecutivo": datos_pedidos[i].pedExt_Id,
-                "cliente": datos_pedidos[i].cli_Nombre,
-                "idProducto": datos_pedidos[i].prod_Id,
-                "producto":  datos_pedidos[i].prod_Nombre,
-                "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
-                "cant_Pendiente": datos_pedidos[i].cant_Pendiente,
-                "cant_Facturada": datos_pedidos[i].cant_Facturada,
-                "existencias": datos_pedidos[i].existencias,
-                "presentacion": datos_pedidos[i].undMed_Id,
-                "estado": datos_pedidos[i].estado_Nombre,
-                "vendedor": datos_pedidos[i].usua_Nombre,
-                "precioUnidad" : this.formatonumeros(datos_pedidos[i].pedExtProd_PrecioUnitario),
-                "orden_Compra_CLiente": '',
-                "costo_Cant_Pendiente": 0,
-                "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].pedExtProd_PrecioUnitario),
-                "fecha_Creacion": datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
-                "fecha_Entrega" : datos_pedidos[i].pedExtProd_FechaEntrega.replace('T00:00:00', ''),
-                "OT" : '',
-                "Proceso_OT": '',
-                "CantPesada" : '',
-                "Estado_OT": '',
-                "CantPedidaKg_OT" : '',
-                "CantPedidaUnd_OT" : '',
-                "ExistenciaMayor" : false,
-                "Zeus" : 1,
-                "Cant_Items_ExistenciaMayor" : 0,
-                "Cant_Items" : 0,
-              }
-            }
-            if(datos_pedidos[i].undMed_Id == 'Und') datos_pedidos[i].undMed_Id = 'UND';
-            if(datos_pedidos[i].undMed_Id == 'Kg') datos_pedidos[i].undMed_Id = 'KLS';
-            if(datos_pedidos[i].undMed_Id == 'Paquete') datos_pedidos[i].undMed_Id = 'PAQ';
+        if (this.ValidarRol == 2){
+          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarArrayPedidos(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i], i);
+      }
+    });
+    setTimeout(() => { this.cargando = false; }, 1500);
+  }
 
-            this.inventarioZeusService.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => {
-              for (let index = 0; index < dataZeus.length; index++) {
-                info.data.existencias = dataZeus[index].existencias;
-              }
-            });
-            this.ArrayDocumento[j].children.push(info);
-            this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
+  // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos en zeus
+  llenarArrayPedidosZeus(datos : any, index : number){
+    let info : any = {
+      id : index,
+      id_color : 4,
+      color : 'blanco',
+      consecutivo : datos.consecutivo,
+      cliente: datos.cliente,
+      producto: datos.producto,
+      id_Producto: datos.id_Producto,
+      cant_Pedida: datos.cant_Pedida.toFixed(2),
+      cant_Pendiente: parseFloat(datos.cant_Pendiente).toFixed(2),
+      cant_Facturada: datos.cant_Facturada.toFixed(2),
+      existencias: parseFloat(datos.existencias).toFixed(2),
+      presentacion: datos.presentacion,
+      estado: datos.estado,
+      vendedor: datos.vendedor,
+      precioUnidad : datos.precioUnidad.toFixed(2),
+      orden_Compra_CLiente: datos.orden_Compra_CLiente,
+      costo_Cant_Pendiente: datos.costo_Cant_Pendiente.toFixed(2),
+      costo_Cant_Total: datos.costo_Cant_Total.toFixed(2),
+      fecha_Creacion: datos.fecha_Creacion.replace('T00:00:00', ''),
+      fecha_Entrega: datos.fecha_Entrega.replace('T00:00:00', ''),
+      OT : '',
+      Proceso_OT: '',
+      CantPesada : '',
+      Estado_OT: '',
+      CantPedidaKg_OT : '',
+      CantPedidaUnd_OT : '',
+      Zeus : 1,
+    };
+    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
+          info.OT = datos_orden[i].estProcOT_OrdenTrabajo;
+          if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
+            info.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
           }
+          if (datos_orden[i].estProcOT_ImpresionKg > 0) {
+            info.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
+            info.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_LaminadoKg > 0) {
+            info.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_CorteKg > 0) {
+            info.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_DobladoKg > 0) {
+            info.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
+            info.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_SelladoKg > 0) {
+            info.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
+            info.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+            info.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
+          }
+          info.Estado_OT = datos_orden[i].estado_Id;
+          info.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;
+          info.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
         }
       }
     });
+    this.columnas = [
+      { header: 'Pedido', field: 'consecutivo', tipo: '' },
+      { header: 'Cliente', field: 'cliente', tipo: '' },
+      { header: 'Id Producto', field: 'id_Producto', tipo: '' },
+      { header: 'Producto', field: 'producto', tipo: '' },
+      { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
+      { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
+      { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
+      { header: 'Stock', field: 'existencias', tipo: 'numero' },
+      { header: 'Und', field: 'presentacion', tipo: '' },
+      { header: 'Estado', field: 'estado', tipo: '' },
+      { header: 'Vendedor', field: 'vendedor', tipo: '' },
+      { header: 'OT', field: 'OT', tipo: '' },
+      { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
+      { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
+      { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
+      { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
+      { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
+      { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
+      { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
+    ];
+    this.columnasSeleccionadas = this.columnas;
+    this.ArrayPedidos.push(info);
+    this.datosExcel = this.ArrayPedidos;
+
+    let pedidos = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo);
+    let cantidad = this.ArrayPedidos.filter((item) => item.consecutivo == datos.consecutivo && parseFloat(item.existencias) >= parseFloat(item.cant_Pendiente));
+
+    if (pedidos.length == cantidad.length) {
+      for (let i = 0; i < pedidos.length; i++) {
+        let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
+        this.ArrayPedidos[posicion].id_color = 1;
+        this.ArrayPedidos[posicion].color = 'verde';
+      }
+    } else if (cantidad.length > 0 && cantidad.length < pedidos.length) {
+      for (let i = 0; i < pedidos.length; i++) {
+        if (parseFloat(pedidos[i].existencias) >= parseFloat(pedidos[i].cant_Pendiente)) {
+          let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
+          this.ArrayPedidos[posicion].id_color = 2;
+          this.ArrayPedidos[posicion].color = 'verde';
+        } else {
+          let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
+          this.ArrayPedidos[posicion].id_color = 2;
+          this.ArrayPedidos[posicion].color = 'azul';
+        }
+      }
+    } else {
+      for (let i = 0; i < pedidos.length; i++) {
+        let posicion = this.ArrayPedidos.findIndex((item) => item.id == pedidos[i].id);
+        this.ArrayPedidos[posicion].id_color = 4;
+        this.ArrayPedidos[posicion].color = 'blanco';
+      }
+    }
   }
 
-  // Funcion que buscará las columnas que se desean colocar
-  @Input() get columnasSeleccionada(): any[] {
-    return this._columnasSeleccionada;
+  // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
+  llenarArrayPedidos(datos : any, index : number){
+    if(datos.undMed_Id == 'Und') datos.undMed_Id = 'UND';
+    if(datos.undMed_Id == 'Kg') datos.undMed_Id = 'KLS';
+    if(datos.undMed_Id == 'Paquete') datos.undMed_Id = 'PAQ';
+
+    let info : any = {
+      id : index,
+      id_color : 3,
+      color : 'rojo',
+      consecutivo : datos.pedExt_Id,
+      cliente: datos.cli_Nombre,
+      producto: datos.prod_Nombre,
+      id_Producto: datos.prod_Id,
+      cant_Pedida: datos.pedExtProd_Cantidad,
+      cant_Pendiente: datos.pedExtProd_Cantidad,
+      cant_Facturada: 0,
+      existencias: datos.existencias,
+      presentacion: datos.undMed_Id,
+      estado: datos.estado_Nombre,
+      vendedor: datos.usua_Nombre,
+      precioUnidad : datos.pedExtProd_PrecioUnitario,
+      orden_Compra_CLiente: datos.orden_Compra_CLiente,
+      costo_Cant_Pendiente: datos.costo_Cant_Pendiente,
+      costo_Cant_Total: datos.pedExtProd_Cantidad * datos.pedExtProd_PrecioUnitario,
+      fecha_Creacion: datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
+      fecha_Entrega: datos.pedExtProd_FechaEntrega.replace('T00:00:00', ''),
+      OT : '',
+      Proceso_OT: '',
+      CantPesada : '',
+      Estado_OT: '',
+      CantPedidaKg_OT : '',
+      CantPedidaUnd_OT : '',
+      Zeus : 0,
+    };
+
+    this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(dataZeus => {
+      for (let index = 0; index < dataZeus.length; index++) {
+        info.existencias = dataZeus[index].existencias;
+      }
+    });
+
+    this.ArrayPedidos.push(info);
+    this.datosExcel = this.ArrayPedidos;
+    this.ArrayPedidos.sort((a,b) => Number(a.id) - Number(b.id));
   }
 
-  // Funcion que colocará las columnas que se deseen
-  set columnasSeleccionada(val: any[]) {
-    this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
+  // Funcion que va a calcular el costo total del pedido
+  calcularCostoPedido(consecutivo : number) : number {
+    let nuevo = this.ArrayPedidos.filter((item) => item.consecutivo == consecutivo);
+    let total : number = 0;
+    for (let i = 0; i < nuevo.length; i++) {
+      total += nuevo[i].cant_Pendiente * nuevo[i].precioUnidad;
+    }
+    return total;
+  }
+
+  // Funcion que creará un archivo de excel con base de lo que esté en la tabla
+  exportarExcel(){
+    if (this.ArrayPedidos.length == 0) this.mostrarAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
+    else {
+      this.cargando = true;
+      const title = `Reporte de Pedidos Zeus - ${this.today}`;
+      const header = ["N° Pedido", "Cliente", "Id Producto", "Producto", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
+
+      let datos : any =[];
+      for (const item of this.datosExcel) {
+        const datos1 : any = [item.consecutivo, item.cliente, item.id_Producto, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT ];
+        datos.push(datos1);
+      }
+
+      let workbook = new Workbook();
+      const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+      let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
+      worksheet.addImage(imageId1, 'A1:C3');
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell, number) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:T3');
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
+        row.alignment = { horizontal : 'center' }
+        row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(5).font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
+
+        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(14).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+
+        let colorEstadoPedido : string, colorEstadoOT : string;
+        // OT con Estado
+        if (row.getCell(20).value == 17) {
+          colorEstadoOT = '8AFC9B';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "Terminada";
+        } else if (row.getCell(20).value == 18) {
+          colorEstadoOT = '53CC48';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "Cerrada";
+        } else if (row.getCell(20).value == 3) {
+          colorEstadoOT = 'FF7878';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "Anulado";
+        } else if (row.getCell(20).value == 14) {
+          colorEstadoOT = '83D3FF';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "Asignada";
+        } else if (row.getCell(20).value == 16) {
+          colorEstadoOT = 'F3FC20;';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "En proceso";
+        } else if (row.getCell(20).value == 15) {
+          colorEstadoOT = 'F6D45D';
+          row.getCell(20).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, };
+          row.getCell(20).value = "Abierta";
+        } else colorEstadoOT = 'FFFFFF';
+
+        /** Estado Pedido*/
+        if (row.getCell(11).value == 'Pendiente') colorEstadoPedido = 'FF7F71'
+        else if (row.getCell(11).value == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
+        row.getCell(11).fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoPedido }, }
+
+        worksheet.getColumn(1).width = 12;
+        worksheet.getColumn(2).width = 60;
+        worksheet.getColumn(3).width = 15;
+        worksheet.getColumn(4).width = 60;
+        worksheet.getColumn(5).width = 15;
+        worksheet.getColumn(6).width = 15;
+        worksheet.getColumn(7).width = 15;
+        worksheet.getColumn(8).width = 18;
+        worksheet.getColumn(9).width = 15;
+        worksheet.getColumn(10).width = 15;
+        worksheet.getColumn(11).width = 20;
+        worksheet.getColumn(12).width = 50;
+        worksheet.getColumn(13).width = 25;
+        worksheet.getColumn(14).width = 20;
+        worksheet.getColumn(15).width = 20;
+        worksheet.getColumn(16).width = 15;
+        worksheet.getColumn(17).width = 15;
+        worksheet.getColumn(18).width = 15;
+        worksheet.getColumn(19).width = 40;
+        worksheet.getColumn(20).width = 30;
+      });
+      setTimeout(() => {
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, `Reporte de Pedidos Zeus - ${this.today}.xlsx`);
+        });
+        setTimeout(() => {  this.mostrarConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!'); }, 3100);
+        this.cargando = false;
+      }, 2000);
+    }
+  }
+
+  // Funcion que llenará el archivo de excel con los datos de la tabla
+  llenarArrayExcel(datos : any, arrayDatos : any){
+    this.cargando = true;
+    for (let i = 0; i < datos.length; i++) {
+      const datos1 : any = [
+        datos[i].consecutivo,
+        datos[i].cliente,
+        datos[i].producto,
+        datos[i].cant_Pedida,
+        datos[i].cant_Pendiente,
+        datos[i].cant_Facturada,
+        datos[i].existencias,
+        datos[i].presentacion,
+        datos[i].precioUnidad,
+        datos[i].estado,
+        datos[i].vendedor,
+        datos[i].orden_Compra_CLiente,
+        datos[i].costo_Cant_Pendiente,
+        datos[i].costo_Cant_Total,
+        datos[i].fecha_Creacion.replace('T00:00:00', ''),
+        datos[i].fecha_Entrega.replace('T00:00:00', ''),
+        datos[i].OT,
+        datos[i].Proceso_OT,
+        datos[i].Estado_OT,
+      ];
+      arrayDatos.push(datos1);
+    }
   }
 
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro($event, campo : any, valorCampo : string){
-    this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      if (this.tt.filteredNodes != null) {
-        this.sumaCostoPendiente = 0;
-        this.sumaCostoTotal = 0;
-        for (let i = 0; i < this.tt.filteredNodes.length; i++) {
-          this.sumaCostoPendiente += this.tt.filteredNodes[i].data.costo_Cant_Pendiente;
-          this.sumaCostoTotal += this.tt.filteredNodes[i].data.costo_Cant_Total;
+      this.datosExcel = [];
+      if (this.dt.filteredValue != null) {
+        for (let i = 0; i < this.dt.filteredValue.length; i++) {
+          this.datosExcel.push(this.dt.filteredValue[i]);
         }
       } else {
-        this.sumaCostoPendiente = 0;
-        this.sumaCostoTotal = 0;
-        for (let i = 0; i < this.tt._value.length; i++) {
-          this.sumaCostoPendiente += this.tt._value[i].data.costo_Cant_Pendiente;
-          this.sumaCostoTotal += this.tt._value[i].data.costo_Cant_Total;
+        for (let i = 0; i < this.ArrayPedidos.length; i++) {
+          this.datosExcel.push(this.ArrayPedidos[i]);
         }
       }
     }, 400);
+  }
+
+  // Función que mostrará la descripción de cada una de las card de los dashboard's
+  mostrarDescripcion($event, color : string){
+    if (color == 'verde') this.infoColor = `El color verde indica que <b>${'todos los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'las existencias de el/los item(s) son mayores que las cantidades pendientes.'}</b>`;
+    if (color == 'azul') this.infoColor = `El color azul indica que <b>${'al menos uno de los items de un pedido pueden ser facturados.'}</b><br><br> Debido a que <b>${'el stock de dicho(s) producto(s) es mayor que las cantidad solicitada.'}</b><br><br>
+    <b>${'Nota:'}</b> Si encuentra filas de color verde dentro de encabezados de pedidos de color azul <b>${'es porque ese item en específico está listo para ser facturado!'}</b>`;
+    if (color == 'rojo') this.infoColor = `El color rojo muestra los pedidos <b>${'que aún no han sido aprobados por gerencia para ser creados en Zeus'}</b>`;
+
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
   }
 
   // Funcion que mostrará un modal con la informacion del pedido seleccionado y en el que se podrá editar el pedido selecionado
@@ -588,7 +632,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   mostrarEleccion(item : any, eleccion : any){
     let mensaje : string = "";
     this.itemSeleccionado = item;
-    console.log(this.itemSeleccionado);
     if (eleccion == 'aceptar') { this.onReject('aceptar'); this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
     if(eleccion == 'cancelar') { this.onReject('cancelar'); this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
 
@@ -626,18 +669,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
   }
 
-  //
-  confirmarCancelacion(item : any){
-    Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: 'Está seguro que desea cancelar el pedido?',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      confirmButtonColor: '#53CC48',
-    }).then((result) => { if (result.isConfirmed) this.cancelarPedido(item); });
-  }
-
   /** Aceptar Pedido para luego crearlo en Zeus */
   cancelarPedido(item : any){
     this.onReject('cancelar');
@@ -667,161 +698,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }, 100);
       }, error => { this.mostrarError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
     });
-  }
-
-  // Funcion que creará un archivo de excel con base de lo que esté en la tabla
-  exportarExcel(){
-    if (this.ArrayDocumento.length == 0) this.mostrarAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
-    else {
-      let datos : any =[];
-      setTimeout(() => {
-        if(this.tt.filteredNodes != null) {
-          for (let index = 0; index < this.tt.filteredNodes.length; index++) {
-            this.llenarArrayExcel(this.tt.filteredNodes[index].children, datos);
-          }
-        } else {
-          for (let index = 0; index < this.tt._value.length; index++) {
-            this.llenarArrayExcel(this.tt._value[index].children, datos);
-          }
-        }
-      }, 300);
-
-      setTimeout(() => {
-        const title = `Reporte de Pedidos Zeus - ${this.today}`;
-        const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
-
-        let workbook = new Workbook();
-        const imageId1 = workbook.addImage({
-          base64:  logoParaPdf,
-          extension: 'png',
-        });
-        let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
-        worksheet.addImage(imageId1, 'A1:B3');
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:S3');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          let consecutivo = row.getCell(1);
-          let fecha1 = row.getCell(15);
-          let fecha2 = row.getCell(16);
-          let medida = row.getCell(8);
-          let Pedida = row.getCell(4);
-          let Pendiente = row.getCell(5);
-          let Facturada = row.getCell(6);
-          let stock = row.getCell(7);
-          let precioUnd  = row.getCell(9);
-          let ccPendiente = row.getCell(13);
-          let ccTotal = row.getCell(14);
-          let OT = row.getCell(17);
-          let estadoPedido = row.getCell(10);
-          let estadoOT = row.getCell(19);
-          let colorEstadoOT;
-          let colorEstadoPedido;
-
-          consecutivo.alignment = { horizontal : 'center' }
-          fecha1.alignment = { horizontal : 'center' }
-          fecha2.alignment = { horizontal : 'center' }
-          medida.alignment = { horizontal : 'center' }
-          OT.alignment = {horizontal : 'center'}
-          Pedida.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          /** Pendiente */
-          row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          Pendiente.font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
-
-          Facturada.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          stock.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          precioUnd.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          ccPendiente.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          ccTotal.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-
-          /** OT con Estado */
-          if(d[18] == 17) { colorEstadoOT = '8AFC9B';  estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Terminada'; }
-          else if(d[18] == 18) {colorEstadoOT = '53CC48'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Cerrada';}
-          else if(d[18] == 3) {colorEstadoOT = 'FF7878'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Anulada';}
-          else if(d[18] == 14) {colorEstadoOT = '83D3FF'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Asignada';}
-          else if(d[18] == 16) {colorEstadoOT = 'F3FC20;'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'En Proceso';}
-          else if(d[18] == 15) {colorEstadoOT = 'F6D45D'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Abierta';}
-          else colorEstadoOT = 'FFFFFF';
-
-          /** Estado Pedido*/
-          if (d[9] == 'Pendiente') colorEstadoPedido = 'FF7F71'
-          else if (d[9] == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
-          estadoPedido.fill = {
-            type : 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: colorEstadoPedido },
-          }
-
-          worksheet.getColumn(1).width = 12;
-          worksheet.getColumn(2).width = 50;
-          worksheet.getColumn(3).width = 45;
-          worksheet.getColumn(4).width = 15;
-          worksheet.getColumn(5).width = 15;
-          worksheet.getColumn(6).width = 15;
-          worksheet.getColumn(7).width = 15;
-          worksheet.getColumn(8).width = 10;
-          worksheet.getColumn(9).width = 15;
-          worksheet.getColumn(10).width = 25;
-          worksheet.getColumn(11).width = 40;
-          worksheet.getColumn(12).width = 20;
-          worksheet.getColumn(13).width = 20;
-          worksheet.getColumn(14).width = 20;
-          worksheet.getColumn(15).width = 15;
-          worksheet.getColumn(16).width = 15;
-          worksheet.getColumn(17).width = 15;
-          worksheet.getColumn(18).width = 30;
-          worksheet.getColumn(19).width = 20;
-        });
-
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Reporte de Pedidos Zeus - ${this.today}.xlsx`);
-          });
-          this.cargando = false;
-        }, 1000);
-      }, 1500);
-      setTimeout(() => {  this.mostrarConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!'); }, 3100);
-    }
-  }
-
-  // Funcion que llenará el archivo de excel con los datos de la tabla
-  llenarArrayExcel(datos : any, arrayDatos : any){
-    this.cargando = true;
-    for (let i = 0; i < datos.length; i++) {
-      const datos1 : any = [
-        datos[i].data.consecutivo,
-        datos[i].data.cliente,
-        datos[i].data.producto,
-        datos[i].data.cant_Pedida,
-        datos[i].data.cant_Pendiente,
-        datos[i].data.cant_Facturada,
-        datos[i].data.existencias,
-        datos[i].data.presentacion,
-        datos[i].data.precioUnidad,
-        datos[i].data.estado,
-        datos[i].data.vendedor,
-        datos[i].data.orden_Compra_CLiente,
-        datos[i].data.costo_Cant_Pendiente,
-        datos[i].data.costo_Cant_Total,
-        datos[i].data.fecha_Creacion.replace('T00:00:00', ''),
-        datos[i].data.fecha_Entrega.replace('T00:00:00', ''),
-        datos[i].data.OT,
-        datos[i].data.Proceso_OT,
-        datos[i].data.Estado_OT,
-      ];
-      arrayDatos.push(datos1);
-    }
   }
 
   /** Llenar array al momento de seleccionar VER PDF */
@@ -1149,6 +1025,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+   this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
   }
 
   /** Mostrar mensaje de error  */

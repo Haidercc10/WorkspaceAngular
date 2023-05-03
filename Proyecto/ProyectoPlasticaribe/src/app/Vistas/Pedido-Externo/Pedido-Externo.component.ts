@@ -113,8 +113,8 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.clientesComboBox();
     this.lecturaStorage();
+    this.clientesComboBox();
     this.checkboxIva();
   }
 
