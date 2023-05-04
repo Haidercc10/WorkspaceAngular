@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -15,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -49,19 +50,59 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   costoCantidadPendiente : number = 0;
   arrayPedidosIndividuales : any = [];
   datosExcel : any [] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
+  temaSeleccionado : boolean = false;
+  device: HIDDevice;
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
                   private inventarioZeusService : InventarioZeusService,
                     private pedidoProductosService : PedidoProductosService,
                       private pedidoExternoService : OpedidoproductoService,
-                        private estadosProcesos_OTService : EstadosProcesos_OTService,) {
+                        private estadosProcesos_OTService : EstadosProcesos_OTService,
+                          @Inject(DOCUMENT) private document : Document) {
+    this.mostrar();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.lecturaStorage();
     this.consultarPedidosZeus();
     this.consultarPedidos();
+    //this.connectHID();
+  }
+
+  async connectHID() {
+    if (!('hid' in navigator)) {
+      console.error('WebHID is not supported in this browser.');
+      return;
+    }
+
+    try {
+      this.device = await (navigator as any).hid.requestDevice({ filters: [] });
+      let devices = await navigator.hid.getDevices();
+      await this.device.open();
+      devices.forEach((device) => {
+        console.log(`HID: ${device.productName}`);
+      });
+
+      //await this.device.open();
+      console.log('Device connected:', this.device);
+    } catch (error) {
+      console.error('Failed to connect to the HID device:', error);
+    }
+  }
+
+  mostrar() {
+    let modo = window.localStorage.getItem("theme");
+    console.log(modo);
+    if(modo) this.temaSeleccionado = modo == 'dark' ? true : false;
+    this.cambiar(this.temaSeleccionado);
+  }
+
+  cambiar(estado : boolean) {
+    let tema = estado ? 'dark' : 'light';
+    window.localStorage.setItem("theme", tema);
+    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
+    linkTema.href = 'lara-' + tema + '-blue' + '.css'
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
