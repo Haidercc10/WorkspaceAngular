@@ -21,9 +21,8 @@
     </div>
   </div>
 </div>
-
-<div class="formulario">
-
+<p-inputSwitch (onChange)="cambiar($event.checked)" [(ngModel)]="temaSeleccionado"></p-inputSwitch><br><br>
+<p-card>
   <!-- Informacion sobre los colores -->
   <p-toolbar>
     <ng-template pTemplate="right">
@@ -40,7 +39,7 @@
   <!-- Exportar a excel -->
   <p-toolbar>
     <ng-template pTemplate="right">
-      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
+      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="connectHID()"></button>
     </ng-template>
 
     <ng-template pTemplate="left">
@@ -144,7 +143,7 @@
       </ng-template>
     </p-table>
   </div>
-</div>
+</p-card>
 
 <!-- Mensajes de descripción en los botones de la parte superior -->
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >

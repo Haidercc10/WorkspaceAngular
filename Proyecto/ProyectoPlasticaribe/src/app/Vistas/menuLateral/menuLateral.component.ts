@@ -1,4 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { CookieService } from 'ngx-cookie-service';
@@ -17,6 +18,7 @@ export class MenuLateralComponent implements OnInit {
   display : boolean = false;
   items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
+  @ViewChild(AppComponent) appComponent : AppComponent;
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -43,16 +45,23 @@ export class MenuLateralComponent implements OnInit {
   subir14 : boolean = true;
   subir15 : boolean = true;
   subir16 : boolean = true;
+  modoSeleccionado : boolean;
 
   constructor(private AppComponent : AppComponent,
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
                       private authenticationService: AuthenticationService,
-                        private cookieService: CookieService,) { }
+                        private cookieService: CookieService,
+                          @Inject(DOCUMENT) private document : Document) {
+
+    this.AppComponent.mostrar();
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.lecturaStorage();
+
   }
 
   lecturaStorage(){
@@ -197,5 +206,19 @@ export class MenuLateralComponent implements OnInit {
   clickIcon16(){
     if (this.subir16) this.subir16 = false;
     else this.subir16 = true;
+  }
+
+  mostrar() {
+    let modo = window.localStorage.getItem("theme");
+    console.log(modo);
+    if(modo) this.AppComponent.temaSeleccionado = modo == 'dark' ? true : false;
+    this.cambiar(this.AppComponent.temaSeleccionado);
+  }
+
+  cambiar(estado : boolean) {
+    let tema = estado ? 'dark' : 'light';
+    window.localStorage.setItem("theme", tema);
+    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
+    linkTema.href = 'lara-' + tema + '-blue' + '.css'
   }
 }
