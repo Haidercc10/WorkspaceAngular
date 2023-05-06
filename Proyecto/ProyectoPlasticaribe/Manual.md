@@ -53,6 +53,7 @@ Al iniciar sesión con nuestras credenciales se nos redirecciona al dashboard do
 * Un usuario con rol de `Presidencia` tendrá acceso a los `Pedidos` del dashboard.
 + Un usuario con rol de `Vendedor` tendrá acceso a `Facturación Vendedores` en el dashboard.
 - Un usuario con rol de `Operario Materia Prima` tendrá acceso a `Materias Primas` en el dashboard.
+
 ![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard.jpg)
 
 El resto de roles verán lo siguiente:
