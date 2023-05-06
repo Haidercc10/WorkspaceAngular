@@ -27,6 +27,11 @@ p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng
   width: 100%;
 }
 
+p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
+  color: var(--rojo);
+  width: 100%;
+}
+
 p-chart ::ng-deep div ::ng-deep canvas {
   display: inline-block;
   width: 100%;

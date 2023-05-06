@@ -39,15 +39,6 @@ body {
   margin-bottom: 5%;
 }
 
-.formularioModal {
-  align-items: center;
-  margin: auto;
-  background-color: rgb(255, 255, 255);
-  width: 90%;
-  height: 100%;
-  padding: 2%;
-}
-
 @media (max-width : 800px) {
   .formulario {
     width: 90%;
@@ -190,6 +181,3 @@ a {
 .p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
   font-weight: 500;
 }
-
-
-
