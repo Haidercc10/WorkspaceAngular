@@ -1,12 +1,12 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { AppComponent } from 'src/app/app.component';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Component({
   selector: 'app-Dashboard-OT',
@@ -45,19 +45,23 @@ export class DashboardOTComponent implements OnInit {
   productosFacturas : any [] = []; //Variable que almacenará la informacion de los productos a los que se les ha facturado en el mes
   vendedoresFacturas : any [] = []; //Variable que almacenará la informacion de los vendedores a los que se les ha facturado en el mes
 
-  mostrarGrafica : boolean = false; //Variable que mostrará o no la información graficada
+  graficaMateriales : boolean = false; //Variable que validará si la grafica de barras que se está mostrando es la grafica de materiales
+  mostrarGraficaBarras : boolean = false; //Variable que mostrará o no la información en una grafica de barras
+  mostrarGraficaPie : boolean = false; //Variable que mostrará o no la información en una grafica de pie
   nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
   multiAxisData: any;
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
+  graficaPieData : any; //Variable que almacenará la informacion que se mostrará en la grafica de pie
+  graficaPieOptions : any; //Variable que almacenará la información de los estilos que tendrá la grafica de pie
   nroCard : string = '';  /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private bagProService : BagproService,
                   private ordenTrabajoService : EstadosProcesos_OTService,
                     private zeusService : InventarioZeusService,) {
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
@@ -73,7 +77,7 @@ export class DashboardOTComponent implements OnInit {
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => { this.tiempoExcedido(); }, 60000);
+  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
@@ -192,7 +196,8 @@ export class DashboardOTComponent implements OnInit {
 
   // Funcion que va a llenar la grafica con la información de los vendedores
   llenarGraficaVendedores(){
-    this.mostrarGrafica = true;
+    this.graficaMateriales = false;
+    this.mostrarGraficaBarras = true;
     this.nombreGrafica = `Grafica de Vendedores`;
     let vendedores : any = [];
     let costoVentas : any = [];
@@ -248,7 +253,8 @@ export class DashboardOTComponent implements OnInit {
 
   // Funcion que va a llenar la grafica con informacion de los clientes
   llenarGraficaClientes(){
-    this.mostrarGrafica = true;
+    this.graficaMateriales = false;
+    this.mostrarGraficaBarras = true;
     this.nombreGrafica = `Grafica de Clientes`;
     let clientes : any = [];
     let costo : any = [];
@@ -303,7 +309,7 @@ export class DashboardOTComponent implements OnInit {
   }
 
   llenarGraficaFactClientes() {
-    this.mostrarGrafica = true;
+    this.mostrarGraficaBarras = true;
     this.nombreGrafica = `Grafica de facturación por clientes`;
     let clientes : any = [];
     let costo : any = [];
@@ -359,7 +365,7 @@ export class DashboardOTComponent implements OnInit {
   }
 
   llenarGraficaFactVendedores() {
-    this.mostrarGrafica = true;
+    this.mostrarGraficaBarras = true;
     this.nombreGrafica = `Grafica de facturación por vendedores`;
     let vendedores : any = [];
     let costo : any = [];
@@ -517,6 +523,149 @@ export class DashboardOTComponent implements OnInit {
       this.op!.toggle($event);
       $event.stopPropagation();
     }, 500);
+  }
+
+  // Funcion que va a llenar la grafica de pie con informacion de los estados de las ordenes de trabajo
+  llenarGraficaEstadosOt(){
+      this.mostrarGraficaPie = true;
+      this.nombreGrafica = `Grafica de Estados de Ordenes de Trabajo`;
+      let labels : string [] = [];
+      let cantidades : number [] = [];
+      for (const item of this.estadosOrdenes) {
+        labels.push(item.Nombre);
+        cantidades.push(item.Cantidad);
+      }
+      this.graficaPieData = {
+        labels: labels,
+        datasets: [
+          {
+            data: cantidades,
+            backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033', '#009900'],
+            hoverBackgroundColor: ['#FFCC66', '#CCFFFF', '#33FF99', '#FFFF99', '#FF6666', '#00CC66']
+          }
+        ]
+      };
+
+      this.graficaPieOptions = {
+        plugins: {
+          legend: {  labels: { color: '#000', font: { size: 18 } } },
+          tooltip: { titleFont: { size: 25, }, bodyFont: { size: 20 }, },
+        },
+      };
+  }
+
+  // Funcion que va a llenar la grafica de barras con la informacion de las ordenes creadas para cada material, los tipos de graficas serán 3, cantidad, costo y peso
+  llenarGraficaMateriales(TipoGrafica : number){
+      this.graficaMateriales = true;
+      this.mostrarGraficaBarras = true;
+      this.nombreGrafica = `Grafica de Materiales`;
+      let labels : string [] = [];
+      let cantidad : number [] = [];
+      let costo : number [] = [];
+      let peso : number [] = [];
+      let data : number [] = [];
+      let nombreTipo : string = '';
+      for (let i = 0; i < this.materialesOrdenesMes.length; i++) {
+        labels.push(this.materialesOrdenesMes[i].extMaterialNom)
+        cantidad.push(this.materialesOrdenesMes[i].cantidad);
+        costo.push(this.materialesOrdenesMes[i].costo);
+        peso.push(this.materialesOrdenesMes[i].peso);
+      }
+      if (TipoGrafica == 1) {
+        data = cantidad;
+        nombreTipo = 'Cantidad';
+      } else if (TipoGrafica == 2) {
+        data = costo;
+        nombreTipo = 'Costo';
+      } else if (TipoGrafica == 3) {
+        data = peso;
+        nombreTipo = 'Peso Kg';
+      }
+      this.multiAxisData = {
+        labels: labels,
+        datasets: [
+          {
+            label: nombreTipo,
+            data: data,
+            backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033'],
+            borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)'],
+            borderWidth: 1
+          },
+        ]
+      };
+      this.multiAxisOptions = {
+        stacked: false,
+        plugins: {
+          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
+          tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#495057',
+              font: { size: 20 },
+            },
+            grid: { color: '#ebedef' }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: { color: '#495057', font: { size: 20 } },
+            grid: { color: '#ebedef' }
+          },
+        },
+        datalabels: { anchor: 'end', align: 'end' }
+      };
+  }
+
+  // Funcion que va a graficar la informacion de lo producido por los diferentes procesos
+  llenarGraficaProcesos(){
+      this.graficaMateriales = false;
+      this.mostrarGraficaBarras = true;
+      this.nombreGrafica = `Grafica de Procesos`;
+      let labels : string [] = [];
+      let cantidad : number [] = [];
+      for (let i = 0; i < this.procesosOrdenesMes.length; i++) {
+        labels.push(this.procesosOrdenesMes[i].Nombre)
+        cantidad.push(this.procesosOrdenesMes[i].cantidad);
+      }
+      this.multiAxisData = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Cantidad',
+            data: cantidad,
+            backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033', '#009900', '#CCFF66'],
+            borderColor: ['rgb(255, 159, 64)'],
+            borderWidth: 1
+          },
+        ]
+      };
+      this.multiAxisOptions = {
+        stacked: false,
+        plugins: {
+          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
+          tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#495057',
+              font: { size: 20 },
+            },
+            grid: { color: '#ebedef' }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: { color: '#495057', font: { size: 20 } },
+            grid: { color: '#ebedef' }
+          },
+        },
+        datalabels: { anchor: 'end', align: 'end' }
+      };
   }
 
 }

@@ -11,7 +11,6 @@ import { authentication_BagPro } from './_Services/authentication_BagPro.service
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +37,6 @@ export class AppComponent implements OnInit{
   rutaCarpetaArchivos : string = 'D:\\Calidad\\'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
   public data:any=[];
   tamanoLetra : number = 1;
-  temaSeleccionado : boolean = false;
 
   constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private authenticationService: AuthenticationService,
@@ -47,29 +45,12 @@ export class AppComponent implements OnInit{
                       private authenticationBagProService : authentication_BagPro,
                         private cookieService: CookieService,
                           private config: PrimeNGConfig,
-                            private encriptacion : EncriptacionService,
-                              @Inject(DOCUMENT) private document : Document) {
+                            private encriptacion : EncriptacionService,) {
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
     this.authenticationBagProService.user.subscribe(x => this.user_BagPro = x);
     this.inactividad();
-    this.mostrar();
-  }
-
-  mostrar() {
-    let modo = window.localStorage.getItem("theme");
-    console.log(modo);
-    if(modo) this.temaSeleccionado = modo == 'dark' ? true : false;
-    this.cambiar(this.temaSeleccionado);
-    console.log(this.temaSeleccionado);
-  }
-
-  cambiar(estado : boolean) {
-    let tema = estado ? 'dark' : 'light';
-    window.localStorage.setItem("theme", tema);
-    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
-    linkTema.href = 'lara-' + tema + '-blue' + '.css'
   }
 
   ngOnInit(): void {

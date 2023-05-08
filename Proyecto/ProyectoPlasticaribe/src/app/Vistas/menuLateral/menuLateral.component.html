@@ -870,11 +870,6 @@
               Tamaño de Letra <i class="pi pi-plus" (click)="aumentarLetra()"></i> <i class="pi pi-minus" (click)="disminuirLetra()"></i>
             </div>
           </ng-container>
-          <ng-container>
-            <div class="mb-2 sangria tanamoLetra">
-              Cambiar Tema <p-inputSwitch (onChange)="cambiar($event.checked)" [(ngModel)]="modoSeleccionado"></p-inputSwitch>
-            </div>
-          </ng-container>
             <div class="mb-2 sangria">
             <hr>
           </div>
@@ -907,15 +902,9 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <span class="user"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
       <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
-      <!-- <div class="justify-content-center">
-        <p-toast></p-toast>
-        <p-menu #menu [model]="items" [popup]="true"></p-menu>
-        <i (click)="menu.toggle($event)" class="pi pi-cog"></i>
-      </div> -->
     </div>
   </div>
 </nav>
-<br>
 
 <p-toast position="center" key="c" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
