@@ -4,12 +4,26 @@
   height: 100%;
 }
 
+.fondo2 {
+  background-color: #040d19;
+  height: 100%;
+}
+
 .header h3, .header .pi, .rojo {
   font-size: calc(var(--font-size) * 1.5rem);
   color: var(--rojo);
 }
 
+.header2 h3, .header2 .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojoClaro);
+}
+
 .header h3:hover, .header .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.header2 h3:hover, .header2 .pi:hover, .rojo:hover {
   color: var(--rojoHover);
 }
 

@@ -3,11 +3,12 @@
   --font-size: 1;
   --rojo: #db4149;
   --rojoHover: #a8262c;
+  --rojoClaro : rgb(214, 100, 106);
 }
 
-body {
+/*body {
   background-color: #f7f7f7;
-}
+}*/
 
 * {
   text-decoration: none;
@@ -76,8 +77,17 @@ a {
   font-size: calc(var(--font-size) * 32px);
 }
 
+.Titulo .tituloClaro {
+  font-size: calc(var(--font-size) * 32px);
+}
+
 .tituloRojo{
   color: var(--rojo);
+  font-size: calc(var(--font-size) * 20px);
+}
+
+.tituloClaro{
+  color: var(--rojoClaro);
   font-size: calc(var(--font-size) * 20px);
 }
 
@@ -190,6 +200,4 @@ a {
 .p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
   font-weight: 500;
 }
-
-
 

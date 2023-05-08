@@ -86,7 +86,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61 || this.ValidarRol == 6 || this.ValidarRol == 10) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
       }
     });
     setTimeout(() => {

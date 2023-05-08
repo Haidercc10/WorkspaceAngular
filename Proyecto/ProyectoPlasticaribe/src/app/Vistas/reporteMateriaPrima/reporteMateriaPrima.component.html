@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Materia Prima / BOPP / Tintas</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Materia Prima / BOPP / Tintas</h2>
     </div>
 
     <div class="mb-4">
@@ -20,14 +20,13 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card class="font-size-14">
 
   <div class="mb-4">
-    <h2 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
   </div>
 
-  <div class="card font-size-14">
-    <p-toolbar styleClass="mb-6 gap-5">
+  <p-toolbar styleClass="mb-5 gap-3">
       <ng-template pTemplate="left">
         <span class="p-float-label">
           <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
@@ -40,10 +39,9 @@
       <ng-template pTemplate="right">
         <button pButton pRipple label="Exportar Todo a Excel" icon="pi pi-file-excel"class="p-button-success" (click)="exportarExcel(1)"></button>
       </ng-template>
-    </p-toolbar>
+  </p-toolbar>
 
-    <br>
-    <p-tabView [scrollable]="true">
+  <p-tabView [scrollable]="true">
       <!-- Materias Primas -->
       <p-tabPanel
         header="Materias Primas"
@@ -492,6 +490,6 @@
           </div>
         </div>
       </p-tabPanel>
-    </p-tabView>
-  </div>
-</div>
+  </p-tabView>
+
+</p-card>

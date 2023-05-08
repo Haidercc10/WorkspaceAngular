@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos de Extrusión</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Movimientos de Extrusión</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -18,9 +18,9 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
   <br>
 
@@ -30,15 +30,15 @@
       <div class="row g-4">
 
         <!-- Orden de Trabajo -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
-            <input formControlName="Documento" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="Documento" id="ordenTrabajo" type="text" pInputText/>
             <label for="ordenTrabajo">Orden de Trabajo</label>
           </span>
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Tipo Documento -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-dropdown formControlName="tipoDoc" inputId="Proceso" [autoDisplayFirst]="false" [options]="tipoDocumento" optionLabel=""></p-dropdown>
             <label for="Proceso">Tipo Documento</label>
@@ -78,7 +78,7 @@
 
   <!-- titulo tabla producto -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Registros consultados</h4>
   </div>
 
   <!-- Inicio tabla de registros consultados -->
@@ -130,4 +130,4 @@
       </div>
     </div>
   </div>
-</div>
+</p-card>

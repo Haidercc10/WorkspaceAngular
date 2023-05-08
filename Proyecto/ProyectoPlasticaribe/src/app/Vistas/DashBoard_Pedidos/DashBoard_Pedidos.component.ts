@@ -52,10 +52,13 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   infoTablaModal : any [] = [];
   nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
-                  private ordenTrabajoService : EstadosProcesos_OTService,) { }
+                  private ordenTrabajoService : EstadosProcesos_OTService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.lecturaStorage();

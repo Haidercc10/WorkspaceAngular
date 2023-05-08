@@ -32,6 +32,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
   itemSeleccionado : any;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -55,6 +56,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       boppSerial: ['', Validators.required],
       boppCantidad : ['', Validators.required],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {

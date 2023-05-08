@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Salida de Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Salida de Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -18,9 +18,9 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar Rollos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
   </div>
   <br>
 
@@ -29,25 +29,25 @@
       <div class="row g-4">
 
         <!-- Consultar Orden de Trabajo -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OT_Id" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="consultarRollos()" required/>
+            <input formControlName="OT_Id" id="ordenTrabajo" type="text" pInputText (keyup.enter)="consultarRollos()" required/>
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
         <!-- Numero de Rollo -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="IdRollo" id="Rollo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="consultarRollos()" required/>
+            <input formControlName="IdRollo" id="Rollo" type="text" pInputText (keyup.enter)="consultarRollos()" required/>
             <label for="Rollo">Rollo</label>
           </span>
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -63,7 +63,7 @@
         </div>
 
         <!-- Procesos -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
           <span class="p-float-label">
             <p-dropdown formControlName="Proceso" inputId="Proceso" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"></p-dropdown>
             <label for="Proceso">Procesos</label>
@@ -71,9 +71,9 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-md-12">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-4 col-xl-12 col-xxl-12">
           <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="Observacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -96,7 +96,7 @@
 
   <!-- Inicio titulo tabla producto -->
   <div class="mb-4 tabla1">
-    <h4 class="tituloRojo" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
   </div>
 
   <!--Inicio tabla Rollos creados en OT -->
@@ -165,7 +165,7 @@
 
   <!-- Inicio titulo tabla producto -->
   <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
@@ -218,7 +218,7 @@
 
   <!-- Inicio titulo tabla producto -->
   <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
@@ -275,4 +275,4 @@
       <button pButton class="p-button-secondary" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="limpiarCampos()"></button>
     </div>
   </div>
-</div>
+</p-card>

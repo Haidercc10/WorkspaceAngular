@@ -1,4 +1,4 @@
-<div class="fondo">
+<div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
   <!-- Cards de CAntidad de Pedidos -->
   <div class="row g-2 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
     <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">

@@ -46,6 +46,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   mesActual ;
   cargando : boolean = false;
   nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   /* GRAFICA */
   ComparativoData: any;
@@ -58,7 +59,9 @@ export class Dashboard_MatPrimaComponent implements OnInit {
                     private ordenTrabajoService : EstadosProcesos_OTService,
                         private materiaPrimaService : MateriaPrimaService,
                           private boppService : EntradaBOPPService,
-                            private tintasCreadasService : DetallesAsignacionMPxTintasService,) { }
+                            private tintasCreadasService : DetallesAsignacionMPxTintasService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.tiempoExcedido();

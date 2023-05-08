@@ -35,6 +35,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   totalRollos : number = 0; //Variable que almacenará el total de rollos
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
   tipoDocumento : string [] = ['Ingreso de Rollos', 'Salida de Rollos'];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -51,6 +52,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
       fechaFinalDoc: [null, Validators.required],
       estadoRollo: ['', Validators.required],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

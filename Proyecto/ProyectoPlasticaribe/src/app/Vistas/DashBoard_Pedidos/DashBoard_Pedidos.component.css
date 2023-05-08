@@ -45,3 +45,8 @@ p-dialog ::ng-deep div span {
   width: 10%;
   height: 100%;
 }
+
+.fondo2 {
+  background-color: #040d19;
+  height: 100%;
+}

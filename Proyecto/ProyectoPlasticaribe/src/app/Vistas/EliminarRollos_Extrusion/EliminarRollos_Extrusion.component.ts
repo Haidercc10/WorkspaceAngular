@@ -41,6 +41,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   public bdBagpro : boolean;
   scrolly : number = 0;
   scrollx : number = 0;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -61,6 +62,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     });
 
     this.cargando = true;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

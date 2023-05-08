@@ -48,6 +48,7 @@ export class EntradaBOPPComponent implements OnInit {
   arrayBoppsRemisionados : any = [];
   tipoDoc : any = null;
   boppSeleccionado : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -86,6 +87,8 @@ export class EntradaBOPPComponent implements OnInit {
       PrvNombre : [null],
       Observacion : [null],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

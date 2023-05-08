@@ -1,6 +1,7 @@
 <p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'27rem'}">
   <div class="imagen">
-    <img src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
+    <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
+    <img *ngIf="modoSeleccionado" src=".\assets\Logo-Plasticaribe\logo.png" alt="Plasticaribe S.A.S">
   </div>
   <br>
   <ul>
@@ -255,7 +256,7 @@
     </ng-container>
 
     <!-- GESTOR DE ARCHIVOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
           <ng-container *ngIf="subir2; then thenTemplate; else elseTemplate"></ng-container>
@@ -612,7 +613,7 @@
     </ng-container>
 
     <!-- PEDIDOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61 || ValidarRol == 6 || ValidarRol == 10">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
@@ -638,7 +639,7 @@
             </a>
           </div> -->
 
-          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61 || ValidarRol == 6 || ValidarRol == 10">
             <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Ver Pedidos
@@ -652,7 +653,7 @@
     </ng-container>
 
     <!-- PRODUCTOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61 || ValidarRol == 6 || ValidarRol == 10">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
@@ -665,7 +666,7 @@
           <b>Productos</b>
         </a>
         <div class="collapse" id="collapseExample6">
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61 || ValidarRol == 6 || ValidarRol == 10">
               <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -689,7 +690,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 60">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5  || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 60">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -789,7 +790,7 @@
     </ng-container>
 
     <!-- TICKETS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 10 || ValidarRol == 11 || ValidarRol == 12 || ValidarRol == 13 || ValidarRol == 59 || ValidarRol == 60">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 10 || ValidarRol == 11 || ValidarRol == 12 || ValidarRol == 13 || ValidarRol == 59 || ValidarRol == 60">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample16" role="button" (click)="clickIcon16()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir16; then thenTemplate; else elseTemplate"></ng-container>

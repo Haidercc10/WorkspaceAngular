@@ -11,7 +11,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Ingresar Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingresar Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -19,9 +19,9 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar Rollos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
   </div>
   <br>
 
@@ -31,25 +31,25 @@
       <div class="row g-4">
 
         <!-- Consultar Orden de Trabajo -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OT_Id" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText required/>
+            <input formControlName="OT_Id" id="ordenTrabajo" type="text" pInputText required/>
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
         <!-- Numero de Rollo -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="IdRollo" id="Rollo" class="form-control form-control-sm" type="text" pInputText required/>
+            <input formControlName="IdRollo" id="Rollo" type="text" pInputText required/>
             <label for="Rollo">N° Rollo</label>
           </span>
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -57,7 +57,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -65,19 +65,20 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-md-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
+
       </div>
     </div>
 
     <!--Botones-->
     <div class="mb-3">
       <div class="row g-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
         </div>
@@ -90,15 +91,15 @@
   </div>
 
   <!-- Inicio titulo tabla producto -->
-  <div class="mb-4 tabla1">
-    <h4 class="tituloRojo" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-right: 5%;">
-      <div class="form-floating col-md">
+  <div class="mb-4">
+    <div class="row g-3">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-8 col-xxl-8">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
         <p-chip label="Rollos Ingresados: {{rollosIngresados}}" icon="pi pi-check"></p-chip>
       </div>
-    </div>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <div class="form-floating col-md">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
         <p-chip label="Rollos No Ingresados: {{rollosSinIngresar}}" icon="pi pi-check"></p-chip>
       </div>
     </div>
@@ -170,7 +171,7 @@
 
   <!-- Inicio titulo tabla producto -->
   <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
@@ -225,7 +226,7 @@
 
   <!-- Inicio titulo tabla producto -->
   <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
@@ -282,4 +283,4 @@
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>
-</div>
+</p-card>

@@ -32,6 +32,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   totalRollos : number = 0;
   totalCantidad : number = 0;
   rollosPDF : any [] = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -48,6 +49,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
       Proceso : [null, Validators.required],
       Observacion : [''],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

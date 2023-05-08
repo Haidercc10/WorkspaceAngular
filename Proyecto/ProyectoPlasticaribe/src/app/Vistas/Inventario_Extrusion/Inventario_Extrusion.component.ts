@@ -30,6 +30,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
   ArrayInfoOrden : any [] = []; //variable que va a tener la informacion de la orden de trabajo consultada
   pesoTotalOrden : number = 0; //Variable que va a tener el peso total de la orden consultada
   aperturaModal : number = 0;
+  modoSeleccionado : boolean;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -42,6 +43,8 @@ export class Inventario_ExtrusionComponent implements OnInit {
       FechaFinal : [null],
       Rollo : [null],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

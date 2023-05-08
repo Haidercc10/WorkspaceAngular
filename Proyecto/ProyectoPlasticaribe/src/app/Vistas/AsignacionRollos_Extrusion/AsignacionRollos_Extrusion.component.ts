@@ -33,6 +33,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   totalRollos : number = 0; //Variable que almacenará el total de rollos escogidos
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -50,6 +51,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       Proceso : [null, Validators.required],
       Observacion : [''],
     });
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

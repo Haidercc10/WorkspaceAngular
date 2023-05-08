@@ -1,4 +1,4 @@
-<div class="fondo">
+<div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
   <!--  -->
  <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
   <!-- Tabla de Procesos -->
@@ -7,7 +7,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
       </div>
-      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
+      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3" class="mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
       <p-table
         #dt1
         [resizableColumns]="true"
@@ -44,7 +44,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
       </div>
-      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
+      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
       <p-table
         #dt2
         responsiveLayout="stack"
@@ -75,7 +75,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
       </div>
-      <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
+      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
 
       <p-toolbar>
         <div class="p-toolbar-group-start">
@@ -127,7 +127,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-dollar"></i> Clientes con más compras en el mes.</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-dollar"></i> Clientes con más compras en el mes.</h2>
 
         <p-table
           #dt1
@@ -156,6 +156,10 @@
             </tr>
           </ng-template>
         </p-table>
+
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactClientes()"></button>
+        </ng-template>
       </p-card>
     </div>
 
@@ -165,7 +169,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-truck"></i> Productos más vendidos en el mes</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-truck"></i> Productos más vendidos en el mes</h2>
 
         <p-table
           #dt2
@@ -203,7 +207,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-cart-plus"></i> Asesores con más ventas en el mes</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-cart-plus"></i> Asesores con más ventas en el mes</h2>
 
         <p-table
           #dt3
@@ -232,6 +236,9 @@
             </tr>
           </ng-template>
         </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactVendedores()"></button>
+        </ng-template>
       </p-card>
     </div>
 
@@ -245,7 +252,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-7')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
 
         <p-table
           #dt1
@@ -289,7 +296,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-8')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
 
         <p-table
           #dt2
@@ -325,7 +332,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-9')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
 
         <p-table
           #dt3
@@ -372,7 +379,7 @@
 </p-dialog>
 
 <!-- Modal donde se podrá ver algunas graficas -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '130rem'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '90%'}">
   <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
 </p-dialog>
 <br>

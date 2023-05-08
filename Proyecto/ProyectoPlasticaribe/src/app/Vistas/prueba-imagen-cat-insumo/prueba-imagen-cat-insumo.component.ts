@@ -16,6 +16,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { DOCUMENT } from '@angular/common';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -52,6 +53,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   datosExcel : any [] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
   temaSeleccionado : boolean = false;
   device: HIDDevice;
+  device2: SerialPort;
+  device3: USBDevice;
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -65,30 +68,36 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   async ngOnInit() {
     this.lecturaStorage();
-    this.consultarPedidosZeus();
-    this.consultarPedidos();
+    //this.consultarPedidosZeus();
+    //this.consultarPedidos();
     //this.connectHID();
+    this.desconectar();
   }
 
   async connectHID() {
-    if (!('hid' in navigator)) {
-      console.error('WebHID is not supported in this browser.');
-      return;
+    let devices = await navigator.usb.requestDevice({filters : []});
+    await devices.open();
+    if (devices.configuration === null) {
+      await devices.selectConfiguration(1);
+      await devices.claimInterface(1);
     }
 
-    try {
-      this.device = await (navigator as any).hid.requestDevice({ filters: [] });
-      let devices = await navigator.hid.getDevices();
-      await this.device.open();
-      devices.forEach((device) => {
-        console.log(`HID: ${device.productName}`);
-      });
+    await devices.controlTransferOut({
+      requestType: 'vendor',
+      recipient: 'interface',
+      request: 0x04f2,  // vendor-specific request: enable channels
+      value: 0xb6c4,  // 0b00010011 (channels 1, 2 and 5)
+      index: 0x0001   // Interface 1 is the recipient
+    });
+    console.log(devices);
 
-      //await this.device.open();
-      console.log('Device connected:', this.device);
-    } catch (error) {
-      console.error('Failed to connect to the HID device:', error);
-    }
+  }
+
+  desconectar() {
+    navigator.hid.addEventListener("disconnect", (event) => {
+      console.log(`HID disconnected: ${event.device.productName}`);
+      console.dir(event);
+    });
   }
 
   mostrar() {

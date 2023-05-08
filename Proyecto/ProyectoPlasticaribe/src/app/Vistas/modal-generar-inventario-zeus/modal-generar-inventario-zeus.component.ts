@@ -8,6 +8,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
+import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -42,10 +43,18 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 private clienteOtItems : BagproService,
                   private existencias_ProductosService : ExistenciasProductosService,
                     private invMesProductoService : Inventario_Mes_ProductosService,
-                      private messageService: MessageService) { }
+                      private messageService: MessageService,
+                        private AppComponent : AppComponent) { }
 
   ngOnInit(): void {
     this.invetarioProductos();
+    this.lecturaStorage();
+  }
+
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que calculará cual es la fecha segun los parametros especificados

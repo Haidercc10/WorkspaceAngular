@@ -4,6 +4,11 @@
   height: 100%;
 }
 
+.fondo2 {
+  background-color: #040d19;
+  height: 100%;
+}
+
 .header h3, .header .pi, .rojo {
   font-size: calc(var(--font-size) * 1.5rem);
   color: var(--rojo);

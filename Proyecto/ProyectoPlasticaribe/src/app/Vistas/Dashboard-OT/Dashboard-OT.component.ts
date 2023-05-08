@@ -51,11 +51,14 @@ export class DashboardOTComponent implements OnInit {
   multiAxisOptions: any;
   multiAxisPlugins = [ DataLabelsPlugin ];
   nroCard : string = '';  /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private bagProService : BagproService,
                   private ordenTrabajoService : EstadosProcesos_OTService,
-                    private zeusService : InventarioZeusService,) { }
+                    private zeusService : InventarioZeusService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -258,20 +261,20 @@ export class DashboardOTComponent implements OnInit {
     this.multiAxisData = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#FF7878'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#FF7878'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057', font: { size: 20 } } },
+        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } } },
         tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 15 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
@@ -284,7 +287,7 @@ export class DashboardOTComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, olor: '#495057', font: { size: 20 } },
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -292,11 +295,123 @@ export class DashboardOTComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } }
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } }
         }
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
+  }
+
+  llenarGraficaFactClientes() {
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de facturación por clientes`;
+    let clientes : any = [];
+    let costo : any = [];
+    let cantVeces : any = [];
+
+    for (let i = 0; i < 10; i++) {
+      clientes.push(this.clientesFacturados[i].cliente);
+      costo.push(this.clientesFacturados[i].costo);
+      cantVeces.push(this.clientesFacturados[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: clientes,
+      datasets: [
+        { label: 'Cantidad de compras', backgroundColor: [ '#04B2D9'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],  yAxisID: 'y', data: cantVeces },
+        { label: 'Valor facturado',  backgroundColor: [ '#B7D996' ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
+      ]
+    };
+    this.multiAxisOptions = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } } },
+        tooltip: { titleFont: { size: 22, }, bodyFont: { size: 17 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057',
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: { drawOnChartArea: false, color: '#ebedef' },
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } }
+        }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    }
+  }
+
+  llenarGraficaFactVendedores() {
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de facturación por vendedores`;
+    let vendedores : any = [];
+    let costo : any = [];
+    let cantVentas : any = [];
+
+    for (let i = 0; i < 5; i++) {
+      vendedores.push(this.vendedoresFacturas[i].vendedor);
+      costo.push(this.vendedoresFacturas[i].costo);
+      cantVentas.push(this.vendedoresFacturas[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: vendedores,
+      datasets: [
+        { label: 'Cantidad de ventas', backgroundColor: [ '#F2889B'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],  yAxisID: 'y', data: cantVentas },
+        { label: 'Valor facturado',  backgroundColor: [ '#A6874E' ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
+      ]
+    };
+    this.multiAxisOptions = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } } },
+        tooltip: { titleFont: { size: 22, }, bodyFont: { size: 17 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057',
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 7) return `${this.getLabelForValue(value).substring(0, 7)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: { drawOnChartArea: false, color: '#ebedef' },
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } }
+        }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    }
   }
 
   // Funcion que mostrará el modal de los estados de las ordenes de trabajo, adicional a eso le enviará parametros para que realice la consulta
