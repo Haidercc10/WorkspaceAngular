@@ -62,7 +62,6 @@ export class AppComponent implements OnInit{
     console.log(modo);
     if(modo) this.temaSeleccionado = modo == 'dark' ? true : false;
     this.cambiar(this.temaSeleccionado);
-    console.log(this.temaSeleccionado);
   }
 
   cambiar(estado : boolean) {

@@ -257,12 +257,12 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.ComparativoOptions = {
       indexAxis: 'y',
       plugins: {
-        legend: { abels: { color: '#495057' } },
+        legend: { abels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } }
+        x: { ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], }, grid: { color: '#ebedef' } },
+        y: { ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], }, grid: { color: '#ebedef' } }
       }
     };
   }
