@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { CookieService } from 'ngx-cookie-service';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
@@ -50,8 +52,11 @@ export class MenuLateralComponent implements OnInit {
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
                       private authenticationService: AuthenticationService,
-                        private cookieService: CookieService,) {
+                        private cookieService: CookieService,
+                          @Inject(DOCUMENT) private document : Document) {
 
+    this.AppComponent.mostrar();
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
@@ -201,5 +206,19 @@ export class MenuLateralComponent implements OnInit {
   clickIcon16(){
     if (this.subir16) this.subir16 = false;
     else this.subir16 = true;
+  }
+
+  mostrar() {
+    let modo = window.localStorage.getItem("theme");
+    console.log(modo);
+    if(modo) this.AppComponent.temaSeleccionado = modo == 'dark' ? true : false;
+    this.cambiar(this.AppComponent.temaSeleccionado);
+  }
+
+  cambiar(estado : boolean) {
+    let tema = estado ? 'dark' : 'light';
+    window.localStorage.setItem("theme", tema);
+    let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
+    linkTema.href = 'lara-' + tema + '-blue' + '.css'
   }
 }

@@ -35,9 +35,6 @@
           </tr>
         </ng-template>
       </p-table>
-      <ng-template pTemplate="footer">
-        <button pButton pTooltip="Graficar Procesos OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaProcesos()"></button>
-      </ng-template>
     </p-card>
   </div>
 
@@ -69,9 +66,6 @@
           </tr>
         </ng-template>
       </p-table>
-      <ng-template pTemplate="footer">
-        <button pButton pTooltip="Graficar Estados OT" pRipple type="button" icon="pi pi-chart-pie" class="p-button-rounded p-button-danger" (click)="llenarGraficaEstadosOt()"></button>
-      </ng-template>
     </p-card>
   </div>
 
@@ -120,9 +114,6 @@
           </tr>
         </ng-template>
       </p-table>
-      <ng-template pTemplate="footer">
-        <button pButton pTooltip="Graficar Estados OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaMateriales(1)"></button>
-      </ng-template>
     </p-card>
   </div>
  </div>
@@ -387,23 +378,11 @@
   <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
 </p-dialog>
 
-<!-- Modal donde se podrá ver algunas graficas de barras -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaBarras" [style]="{width: '130rem'}">
-  <p-toolbar *ngIf="graficaMateriales">
-    <div class="p-toolbar-group-start">
-      <button pButton pTooltip="Graficar Cantidad" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficaMateriales(1)"></button>
-      <button pButton pTooltip="Graficar Costo" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-info mr-2" (click)="llenarGraficaMateriales(2)"></button>
-      <button pButton pTooltip="Graficar Peso" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-warning mr-2" (click)="llenarGraficaMateriales(3)"></button>
-      <h5>¡Grafica por una de las 3 opciones!</h5>
-    </div>
-  </p-toolbar>
+<!-- Modal donde se podrá ver algunas graficas -->
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '90%'}">
   <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
 </p-dialog>
-
-<!-- Modal donde se podrán ver algunas graficas de pie -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaPie" [style]="{width: '130rem'}">
-  <p-chart type="pie" width="90%" height="400px" [data]="graficaPieData" [options]="graficaPieOptions"></p-chart>
-</p-dialog>
+<br>
 
 <!-- style="background-color: rgba(39, 39, 39, 0.9)"-->
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >
