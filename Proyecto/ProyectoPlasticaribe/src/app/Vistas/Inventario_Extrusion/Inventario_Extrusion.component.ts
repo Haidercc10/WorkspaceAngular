@@ -44,7 +44,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       Rollo : [null],
     });
 
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

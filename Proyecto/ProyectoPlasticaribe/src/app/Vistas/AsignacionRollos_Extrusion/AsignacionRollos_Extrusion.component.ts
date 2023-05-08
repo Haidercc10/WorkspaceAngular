@@ -51,7 +51,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       Proceso : [null, Validators.required],
       Observacion : [''],
     });
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

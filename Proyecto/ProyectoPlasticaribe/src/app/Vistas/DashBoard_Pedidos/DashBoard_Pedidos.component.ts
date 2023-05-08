@@ -57,7 +57,7 @@ export class DashBoard_PedidosComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private ordenTrabajoService : EstadosProcesos_OTService,) {
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

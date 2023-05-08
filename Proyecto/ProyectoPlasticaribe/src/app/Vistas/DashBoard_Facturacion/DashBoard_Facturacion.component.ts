@@ -55,7 +55,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   ) {
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

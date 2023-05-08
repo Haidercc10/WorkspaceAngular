@@ -88,7 +88,7 @@ export class EntradaBOPPComponent implements OnInit {
       Observacion : [null],
     });
 
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

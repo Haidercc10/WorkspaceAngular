@@ -57,7 +57,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       boppCantidad : ['', Validators.required],
     });
 
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {

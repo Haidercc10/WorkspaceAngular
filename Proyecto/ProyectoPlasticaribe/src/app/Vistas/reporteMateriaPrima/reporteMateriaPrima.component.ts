@@ -65,7 +65,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   cantSalienteBiorientado : number = 0; //Variable que guardará la cantidad total saliente de los biorientados
   cantExistenciasBiorientado : number = 0; //Variable que guardará la cantidad total en existencias de los biorientados
   cantDiferenciaBiorientado : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los biorientados
-  modoSeleccionado : boolean = false; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
@@ -73,7 +73,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     private AppComponent : AppComponent,
                       private boppService : EntradaBOPPService,
                         private messageService: MessageService) {
-    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
