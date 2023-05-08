@@ -53,7 +53,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
       estadoRollo: ['', Validators.required],
     });
 
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

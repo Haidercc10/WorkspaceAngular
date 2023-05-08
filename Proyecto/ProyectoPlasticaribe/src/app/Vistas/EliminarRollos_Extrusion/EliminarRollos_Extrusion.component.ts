@@ -62,7 +62,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     });
 
     this.cargando = true;
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

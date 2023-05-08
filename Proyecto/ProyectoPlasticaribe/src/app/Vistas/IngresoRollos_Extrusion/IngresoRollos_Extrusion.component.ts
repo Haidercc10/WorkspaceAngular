@@ -50,7 +50,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
       Observacion : [''],
     });
 
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

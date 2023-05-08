@@ -60,7 +60,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
                         private materiaPrimaService : MateriaPrimaService,
                           private boppService : EntradaBOPPService,
                             private tintasCreadasService : DetallesAsignacionMPxTintasService,) {
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    //this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
