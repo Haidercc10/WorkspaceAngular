@@ -59,9 +59,29 @@ Al iniciar sesión con nuestras credenciales se nos redirecciona al dashboard do
 El resto de roles verán lo siguiente:
 ![Dahboard2](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard2.jpg)
 
+# Roles
+| Codigo | Nombre                  | Descripción |
+| ------ | ----------------------- | ----------- |
+| 1      | Administrador           | Persona que tiene acceso de todos los precesos del software. |
+| 2      | Vendedor                | Personas que son del área de Ventas de la empresa. |
+| 3      | Operario Materia Prima  | Persona que lleva control de la materia prima |
+| 4	     | Operario BOPP	         | Persona lleva control de la materia prima de tipo BOPP |
+| 5	     | Calidad	               | Será quien se encargará de la parte de calidad de la empresa |
+| 6	     | Facturación	           | Persona encargada de realizar la facturación de pedidos |
+| 7	     | Superior Extrusion	     | Persona que es Jefe de extrusion |
+| 8	     | Superior Sellado	       | Persona que es Jefe de Sellado |
+| 9	     | Superior Empaque	       | Persona que es Jefe de Empaque |
+| 10     | Superior Despacho	     | Persona que está encargada del área de despacho |
+| 11     | Conductor	             | Es el encargado de llevar el producto terminado hasta las oficinas del cliente. |
+| 12     | Producción	             | Persona encargada de velar por la producción |
+| 13     | Orden de Compra	       | Personas encargadas de crear ordenes de compra de materia prima |
+| 59     | Operarios de Producción | Personas del área de producción |
+| 60     | Director Comercial	     | Persona a cargo del área comercial |
+| 61     | Presidencia	           | Persona del área de presidencia |
+
 # Modulos de la Aplicación
 1. [Bodega Extrusión.](#bodega-extrusión)
-2. [BOPP / BOPA / Poliester.](#bopp-bopa-poliester)
+2. [BOPP / BOPA / Poliester.](#bopp--bopa--poliester)
 3. [Despacho.](#despacho)
 4. [Desperdicio.](#desperdicio)
 5. [Gestor de Archivos.](#gestión-de-archivos)
@@ -69,12 +89,12 @@ El resto de roles verán lo siguiente:
 7. [Mantenimiento de Activos.](#matenimiento-de-activos)
 8. [Movimientos.](#movimientos)
 9. [Maquilas.](#maquilas)
-10. [Orden de Trabajo.](#)
-11. [Pedidos.](#)
-12. [Productos.](#)
-13. [Reportes.](#)
-14. [Tickets.](#)
-15. [Usuarios.](#)
+10. [Orden de Trabajo.](#orden-de-trabajo)
+11. [Pedidos.](#pedidos)
+12. [Productos.](#productos)
+13. [Reportes.](#reportes)
+14. [Tickets.](#tickets)
+15. [Usuarios.](#usuarios)
 
 ## `Bodega Extrusión`
 En este módulo tenemos diferentes acciones que son: 
@@ -417,3 +437,147 @@ Una orden de trabajo es un documento donde se especifica de manera detallada la 
         9. Tinta 6 (Opcional).
         10. Tinta 7 (Opcional).
         11. Tinta 8 (Opcional).
+    5. En el apartado llamado "Laminado" aparecerá:
+        1. Capa 1.
+        2. Calibre 1.
+        3. Cantidad 1.
+        4.Capa 2.
+        5.Calibre 2.
+        6.Cantidad 2.
+        7.Capa 3.
+        8.Calibre 3.
+        9.Cantidad 3.
+    6. En el apartado llamado "Corte" aparecerá:
+        1. Formato.
+        2. Ancho.
+        3. Largo.
+        4. Fuelle.
+        5. Porcentaje de Margen.
+        6. Margen Kg se calculará de la siguiente manera:
+            * Si la presentación es Kg: Margen Adicional * (Cantidad / 100).
+            - Si la presentación es Und: Margen Adicional * (((Cantidad * Bolsas por Paquete * Peso Millar) / 1000) / 100).
+            + Si la presentación es Paquete: (Margen Adicional * ((Cantidad * Peso Millar) / 1000)) / 100.
+    7. En el apartado llamado "Sellado" aparecerá:
+        1. Formato.
+        2. Ancho.
+        3. Largo.
+        4. Fuelle.
+        5. Porcentaje de Margen.
+        6. Margen Kg se calculará de la siguiente manera:
+            * Si la presentación es Kg: Margen Adicional * (Cantidad / 100).
+            - Si la presentación es Und: Margen Adicional * (((Cantidad * Bolsas por Paquete * Peso Millar) / 1000) / 100).
+            + Si la presentación es Paquete: (Margen Adicional * ((Cantidad * Peso Millar) / 1000)) / 100.
+        7. Peso Millar : Peso del producto * 1000
+        8. Tipo Sellado.
+        9. Precio Día.
+        10. Precio Noche.
+        11. Cantidad de bolsas por paquete.
+        12. Peso del Paquete.
+        13. Cantidad de bolsas por Bulto.
+        14. Peso del bulto.
+    8. En el apartado llamado "Mezclas" aparecerá:
+        1. Nombre de la mezcla.
+        2. Capas.
+        3. Porcentaje por capas.
+        4. Materiales por capas.
+        5. Porcentaje de cada material.
+        6. Pigementos por capas.
+        7. Porcentaje de cada pigmento.
+        8. Si la mezcla no existe se debe crear, para ello se presiona el botón "Crear Mezclas" y se abrirá un modal. Una vez abierto podemos elegir una de las mezclas existentes para crear una parecida o podemos crear una totalmente nueva. Para crear una nueva llenamos todos los campos, si no existe un pigmento y/o un material debemos crealos con los botones que están en la parte superior derecha.
+3. Podemos ver el botón de "Crear OT" que al presionarlo si tenemos todos los datos bien creará una nueva orden y inmediatamente nos las exportará a un archivo PDF.
+4. Podemos ver que tenemos el botón "Limpiar campos" que limpiará todos los campos.
+5. Si lo que queremos es ver en una orden de trabajo en un PDF lo que debemos hacer es consultar el codigo de la Orden de trabajo en el campo "Nro. OT" y presionar el botón "Ver PDF" que se encuentra al final.
+
+
+## `Pedidos`
+Los pedidos son documentos que realizan los vendedores para documentar lo que le piden los clientes, aquí colocan los productos pedidos, los precios por unidad del producto, el cliente, la ciudad en la que está el cliente, la dirección de entrega, fecha de entrega etc... 
+1. Crear Pedido: Acontinuación explicaremos debe ser creado un pedido.
+    1. Seleccionar el cliente: A cada vendedor le aparecerán los clientes que tiene asociados, debe buscar el cliente al que le va a vender en el campo "Cliente" y al seleccionarlo el programa verificará si es posible crearle un pedido o no, para saber si es posible o no se verifica si el cliente está en cartera, es decir, atrasado con algun pago.
+    2. Al terminar la validación del cliente si está valido para pedidos se llenarán automaticamente los campos ciudad, dirección, vendedor. Si el cliente tiene sede en más de una ciudad los campos ciudad y dirección deben llenarse de manera manual.
+    3. Podemos colocar el desceunto que se le hace al cliente en el campos "Descuento".
+    4. la observación es opcional.
+    5. Seguido tenemos un checkbox que inicialmente estará siempre seleccionado. Este checkbox sirve para saber si el cliente maneja IVA o no, si el cliente no maneja IVA simplemente se presiona click sobre el y ya ya no estará seleccionado.
+    6. Lo siguiente a hacer es elegir los productos que tendrá el pedido. Para ello tenemos 2 opciones de hacerlo:
+        1. Opción 1: Al elegir el cliente así como se llenan los campos de la información del vededor tambien se buscarán los productos que este cliente ha comprado anteriormente, estos aparecerán en el campo "Producto" y al seleccionarlo se llenarán algunos de los campos faltantes.
+        2. Opción 2: Si es un producto que el cliente no ha comprado antes, podemos digitar el codigo del producto en el campo "Id" y presionar enter, el programa se encargará de llenar el resto de campos.
+    7. Luego debemos digitar la cantidad pedida, la fecha de entrega del producto y podemos modificar el precio, el precio siempre deberá ser mayor o igual al de la última vez que se vendió.
+    8. Sí ya tenemos completa la información del producto procedemos a presionar el botón "Agregar Producto" y veremos como se agrega en la tabla siguiente. Al agregar el producto veremos que en la parte inferior a la tabla se estarán realizando calculos sobre los productos que se llevan teniendo en cuenta el decuento y el IVA.
+    9. Despues de tener los productos completos presionamos "Crear Pedido" y nos enviará un mensaje para que verifiquemos la información del pedido que vamos a crear, luego de verificar y aceptar se habrá creado nuestro pedido y nos lo mostrará en un archivo PDF.
+2. Ver Pedidos: Aquí podemos ver los pedidos que tienen los estados "Pendiente" o "Parcialmente Satisfecho". Los pedidos se dividirán y organizarán por colores.
+    - En la parte superior saldrán los pedidos con color verde. Estos indican que todos los productos de este pedido se pueden facturar por que en inventario hay cantidades iguales o suficientes a las cantidades pendientes del pedido.
+    + Saldrán de segundos los pedidos con un color azul que nos dicen que minimo un producto se puede facturar pero no todo el pedido.
+    - De terceros saldrán los pedidos con color rojo. Estos indican que el pedido fue creado pero no ha sido revisado y/o aceptado por gerencia.
+    * Por ultimo saldrán los pedidos con color blanco que son los que no pueden ser facturados aún.
+Estos pedidos tiene funciones como:
+1. Ver en un archivo PDF el pedido.
+2. Editar un pedido. Esta opción solo estará disponible para productos que no han sido aceptados.
+3. Aceptar pedidos. Esta opción solo estará disponible para productos que no han sido aceptados.
+4. Cancelar y/o Anular pedidos. Esta opción solo estará disponible para productos que no han sido aceptados.
+5. Si el pedido tiene una orden de trabajo asignada podremos ver la información de la orden en el [Reporte Procesos OT](#).
+
+## `Productos`
+En este módulo podemos ver 2 inventarios de productos.
+1. Inventario de Zeus: Aquí veremos los productos que hay en el inventario de Zeus.
+2. Inventario: Aquí veremos los productos y las cantidades que hay en el inventario del programa.
+
+## `Reportes`
+Modulo donde se podrán ver todos los reportes que puede dar el programa.
+1. Inventario Activos: Aqui podremos ver todos los activos que tiene la empresa, con algunos de sus costo.
+
+![Activos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/activos/Activos.jpg)
+
+2. Bodega Extrusión: Aquí vamos a consultar y ver los movimientos que hemos realizado, llamese movimientos lo que es entradas y salidas de rollos. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual.
+
+![Inventario Rollos Extrusión](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Bodega%20Extrusion/BodegaExtrusion.jpg)
+
+3. Inventario de Materia Prima:
+    - Desde aquí podremos ver de manera detallada la información de todas las materias primas que hay en la bodega de inventario actualmente. 
+    + Tambien podemos filtar si queremos buscar una materia prima en especifico, podemos ver el movimiento que tuvo un en una rango de fechas. 
+    * Podemos exportar la información a un archivo de excel.
+    - Podemos ver cada Subbodega como Polietilenoes, Tintas, Biorientados.
+
+![Inventario de Materia Prima](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/Inventario.jpg)
+
+4. Reporte de Costos: En este reporte podemos ver el costo de una orden de trabajo con base a el costo de esta, el costo de la materia prima utilizada. Para ver el costo de una OT solo debemos digitar el codigo de la OT en el campos "OT" y presionar enter o presionar el botón "Consultar OT". Luego se cargará y realizará los calculos automaticamente. Desde aqui tambien podemos cambiar el estado de la orden de trabajo, esto con el botón verde para cerrarla o el botón naranja y el campo "Estado". Otra acción que tenemos es la de ver en un PDF la información consultada.
+
+5. Consolidado de Facturación: Al ingresar al consolidado de facturación podemos ver que tenemos unos filtros, estos filtros nos sirven para que la busqueda sea más rapida y concisa. Para consultar llenamos los filtros o no y presionamos "Consultar" y empezará a cargar (dependeiendo de la cantidad de datos que se consulten se demorará cargando), al terminar de cargar saldrá la siguiente información:
+    1. Mes, que indicará el mes del cual es el registro.
+    2. Vendedor, que indicará de que vendedor es el registro.
+    3. Cliente.
+    4. Id Producto.
+    5. Nombre del Producto comprado por el cliente.
+    6. Cantidad total que compró el cliente durante el més y el año.
+    7. Cuanto devolvió el cliente durante ese mismo periodo.
+    8. Presentación del productos.
+    9. Precio Unitario del producto durante ese pediodo de tiempo.
+    10. SubTotal de lo comprado por el producto.
+Este reporte está encargado de mostrarnos de manera consolidada lo que compró cada cliente en cada mes del año.
+Esta información podemos exportarla a excel.
+
+6. Consolidado de Facturación 2: Al ingresar al consolidado de facturación podemos ver que tenemos unos filtros, estos filtros nos sirven para que la busqueda sea más rapida y concisa. Para consultar llenamos los filtros o no y presionamos "Consultar" y empezará a cargar (dependeiendo de la cantidad de datos que se consulten se demorará cargando), al terminar de cargar saldrá la siguiente información:
+    1. Cliente.
+    2. Producto comprado por el cliente.
+    3. Cantidad total que compró el cliente durante el més de Enero.
+    4. Cantidad total que compró el cliente durante el més de Febrero.
+    5. Cantidad total que compró el cliente durante el més de Marzo.
+    6. Cantidad total que compró el cliente durante el més de Abril.
+    7. Cantidad total que compró el cliente durante el més de Mayo.
+    8. Cantidad total que compró el cliente durante el més de Junio.
+    9. Cantidad total que compró el cliente durante el més de Julio.
+    10. Cantidad total que compró el cliente durante el més de Agosto.
+    11. Cantidad total que compró el cliente durante el més de Septiembre.
+    12. Cantidad total que compró el cliente durante el més de Octubre.
+    13. Cantidad total que compró el cliente durante el més de Noviembre.
+    14. Cantidad total que compró el cliente durante el més de Diciembre.
+    15. Precio Unitario del producto durante ese pediodo de tiempo.
+    16. SubTotal de lo comprado por el producto.
+Este reporte está encargado de mostrarnos de manera consolidada lo que compró cada cliente en cada mes del año.
+Esta información podemos exportarla a excel.
+
+7. Reporte de Procesos OT: Tenemos multiples funciones en este reporte, estas son:
+    1. Una de las funciones más importantes de este reporte es ver el estado de la orden de trabajo y cuanto a producido cada proceso, tambien nos indica si la cantidad que inicialmente se pide en la orden de trabajo ya fue procesada en cada uno de los procesos.
+    2. Podemos agregar fallas a la orden de trabajo.
+    3. Exportar la información a excel.
+    4. Tenemos acceso al reporte de costos, para verlo tenemos que presionar click sobre el número de la OT.
+    5. Podemos ver cada uno de los rollos pesados en cada proceso.
+    6. Podemos cambiar el estado de la orden de trabajo presionando el icono :pencil2:
