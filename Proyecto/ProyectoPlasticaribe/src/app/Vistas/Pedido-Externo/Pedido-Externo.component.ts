@@ -69,6 +69,7 @@ export class PedidoExternoComponent implements OnInit {
   modalMode : boolean = false; //Variable que será true cuando el componente esté apareciendo en un modal
   pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
   fechaUltFacuracion : any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private pedidoproductoService : OpedidoproductoService,
                 private productosServices : ProductoService,
@@ -83,7 +84,7 @@ export class PedidoExternoComponent implements OnInit {
                                   private ClientesProductosService : ClientesProductosService,
                                     private zeusService : InventarioZeusService,
                                       private zeusCobtabilidadService : ZeusContabilidadService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       PedClienteId: [null, Validators.required],

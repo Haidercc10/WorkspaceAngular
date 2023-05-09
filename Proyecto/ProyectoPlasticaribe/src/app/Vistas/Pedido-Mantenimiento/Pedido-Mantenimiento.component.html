@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <!-- Titulo principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Pedidos de Mantenimiento</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Pedidos de Mantenimiento</h2>
     </div>
 
     <!-- Linea principal -->
@@ -22,11 +22,11 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
 
   <!-- Informacion del pedido de mantenimiento -->
   <div class="mb-5">
-    <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
 
   <!-- Formulario del pedido de mantenimiento -->
@@ -35,17 +35,17 @@
       <div class="row g-4">
 
         <!-- Consecutivo del pedido -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="ConsecutivoPedido" id="ConsecutivoPedido" class="form-control form-control-sm" type="text" pInputText readonly required/>
-            <label for="ConsecutivoPedido">Consecutivo Pedido</label>
+            <input formControlName="ConsecutivoPedido" id="ConsecutivoPedido" type="text" pInputText readonly required/>
+            <label for="ConsecutivoPedido">Consecutivo</label>
           </span>
         </div>
 
         <!-- Activos -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="Activo" id="activos" list="Activo" class="form-control form-control-sm" type="text" pInputText (change)="buscarActivoSeleccionado()" required/>
+            <input formControlName="Activo" id="activos" list="Activo" type="text" pInputText (change)="buscarActivoSeleccionado()" required/>
             <datalist id="Activo">
               <option value={{item.actv_Id}} *ngFor="let item of activos">{{item.actv_Nombre}}</option>
             </datalist>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Fecha en que presentó el daño -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
             <p-calendar formControlName="FechaDaño" inputId="FechaDaño" [showIcon]="true"></p-calendar>
             <label for="FechaDaño">Fecha Daño</label>
@@ -62,9 +62,9 @@
         </div>
 
         <!-- Tipos de Mantenimientos -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="TipoMantenimiento" id="Tipo" list="tipos" class="form-control form-control-sm" type="text" pInputText (change)="buscarTipoMantenimientoSeleccionado()" required/>
+            <input formControlName="TipoMantenimiento" id="Tipo" list="tipos"  type="text" pInputText (change)="buscarTipoMantenimientoSeleccionado()" required/>
             <datalist id="tipos">
               <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
             </datalist>
@@ -73,12 +73,13 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-md-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="Observacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
+
       </div>
     </div>
 
@@ -96,7 +97,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-car"></i> Activos Seleccionados</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-car"></i> Activos Seleccionados</h4>
   </div>
 
   <div class="row g-3">
@@ -141,7 +142,7 @@
       <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>
   </div>
-</div>
+</p-card>
 
 <p-toast position="center" key="{{llave}}" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-activo>

@@ -35,7 +35,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   mpAgregada = [];
   remision : any = [];
   remConFac : any = [];
-  load: boolean = true;;
+  load: boolean = true;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private AppComponent : AppComponent,
@@ -43,7 +44,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                     private proveedorService : ProveedorService,
                       private remisionMpService : RemisionesMPService,
                         private facturaCompraMPService : FacturaMpService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null],
       TipoDocumento: [null],

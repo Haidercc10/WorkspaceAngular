@@ -42,6 +42,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   rollosIngresados : number = 0; //variable para calcular la cantidad de rollos que se han ingresado
   procesos : any [] = [{Id : 'EMP', Nombre: 'Empaque'}, {Id : 'EXT', Nombre: 'Extrusión'}, {Id : 'SELLA', Nombre: 'Sellado'}]; //Variable que va a guardar los diferentes procesos de donde vienen los rollos
   minDate: Date = new Date(); //Variable que validará la fecha minima para los campos Date en el HTML
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -52,6 +53,7 @@ export class Ingresar_ProductosComponent implements OnInit {
                           private dtPreEntregaService : DtPreEntregaRollosService,
                             private messageService: MessageService,) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
       IdRollo : [null],

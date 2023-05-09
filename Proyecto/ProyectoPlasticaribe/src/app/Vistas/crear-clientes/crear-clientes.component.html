@@ -6,7 +6,7 @@
       <!-- ID Cliente -->
       <div class="col-md-2">
         <span class="p-float-label">
-          <input formControlName="CliId" id="CliId" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="CliId" id="CliId" type="text" pInputText required/>
           <label for="CliId">Id</label>
         </span>
       </div>
@@ -22,7 +22,7 @@
       <!-- Nombre Cliente-->
       <div class="col-md-4">
         <span class="p-float-label">
-          <input formControlName="CliNombre" id="CliNombre" list="cliente" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="CliNombre" id="CliNombre" list="cliente" type="text" pInputText required/>
           <datalist id="cliente">
             <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
           </datalist>
@@ -33,7 +33,7 @@
       <!-- Telefono Cliente -->
       <div class="col-md-3">
         <span class="p-float-label">
-          <input formControlName="CliTelefono" id="CliTelefono" class="form-control form-control-sm" type="text" pInputText/>
+          <input formControlName="CliTelefono" id="CliTelefono" type="text" pInputText/>
           <label for="CliTelefono">Telefono</label>
         </span>
       </div>
@@ -41,7 +41,7 @@
       <!-- Email cliente -->
       <div class="col-md-3">
         <span class="p-float-label">
-          <input formControlName="CliEmail" id="CliEmail" class="form-control form-control-sm" type="text" pInputText/>
+          <input formControlName="CliEmail" id="CliEmail" type="text" pInputText/>
           <label for="CliEmail">Correo/Email</label>
         </span>
       </div>
@@ -57,7 +57,7 @@
       <!-- ID/Nombre Usuario -->
       <div class="col-md">
         <span class="p-float-label">
-          <input formControlName="UsuIdNombre" id="UsuIdNombre" list="vendedor" class="form-control form-control-sm" type="text" (change)="vendedoreSeleccionado()" pInputText required/>
+          <input formControlName="UsuIdNombre" id="UsuIdNombre" list="vendedor" type="text" (change)="vendedoreSeleccionado()" pInputText required/>
           <datalist id="vendedor">
             <option value={{item.usua_Id}} *ngFor="let item of usuario">{{item.usua_Nombre}}</option>
           </datalist>
@@ -91,7 +91,7 @@
       <!-- Nombre del cliente -->
       <div class="col-md-4">
         <span class="p-float-label">
-          <input formControlName="CliId2" id="CliNombre" list="cliente" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="CliId2" id="CliNombre" list="cliente" type="text" pInputText required/>
           <label for="CliNombre">Cliente</label>
         </span>
       </div>
@@ -99,7 +99,7 @@
       <!-- Ciudad sede cliente -->
       <div class="col-md-3">
         <span class="p-float-label">
-          <input formControlName="SedeCli_Ciudad" id="Ciudad" class="form-control form-control-sm" type="text" pInputText/>
+          <input formControlName="SedeCli_Ciudad" id="Ciudad" type="text" pInputText/>
           <label for="Ciudad">Ciudad Sede</label>
         </span>
       </div>
@@ -107,7 +107,7 @@
       <!-- Direccion -->
       <div class="col-md-3">
         <span class="p-float-label">
-          <input formControlName="SedeCli_Direccion" id="Direccion" class="form-control form-control-sm" type="text" pInputText/>
+          <input formControlName="SedeCli_Direccion" id="Direccion" type="text" pInputText/>
           <label for="Direccion">Direccion Sede</label>
         </span>
       </div>
@@ -115,7 +115,7 @@
       <!-- Codigo postal -->
       <div class="col-md">
         <span class="p-float-label">
-          <input formControlName="SedeCli_Postal" id="Postal" class="form-control form-control-sm" type="text" pInputText/>
+          <input formControlName="SedeCli_Postal" id="Postal" type="text" pInputText/>
           <label for="Postal">Codigo Postal Sede</label>
         </span>
       </div>

@@ -36,6 +36,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada para mostrarlos en el pdf
   Productos = []; //Variable que va a almcanenar el consolidado de los productos para mostrarlos en el pdf
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   scrollToTop: any = () => window.scroll(0, 999999999999);
 
@@ -48,6 +49,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                           private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
                             private ExistenciasProdService : ExistenciasProductosService,){
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarProductos = this.frmBuilder.group({
       Factura : ['', Validators.required],
       NotaCredito : [''],

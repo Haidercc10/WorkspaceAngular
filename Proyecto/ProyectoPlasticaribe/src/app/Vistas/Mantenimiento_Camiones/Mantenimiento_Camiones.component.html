@@ -10,7 +10,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Mantenimiento de Camiones</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Mantenimiento de Camiones</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -18,10 +18,10 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Consultar Filtros</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Consultar Filtros</h4>
   </div>
   <br>
 
@@ -30,23 +30,23 @@
       <div class="row g-4">
 
         <!-- Pedido -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="idPedido" id="Pedido" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="idPedido" id="Pedido"  type="text" pInputText/>
             <label for="Pedido">Nro. Pedido</label>
           </span>
         </div>
 
         <!-- Id Mantenimiento -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="idMtto" id="idMtto" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="idMtto" id="idMtto"  type="text" pInputText/>
             <label for="idMtto">Nro. Mantenimiento</label>
           </span>
         </div>
 
         <!--Tipo de movimiento -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-4 col-xxl-4">
           <span class="p-float-label">
             <p-dropdown formControlName="tipoMov" inputId="tipoMov" optionValue="Id" [autoDisplayFirst]="false" [options]="tipoMovimientos" optionLabel="Nombre"></p-dropdown>
             <label for="tipoMov">Tipo Movimiento</label>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaInicio" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFin" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -81,7 +81,7 @@
 
   <!-- Tabla vista inicial -->
   <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Pedidos/Mantenimientos</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Pedidos/Mantenimientos</h4>
   </div>
 
   <div class="mb-3" *ngIf="cargando">
@@ -151,7 +151,7 @@
             <!-- Fecha Pedido -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="pedFecha" id="pedFecha" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="pedFecha" id="pedFecha"  type="text" pInputText readonly/>
                 <label for="pedFecha">Fecha Pedido</label>
               </span>
             </div>
@@ -159,7 +159,7 @@
             <!-- Hora Pedido -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="pedHora" id="pedHora" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="pedHora" id="pedHora"  type="text" pInputText readonly/>
                 <label for="pedHora">Hora Pedido</label>
               </span>
             </div>
@@ -167,7 +167,7 @@
             <!--Estado-->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="pedEstado" id="pedEstado" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="pedEstado" id="pedEstado"  type="text" pInputText readonly/>
                 <label for="pedEstado">Estado</label>
               </span>
             </div>
@@ -183,7 +183,7 @@
             <!-- Usuario -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="pedUsuario" id="pedUsuario" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="pedUsuario" id="pedUsuario"  type="text" pInputText readonly/>
                 <label for="pedUsuario">Usuario</label>
               </span>
             </div>
@@ -191,7 +191,7 @@
             <!--Observación-->
             <div class="col-md-12">
               <span class="p-float-label">
-                <textarea formControlName="pedObservacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                <textarea formControlName="pedObservacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
                 <label for="textarea">Observación</label>
               </span>
             </div>
@@ -261,7 +261,7 @@
             <!-- ID Mtto -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="mttoId" id="mttoId" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="mttoId" id="mttoId"  type="text" pInputText readonly/>
                 <label for="mttoId">Nro. Mantenimiento</label>
               </span>
             </div>
@@ -277,7 +277,7 @@
             <!-- Fecha Inicio -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="mttoFecha" id="mttoFecha" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="mttoFecha" id="mttoFecha"  type="text" pInputText readonly/>
                 <label for="mttoFecha">Fecha Inicio</label>
               </span>
             </div>
@@ -285,7 +285,7 @@
             <!--Estado-->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="mttoEstado" id="mttoEstado" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="mttoEstado" id="mttoEstado"  type="text" pInputText readonly/>
                 <label for="mttoEstado">Estado</label>
               </span>
             </div>
@@ -293,7 +293,7 @@
             <!-- Usuario -->
             <div class="col-md">
               <span class="p-float-label">
-                <input formControlName="mttoUsuario" id="mttoUsuario" class="form-control form-control-sm" type="text" pInputText readonly/>
+                <input formControlName="mttoUsuario" id="mttoUsuario"  type="text" pInputText readonly/>
                 <label for="mttoUsuario">Usuario</label>
               </span>
             </div>
@@ -301,7 +301,7 @@
             <!-- Observacion -->
             <div class="col-md-12">
               <span class="p-float-label">
-                <textarea formControlName="mttoObservacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                <textarea formControlName="mttoObservacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
                 <label for="textarea">Observación</label>
               </span>
             </div>
@@ -460,7 +460,8 @@
       </div>
     </ng-template>
   </p-dialog>
-</div>
+
+</p-card>
 
 <p-toast position="center" key="advertencia" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">

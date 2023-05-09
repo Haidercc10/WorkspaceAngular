@@ -6,7 +6,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos de Recuperado (Mat. Prima)</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Recuperado (Mat. Prima)</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -14,9 +14,9 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
   <!-- FORMULARIO DE MATERIAS PRIMAS -->
   <form [formGroup]="formReporteRMP">
@@ -24,7 +24,7 @@
       <div class="row g-3">
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="FechaInicial" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="FechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -40,9 +40,9 @@
         </div>
 
         <!-- Materia Prima -->
-        <div class="col-md-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="MateriaPrima" id="materiaPrima" list="materiasPrimas" class="form-control form-control-sm" type="text" pInputText (change)="buscarMateriaPrima()"/>
+            <input formControlName="MateriaPrima" id="materiaPrima" list="materiasPrimas" type="text" pInputText (change)="buscarMateriaPrima()"/>
             <datalist id="materiasPrimas">
               <option value={{item.matPri_Id}} *ngFor="let item of materiasPrimas">{{item.matPri_Nombre}}</option>
             </datalist>
@@ -51,9 +51,9 @@
         </div>
 
         <!-- Turno -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="Turno" id="Turno" list="turnos" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="Turno" id="Turno" list="turnos" type="text" pInputText/>
             <datalist id="turnos">
               <option value={{item.turno_Id}} *ngFor="let item of turnos">{{item.turno_Nombre}}</option>
             </datalist>
@@ -62,9 +62,9 @@
         </div>
 
         <!-- Operario -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="Operario" id="Operario" list="operarios" class="form-control form-control-sm" type="text" pInputText (change)="buscarOperarios()"/>
+            <input formControlName="Operario" id="Operario" list="operarios" type="text" pInputText (change)="buscarOperarios()"/>
             <datalist id="operarios">
               <option value={{item.usua_Id}} *ngFor="let item of operarios">{{item.usua_Nombre}}</option>
             </datalist>
@@ -88,7 +88,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Listado de movimientos consultados</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Listado de movimientos consultados</h4>
   </div>
 
   <div class="mb-2">
@@ -134,4 +134,4 @@
     </div>
   </ng-container>
 
-</div>
+</p-card>

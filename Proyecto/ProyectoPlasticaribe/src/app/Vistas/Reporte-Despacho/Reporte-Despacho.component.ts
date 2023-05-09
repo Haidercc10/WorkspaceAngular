@@ -30,7 +30,7 @@ export class ReporteDespachoComponent implements OnInit {
   infoDoc : any [] = []; //Variable que almacenará la información que se verá en la tabla
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados
   consolidadoRollo : any [] = []; //Variable que va a almacenar el consolidado de la cantidad de rollos ingresados o facturados
-
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -41,6 +41,7 @@ export class ReporteDespachoComponent implements OnInit {
                           private dtEntradaService : DetallesEntradaRollosService,
                             private preCargueService : DtPreEntregaRollosService,){
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
       ProdNombre : ['', Validators.required],

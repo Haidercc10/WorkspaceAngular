@@ -28,6 +28,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   facturaConsultada : string; //Variable que almacenará el consecutivo de la factura buscada
   observacionFactura : string = ''; //Variable que almacenará la observcación añadida de la devolución de factura
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -35,7 +36,10 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                     private rollosService : DetallesEntradaRollosService,
                       private dtDevolucionService : DetallesDevolucionesProductosService,
                         private devolcuionesService : DevolucionesProductosService,
-                          private ExistenciasProdService : ExistenciasProductosService,){}
+                          private ExistenciasProdService : ExistenciasProductosService,){
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit(): void {
     this.lecturaStorage();

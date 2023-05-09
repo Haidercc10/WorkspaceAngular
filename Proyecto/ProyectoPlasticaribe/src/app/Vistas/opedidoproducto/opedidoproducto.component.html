@@ -13,13 +13,15 @@
   <div class="container-fluid">
     <!-- Debajo del Navegador -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Ordenes de Pedidos</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ordenes de Pedidos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
+  </div>
+</div>
   <!-- Fin Debajo del Navegador -->
-    <div class="formulario">
+    <p-card>
       <!-- Inicio Botones que llama el modal de crear Cliente y producto-->
       <ng-container *ngIf="temporal">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -38,7 +40,7 @@
       <!-- Fin Botones que llama el modal de crear cliente y producto-->
       <!-- Inicio titulo -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Pedido</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"> Consultar Pedido</h4>
       </div>
       <!-- Fin titulo -->
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
@@ -48,19 +50,19 @@
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
             <div class="form-floating col-md-2">
-              <input formControlName="PedExtIdConsulta" type="number" min="0" class="form-control form-control-sm" id="floatingInput" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
+              <input formControlName="PedExtIdConsulta" type="number" min="0" id="floatingInput" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
               <label for="floatingInput">Id Producto</label>
             </div>
             <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
 
             <div class="form-floating col-md-2">
-              <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="floatingInput" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
+              <input formControlName="PedExtFechaConsulta" type="date" id="floatingInput" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
               <label for="floatingInput">Fecha del Pedido</label>
             </div>
             <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
 
             <div class="form-floating col-md-2">
-              <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="floatingInput" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
+              <input formControlName="PedExtFechaEntregaConsulta" type="date" id="floatingInput" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
               <label for="floatingInput">Fecha de Entrega</label>
             </div>
 
@@ -103,7 +105,7 @@
           <div class="row g-3">
             <!-- Id CLiente -->
             <div class="form-floating col-md-2">
-              <input formControlName="PedExtIdClienteConsulta" min="0" type="number" class="form-control form-control-sm" id="floatingInput" placeholder="Id del Cliente" name="PedExtId" title="Identificacion del cliente">
+              <input formControlName="PedExtIdClienteConsulta" min="0" type="number" id="floatingInput" placeholder="Id del Cliente" name="PedExtId" title="Identificacion del cliente">
               <label for="floatingInput">Id del Cliente</label>
             </div>
 
@@ -144,7 +146,7 @@
       <!--Cierre formulario-->
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla Pedido</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"> Tabla Pedido</h4>
       </div>
 
       <!-- <div class="overlay" *ngIf="!load">
@@ -203,7 +205,7 @@
       <ng-container *ngIf="temporal">
         <!-- Inicio titulo -->
         <div class="mb-4">
-          <h4 class="tituloRojo">Crear Pedido</h4>
+          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Crear Pedido</h4>
         </div>
         <!-- Fin titulo -->
         <!--Inicio Crear Pedidos-->
@@ -268,13 +270,13 @@
             <div class="row g-3">
               <!-- Fecha pedido -->
               <div class="form-floating col-md-2">
-                <input formControlName="PedFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido" readonly onmousedown="return false;">
+                <input formControlName="PedFecha" type="date" id="floatingInput" required title="Fecha Pedido" readonly onmousedown="return false;">
                 <label for="floatingInput">Fecha Pedido</label>
               </div>
 
               <!-- Fecha entrega -->
               <div class="form-floating col-md-2">
-                <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Entrega">
+                <input formControlName="PedFechaEnt" type="date" id="floatingInput" title="Fecha Entrega">
                 <label for="floatingInput">Fecha Entrega</label>
               </div>
 
@@ -288,7 +290,7 @@
 
               <!-- Campo Observacion -->
               <div class="form-floating col-md">
-                <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+                <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
                 <label for="floatingTextarea">Observación</label>
               </div>
             </div>
@@ -304,7 +306,7 @@
         </form>
           <!-- Inicio Titulo Agregar Productos al pedido -->
         <div class="mb-4">
-          <h4 class="tituloRojo">Agregar Productos</h4>
+          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Agregar Productos</h4>
         </div>
           <!-- Fin Titulo Agregar Productos al pedido -->
 
@@ -344,25 +346,25 @@
               </ng-container>
 
               <div class="form-floating col-md-1">
-                <input formControlName="ProdAncho" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0">
+                <input formControlName="ProdAncho" type="number" id="floatingSelect" title="Ancho" min="0">
                 <label for="floatingInput">Ancho</label>
               </div>
 
               <!-- Fuelle Producto -->
               <div class="form-floating col-md-1">
-                <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="floatingSelect"title="Fuelle" min="0">
+                <input formControlName="ProdFuelle" type="number" id="floatingSelect"title="Fuelle" min="0">
                 <label for="floatingInput">Fuelle</label>
               </div>
 
                 <!-- Calibre Producto -->
               <div class="form-floating col-md-1">
-                <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="floatingSelect" title="Calibre" min="0">
+                <input formControlName="ProdCalibre" type="number" id="floatingSelect" title="Calibre" min="0">
                 <label for="floatingInput">Calibre</label>
               </div>
 
               <!-- Largo -->
               <div class="form-floating col-md-1">
-                <input formControlName="ProdLargo" type="number" class="form-control form-control-sm" id="floatingSelect" title="Largo" min="0">
+                <input formControlName="ProdLargo" type="number" id="floatingSelect" title="Largo" min="0">
                 <label for="floatingInput">Largo</label>
               </div>
 
@@ -405,7 +407,7 @@
 
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
               <div class="form-floating col-md-2">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                <input formControlName="ProdCantidad" type="number" id="floatingInput" required>
                 <label for="floatingSelect">Cantidad Pedida</label>
               </div>
 
@@ -420,7 +422,7 @@
 
               <!-- Precio Producto -->
               <div class="form-floating col-md">
-                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
+                <input formControlName="ProdPrecioUnd" type="number" id="floatingInput" name="PrdPrecioUnd">
                 <label for="floatingInput">Precio unitario</label>
               </div>
             </div>
@@ -432,7 +434,7 @@
             <div class="row g-3">
               <!-- Ultima venta -->
               <div class="form-floating col-md-2">
-                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
+                <input formControlName="ProdUltFacturacion" type="number" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
                 <label for="floatingInput">Ultimo Precio Facturado</label>
               </div>
 
@@ -447,7 +449,7 @@
 
               <!-- Stock Producto -->
               <div class="form-floating col-md-2">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
+                <input formControlName="ProdStock" type="number" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
                 <label for="floatingSelect">En Stock</label>
               </div>
 
@@ -478,7 +480,7 @@
           <!--Inicio tabla productos -->
           <!-- Inicio titulo tabla producto -->
           <div class="mb-4">
-            <h4 class="tituloRojo">Tabla de Productos</h4>
+            <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Tabla de Productos</h4>
           </div>
           <!-- Fin titulo producto -->
           <!-- Inicio tabla producto -->
@@ -598,6 +600,5 @@
           </div>
         </ng-container>
       </ng-container>
-    </div>
-  </div>
-</div>
+    </p-card>
+

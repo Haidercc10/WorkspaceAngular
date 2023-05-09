@@ -7,6 +7,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Modal_RptRecuperadoMPComponent } from 'src/app/Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 
 
 @Component({
@@ -29,13 +30,15 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   rows = 20;
   consultaTurno : string = '';
   modalInfoRecuperado : boolean = false;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private materiaPrimaService : MateriaPrimaService,
                   private turnosService : TurnosService,
                     private usuariosService : UsuarioService,
                       private recuperadoService : RecuperadoMPService,
-                        private messageService: MessageService) {
+                        private messageService: MessageService,
+                          private AppComponent : AppComponent) {
 
     this.formReporteRMP = this.frmBuilder.group({
       FechaInicial: [null],
@@ -44,6 +47,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
       Turno : [null],
       Operario : [null],
     });
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

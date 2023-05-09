@@ -12,7 +12,7 @@
     <div class="container-fluid">
       <!-- principal -->
       <div class="mb-4 Titulo">
-        <h2 class="tituloRojo font-size-32">Creación de Tintas</h2>
+        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-32"> Creación de Tintas</h2>
       </div>
       <div class="mb-4">
         <hr class="colorLinea">
@@ -21,7 +21,7 @@
   </div>
 
   <div class="contain">
-    <div class="formulario">
+    <p-card>
       <!-- Inicio Botones que llaman el modal de crear materias primas y Crear tintas-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"(click)="llamarModalCrearTintas()"></button>
@@ -30,7 +30,7 @@
 
       <!--Titulo Asignación -->
       <div class="mb-3">
-        <h4 class="tituloRojo"><i class="pi pi-check-circle"></i> Creación de Tintas</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-check-circle"></i> Creación de Tintas</h4>
       </div>
       <br>
 
@@ -40,10 +40,10 @@
           <div class="row g-4">
 
             <!-- Tinta -->
-            <div class="col-md-4">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-4">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-search"></i>
-                <input formControlName="Tinta" id="Tinta" list="ListaTinta" class="form-control form-control-sm" type="text" pInputText (change)="buscarTintaSeleccionada()" required/>
+                <input formControlName="Tinta" id="Tinta" list="ListaTinta" type="text" pInputText (change)="buscarTintaSeleccionada()" required/>
                 <datalist id="ListaTinta">
                   <option value={{item.id}} *ngFor="let item of tintas">{{item.name}}</option>
                 </datalist>
@@ -52,7 +52,7 @@
             </div>
 
             <!-- Cantidad -->
-            <div class="col-md">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
               <span class="p-float-label">
                 <p-inputNumber formControlName="cantidadTinta" mode="decimal" inputId="CantidadTinta" [minFractionDigits]="2"></p-inputNumber>
                 <label for="CantidadTinta">Cantidad</label>
@@ -60,7 +60,7 @@
             </div>
 
             <!-- Unidad de Medida -->
-            <div class="col-md-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
               <span class="p-float-label">
                 <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
                 <label for="Und">Und</label>
@@ -68,9 +68,9 @@
             </div>
 
             <!-- Observación -->
-            <div class="col-md">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-xxl-4">
               <span class="p-float-label">
-                <textarea formControlName="Observacion" [rows]="1" inputId="Observacion" class="form-control form-control-sm" pInputTextarea></textarea>
+                <textarea formControlName="Observacion" [rows]="1" inputId="Observacion"  pInputTextarea></textarea>
                 <label for="Observacion">Observación</label>
               </span>
             </div>
@@ -80,8 +80,8 @@
       </form>
 
       <!-- Titulo Materia Prima -->
-      <div class="mb-3">
-        <h4 class="tituloRojo"><i class="pi pi-box"></i> Materia Prima</h4>
+      <div class="mb-4">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Materia Prima</h4>
       </div>
 
       <!-- Formulario de Materia Prima -->
@@ -89,17 +89,17 @@
         <div class="mb-3">
           <div class="row g-4">
             <!-- Id Materia Prima -->
-            <div class="col-md-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <input formControlName="idMateriaPrima" id="IdMP" class="form-control form-control-sm" type="number" pInputText required/>
+                <input formControlName="idMateriaPrima" id="IdMP"  type="number" pInputText required/>
                 <label for="IdMP">Id</label>
               </span>
             </div>
 
             <!-- Nombre Materia Prima -->
-            <div class="col-md-6">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
               <span class="p-float-label">
-                <input formControlName="nombreMateriaPrima" id="MP" class="form-control form-control-sm" list="materiaprima" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
+                <input formControlName="nombreMateriaPrima" id="MP"  list="materiaprima" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
                 <datalist id="materiaprima">
                   <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.name}}</option>
                 </datalist>
@@ -108,7 +108,7 @@
             </div>
 
             <!-- Stock de Materia Prima  -->
-            <div class="col-md">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl-2">
               <span class="p-float-label">
                 <p-inputNumber formControlName="stockMateriaPrima" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
                 <label for="Stock">Stock</label>
@@ -116,7 +116,7 @@
             </div>
 
             <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
-            <div class="col-md">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl-2">
               <span class="p-float-label">
                 <p-inputNumber formControlName="cantidadMateriaPrima" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
                 <label for="Cantidad">Cantidad</label>
@@ -124,7 +124,7 @@
             </div>
 
             <!-- Unidad de Medida -->
-            <div class="col-md">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
               <span class="p-float-label">
                 <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
                 <label for="Und">Und</label>
@@ -148,7 +148,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de materias primas asignadas</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de materias primas asignadas</h4>
       </div>
 
       <!-- TABLA DE Materias Primas Asignadas -->
@@ -228,7 +228,7 @@
         </div>
       </div>
 
-    </div>
+    </p-card>
   </div>
 </div>
 

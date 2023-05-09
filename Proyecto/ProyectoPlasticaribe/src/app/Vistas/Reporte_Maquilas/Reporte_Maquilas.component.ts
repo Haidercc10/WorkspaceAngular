@@ -38,6 +38,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
   pesoTotal : number = 0;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -47,7 +48,7 @@ export class Reporte_MaquilasComponent implements OnInit {
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private servicioTerceros : TercerosService,
                             private messageService: MessageService ) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
       fechaDoc: [null],

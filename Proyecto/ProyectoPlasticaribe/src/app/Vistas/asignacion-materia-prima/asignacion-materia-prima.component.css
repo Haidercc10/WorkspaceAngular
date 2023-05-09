@@ -11,3 +11,19 @@ p-inputnumber, p-inputnumber ::ng-deep span {
   display: flex;
   width: 100%;
 }
+
+::ng-deep .p-card {
+  align-items: center;
+  margin: auto;
+  width: 90%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+  display: flex;
+  width: 100%;
+}

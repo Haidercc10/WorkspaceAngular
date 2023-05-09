@@ -4,31 +4,31 @@
   <div class="mb-3">
     <div class="row g-4">
       <!-- Nombre -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4">
         <span class="p-float-label">
-          <input formControlName="TintaNombre" id="TintaNombre" class="form-control form-control-sm" type="text" (keyup)="cargarDescripcion()" pInputText required/>
+          <input formControlName="TintaNombre" id="TintaNombre" type="text" (keyup)="cargarDescripcion()" pInputText required/>
           <label for="TintaNombre">Nombre</label>
         </span>
       </div>
 
       <!-- Descripcion -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="TintaDescripcion" id="TintaDescripcion" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="TintaDescripcion" id="TintaDescripcion" type="text" pInputText required/>
           <label for="TintaDescripcion">Descripción</label>
         </span>
       </div>
 
       <!-- Codigo Hexadecimal -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="TintaCodigoHexa" id="TintaCodigoHexa" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="TintaCodigoHexa" id="TintaCodigoHexa" type="text" pInputText required/>
           <label for="TintaCodigoHexa">Código Hexa</label>
         </span>
       </div>
 
       <!-- Unidad de Medida -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="TintaUndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
@@ -36,7 +36,7 @@
       </div>
 
       <!-- Categorias -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="TintaCategoria" inputId="TintaCategoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre" [required]="true"></p-dropdown>
           <label for="TintaCategoria">Categorias</label>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Precio -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="TintaPrecio" mode="decimal" inputId="TintaPrecio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="TintaPrecio">Precio</label>

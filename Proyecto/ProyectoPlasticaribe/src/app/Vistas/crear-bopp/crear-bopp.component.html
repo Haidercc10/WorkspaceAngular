@@ -6,15 +6,15 @@
     <div class="row g-4">
 
       <!-- Nombre -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
         <span class="p-float-label">
-          <input formControlName="Nombre" id="Nombre" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="Nombre" id="Nombre" type="text" pInputText required/>
           <label for="Nombre">Nombre</label>
         </span>
       </div>
 
       <!-- Ancho -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="Ancho" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Ancho">Ancho</label>
@@ -22,7 +22,7 @@
       </div>
 
       <!-- Micras -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="Micras" inputId="Micras" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Micras">Micras</label>

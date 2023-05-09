@@ -34,6 +34,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   conductores : any [] = []; //Variable que almcenará la información de los conductores
   Productos : any [] = [];
   rollosAsignados : any [] = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -43,6 +44,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                         private facturaService : AsignacionProductosFacturaService,
                           private rollosService : DetallesEntradaRollosService,){
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFactura = this.frmBuilder.group({
       Fact_Id: [null, Validators.required],
       Conductor : [null, Validators.required],

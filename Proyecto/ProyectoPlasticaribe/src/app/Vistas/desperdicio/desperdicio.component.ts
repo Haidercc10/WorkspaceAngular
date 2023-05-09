@@ -37,6 +37,7 @@ export class DesperdicioComponent implements OnInit {
   datosPdf : any [] = []; //Variable que va a almacenar los datos ingresados a la base de datos
   materiales : any [] = []; //Variable que va a tener la información de los materiales
   registroSeleccionado : any =[]; /** Variable que contendrá el registro a quitar de la tabla. */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -49,6 +50,7 @@ export class DesperdicioComponent implements OnInit {
                               private materiaService : MaterialProductoService,
                                 private messageService: MessageService) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
       IdMaquina : [null, Validators.required],

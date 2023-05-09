@@ -51,6 +51,7 @@ export class Orden_MaquilaComponent implements OnInit {
   informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de maquila
   llave : string = 'pdf'; /** Variable que se utilizará como palabra clave para cargar el mensaje de Ver Pdf/Quitar MP/Eliminar MP de la tabla*/
   itemSeleccionado : any; /** Variable que tomará diferentes valores, generalmente id para mostrar el pdf o id del item a quitar o eliminar de la tabla. */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -62,7 +63,7 @@ export class Orden_MaquilaComponent implements OnInit {
                             private ordenMaquilaService : Orden_MaquilaService,
                               private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                                 private messageService: MessageService ) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenMaquila = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
       Tercero : ['', Validators.required],

@@ -61,6 +61,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   public arrayInfoMatPrima : any [] = [];
 
   modalMode : boolean = false;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private rolService : RolesService,
@@ -78,7 +79,7 @@ export class PedidomateriaprimaComponent implements OnInit {
                                         private ordenCompraRemisionService : OrdenCompra_RemisionService,
                                           private dtOrdenCompraService : DetallesOrdenesCompraService,
                                             private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
       OrdenCompra : ['', Validators.required],

@@ -31,6 +31,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
@@ -39,6 +40,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       private preEntRollosService : PreEntregaRollosService,
                         private messageService: MessageService,) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
       fechaDoc : [null],

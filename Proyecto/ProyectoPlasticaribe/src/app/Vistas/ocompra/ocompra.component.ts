@@ -59,6 +59,7 @@ export class OcompraComponent implements OnInit {
   llave : string = 'pdf';
   ordenCreada : number;
   sombra : boolean = false;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -70,7 +71,7 @@ export class OcompraComponent implements OnInit {
                             private servicioTintas : TintasService,
                               private messageService: MessageService,
                                 private boppService : EntradaBOPPService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
       Proveedor : ['', Validators.required],

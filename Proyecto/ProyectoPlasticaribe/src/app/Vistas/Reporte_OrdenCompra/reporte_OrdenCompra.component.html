@@ -11,7 +11,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos de Ordenes de Compras</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Ordenes de Compras</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -19,27 +19,27 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
   <!-- Formulario para consultar filtros -->
   <form [formGroup]="FormConsultarFiltros">
-    <div class="mb-3">
+    <div class="mb-4">
       <div class="row g-3 justify-content-md-center">
 
         <!-- Orden de Compra -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Documento" id="orden" class="form-control form-control-sm" type="text" pInputText required/>
+            <input formControlName="Documento" id="orden" type="text" pInputText required/>
             <label for="orden">Orden de Compra</label>
           </span>
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
             <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Estados -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
             <p-dropdown formControlName="estadoDoc" inputId="Estado" [autoDisplayFirst]="false" [options]="estados" optionValue="estado_Id" optionLabel="estado_Nombre"></p-dropdown>
             <label for="Estado">Estados</label>
@@ -78,7 +78,7 @@
   </div>
   <!-- titulo tabla producto -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Registros consultados</h4>
   </div>
 
   <!-- Inicio tabla de registros consultados -->
@@ -123,7 +123,7 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-registros>
-            <tr data-bs-toggle="modal" data-bs-target="#editarOrden" (click)="llenarModal(registros.Oc)">
+            <tr (click)="llenarModal(registros.Oc)">
               <td>{{registros.Oc}}</td>
               <td>{{registros.Usuario}}</td>
               <td>{{registros.Fecha}}</td>
@@ -135,21 +135,10 @@
       </div>
     </div>
   </div>
-</div>
+</p-card>
 
-<ng-container *ngIf="mostrarModal">
-  <div class="modal fade" id="editarOrden" aria-labelledby="Editar Orden" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel2">Editar Orden de Compra N° {{numeroOrdenCompra}}</h5>
-          <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <app_ocompra_component></app_ocompra_component>
-        </div>
-      </div>
-    </div>
-  </div>
-</ng-container>
+<p-dialog [(visible)]="mostrarModal" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Editar Orden N° {{numeroOrdenCompra}}" [modal]="true" >
+  <app_ocompra_component></app_ocompra_component>
+</p-dialog>
+
 

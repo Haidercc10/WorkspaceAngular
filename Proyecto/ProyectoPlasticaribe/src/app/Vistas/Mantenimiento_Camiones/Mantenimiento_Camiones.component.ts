@@ -45,6 +45,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   public precioTotalMtto : number = 0;
   public PedMtto : string = '';
   tipoMovimientos : any [] = [{Id : 1, Nombre: 'Pedido de Mantenimiento'}, {Id : 2, Nombre: 'Mantenimiento'}];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -54,7 +55,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
                         private servicioProveedores : ProveedorService,
                           private servicioEstados : EstadosService,
                             private messageService: MessageService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarFormulario();
     this.inicializarFormulario2();
     this.inicializarFormularioMtto();

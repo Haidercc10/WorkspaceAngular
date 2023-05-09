@@ -35,6 +35,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   @ViewChild(OcompraComponent)  EditarOrdenCompra : OcompraComponent;
   mostrarModal : boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
   numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -42,6 +43,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     private dtOrdenCompraService : DetallesOrdenesCompraService,
                       private messageService: MessageService) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
       fechaDoc: [null, Validators.required],

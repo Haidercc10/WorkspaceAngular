@@ -33,6 +33,7 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
   mpSeleccionada : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -43,6 +44,7 @@ export class AsignacionTintasComponent implements OnInit {
                           private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
                             private messageService: MessageService)  {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormAsignacionMP = this.frmBuilder.group({
       Id_Tinta : [null, Validators.required],
       Tinta : [null, Validators.required],

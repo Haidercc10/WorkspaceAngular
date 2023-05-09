@@ -38,6 +38,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   movimientosConsultados : any [] = []; //Variable que almacenará toda la informacion de los movimientos consultados
   modeModal : boolean = false; //Variable que hará que se muestre el menú lateral o no
   infoPdf : any [] = []; //Variable que tendrá la información los activos de un pedido un mantenimiento consultados
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -47,7 +48,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                         private dtMantenimientoService : Detalle_MantenimientoService,
                           private dtPedidoMttoService : DetallePedido_MantenimientoService,
                             private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
       IdActivo : [null],

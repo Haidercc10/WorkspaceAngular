@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Consultar Facturas y Remisiones de Materia Prima</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Consultar Facturas y Remisiones de Materia Prima</h2>
     </div>
 
     <div class="mb-4">
@@ -21,9 +21,9 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="FormDocumentos">
@@ -31,15 +31,15 @@
       <div class="row g-4">
 
         <!-- ID Documento -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="idDocumento" id="idDocumento" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="idDocumento" id="idDocumento" type="text" pInputText/>
             <label for="idDocumento">Cod. Documento</label>
           </span>
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
             <label for="FechaInicial">Fecha Inicial</label>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Fecha Final -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
             <label for="FechaFinal">Fecha Final</label>
@@ -55,17 +55,17 @@
         </div>
 
         <!-- Tipo Docuemtno -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="TipoDocumento" inputId="TipoDocumento" optionValue="tpDoc_Id" [autoDisplayFirst]="false" [options]="tipoDocumento" optionLabel="tpDoc_Nombre"></p-dropdown>
-            <label for="TipoDocumento">Tipo de Documento</label>
+            <label for="TipoDocumento">Tipo Doc.</label>
           </span>
         </div>
 
         <!-- Proveedores -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-5 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="proveedorNombre" id="proveedorNombre" list="Proveedor" class="form-control form-control-sm" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()"/>
+            <input formControlName="proveedorNombre" id="proveedorNombre" list="Proveedor" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()"/>
             <datalist id="Proveedor">
               <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
             </datalist>
@@ -89,7 +89,7 @@
   </div>
 
   <div class="mb-4">
-    <h2 class="tituloRojo"><i class="pi pi-list"></i> Listado de registros consultados</h2>
+    <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Listado de registros consultados</h2>
   </div>
 
   <div class="container-fluid font-size-14">
@@ -145,5 +145,5 @@
       </div>
     </div>
   </div>
-</div>
+</p-card>
 

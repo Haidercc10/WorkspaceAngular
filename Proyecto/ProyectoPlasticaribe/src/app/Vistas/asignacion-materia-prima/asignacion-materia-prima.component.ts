@@ -48,6 +48,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   categoriasSeleccionadas : any [] = [];
   soloTintas : boolean = false;
   mpSeleccionada : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -61,6 +62,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                 private detallesAsignacionTintas : DetallesAsignacionTintasService,
                                   private messageService: MessageService) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
       OTImp : [''],
@@ -123,7 +125,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   limpiarCamposMP = () => this.FormMateriaPrimaRetirada.reset();
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => this.unidadMedida = datos_unidadesMedida);
+  obtenerUnidadMedida() { this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => { this.unidadMedida = datos_unidadesMedida }) }
 
   //Funcion que se encagará de obtener los procesos de la empresa
   obtenerProcesos(){

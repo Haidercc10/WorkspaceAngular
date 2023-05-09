@@ -30,6 +30,7 @@ export class DevolucionesMPComponent implements OnInit {
   materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load : boolean = true;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private AppComponent : AppComponent,
@@ -40,7 +41,7 @@ export class DevolucionesMPComponent implements OnInit {
                           private detallesAsignacionService : DetallesAsignacionService,
                             private boppService : EntradaBOPPService,
                               private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
       MpingresoFecha: [this.today, Validators.required],

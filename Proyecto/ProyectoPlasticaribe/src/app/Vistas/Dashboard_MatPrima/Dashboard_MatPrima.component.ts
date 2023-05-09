@@ -249,15 +249,15 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.ComparativoData = {
       labels: [''],
       datasets: [
-        { label: 'MP Asignada', backgroundColor: '#42A5F5', data: [this.totalMpAsignada] },
-        { label: 'MP Extruida', backgroundColor: '#FFA726', data: [this.totalExtruidoMes] }
+        { label: 'MP Asignada', backgroundColor: '#42A5F5',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data:  [this.totalMpAsignada] },
+        { label: 'MP Extruida', backgroundColor: '#FFA726',  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], data: [this.totalExtruidoMes] }
       ]
     };
 
     this.ComparativoOptions = {
       indexAxis: 'y',
       plugins: {
-        legend: { abels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
+        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], } },
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {

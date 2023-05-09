@@ -14,7 +14,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Devolución de Productos/Rollos</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Devolución de Productos/Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -22,36 +22,34 @@
   </div>
 </div>
 
-<div class="formulario">
-  <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+<p-card>
+  <div class="mb-3">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Rollos</h4>
   </div>
   <br>
 
-  <div class="card" *ngIf="!cargando">
-    <p-toolbar>
+  <div *ngIf="!cargando">
       <div class="mb-3">
         <div class="row g-4">
 
           <!-- Codigo Factura -->
-          <div class="col-md">
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
             <span class="p-input-icon-left p-float-label">
               <i class="pi pi-search"></i>
-              <input id="Id" [(ngModel)]="facturaConsultada" class="form-control form-control-sm" type="text" (keyup.enter)="consultarFactura()" pInputText required/>
+              <input id="Id" [(ngModel)]="facturaConsultada" type="text" (keyup.enter)="consultarFactura()" pInputText required/>
               <label for="Id">Código Factura</label>
             </span>
           </div>
 
           <!-- Observacion -->
-          <div class="col-md-12">
+          <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-9 col-xxl-9">
             <span class="p-float-label">
-              <textarea [(ngModel)]="observacionFactura" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+              <textarea [(ngModel)]="observacionFactura" [rows]="1" maxlength="200" pInputTextarea></textarea>
               <label for="textarea">Observación</label>
             </span>
           </div>
         </div>
       </div>
-    </p-toolbar>
 
     <div class="mb-3" *ngIf="!cargando">
       <div class="row g-3 font-size-14">
@@ -103,7 +101,7 @@
 
   <!-- Titlo Rollos Seleccionados -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos a devolver</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Rollos a devolver</h4>
   </div>
 
   <!-- Tabla con Rollos Seleccionados -->
@@ -159,4 +157,4 @@
     </div>
   </div>
 
-</div>
+</p-card>

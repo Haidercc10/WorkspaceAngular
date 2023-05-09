@@ -14,7 +14,7 @@
 <div class="contain" id="form">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Asignar Rollos/Productos</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Asignar Rollos/Productos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -29,9 +29,9 @@
   </svg>
 </button>
 
-<div class="formulario">
+<p-card>
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
   </div>
   <br>
 
@@ -41,32 +41,32 @@
       <div class="row g-4">
 
         <!-- Codigo Factura -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
           <span class="p-float-label">
-            <input formControlName="Factura" id="Factura" class="form-control form-control-sm" type="text" pInputText required/>
+            <input formControlName="Factura" id="Factura" type="text" pInputText required/>
             <label for="Factura">Factura</label>
           </span>
         </div>
 
         <!-- Nota Creadito -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
           <span class="p-float-label">
-            <input formControlName="NotaCredito" id="NotaCredito" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="NotaCredito" id="NotaCredito" type="text" pInputText/>
             <label for="NotaCredito">Nota Credito</label>
           </span>
         </div>
 
         <!-- Codigo de Producto -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="IdProducto" id="IdProducto" class="form-control form-control-sm" type="text" pInputText (keyup.Enter)="buscarProducto()"/>
+            <input formControlName="IdProducto" id="IdProducto" type="text" pInputText (keyup.Enter)="buscarProducto()"/>
             <label for="IdProducto">Cod. Producto</label>
           </span>
         </div>
 
         <!-- Cantidad Producto -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl col-xxl">
           <span class="p-float-label">
             <p-inputNumber formControlName="CantidadProducto" mode="decimal" inputId="CantidadProducto" [minFractionDigits]="2" (keyup.Enter)="buscarProducto()"></p-inputNumber>
             <label for="CantidadProducto">Cantidad Item</label>
@@ -74,9 +74,9 @@
         </div>
 
         <!-- Cliente -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="Cliente" id="Cliente" list="clientes" class="form-control form-control-sm" type="text" pInputText (change)='buscarCliente()' required/>
+            <input formControlName="Cliente" id="Cliente" list="clientes" type="text" pInputText (change)='buscarCliente()' required/>
             <datalist id="clientes">
               <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
             </datalist>
@@ -85,9 +85,9 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-md-12">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8 col-xl-12 col-xxl-12">
           <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="Observacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -102,7 +102,7 @@
 
   <!-- Titulo Rollos Disponibles -->
   <div class="mb-4 tabla1">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Disponibles</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Rollos Disponibles</h4>
   </div>
 
   <!-- Tabla con Rollos Disponibles -->
@@ -163,7 +163,7 @@
 
   <!-- Titulo Rollos Seleccionados -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Seleccionados</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Rollos Seleccionados</h4>
   </div>
 
   <!-- Tabla con Rollos Seleccionados -->
@@ -232,7 +232,7 @@
 
   <!-- Titulo Consolidado Productos -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-table"></i> Consolidado de Productos</h4>
   </div>
 
   <!-- Tabla Consolidado -->
@@ -277,4 +277,4 @@
     </div>
   </div>
 
-</div>
+</p-card>

@@ -6,23 +6,23 @@
     <div class="row g-4">
 
       <!-- Nombre Materia Prima -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="mpNombre" id="mpNombre" class="form-control form-control-sm" type="text" pInputText (click)="cargarDescripcion()" required/>
+          <input formControlName="mpNombre" id="mpNombre" type="text" pInputText (click)="cargarDescripcion()" required/>
           <label for="mpNombre">Nombre</label>
         </span>
       </div>
 
       <!-- Descripción -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
-          <input formControlName="mpDescripcion" id="mpDescripcion" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="mpDescripcion" id="mpDescripcion" type="text" pInputText required/>
           <label for="mpDescripcion">Descripción</label>
         </span>
       </div>
 
       <!-- CATEGORIA  -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-dropdown formControlName="mpCategoria" inputId="mpCategoria" optionValue="catMP_Id" [autoDisplayFirst]="false" [options]="nombreCategoriasMP" optionLabel="catMP_Nombre"></p-dropdown>
           <label for="mpCategoria">Categoria</label>
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Precio -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="mpValor" inputId="mpValor" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="mpValor">Precio Unitario</label>

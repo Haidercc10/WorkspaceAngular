@@ -38,6 +38,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   precioTotal : number = 0; //Variable que almacenará el precio total de las materias primas elegidas
   informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
   documento : number = 0;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -50,7 +51,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
                               private boppService : EntradaBOPPService,
                                 private ordenMaquilaService : Orden_MaquilaService,
                                   private messageService: MessageService ) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFacturacionOrden = this.frmBuilder.group({
       OrdenMaquila : ['', Validators.required],
       Factura: [null],

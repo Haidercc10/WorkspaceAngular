@@ -17,7 +17,9 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 export class MovimientoMPComponent implements OnInit {
 
-  @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dt1') dt1: Table | undefined;
+  @ViewChild('dt2') dt2: Table | undefined;
+  @ViewChild('dt3') dt3: Table | undefined;
   cargando : boolean = false;
   formMovimientos !: FormGroup;
   tiposMovimientos : any [] = [];
@@ -31,6 +33,7 @@ export class MovimientoMPComponent implements OnInit {
   movimientosTintas : any [] = []; //Variable que va a contener la información de los movomientos de las tintas
   movimientosBiorientados : any [] = []; //Variable que va a contener la informacion de los movimientos de los biorientados
   datosPdf : any [] = []; //Variable en la que se almacenará la información que se verá en el pdf
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -45,6 +48,8 @@ export class MovimientoMPComponent implements OnInit {
       MateriasPrimas_Id : [null, Validators.required],
       MateriasPrimas : [null, Validators.required],
     });
+
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
@@ -981,7 +986,17 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro1($event, campo : any, valorCampo : string) {
+    this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  }
+
+  aplicarfiltro2($event, campo : any, valorCampo : string) {
+    this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  }
+
+  aplicarfiltro3($event, campo : any, valorCampo : string) {
+    this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  }
 
   // Mostrar mensaje de confirmación
   mensajeConfirmacion(titulo : string, mensaje : any) {

@@ -176,7 +176,7 @@ export class DashBoard_PedidosComponent implements OnInit {
 
     this.multiAxisOptions = {
       plugins: {
-        legend: {  labels: { color: '#000', font: { size: 18 } } },
+        legend: {  labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } } },
         tooltip: { titleFont: { size: 25, }, bodyFont: { size: 20 }, },
       },
     };
@@ -195,22 +195,22 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#6475FF', ], yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#6475FF', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
 
     this.opcionesPedidosClientes = {
       stacked: false,
         plugins: {
-          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+          legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
           tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
         },
         tooltip: { usePointStyle: true, },
         scales: {
           x: {
             ticks: {
-              color: '#495057',
+               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
               font: { size: 18 },
               callback: function(value) {
                 if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
@@ -223,14 +223,14 @@ export class DashBoard_PedidosComponent implements OnInit {
             type: 'linear',
             display: true,
             position: 'left',
-            ticks: { color: '#495057', font: { size: 18 }, },
+            ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
             grid: { color: '#ebedef' }
           },
           y1: {
             type: 'linear',
             display: true,
             position: 'right',
-            ticks: { color: '#495057', font: { size: 18 } },
+            ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
             grid: { drawOnChartArea: false, color: '#ebedef' }
           },
         },
@@ -256,13 +256,13 @@ export class DashBoard_PedidosComponent implements OnInit {
     };
     this.opcionesPedidosProductos = {
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
           tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
@@ -275,7 +275,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 18 }, },
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -283,7 +283,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { color: '#495057', font: { size: 18 }, },
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
         }
       },
     };
@@ -312,13 +312,13 @@ export class DashBoard_PedidosComponent implements OnInit {
     };
     this.opcionesPedidosVendedores = {
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 18 } } },
+        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
         tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
@@ -331,7 +331,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 18 }, },
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -339,7 +339,7 @@ export class DashBoard_PedidosComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { color: '#495057', font: { size: 18 }, },
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
         }
       }
     };

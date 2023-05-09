@@ -45,6 +45,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
   mpSeleccionada : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   modalMode : boolean = false;
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -57,7 +58,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                             private recuperadoMPService : RecuperadoMPService,
                               private turnosService : TurnosService,
                                 private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
       MpingresoFecha: ['', Validators.required],

@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- Titulo principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Activos</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Reporte de Activos</h2>
     </div>
     <!-- Linea principal -->
     <div class="mb-4">
@@ -20,9 +20,9 @@
   </div>
 </div>
 
-<div class="formulario font-size-14">
+<p-card class="font-size-14">
   <div class="mb-4">
-    <h2 class="tituloRojo"><i class="pi pi-list"></i> Listado de activos</h2>
+    <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Listado de activos</h2>
   </div>
 
   <div class="mb-3" *ngIf="!cargando">
@@ -91,7 +91,7 @@
       </p-table>
     </div>
   </div>
-</div>
+</p-card>
 
 <p-dialog [(visible)]="modalMovimientos" [style]="{width: '70vw'}" [resizable]="true" header="Movimientos de Activos" [modal]="true" >
   <ng-template pTemplate="content">

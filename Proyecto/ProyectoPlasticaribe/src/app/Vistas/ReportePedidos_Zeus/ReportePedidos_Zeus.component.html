@@ -149,13 +149,13 @@
 
 
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >
-  <ng-template #infoColor>
-    {{infoColor}}
+  <ng-template pTemplate>
+    <div [innerHTML]="infoColor"></div>
   </ng-template>
 </p-overlayPanel>
 
 <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
   <ng-template pTemplate="content">
     <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
   </ng-template>

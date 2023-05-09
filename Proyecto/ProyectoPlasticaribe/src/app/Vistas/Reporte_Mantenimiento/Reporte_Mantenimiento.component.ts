@@ -38,6 +38,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
   InformacionActivos : any [] = []; //Variable que va a almacenar los datos consultados y los mostrará en la tabla
   modalMovimientos : boolean = false; //Variable que hará que se muestre o no el modal de movimientos de activos
   @ViewChild(Movimientos_MantenimientoComponent) movimientosActivos : Movimientos_MantenimientoComponent;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private AppComponent : AppComponent,
@@ -45,6 +46,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
                     private tipoActivoService : Tipo_ActivoService,
                       private messageService: MessageService) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormActivos = this.frmBuilderMateriaPrima.group({
       ActivoId : [null, Validators.required],
       ActivoNombre: [null, Validators.required],

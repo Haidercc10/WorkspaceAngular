@@ -31,12 +31,13 @@ export class ArchivosComponent implements OnInit {
   rutaInicial : string; //Variable que va a almacenar la ruta inicial desde la cual se va a mover o copiar el archivo
   nombreArchivo : string; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
   validarArchivo_Carpeta : boolean;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private archivosService : ArchivosService,
                     private categoriaArchivosService : Categorias_ArchivosService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
       carpetaNueva : ['', Validators.required],

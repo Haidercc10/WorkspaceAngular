@@ -6,7 +6,7 @@
       <!-- ID Producto -->
       <div class="col-md-2">
         <span class="p-float-label">
-          <input formControlName="ProduId" id="Id" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="ProduId" id="Id"  type="text" pInputText required/>
           <label for="Id">Id</label>
         </span>
       </div>
@@ -14,7 +14,7 @@
       <!-- Nombre Producto -->
       <div class="col-md-4">
         <span class="p-float-label">
-          <input formControlName="ProduNombre" id="Nombre" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="ProduNombre" id="Nombre"  type="text" pInputText required/>
           <label for="Nombre">Nombre</label>
         </span>
       </div>
@@ -110,7 +110,7 @@
       <!-- Campo Descripción producto -->
       <div class="col-md">
         <span class="p-float-label">
-          <input formControlName="ProdDescripcion" id="Descripcion" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="ProdDescripcion" id="Descripcion"  type="text" pInputText required/>
           <label for="Descripcion">Descripción</label>
         </span>
       </div>
@@ -118,7 +118,7 @@
       <!-- Cliente -->
       <div class="col-md">
         <span class="p-float-label">
-          <input formControlName="ClienteNombre" id="Clientes" list="cli" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="ClienteNombre" id="Clientes" list="cli"  type="text" pInputText required/>
           <datalist id="cli">
             <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
           </datalist>
@@ -152,7 +152,7 @@
       <!-- Producto -->
       <div class="col-md-2">
         <span class="p-float-label">
-          <input formControlName="ProdId" id="Id" class="form-control form-control-sm" type="text" pInputText required/>
+          <input formControlName="ProdId" id="Id"  type="text" pInputText required/>
           <label for="Id">Id Producto</label>
         </span>
       </div>

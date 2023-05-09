@@ -27,7 +27,7 @@ import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pi
 import { OrdenesTrabajoComponent } from '../ordenes-trabajo/ordenes-trabajo.component';
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import moment from 'moment';
-//import * as XLSX from 'xlsx';
+import { AppComponent } from 'src/app/app.component';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -128,6 +128,7 @@ export class OpedidoproductoComponent implements OnInit {
   keywordNombresProductos = 'prod_Nombre';
   public historyHeading: string = 'Seleccionado Recientemente';
   public historyHeading2: string = 'Seleccionado Recientemente';
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
 
   constructor(private pedidoproductoService : OpedidoproductoService,
@@ -150,9 +151,10 @@ export class OpedidoproductoComponent implements OnInit {
                                     private ClientesProductosService : ClientesProductosService,
                                       private materialService : MaterialProductoService,
                                         private pigmentoServices : PigmentoProductoService,
-                                          private ordenTrabajoService : Orden_TrabajoService,) {
+                                          private ordenTrabajoService : Orden_TrabajoService,
+                                            private AppComponent : AppComponent ) {
 
-
+     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Datos para la tabla de pedidos.

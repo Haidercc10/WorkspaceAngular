@@ -34,6 +34,8 @@ export class PedidoMantenimientoComponent implements OnInit {
   idActivosSeleccionados : number [] = []; //Variable que va a almacenar el id de cada uno de los activos selccionados
   activoSeleccionado : any = [];
   llave : string = '';
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private pedidoMantenimientoService : Pedido_MantenimientoService,
@@ -42,6 +44,7 @@ export class PedidoMantenimientoComponent implements OnInit {
                         private tipoMantenimientoService : Tipo_MantenimientoService,
                           private messageService: MessageService) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormPedidoMantenimiento = this.frmBuilder.group({
       ConsecutivoPedido : [null],
       Observacion : [null],

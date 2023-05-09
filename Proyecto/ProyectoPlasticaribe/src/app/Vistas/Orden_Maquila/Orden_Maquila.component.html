@@ -15,7 +15,7 @@
   <div class="container-fluid">
     <!-- Titulo principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Orden de Maquila</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Orden de Maquila</h2>
     </div>
 
     <!-- Linea principal -->
@@ -25,7 +25,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <!-- Botones que llamaran los modeles -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <button pButton pRipple class="p-button-danger" icon="pi pi-user-plus" label="Crear Tercero" (click)="modalCreacionTerceros = true;"></button>
@@ -33,7 +33,7 @@
 
   <!-- Informacion de la orden de maquila -->
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de la Orden de Maquila</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-info-circle"></i> Información de la Orden de Maquila</h4>
   </div>
   <br>
 
@@ -42,19 +42,19 @@
       <div class="row g-4">
 
         <!-- Consecutivo de la orden de compra -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="ConsecutivoOrden" id="orden" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="buscarOrdenMaquila()" required/>
+            <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText (keyup.enter)="buscarOrdenMaquila()" required/>
             <label for="orden">Consecutivo</label>
           </span>
         </div>
 
         <!-- Tercero -->
-        <div class="col-md-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Tercero" autocomplete="off" id="Terceros" list="Proveedor" class="form-control form-control-sm" type="text" pInputText (keyup)="consultarTercero()" (change)="cambiarNombreTercero()" required/>
+            <input formControlName="Tercero" autocomplete="off" id="Terceros" list="Proveedor" type="text" pInputText (keyup)="consultarTercero()" (change)="cambiarNombreTercero()" required/>
             <datalist id="Proveedor">
               <option value={{item.tercero_Id}} *ngFor="let item of terceros">{{item.tercero_Nombre}}</option>
             </datalist>
@@ -63,9 +63,9 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-md-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
           <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="Observacion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -79,7 +79,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-check-square"></i> Seleccionar Mat. Prima</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-check-square"></i> Seleccionar Mat. Prima</h4>
   </div>
 
   <form [formGroup]="FormMateriaPrima">
@@ -87,17 +87,17 @@
       <div class="row g-4">
 
         <!-- ID de la Materia prima -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Id" inputId="Id" autocomplete="off" [useGrouping]="false" [required]="true"></p-inputNumber>
+            <p-inputNumber formControlName="Id" inputId="Id" autocomplete="off" [useGrouping]="false" [required]="true" (keyup.enter)="cambiarNombreMateriaPrima()"></p-inputNumber>
             <label for="Id">Id</label>
           </span>
         </div>
 
         <!-- Nombre Producto -->
-        <div class="col-md-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="Nombre" id="Nombre" autocomplete="off" list="materiaprima" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
+            <input formControlName="Nombre" id="Nombre" autocomplete="off" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
             <datalist id="materiaprima">
               <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
             </datalist>
@@ -106,7 +106,7 @@
         </div>
 
         <!-- STOCK DE MATERIA PRIMA  -->
-        <div class="form-floating col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="Stock" [readonly]="true" inputId="Stock" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="Stock">Stock</label>
@@ -114,7 +114,7 @@
         </div>
 
         <!-- CANTIDAD DE MATERIA PRIMA  -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="Cantidad" inputId="Cantidad" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Unidad medida-->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="UndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadesMedida" optionValue="undMed_Id" optionLabel="undMed_Id"></p-dropdown>
             <label for="Und">Und</label>
@@ -130,7 +130,7 @@
         </div>
 
         <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="PrecioOculto" inputId="PrecioOculto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="PrecioOculto">Precio Unitario</label>
@@ -153,7 +153,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Mat. Primas Seleccionadas</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Mat. Primas Seleccionadas</h4>
   </div>
 
   <div class="row g-3">
@@ -224,7 +224,7 @@
       <app-Crear-Tercero></app-Crear-Tercero>
     </ng-template>
   </p-dialog>
-</div>
+</p-card>
 
 <p-toast position="center" key="{{llave}}" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-matPrima>

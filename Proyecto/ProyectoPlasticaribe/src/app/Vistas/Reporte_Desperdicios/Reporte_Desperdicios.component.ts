@@ -36,6 +36,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   arrayDatosAgrupadosPdf : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private formBuilder : FormBuilder,
                 private servicioMateriales : MaterialProductoService,
@@ -43,6 +44,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
                     private servicioDesperdicios : DesperdicioService,
                       private AppComponent : AppComponent,
                         private messageService: MessageService) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.formBuilder.group({
       OT : [null],
       Producto : [null],
