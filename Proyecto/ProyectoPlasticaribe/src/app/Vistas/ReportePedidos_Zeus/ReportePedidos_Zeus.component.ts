@@ -58,6 +58,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.seleccionarColumnas();
     this.consultarPedidosZeus();
     this.consultarPedidos();
   }
@@ -86,7 +87,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61 || this.ValidarRol == 6 || this.ValidarRol == 10) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 6 || this.ValidarRol == 60 || this.ValidarRol == 61) this.llenarArrayPedidosZeus(datos_pedidos[i], i);
       }
     });
     setTimeout(() => {
@@ -106,10 +107,38 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarArrayPedidos(datos_pedidos[i], i);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i], i);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 6 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i], i);
       }
     });
     setTimeout(() => { this.cargando = false; }, 1500);
+  }
+
+  // Funcion que va a almcanear las columnas que se podrán elegir y que saldrán elegidas desde el principio
+  seleccionarColumnas(){
+    this.columnas = [
+      { header: 'Pedido', field: 'consecutivo', tipo: '' },
+      { header: 'Cliente', field: 'cliente', tipo: '' },
+      { header: 'Item', field: 'id_Producto', tipo: '' },
+      { header: 'Producto', field: 'producto', tipo: '' },
+      { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
+      { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
+      { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
+      { header: 'Stock', field: 'existencias', tipo: 'numero' },
+      { header: 'Und', field: 'presentacion', tipo: '' },
+      { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
+      { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
+      { header: 'Estado', field: 'estado', tipo: '' },
+      { header: 'Vendedor', field: 'vendedor', tipo: '' },
+      { header: 'OT', field: 'OT', tipo: '' },
+      { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
+      { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
+      { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
+      { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
+      { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
+    ];
+    this.columnasSeleccionadas = this.columnas;
+    let posicion = this.columnasSeleccionadas.findIndex((item) => item.header == 'Total');
+    this.columnasSeleccionadas.splice(posicion, 1);
   }
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos en zeus
@@ -189,28 +218,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }
       }
     });
-    this.columnas = [
-      { header: 'Pedido', field: 'consecutivo', tipo: '' },
-      { header: 'Cliente', field: 'cliente', tipo: '' },
-      { header: 'Id Producto', field: 'id_Producto', tipo: '' },
-      { header: 'Producto', field: 'producto', tipo: '' },
-      { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
-      { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
-      { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
-      { header: 'Stock', field: 'existencias', tipo: 'numero' },
-      { header: 'Und', field: 'presentacion', tipo: '' },
-      { header: 'Estado', field: 'estado', tipo: '' },
-      { header: 'Vendedor', field: 'vendedor', tipo: '' },
-      { header: 'OT', field: 'OT', tipo: '' },
-      { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
-      { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
-      { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
-      { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
-      { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
-      { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
-      { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
-    ];
-    this.columnasSeleccionadas = this.columnas;
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
 

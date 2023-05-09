@@ -44,13 +44,14 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   private existencias_ProductosService : ExistenciasProductosService,
                     private invMesProductoService : Inventario_Mes_ProductosService,
                       private messageService: MessageService,
-                        private AppComponent : AppComponent) { }
+                        private AppComponent : AppComponent,) { }
 
   ngOnInit(): void {
     this.invetarioProductos();
     this.lecturaStorage();
   }
 
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;

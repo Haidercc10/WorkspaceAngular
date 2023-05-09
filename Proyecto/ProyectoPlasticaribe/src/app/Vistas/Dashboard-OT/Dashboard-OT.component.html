@@ -1,122 +1,132 @@
-<div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
+<div class="fondo">
   <!--  -->
- <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
-  <!-- Tabla de Procesos -->
-  <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <p-card header="">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-      </div>
-      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3" class="mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
-      <p-table
-        #dt1
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-sm p-datatable-striped"
-        responsiveLayout="scroll"
-        [scrollable]="true"
-        scrollHeight="400px"
-        [rowHover]="true"
-        [value]="procesosOrdenesMes">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>#</th>
-            <th>Proceso</th>
-            <th>Kg</th>
-            <th>Und</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-          <tr>
-            <td style="padding : 11px">{{rowIndex + 1}}</td>
-            <td><b>{{item.Nombre}}</b></td>
-            <td>{{item.cantidad | number : '1.2-2'}}</td>
-            <td>{{item.und | number : '1.2-2'}}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
-  </div>
-
-  <!--Estados de ordenes de trabajo-->
-  <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <p-card header="">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-      </div>
-      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
-      <p-table
-        #dt2
-        responsiveLayout="stack"
-        [rowHover]="true"
-        styleClass="p-datatable-sm"
-        [value]="estadosOrdenes">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Proceso</th>
-            <th>Cantidad</th>
-            <th>Ver</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item>
-          <tr>
-            <td><span class="badge {{item.Class}}">{{item.Nombre | uppercase}}</span></td>
-            <td>{{item.Cantidad | number}}</td>
-            <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-success" [style]="{width: '40px', height: '40px'}" (click)="mostrarModalEstados(item.Nombre)"></p-button></td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
-  </div>
-
-   <!-- Tabla de Cantidad de ordenes y Materiales -->
-   <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <p-card>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
-      </div>
-      <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
-
-      <p-toolbar>
-        <div class="p-toolbar-group-start">
-          <p class="font-size-15">En el mes actual se han creado un total de <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
+  <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+    <!-- Tabla de Procesos -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <div class="p-toolbar-group-start">
-          <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
+        <br>
+        <p-table
+          #dt1
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-sm p-datatable-striped"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [value]="procesosOrdenesMes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>Proceso</th>
+              <th>Kg</th>
+              <th>Und</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="padding : 11px">{{rowIndex + 1}}</td>
+              <td><b>{{item.Nombre}}</b></td>
+              <td>{{item.cantidad | number : '1.2-2'}}</td>
+              <td>{{item.und | number : '1.2-2'}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Procesos OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaProcesos()"></button>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <!--Estados de ordenes de trabajo-->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-      </p-toolbar>
-      <p-table
-        #dt1
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [scrollable]="true"
-        scrollHeight="400px"
-        [rowHover]="true"
-        [value]="materialesOrdenesMes">
-        <ng-template pTemplate="header">
-          <tr>
-            <th style="max-width:8%">#</th>
-            <th style="max-width:50%; min-width:30%">Material</th>
-            <th style="max-width:12%; min-width:12%">Cant.</th>
-            <th style="max-width:30%; min-width:30%">Costo</th>
-            <th style="max-width:20%">Peso (Kg)</th>
-          </tr>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
+        <p-table
+          #dt2
+          responsiveLayout="stack"
+          [rowHover]="true"
+          styleClass="p-datatable-sm"
+          [value]="estadosOrdenes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Proceso</th>
+              <th>Cantidad</th>
+              <th>Ver</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td><span class="badge {{item.Class}}">{{item.Nombre | uppercase}}</span></td>
+              <td>{{item.Cantidad | number}}</td>
+              <td><p-button icon="pi pi-search" styleClass="p-button-rounded p-button-success" [style]="{width: '40px', height: '40px'}" (click)="mostrarModalEstados(item.Nombre)"></p-button></td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Estados OT" pRipple type="button" icon="pi pi-chart-pie" class="p-button-rounded p-button-danger" (click)="llenarGraficaEstadosOt()"></button>
         </ng-template>
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-          <tr>
-            <td style="max-width:8%">{{rowIndex + 1}}</td>
-            <td style="max-width:30%; min-width:30%"><b>{{item.extMaterialNom}}</b></td>
-            <td style="max-width:12%; min-width:12%">{{item.cantidad | number}}</td>
-            <td style="max-width:30%; min-width:30%"><b>{{item.costo | currency : '$'}}</b></td>
-            <td style="max-width:20%">{{item.peso | number}}</td>
-          </tr>
+      </p-card>
+    </div>
+
+    <!-- Tabla de Cantidad de ordenes y Materiales -->
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
+        </div>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
+
+        <p-toolbar>
+          <div class="p-toolbar-group-start">
+            <p class="font-size-15">En el mes actual se han creado un total de <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
+          </div>
+          <div class="p-toolbar-group-start">
+            <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+          </div>
+        </p-toolbar>
+        <p-table
+          #dt1
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+          [rowHover]="true"
+          [value]="materialesOrdenesMes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="max-width:8%">#</th>
+              <th style="max-width:50%; min-width:30%">Material</th>
+              <th style="max-width:12%; min-width:12%">Cant.</th>
+              <th style="max-width:30%; min-width:30%">Costo</th>
+              <th style="max-width:20%">Peso (Kg)</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td style="max-width:8%">{{rowIndex + 1}}</td>
+              <td style="max-width:30%; min-width:30%"><b>{{item.extMaterialNom}}</b></td>
+              <td style="max-width:12%; min-width:12%">{{item.cantidad | number}}</td>
+              <td style="max-width:30%; min-width:30%"><b>{{item.costo | currency : '$'}}</b></td>
+              <td style="max-width:20%">{{item.peso | number}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <ng-template pTemplate="footer">
+          <button pButton pTooltip="Graficar Estados OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaMateriales(1)"></button>
         </ng-template>
-      </p-table>
-    </p-card>
+      </p-card>
+    </div>
   </div>
- </div>
 
   <!-- Tablas de Ordenes de Trabajo -->
   <div class="row g-2 fila-2" *ngIf="ValidarRol == 1">
@@ -127,7 +137,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-dollar"></i> Clientes con más compras en el mes.</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-dollar"></i> Clientes con más compras en el mes.</h2>
 
         <p-table
           #dt1
@@ -156,9 +166,8 @@
             </tr>
           </ng-template>
         </p-table>
-
         <ng-template pTemplate="footer">
-          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactClientes()"></button>
+          <button pButton pTooltip="Graficar Procesos OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactClientes()"></button>
         </ng-template>
       </p-card>
     </div>
@@ -169,7 +178,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-truck"></i> Productos más vendidos en el mes</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-truck"></i> Productos más vendidos en el mes</h2>
 
         <p-table
           #dt2
@@ -207,7 +216,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-cart-plus"></i> Asesores con más ventas en el mes</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-cart-plus"></i> Asesores con más ventas en el mes</h2>
 
         <p-table
           #dt3
@@ -237,7 +246,7 @@
           </ng-template>
         </p-table>
         <ng-template pTemplate="footer">
-          <button pButton pTooltip="Graficar Tabla" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactVendedores()"></button>
+          <button pButton pTooltip="Graficar Procesos OT" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="llenarGraficaFactVendedores()"></button>
         </ng-template>
       </p-card>
     </div>
@@ -252,7 +261,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-7')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
 
         <p-table
           #dt1
@@ -296,7 +305,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-8')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
 
         <p-table
           #dt2
@@ -332,7 +341,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-9')" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
         </div>
-        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
 
         <p-table
           #dt3
@@ -378,11 +387,23 @@
   <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
 </p-dialog>
 
-<!-- Modal donde se podrá ver algunas graficas -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '90%'}">
+<!-- Modal donde se podrá ver algunas graficas de barras -->
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaBarras" [style]="{width: '130rem'}">
+  <p-toolbar *ngIf="graficaMateriales">
+    <div class="p-toolbar-group-start">
+      <button pButton pTooltip="Graficar Cantidad" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficaMateriales(1)"></button>
+      <button pButton pTooltip="Graficar Costo" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-info mr-2" (click)="llenarGraficaMateriales(2)"></button>
+      <button pButton pTooltip="Graficar Peso" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-warning mr-2" (click)="llenarGraficaMateriales(3)"></button>
+      <h5>¡Grafica por una de las 3 opciones!</h5>
+    </div>
+  </p-toolbar>
   <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
 </p-dialog>
-<br>
+
+<!-- Modal donde se podrán ver algunas graficas de pie -->
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaPie" [style]="{width: '130rem'}">
+  <p-chart type="pie" width="90%" height="400px" [data]="graficaPieData" [options]="graficaPieOptions"></p-chart>
+</p-dialog>
 
 <!-- style="background-color: rgba(39, 39, 39, 0.9)"-->
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >

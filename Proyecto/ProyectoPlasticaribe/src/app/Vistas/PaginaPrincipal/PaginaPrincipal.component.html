@@ -4,7 +4,7 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
-    <p-tabView [scrollable]="true">
+    <p-tabView [scrollable]="true" *ngIf="(ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 60 || ValidarRol == 61)">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Ordenes de Trabajo"

@@ -239,7 +239,7 @@ export const routes: Routes = [
 
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
   {path: 'inventario-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : InventarioProductosPBDDComponent},
-  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,60,61,6,10]}, component: ModalGenerarInventarioZeusComponent},
+  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,60,61]}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
@@ -261,7 +261,7 @@ export const routes: Routes = [
   {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
-  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60,61,6,10]}, component: ReportePedidos_ZeusComponent},
+  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,6,60,61]}, component: ReportePedidos_ZeusComponent},
   {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
