@@ -178,3 +178,11 @@ p {
   font-size: calc(var(--font-size) * 20px);
   margin-left: 10%;
 }
+
+.navbar {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
+}

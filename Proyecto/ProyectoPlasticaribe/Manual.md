@@ -60,15 +60,15 @@ El resto de roles verán lo siguiente:
 ![Dahboard2](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard2.jpg)
 
 # Modulos de la Aplicación
-1. [Bodega Extrusión](#bodega-extrusión).
-2. [BOPP / BOPA / Poliester](#bopp-bopa-poliester)
+1. [Bodega Extrusión.](#bodega-extrusión)
+2. [BOPP / BOPA / Poliester.](#bopp-bopa-poliester)
 3. [Despacho.](#despacho)
 4. [Desperdicio.](#desperdicio)
-5. [Gestor de Archivos](#gestión-de-archivos).
+5. [Gestor de Archivos.](#gestión-de-archivos)
 6. [Materia Prima.](#materia-prima)
-7. [Mantenimiento de Activos.](#)
-8. [Movimientos.](#)
-9. [Maquilas.](#)
+7. [Mantenimiento de Activos.](#matenimiento-de-activos)
+8. [Movimientos.](#movimientos)
+9. [Maquilas.](#maquilas)
 10. [Orden de Trabajo.](#)
 11. [Pedidos.](#)
 12. [Productos.](#)
@@ -183,7 +183,7 @@ En este modulo se podrá pre-ingresar, ingresar, facturar, dar salida, devolver 
 
 5. Movimientos Despacho: Aquí vamos a consultar y ver los movimientos que hemos realizado, llamese movimientos lo que es  pre-ingreso, ingreso, factura, salida, devolución de rollos. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual.
 
-![Devolución de Rollos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Despacho/Movimientos.jpg)
+![Movimientos de Rollos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Despacho/Movimientos.jpg)
 
 6. Pre ingresos: Para ingresar los rollos estos primero deben ser Pre-Ingresados. Los Pre-Ingresos se dividen en 2: Extrusión y Sellado
     1. Llenar los filtros por los que vamos a buscar los rollos y luego presionar el botón "Consultar Productción" y nos traerá los rollos que se encuentran dentro de los filtros o presionar directamente el botón "Consultar Productción" y esto nos traerá todos los rollos que no han sido ingresados.
@@ -245,7 +245,7 @@ En este módulo se podrán realizar movmientos de materia prima como asignacione
     3. Al presionar el check se cargará la información de la materia prima en la tabla siguiente.
     4. Llenamos el campo Factura o Remisión con el codigo de una de estas 2.
     5. Por último solo debemos presionar "Agregar Factura" y listo, todo se habrá enviado a la base de datos.
-    6. Si lo que estamos ingresando en una factura tenemos la opción de relacionarle una remisión, para ello desplemos el bloque Añadir remisión a factura y buscamos el código de la remisión (esto es opcional).
+    6. Si lo que estamos ingresando en una factura tenemos la opción de relacionarle una remisión, para ello desplemos el bloque.Añadir remisión a factura y buscamos el código de la remisión (esto es opcional).
 
 ![Entrada de Materia Prima](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/Entrada.jpg)
 
@@ -318,3 +318,102 @@ El mantenimiento de activos es algo que se debe tener en cuenta para saber la vi
 3. Inventario Activos: Aqui podremos ver todos los activos que tiene la empresa, con algunos de sus costo.
 
 ![Activos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/activos/Activos.jpg)
+
+## `Movimientos`
+En los movimientos podemos ver los movimientos (valga la redundancia) de todos los módulos de la aplicación.
+
+1. Bodega Extrusión: Aquí vamos a consultar y ver los movimientos que hemos realizado, llamese movimientos lo que es entradas y salidas de rollos. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual.
+
+![Inventario Rollos Extrusión](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Bodega%20Extrusion/BodegaExtrusion.jpg)
+
+2. Entradas de Materia Prima: Aquí podemos ver todas las entradas que se han realizado de materia prima (no se incluyen biorientados).
+3. Movimientos Mantenimientos: Desde aquí podemos ver todos los movimientos que se han realizado para los activos.
+4. Movimientos Despacho: Aquí vamos a consultar y ver los movimientos que hemos realizado, llamese movimientos lo que es  pre-ingreso, ingreso, factura, salida, devolución de rollos. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual.
+
+![Movimientos de Rollos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Despacho/Movimientos.jpg)
+
+5. Movimientos de Materia Prima: Se dividen en 2:
+    5.1. Movimientos de Materia Prima: Aquí vamos a consultar y ver los movimientos que hemos realizado, llamese movimientos lo que es entradas y asignaciones, creaciones, devoluciones de polietilenos, tintas o biorientados. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual.
+    ![Movimientos de Materia Prima](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/Movimientos.jpg)
+    5.2. Movimientos de Recuperado: Aquí vamos a consultar y ver los PELETIZADO que se han ingresado y las cantidades. Debemos llenar los filtros o simplemente presionar el boton para consultar, si no se llenan los filtros el programa automaticamente buscará por el día actual. Si presionamos doble click sobre la columna día o noche veremos de forma detallada cada ingreso.
+    ![Movimientos de Recuperado](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/MovimientosRecuperado.jpg)
+    ![Movimientos de Recuperado](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/MovimientosRecuperado2.jpg)
+    
+6. Movimientos Ordenes de Compra: Aquí podemos ver las ordenes de compra que se han creado consultando los filtros.
+
+![Movimientos Orden de Compra](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Materia%20Prima/MovimientosOrdenCompra.jpg)
+
+7. Movimientos de Maquilas: Aquí podemos ver la información de las ordenes de maquilas que se han creado y facturado.
+
+## `Maquilas`
+Las maquilas con documentos en los que se verá reflejada la información de las materias primas que salen hacia otras empresas.
+
+1. Orden de Maquila: Crear una orden de maquila es muy parecido a crear una orden de compra:
+    1.1. Primero escogemos el tercero hacia el que saldrá y si este no existe podemos crearlo presionando el botón de "Crear Tercero".
+    1.2. Segundo podemos llenar o no el campo de observación.
+    1.3. Luego escogemos la materia prima que saldrá, colocamos la cantidad y el precio,
+    1.4. Agregamos materia prima.
+    1.5. Finalmente si ya agregamos todas las materias primas debemos presionar el botón de "Crear Orden de Maquila".
+    1.6. Nos aparecerá un mensaje para ver la orden que acabamos de crear en formato pdf.
+
+
+2. Facturar Orden de Maquila: Para facturar una orden de maquila debemos seguir los siguientes pasos:
+    1. Diligenciamos el campo "Orden de Maquila" o "OM" y presinamos Enter.
+    2. Nos aparecerán las materias primas a ingresar en la tabla y si no está ingresado le aparecerá un check.
+    3. Al presionar el check se cargará la información de la materia prima en la tabla siguiente.
+    4. Llenamos el campo Factura o Remisión con el codigo de una de estas 2.
+    5. Por último solo debemos presionar "Facturar Maquila" y listo, todo se habrá enviado a la base de datos.
+
+
+3. Movimientos de maquilas: Aquí podemos ver la información de las ordenes de maquilas que se han creado y facturado.
+
+
+## `Orden de Trabajo`
+Una orden de trabajo es un documento donde se especifica de manera detallada la información sobre como crear un producto indicando por que procesos debe pasar, los materiales a utilizar, etc. En la orden de trabajo se detalla el pedido del cual se está realizando la orden de trabajo, así como tambien podemos ver el vendedor, cliente, dirección del cliente, estado del pedido, fecha de creación y entrega del producto. Para crear una orden de compra debemos: 
+1. Elegimos el pedido del cual obtendremos el producto que crearemos, al elegir el pedido se llenarán algumos campos automaticamente (vendedor, fecha entrega, id cliente, nombre cliente, ciudad cliente, dirección cliente, estado y observación), tambien se llenará una tabla con los productos que tiene el pedido que tengan cantidades pendientes.
+2. Para elegir el producto debemos dar click sobre cualquier parte de la información del producto que está en la tabla. Al dar click se buscará la ultima orden de trabajo creada para el producto seleccionado, extraerá los detalles de la creación de este producto en la ultima orden de compra y llenará los campos correspondientes a esta creación.
+    1. Bajo la tabla tenemos unos checkbox con los nombres de cada procesos por los que puede pasar la orden de trabajo, para crear el producto debemos seleccionar o dar click sobre el check por el que pasará y se habilitará una nueva opción en el apartado de "Procesos de Producción" con el nombre de cada proceso. Si el producto se ha creado antes al seleccionarlo estos campos se llenarán automaticamente pero siempre tendrá la opción de editarlos.
+    2. En el apartado llamado "Datos OT" saldrán algunos calculos que se harán teniendo en cuenta algunos datos de cada procesos:
+        1. Cantidad será la cantidad que se va a crear.
+        2. Valor Und será el costo del producto por unidad.
+        3. Neto Kg será el resultado del siguiente calculo. El calculo dependerá de la presentación del producto.
+            - Kg: Cantidad + ((Cantidad * Margen Adicional) / 100)
+            * Und: ((1 + (Margen Adicional / 100)) * ((Peso Millar / 1000) * Cantidad));
+            + Paquete: ((1 + (Margen Adicional / 100)) * ((Peso Millar / 1000) * (Cantidad * Cantidad Und por Paquetes)));
+        4. Valor Kg será el costo que tendrá por kilogramo. Para saber esto tenemos los siguientes calculos que dependerán de la presentación del producto.
+            - Kg: Valor Unitario.
+            * Und: Valor de La Orden / ((Cantidad * Peso Millar) / 1000);
+            + Paquete: Precio Unitario / Peso del Paquete.
+        5. Valor OT será el resultado del siguiente calculo:
+            - Kg: Cantidad * Valor Unitario.
+            * Und: Cantidad * Valor Unitario.
+            + Paquete: Cantidad * Valor Unitario.
+    3. En el apartado llamado "Extrusión" aparecerá:
+        1. Material que se va a extruir.
+        2. Formato.
+        3. Pigmento.
+        4. Tratado.
+        5. Ancho 1.
+        6. Ancho 2.
+        7. Ancho 3.
+        8. Calibre.
+        9. Unidad de Medida.
+        10. Peso de Extrusión se calculará de la siguiente manera.
+            - Si la unidad de medida es centimetros: 
+                - Si el material es Alta: ((ancho1 + ancho2 + ancho3) * calibre * 0.0048 * 100)
+                + Si el material es diferente de Alta: ((ancho1 + ancho2 + ancho3) * calibre * 0.00468 * 100)
+            * Si la unidad de medida es diferente de centimetros:
+                - Si el material es Alta: ((ancho1 + ancho2 + ancho3) * calibre * 0.0317 * 39.3701)
+                + Si el material es diferente de Alta: ((ancho1 + ancho2 + ancho3) * calibre * 0.0302 * 39.3701)
+    4. En el apartado llamado "Impresión" aparecerá:
+        1. Tipo de Impresión.
+        2. Rodillo.
+        3. Pista.
+        4. Tinta 1 (Opcional).
+        5. Tinta 2 (Opcional).
+        6. Tinta 3 (Opcional).
+        7. Tinta 4 (Opcional).
+        8. Tinta 5 (Opcional).
+        9. Tinta 6 (Opcional).
+        10. Tinta 7 (Opcional).
+        11. Tinta 8 (Opcional).

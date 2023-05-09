@@ -16,7 +16,6 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { DOCUMENT } from '@angular/common';
-import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
