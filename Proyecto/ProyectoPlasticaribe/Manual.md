@@ -575,9 +575,36 @@ Este reporte está encargado de mostrarnos de manera consolidada lo que compró 
 Esta información podemos exportarla a excel.
 
 7. Reporte de Procesos OT: Tenemos multiples funciones en este reporte, estas son:
+Para consultar las ordenes de trabajo simplemente debemos llenar los filtros que tenemos con la información necesaria o consultar sin llenar los filtros (esto buscará las ordenes de trabajo del día actual).
     1. Una de las funciones más importantes de este reporte es ver el estado de la orden de trabajo y cuanto a producido cada proceso, tambien nos indica si la cantidad que inicialmente se pide en la orden de trabajo ya fue procesada en cada uno de los procesos.
     2. Podemos agregar fallas a la orden de trabajo.
     3. Exportar la información a excel.
     4. Tenemos acceso al reporte de costos, para verlo tenemos que presionar click sobre el número de la OT.
     5. Podemos ver cada uno de los rollos pesados en cada proceso.
-    6. Podemos cambiar el estado de la orden de trabajo presionando el icono :pencil2:
+    6. Podemos cambiar el estado de la orden de trabajo presionando el icono :pencil2: ubicado en la última columna de la tabla y nos aparecerá un modal con los posibles estados de la orden de trabajo.
+    
+8. Reporte de Rollos eliminados: Cuando se eliminan rollos de la base de datos es posible verlos desde este reporte. Se mostrarán todos los rollos que han sido eliminados de la base de datos de bagpro y de la bodega de extrusión y de la bodega de despacho.
+
+## `Tickets`
+Un ticket es creado por usuarios cuando tienen sugerencias o algún problema con el programa. Desde este módulo se le puede dar seguimiento a los tickets que han sido creados por usuarios.
+1. Creación de Tickets: Para crear un ticket debemos describir el problema que tenemos en el campo "Descripción" y podemos o no agregar imagenes de nuestro problema.
+
+2. Gestión de Tickets: Desde este punto podemos ver la cantidad de tickets que tenemos para cada uno de los estados, los tickets que tenemos y no hemos solucionado, podemos revisarlos y cambiarles el estado mediante los vamos revisando y/o solucionando. Para cambiarle el estado a un ticket hacemos lo siguiente:
+    1. Seleccionamos el ticket presionando click sobre el radio button que esta en la parte derecha de la tabla.
+    2. En la parte derecha de pantalla (para pantallas con resoluciones mayores a 768px) nos aparecerá la información del ticket con las imagenes adjuntadas por el usuario.
+    3. En este mismo lugar al final de la información del ticket tenemos 2 botones con los que podemos cambiar el estado:
+        1. "En Revisión": Al presionarlo colocará el ticket en revisión, es decir, que ya se vió y se está solucionando.
+        2. "Resuelto": Al presionarlo nos aparecerá un modal con un campo descripción donde podemos escribir como solucionamos el problema del ticket o podemos nos llenar el campo y cambiar el estado.
+
+## `Usuarios`
+En este modulo vamos a poder manejar los usuarios que tendrá acceso al programa, es decir, desde quí podemos crear, editar y inhabilitar usuarios.
+1. Crear Usuarios: Para crear un nuevo usuario debemos presionar el botón ":heavy_plus_sign: Nuevo" y se nos desplegará un modal desde el que podremos crear el usuario de manera sencilla.
+    1. Crear Nuevo Rol: Si el usuario que vamos a crear va a tener un rol que no existe debemos crearlo, presionamos click en ":heavy_plus_sign: Nuevo Rol", lleamos los campos y listo.
+    2. Crear Área: Si el usuario que vamos a crear va a tener un área que no existe debemos crearlo, presionamos click en ":heavy_plus_sign: Nueva Área", lleamos los campos y listo.
+2. Editar Usuario: Para editar los usuarios nos vamos a la tabla y presionamos el icono :pencil2: ubicado en la antepenultima columna de la tabla, nos aparecerá un modal igual al de crear usuario pero esta vez con la información diligenciada, editamos los que queremos, le damos guardar y listo. 
+3. Inhabilitar Usuarios: Para inhabilitar un usuario tenemos 2 formas de hacerlo:
+    1. En la última columna de la tabla tenemos el siguiente icono :wastebasket: presionamos click sobre él y listo habremos cambiado el estado del usuario.
+    2. Esta forma de inhabilitar usuarios es mucho más comoda si se van a inhabilitar varios usuarios, para ello selecionamos los usuarios marcando en checkbox que está en la primera columna de la tabla y luego presionamos el boton ":wastebasket: Eliminar" y habremos cambiado el estado de los usuarios.
+
+## `Configuración`
+1. Cambiar tamaño de letra: Para cambiar el tamaño de la letra presionamos los botones con los iconos :heavy_plus_sign: y :heavy_minus_sign: hasta que el tamaño de la letra sea de nuestro agrado.
