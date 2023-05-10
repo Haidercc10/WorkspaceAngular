@@ -108,6 +108,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   pesoPaquete : number = 0; //Variable que almacenará cuantos kg pesa un paquete
   pesoBulto : number = 0; //Variable que almacenará cuantos kg pesa un bulto
   informacionSeleccionada : any; //Variable que almacenará la información del producto seleccionado
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   formCrearMezclas !: FormGroup;
   arrayMateriales2 : any = [];
@@ -148,7 +149,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                                 private tipoSelladoService : TiposSelladoService,
                                                                   private pedidosZeusService : InventarioZeusService,
                                                                     private sedeClienteService : SedeClienteService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
       Pedido_Id: [null, Validators.required],
