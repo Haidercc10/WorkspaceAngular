@@ -215,7 +215,7 @@ export class MenuLateralComponent implements OnInit {
     this.cambiar(this.AppComponent.temaSeleccionado);
   }
 
-  cambiar(estado : boolean) {
+  cambiar(estado : any) {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);
     let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
