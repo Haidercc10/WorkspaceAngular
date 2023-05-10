@@ -1,6 +1,7 @@
 <p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'27rem'}">
   <div class="imagen">
-    <img src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
+    <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
+    <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
   </div>
   <br>
   <ul>
@@ -869,6 +870,11 @@
               Tamaño de Letra <i class="pi pi-plus" (click)="aumentarLetra()"></i> <i class="pi pi-minus" (click)="disminuirLetra()"></i>
             </div>
           </ng-container>
+          <ng-container>
+            <div class="mb-2 sangria switch">
+              <i class="pi pi-sun"></i> Cambiar Tema <p-inputSwitch (onChange)="cambiar($event.checked)" [(ngModel)]="modoSeleccionado"></p-inputSwitch>
+            </div>
+          </ng-container>
             <div class="mb-2 sangria">
             <hr>
           </div>
@@ -876,13 +882,8 @@
       </li>
     </ng-container>
   </ul>
-  <div class="botonCierreSesion">
-    <button class="btn" type="button" (click)="confirm1()">
-      <li aria-hidden="true">
-        <i class="pi pi-fw pi-power-off"></i>
-        <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-      </li>
-    </button>
+  <div class="text-center">
+    <p-button type="button" styleClass="p-button-raised p-button-outlined p-button-danger" label="Cerrar Sesión" icon="pi pi-fw pi-power-off" (click)="confirm1()"></p-button>
   </div>
 
   <!-- BOTON DE CONFIGURACION -->

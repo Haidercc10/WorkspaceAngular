@@ -186,3 +186,9 @@ p {
   left: 0;
   z-index: 5;
 }
+
+.switch p-inputswitch {
+  margin-left: 10%;
+}
+
+
