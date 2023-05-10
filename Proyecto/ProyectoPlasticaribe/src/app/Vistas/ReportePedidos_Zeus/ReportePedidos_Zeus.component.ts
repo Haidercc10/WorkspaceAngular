@@ -47,6 +47,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   costoCantidadPendiente : number = 0;
   arrayPedidosIndividuales : any = [];
   datosExcel : any [] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -54,6 +55,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                     private pedidoProductosService : PedidoProductosService,
                       private pedidoExternoService : OpedidoproductoService,
                         private estadosProcesos_OTService : EstadosProcesos_OTService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {

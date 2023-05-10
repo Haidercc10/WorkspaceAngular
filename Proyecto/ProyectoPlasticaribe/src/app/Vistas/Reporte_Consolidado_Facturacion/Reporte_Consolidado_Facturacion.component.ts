@@ -36,12 +36,13 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
   datosExcel : any [] = []; //Variable que almcaneá la informacion con la que se llenará el excel
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
                     private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null, Validators.required],
       idvendedor : [null, Validators.required],

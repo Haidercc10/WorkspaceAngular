@@ -42,6 +42,7 @@ export class CrearProductoComponent implements OnInit {
   tipoMoneda : any [] = []; //Variable que almacenará los tipos de monedas
   tiposSellado : any [] = [];  //Variable que almacenará los tipos de sellados
   cliente : any [] = []; //Variable que almacenará los clientes
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderCrearProducto : FormBuilder,
                 private unidadMedidaService : UnidadMedidaService,
@@ -56,7 +57,7 @@ export class CrearProductoComponent implements OnInit {
                                   private pigmentoServices : PigmentoProductoService,
                                     private tipoSelladoService : TiposSelladoService,
                                       private ClientesProductosService : ClientesProductosService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       ProduId:[null, Validators.required],
       ProduNombre: [null, Validators.required],

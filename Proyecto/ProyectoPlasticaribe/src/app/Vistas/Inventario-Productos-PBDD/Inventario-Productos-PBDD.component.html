@@ -12,7 +12,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Inventario de Productos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Productos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -20,8 +20,7 @@
   </div>
 </div>
 
-<div class="formulario" *ngIf="load">
-  <div class="card">
+<p-card *ngIf="load">
     <p-toolbar styleClass="mb-4 gap-2">
       <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
     </p-toolbar>
@@ -136,5 +135,4 @@
           </div>
       </ng-template>
     </p-table>
-  </div>
-</div>
+</p-card>

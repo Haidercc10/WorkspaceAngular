@@ -17,7 +17,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Costos OT</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Costos OT</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -25,10 +25,10 @@
   </div>
 </div>
 
-<div [ngClass]="{'formularioModal' : modeModal, 'formulario' : !modeModal }">
+<p-card>
 
   <div class="mb-4">
-    <h3 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT's</h3>
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar OT's</h3>
   </div>
 
   <form [formGroup]="infoOT">
@@ -37,139 +37,125 @@
       <div class="row g-4">
 
         <!-- OT -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="ot" id="ordenTrabajo" (keyup.enter)="consultaOTBagPro()" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="ot" id="ordenTrabajo" (keyup.enter)="consultaOTBagPro()" type="text" pInputText/>
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
         <!-- Nombre del cliente -->
-        <div class="col-md-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="cliente" id="cliente" class="form-control form-control-sm" type="text" [disabled]="true" pInputText/> <!--readonly onmousedown="return false;"-->
+            <input formControlName="cliente" id="cliente" type="text" [disabled]="true" pInputText/> <!--readonly onmousedown="return false;"-->
             <label for="cliente">Cliente</label>
           </span>
         </div>
 
         <!-- Id Producto -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="IdProducto" id="idproducto" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="IdProducto" id="idproducto" type="text" [disabled] pInputText/>
             <label for="idproducto">Id Producto</label>
           </span>
         </div>
 
          <!-- Nombre Producto-->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5">
           <span class="p-float-label">
-            <input formControlName="NombreProducto" id="nombreProducto" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="NombreProducto" id="nombreProducto" type="text" [disabled] pInputText/>
             <label for="nombreProducto">Producto</label>
           </span>
         </div>
 
-      </div>
-    </div>
-
-    <!--Fila 2-->
-    <div class="mb-4">
-      <div class="row g-4">
-
         <!-- Cantidad Producto Unidad Sin Margen -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoSinMargenUnd" id="cantProdSinMrgUnd" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="cantProductoSinMargenUnd" id="cantProdSinMrgUnd" type="text" [disabled] pInputText/>
             <label for="cantProdSinMrgUnd">Cantidad Prod. Und</label>
           </span>
         </div>
 
         <!-- Cantidad Producto Kg Sin Margen -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoSinMargenKg" id="cantProdSinMrgKg" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="cantProductoSinMargenKg" id="cantProdSinMrgKg" type="text" [disabled] pInputText/>
             <label for="cantProdSinMrgKg">Cantidad Prod. Kg</label>
           </span>
         </div>
 
         <!-- Margen -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="margenAdicional" id="margen" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="margenAdicional" id="margen" type="text" [disabled] pInputText/>
             <label for="margen">Margen Adicional</label>
           </span>
         </div>
 
         <!-- Cantidad Producto Con Margen-->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="cantProductoConMargen" id="cantProdMargen" class="form-control form-control-sm" type="text" [disabled] pInputText/>
-            <label for="cantProdMargen">Cant. Kg con Margen</label>
+            <input formControlName="cantProductoConMargen" id="cantProdMargen" type="text" [disabled] pInputText/>
+            <label for="cantProdMargen">Cant. Kg Margen</label>
           </span>
         </div>
 
         <!--Presentación-->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="PresentacionProducto" id="presentacion" class="form-control form-control-sm" type="text" [disabled] pInputText/> <!--readonly onmousedown="return false;"-->
+            <input formControlName="PresentacionProducto" id="presentacion" type="text" [disabled] pInputText/> <!--readonly onmousedown="return false;"-->
             <label for="presentacion">Presentación</label>
           </span>
         </div>
 
         <!-- Valor Unidad Producto -->
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoUnd" *ngIf="ValidarRol == 1" id="presentacion" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoUnd" *ngIf="ValidarRol == 1" id="presentacion" type="text" [disabled] pInputText/>
             <label for="presentacion">$ Und Producto</label>
           </span>
         </div>
 
-      </div>
-    </div>
-
-    <!--Fila 3-->
-    <div class="mb-4">
-      <div class="row g-4">
-
         <!-- Valor Kg Producto -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="ValorUnidadProductoKg" *ngIf="ValidarRol == 1" id="valorUnitProdKg" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="ValorUnidadProductoKg" *ngIf="ValidarRol == 1" id="valorUnitProdKg" type="text" [disabled] pInputText/>
             <label for="valorUnitProdKg">$ Kg Producto</label>
           </span>
         </div>
 
         <!--Valor Estimado OT -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="ValorEstimadoOt" *ngIf="ValidarRol == 1" id="valorOT" class="form-control form-control-sm" type="text" [disabled] pInputText/>
+            <input formControlName="ValorEstimadoOt" *ngIf="ValidarRol == 1" id="valorOT" type="text" [disabled] pInputText/>
             <label for="valorOT">Valor OT</label>
           </span>
         </div>
 
         <!-- Fecha de Inicio -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="fechaInicioOT" inputId="fechaInicio" class="form-control form-control-sm" type="text" pInputText>
+            <input formControlName="fechaInicioOT" inputId="fechaInicio" type="text" pInputText>
             <label for="fechaInicio">Fecha Inicio</label>
           </span>
         </div>
 
         <!-- Fecha en que Finaliza -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="fechaFinOT" inputId="fechaFinal" class="form-control form-control-sm" type="text" pInputText>
+            <input formControlName="fechaFinOT" inputId="fechaFinal" type="text" pInputText>
             <label for="fechaFinal">Fecha Final</label>
           </span>
         </div>
 
         <!-- Estado -->
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="estadoOT" inputId="EstadoOT" [autoDisplayFirst]="false" [options]="arrayEstados" optionValue="valor" optionLabel="nombre"></p-dropdown>
             <label for="EstadoOT">Estado OT</label>
           </span>
         </div>
 
-        <div class="col-md">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="d-grid gap-2 d-md-flex justify-content-md">
             <button pButton class="p-button-warning" type="button" label="Cambiar Estado" icon="pi pi-sync" *ngIf="ValidarRol == 1 && storage_Id != 101" (click)="cambiarEstado()"></button>
           </span>
@@ -195,7 +181,7 @@
     </div>
 
     <div class="mb-4">
-      <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Materia Prima</h4>
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Materia Prima</h4>
     </div>
 
     <div class="mb-4">
@@ -247,7 +233,7 @@
     </div>
 
     <div class="mb-4">
-      <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Procesos</h4>
+      <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Procesos</h4>
     </div>
 
     <div class="mb-4">
@@ -302,4 +288,4 @@
         <p-chip label="Diferencia: {{diferenciaPorcentaje | number: '1.2-2'}}%" icon="pi pi-arrow-right-arrow-left" class="mr-2"></p-chip>
     </div>
   </div>
-</div>
+</p-card>

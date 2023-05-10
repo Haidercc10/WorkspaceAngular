@@ -76,6 +76,7 @@ export class ReporteCostosOTComponent implements OnInit {
   usuarioCreador : any;
   estado : any;
   arrayEstados : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
@@ -89,7 +90,7 @@ export class ReporteCostosOTComponent implements OnInit {
                                 private estadosProcesos_OTService : EstadosProcesos_OTService,
                                   private paginaPrincipal : PaginaPrincipalComponent,
                                     private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
       cliente : ['',Validators.required],

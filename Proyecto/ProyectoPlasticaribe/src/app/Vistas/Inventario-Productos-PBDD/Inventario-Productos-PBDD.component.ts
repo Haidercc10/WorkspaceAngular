@@ -8,6 +8,7 @@ import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -33,11 +34,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
   opcionFiltroFechas : string [] = ['Elija el filtro', 'Semana(s)', 'Mes(es)', 'Año(s)'];
   filtroFechas : string;
   cantidadDias : number;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private clienteOtItems : BagproService,
                 private existencias_ProductosService : ExistenciasProductosService,
                   private productosService : ProductoService,
-                    private messageService: MessageService) {
+                    private messageService: MessageService,
+                      private AppComponent : AppComponent) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {

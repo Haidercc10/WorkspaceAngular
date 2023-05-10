@@ -49,4 +49,7 @@ p-calendar ::ng-deep span button span {
   width: 100%;
 }
 
+::ng-deep p-chip {
+  text-align: center;
+}
 

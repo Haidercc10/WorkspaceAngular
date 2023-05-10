@@ -4,7 +4,7 @@
     <div class="row g-4">
 
       <!-- ID Producto -->
-      <div class="col-md-2">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="ProduId" id="Id"  type="text" pInputText required/>
           <label for="Id">Id</label>
@@ -12,7 +12,7 @@
       </div>
 
       <!-- Nombre Producto -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="ProduNombre" id="Nombre"  type="text" pInputText required/>
           <label for="Nombre">Nombre</label>
@@ -20,15 +20,15 @@
       </div>
 
       <!-- Ancho Producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduAncho" mode="decimal" inputId="Ancho" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Ancho">Ancho</label>
         </span>
       </div>
 
-      <!-- Fuelle Producto -->
-      <div class="col-md">
+      <!-- Fuelle Producto - -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduFuelle" mode="decimal" inputId="Fuelle" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Fuelle">Fuelle</label>
@@ -36,7 +36,7 @@
       </div>
 
       <!-- Calibre Producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduCalibre" mode="decimal" inputId="Calibre" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Calibre">Calibre</label>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Largo Producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduLargo" mode="decimal" inputId="Largo" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Largo">Largo</label>
@@ -52,7 +52,7 @@
       </div>
 
       <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduUnidadMedidaACF" inputId="Und" [options]="unidadMedida" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
@@ -60,7 +60,7 @@
       </div>
 
       <!-- Tipo Producto -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduTipo" inputId="TipoProducto" [options]="tipoProducto" optionValue="tpProd_Id" optionLabel="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="TipoProducto">Tipo Producto</label>
@@ -68,23 +68,23 @@
       </div>
 
       <!-- Tipo Sellado -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduSellado" inputId="TipoSellado" [options]="tiposSellado" optionValue="tpSellado_Id" optionLabel="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="TipoSellado">Tipo Sellado</label>
         </span>
       </div>
 
-      <!-- Bolsas Por Bulto -->
-      <div class="col-md">
+      <!-- Bolsas Por Bulto -- -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduBolsasBulto" mode="decimal" inputId="BolsasBulto" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="BolsasBulto">Bolsas Por Bulto</label>
         </span>
       </div>
 
-      <!-- Bolsas Por Paquete -->
-      <div class="col-md">
+      <!-- Bolsas Por Paquete -- -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduBolsasPaquete" mode="decimal" inputId="BolsasPaquete" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="BolsasPaquete">Bolsas Por Paquete</label>
@@ -92,7 +92,7 @@
       </div>
 
       <!-- Material -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduMaterial" inputId="Material" [options]="materialProducto" optionValue="material_Id" optionLabel="material_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Material">Material</label>
@@ -100,7 +100,7 @@
       </div>
 
       <!-- Pigmento -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduPigmento" inputId="Pigmento" [options]="pigmentoProducto" optionValue="pigmt_Id" optionLabel="pigmt_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Pigmento">Pigmento</label>
@@ -108,7 +108,7 @@
       </div>
 
       <!-- Campo Descripción producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
         <span class="p-float-label">
           <input formControlName="ProdDescripcion" id="Descripcion"  type="text" pInputText required/>
           <label for="Descripcion">Descripción</label>
@@ -116,7 +116,7 @@
       </div>
 
       <!-- Cliente -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
         <span class="p-float-label">
           <input formControlName="ClienteNombre" id="Clientes" list="cli"  type="text" pInputText required/>
           <datalist id="cli">
@@ -141,7 +141,7 @@
 </div>
 
 <div class="mb-4">
-  <h5 class="tituloRojo">Crear Presentación de productos</h5>
+  <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-plus-circle"></i> Crear Presentación de productos</h5>
 </div>
 <br>
 
@@ -150,7 +150,7 @@
     <div class="row g-4">
 
       <!-- Producto -->
-      <div class="col-md-2">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="ProdId" id="Id"  type="text" pInputText required/>
           <label for="Id">Id Producto</label>
@@ -158,7 +158,7 @@
       </div>
 
       <!-- Cantidad Producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduCantidad" mode="decimal" inputId="Cantidad" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Cantidad">Cantidad</label>
@@ -166,7 +166,7 @@
       </div>
 
       <!-- Presentacion Producto -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduUnidadMedidaCant" inputId="Und" [options]="unidadMedida" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
@@ -174,7 +174,7 @@
       </div>
 
       <!-- Precio Producto -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduPrecioUnd" mode="decimal" inputId="Precio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Precio">Precio</label>
@@ -182,7 +182,7 @@
       </div>
 
       <!-- Tipo Moneda -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="ProduTipoMoneda" inputId="Moneda" [options]="tipoMoneda" optionValue="tpMoneda_Id" optionLabel="tpMoneda_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Moneda">Tipo de Moneda</label>

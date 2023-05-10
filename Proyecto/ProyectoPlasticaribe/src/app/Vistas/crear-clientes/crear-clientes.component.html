@@ -4,7 +4,7 @@
     <div class="row g-4">
 
       <!-- ID Cliente -->
-      <div class="col-md-2">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="CliId" id="CliId" type="text" pInputText required/>
           <label for="CliId">Id</label>
@@ -12,7 +12,7 @@
       </div>
 
       <!-- Tipo ID -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="TipoIdCliente" inputId="tipoIdentificacion" [autoDisplayFirst]="false" [options]="tipoIdentificacion" optionLabel=""></p-dropdown>
           <label for="tipoIdentificacion">Tipo Id</label>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Nombre Cliente-->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-5 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="CliNombre" id="CliNombre" list="cliente" type="text" pInputText required/>
           <datalist id="cliente">
@@ -30,8 +30,16 @@
         </span>
       </div>
 
+      <!-- Tipo cliente -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TipoClienteId" inputId="TipoClienteId" optionValue="tpCli_Id" optionLabel="tpCli_Nombre" [autoDisplayFirst]="false" [options]="tiposClientes"></p-dropdown>
+          <label for="TipoClienteId">Tipo Cliente</label>
+        </span>
+      </div>
+
       <!-- Telefono Cliente -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="CliTelefono" id="CliTelefono" type="text" pInputText/>
           <label for="CliTelefono">Telefono</label>
@@ -39,23 +47,15 @@
       </div>
 
       <!-- Email cliente -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-5 col-xxl-6">
         <span class="p-float-label">
           <input formControlName="CliEmail" id="CliEmail" type="text" pInputText/>
           <label for="CliEmail">Correo/Email</label>
         </span>
       </div>
 
-      <!-- Tipo cliente -->
-      <div class="col-md">
-        <span class="p-float-label">
-          <p-dropdown formControlName="TipoClienteId" inputId="TipoClienteId" optionValue="tpCli_Id" optionLabel="tpCli_Nombre" [autoDisplayFirst]="false" [options]="tiposClientes"></p-dropdown>
-          <label for="TipoClienteId">Tipo Cliente</label>
-        </span>
-      </div>
-
       <!-- ID/Nombre Usuario -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-5 col-xxl-6">
         <span class="p-float-label">
           <input formControlName="UsuIdNombre" id="UsuIdNombre" list="vendedor" type="text" (change)="vendedoreSeleccionado()" pInputText required/>
           <datalist id="vendedor">
@@ -80,16 +80,15 @@
 </div>
 
 <div class="mb-4">
-  <h5 class="tituloRojo">Crear sedes a clientes</h5>
+  <h5 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-plus-circle"></i> Crear sedes a clientes</h5>
 </div>
-<br>
 
 <form [formGroup]="FormCrearSedeClientes" (ngSubmit)="validarCamposVaciosSedes()">
   <div class="mb-4">
     <div class="row g-4">
 
       <!-- Nombre del cliente -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="CliId2" id="CliNombre" list="cliente" type="text" pInputText required/>
           <label for="CliNombre">Cliente</label>
@@ -97,7 +96,7 @@
       </div>
 
       <!-- Ciudad sede cliente -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="SedeCli_Ciudad" id="Ciudad" type="text" pInputText/>
           <label for="Ciudad">Ciudad Sede</label>
@@ -105,7 +104,7 @@
       </div>
 
       <!-- Direccion -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="SedeCli_Direccion" id="Direccion" type="text" pInputText/>
           <label for="Direccion">Direccion Sede</label>
@@ -113,7 +112,7 @@
       </div>
 
       <!-- Codigo postal -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
           <input formControlName="SedeCli_Postal" id="Postal" type="text" pInputText/>
           <label for="Postal">Codigo Postal Sede</label>

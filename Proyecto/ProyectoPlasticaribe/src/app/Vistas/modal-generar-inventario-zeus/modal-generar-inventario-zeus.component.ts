@@ -37,14 +37,16 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   filtroFechas : string;
   cantidadDias : number;
   numeroIdProd : number = 0;
-
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
                   private existencias_ProductosService : ExistenciasProductosService,
                     private invMesProductoService : Inventario_Mes_ProductosService,
                       private messageService: MessageService,
-                        private AppComponent : AppComponent,) { }
+                        private AppComponent : AppComponent,) {
+   this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit(): void {
     this.invetarioProductos();

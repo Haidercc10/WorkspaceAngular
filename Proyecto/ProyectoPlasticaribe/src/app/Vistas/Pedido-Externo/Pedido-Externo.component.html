@@ -213,7 +213,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Productos</h4>
   </div>
 
-  <div class="mb-3" *ngIf="!cargando">
+  <div class="mb-5" *ngIf="!cargando">
     <div class="row g-3">
       <div class="table-responsive">
         <p-table
@@ -266,46 +266,46 @@
     </div>
   </div>
 
-  <p-card>
+  <div class="mb-5">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Valor total" icon="pi pi-dollar"></p-chip>
-          <label for="">${{valorTotal | number}}</label>
+          <label class="text-center" for="">${{valorTotal | number}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Descuento" icon="pi pi-percentage"></p-chip>
-          <label for="">{{descuento | number}}%</label>
+          <label class="text-center" for="">{{descuento | number}}%</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
-          <p-chip label="Subtotal menos Descuento" icon="pi pi-wallet"></p-chip>
-          <label for="">${{valorMenosDescuento | number}}</label>
+          <p-chip label="Subtotal menos Dcto" pTooltip="Subtotal menos descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
+          <label class="text-center" for="">${{valorMenosDescuento | number}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="IVA" icon="pi pi-percentage"></p-chip>
-          <label for="">{{iva | number}}%</label>
+          <label class="text-center" for="">{{iva | number}}%</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Subtotal Iva" icon="pi pi-money-bill"></p-chip>
-          <label for="">${{valorMenosIva | number}}</label>
+          <label class="text-center" for="">${{valorMenosIva | number}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Total" icon="pi pi-shopping-cart"></p-chip>
-          <label for="">${{valorfinal | number}}</label>
+          <label class="text-center" for="">${{valorfinal | number}}</label>
         </div>
       </div>
     </div>
-  </p-card>
+  </div>
 
   <div class="mb-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">

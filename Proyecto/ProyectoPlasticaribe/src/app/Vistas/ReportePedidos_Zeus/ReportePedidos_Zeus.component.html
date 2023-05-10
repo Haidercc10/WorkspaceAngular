@@ -14,7 +14,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Pedidos de Productos</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Pedidos de Productos</h2>
     </div>
 
     <div class="mb-4">
@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
 
   <!-- Informacion sobre los colores -->
   <p-toolbar>
@@ -45,7 +45,7 @@
     </ng-template>
 
     <ng-template pTemplate="left">
-      <h3 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
+      <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
     </ng-template>
   </p-toolbar>
   <br>
@@ -100,7 +100,7 @@
         </tr>
       </ng-template>
       <!-- Titulo de Agrupacion -->
-      <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded">
+      <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded" >
         <tr>
           <td [attr.colspan]="columnasSeleccionadas.length" class="font-size-16" [ngClass]="{'verde' : pedido.id_color == 1, 'azul' : pedido.id_color == 2, 'rojo' : pedido.Zeus == 0, 'blanco' : pedido.id_color == 4}">
             <button type="button" pButton pRipple [pRowToggler]="pedido" class="p-button-text p-button-rounded p-button-plain mr-2" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
@@ -145,7 +145,7 @@
       </ng-template>
     </p-table>
   </div>
-</div>
+</p-card>
 
 
 <p-overlayPanel #op [style]="{background: 'rgba(0, 3, 34, 0.9)', width: '350px', color : 'rgb(247, 247, 247)' }" >

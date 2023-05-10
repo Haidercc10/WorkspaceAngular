@@ -35,6 +35,7 @@ export class ClientesComponent implements OnInit {
   tiposClientes = []; //Variable que almacena los tipos de clientes
   usuario = []; //Variable que almancena los vendedores
   cliente = []; //Variable que almacenará el nombre de los clientes
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private rolService : RolesService,
                 private AppComponent : AppComponent,
@@ -46,7 +47,7 @@ export class ClientesComponent implements OnInit {
                             private crearProducto : CrearProductoComponent,
                               private clientesService :ClientesService,
                                 private sedesClientesService: SedeClienteService,) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: [null, Validators.required],
       TipoIdCliente: [null, Validators.required],

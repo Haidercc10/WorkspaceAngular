@@ -3,7 +3,7 @@
 <br>
 <br>
 
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -13,28 +13,26 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Inventario de Productos Terminados</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Productos Terminados</h2>
     </div>
 
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
 
-    <div class="formulario">
+    <p-card>
       <div class="mb-3" *ngIf="ValidarRol != 6">
         <div class="gap-2 d-grid d-md-flex justify-content-md-end">
           <p-chip label="Total Stock Zeus $ {{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
         </div>
       </div>
 
-
       <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Productos</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>
       </div>
 
-
       <div class="contain">
-        <div class="card" *ngIf="load">
+        <div *ngIf="load">
           <p-toolbar styleClass="mb-4 gap-2">
             <ng-template pTemplate="right">
               <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
@@ -186,6 +184,6 @@
           <br>
         </div>
       </div>
-    </div>
+    </p-card>
   </div>
 </div>
