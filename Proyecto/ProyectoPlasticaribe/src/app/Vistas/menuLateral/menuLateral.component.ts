@@ -1,9 +1,8 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { CookieService } from 'ngx-cookie-service';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
@@ -20,6 +19,7 @@ export class MenuLateralComponent implements OnInit {
   mode = new FormControl('over' as MatDrawerMode);
   @ViewChild(AppComponent) appComponent : AppComponent;
 
+  menuConfiguracion : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -61,7 +61,6 @@ export class MenuLateralComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-
   }
 
   lecturaStorage(){
@@ -80,14 +79,46 @@ export class MenuLateralComponent implements OnInit {
 
   aumentarLetra() {
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
-    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
+    if (parseFloat(fontSize.toFixed(2)) < 1.2) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1569}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
+    this.cambiarColorIcono();
   }
 
   disminuirLetra(){
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
-    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
+    if (parseFloat(fontSize.toFixed(2)) > 0.67) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.86437}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')).toFixed(2)}`, { expires: 365, sameSite: 'Lax' });
+    this.cambiarColorIcono();
+  }
+
+  cambiarColorIcono(){
+    let fontSize : number;
+    fontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    const icono1 = this.document.getElementById('iconoTanamoLetra1');
+    const icono2 = this.document.getElementById('iconoTanamoLetra2');
+    const icono3 = this.document.getElementById('iconoTanamoLetra3');
+    const icono4 = this.document.getElementById('iconoTanamoLetra4');
+    const icono5 = this.document.getElementById('iconoTanamoLetra5');
+
+    if (fontSize > 0.66 && fontSize < 0.68) icono1.className = 'pi pi-circle-fill font-size-25';
+    else icono1.className = 'pi pi-circle font-size-16';
+
+    if (fontSize > 0.68 && fontSize < 0.89) icono2.className = 'pi pi-circle-fill font-size-25';
+    else icono2.className = 'pi pi-circle font-size-16';
+
+    if (fontSize > 0.89 && fontSize < 1.03) icono3.className = 'pi pi-circle-fill font-size-25';
+    else icono3.className = 'pi pi-circle font-size-16';
+
+    if (fontSize > 1.03 && fontSize < 1.19) icono4.className = 'pi pi-circle-fill font-size-25';
+    else icono4.className = 'pi pi-circle font-size-16';
+
+    if (fontSize > 1.19 && fontSize < 1.3) icono5.className = 'pi pi-circle-fill font-size-25';
+    else icono5.className = 'pi pi-circle font-size-16';
+  }
+
+  configuracion(){
+    this.menuConfiguracion = true;
+    setTimeout(() => this.cambiarColorIcono(), 100);
   }
 
   showConfirm() {
