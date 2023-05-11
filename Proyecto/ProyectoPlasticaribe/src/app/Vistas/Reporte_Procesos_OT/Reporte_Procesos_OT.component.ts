@@ -18,6 +18,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +66,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   mostrarModalCostos : boolean = false; //Variable que validará cuando se muetra el modal de costos
   estadoModal : any; //Variablke que se utilizará para validar el estado en el que se encuentra la orden de trabajo y actualziar el estado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  infoColor : string = ''; /** Variable que servirá para mostrar la descripción de cada color */
+  @ViewChild('op') op: OverlayPanel | undefined;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -1324,6 +1327,22 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que va a devolver un mensaje de advertencia
   mensajeAdvertencia(titulo : string, mensaje : any) {
     this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
+  }
+
+  // Función que mostrará la descripción de cada una de las card de los dashboard's
+  mostrarDescripcion($event, color : string){
+    if (color == 'amarillo') this.infoColor = `Este color indica que la OT <b>${'ya inició su producción.'}</b>`;
+    if (color == 'naranja') this.infoColor = `Este color muestra que la OT está <b>${'ABIERTA'}</b>, es decir, <b>${'no tiene asignaciones y por ende no ha iniciado su producción'}</b>`;
+    if (color == 'verde') this.infoColor = `Este color indica que la OT está <b>${'TERMINADA'}</b>, osea que <b>${'que su producción ya alcanzó la cantidad pedida.'}</b>`;
+    if (color == 'azul') this.infoColor = `Este color muestra que la OT está <b>${'ASIGNADA'}</b>, debido a que, <b>${'ya se hicieron asignaciones de materia prima pero no ha iniciado su producción.'}</b>`;
+    if (color == 'rojo') this.infoColor = `Este color indica que la OT está <b>${'ANULADA, y que no puede seguir siendo pesada.'}</b>`;
+    if (color == 'verde2') this.infoColor = `Este color muestra que la OT está <b>${'CERRADA'}</b>, es decir, <b>${'ya se finalizó su producción y se cerró'}</b> para que no continue siendo pesada en la planta.</b>`;
+    if (color == 'gris') this.infoColor = `Este color indica la OT <b>${'no pasa por dicha área o no ha llegado aún al proceso con este color.'}</b>`;
+
+    setTimeout(() => {
+      this.op!.toggle($event);
+      $event.stopPropagation();
+    }, 500);
   }
 
 }

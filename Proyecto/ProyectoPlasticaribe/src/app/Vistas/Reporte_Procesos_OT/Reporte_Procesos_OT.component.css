@@ -179,6 +179,12 @@ p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
   }
 }
 
+@media (max-width: 792px){
+  .text-right {
+    text-align: center !important;
+  }
+}
+
 @media (min-width: 1370px){
   .tablaDatos{
     min-width: 1500px;

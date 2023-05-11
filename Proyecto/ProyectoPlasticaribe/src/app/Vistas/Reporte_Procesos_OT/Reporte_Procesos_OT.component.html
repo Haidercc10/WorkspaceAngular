@@ -23,7 +23,7 @@
 
 <p-card>
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-22"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
   </div>
 
   <!-- Inicio formulario Estado OT -->
@@ -224,7 +224,7 @@
   <div class="mb-4">
     <div class="row g-3">
       <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24" style="width: 90%;"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"  class="font-size-24" style="width: 90%;"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
       </div>
       <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6" >
         <p class="text-right"><b>Haz clic sobre los botones </b> <i class="pi pi-info-circle"></i> y observa que <b>indica cada color </b> <i class="pi pi-palette"></i></p>
@@ -238,25 +238,26 @@
       <div class="row g-3">
         <!-- Buscador de columnas -->
         <p-toolbar>
-          <div class="row g-2">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
+          <div class="row g-3">
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-5 col-xl-6 col-xxl-6">
               <p-multiSelect
               [options]="columnas"
               [(ngModel)]="columnasSeleccionada"
               optionLabel="header"
               selectedItemsLabel="{0} columnas seleccionadas"
-              placeholder="Elige las columnas que quieres ver">
+              placeholder="Elige las columnas que quieres ver"
+              pTooltip="Elige las columnas que quieres ver"
+              tooltipPosition="top">
               </p-multiSelect>
             </div>
-
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 text-right">
-              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-2" label="{{cantidadOTIniciada}}" pTooltip="Iniciada" tooltipPosition="top"></p-button>
-              <p-button class="btnNaranja" styleClass="p-button-rounded mr-2" label="{{catidadOTAbiertas}}" pTooltip="Abierta" tooltipPosition="top"></p-button>
-              <p-button class="btnVerde" styleClass="p-button-rounded mr-2" label="{{cantidadOTTerminada}}" pTooltip="Terminada" tooltipPosition="top"></p-button>
-              <p-button class="btnAzul" styleClass="p-button-rounded mr-2" label="{{cantidadOTAsignadas}}" pTooltip="Asignada" tooltipPosition="top"></p-button>
-              <p-button class="btnRojo" styleClass="p-button-rounded mr-2" label="{{cantidadOtAnulada}}" pTooltip="Anulada" tooltipPosition="top"></p-button>
-              <p-button class="btnVerde2" styleClass="p-button-rounded mr-2" label="{{cantidadOTCerrada}}" pTooltip="Cerrada" tooltipPosition="top"></p-button>
-              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciado" tooltipPosition="top"></p-button>
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-7 col-xl-6 col-xxl-6 text-right">
+              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-1" label="{{cantidadOTIniciada}}" (click)="mostrarDescripcion($event, 'amarillo')" pTooltip="Iniciada(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnNaranja" styleClass="p-button-rounded mr-1" label="{{catidadOTAbiertas}}" (click)="mostrarDescripcion($event, 'naranja')" pTooltip="Abierta(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnVerde" styleClass="p-button-rounded mr-1" label="{{cantidadOTTerminada}}" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Terminada(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnAzul" styleClass="p-button-rounded mr-1" label="{{cantidadOTAsignadas}}" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Asignada(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnRojo" styleClass="p-button-rounded mr-1" label="{{cantidadOtAnulada}}" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Anulada(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnVerde2" styleClass="p-button-rounded mr-1" label="{{cantidadOTCerrada}}" (click)="mostrarDescripcion($event, 'verde2')" pTooltip="Cerrada(s)" tooltipPosition="top"></p-button>
+              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciada(s)" (click)="mostrarDescripcion($event, 'gris')" tooltipPosition="top"></p-button>
             </div>
           </div>
         </p-toolbar>
@@ -667,3 +668,9 @@
     </div>
   </div>
 </p-card>
+
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
+  <ng-template pTemplate>
+    <div [innerHTML]="infoColor"></div>
+  </ng-template>
+</p-overlayPanel>
