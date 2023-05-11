@@ -915,18 +915,18 @@
   <!-- BOTON DE CONFIGURACION -->
 </p-sidebar>
 
-<nav class="navbar">
+<nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
   <div class="container-fluid">
     <p>
       <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="display = true">
         <i class="pi pi-list"></i>
         <b>
-          <span class="user">&nbsp;&nbsp;Plasti<span>caribe S.A.S</span></span>
+          <span [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">&nbsp;&nbsp;Plasti<span>caribe S.A.S</span></span>
         </b>
       </button>
     </p>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <span class="user"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
+      <span [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
       <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
     </div>
   </div>

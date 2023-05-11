@@ -78,7 +78,6 @@ span{
 }
 
 .botonMenu{
-  background-color: #FFF;
   padding: 5px;
 }
 
@@ -132,7 +131,6 @@ p {
 
 .navbar {
   padding: 15px 10px;
-  background: #fff;
   border: none;
   border-radius: 0;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
@@ -142,7 +140,19 @@ p {
   margin-top: -25px; */
 }
 
-.user {
+.navbarDark {
+  background-color: #071426;
+}
+
+.navbarLigth {
+  background-color: #fff;
+}
+
+.userDark {
+  color: #FFF;
+}
+
+.userLigth {
   color: #000;
 }
 

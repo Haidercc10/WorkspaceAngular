@@ -59,7 +59,6 @@ export class AppComponent implements OnInit{
 
   mostrar() {
     let modo = window.localStorage.getItem("theme");
-    console.log(modo);
     if(modo) this.temaSeleccionado = modo == 'dark' ? true : false;
     this.cambiar(this.temaSeleccionado);
   }

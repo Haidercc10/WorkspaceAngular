@@ -210,7 +210,6 @@ export class MenuLateralComponent implements OnInit {
 
   mostrar() {
     let modo = window.localStorage.getItem("theme");
-    console.log(modo);
     if(modo) this.AppComponent.temaSeleccionado = modo == 'dark' ? true : false;
     this.cambiar(this.AppComponent.temaSeleccionado);
   }
@@ -219,6 +218,6 @@ export class MenuLateralComponent implements OnInit {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);
     let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
-    linkTema.href = 'lara-' + tema + '-blue' + '.css'
+    linkTema.href = 'lara-' + tema + '-blue' + '.css';
   }
 }
