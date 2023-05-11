@@ -9,14 +9,26 @@
         </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-chart-line"></i> Facturación de Vendedores</h2>
         <p-toolbar>
-          <div class="p-toolbar-group-start">
-            <h5>¡Elige el año y vendedor que deseas graficar y presione el botón!</h5>
-          </div>
-          <div class="p-toolbar-group-center">
-            <p-dropdown class="mr-2" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
-            <p-dropdown class="mr-2" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [(ngModel)]="vendedorSeleccionado"></p-dropdown>
-            <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="consultarFacturacionVendedor()"></button>
-            <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="graficarDatos()"></button>
+          <div class="row g-2 justify-content-center align-middle">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
+              <h5 class="justify-content-center align-middle">¡Elige el año y vendedor que deseas graficar, luego presione el botón con el icono <i class="pi pi-chart-bar rojo"></i>!</h5>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
+              <div class="row mb-4 justify-content-center">
+                <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-2 col-xl-2 col-xxl-2">
+                  <p-dropdown class="mr-2" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+                </div>
+
+                <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
+                  <p-dropdown class="mr-2" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [(ngModel)]="vendedorSeleccionado"></p-dropdown>
+                </div>
+
+                <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
+                  <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="consultarFacturacionVendedor()"></button>
+                  <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="graficarDatos()"></button>
+                </div>
+              </div>
+            </div>
           </div>
         </p-toolbar>
 

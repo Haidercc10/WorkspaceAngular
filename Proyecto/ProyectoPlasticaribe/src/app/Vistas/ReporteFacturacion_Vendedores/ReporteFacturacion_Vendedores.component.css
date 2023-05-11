@@ -22,6 +22,27 @@ p-chart ::ng-deep div ::ng-deep canvas {
   padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
+p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
+  width: 100%;
+}
+
+p-dropdown {
+  margin: 0;
+}
+
+p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
+  width: 100%;
+}
+
+button {
+  width: 30px;
+}
+
+.rojo {
+  color: red;
+  font-weight: bold;
+}
+
 .imagen {
   width: 10%;
   height: 100%;

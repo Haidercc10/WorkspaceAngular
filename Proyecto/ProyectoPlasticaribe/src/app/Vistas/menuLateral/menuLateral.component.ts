@@ -217,6 +217,7 @@ export class MenuLateralComponent implements OnInit {
   cambiar(estado : any) {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);
+    this.cookieService.set('theme', tema, { expires: 365, sameSite: 'Lax' });
     let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
     linkTema.href = 'lara-' + tema + '-blue' + '.css';
   }
