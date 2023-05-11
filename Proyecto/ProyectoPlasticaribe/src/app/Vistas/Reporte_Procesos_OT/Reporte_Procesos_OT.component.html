@@ -221,8 +221,15 @@
     </div>
   </div>-->
 
-  <div class="mb-4 titulos_Paginador">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24" style="width: 90%;"><i class="pi pi-file-edit"></i> Ordenes de Trabajo</h4>
+  <div class="mb-4">
+    <div class="row g-3">
+      <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24" style="width: 90%;"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
+      </div>
+      <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6" >
+        <p class="text-right"><b>Haz clic sobre los botones </b> <i class="pi pi-info-circle"></i> y observa que <b>indica cada color </b> <i class="pi pi-palette"></i></p>
+      </div>
+    </div>
   </div>
 
   <!-- Tabla donde se mostrarán las OT Consultadas -->
@@ -230,7 +237,7 @@
     <div class="mb-4 ">
       <div class="row g-3">
         <!-- Buscador de columnas -->
-        <p-toolbar>
+        <p-toolbar pTooltip="">
           <ng-template pTemplate="left">
             <p-multiSelect
             [options]="columnas"
@@ -242,14 +249,14 @@
             </p-multiSelect>
           </ng-template>
 
-          <ng-template pTemplate="right">
-            <p-button id="btnAmarillo" icon="pi pi-check" styleClass="p-button-rounded mr-2"></p-button>
-            <p-button icon="pi pi-bell" styleClass="p-button-rounded p-button-warning mr-2"></p-button>
-            <p-button icon="pi pi-search" styleClass="p-button-rounded p-button-success mr-2"></p-button>
-            <p-button icon="pi pi-user" styleClass="p-button-rounded p-button-info mr-2"></p-button>
-            <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger mr-2"></p-button>
-            <p-button id="btnVerde" icon="pi pi-heart" styleClass="p-button-rounded"></p-button>
-            <p-button icon="pi pi-bookmark" styleClass="p-button-rounded p-button-secondary mr-2"></p-button>
+          <ng-template pTemplate="right" >
+            <p-button class="btnAmarillo" styleClass="p-button-rounded mr-2" label="{{cantidadOTIniciada}}" pTooltip="Iniciada" tooltipPosition="top"></p-button>
+            <p-button class="btnNaranja" styleClass="p-button-rounded mr-2" label="{{catidadOTAbiertas}}" pTooltip="Abierta" tooltipPosition="top"></p-button>
+            <p-button class="btnVerde" styleClass="p-button-rounded mr-2" label="{{cantidadOTTerminada}}" pTooltip="Terminada" tooltipPosition="top"></p-button>
+            <p-button class="btnAzul" styleClass="p-button-rounded mr-2" label="{{cantidadOTAsignadas}}" pTooltip="Asignada" tooltipPosition="top"></p-button>
+            <p-button class="btnRojo" styleClass="p-button-rounded mr-2" label="{{cantidadOtAnulada}}" pTooltip="Anulada" tooltipPosition="top"></p-button>
+            <p-button class="btnVerde2" styleClass="p-button-rounded mr-2" label="{{cantidadOTCerrada}}" pTooltip="Cerrada" tooltipPosition="top"></p-button>
+            <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciado" tooltipPosition="top"></p-button>
           </ng-template>
         </p-toolbar>
 

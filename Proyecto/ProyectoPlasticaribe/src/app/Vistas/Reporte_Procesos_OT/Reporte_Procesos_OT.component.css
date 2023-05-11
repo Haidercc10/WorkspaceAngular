@@ -92,6 +92,8 @@ a:hover {
 
 .titulos_Paginador{
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .p-input-icon-left {
@@ -267,13 +269,50 @@ p-calendar ::ng-deep span button span {
   width: 100%;
 }
 
-#btnAmarillo ::ng-deep .p-button {
+.btnAmarillo ::ng-deep .p-button, .p-button-rounded {
   background: #F3FC20;
-  border: #F3FC20;
+  border-color: #b9be10;
+  color: #495057;
 }
 
-#btnVerde2 ::ng-deep .p-button {
+.btnNaranja ::ng-deep .p-button, .p-button-rounded {
+  background: #F6D45D;
+  border-color: #b89a31;
+  color: #495057
+}
+
+.btnRojo ::ng-deep .p-button, .p-button-rounded {
+  background: #FF7878;
+  border-color: #da5e5e;
+  color: #495057
+}
+
+.btnVerde ::ng-deep .p-button, .p-button-rounded {
+  background: #8AFC9B;
+  border-color: #5bcc6c;
+  color: #495057
+}
+
+.btnAzul ::ng-deep .p-button, .p-button-rounded {
+  background: #83D3FF;
+  border-color: #5aadda;
+  color: #495057
+}
+
+.btnGris ::ng-deep .p-button, .p-button-rounded {
+  background: #DDDDDD;
+  border-color: #adadad;
+  color: #495057
+}
+
+.btnVerde2 ::ng-deep .p-button, .p-button-rounded {
   background: #53CC48;
-  border: #53CC48;
+  border-color: #44a33b;
+  color: #495057;
 }
 
+@media (max-width: 576px){
+  .text-right {
+    text-align: center !important;
+  }
+}
