@@ -64,6 +64,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   clientes: any[] = []; //Variable que almacencará la informacion de los clientes
   mostrarModalCostos : boolean = false; //Variable que validará cuando se muetra el modal de costos
   estadoModal : any; //Variablke que se utilizará para validar el estado en el que se encuentra la orden de trabajo y actualziar el estado
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -76,7 +77,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               private clientesService : ClientesService,
                                 private messageService: MessageService,
                                   private paginaPrincipal : PaginaPrincipalComponent) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
       fecha: [null],

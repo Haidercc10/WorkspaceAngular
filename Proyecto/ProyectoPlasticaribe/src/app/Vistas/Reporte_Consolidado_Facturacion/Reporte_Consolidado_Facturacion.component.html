@@ -191,7 +191,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="groupfooter" let-consolidado>
-        <tr style="background-color: palegreen;">
+        <tr style="background-color: palegreen;  color: black">
           <td colspan="16" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
           <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
           <ng-template #Filtro>
