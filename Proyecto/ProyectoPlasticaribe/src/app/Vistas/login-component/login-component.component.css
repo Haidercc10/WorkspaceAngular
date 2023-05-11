@@ -36,8 +36,8 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
   color: #db4149;
 }
 
-.contenedorLogin {
-  /* background-color: #fffd; */
+.contenedorLoginLigth {
+  background-color: #fffd;
   width: 400px;
   padding: 2%;
   margin: 0 auto;
@@ -48,6 +48,20 @@ p-password ::ng-deep div, p-password ::ng-deep div ::ng-deep input {
   -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
   box-shadow: 1px 18px 60px -19px rgba(0,0,0);
 }
+
+.contenedorLoginDark {
+  background-color: #071426f8;
+  width: 400px;
+  padding: 2%;
+  margin: 0 auto;
+  border-radius: 3%;
+  border-color: #071426f8;
+  border-style: solid;
+  -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
+  -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
+  box-shadow: 1px 18px 60px -19px rgba(0,0,0);
+}
+
 
 p-card ::ng-deep .p-card-body {
   background-color: #fffd;
@@ -120,6 +134,10 @@ a {
   .contenedorLogin {
     background-color: #fffe;
     padding: 0 2rem;
+  }
+
+  .container-fluid{
+    padding: 0 5% 0 5%;
   }
 }
 

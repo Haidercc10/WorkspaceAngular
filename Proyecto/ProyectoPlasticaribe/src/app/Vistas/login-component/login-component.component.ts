@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
-import Swal from 'sweetalert2';
 import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { Router } from '@angular/router';
@@ -13,6 +12,7 @@ import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.s
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -29,6 +29,7 @@ export class LoginComponentComponent implements OnInit {
   mostrarPass : boolean = false;
   empresas: any [] = [];
   ipAddress : any;
+  modoSeleccionado : boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
 
   constructor(private empresaServices : EmpresaService,
                 private frmBuilderUsuario : FormBuilder,
@@ -41,7 +42,8 @@ export class LoginComponentComponent implements OnInit {
                               private authenticationBagPro : authentication_BagPro,
                                 private http : HttpClient,
                                   private messageService: MessageService,
-                                    private encriptacion : EncriptacionService,) {
+                                    private encriptacion : EncriptacionService,
+                                      private cookiesServices : CookieService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -49,6 +51,8 @@ export class LoginComponentComponent implements OnInit {
        && this.storage.get('Token_Inv_Zeus')
        && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
 
+    window.localStorage.setItem('theme', this.cookiesServices.get('theme'));
+    this.modoSeleccionado = window.localStorage.getItem('theme') == 'dark' ? true : false;
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [null, Validators.required],
       Contrasena: [null, Validators.required],

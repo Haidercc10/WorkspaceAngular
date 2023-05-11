@@ -237,27 +237,28 @@
     <div class="mb-4 ">
       <div class="row g-3">
         <!-- Buscador de columnas -->
-        <p-toolbar pTooltip="">
-          <ng-template pTemplate="left">
-            <p-multiSelect
-            [options]="columnas"
-            [(ngModel)]="columnasSeleccionada"
-            optionLabel="header"
-            selectedItemsLabel="{0} columnas seleccionadas"
-            [style]="{minWidth: '330px'}"
-            placeholder="Elige las columnas que quieres ver">
-            </p-multiSelect>
-          </ng-template>
+        <p-toolbar>
+          <div class="row g-2">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6">
+              <p-multiSelect
+              [options]="columnas"
+              [(ngModel)]="columnasSeleccionada"
+              optionLabel="header"
+              selectedItemsLabel="{0} columnas seleccionadas"
+              placeholder="Elige las columnas que quieres ver">
+              </p-multiSelect>
+            </div>
 
-          <ng-template pTemplate="right" >
-            <p-button class="btnAmarillo" styleClass="p-button-rounded mr-2" label="{{cantidadOTIniciada}}" pTooltip="Iniciada" tooltipPosition="top"></p-button>
-            <p-button class="btnNaranja" styleClass="p-button-rounded mr-2" label="{{catidadOTAbiertas}}" pTooltip="Abierta" tooltipPosition="top"></p-button>
-            <p-button class="btnVerde" styleClass="p-button-rounded mr-2" label="{{cantidadOTTerminada}}" pTooltip="Terminada" tooltipPosition="top"></p-button>
-            <p-button class="btnAzul" styleClass="p-button-rounded mr-2" label="{{cantidadOTAsignadas}}" pTooltip="Asignada" tooltipPosition="top"></p-button>
-            <p-button class="btnRojo" styleClass="p-button-rounded mr-2" label="{{cantidadOtAnulada}}" pTooltip="Anulada" tooltipPosition="top"></p-button>
-            <p-button class="btnVerde2" styleClass="p-button-rounded mr-2" label="{{cantidadOTCerrada}}" pTooltip="Cerrada" tooltipPosition="top"></p-button>
-            <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciado" tooltipPosition="top"></p-button>
-          </ng-template>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6 text-right">
+              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-2" label="{{cantidadOTIniciada}}" pTooltip="Iniciada" tooltipPosition="top"></p-button>
+              <p-button class="btnNaranja" styleClass="p-button-rounded mr-2" label="{{catidadOTAbiertas}}" pTooltip="Abierta" tooltipPosition="top"></p-button>
+              <p-button class="btnVerde" styleClass="p-button-rounded mr-2" label="{{cantidadOTTerminada}}" pTooltip="Terminada" tooltipPosition="top"></p-button>
+              <p-button class="btnAzul" styleClass="p-button-rounded mr-2" label="{{cantidadOTAsignadas}}" pTooltip="Asignada" tooltipPosition="top"></p-button>
+              <p-button class="btnRojo" styleClass="p-button-rounded mr-2" label="{{cantidadOtAnulada}}" pTooltip="Anulada" tooltipPosition="top"></p-button>
+              <p-button class="btnVerde2" styleClass="p-button-rounded mr-2" label="{{cantidadOTCerrada}}" pTooltip="Cerrada" tooltipPosition="top"></p-button>
+              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciado" tooltipPosition="top"></p-button>
+            </div>
+          </div>
         </p-toolbar>
 
         <!-- Tabla con información de la orden de trabajo -->

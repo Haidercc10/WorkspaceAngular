@@ -51,43 +51,7 @@ a:hover {
 }
 
 #tableProcesos td{
- /* max-width: 50px; */
   font-size: calc(var(--font-size) * 13px);
-}
-
-@media (min-width: 1370px){
-  .tablaDatos{
-    min-width: 1500px;
-  }
-
-  .table-responsive {
-    width: 100%;
-  }
-
-  .tableColores {
-    text-align: center;
-    width: 1250px;
-    margin: auto;
-  }
-
-  .tableColores td .collapse{
-    margin-top: 1%;
-    text-align: start;
-    font-size: calc(var(--font-size) * 11px);
-
-  }
-}
-
-@media (max-width: 1369px){
-  .tableColores {
-    text-align: center;
-  }
-
-  .tableColores td .collapse{
-    margin-top: 1%;
-    font-size: calc(var(--font-size) * 11px);
-    text-align: center;
-  }
 }
 
 .titulos_Paginador{
@@ -100,7 +64,7 @@ a:hover {
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
   display: flex;
   width: 100%;
 }
@@ -126,131 +90,29 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
 p-calendar ::ng-deep span button span {
   display: block;
 }
-span{
-  color: #db4149;
+
+p-dropdown {
+  margin: 0;
 }
 
-.id {
-  border: none;
+p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
   width: 100%;
 }
 
-.amarillo {
-  background-color: #F3FC20;
-  color: #495057
-}
-
-.naranja {
-  background-color: #F6D45D;
-  color: #495057
-}
-
-.rojo {
-  background-color: #FF7878;
-  color: #495057
-}
-
-.verde {
-  background-color: #8AFC9B;
-  color: #495057
-}
-
-.azul {
-  background-color: #83D3FF;
-  color: #495057
-}
-
-.gris{
-  background-color: #DDDDDD;
-  color: #495057
-}
-
-.verde2 {
-  background-color: #53CC48;
-  color: #495057
-}
-
-a {
-  color: #000;
-}
-
-a:hover {
-  color: #555;
-}
-
-#tableProcesos td{
- /* max-width: 50px; */
-  font-size: calc(var(--font-size) * 13px);
-}
-
-@media (min-width: 1370px){
-  .tablaDatos{
-    min-width: 1500px;
-  }
-
-  .table-responsive {
-    width: 100%;
-  }
-
-  .tableColores {
-    text-align: center;
-    width: 1250px;
-    margin: auto;
-  }
-
-  .tableColores td .collapse{
-    margin-top: 1%;
-    text-align: start;
-    font-size: calc(var(--font-size) * 11px);
-
-  }
-}
-
-@media (max-width: 1369px){
-  .tableColores {
-    text-align: center;
-  }
-
-  .tableColores td .collapse{
-    margin-top: 1%;
-    font-size: calc(var(--font-size) * 11px);
-    text-align: center;
-  }
-}
-
-.titulos_Paginador{
-  display: flex;
-}
-
-.p-input-icon-left {
+p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
-  display: flex;
+p-multiSelect {
+  margin: 0;
+}
+
+p-multiSelect ::ng-deep div {
   width: 100%;
 }
 
-p-calendar ::ng-deep span button {
-  background-color: var(--rojo);
-  border: 0;
-  transition: all 1s;
-}
-
-p-calendar ::ng-deep span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
-}
-
-p-calendar ::ng-deep .p-datepicker-header button {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep .p-datepicker-header button:hover {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep span button span {
-  display: block;
+p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
+  min-width: none !important;
 }
 
 ::ng-deep .p-card {
@@ -284,7 +146,7 @@ p-calendar ::ng-deep span button span {
 .btnRojo ::ng-deep .p-button, .p-button-rounded {
   background: #FF7878;
   border-color: #da5e5e;
-  color: #495057
+  color: #FFF
 }
 
 .btnVerde ::ng-deep .p-button, .p-button-rounded {
@@ -308,11 +170,21 @@ p-calendar ::ng-deep span button span {
 .btnVerde2 ::ng-deep .p-button, .p-button-rounded {
   background: #53CC48;
   border-color: #44a33b;
-  color: #495057;
+  color: #FFF;
 }
 
 @media (max-width: 576px){
   .text-right {
     text-align: center !important;
+  }
+}
+
+@media (min-width: 1370px){
+  .tablaDatos{
+    min-width: 1500px;
+  }
+
+  .table-responsive {
+    width: 100%;
   }
 }
