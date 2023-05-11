@@ -6,10 +6,6 @@
   --rojoClaro : rgb(214, 100, 106);
 }
 
-/*body {
-  background-color: #f7f7f7;
-}*/
-
 * {
   text-decoration: none;
 }
@@ -212,3 +208,6 @@ a {
   font-weight: 500;
 }
 
+html, body {
+  font-size: calc(var(--font-size) * 16px);
+}
