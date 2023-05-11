@@ -12,7 +12,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo font-size-32">Gestión de Usuarios</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-32">Gestión de Usuarios</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -20,20 +20,17 @@
   </div>
 </div>
 
-<div class="contain">
-  <div class="container-fluid bajarPagina">
-    <div class="formulario">
-
+    <p-card>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button pButton pRipple label="Nuevo Rol" icon="pi pi-plus" class="p-button-success r-2" (click)="modalRoles_TiposUsuarios()"></button>
         <button pButton pRipple label="Nueva Area" icon="pi pi-plus" (click)="modalAreas()" class="p-button-success"></button>
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo font-size-24"><i class="pi pi-list"></i> Tabla de Usuarios</h4>
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-list"></i> Tabla de Usuarios</h4>
       </div>
 
-      <div class="card" *ngIf="load">
+      <div *ngIf="load">
         <p-toolbar styleClass="mb-4 gap-2">
           <ng-template pTemplate="left">
             <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button>
@@ -68,7 +65,7 @@
             <div class="flex align-items-center justify-content-between">
               <span class="p-input-icon-left">
                 <i class="pi pi-search"></i>
-                <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')"/>
+                <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" pTooltip="Busca usuarios por su Id, Nombre o Área" tooltipPosition="top"/>
               </span>
             </div>
           </ng-template>
@@ -200,7 +197,6 @@
         </ng-template>
       </p-dialog>
 
-
       <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" >
         <ng-container *ngIf="accionDialogoNuevo == 'Rol' then rol; else area"></ng-container>
          <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
@@ -274,7 +270,5 @@
           <button pButton pRipple label="Agregar {{accionDialogoNuevo}}" icon="pi pi-plus" (click)="agregar()" class="p-button-success"></button>
         </div>
       </p-dialog>
-    </div>
-  </div>
-</div>
+    </p-card>
 

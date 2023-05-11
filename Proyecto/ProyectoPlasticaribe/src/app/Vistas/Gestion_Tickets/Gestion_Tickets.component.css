@@ -3,16 +3,32 @@ p-card, p-card ::ng-deep .p-card {
 }
 
 p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
-  color: var(--rojo);
   text-align: center;
   width: 100%;
-}
-
-p-dialog ::ng-deep div ::ng-deep div ::ng-deep .p-dialog-header ::ng-deep span {
-  color: var(--rojo);
 }
 
 textarea {
   width: 100%;
   height: 100%;
+}
+
+::ng-deep .p-card {
+  align-items: center;
+  margin: auto;
+  width: 90%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea, input {
+  display: flex;
+  width: 100%;
+}
+
+.ajustar {
+  font-weight: 700;
+  text-align: center;
 }

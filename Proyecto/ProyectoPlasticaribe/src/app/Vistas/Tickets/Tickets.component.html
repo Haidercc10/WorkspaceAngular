@@ -14,7 +14,7 @@
 <div class="contain" id="form">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Tickets</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Tickets</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -22,24 +22,24 @@
   </div>
 </div>
 
-<div class="formulario">
+<p-card>
   <form [formGroup]="FormTickets">
     <div class="row g-4">
 
       <!-- Codigo Ticket -->
-      <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+      <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-ticket"></i>
-          <input formControlName="Codigo_Ticket" id="Ticket" class="form-control form-control-sm" type="text" pInputText readonly required/>
+          <input formControlName="Codigo_Ticket" id="Ticket" type="text" pInputText readonly required/>
           <label for="Ticket">Código Ticket</label>
         </span>
       </div>
 
-      <!-- Descriprion -->
-      <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+      <!-- Descripcion -->
+      <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
         <span class="p-float-label">
-          <textarea formControlName="Descripcion" id="float-input" [autoResize]="true" rows="1" pInputTextarea></textarea>
-          <label for="float-input">Descripción</label>
+          <textarea formControlName="Descripcion" id="descripcion" [autoResize]="true" rows="2" pInputTextarea></textarea>
+          <label for="descripcion">Descripción</label>
         </span>
       </div>
 
@@ -57,4 +57,4 @@
     </div>
 
   </form>
-</div>
+</p-card>

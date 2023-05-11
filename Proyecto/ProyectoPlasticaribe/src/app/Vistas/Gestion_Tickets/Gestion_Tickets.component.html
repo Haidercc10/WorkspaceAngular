@@ -14,7 +14,7 @@
 <div class="contain" id="form">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Gestión de Tickets</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Gestión de Tickets</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -22,26 +22,29 @@
   </div>
 </div>
 
-<div class="formulario">
-  <div class="row g-2 text-center">
-    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-      <p-card header="Tickets Abiertos">
+<p-card>
+  <div class="row g-3 text-center">
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <p-card>
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-lock-open font-size-20"></i> Tickets Abiertos </h3>
         <div class="body">
           <h4><b>{{ticketsAbiertos | number}}</b></h4>
         </div>
       </p-card>
     </div>
 
-    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-      <p-card header="Tickets En Revisión">
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <p-card>
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-eye font-size-20"></i> Tickets En Revisión</h3>
         <div class="body">
           <h4><b>{{ticketsEnRevision | number}}</b></h4>
         </div>
       </p-card>
     </div>
 
-    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-      <p-card header="Tickets Resueltos En El Mes">
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <p-card>
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-5 ajustar"><i class="pi pi-check-square font-size-20"></i> Tickets resueltos en el mes </h3>
         <div class="body">
           <h4><b>{{ticketsResuletosMes | number}}</b></h4>
         </div>
@@ -49,9 +52,10 @@
     </div>
   </div>
 
-  <div class="row g-2">
-    <div class="p-4 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
-      <p-card header="Nuevos Tickets y En Revisión">
+  <div class="row g-3">
+    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+      <p-card>
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-wrench font-size-20"></i> Nuevos Tickets y En Revisión</h3>
         <p-table
           #dt
           [resizableColumns]="true"
@@ -106,7 +110,7 @@
               </tr>
             </ng-container>
             <ng-template #elseTemplate>
-              <tr style="background-color: oldlace;">
+              <tr style="background-color: oldlace; color: #071426">
                 <td><p-tableRadioButton [value]="item"></p-tableRadioButton></td>
                 <td>{{rowIndex + 1}}</td>
                 <td>{{item.codigo}}</td>
@@ -120,8 +124,9 @@
       </p-card>
     </div>
 
-    <div class="p-4 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-      <p-card header="Información Ticket">
+    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <p-card>
+        <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-info-circle font-size-20"></i> Información de Tickets</h3>
         <div class="row p-2">
           <h5>Ticket # {{ticketSeleccionado.Codigo}}</h5>
         </div>
@@ -155,14 +160,14 @@
       </p-card>
     </div>
   </div>
-</div>
+</p-card>
 
 <p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [modal]="true" [style]="{ width: '80%' }" [draggable]="false" [resizable]="false">
   <div class="row g-4">
     <form [formGroup]="FormTicketResuelto" (ngSubmit)="ticket_Resuelto()">
       <div class="p-5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <span class="p-float-label">
-          <textarea formControlName="Descripcion" [rows]="3" class="form-control form-control-sm" maxlength="200"id="float-input"  pInputTextarea></textarea>
+          <textarea formControlName="Descripcion" [rows]="3" maxlength="200"id="float-input"  pInputTextarea></textarea>
           <label for="float-input">Descripción</label>
         </span>
       </div>

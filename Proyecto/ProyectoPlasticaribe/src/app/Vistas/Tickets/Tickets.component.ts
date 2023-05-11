@@ -23,6 +23,7 @@ export class TicketsComponent implements OnInit {
   storage_Rol : number; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   archivoSeleccionado : any;
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private frmBuiler : FormBuilder,
@@ -45,6 +46,7 @@ export class TicketsComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   // Funcion que va a limpiar los campos y todas las variables

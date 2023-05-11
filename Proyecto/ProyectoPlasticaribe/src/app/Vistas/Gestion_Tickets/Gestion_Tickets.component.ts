@@ -29,6 +29,7 @@ export class Gestion_TicketsComponent implements OnInit {
   ticketSeleccionado : any = { Codigo : '', Fecha : '', Estado : '', Descripcion: '' }; //Variable que almcanerá la información del ticket seleccionado
   imagenesTicket : any [] = []; //Variable que va a almacenar la información de las imagenes que se adjuntaron al ticket
   visible : boolean = false; //Variable que validará cuando se verá el modal de ticket resuelto y cuando no
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -51,6 +52,7 @@ export class Gestion_TicketsComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   // Funcion que va a limpiar los campos y llamar a todas las funciones de consulta iniciales a que se ejecuten de nuevo

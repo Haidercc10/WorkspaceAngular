@@ -15,6 +15,7 @@ import { MessageService } from 'primeng/api';
 import { modelAreas } from 'src/app/Modelo/modelAreas';
 import { modelRol } from 'src/app/Modelo/modelRol';
 import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-registro-component',
@@ -47,6 +48,7 @@ export class RegistroComponentComponent implements OnInit {
   public accionDialogoNuevo : string = ''; /** Acción del dialogo (Modal) nuevo de areas o roles */
   public arrayNombresRoles : any = []; /** Array que cargará los nombres de los roles en el modal para crear roles. */
   public arrayNombresAreas : any = []; /** Array que cargará los nombres de las areas en el modal para crear areas. */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private formBuilder : FormBuilder,
               private servicioRoles : RolesService,
@@ -54,7 +56,8 @@ export class RegistroComponentComponent implements OnInit {
                   private servicioUsuarios : UsuarioService,
                     private servicioEstados : EstadosService,
                       private servicioTpUsuarios : SrvTipos_UsuariosService,
-                       private messageService: MessageService) {
+                       private messageService: MessageService,
+                        private AppComponent : AppComponent) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
@@ -76,6 +79,7 @@ export class RegistroComponentComponent implements OnInit {
     this.cargarUsuarios();
     this.cargarEstados();
     this.cargarTiposUsuarios();
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   // Funcion que crgará las areas
