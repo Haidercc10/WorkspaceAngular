@@ -9,30 +9,37 @@ span{
 
 .amarillo {
   background-color: #F3FC20;
+  color: #495057
 }
 
 .naranja {
   background-color: #F6D45D;
+  color: #495057
 }
 
 .rojo {
   background-color: #FF7878;
+  color: #495057
 }
 
 .verde {
   background-color: #8AFC9B;
+  color: #495057
 }
 
 .azul {
   background-color: #83D3FF;
+  color: #495057
 }
 
 .gris{
   background-color: #DDDDDD;
+  color: #495057
 }
 
 .verde2 {
   background-color: #53CC48;
+  color: #495057
 }
 
 a {
@@ -128,30 +135,37 @@ span{
 
 .amarillo {
   background-color: #F3FC20;
+  color: #495057
 }
 
 .naranja {
   background-color: #F6D45D;
+  color: #495057
 }
 
 .rojo {
   background-color: #FF7878;
+  color: #495057
 }
 
 .verde {
   background-color: #8AFC9B;
+  color: #495057
 }
 
 .azul {
   background-color: #83D3FF;
+  color: #495057
 }
 
 .gris{
   background-color: #DDDDDD;
+  color: #495057
 }
 
 .verde2 {
   background-color: #53CC48;
+  color: #495057
 }
 
 a {
@@ -236,3 +250,20 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
 p-calendar ::ng-deep span button span {
   display: block;
 }
+
+::ng-deep .p-card {
+  align-items: center;
+  margin: auto;
+  width: 90%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+  display: flex;
+  width: 100%;
+}
+
