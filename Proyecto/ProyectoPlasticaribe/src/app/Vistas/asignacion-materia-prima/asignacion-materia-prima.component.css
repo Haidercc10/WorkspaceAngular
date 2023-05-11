@@ -7,7 +7,7 @@ p-dropdown ::ng-deep .p-dropdown {
   display: flex;
 }
 
-p-inputnumber, p-inputnumber ::ng-deep span {
+p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   display: flex;
   width: 100%;
 }
