@@ -267,3 +267,13 @@ p-calendar ::ng-deep span button span {
   width: 100%;
 }
 
+#btnAmarillo ::ng-deep .p-button {
+  background: #F3FC20;
+  border: #F3FC20;
+}
+
+#btnVerde2 ::ng-deep .p-button {
+  background: #53CC48;
+  border: #53CC48;
+}
+
