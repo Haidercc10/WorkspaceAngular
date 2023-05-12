@@ -31,9 +31,12 @@ export class VistasFavoritasComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.llenarDatosSeleccionables();
-    this.buscarFavoritos();
-    setTimeout(() => this.mostrarVistasFav(), 2500);
+    console.log(this.storage_Id)
+    if (this.storage_Id.toString() != '') {
+      this.llenarDatosSeleccionables();
+      this.buscarFavoritos();
+      setTimeout(() => this.mostrarVistasFav(), 2500);
+    }
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
