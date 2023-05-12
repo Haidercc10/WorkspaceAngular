@@ -60,7 +60,9 @@ export class DashboardOTComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
     private bagProService : BagproService,
       private ordenTrabajoService : EstadosProcesos_OTService,
-        private zeusService : InventarioZeusService,) { }
+        private zeusService : InventarioZeusService,) {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -208,20 +210,20 @@ export class DashboardOTComponent implements OnInit {
     this.multiAxisData = {
       labels: vendedores,
       datasets: [
-        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#83D3FF', ], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#8AFC9B', yAxisID: 'y1', data: costoVentas }
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#83D3FF', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#8AFC9B', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID:  'y1', data: costoVentas }
       ]
     };
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057', font: { size: 20 } } },
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } } },
         tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 15 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
@@ -234,7 +236,7 @@ export class DashboardOTComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } },
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -242,7 +244,7 @@ export class DashboardOTComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } }
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } }
         }
       },
       datalabels: { anchor: 'end', align: 'end' }
@@ -265,20 +267,20 @@ export class DashboardOTComponent implements OnInit {
     this.multiAxisData = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#FF7878'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], yAxisID: 'y1', data: costo }
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#FF7878'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057', font: { size: 20 } } },
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } } },
         tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 15 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
@@ -291,7 +293,7 @@ export class DashboardOTComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, olor: '#495057', font: { size: 20 } },
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -299,7 +301,7 @@ export class DashboardOTComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } }
+          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } }
         }
       },
       datalabels: { anchor: 'end', align: 'end' }
@@ -329,7 +331,7 @@ export class DashboardOTComponent implements OnInit {
 
     this.graficaPieOptions = {
       plugins: {
-        legend: {  labels: { color: '#000', font: { size: 18 } } },
+        legend: {  labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } } },
         tooltip: { titleFont: { size: 25, }, bodyFont: { size: 20 }, },
       },
     };
@@ -377,13 +379,13 @@ export class DashboardOTComponent implements OnInit {
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
           },
           grid: { color: '#ebedef' }
@@ -392,7 +394,7 @@ export class DashboardOTComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 20 } },
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
       },
@@ -426,13 +428,13 @@ export class DashboardOTComponent implements OnInit {
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
         tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
       },
       scales: {
         x: {
           ticks: {
-            color: '#495057',
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 20 },
           },
           grid: { color: '#ebedef' }
@@ -441,7 +443,7 @@ export class DashboardOTComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { color: '#495057', font: { size: 20 } },
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
       },

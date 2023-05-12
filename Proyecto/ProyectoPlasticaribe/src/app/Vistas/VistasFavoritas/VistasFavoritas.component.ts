@@ -24,10 +24,13 @@ export class VistasFavoritasComponent implements OnInit {
   seleccionados = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
   vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
   disponiblesMostrar = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
-                  private messageService: MessageService,) { }
+                  private messageService: MessageService,) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.lecturaStorage();

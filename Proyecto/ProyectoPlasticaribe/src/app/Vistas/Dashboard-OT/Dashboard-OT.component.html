@@ -388,7 +388,7 @@
 </p-dialog>
 
 <!-- Modal donde se podrá ver algunas graficas de barras -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaBarras" [style]="{width: '130rem'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaBarras" [style]="{width: '80%'}">
   <p-toolbar *ngIf="graficaMateriales">
     <div class="p-toolbar-group-start">
       <button pButton pTooltip="Graficar Cantidad" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficaMateriales(1)"></button>
@@ -401,7 +401,7 @@
 </p-dialog>
 
 <!-- Modal donde se podrán ver algunas graficas de pie -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaPie" [style]="{width: '130rem'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaPie" [style]="{width: '80%'}">
   <p-chart type="pie" width="90%" height="400px" [data]="graficaPieData" [options]="graficaPieOptions"></p-chart>
 </p-dialog>
 

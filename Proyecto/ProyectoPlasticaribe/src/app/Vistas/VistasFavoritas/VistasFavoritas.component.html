@@ -35,9 +35,9 @@
           <div class="product-list-detail">
             <span>
               <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
-              <p style="padding-left: 5%;">{{product.nombre}}</p>
+              <p style="padding-left: 5%;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>{{product.nombre}}</b></p>
             </span>
-            <p style="color: #db4149; padding-left: 20%;">{{product.categoria}}</p>
+            <p style="padding-left: 20%;">Módulo {{product.categoria}}</p>
           </div>
         </div>
       </ng-template>
