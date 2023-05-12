@@ -41,6 +41,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { KnobModule } from 'primeng/knob';
 import { MenuModule } from 'primeng/menu';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PasswordModule } from 'primeng/password';
 import { PickListModule } from 'primeng/picklist';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -53,6 +54,7 @@ import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
+import { SpeedDialModule } from 'primeng/speeddial';
 import { TableModule } from 'primeng/table';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { TabViewModule } from 'primeng/tabview';
@@ -61,7 +63,6 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
-import {OverlayPanelModule} from 'primeng/overlaypanel';
 import { MaterialExampleModule } from '../material.module';
 import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
@@ -82,6 +83,7 @@ import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.comp
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
+import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
 import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
@@ -107,7 +109,9 @@ import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
+import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
@@ -119,6 +123,7 @@ import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Rep
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
+import { VistasFavoritasComponent } from './Vistas/VistasFavoritas/VistasFavoritas.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
@@ -167,9 +172,6 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
-import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
-import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 
 export const routes: Routes = [
 
@@ -380,7 +382,8 @@ export const routes: Routes = [
     Gestion_TicketsComponent,
     DashboardOTComponent,
     ReporteFacturacion_VendedoresComponent,
-    Reporte_Consolidado_FacturacionComponent
+    Reporte_Consolidado_FacturacionComponent,
+    VistasFavoritasComponent,
   ],
 
   imports: [
@@ -463,6 +466,7 @@ export const routes: Routes = [
     ImageModule,
     GalleriaModule,
     OverlayPanelModule,
+    SpeedDialModule,
   ],
 
   providers: [

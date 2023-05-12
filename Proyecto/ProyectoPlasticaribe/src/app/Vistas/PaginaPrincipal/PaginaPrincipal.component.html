@@ -1,10 +1,11 @@
 <app-menuLateral></app-menuLateral>
+<app-VistasFavoritas></app-VistasFavoritas>
 
 <div class="fondo">
 <br>
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
-  <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
+  <div class="container-fluid" id="card">
     <p-tabView [scrollable]="true" *ngIf="(ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 60 || ValidarRol == 61)">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
@@ -50,58 +51,5 @@
         <app-ReporteFacturacion_Vendedores></app-ReporteFacturacion_Vendedores>
       </p-tabPanel>
     </p-tabView>
-  </div>
-
-  <!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
-  <div class="dock-window dock-advanced">
-    <!-- Docker -->
-    <div class="fixed-bottom">
-      <p-dock [model]="dockItems" position="bottom">
-        <ng-template pTemplate="item" let-item>
-          <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
-        </ng-template>
-      </p-dock>
-    </div>
-
-    <!-- PickList -->
-    <div class="contenedorLista" id="contenedorLista" *ngIf="displayTerminal">
-      <div class="d-grid gap-2 d-md-flex justify-content-end">
-        <!-- Para cerrar el apartado donde se escogen y modifican las vistas favoritas se creó un label que al dar click sobre el dejará de mostrar este apartado -->
-        <label class="btnclose pi pi-times" mat-button (click)="cerrarLista()"></label>
-      </div>
-      <p-pickList
-        [source]="disponiblesMostrar"
-        [target]="targetProducts"
-        [showTargetControls]="false"
-        [showSourceControls]="false"
-        sourceHeader="Disponible"
-        targetHeader="Seleccionado"
-        [dragdrop]="true"
-        [metaKeySelection]="false"
-        [responsive]="true"
-        [sourceStyle]="{'height':'30rem'}"
-        [targetStyle]="{'height':'30rem'}"
-        filterBy="nombre"
-        sourceFilterPlaceholder="Buscar por nombre"
-        targetFilterPlaceholder="Buscar por nombre"
-        (onMoveToTarget)="elegirFavoritos()"
-        (onMoveAllToTarget)="llenarDatosRol()"
-        (onMoveToSource)="elegirFavoritos()"
-        (onMoveAllToSource)="elegirFavoritos()">
-        <ng-template let-product pTemplate="item">
-          <div class="product-item">
-            <div class="product-list-detail">
-              <span>
-                <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
-                <p style="color: #000; padding-left: 5%;">{{product.nombre}}</p>
-              </span>
-              <p style="color: #db4149; padding-left: 20%;">{{product.categoria}}</p>
-            </div>
-          </div>
-        </ng-template>
-        <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
-      </p-pickList>
-    </div>
-
   </div>
 </div>

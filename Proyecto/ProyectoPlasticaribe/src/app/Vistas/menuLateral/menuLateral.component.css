@@ -205,8 +205,8 @@ p {
 
 /* ESTILOS DEL INPUT SWITCH PARA EL MODO NOCTURNO */
 .colorMode {
-	width:35%;
-	height:32px;
+	width: 150px;
+	height: 32px;
 	position: relative;
 	display: inline-block;
 	background: #ebebeb;
@@ -214,16 +214,15 @@ p {
 	box-shadow: inset 0px 5px 15px rgba(0,0,0,0.4), inset 0px -5px 15px rgba(255,255,255,0.4);
 	cursor: pointer;
 	transition: 0.3s;
-  margin-left: 10%;
 }
 
 .colorMode:after {
 	content: "";
-	width:28px;
+	width: 28px;
 	height: 28px;
 	position: absolute;
-	top:2px;
-	left:5px;
+	top: 2px;
+	left: 5px;
 	background: linear-gradient(180deg,#ffcc89,#d8860b);
 	border-radius: 180px;
 	box-shadow: 0px 5px 10px rgba(0,0,0,0.2);
@@ -253,18 +252,18 @@ input:checked + .colorMode:after {
 .colorMode svg {
 	position: absolute;
 	width: 20px;
-	top:5px;
+	top: 5px;
 	z-index: 100;
 }
 
 .colorMode svg.sun {
-	left:8%;
-	fill:#fff;
+	left: 9px;
+	fill: #fff;
 	transition: 0.3s;
 }
 
 .colorMode svg.moon {
-	left:70%;
+	left: 119.5px;
 	fill:#7e7e7e;
 	transition: 0.3s;
 }

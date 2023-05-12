@@ -113,10 +113,13 @@ export class AppComponent implements OnInit{
     this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
     this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
     this.storage_Rol = this.ValidarRol;
+    let tamanoLetraCambiado = this.cookieService.get('tamanoLetraCambiado');
+    if (tamanoLetraCambiado == '') this.cookieService.set('TamanoLetra', '0.90', { expires: 365, sameSite: 'Lax' });
     this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
-    if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 1;
+    if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 0.90;
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
+    this.cookieService.set('tamanoLetraCambiado', 'true', { expires: 365, sameSite: 'Lax' });
   }
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion

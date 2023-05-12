@@ -1,0 +1,21 @@
+
+p-pickList span{
+  display: flex;
+}
+
+@media screen and (max-width: 576px) {
+
+  .product-item {
+    flex-wrap: wrap;
+  }
+
+  p-pickList img {
+    margin: 0 0 1rem 0;
+    width: 50px;
+  }
+}
+
+::ng-deep .p-picklist-item:not(.cdk-drag-disabled) {
+  cursor: move;
+  z-index: 3130 !important;
+}
