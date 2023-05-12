@@ -116,14 +116,14 @@
                 <!-- ID -->
                 <div class="col-md-12" *ngIf="accion == 'Crear'; else Editar">
                   <span class="p-float-label">
-                    <input formControlName="usuId" id="usuId" class="form-control form-control-sm" type="number" pInputText required/>
+                    <input formControlName="usuId" id="usuId" type="number" pInputText required/>
                     <label for="usuId">ID Usuario</label>
                   </span>
                 </div>
 
                 <ng-template #Editar>
                   <span class="p-float-label">
-                    <input formControlName="usuId" id="usuId" class="form-control form-control-sm" type="number" pInputText required readonly/>
+                    <input formControlName="usuId" id="usuId" type="number" pInputText required readonly/>
                     <label for="usuId">ID Usuario</label>
                   </span>
                 </ng-template>
@@ -131,7 +131,7 @@
                 <!-- Nombre -->
                 <div class="col-md-12">
                   <span class="p-float-label">
-                    <input formControlName="usuNombre" id="usuNombre" class="form-control form-control-sm" type="text" pInputText required/>
+                    <input formControlName="usuNombre" id="usuNombre" type="text" pInputText required/>
                     <label for="usuNombre">Nombre Usuario</label>
                   </span>
                 </div>
@@ -175,16 +175,17 @@
                     <label for="Contrasena">Contraseña</label>
                   </span>
                 </div> -->
-                <div class="col-md mb">
-                  <div class="p-inputgroup">
+                <div class="col-md-12 mb">
+                  <!--<div class="p-inputgroup">-->
                     <span class="p-float-label">
-                      <input formControlName="usuPassword" type="password" id="pass" pInputText>
+                      <!--<input formControlName="usuPassword" type="password" id="pass" pInputText>-->
+                      <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
                       <label for="pass">Contraseña</label>
                     </span>
-                    <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
+                    <!--<ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
                     <ng-template #mostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
                     <ng-template #noMostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
-                  </div>
+                  </div>-->
                 </div>
 
                 <!--Boton Ingresar al sistema-->
@@ -224,7 +225,7 @@
                 <!-- Descripcion -->
                 <div class="col-md-12">
                   <span class="p-float-label">
-                    <textarea formControlName="rolDescripcion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                    <textarea formControlName="rolDescripcion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
                     <label for="textarea">Descripción</label>
                   </span>
                 </div>
@@ -235,6 +236,7 @@
 
         <!-- FORMULARIO AREAS -->
         <ng-template #area>
+          <br>
           <form [formGroup]="formAreas">
             <div class="mb-3">
               <div class="row g-4">
@@ -255,7 +257,7 @@
                 <!-- Descripcion -->
                 <div class="col-md-12">
                   <span class="p-float-label">
-                    <textarea formControlName="areaDescripcion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                    <textarea formControlName="areaDescripcion" [rows]="1"  maxlength="200" pInputTextarea></textarea>
                     <label for="textarea">Descripción</label>
                   </span>
                 </div>
