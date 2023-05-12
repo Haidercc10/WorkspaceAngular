@@ -52,6 +52,7 @@ a:hover {
 
 #tableProcesos td{
   font-size: calc(var(--font-size) * 13px);
+  font-weight: 500;
 }
 
 .titulos_Paginador{
