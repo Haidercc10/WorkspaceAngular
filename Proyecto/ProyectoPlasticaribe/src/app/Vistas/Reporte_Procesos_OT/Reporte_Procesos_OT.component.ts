@@ -1333,11 +1333,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   mostrarDescripcion($event, color : string){
     if (color == 'amarillo') this.infoColor = `Este color indica que la OT <b>${'ya inició su producción.'}</b>`;
     if (color == 'naranja') this.infoColor = `Este color muestra que la OT está <b>${'ABIERTA'}</b>, es decir, <b>${'no tiene asignaciones y por ende no ha iniciado su producción'}</b>`;
-    if (color == 'verde') this.infoColor = `Este color indica que la OT está <b>${'TERMINADA'}</b>, osea que <b>${'que su producción ya alcanzó la cantidad pedida.'}</b>`;
-    if (color == 'azul') this.infoColor = `Este color muestra que la OT está <b>${'ASIGNADA'}</b>, debido a que, <b>${'ya se hicieron asignaciones de materia prima pero no ha iniciado su producción.'}</b>`;
-    if (color == 'rojo') this.infoColor = `Este color indica que la OT está <b>${'ANULADA, y que no puede seguir siendo pesada.'}</b>`;
+    if (color == 'verde') this.infoColor = `Este color indica que la OT está <b>${'TERMINADA'}</b>, osea que <b>${'su producción ya alcanzó la cantidad pedida.'}</b>`;
+    if (color == 'azul') this.infoColor = `Este color muestra que la OT está <b>${'ASIGNADA'}</b>, debido a que, <b>${'ya se realizaron asignaciones de materia prima pero no ha iniciado su producción.'}</b>`;
+    if (color == 'rojo') this.infoColor = `Este color indica que la OT está <b>${'ANULADA, y que no puede seguir siendo producida en la planta.'}</b>`;
     if (color == 'verde2') this.infoColor = `Este color muestra que la OT está <b>${'CERRADA'}</b>, es decir, <b>${'ya se finalizó su producción y se cerró'}</b> para que no continue siendo pesada en la planta.</b>`;
-    if (color == 'gris') this.infoColor = `Este color indica la OT <b>${'no pasa por dicha área o no ha llegado aún al proceso con este color.'}</b>`;
+    if (color == 'gris') this.infoColor = `Este color indica que la producción de la OT <b>${'no pasa por dicha área o no ha llegado aún al proceso que contiene este color.'}</b>`;
 
     setTimeout(() => {
       this.op!.toggle($event);

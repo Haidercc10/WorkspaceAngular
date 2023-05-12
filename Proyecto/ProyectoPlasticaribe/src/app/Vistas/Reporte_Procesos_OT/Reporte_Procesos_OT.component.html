@@ -127,104 +127,10 @@
     <hr class="colorLinea">
   </div>
 
-  <!-- Tabla informativa de colores -->
-  <!--<div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <div class="table-responsive">
-      <table class="table tableColores">
-        <thead class="TitulosTabla">
-          <td class="amarillo">
-            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Iniciado <b>{{cantidadOTIniciada}}</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample1">
-                  <div class="card card-body">
-                    Este color indica que la OT ya inició su producción.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="naranja">
-            <a class="btn naranja" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Abierta <b>{{catidadOTAbiertas}}</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample2">
-                  <div class="card card-body">
-                    Este color indica que la OT está abierta, es decir, no tiene asignaciones y tampoco ha empazado su producción.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="verde">
-            <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Terminada <b>{{cantidadOTTerminada}}</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample4">
-                  <div class="card card-body">
-                    Este color indica que la orden de trabajo está terminada, es decir, que su producción ya alcanzó la cantidad pedida.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="azul">
-            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Asignada <b>{{cantidadOTAsignadas}}</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample5">
-                  <div class="card card-body">
-                    Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="rojo">
-              <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Anulada <b>{{cantidadOtAnulada}}</b></a>
-              <div class="row">
-                <div class="col">
-                  <div class="collapse multi-collapse" id="multiCollapseExample6">
-                    <div class="card card-body">
-                      Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
-                    </div>
-                  </div>
-                </div>
-              </div>
-          </td>
-          <td class="verde2">
-            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample8" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample8">
-                  <div class="card card-body">
-                    Este color indica que la orden de trabajo está cerrada, es decir, ya se finalizó su producción y se cerró la orden para que no haya más producción.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="gris">
-            <a class="btn gris" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
-            <div class="row">
-              <div class="col">
-                <div class="collapse multi-collapse" id="multiCollapseExample3">
-                  <div class="card card-body">
-                    Este color indica la OT ya inició su producción en otros procesos, pero no ha llegado aún al proceso con este color.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-        </thead>
-      </table>
-    </div>
-  </div>-->
-
   <div class="mb-4">
     <div class="row g-3">
       <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"  class="font-size-24" style="width: 90%;"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24"><i class="pi pi-file-edit font-size-24"></i> Ordenes de Trabajo</h4>
       </div>
       <div id="centrar" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6" >
         <p class="text-right"><b>Haz clic sobre los botones </b> <i class="pi pi-info-circle"></i> y observa que <b>indica cada color </b> <i class="pi pi-palette"></i></p>
@@ -238,7 +144,7 @@
       <div class="row g-3">
         <!-- Buscador de columnas -->
         <p-toolbar>
-          <div class="row g-3">
+          <div id="rowToolbar" class="row g-3">
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-5 col-xl-6 col-xxl-6">
               <p-multiSelect
               [options]="columnas"
@@ -246,18 +152,18 @@
               optionLabel="header"
               selectedItemsLabel="{0} columnas seleccionadas"
               placeholder="Elige las columnas que quieres ver"
-              pTooltip="Elige las columnas que quieres ver"
+              pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
               tooltipPosition="top">
               </p-multiSelect>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-7 col-xl-6 col-xxl-6 text-right">
-              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-1" label="{{cantidadOTIniciada}}" (click)="mostrarDescripcion($event, 'amarillo')" pTooltip="Iniciada(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnNaranja" styleClass="p-button-rounded mr-1" label="{{catidadOTAbiertas}}" (click)="mostrarDescripcion($event, 'naranja')" pTooltip="Abierta(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnVerde" styleClass="p-button-rounded mr-1" label="{{cantidadOTTerminada}}" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Terminada(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnAzul" styleClass="p-button-rounded mr-1" label="{{cantidadOTAsignadas}}" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Asignada(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnRojo" styleClass="p-button-rounded mr-1" label="{{cantidadOtAnulada}}" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Anulada(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnVerde2" styleClass="p-button-rounded mr-1" label="{{cantidadOTCerrada}}" (click)="mostrarDescripcion($event, 'verde2')" pTooltip="Cerrada(s)" tooltipPosition="top"></p-button>
-              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciada(s)" (click)="mostrarDescripcion($event, 'gris')" tooltipPosition="top"></p-button>
+              <p-button class="btnAmarillo" styleClass="p-button-rounded mr-1" label="{{cantidadOTIniciada}}" (click)="mostrarDescripcion($event, 'amarillo')" pTooltip="Iniciada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnNaranja" styleClass="p-button-rounded mr-1" label="{{catidadOTAbiertas}}" (click)="mostrarDescripcion($event, 'naranja')" pTooltip="Abierta(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnVerde" styleClass="p-button-rounded mr-1" label="{{cantidadOTTerminada}}" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Terminada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnAzul" styleClass="p-button-rounded mr-1" label="{{cantidadOTAsignadas}}" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Asignada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnRojo" styleClass="p-button-rounded mr-1" label="{{cantidadOtAnulada}}" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Anulada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnVerde2" styleClass="p-button-rounded mr-1" label="{{cantidadOTCerrada}}" (click)="mostrarDescripcion($event, 'verde2')" pTooltip="Cerrada(s)" tooltipPosition="left"></p-button>
+              <p-button class="btnGris" styleClass="p-button-rounded" label="{{0}}" pTooltip="No iniciada(s)" (click)="mostrarDescripcion($event, 'gris')" tooltipPosition="left"></p-button>
             </div>
           </div>
         </p-toolbar>
@@ -651,14 +557,14 @@
         <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
 
-        <p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: 'auto'}" header="Rollos de la OT" [modal]="true" >
+        <p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: '70%'}" header="Rollos de la OT" [modal]="true" >
           <ng-template pTemplate="content">
             <app-DatosOT-Status></app-DatosOT-Status>
           </ng-template>
         </p-dialog>
 
 
-        <p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true" >
+        <p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '70%'}" header="Reporte de costos" [modal]="true" >
           <ng-template pTemplate="content">
             <app-reporteCostosOT></app-reporteCostosOT>
           </ng-template>

@@ -177,10 +177,8 @@ p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
   .text-right {
     text-align: center !important;
   }
-}
 
-@media (max-width: 792px){
-  .text-right {
+  #centrar {
     text-align: center !important;
   }
 }
@@ -194,3 +192,7 @@ p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
     width: 100%;
   }
 }
+
+#rowToolbar ::ng-deep .row, .g-3 {
+  --bs-gutter-x : 0
+ }

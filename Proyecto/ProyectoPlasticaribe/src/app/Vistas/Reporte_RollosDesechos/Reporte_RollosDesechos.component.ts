@@ -51,6 +51,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   public PesoTotalKg : number = 0; /** Peso total en Kg de rollos eliminados para mostrarlos en el PDF */
   public Item : any = null; /** variable ngModel que servirá para la consulta de tipo LIKE para traer nombres de productos */
   public arrayProcesos : any = [];
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private formbuilder : FormBuilder,
                 private servicioTurno : TurnosService,
@@ -61,7 +62,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                           private AppComponent : AppComponent,
                             private servicioProcesos : ProcesosService,
                               private messageService: MessageService) {
-
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
       fecha : [null],
