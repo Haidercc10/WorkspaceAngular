@@ -24,7 +24,7 @@ export class ArchivosComponent implements OnInit {
   ArrayArchivos : any [] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos : any [] = []; //Variable para almacenar las categorias de archivos que hay
   selectedFile: File = null;
-  nombreCarpeta : string = 'D:\\Calidad\\'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
+  nombreCarpeta : string = 'D:\\Calidad'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
   ruta : string; //Variable que almacenará el nombre de las carpetas que se estan vistando
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
@@ -96,7 +96,7 @@ export class ArchivosComponent implements OnInit {
   mostrarCarpetas(ruta : string = this.AppComponent.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.nombreCarpeta = ruta;
-    this.ruta = ruta.replace(`D:\\Calidad\\`, 'Calidad\\');
+    this.ruta = ruta.replace(`D:\\Calidad`, 'Calidad');
     this.archivosService.mostrarCarpetas(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
         let nombreArchivos : string = datos_archivos[i].replace(`${ruta}`,'');

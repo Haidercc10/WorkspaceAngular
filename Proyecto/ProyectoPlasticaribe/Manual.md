@@ -1,6 +1,6 @@
 # `(Nombre App)`
 
-`(Nombre app)` es una aplicación web desarrollada en Angular para la empresa Plasticaribe SAS de la ciudad de barranquilla. Esta aplicación busca realizar reportes de ventas, facturación, movimientos, mejorar el control de las existencias de materias primas, productos, etc.
+`(Nombre app)` es una aplicación web desarrollada en Angular para la empresa Plasticaribe SAS de la ciudad de Barranquilla. Esta aplicación busca realizar reportes de ventas, facturación, movimientos, mejorar el control de las existencias de materias primas, productos, etc.
 
 Al Ingresar a la aplicación por primera vez nos topamos con un login.
 ![Login](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Login.jpg)
