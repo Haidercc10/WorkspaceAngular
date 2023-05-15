@@ -38,6 +38,7 @@ export class ArchivosComponent implements OnInit {
   clave : string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
   fileSeleccionado : any; /** Archivo/Carpeta seleccionado para ser eliminado */
   rutaSeleccionada : any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
+  accionMoverCopiar : number;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -202,11 +203,8 @@ export class ArchivosComponent implements OnInit {
   /** Función que mostrará el mensaje de elección para eliminación de archivos ó carpetas */
   mostrarEleccion1(ruta : string, index : number,  opcion : string) {
     this.clave = opcion;
-    console.log(opcion);
     setTimeout(() => {
       if(this.clave == 'd-archivo') {
-        console.log(ruta);
-        console.log(index);
         this.rutaSeleccionada = ruta;
         this.fileSeleccionado = index;
         this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere eliminar definitivamente el archivo/carpeta?`, sticky: true});
@@ -258,38 +256,47 @@ export class ArchivosComponent implements OnInit {
 
   /*Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo,
   ademas de darle valor a la variable que declara el la ruta incial y la que declara el nombre del archivo o carpeta*/
-  moverArchivoCarpeta(accion : number, ruta, nombre : string, validador : number){
-    if (accion == 1) {
-      Swal.fire({
-        title: '¿Está seguro de copiar este Archivo/Carpeta?',
-        showDenyButton : true,
-        confirmButtonText: 'Copiar',
-        denyButtonText: `No Copiar`,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.copiar = true;
-          this.rutaInicial = ruta;
-          this.nombreArchivo = nombre;
-          if (validador == 1) this.validarArchivo_Carpeta = true;
-          else this.validarArchivo_Carpeta = false;
-        }
-      });
-    } else if (accion == 2){
-      Swal.fire({
-        title: '¿Está seguro de mover este Archivo/Carpeta?',
-        showDenyButton : true,
-        confirmButtonText: 'Mover',
-        denyButtonText: `No Mover`,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.mover = true;
-          this.rutaInicial = ruta;
-          this.nombreArchivo = nombre;
-          if (validador == 1) this.validarArchivo_Carpeta = true;
-          else this.validarArchivo_Carpeta = false;
-        }
-      });
-    }
+  moverArchivoCarpeta(accion : string, ruta, nombre : string){
+    this.clave = accion;
+    setTimeout(() => {
+      if (this.clave == 'copiar') {
+        this.rutaInicial = ruta;
+        this.nombreArchivo = nombre;
+        console.log(this.rutaInicial)
+        console.log(this.nombreArchivo)
+        this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere copiar el archivo/carpeta?`, sticky: true});
+      } else if (this.clave == 'mover'){
+        this.rutaInicial = ruta;
+        this.nombreArchivo = nombre;
+        console.log(this.rutaInicial)
+        console.log(this.nombreArchivo)
+        this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere mover este archivo/carpeta?`, sticky: true});
+      }
+    }, 500);
+  }
+
+  /** Función que valida la acción de confirmar la copia de un archivo, contiene su ruta y nombre */
+  copyFiles(ruta : string, nombre : string, validador : number){
+    this.onReject()
+    this.copiar = true;
+    ruta = this.rutaInicial;
+    nombre = this.nombreArchivo;
+    if (validador == 1) this.validarArchivo_Carpeta = true;
+    else this.validarArchivo_Carpeta = false;
+    console.log(validador);
+    this.clave = '';
+    console.log(this.clave)
+  }
+
+  /** Función que valida la acción de confirmar el movimiento de un archivo, contiene su ruta y nombre */
+  moveFiles(ruta : string, nombre : string, validador : number){
+    this.onReject();
+    this.mover = true;
+    ruta = this.rutaInicial;
+    nombre = this.nombreArchivo;
+    if (validador == 1) this.validarArchivo_Carpeta = true;
+    else this.validarArchivo_Carpeta = false;
+    this.clave = '';
   }
 
   /*Variable que se encargará de validar una vez mas el proceso que se va a realizar, una copia o un movimiento,

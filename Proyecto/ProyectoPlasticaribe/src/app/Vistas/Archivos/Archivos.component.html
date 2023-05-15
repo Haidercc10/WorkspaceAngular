@@ -112,19 +112,19 @@
 
               <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 1)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 1)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
               </ng-container>
 
               <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 2)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 2)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
               </ng-container>
 
@@ -232,7 +232,7 @@
 </p-dialog>
 
 <p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message" let-matPrima let-index>
+  <ng-template let-message pTemplate="message" let-ruta let-index>
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
         <i class="pi pi-exclamation-triangle font-size-48"></i>
@@ -243,6 +243,27 @@
         <div class="col-6" style="margin-right: 5px;">
           <button *ngIf="clave == 'd-archivo'" type="button" pButton (click)="eliminarArchivo(ruta, index)" icon="pi pi-check" label="Si" class="p-button-success"></button>
           <button *ngIf="clave == 'd-carpeta'" type="button" pButton (click)="eliminarCarpetas(ruta, index)" icon="pi pi-check-square" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-ruta let-index>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button *ngIf="this.clave == 'copiar'" type="button" pButton (click)="copyFiles(ruta, index, 1)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="this.clave == 'mover'" type="button" pButton (click)="moveFiles(ruta, index, 1)" icon="pi pi-check-square" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
