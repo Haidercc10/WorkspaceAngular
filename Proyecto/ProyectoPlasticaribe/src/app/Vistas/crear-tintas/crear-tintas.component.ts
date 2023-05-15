@@ -56,7 +56,7 @@ export class CrearTintasComponent implements OnInit {
   obtenerUnidadMedida(){
     this.servicioUnidadMedida.srvObtenerLista().subscribe(datos_unidadesMedida => {
       for (let index = 0; index < datos_unidadesMedida.length; index++) {
-        this.unidadMedida.push(datos_unidadesMedida[index].undMed_Id);
+        this.unidadMedida.push(datos_unidadesMedida[index]);
         this.unidadMedida.sort();
       }
     });

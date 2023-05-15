@@ -24,8 +24,8 @@
     <p-card>
       <!-- Inicio Botones que llaman el modal de crear materias primas y Crear tintas-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"(click)="llamarModalCrearTintas()"></button>
-        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Materia Prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"(click)="llamarModalMateriasPrimas()"></button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" (click)="llamarModalCrearTintas()"></button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Materia Prima" class="p-button-danger" (click)="llamarModalMateriasPrimas()"></button>
       </div>
 
       <!--Titulo Asignación -->
@@ -197,37 +197,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Modal de crear Tinta -->
-      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">Crear Tinta</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <app-crear-tintas></app-crear-tintas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal de crear Materia Prima -->
-      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel2">Crear Materia Prima</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <app-modal-crear-materias-primas></app-modal-crear-materias-primas>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </p-card>
   </div>
 </div>
@@ -271,3 +240,13 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!--Modal para crear tintas -->
+<p-dialog header="Crear Tinta" [(visible)]="componenteCrearTintas" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+  <app-crear-tintas></app-crear-tintas>
+</p-dialog>
+
+<!--Modal para crear materias primas -->
+<p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+  <app-modal-crear-materias-primas></app-modal-crear-materias-primas>
+</p-dialog>

@@ -1,11 +1,12 @@
  <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+ <br>
 <form [formGroup]="FormCrearMateriaPrima" (ngSubmit)="registrarMateriaPrimaDesdeModal()">
 
   <!-- Inicio Fila 1 Agregar Materia Prima -->
   <div class="mb-3">
     <div class="row g-4">
       <!-- Nombre -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <input formControlName="mpNombre" id="mpNombre" type="text" pInputText required/>
           <label for="mpNombre">Nombre</label>
@@ -13,7 +14,7 @@
       </div>
 
       <!-- Descripcion -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
         <span class="p-float-label">
           <input formControlName="mpdescripcion" id="mpdescripcion" type="text" pInputText required/>
           <label for="mpdescripcion">Descripción</label>
@@ -21,7 +22,7 @@
       </div>
 
       <!-- Categorias -->
-      <div class="col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="mpCategoria" inputId="mpCategoria" [autoDisplayFirst]="false" [options]="comboCategoriasMatPri" optionValue="catMP_Id" optionLabel="catMP_Nombre" [required]="true"></p-dropdown>
           <label for="mpCategoria">Categorias</label>
@@ -29,7 +30,7 @@
       </div>
 
       <!-- Unidad de Medida -->
-      <div class="col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="mpUnidadMedida" inputId="Und" [autoDisplayFirst]="false" [options]="comboUnidadMedida" optionLabel="" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
@@ -37,7 +38,7 @@
       </div>
 
       <!-- Precio -->
-      <div class="col-md">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="mpValor" mode="decimal" inputId="Precio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Precio">Precio</label>

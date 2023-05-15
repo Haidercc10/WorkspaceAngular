@@ -1,4 +1,5 @@
  <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+ <br>
 <form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
   <!-- Inicio Fila 1 Agregar Unidad Medida -->
   <div class="mb-3">
@@ -30,7 +31,7 @@
       <!-- Unidad de Medida -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="TintaUndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="" [required]="true"></p-dropdown>
+          <p-dropdown formControlName="TintaUndMedida" inputId="Und" [autoDisplayFirst]="false" optionValue="undMed_Id" [options]="unidadMedida" optionLabel="undMed_Id" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
         </span>
       </div>
