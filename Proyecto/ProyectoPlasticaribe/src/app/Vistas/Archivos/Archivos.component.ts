@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -7,6 +7,10 @@ import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
 import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
+import { MessageService } from 'primeng/api';
+import { File } from 'buffer';
 
 @Component({
   selector: 'app-Archivos',
@@ -23,8 +27,8 @@ export class ArchivosComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD') //Variable que se usará para llenar la fecha actual
   ArrayArchivos : any [] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos : any [] = []; //Variable para almacenar las categorias de archivos que hay
-  selectedFile: File = null;
-  nombreCarpeta : string = 'D:\\Calidad'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
+  selectedFile: any;
+  nombreCarpeta : string = 'D:\\Calidad3'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
   ruta : string; //Variable que almacenará el nombre de las carpetas que se estan vistando
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
@@ -32,11 +36,17 @@ export class ArchivosComponent implements OnInit {
   nombreArchivo : string; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
   validarArchivo_Carpeta : boolean;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modal : boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
+  @ViewChild(CrearCategoriasComponent) modalCrearCategorias : CrearCategoriasComponent;
+  clave : string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
+  fileSeleccionado : any; /** Archivo/Carpeta seleccionado para ser eliminado */
+  rutaSeleccionada : any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private archivosService : ArchivosService,
-                    private categoriaArchivosService : Categorias_ArchivosService) {
+                    private categoriaArchivosService : Categorias_ArchivosService,
+                      private messageService : MessageService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
@@ -96,7 +106,7 @@ export class ArchivosComponent implements OnInit {
   mostrarCarpetas(ruta : string = this.AppComponent.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.nombreCarpeta = ruta;
-    this.ruta = ruta.replace(`D:\\Calidad`, 'Calidad');
+    this.ruta = ruta.replace(`D:\\Calidad3`, 'Calidad3');
     this.archivosService.mostrarCarpetas(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
         let nombreArchivos : string = datos_archivos[i].replace(`${ruta}`,'');
@@ -116,42 +126,30 @@ export class ArchivosComponent implements OnInit {
   crearCarpeta(){
     let nombresArchivosCarpetas : any = [];
     let nombreCarpeta : any = this.formularioArchivo.value.carpetaNueva;
-    if (nombreCarpeta == '') Swal.fire("¡No se ha escrito un nombre para la carpeta!");
+    if (nombreCarpeta == '') this.mostrarAdvertencia(`Advertencia`, `Debe diligenciar el campo nombre de carpeta`);
     else {
       for (let i = 0; i < this.ArrayArchivos.length; i++) {
         nombresArchivosCarpetas.push(this.ArrayArchivos[i].nombre);
       }
-      if (nombresArchivosCarpetas.includes(`${nombreCarpeta}`)) Swal.fire("¡Ya existe una archivo o carpeta con este nombre!");
+      if (nombresArchivosCarpetas.includes(`${nombreCarpeta}`)) this.mostrarAdvertencia(`Advertencia`, `Ya existe una archivo o carpeta con este nombre, debe cambiarlo!`);
       else {
         this.nombreCarpeta = `${this.nombreCarpeta}\\${nombreCarpeta}`
         let ruta : string = this.nombreCarpeta;
-        this.ruta = ruta.replace(`D:\\Calidad\\`, '');
+        this.ruta = ruta.replace(`D:\\Calidad3\\`, '');
         this.archivosService.crearCarpetas(ruta).subscribe(datos_archivo => {
+          this.mostrarConfirmacion(`Confirmación`, `La carpeta ha sido creada exitosamente!`);
           this.cargarArchivos(this.nombreCarpeta);
           this.mostrarCarpetas(this.nombreCarpeta);
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2200,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'success',
-            title: '¡La carpeta se ha creado con exito!'
-          });
+          this.formularioArchivo.reset();
         });
       }
     }
   }
 
   // Funcion que toma el archivo que se subió
-  onSelectFile(fileInput: any) {
-    this.selectedFile = <File>fileInput.target.files[0];
+  onSelectFile(event: any) {
+    this.selectedFile = <File>event.currentFiles;
+    console.log(this.selectedFile)
   }
 
   //Funcion que y le pasará el archivo que se cargó y llamará a la funcion que enviará la informacion al servidor para guardar el archivo en su disco local y guardar la informacion en la base de datos
@@ -161,21 +159,7 @@ export class ArchivosComponent implements OnInit {
     const formData = new FormData();
     formData.append('archivo', this.selectedFile);
     this.archivosService.srvGuardar(formData, this.today, categoria, this.storage_Id, filePath).subscribe(datos_archivo => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 2200,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡El archivo se ha guardado con exito!'
-      });
+      this.mostrarConfirmacion(`Confirmación`, `Archivo guardado exitosamente!`);
       this.cargarArchivos(filePath);
       this.mostrarCarpetas(filePath);
     });
@@ -185,10 +169,10 @@ export class ArchivosComponent implements OnInit {
   regresarCarpetaAnterior(){
     let ultimaRuta : any = `${this.nombreCarpeta.lastIndexOf("\\")}`;
     this.nombreCarpeta = this.nombreCarpeta.substring(0, ultimaRuta);
-    if (this.nombreCarpeta != "D:\\Calidad\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "D:\\" && this.nombreCarpeta != "D:" && this.nombreCarpeta != "D") {
+    if (this.nombreCarpeta != "D:\\Calidad3\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "D:\\" && this.nombreCarpeta != "D:" && this.nombreCarpeta != "D") {
       this.cargarArchivos(this.nombreCarpeta);
       this.mostrarCarpetas(this.nombreCarpeta);
-    } else this.nombreCarpeta = "D:\\Calidad\\";
+    } else this.nombreCarpeta = "D:\\Calidad3\\";
   }
 
   // Funcion que servirá para abrir carpetas
@@ -212,56 +196,60 @@ export class ArchivosComponent implements OnInit {
       a.target = '_blank';
       a.click();
       document.body.removeChild(a);
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 2200,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡El archivo se ha descargado con exito!'
-      });
+      this.mostrarConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
     });
+  }
+
+  /** Función que mostrará el mensaje de elección para eliminación de archivos ó carpetas */
+  mostrarEleccion1(ruta : string, index : number,  opcion : string) {
+    this.clave = opcion;
+    console.log(opcion);
+    setTimeout(() => {
+      if(this.clave == 'd-archivo') {
+        console.log(ruta);
+        console.log(index);
+        this.rutaSeleccionada = ruta;
+        this.fileSeleccionado = index;
+        this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere eliminar definitivamente el archivo/carpeta?`, sticky: true});
+      }
+      if(this.clave == 'd-carpeta') {
+        this.rutaSeleccionada = ruta;
+        this.fileSeleccionado = index;
+        this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea eliminar la carpeta/archivo?`, sticky: true});
+      }
+    }, 200)
+  }
+
+  /** Función para quitar mensaje de elección */
+  onReject(){
+    this.messageService.clear(this.clave);
   }
 
   // Funcion que permitirá eliminar un archivo
   eliminarArchivo(ruta : string, index : any){
-    Swal.fire({
-      title: '¿Está seguro de eliminar este Archivo/Carpeta?',
-      showDenyButton : true,
-      confirmButtonText: 'Eliminar',
-      denyButtonText: `No Eliminar`,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.archivosService.eliminarArchivos(ruta).subscribe(datos_archivos => {
-          this.ArrayArchivos.splice(index, 1);
-          Swal.fire("¡Archivo Eliminado!");
-        });
-      }
+
+    ruta = this.rutaSeleccionada;
+    index = this.fileSeleccionado;
+    this.onReject();
+    this.archivosService.eliminarArchivos(ruta).subscribe(datos_archivos => {
+      this.ArrayArchivos.splice(index, 1);
+      this.mostrarConfirmacion(`Confirmación`, `Archivo eliminado con éxito!`);
+    }, error => { this.mostrarError(`Error`, `No fue posible eliminar el archivo`);
     });
+    this.clave = '';
   }
 
-  //
+  // Funcion que permitirá eliminar una carpeta
   eliminarCarpetas(ruta : string, index : any){
-    Swal.fire({
-      title: '¿Está seguro de eliminar este Archivo/Carpeta?',
-      showDenyButton : true,
-      confirmButtonText: 'Eliminar',
-      denyButtonText: `No Eliminar`,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.archivosService.eliminarCarpetas(ruta).subscribe(datos_archivos => {
-          this.ArrayArchivos.splice(index, 1);
-          Swal.fire("¡Carpeta Eliminada!");
-        });
-      }
+    ruta = this.rutaSeleccionada;
+    index = this.fileSeleccionado;
+    this.onReject();
+    this.archivosService.eliminarCarpetas(ruta).subscribe(datos_archivos => {
+      this.ArrayArchivos.splice(index, 1);
+      this.mostrarConfirmacion(`Confirmación`, `Carpeta eliminada con éxito!`);
+    }, error => { this.mostrarError(`Error`, `No fue posible eliminar la carpeta`);
     });
+    this.clave = '';
   }
 
   /*Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo,
@@ -366,4 +354,26 @@ export class ArchivosComponent implements OnInit {
       });
     });
   }
+
+  /** Función que cargará el modal de crear categorias */
+  cargarModal() {
+    this.modal = true;
+    this.modalCrearCategorias.limpiarCampos();
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+   /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+    this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
+  }
+
+   /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+  }
+
 }

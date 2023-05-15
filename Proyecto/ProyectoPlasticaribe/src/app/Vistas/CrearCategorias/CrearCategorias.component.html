@@ -1,30 +1,32 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <form [formGroup]="formCrearCategorias" (ngSubmit)="crearCategoriaArchivos()">
 
-  <!-- Inicio Fila 1 Agregar Categoria -->
   <div class="mb-3">
     <div class="row g-3">
+
       <!-- Nombre -->
-      <div class="form-floating col-md">
-        <input formControlName="catNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
-        <label for="floatingInput">Nombre</label>
+      <div class="col-md-6">
+        <span class="p-float-label">
+          <input formControlName="catNombre" type="text" id="nombre" pInputText required>
+          <label for="nombre">Nombre</label>
+        </span>
       </div>
 
       <!-- Descripción -->
-      <div class="form-floating col-md">
-        <input formControlName="catDescripcion" class="form-control form-control-sm" id="floatingInput" required>
-        <label for="floatingInput">Descripción</label>
+      <div class="col-md-6">
+        <span class="p-float-label">
+          <input formControlName="catDescripcion" id="descripcion" pInputText required>
+          <label for="descripcion">Descripción</label>
+        </span>
       </div>
     </div>
   </div>
-  <!-- Fin Fila 1 -->
 
-  <!--Inicio Fila 2 Botones y Limpiar Campos-->
-  <div class="mb-1">
+  <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" type="submit" label="Crear Categoria" icon="pi pi-check"> </button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>
-  <!--Fin Fila 2-->
 </form>
 

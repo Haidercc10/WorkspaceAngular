@@ -4,6 +4,7 @@ import { modelCategoriaMP } from 'src/app/Modelo/modelCategoriaMP';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
 import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-CrearCategorias',
@@ -15,7 +16,8 @@ export class CrearCategoriasComponent implements OnInit {
   public formCrearCategorias !: FormGroup;
 
   constructor(private frmBuilderCategoria : FormBuilder,
-              private categoriaService : Categorias_ArchivosService,) {
+              private categoriaService : Categorias_ArchivosService,
+              private messageService: MessageService) {
 
     this.formCrearCategorias = this.frmBuilderCategoria.group({
       catNombre : [, Validators.required],
@@ -23,7 +25,6 @@ export class CrearCategoriasComponent implements OnInit {
      });
    }
 
-  //
   ngOnInit(): void {
     this.limpiarCampos();
   }
@@ -33,36 +34,36 @@ export class CrearCategoriasComponent implements OnInit {
     this.formCrearCategorias.reset();
   }
 
-  // Funcion que va a registrar las categorias
+  // Funcion que va a registrar las categorias de archivos
   crearCategoriaArchivos(){
     if (this.formCrearCategorias.valid) {
       let nombre : string = this.formCrearCategorias.value.catNombre;
       let descripcion : string = this.formCrearCategorias.value.catDescripcion;
 
       let data : any = {
-        categoria_Name :nombre ,
+        categoria_Name : nombre,
         categoria_Descricion : descripcion,
       }
 
       this.categoriaService.srvGuardar(data).subscribe(datos_categorias => {
+        this.mostrarConfirmacion(`Confirmación`, `La categoria de archivos ${nombre} se ha guardado exitosamente!`);
         this.limpiarCampos();
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2200,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: `¡La Categoria ${nombre} se ha creado con exito!`
-        });
-      });
-    } else Swal.fire(`¡Por favor llene todos los campos!`);
+      }, error => { this.mostrarError(`Error`, `No fue posible crear la categoría!`) });
+    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+   /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+    this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
+  }
+
+   /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+  }
 }

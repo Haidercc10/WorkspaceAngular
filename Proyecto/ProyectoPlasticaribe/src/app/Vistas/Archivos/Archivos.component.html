@@ -1,4 +1,4 @@
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
 <app-menuLateral></app-menuLateral>
 <br>
@@ -18,132 +18,238 @@
   </div>
 </div>
 
-<div class="contain">
-  <div class="container-fluid">
-    <div class="formulario">
+  <!--Card que contendrá los campos para gestionar archivos -->
+  <p-card>
+    <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button pButton class="p-button-danger" type="button" label="Crear Categorias" icon="pi pi-plus-circle" (click)="cargarModal()" pTooltip="Crear categorias de archivos" tooltipPosition="left"> </button>
+        <br>
+      </div>
+    </ng-container>
 
-      <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <button pButton class="p-button-danger" type="button" label="Crear Categorias" icon="pi pi-plus-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"> </button>
-          <br>
-        </div>
-      </ng-container>
+    <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
+      <form [formGroup]="formularioArchivo" (ngSubmit)="subirArchivos()">
+        <div class="mb-4">
+          <div class="row g-3">
 
-      <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
-        <form [formGroup]="formularioArchivo" (ngSubmit)="subirArchivos()">
-          <div class="mb-4">
-            <div class="row g-3">
+            <div class="col-md-6">
+              <span class="p-inputgroup">
+                <input formControlName="carpetaNueva" type="text" pTooltip="¡Escribe el nombre de la nueva carpeta y haz clic en crear!" pInputText placeholder="Nueva Carpeta" required>
+                <button type="button" pButton icon="pi pi-plus-circle" styleClass="p-button-warn" (click)="crearCarpeta()" label="Crear" pTooltip="Crear Carpeta" tooltipPosition="left"></button>
+              </span>
+            </div>
 
-              <div class="form-floating col-md-4">
-                <input formControlName="carpetaNueva" type="text" id="floatingSelect" class="form-control form-control-sm">
-                <label for="floatingInput">Nombre Carpeta</label>
-              </div>
+            <div class="col-md-6">
+              <span class="p-float-label">
+                <p-dropdown formControlName="CategoriaArchivos" inputId="catArchivos" [autoDisplayFirst]="false" [options]="categoriasArchivos" optionValue="categoria_Id" optionLabel="categoria_Name"></p-dropdown>
+                <label for="catArchivos">Categorias</label>
+              </span>
+            </div>
 
-              <div class="col-md">
-                <input formControlName="catImagen" type="file" (change)="onSelectFile($event)" accept="image/*" class="form-control form-control-sm" required>
-              </div>
-
-              <div class="form-floating col-md-3">
-                <select formControlName="CategoriaArchivos" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="catArchivo.categoria_Id" *ngFor="let catArchivo of categoriasArchivos">{{catArchivo.categoria_Name}}</option>
-                </select>
-                <label for="floatingSelect">Categorias</label>
-              </div>
+            <div class="col-md-12">
+              <p-fileUpload (onSelect)="onSelectFile($event)" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir archivo(s)" [showUploadButton]="false" type="file"></p-fileUpload>
             </div>
           </div>
-
-        <!-- Botones para agregar productos -->
-        <div class="mb-1">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
-            <button pButton class="p-button-success" type="button" label="Crear Carpeta" icon="pi pi-plus-circle" (click)="crearCarpeta()"> </button>
-            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-          </div>
         </div>
-        </form>
-      </ng-container>
 
-      <div class="mb-2">
-        <div class="row g-1">
-          <div class="table-responsive">
-            <table class="table table-hover mt-2">
-              <thead class="TitulosTabla table-light">
-                <tr>
-                  <th scope="col"><svg xmlns="http://www.w3.org/2000/svg" style="width: 17px;" (click)="regresarCarpetaAnterior()" class="cursor" viewBox="0 0 512 512"><path d="M8.31 189.9l176-151.1c15.41-13.3 39.69-2.509 39.69 18.16v80.05C384.6 137.9 512 170.1 512 322.3c0 61.44-39.59 122.3-83.34 154.1c-13.66 9.938-33.09-2.531-28.06-18.62c45.34-145-21.5-183.5-176.6-185.8v87.92c0 20.7-24.31 31.45-39.69 18.16l-176-151.1C-2.753 216.6-2.784 199.4 8.31 189.9z"/></svg>&nbsp;&nbsp;&nbsp;{{ruta}}&nbsp;&nbsp;&nbsp;<svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M572.6 270.3l-96 192C471.2 473.2 460.1 480 447.1 480H64c-35.35 0-64-28.66-64-64V96c0-35.34 28.65-64 64-64h117.5c16.97 0 33.25 6.742 45.26 18.75L275.9 96H416c35.35 0 64 28.66 64 64v32h-48V160c0-8.824-7.178-16-16-16H256L192.8 84.69C189.8 81.66 185.8 80 181.5 80H64C55.18 80 48 87.18 48 96v288l71.16-142.3C124.6 230.8 135.7 224 147.8 224h396.2C567.7 224 583.2 249 572.6 270.3z"/></svg></th>
-                  <th scope="col" style="width: 80px;">Descargar</th>
+      <!-- Botones para agregar productos -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+        </div>
+      </div>
+      </form>
+    </ng-container>
 
-                  <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
-                    <th scope="col" style="width: 80px;">Copiar</th>
-                    <th scope="col" style="width: 80px;">Mover</th>
+    <div class="mb-3">
+      <div class="row g-3">
+        <p-table
+        #dt
+        [value]="ArrayArchivos"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        dataKey="id">
+        <ng-template pTemplate="header">
+          <tr class="font-size-13">
 
-                    <ng-container *ngIf="mover == true || copiar == true">
-                      <th scope="col" style="width: 80px;" class="cursor" class="cursor" (click)="pegarArchivoCarpeta()">Pegar</th>
-                      <th scope="col" style="width: 80px;" class="cursor" class="cursor" (click)="cancelarPegadoArchivoCarpeta()">Cancelar</th>
-                    </ng-container >
-                    <th scope="col" style="width: 80px;">Eliminar</th>
-                  </ng-container>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let archivos of ArrayArchivos let i = index">
+            <th scope="col" style="width: 65%" pResizableColumn><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
+            <th scope="col" class="text-center" pResizableColumn>Descargar</th>
+            <!--Copiar/Mover-->
+            <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
+              <th scope="col" class="text-center" pResizableColumn>Copiar</th>
+              <th scope="col" class="text-center" pResizableColumn>Mover</th>
+              <!--Cancelar-->
+              <ng-container *ngIf="mover == true || copiar == true">
 
+                <th scope="col" class="text-center cursor" pTooltip="Si la carpeta no contiene archivos haz clic aquí para pegar" (click)="pegarArchivoCarpeta()">Pegar</th>
+                <th scope="col" class="text-center cursor" pTooltip="Si la carpeta no contiene archivos haz clic aquí para cancelar" (click)="cancelarPegadoArchivoCarpeta()" pResizableColumn>Cancelar</th>
+              </ng-container>
+            </ng-container>
+            <!--Eliminar-->
+            <th scope="col" class="text-center" pResizableColumn>Eliminar</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-archivos>
+          <tr class="font-size-13">
+
+            <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
+              <td style="width: 65%"><i id="margen" class="pi pi-file" ></i> {{archivos.nombre}}</td>
+              <td class="text-center">
+                <p-button id="minimizar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarArchivos(archivos.nombre)"></p-button>
+              </td>
+            </ng-container>
+
+            <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
+              <td style="width: 65%" class="cursor" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left"><i class="pi pi-folder"></i> {{archivos.nombre}}</td>
+              <td></td>
+            </ng-container>
+
+            <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
+
+              <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 1)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 1)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+              </ng-container>
+
+              <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 2)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 2)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+              </ng-container>
+
+              <ng-container *ngIf="mover == true || copiar == true">
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-clone" styleClass="p-button-rounded p-button-help" (click)="pegarArchivoCarpeta()" pTooltip="Pegar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-times" styleClass="p-button-rounded p-button-secondary" (click)="cancelarPegadoArchivoCarpeta()" pTooltip="Cancelar" tooltipPosition="left"></p-button>
+                </td>
+              </ng-container>
+
+              <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-archivo')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+              </ng-container>
+
+              <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
+                <td class="text-center">
+                  <p-button id="minimizar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-carpeta')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                </td>
+              </ng-container>
+
+            </ng-container>
+          </tr>
+        </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+   <!--<div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <table class="table table-hover mt-2">
+            <thead class="TitulosTabla table-light">
+              <tr>
+                <th scope="col"><svg xmlns="http://www.w3.org/2000/svg" style="width: 17px;" (click)="regresarCarpetaAnterior()" class="cursor" viewBox="0 0 512 512"><path d="M8.31 189.9l176-151.1c15.41-13.3 39.69-2.509 39.69 18.16v80.05C384.6 137.9 512 170.1 512 322.3c0 61.44-39.59 122.3-83.34 154.1c-13.66 9.938-33.09-2.531-28.06-18.62c45.34-145-21.5-183.5-176.6-185.8v87.92c0 20.7-24.31 31.45-39.69 18.16l-176-151.1C-2.753 216.6-2.784 199.4 8.31 189.9z"/></svg>&nbsp;&nbsp;&nbsp;{{ruta}}&nbsp;&nbsp;&nbsp;<svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M572.6 270.3l-96 192C471.2 473.2 460.1 480 447.1 480H64c-35.35 0-64-28.66-64-64V96c0-35.34 28.65-64 64-64h117.5c16.97 0 33.25 6.742 45.26 18.75L275.9 96H416c35.35 0 64 28.66 64 64v32h-48V160c0-8.824-7.178-16-16-16H256L192.8 84.69C189.8 81.66 185.8 80 181.5 80H64C55.18 80 48 87.18 48 96v288l71.16-142.3C124.6 230.8 135.7 224 147.8 224h396.2C567.7 224 583.2 249 572.6 270.3z"/></svg></th>
+                <th scope="col" style="width: 80px;">Descargar</th>
+
+                <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
+                  <th scope="col" style="width: 80px;">Copiar</th>
+                  <th scope="col" style="width: 80px;">Mover</th>
+
+                  <ng-container *ngIf="mover == true || copiar == true">
+                    <th scope="col" style="width: 80px;" class="cursor" class="cursor" (click)="pegarArchivoCarpeta()">Pegar</th>
+                    <th scope="col" style="width: 80px;" class="cursor" class="cursor" (click)="cancelarPegadoArchivoCarpeta()">Cancelar</th>
+                  </ng-container >
+
+                  <th scope="col" style="width: 80px;">Eliminar</th>
+                </ng-container>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let archivos of ArrayArchivos let i = index">
+
+                <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
+                  <td><svg xmlns="http://www.w3.org/2000/svg" style="width: 12px;" viewBox="0 0 384 512"><path d="M365.3 93.38l-74.63-74.64C278.6 6.742 262.3 0 245.4 0L64-.0001c-35.35 0-64 28.65-64 64l.0065 384c0 35.34 28.65 64 64 64H320c35.2 0 64-28.8 64-64V138.6C384 121.7 377.3 105.4 365.3 93.38zM336 448c0 8.836-7.164 16-16 16H64.02c-8.838 0-16-7.164-16-16L48 64.13c0-8.836 7.164-16 16-16h160L224 128c0 17.67 14.33 32 32 32h79.1V448zM96 280C96 293.3 106.8 304 120 304h144C277.3 304 288 293.3 288 280S277.3 256 264 256h-144C106.8 256 96 266.8 96 280zM264 352h-144C106.8 352 96 362.8 96 376s10.75 24 24 24h144c13.25 0 24-10.75 24-24S277.3 352 264 352z"/></svg>&nbsp;&nbsp;&nbsp;{{archivos.nombre}}</td>
+                  <td title="Descargar Archivo" class="cursor" (click)="descargarArchivos(archivos.nombre)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" style="width: 15px;" viewBox="0 0 384 512"><path d="M384 128h-128V0L384 128zM256 160H384v304c0 26.51-21.49 48-48 48h-288C21.49 512 0 490.5 0 464v-416C0 21.49 21.49 0 48 0H224l.0039 128C224 145.7 238.3 160 256 160zM255 295L216 334.1V232c0-13.25-10.75-24-24-24S168 218.8 168 232v102.1L128.1 295C124.3 290.3 118.2 288 112 288S99.72 290.3 95.03 295c-9.375 9.375-9.375 24.56 0 33.94l80 80c9.375 9.375 24.56 9.375 33.94 0l80-80c9.375-9.375 9.375-24.56 0-33.94S264.4 285.7 255 295z"/></svg></td>
+                </ng-container>
+
+                <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
+                  <td class="cursor" (click)="abrirCarpeta(archivos.nombre)"><svg xmlns="http://www.w3.org/2000/svg" style="width: 15px;" viewBox="0 0 512 512"><path d="M448 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C512 124.7 483.3 96 448 96zM64 80h117.5c4.273 0 8.293 1.664 11.31 4.688L256 144h192c8.822 0 16 7.176 16 16v32h-416V96C48 87.18 55.18 80 64 80zM448 432H64c-8.822 0-16-7.176-16-16V240h416V416C464 424.8 456.8 432 448 432z"/></svg> &nbsp;&nbsp;&nbsp;{{archivos.nombre}}</td>
+                  <td></td>
+                </ng-container>
+
+                <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
                   <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
-                    <td><svg xmlns="http://www.w3.org/2000/svg" style="width: 12px;" viewBox="0 0 384 512"><path d="M365.3 93.38l-74.63-74.64C278.6 6.742 262.3 0 245.4 0L64-.0001c-35.35 0-64 28.65-64 64l.0065 384c0 35.34 28.65 64 64 64H320c35.2 0 64-28.8 64-64V138.6C384 121.7 377.3 105.4 365.3 93.38zM336 448c0 8.836-7.164 16-16 16H64.02c-8.838 0-16-7.164-16-16L48 64.13c0-8.836 7.164-16 16-16h160L224 128c0 17.67 14.33 32 32 32h79.1V448zM96 280C96 293.3 106.8 304 120 304h144C277.3 304 288 293.3 288 280S277.3 256 264 256h-144C106.8 256 96 266.8 96 280zM264 352h-144C106.8 352 96 362.8 96 376s10.75 24 24 24h144c13.25 0 24-10.75 24-24S277.3 352 264 352z"/></svg>&nbsp;&nbsp;&nbsp;{{archivos.nombre}}</td>
-                    <td title="Descargar Archivo" class="cursor" (click)="descargarArchivos(archivos.nombre)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" style="width: 15px;" viewBox="0 0 384 512"><path d="M384 128h-128V0L384 128zM256 160H384v304c0 26.51-21.49 48-48 48h-288C21.49 512 0 490.5 0 464v-416C0 21.49 21.49 0 48 0H224l.0039 128C224 145.7 238.3 160 256 160zM255 295L216 334.1V232c0-13.25-10.75-24-24-24S168 218.8 168 232v102.1L128.1 295C124.3 290.3 118.2 288 112 288S99.72 290.3 95.03 295c-9.375 9.375-9.375 24.56 0 33.94l80 80c9.375 9.375 24.56 9.375 33.94 0l80-80c9.375-9.375 9.375-24.56 0-33.94S264.4 285.7 255 295z"/></svg></td>
+                    <td title="Copiar Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 1)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></td>
+                    <td title="Mover Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 1)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M447.1 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H63.1c-35.35 0-64 28.66-64 64v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C511.1 124.7 483.3 96 447.1 96zM463.1 416c0 8.824-7.178 16-16 16h-384c-8.822 0-16-7.176-16-16V96c0-8.824 7.178-16 16-16h117.5c4.273 0 8.293 1.664 11.31 4.688L255.1 144h192c8.822 0 16 7.176 16 16V416z"/></svg></td>
                   </ng-container>
 
                   <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
-                    <td class="cursor" (click)="abrirCarpeta(archivos.nombre)"><svg xmlns="http://www.w3.org/2000/svg" style="width: 15px;" viewBox="0 0 512 512"><path d="M448 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C512 124.7 483.3 96 448 96zM64 80h117.5c4.273 0 8.293 1.664 11.31 4.688L256 144h192c8.822 0 16 7.176 16 16v32h-416V96C48 87.18 55.18 80 64 80zM448 432H64c-8.822 0-16-7.176-16-16V240h416V416C464 424.8 456.8 432 448 432z"/></svg> &nbsp;&nbsp;&nbsp;{{archivos.nombre}}</td>
-                    <td></td>
+                    <td title="Copiar Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 2)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></td>
+                    <td title="Mover Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 2)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M447.1 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H63.1c-35.35 0-64 28.66-64 64v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C511.1 124.7 483.3 96 447.1 96zM463.1 416c0 8.824-7.178 16-16 16h-384c-8.822 0-16-7.176-16-16V96c0-8.824 7.178-16 16-16h117.5c4.273 0 8.293 1.664 11.31 4.688L255.1 144h192c8.822 0 16 7.176 16 16V416z"/></svg></td>
                   </ng-container>
 
-                  <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
-                    <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
-                      <td title="Copiar Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 1)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></td>
-                      <td title="Mover Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 1)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M447.1 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H63.1c-35.35 0-64 28.66-64 64v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C511.1 124.7 483.3 96 447.1 96zM463.1 416c0 8.824-7.178 16-16 16h-384c-8.822 0-16-7.176-16-16V96c0-8.824 7.178-16 16-16h117.5c4.273 0 8.293 1.664 11.31 4.688L255.1 144h192c8.822 0 16 7.176 16 16V416z"/></svg></td>
-                    </ng-container>
-
-                    <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
-                      <td title="Copiar Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(1, archivos.ruta, archivos.nombre, 2)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></td>
-                      <td title="Mover Archivo/Carpeta">&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="moverArchivoCarpeta(2, archivos.ruta, archivos.nombre, 2)" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M447.1 96h-172.1L226.7 50.75C214.7 38.74 198.5 32 181.5 32H63.1c-35.35 0-64 28.66-64 64v320c0 35.34 28.65 64 64 64h384c35.35 0 64-28.66 64-64V160C511.1 124.7 483.3 96 447.1 96zM463.1 416c0 8.824-7.178 16-16 16h-384c-8.822 0-16-7.176-16-16V96c0-8.824 7.178-16 16-16h117.5c4.273 0 8.293 1.664 11.31 4.688L255.1 144h192c8.822 0 16 7.176 16 16V416z"/></svg></td>
-                    </ng-container>
-
-                    <ng-container *ngIf="mover == true || copiar == true">
-                      <td><svg xmlns="http://www.w3.org/2000/svg" title="Pegar Archivo/Carpeta" class="cursor" (click)="pegarArchivoCarpeta()" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 198.6l-61.25-61.25C435.4 131.4 427.3 128 418.8 128H256C220.7 128 191.1 156.7 192 192l.0065 255.1C192 483.3 220.7 512 256 512h192c35.2 0 64-28.8 64-64l.0098-226.7C512 212.8 508.6 204.6 502.6 198.6zM464 448c0 8.836-7.164 16-16 16h-192c-8.838 0-16-7.164-16-16L240 192.1c0-8.836 7.164-16 16-16h128L384 224c0 17.67 14.33 32 32 32h48.01V448zM317.7 96C310.6 68.45 285.8 48 256 48H215.2C211.3 20.93 188.1 0 160 0C131.9 0 108.7 20.93 104.8 48H64c-35.35 0-64 28.65-64 64V384c0 35.34 28.65 64 64 64h96v-48H64c-8.836 0-16-7.164-16-16V112C48 103.2 55.18 96 64 96h16v16c0 17.67 14.33 32 32 32h61.35C190 115.4 220.6 96 256 96H317.7zM160 72c-8.822 0-16-7.176-16-16s7.178-16 16-16s16 7.176 16 16S168.8 72 160 72z"/></svg></td>
-                      <td title="Cancelar">&nbsp;&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="cancelarPegadoArchivoCarpeta()" style="width: 15px;" viewBox="0 0 512 512"><path d="M175 175C184.4 165.7 199.6 165.7 208.1 175L255.1 222.1L303 175C312.4 165.7 327.6 165.7 336.1 175C346.3 184.4 346.3 199.6 336.1 208.1L289.9 255.1L336.1 303C346.3 312.4 346.3 327.6 336.1 336.1C327.6 346.3 312.4 346.3 303 336.1L255.1 289.9L208.1 336.1C199.6 346.3 184.4 346.3 175 336.1C165.7 327.6 165.7 312.4 175 303L222.1 255.1L175 208.1C165.7 199.6 165.7 184.4 175 175V175zM512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48z"/></svg></td>
-                    </ng-container>
-
-                    <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
-                      <td title="Eliminar Archivo" class="cursor">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-trash center" (click)="eliminarArchivo(archivos.ruta, i)" aria-hidden="true"></i></td>
-                    </ng-container>
-
-                    <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
-                      <td title="Eliminar Carpeta" class="cursor">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-trash center" (click)="eliminarCarpetas(archivos.ruta, i)" aria-hidden="true"></i></td>
-                    </ng-container>
+                  <ng-container *ngIf="mover == true || copiar == true">
+                    <td><svg xmlns="http://www.w3.org/2000/svg" title="Pegar Archivo/Carpeta" class="cursor" (click)="pegarArchivoCarpeta()" style="width: 20px; height: 20px;" viewBox="0 0 512 512"><path d="M502.6 198.6l-61.25-61.25C435.4 131.4 427.3 128 418.8 128H256C220.7 128 191.1 156.7 192 192l.0065 255.1C192 483.3 220.7 512 256 512h192c35.2 0 64-28.8 64-64l.0098-226.7C512 212.8 508.6 204.6 502.6 198.6zM464 448c0 8.836-7.164 16-16 16h-192c-8.838 0-16-7.164-16-16L240 192.1c0-8.836 7.164-16 16-16h128L384 224c0 17.67 14.33 32 32 32h48.01V448zM317.7 96C310.6 68.45 285.8 48 256 48H215.2C211.3 20.93 188.1 0 160 0C131.9 0 108.7 20.93 104.8 48H64c-35.35 0-64 28.65-64 64V384c0 35.34 28.65 64 64 64h96v-48H64c-8.836 0-16-7.164-16-16V112C48 103.2 55.18 96 64 96h16v16c0 17.67 14.33 32 32 32h61.35C190 115.4 220.6 96 256 96H317.7zM160 72c-8.822 0-16-7.176-16-16s7.178-16 16-16s16 7.176 16 16S168.8 72 160 72z"/></svg></td>
+                    <td title="Cancelar">&nbsp;&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" class="cursor" (click)="cancelarPegadoArchivoCarpeta()" style="width: 15px;" viewBox="0 0 512 512"><path d="M175 175C184.4 165.7 199.6 165.7 208.1 175L255.1 222.1L303 175C312.4 165.7 327.6 165.7 336.1 175C346.3 184.4 346.3 199.6 336.1 208.1L289.9 255.1L336.1 303C346.3 312.4 346.3 327.6 336.1 336.1C327.6 346.3 312.4 346.3 303 336.1L255.1 289.9L208.1 336.1C199.6 346.3 184.4 346.3 175 336.1C165.7 327.6 165.7 312.4 175 303L222.1 255.1L175 208.1C165.7 199.6 165.7 184.4 175 175V175zM512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48z"/></svg></td>
                   </ng-container>
-                </tr>
-              </tbody>
-            </table>
 
-          </div>
+                  <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
+                    <td title="Eliminar Archivo" class="cursor">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-trash center" (click)="mostrarEleccion1(archivos.ruta, i, 'd-archivo')" aria-hidden="true"></i></td>
+                  </ng-container>
+
+                  <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
+                    <td title="Eliminar Carpeta" class="cursor">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-trash center" (click)="mostrarEleccion1(archivos.ruta, i, 'd-carpeta')" aria-hidden="true"></i></td>
+                  </ng-container>
+                </ng-container>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>-->
+  </p-card>
+
+  <!--Modal para crear categorias de archivos-->
+  <p-dialog header="Crear categorias" [(visible)]="modal" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+    <p class="m-3">
+      <app-CrearCategorias></app-CrearCategorias>
+    </p>
+</p-dialog>
+
+<p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-matPrima let-index>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button *ngIf="clave == 'd-archivo'" type="button" pButton (click)="eliminarArchivo(ruta, index)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="clave == 'd-carpeta'" type="button" pButton (click)="eliminarCarpetas(ruta, index)" icon="pi pi-check-square" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Modal de crear Categorias -->
-  <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel2">Crear Categoria</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!--Carga componente crear Proveedor-->
-          <app-CrearCategorias></app-CrearCategorias>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  </ng-template>
+</p-toast>
+
 
