@@ -8,7 +8,7 @@
   <ul>
     <!-- INICIO -->
     <li>
-      <a class="fw-normal" href="home" role="button">
+      <a href="home" role="button" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
         <i class="pi pi-home" style="margin-right: 3%;"></i>
         <b>Inicio</b>
       </a>
@@ -17,7 +17,7 @@
     <!-- Bodega de Extrusión -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" (click)="clickIcon9()" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" (click)="clickIcon9()" aria-controls="collapseExample">
           <ng-container *ngIf="subir9; then thenTemplate9; else elseTemplate9"></ng-container>
           <ng-template #thenTemplate9>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -30,7 +30,7 @@
         <div class="collapse" id="collapseExample9">
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Eliminar-rollos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Eliminar-rollos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-delete-left font-size-15" style="margin-right: 2%;"></i>
                 Eliminar Rollos
               </a>
@@ -38,7 +38,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/IngresoRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/IngresoRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
                 Ingreso de Rollos
               </a>
@@ -47,7 +47,7 @@
           <!-- Inventario Boddega Extrusion -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario Bodega Extrusión
               </a>
@@ -55,7 +55,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-th-large font-size-15" style="margin-right: 2%;"></i>
                 Bodega de Extrusión
               </a>
@@ -63,7 +63,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/AsignacionRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/AsignacionRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
                 Salida de Rollos
               </a>
@@ -79,7 +79,7 @@
     <!-- BOPP / BOPA / POLIESTER -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
           <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
           <ng-template #thenTemplate1>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -92,7 +92,7 @@
         <div class="collapse" id="collapseExample1">
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
                 Asignación
               </a>
@@ -100,7 +100,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
                 Entrada
               </a>
@@ -108,7 +108,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario de BOPP / BOPA / POLIESTER
               </a>
@@ -116,7 +116,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                 Movimientos BOPP
               </a>
@@ -132,7 +132,7 @@
     <!-- Despacho -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" (click)="clickIcon8()" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" (click)="clickIcon8()" aria-controls="collapseExample">
           <ng-container *ngIf="subir8; then thenTemplate8; else elseTemplate8"></ng-container>
           <ng-template #thenTemplate8>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -145,7 +145,7 @@
         <div class="collapse" id="collapseExample8">
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/ingresar-productos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/ingresar-productos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
                 Ingresar Rollos
               </a>
@@ -153,7 +153,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 ">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/asignacion-productos-facturas" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/asignacion-productos-facturas" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-wallet font-size-15" style="margin-right: 2%;"></i>
                 Facturar Rollos
               </a>
@@ -161,7 +161,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/factura-rollos-productos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/factura-rollos-productos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-truck font-size-15" style="margin-right: 2%;"></i>
                 Despachar Mercancia
               </a>
@@ -169,7 +169,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/devolucion-rollos-productos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/devolucion-rollos-productos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
                 Devolución de Rollos
               </a>
@@ -177,7 +177,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-truck font-size-15" style="margin-right: 2%;"></i>
                 Movimientos Despacho
               </a>
@@ -186,7 +186,7 @@
 
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
             <div class="mb-2 sangria">
-              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8_1" role="button" (click)="clickIcon8_1()" aria-expanded="false" aria-controls="collapseExample">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample8_1" role="button" (click)="clickIcon8_1()" aria-expanded="false" aria-controls="collapseExample">
                 <ng-container *ngIf="subir8_1; then thenTemplate8_1; else elseTemplate8_1"></ng-container>
                 <ng-template #thenTemplate8_1>
                   <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -199,7 +199,7 @@
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7">
                 <div class="collapse" id="collapseExample8_1">
                   <div class="mb-2 subSangria">
-                    <a class="fst-normal" data-bs-toggle="" href="/preingreso-extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/preingreso-extrusion" role="button" aria-expanded="false" aria-controls="">
                       <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
                       Extrusion
                     </a>
@@ -209,7 +209,7 @@
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
                 <div class="collapse" id="collapseExample8_1">
                   <div class="mb-2 subSangria">
-                    <a class="fst-normal" data-bs-toggle="" href="/preingreso-sellado" role="button" aria-expanded="false" aria-controls="">
+                    <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/preingreso-sellado" role="button" aria-expanded="false" aria-controls="">
                       <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
                       Sellado / Empaque
                     </a>
@@ -229,7 +229,7 @@
     <!-- DEPERDICIO -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample13" role="button" aria-expanded="false" (click)="clickIcon13()" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample13" role="button" aria-expanded="false" (click)="clickIcon13()" aria-controls="collapseExample">
           <ng-container *ngIf="subir13; then thenTemplate13; else elseTemplate13"></ng-container>
           <ng-template #thenTemplate13>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -241,13 +241,13 @@
         </a>
         <div class="collapse" id="collapseExample13">
           <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/desperdicio" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/desperdicio" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
               Ingresar Desperdicio
             </a>
           </div>
           <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/reporte-desperdicios" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-desperdicios" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
               Reporte Desperdicio
             </a>
@@ -259,7 +259,7 @@
     <!-- GESTOR DE ARCHIVOS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
           <ng-container *ngIf="subir2; then thenTemplate; else elseTemplate"></ng-container>
             <ng-template #thenTemplate>
               <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -271,7 +271,7 @@
         </a>
         <div class="collapse" id="collapseExample2">
             <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-folder font-size-15" style="margin-right: 2%;"></i>
               Archivos
             </a>
@@ -283,7 +283,7 @@
     <!-- MATERIAS PRIMAS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir3; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -295,32 +295,32 @@
         </a>
         <div class="collapse" id="collapseExample3">
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-            <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
               Asignación Materia Prima
             </a>
           </div>
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-            <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-plus-circle font-size-15" style="margin-right: 2%;"></i>
               Creación Tintas
             </a>
           </div>
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-            <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
               Devoluciones
             </a>
           </div>
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-            <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
               Entradas
             </a>
           </div>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario de Materia Prima
               </a>
@@ -328,7 +328,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
                 <ng-container *ngIf="subir7_1; then thenTemplate7_1; else elseTemplate7_1"></ng-container>
                 <ng-template #thenTemplate7_1>
                   <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -340,7 +340,7 @@
               </a>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+                  <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                     Movimientos MP
                   </a>
@@ -348,7 +348,7 @@
               </div>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
+                  <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                     Movimientos Recuperado
                   </a>
@@ -358,7 +358,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
                 Movimientos Ordenes de Compra
               </a>
@@ -366,14 +366,14 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/ocompra-materiaPrima" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/ocompra-materiaPrima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cart-plus font-size-15" style="margin-right: 2%;"></i>
                 Orden de Compra
               </a>
             </div>
           </ng-container>
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-            <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
               Recuperado
             </a>
@@ -388,7 +388,7 @@
     <!-- MANTENIMIENTOS Y PEDIDOS DE MANTENIMIENTOS -->
     <ng-container *ngIf="ValidarRol == 1">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample12" role="button" (click)="clickIcon12()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample12" role="button" (click)="clickIcon12()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir12; then thenTemplate12; else elseTemplate12"></ng-container>
           <ng-template #thenTemplate12>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -402,13 +402,13 @@
           <!-- Pedido de Mantenimiento -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/pedido-mantenimiento" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/pedido-mantenimiento" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-ticket font-size-15" style="margin-right: 2%;"></i>
                 Pedido de Mantenimiento
               </a>
             </div>
             <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/mantenimiento-activos" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/mantenimiento-activos" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-wrench font-size-15" style="margin-right: 2%;"></i>
               Mantenimiento
             </a>
@@ -416,7 +416,7 @@
           <!-- Inventario Activos -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario Activos
               </a>
@@ -430,7 +430,7 @@
     <!-- MOVIMIENTOS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" (click)="clickIcon10()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample10" role="button" (click)="clickIcon10()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir10; then thenTemplate10; else elseTemplate10"></ng-container>
           <ng-template #thenTemplate10>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -444,7 +444,7 @@
           <!-- Bodega de Extrusión -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-th-large font-size-15" style="margin-right: 2%;"></i>
                 Bodega de Extrusión
               </a>
@@ -454,7 +454,7 @@
           <!-- Entrada Materia Prima -->
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
                 Entradas de Materia Prima
               </a>
@@ -464,7 +464,7 @@
           <!-- Movimientos de Mantenimientos -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/movimientos-mantenimientos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimientos-mantenimientos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-wrench font-size-15" style="margin-right: 2%;"></i>
                 Movimientos Mantenimientos
               </a>
@@ -474,7 +474,7 @@
           <!-- Reporte de Despacho -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-truck font-size-15" style="margin-right: 2%;"></i>
                 Movimientos Despacho
               </a>
@@ -484,7 +484,7 @@
           <!-- Movimientos -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
                 <ng-container *ngIf="subir7_1; then thenTemplate7_1; else elseTemplate7_1"></ng-container>
                 <ng-template #thenTemplate7_1>
                   <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -496,7 +496,7 @@
               </a>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+                  <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                     Movimientos Materias Primas
                   </a>
@@ -504,7 +504,7 @@
               </div>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
+                  <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                     Movimientos Recuperado
                   </a>
@@ -516,7 +516,7 @@
           <!-- MOVIMIENTOS ORDENES DE COMPRA -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
                 Movimientos Ordenes de Compra
               </a>
@@ -526,7 +526,7 @@
           <!-- MOVIMINETOS MAQUILAS -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/Reporte-Maquilas" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Reporte-Maquilas" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
               Movimientos de Maquilas
             </a>
@@ -542,7 +542,7 @@
     <!-- ORDENES DE MAQUILAS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample14" role="button" (click)="clickIcon14()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample14" role="button" (click)="clickIcon14()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir14; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -555,7 +555,7 @@
         <div class="collapse" id="collapseExample14">
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-book font-size-15" style="margin-right: 2%;"></i>
                 Orden de Maquila
               </a>
@@ -563,7 +563,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Facturacion-Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Facturacion-Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-dollar font-size-15" style="margin-right: 2%;"></i>
                 Facturar Orden de Maquila
               </a>
@@ -571,7 +571,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Reporte-Maquilas" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Reporte-Maquilas" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                 Movimientos de Maquilas
               </a>
@@ -587,7 +587,7 @@
     <!-- ORDEN DE TRABAJO -->
     <ng-container *ngIf="ValidarRol == 1">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" (click)="clickIcon4()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample4" role="button" (click)="clickIcon4()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir4; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -600,7 +600,7 @@
         <div class="collapse" id="collapseExample4">
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/ordenes-trabajo" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/ordenes-trabajo" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
                 Crear OT
               </a>
@@ -616,7 +616,7 @@
     <!-- PEDIDOS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -628,14 +628,14 @@
         </a>
         <div class="collapse" id="collapseExample5">
           <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
-            <a class="fst-normal" href="/pedido-externo" role="button" aria-expanded="false">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" href="/pedido-externo" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Crear Pedido
             </a>
           </div>
 
           <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
-            <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Ver Pedidos
             </a>
@@ -650,7 +650,7 @@
     <!-- PRODUCTOS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -663,7 +663,7 @@
         <div class="collapse" id="collapseExample6">
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Producto Terminado (Zeus)
               </a>
@@ -671,7 +671,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/inventario-productos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/inventario-productos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Producto Terminado
               </a>
@@ -687,7 +687,7 @@
     <!-- REPORTES -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 60">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
           <ng-template #thenTemplate7>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -701,7 +701,7 @@
           <!-- Inventario Activos -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario Activos
               </a>
@@ -711,7 +711,7 @@
           <!-- Inventario Boddega Extrusion -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario Bodega Extrusión
               </a>
@@ -721,7 +721,7 @@
           <!-- Inventario Materia Prima -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario de Materia Prima
               </a>
@@ -731,7 +731,7 @@
           <!-- Reporte de Costos -->
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-calculator font-size-15" style="margin-right: 2%;"></i>
                 Reportes de Costos
               </a>
@@ -741,7 +741,7 @@
           <!-- Reporte consolidado de facturación -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/rpt-facturacion-zeus" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/rpt-facturacion-zeus" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-dollar font-size-15" style="margin-right: 2%;"></i>
                 Consolidado Facturación
               </a>
@@ -751,7 +751,7 @@
           <!-- Reporte consolidado de facturación 2 -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Reporte-Facturacion" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Reporte-Facturacion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-wallet font-size-15" style="margin-right: 2%;"></i>
                 Consolidado Facturación 2
               </a>
@@ -761,7 +761,7 @@
           <!-- Reporte de Procesos de Ordenes de trabajo -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sliders-h font-size-15" style="margin-right: 2%"></i>
                 Reporte Procesos OT
               </a>
@@ -771,7 +771,7 @@
           <!-- Reporte de rollos eliminados -->
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-rollos-eliminados" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-rollos-eliminados" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-trash font-size-15" style="margin-right: 2%;"></i>
                 Reporte Rollos Eliminados
               </a>
@@ -787,7 +787,7 @@
     <!-- TICKETS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 10 || ValidarRol == 11 || ValidarRol == 12 || ValidarRol == 13 || ValidarRol == 59 || ValidarRol == 60">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample16" role="button" (click)="clickIcon16()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample16" role="button" (click)="clickIcon16()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir16; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -799,14 +799,14 @@
         </a>
         <div class="collapse" id="collapseExample16">
           <div class="mb-2 sangria">
-            <a class="fst-normal" data-bs-toggle="" href="/Tickets" role="button" aria-expanded="false" aria-controls="">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Tickets" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-ticket font-size-15" style="margin-right: 2%;"></i>
               Creación de Tickets
             </a>
           </div>
           <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/Gestion-Tickets" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Gestion-Tickets" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-wrench font-size-15" style="margin-right: 2%;"></i>
                 Gestionar Tickets
               </a>
@@ -820,7 +820,7 @@
     <!-- USUARIOS -->
     <ng-container *ngIf="ValidarRol == 1">
       <li>
-        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample11" role="button" (click)="clickIcon11()" aria-expanded="false" aria-controls="collapseExample">
+        <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample11" role="button" (click)="clickIcon11()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir11; then thenTemplate; else elseTemplate"></ng-container>
           <ng-template #thenTemplate>
             <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
@@ -833,7 +833,7 @@
         <div class="collapse" id="collapseExample11">
           <ng-container *ngIf="ValidarRol == 1">
               <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/registro-usuario" role="button" aria-expanded="false" aria-controls="">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/registro-usuario" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-users font-size-15" style="margin-right: 2%;"></i>
                 Usuarios
               </a>

@@ -61,8 +61,10 @@
   border-bottom: 1px dashed #ddd;
   margin: 40px 0;
 }
-
-
+/*
+ul li a {
+  color: #FFF;
+} */
 
 ul li a:hover{
   color: #db4149;
