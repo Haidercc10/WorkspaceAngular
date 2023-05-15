@@ -162,7 +162,7 @@ export class ArchivosComponent implements OnInit {
       this.mostrarConfirmacion(`Confirmación`, `Archivo guardado exitosamente!`);
       this.cargarArchivos(filePath);
       this.mostrarCarpetas(filePath);
-    });
+    }, error => console.log(error));
   }
 
   //Funcion que regresará de una en una todas las carpetas abiertas
@@ -227,12 +227,14 @@ export class ArchivosComponent implements OnInit {
 
   // Funcion que permitirá eliminar un archivo
   eliminarArchivo(ruta : string, index : any){
-
     ruta = this.rutaSeleccionada;
     index = this.fileSeleccionado;
     this.onReject();
     this.archivosService.eliminarArchivos(ruta).subscribe(datos_archivos => {
-      this.ArrayArchivos.splice(index, 1);
+     for (let i = 0; i < this.ArrayArchivos.length; i++) {
+      if(this.ArrayArchivos[i].nombre == index.nombre)
+      this.ArrayArchivos.splice(i, 1);
+     }
       this.mostrarConfirmacion(`Confirmación`, `Archivo eliminado con éxito!`);
     }, error => { this.mostrarError(`Error`, `No fue posible eliminar el archivo`);
     });
@@ -245,7 +247,10 @@ export class ArchivosComponent implements OnInit {
     index = this.fileSeleccionado;
     this.onReject();
     this.archivosService.eliminarCarpetas(ruta).subscribe(datos_archivos => {
-      this.ArrayArchivos.splice(index, 1);
+      for (let i = 0; i < this.ArrayArchivos.length; i++) {
+        if(this.ArrayArchivos[i].nombre == index.nombre)
+        this.ArrayArchivos.splice(i, 1);
+       }
       this.mostrarConfirmacion(`Confirmación`, `Carpeta eliminada con éxito!`);
     }, error => { this.mostrarError(`Error`, `No fue posible eliminar la carpeta`);
     });
