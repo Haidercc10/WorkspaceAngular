@@ -614,7 +614,7 @@
     </ng-container>
 
     <!-- PEDIDOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 60 || ValidarRol == 61">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
@@ -627,20 +627,14 @@
           <b>Pedidos</b>
         </a>
         <div class="collapse" id="collapseExample5">
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
             <a class="fst-normal" href="/pedido-externo" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Crear Pedido
             </a>
           </div>
-            <!-- <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
-            <a class="fst-normal" href="/reporte-pedidos-vendedores" role="button" aria-expanded="false">
-              <i class="pi pi-eye" style="margin-right: 2%;"></i>
-              Ver Pedidos
-            </a>
-          </div> -->
 
-          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 60 || ValidarRol == 61">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
             <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Ver Pedidos
@@ -654,7 +648,7 @@
     </ng-container>
 
     <!-- PRODUCTOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 60 || ValidarRol == 61">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
@@ -667,7 +661,7 @@
           <b>Productos</b>
         </a>
         <div class="collapse" id="collapseExample6">
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 60 || ValidarRol == 61">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 10 || ValidarRol == 60 || ValidarRol == 61">
               <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
