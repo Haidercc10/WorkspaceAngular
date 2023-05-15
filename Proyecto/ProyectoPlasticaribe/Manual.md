@@ -9,15 +9,19 @@ Tenemos 2 opciones para ingresar:
 + Iniciando Sesión con nuestro usuario y contraseña
 - Como invitados.
 
-## Gestión de Archivos
-Si iniciamos como invitados se nos direccionará a una apartado donde podemos ver los archivos de una carpeta alojada en el servidor llamada "Calidad", aquá podremos subir, descargar y eliminar archivos de la carpeta, tambien podemos crear subcarpetas, copiar, mover y pegar carpetas y archivs. ![Gestion de archivos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Gestion%20de%20Archivos.jpg)
+### Modo Invitado.
+Si iniciamos como invitados se nos direccionará a una apartado donde podemos ver los archivos de una carpeta alojada en el servidor llamada "Calidad", aquí podremos subir, descargar y eliminar archivos de la carpeta, tambien podemos crear subcarpetas, copiar, mover y pegar carpetas y archivs, este modulo se explica a profundidad más adelante en el modulo [Gestor de Archivos.](#gestión-de-archivos). ![Gestion de archivos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Gestion%20de%20Archivos.jpg)
 
-## Dashboard
-Al iniciar sesión con nuestras credenciales se nos redirecciona al dashboard donde dependiendo del rol que tengamos veremos o no cierta información.
+### Inicio de sesión con credenciales de usuario.
+Al iniciar sesión con nuestras credenciales se nos redirecciona al [Dashboard](#dashboard) donde dependiendo del rol que tengamos veremos o no cierta información.
 
-1. Ordenes de Trabajo
-   - Cantidades producidas por cada uno de los procesos en el mes.
-   - Estados de las ordenes de trabajo del mes.
+## `Dashboard`
+En el dashboard se manejan 5 tabs, los cuales se dividen por la información que se maneja.
+1. Ordenes de Trabajo: En este primer tab podemos ver información sobre las ordenes de trabajo que se han creado a lo largo del mes.
+   - Cantidades producidas por cada uno de los procesos (extrusión, impresión, rotograbado, etc...) en el mes.
+   - Estados de las ordenes de trabajo del mes. En esta card adicionalmente podemos tener acceso al [Reporte Procesos OT](#reportes) (Reporte número 7) presionando el botón con la lupa, el reporte saldrá con la información de las ordenes de trabajo con el estado del botón presionado.
+
+   ![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/BotonProcesosOT.png)
    - Cantidad de ordenes de trabajo creadas en total y por material.
    - Clientes con más compras realizadas en el mes.
    - Productos más comprados en el mes.
@@ -30,7 +34,8 @@ Al iniciar sesión con nuestras credenciales se nos redirecciona al dashboard do
    - Iva ventas del mes.
    - Total ventas del mes.
    - Ventas del día.
-   - Grafica de ventas del año organizadas por mes, con opción de elegir el año a graficar.
+   - Grafica de ventas del año organizadas por mes, con opción de elegir el año a graficar. Presionando el dropdown y cambiando del año podemos graficar el año que deseemos.
+   ![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/BotonFacturacionAnio.png)
 3. Materias Primas
    - Materias primas más usadas en el mes actual.
    - Mat. Prima Asignada vs Extruida.
@@ -47,17 +52,25 @@ Al iniciar sesión con nuestras credenciales se nos redirecciona al dashboard do
    - Productos con más pedidos vigentes.
    - Vendedores con más pedidos vigentes.
 5. Facturación Vendedores
-   - Se podrá graficar las ventas de cada vendedor en los años escogidos, esto con el fin de hacer comparativas de ventas año a año y mes a mes.
+   - Facturación de vendodres por año. Para ver la facturación de cada vendedor debemos escoger el año que deseamos graficar, el vendedor y presionar el botoón rojo, si deseamos agregar otro vendedor o otro año debemos seguir los pasos anteriores. Si lo que deseamos es limpiar la grafica por 'x' motivo debemos presionar el botón gris.
 
-- Un usuario con rol de `Administrador` o `Director Comercial` tendrá acceso a todo en el dashboard.
-* Un usuario con rol de `Presidencia` tendrá acceso a los `Pedidos` del dashboard.
-+ Un usuario con rol de `Vendedor` tendrá acceso a `Facturación Vendedores` en el dashboard.
-- Un usuario con rol de `Operario Materia Prima` tendrá acceso a `Materias Primas` en el dashboard.
+   ![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/BotonFacturacionVendedor.png)
 
-![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard.jpg)
+Nota: Algunas de las cards que contienen información tienen un botón rojo el parte inferior, este botón es para graficar la información que se está mostrando.
+
+![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/BotonGraficar.png)
+
+Estos son los roles de los usuarios que podrán ver al información el dashboard.
+- Ordenes de Trabajo: `Administrador`, `Director Comercial`.
+* Facturación: `Administrador`.
++ Materias Primas: `Administrador`, `Director Comercial`, `Operario Materia Prima`.
+- Pedidos: `Administrador`, `Director Comercial`, `Presidencia`.
++ Facturación Vendedores: `Administrador`, `Director Comercial`, `Vendedor`.
+
+![Dahboard](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/Dashboard.jpg)
 
 El resto de roles verán lo siguiente:
-![Dahboard2](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard2.jpg)
+![Dahboard2](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Dashboard/Dashboard2.jpg)
 
 # Roles
 | Codigo | Nombre                  | Descripción |
@@ -80,26 +93,27 @@ El resto de roles verán lo siguiente:
 | 61     | Presidencia	           | Persona del área de presidencia |
 
 # Modulos de la Aplicación
-1. [Bodega Extrusión.](#bodega-extrusión)
-2. [BOPP / BOPA / Poliester.](#bopp--bopa--poliester)
-3. [Despacho.](#despacho)
-4. [Desperdicio.](#desperdicio)
-5. [Gestor de Archivos.](#gestión-de-archivos)
-6. [Materia Prima.](#materia-prima)
-7. [Mantenimiento de Activos.](#matenimiento-de-activos)
-8. [Movimientos.](#movimientos)
-9. [Maquilas.](#maquilas)
-10. [Orden de Trabajo.](#orden-de-trabajo)
-11. [Pedidos.](#pedidos)
-12. [Productos.](#productos)
-13. [Reportes.](#reportes)
-14. [Tickets.](#tickets)
-15. [Usuarios.](#usuarios)
+1. [Dasboard.](#dashboard)
+2. [Bodega Extrusión.](#bodega-extrusión)
+3. [BOPP / BOPA / Poliester.](#bopp--bopa--poliester)
+4. [Despacho.](#despacho)
+5. [Desperdicio.](#desperdicio)
+6. [Gestor de Archivos.](#gestión-de-archivos)
+7. [Materia Prima.](#materia-prima)
+8. [Mantenimiento de Activos.](#matenimiento-de-activos)
+9. [Movimientos.](#movimientos)
+10. [Maquilas.](#maquilas)
+11. [Orden de Trabajo.](#orden-de-trabajo)
+12. [Pedidos.](#pedidos)
+13. [Productos.](#productos)
+14. [Reportes.](#reportes)
+15. [Tickets.](#tickets)
+16. [Usuarios.](#usuarios)
 
 ## `Bodega Extrusión`
 En este módulo tenemos diferentes acciones que son: 
-1. Elimiar Rollos: Esto nos permite eleminar rollos que fueron pesados en el sistema bagPro o rollos que fueron ingresados a la bodega de extrusión. Para eliminar rollos podemos consultar por diferentes filtros que son OT, Rollo, Procesos, Bodega Fechas.
-Tenemos que elegir obligatoriamente una bodega. Una vez se consulte la información se cargarán todos los rollos dentro de los filtros consultados en la primera tabla, los podemos elegir y se cargarán en la segunda tabla, por último en la tercer tabla se cargarán de manera consolidad por productos los rollos que se escogieron. Presionamos el botón de 'Eliminar Rollos' y nos mandará un mensaje de confirmación.
+1. Elimiar Rollos: Esto nos permite eleminar rollos que fueron pesados en el sistema bagPro, rollos ingresados a despacho o rollos que fueron ingresados a la bodega de extrusión. Para eliminar rollos podemos consultar por diferentes filtros que son OT, Rollo, Procesos, Bodega Fechas.
+Tenemos que elegir obligatoriamente la bodega de la cual se va a eliminar el rollo. Una vez se consulte la información se cargarán todos los rollos dentro de los filtros consultados en la primera tabla, los podemos elegir y se cargarán en la segunda tabla, por último en la tercer tabla se cargarán de manera consolidad por productos los rollos que se escogieron. Presionamos el botón de 'Eliminar Rollos' y nos mandará un mensaje de confirmación.
 ![Elminar Rollos](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Bodega%20Extrusion/EliminarRollos.jpg)
 
 2. Ingreso de Rollos: Desde aquí podemos ingresar rollos a la bodega de extrusión, rollos que ya han sido pesados en BagPro. Para hacer esto debemos seguir los siguientes pasos:
@@ -227,6 +241,9 @@ En el módulo se podrán ingresar los desperdicios generados por orden de trabaj
 2. Reporte de Desperdicios: Aquí se puede consultar los desperdicios que se han ingresado. 
 
 ![Desperdicio](/Proyecto/ProyectoPlasticaribe/src/assets/Manual%20App/Desperdicio/Reporte.jpg)
+
+## `Gestión de Archivos`
+Desde este m
 
 ## `Materia Prima`
 En este módulo se podrán realizar movmientos de materia prima como asignaciones, entradas, creaciones, devoluciones, etc..

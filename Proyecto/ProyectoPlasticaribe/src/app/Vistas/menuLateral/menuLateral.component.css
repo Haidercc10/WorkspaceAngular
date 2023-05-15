@@ -7,10 +7,6 @@
   user-select: none;
 }
 
-p-sidebar {
-  max-width: 32rem;
-}
-
 .imagen{
   display: flex;
   margin-left: 5%;
@@ -328,7 +324,7 @@ input:checked + .colorMode svg.moon {
 }
 
 .escalabilidad .iconos {
-  display: flex;
+  display: inline-flex;
   align-items: center;
 }
 

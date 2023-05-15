@@ -34,7 +34,6 @@ export class VistasFavoritasComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    console.log(this.storage_Id)
     if (this.storage_Id.toString() != '') {
       this.llenarDatosSeleccionables();
       this.buscarFavoritos();

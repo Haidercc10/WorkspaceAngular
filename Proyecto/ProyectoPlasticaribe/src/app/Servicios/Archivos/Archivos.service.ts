@@ -12,8 +12,8 @@ export class ArchivosService {
   constructor(private http : HttpClient) { }
 
   //Funcion que guardará los archivos que se deseen
-  srvGuardar(data : FormData, fecha : any, categoria_Id : any, usuario : any, filePath : any): Observable<any> {
-    return this.http.post(rutaPlasticaribeAPI + `/Archivos/Archivos?Fecha=${fecha}&categoria_Id=${categoria_Id}&usua_Id=${usuario}&filePath=${filePath}`, data);
+  srvGuardar(data : any, fecha : any, categoria_Id : any, usuario : any, filePath : any): Observable<any> {
+    return this.http.post(rutaPlasticaribeAPI + `/Archivos?Fecha=${fecha}&categoria_Id=${categoria_Id}&usua_Id=${usuario}&filePath=${filePath}`, data);
   }
 
   // Funcion que creará carpetas

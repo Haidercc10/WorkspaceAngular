@@ -56,6 +56,7 @@ export class DashboardOTComponent implements OnInit {
   graficaPieOptions : any; //Variable que almacenará la información de los estilos que tendrá la grafica de pie
   nroCard : string = '';  /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
   modoSeleccionado : boolean
+  tutorial : boolean = true;
 
   constructor(private AppComponent : AppComponent,
     private bagProService : BagproService,
@@ -74,6 +75,10 @@ export class DashboardOTComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+    // this.tutorial = this.AppComponent.tutorial;
+    if (this.tutorial) {
+      setTimeout(() => document.getElementById('ordenTrabajo1').className = 'objetoSobresaliente', 500);
+    }
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards

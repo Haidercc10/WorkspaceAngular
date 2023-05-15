@@ -1,5 +1,5 @@
 <!-- Menú Principal -->
-<p-sidebar [(visible)]="display" id="sidebar">
+<p-sidebar [(visible)]="display" id="sidebar" [style]="{width : '32rem'}">
   <div class="imagen">
     <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
     <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
@@ -854,18 +854,18 @@
 </p-sidebar>
 
 <!-- Mesnú de Configuraciones -->
-<p-sidebar [(visible)]="menuConfiguracion" position="right">
+<p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{width : '32rem'}">
   <div class="escalabilidad">
     <div class="mb-2">
       <h4>Tamaño de Letra</h4>
       <div class="iconos">
-        <i class="pi pi-minus font-size-20" (click)="disminuirLetra()"></i>
+        <p-button icon="pi pi-minus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="disminuirLetra()"></p-button>
         <i class="pi pi-circle font-size-16" id="iconoTanamoLetra1"></i>
         <i class="pi pi-circle font-size-16" id="iconoTanamoLetra2"></i>
         <i class="pi pi-circle font-size-16" id="iconoTanamoLetra3"></i>
         <i class="pi pi-circle font-size-16" id="iconoTanamoLetra4"></i>
         <i class="pi pi-circle font-size-16" id="iconoTanamoLetra5"></i>
-        <i class="pi pi-plus font-size-20" (click)="aumentarLetra()"></i>
+        <p-button icon="pi pi-plus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="aumentarLetra()"></p-button>
       </div>
     </div>
   </div>

@@ -1,16 +1,13 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { File } from 'buffer';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AppComponent } from 'src/app/app.component';
+import { MessageService } from 'primeng/api';
 import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
 import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
-import { MessageService } from 'primeng/api';
-import { File } from 'buffer';
 
 @Component({
   selector: 'app-Archivos',
@@ -28,7 +25,7 @@ export class ArchivosComponent implements OnInit {
   ArrayArchivos : any [] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos : any [] = []; //Variable para almacenar las categorias de archivos que hay
   selectedFile: any;
-  nombreCarpeta : string = 'D:\\Calidad3'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
+  nombreCarpeta : string = 'D:\\Calidad'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
   ruta : string; //Variable que almacenará el nombre de las carpetas que se estan vistando
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
@@ -106,7 +103,7 @@ export class ArchivosComponent implements OnInit {
   mostrarCarpetas(ruta : string = this.AppComponent.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.nombreCarpeta = ruta;
-    this.ruta = ruta.replace(`D:\\Calidad3`, 'Calidad3');
+    this.ruta = ruta.replace(`D:\\Calidad`, 'Calidad');
     this.archivosService.mostrarCarpetas(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
         let nombreArchivos : string = datos_archivos[i].replace(`${ruta}`,'');
@@ -135,7 +132,7 @@ export class ArchivosComponent implements OnInit {
       else {
         this.nombreCarpeta = `${this.nombreCarpeta}\\${nombreCarpeta}`
         let ruta : string = this.nombreCarpeta;
-        this.ruta = ruta.replace(`D:\\Calidad3\\`, '');
+        this.ruta = ruta.replace(`D:\\Calidad\\`, '');
         this.archivosService.crearCarpetas(ruta).subscribe(datos_archivo => {
           this.mostrarConfirmacion(`Confirmación`, `La carpeta ha sido creada exitosamente!`);
           this.cargarArchivos(this.nombreCarpeta);
@@ -147,32 +144,34 @@ export class ArchivosComponent implements OnInit {
   }
 
   // Funcion que toma el archivo que se subió
-  onSelectFile(event: any) {
-    this.selectedFile = <File>event.currentFiles;
-    console.log(this.selectedFile)
-  }
+  onSelectFile = (event: any) => this.selectedFile = <File>event.currentFiles;
 
   //Funcion que y le pasará el archivo que se cargó y llamará a la funcion que enviará la informacion al servidor para guardar el archivo en su disco local y guardar la informacion en la base de datos
-  subirArchivos(){
+  async subirArchivos(){
     let categoria = this.formularioArchivo.value.CategoriaArchivos;
     let filePath : string = this.nombreCarpeta;
-    const formData = new FormData();
-    formData.append('archivo', this.selectedFile);
-    this.archivosService.srvGuardar(formData, this.today, categoria, this.storage_Id, filePath).subscribe(datos_archivo => {
-      this.mostrarConfirmacion(`Confirmación`, `Archivo guardado exitosamente!`);
-      this.cargarArchivos(filePath);
-      this.mostrarCarpetas(filePath);
-    });
+    for (let i = 0; i < this.selectedFile.length; i++) {
+      const formData = new FormData();
+      formData.append('archivo', this.selectedFile[i]);
+      try {
+        const data = await this.archivosService.srvGuardar(formData, this.today, categoria, this.storage_Id, filePath).toPromise();
+        this.cargarArchivos(filePath);
+        this.mostrarCarpetas(filePath);
+        this.mostrarConfirmacion(`¡Se ha subido un archivo correcatamente!`);
+      } catch (error) {
+        this.mostrarError(`¡Ha ocurrido un error al intentar subir el archivo!`);
+      }
+    }
   }
 
   //Funcion que regresará de una en una todas las carpetas abiertas
   regresarCarpetaAnterior(){
     let ultimaRuta : any = `${this.nombreCarpeta.lastIndexOf("\\")}`;
     this.nombreCarpeta = this.nombreCarpeta.substring(0, ultimaRuta);
-    if (this.nombreCarpeta != "D:\\Calidad3\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "D:\\" && this.nombreCarpeta != "D:" && this.nombreCarpeta != "D") {
+    if (this.nombreCarpeta != "D:\\Calidad\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "D:\\" && this.nombreCarpeta != "D:" && this.nombreCarpeta != "D") {
       this.cargarArchivos(this.nombreCarpeta);
       this.mostrarCarpetas(this.nombreCarpeta);
-    } else this.nombreCarpeta = "D:\\Calidad3\\";
+    } else this.nombreCarpeta = "D:\\Calidad\\";
   }
 
   // Funcion que servirá para abrir carpetas
@@ -363,17 +362,17 @@ export class ArchivosComponent implements OnInit {
 
   /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
-    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+    this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life: 2000});
   }
 
    /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
-    this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
+    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
   }
 
    /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
-    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+    this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life: 2000});
   }
 
 }
