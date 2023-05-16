@@ -3,6 +3,7 @@ import Step from 'shepherd.js/src/types/step';
 export const builtInButtons = {
   cancel: {
     classes: 'p-button p-button-secondary mr-2',
+    text:  `<i class="pi pi-times mr-2"></i> <b> Cerrar</b>`,
     type: 'cancel',
   },
   next: {
@@ -69,7 +70,7 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'asig-matprima',
     title: '<h5 class="tituloRojo" style="margin: auto;">Elegir Materias Primas</h5>',
-    text: `Aquí debes <b>elegir la materia prima que asignarás para la creación de la tinta</b> elegida inicialmente y luego hacer clic sobre el <b>botón Agregar Materia Prima.</b><br><br>
+    text: `Aquí debes <b>elegir las materias primas que asignarás para la creación de la tinta</b> elegida inicialmente y luego hacer clic sobre el <b>botón Agregar Materia Prima.</b><br><br>
     Además puedes <b>limpiar los campos</b> si elegiste una materia prima erroneamente.`
   },
   {
@@ -92,8 +93,7 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.back
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'botones',
