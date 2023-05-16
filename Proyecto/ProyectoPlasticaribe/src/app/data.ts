@@ -2,22 +2,24 @@ import Step from 'shepherd.js/src/types/step';
 
 export const builtInButtons = {
   cancel: {
-    secondary: true,
-    text: 'Exit',
-    type: 'cancel'
+    classes: 'p-button p-button-rounded p-button-danger pi pi-times mr-2',
+    type: 'cancel',
+
   },
   next: {
+    classes: 'p-button-rounded p-button-danger',
     text: 'Next',
     type: 'next'
   },
   back: {
-    secondary: true,
+    classes: 'p-button-rounded p-button-danger',
     text: 'Back',
-    type: 'back'
+    class: '.p-button-danger'
   }
 };
 
 export const defaultStepOptions: Step.StepOptions = {
+  classes: '',
   scrollTo: true,
   cancelIcon: {
     enabled: true
@@ -27,16 +29,19 @@ export const defaultStepOptions: Step.StepOptions = {
 export const steps: Step.StepOptions[] = [
   {
     attachTo: {
-      element: '.first-element',
-      on: 'bottom-start'
+      element: '#intro',
+      on: 'bottom-end'
     },
     buttons: [
       builtInButtons.cancel,
-      builtInButtons.next
+      builtInButtons.next,
     ],
+    classes: 'card',
     id: 'intro',
-    title: 'Welcome to Angular Shepherd!',
-    text:``
+    title: 'Creación de Materias Primas! ',
+    text: `<p>
+            Aquí encontrarás 2 botones para realizar <br> la creación de tintas y materias primas!
+          </p>`
   },
   {
     attachTo: {
@@ -48,6 +53,7 @@ export const steps: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    classes: 'custom-class-name-1 custom-class-name-2',
     id: 'installation',
     title: 'Installation',
     text: 'Installation is simple, if you are using Ember-CLI, just install like any other addon.'
@@ -62,6 +68,7 @@ export const steps: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    classes: 'custom-class-name-1 custom-class-name-2',
     id: 'usage',
     title: 'Usage',
     text: 'To use the tour service, simply inject it into your application and use it like this example.'
@@ -76,12 +83,12 @@ export const steps: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    classes: 'custom-class-name-1 custom-class-name-2',
     id: 'modal',
     text: `
         <p>
           We implemented true modal functionality by disabling clicking of the rest of the page.
         </p>
-
         <p>
           If you would like to enable modal, simply do this.get('tour').set('modal', true).
         </p>`
@@ -96,6 +103,7 @@ export const steps: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    classes: 'custom-class-name-1 custom-class-name-2',
     id: 'buttons',
     text: `For the common button types ("next", "back", "cancel", etc.), we implemented Ember actions
           that perform these actions on your tour automatically. To use them, simply include
