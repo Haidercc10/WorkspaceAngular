@@ -70,8 +70,23 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'asig-matprima',
     title: '<h5 class="tituloRojo" style="margin: auto;">Elegir Materias Primas</h5>',
-    text: `Aquí debes <b>elegir las materias primas que asignarás para la creación de la tinta</b> elegida inicialmente y luego hacer clic sobre el <b>botón Agregar Materia Prima.</b><br><br>
-    Además puedes <b>limpiar los campos</b> si elegiste una materia prima erroneamente.`
+    text: `Aquí debes <b>elegir las materias primas necesarias que asignarás para la creación de la tinta.</b><br><br>
+    <b>Nota:</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones-add',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'botones-add',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Agregar Materias Primas</h5>',
+    text: `Luego de elegir la materia prima que deseas asignar, <b>haz clic sobre el botón Agregar Mat. Prima</b> para añadirla a un listado en la tabla que se encuentra acontinuación<br><br>
+    Si te equivocas en la elección de una materia prima, <b>haz clic sobre limpiar campos</b>`
   },
   {
     attachTo: {
@@ -89,6 +104,21 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
   },
   {
     attachTo: {
+      element: '#quitar-mp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'quitar-mp',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Quitar Materias Primas elegidas</h5>',
+    text: `En esta fila puedes <b>quitar material(es)</b> elegido(s) erroneamente, haciendo click sobre el icono <i class="pi pi-trash"></i>
+    que observarás <b>cuando existan materias primas cargadas en la tabla.</b>`
+  },
+  {
+    attachTo: {
       element: '#botones',
       on: 'bottom'
     },
@@ -99,7 +129,7 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
     id: 'botones',
     title: '<h5 class="tituloRojo" style="margin: auto;">Asignar Materias Primas</h5>',
     text: `Luego de cargar las materias primas <b>haz clic sobre Asignar Materia Prima</b> para registrarla en el sistema!<br><br>
-    Si deseas volver a iniciar la asignación que llevas hasta ese momento por algún error de digitación, <b>haz clic sobre limpiar todo.</b>`
+    <b>Si deseas volver a iniciar la asignación</b> que llevas hasta ese momento por algún error de digitación, <b>haz clic sobre limpiar todo.</b>`
   },
 
 ];
