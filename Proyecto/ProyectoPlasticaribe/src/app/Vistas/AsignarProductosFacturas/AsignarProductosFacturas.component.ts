@@ -10,6 +10,8 @@ import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/Det
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsFacturarRolloDespacho as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-AsignarProductosFacturas',
@@ -47,7 +49,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
                       private messageService: MessageService,
                         private asgProdFacturaService : AsignacionProductosFacturaService,
                           private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
-                            private ExistenciasProdService : ExistenciasProductosService,){
+                            private ExistenciasProdService : ExistenciasProductosService,
+                              private shepherdService: ShepherdService){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarProductos = this.frmBuilder.group({
@@ -65,6 +68,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerClientes();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

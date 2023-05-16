@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
@@ -9,6 +9,7 @@ import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/Det
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDespacharRollosDespacho as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -42,7 +43,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                     private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
                       private usuariosService : UsuarioService,
                         private facturaService : AsignacionProductosFacturaService,
-                          private rollosService : DetallesEntradaRollosService,){
+                          private rollosService : DetallesEntradaRollosService,
+                            private shepherdService: ShepherdService){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFactura = this.frmBuilder.group({
@@ -56,6 +58,15 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerCondutores();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

@@ -9,6 +9,8 @@ import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRoll
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
+import { defaultStepOptions, stepsDevolverRolloDespacho as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Devoluciones_Productos_Rollos',
@@ -36,13 +38,23 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                     private rollosService : DetallesEntradaRollosService,
                       private dtDevolucionService : DetallesDevolucionesProductosService,
                         private devolcuionesService : DevolucionesProductosService,
-                          private ExistenciasProdService : ExistenciasProductosService,){
+                          private ExistenciasProdService : ExistenciasProductosService,
+                            private shepherdService: ShepherdService){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

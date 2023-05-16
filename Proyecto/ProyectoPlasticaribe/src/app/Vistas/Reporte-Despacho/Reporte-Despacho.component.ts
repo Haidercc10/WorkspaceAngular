@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
@@ -11,6 +10,8 @@ import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoR
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { defaultStepOptions, stepsMovimientosDespacho as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Reporte-Despacho',
@@ -39,7 +40,8 @@ export class ReporteDespachoComponent implements OnInit {
                       private dtAsigFactService : DetallesAsignacionProductosFacturaService,
                         private dtDevolucion : DetallesDevolucionesProductosService,
                           private dtEntradaService : DetallesEntradaRollosService,
-                            private preCargueService : DtPreEntregaRollosService,){
+                            private preCargueService : DtPreEntregaRollosService,
+                              private shepherdService: ShepherdService){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
@@ -57,6 +59,15 @@ export class ReporteDespachoComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerTipoDocumento();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

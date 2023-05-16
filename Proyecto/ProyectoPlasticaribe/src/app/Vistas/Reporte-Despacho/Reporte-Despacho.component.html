@@ -24,6 +24,10 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
@@ -31,7 +35,7 @@
 
   <!-- Formulario para consultar filtros -->
   <form [formGroup]="FormConsultarFiltros">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario">
       <div class="row g-4">
 
         <!-- Factura -->
@@ -73,8 +77,8 @@
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-check" (click)="consultarFiltros()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+      <button pButton class="p-button-danger" id="consultar" type="button" label="Consultar" icon="pi pi-check" (click)="consultarFiltros()"></button>
+      <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
     </div>
   </div>
 
@@ -90,7 +94,7 @@
 
   <!-- Inicio tabla de registros consultados -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3">
+    <div class="row g-3" id="tabla1">
       <div class="table-responsive">
         <p-table
         #dt
@@ -105,7 +109,7 @@
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">Codigo
-                <p-sortIcon field="Codigo"></p-sortIcon>
+                <p-sortIcon field="Codigo" id="sort"></p-sortIcon>
               </th>
               <th scope="col">Registrado por:
                 <p-sortIcon field="Usuario"></p-sortIcon>
@@ -126,7 +130,7 @@
               <td>{{infoDoc.Fecha}}</td>
               <td>{{infoDoc.TipoDoc}}</td>
               <td>
-                <button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="tipoDocumento(infoDoc)"></button>
+                <button pButton type="button" id="pdf" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="tipoDocumento(infoDoc)"></button>
               </td>
             </tr>
           </ng-template>
@@ -134,5 +138,4 @@
       </div>
     </div>
   </div>
-
 </p-card>

@@ -653,7 +653,7 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'eliminarRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Elimiar Rollos Seleccionados!</h4>',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Ingresar Rollos Seleccionados!</h4>',
     text: `<p>¡Luego de haber seleccionado los rollos que queremos ingresar presionamos <b>'Ingresar Rollos'</b> y se ingresarán los rollos a la badega de extrusión!</p>`
   },
   {
@@ -1056,6 +1056,1174 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
     id: 'salidaRollo',
     title: '<h4 style="margin: auto; color: var(--rojo)">Salida de Rollos Seleccionados!</h4>',
     text: `<p>¡Luego de haber seleccionado los rollos a los cuales queremos darle salida presionamos <b>'Asignar Rollos'</b> y se asignarán al proceso que hayamos elegido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Busqueda de rollos!</h4>',
+    text: `<p>¡Llenando estos filtros se pueden consultar los rollos que se quieren ingresar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultarRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'consultarRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Rollos!</h4>',
+    text: `<p>¡Luego de haber llenado los filtros podemos debemos presionar el botón <b>'Consultar Rollos'</b> para obtener la información de los rollos!</p><br>
+            <p>Nota: Es necesario llenar el campo <b>'Proceso'</b>, porque este indicará de donde se buscarán los rollos a ingresar</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarFiltros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarFiltros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros!</h4>',
+    text: `<p>¡Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rollosIngresados',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'rollosIngresados',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Ingresados!</h4>',
+    text: `<p>¡Cantidad de rollos que se han ingresado con base en los filtros consultados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rollosNoIngresados',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'rollosNoIngresados',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos No Ingresados!</h4>',
+    text: `<p>¡Cantidad de rollos que <b>'No'</b> se han ingresado con base en los filtros consultados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que se coincidan con los filtros antes digitados. Si en la tabla salen filas de color rojo significa los rollos de esas filas ya han sido ingresados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirán todos los rollos que se hayan consultado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla3',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
+    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+          <ol>
+            <li>Producto.</li>
+            <li>Cantidad Total en kilos.</li>
+            <li>Numero de rollos.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#ingresarRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'eliminarRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Ingresar Rollos Seleccionados!</h4>',
+    text: `<p>¡Luego de haber seleccionado los rollos que queremos ingresar presionamos <b>'Ingresar Rollos'</b> y se ingresarán los rollos a la badega de despacho!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros y Datos de la asignación!</h4>',
+    text: `<p>¡Aquí podemos digitar los datos de la factura a la cual van a estár asociados los rollos y podemos consultar los rollos de un producto en especifico.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#factura',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'factura',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Código de Factura!</h4>',
+    text: `<p>¡En este campo debemos colocar el código de la factura a la cual estarán asociados los rollos a los que les daremos salida de la bodega de desapacho!</p>`
+  },
+  {
+    attachTo: {
+      element: '#notaCredito',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'notaCredito',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Nota Creadito!</h4>',
+    text: `<p>¡Sí la factura tiene una nota credito podemos colocar el codigo de esta aquí, de lo contrario lo dejamos vacio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#codProducto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'codProducto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Item!</h4>',
+    text: `<p>¡Para buscar los rollos que tendrá la factura tenemos que buscar los rollos de cada uno de los productos que están en la factura. Para ello digitamos el código del producto y presionamos <b>'Enter'</b>, veremos como saldrán los rollos de este producto en la primera tabla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantProducto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'cantProducto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad Item!</h4>',
+    text: `<p>¡Sí queremos buscar la cantidad especifica de un producto digitamos la cantidad en este campo y presionamos <b>'Enter'</b>, para esto primero debemos diligenciar el campo <b>'Item'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'cliente',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cliente!</h4>',
+    text: `<p>¡Aquí podemos buscar por el nombre o por la identificación del cliente, al escribir el programa irá filtrando la información para que sea más facil de buscar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">observacion!</h4>',
+    text: `<p>¡Aquí podemos escribir una observación sobre la asignación que estamos realizando. Este campo es opcional!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que estén disponibles del producto que se haya consultado.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirán todos los rollos que se hayan consultado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'cantidadRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Total Producto!</h4>',
+    text: `<p>¡Suma de la cantidad disponible del producto que se haya consultado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#editarCantPaquetes',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'editarCantPaquetes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar Cantidad de Paquetes!</h4>',
+    text: `<p>¡Para editar la cantidad de paquetes presionamos click sobre la fila y columna que queremos editar, escribimos la cantidad y presionamos click en cualquier otra parte de la pantalla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#editarCantUnidades',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'editarCantUnidades',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar Cantidad de Unidades!</h4>',
+    text: `<p>¡Para editar la cantidad de unidades presionamos click sobre la fila y columna que queremos editar, escribimos la cantidad y presionamos click en cualquier otra parte de la pantalla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla3',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
+    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+          <ol>
+            <li>Producto.</li>
+            <li>Cantidad Total en kilos.</li>
+            <li>Numero de rollos.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#asignarRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'asignarRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Facturar Rollos Seleccionados!</h4>',
+    text: `<p>¡Luego de haber seleccionado los rollos que queremos facturar presionamos <b>'Facturar Rollos'</b> y se listo, se habrán facturado los rollos enviando un PDF con la información de la facturación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Despacho de Mercancia!</h4>',
+    text: `<p>¡Para despachar mercancia de una factura debemos confirmar los rollos de la factura que están saliendo y los necesitamos saber donde se transportarán!</p>`
+  },
+  {
+    attachTo: {
+      element: '#factura',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'factura',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Código de Factura!</h4>',
+    text: `<p>¡En este campo debemos colocar el codigo de la factura y presionar <b>'Enter'</b> para que nos salgan los rollos que esta tiene asignados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#coductor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'coductor',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Conductor!</h4>',
+    text: `<p>¡En este campo debemos tenemos que escoger el conductor que transpotará la mercancia!</p>`
+  },
+  {
+    attachTo: {
+      element: '#placaCamion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'placaCamion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Placa del Camión!</h4>',
+    text: `<p>¡Aquí hay que colocar la placa del camión donde se estará transportando la mercancia!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos de la factura, debemos elegir los que se despacharán!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirán todos los rollos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadTotal',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'cantidadTotal',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Total Producto!</h4>',
+    text: `<p>¡Suma de la cantidad total de cada uno de los rollos que tiene la factura asignados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla3',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
+    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+          <ol>
+            <li>Producto.</li>
+            <li>Cantidad Total en kilos.</li>
+            <li>Numero de rollos.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#despachar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'despachar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Despachar Rollos Seleccionados!</h4>',
+    text: `<p>¡Luego de haber seleccionado los rollos que queremos despachar presionamos <b>'Confirmar Rollos'</b> y listo, se habrán despachado los rollos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Devolver Mercancia!</h4>',
+    text: `<p>¡Para devolver la mercancia de una factura debemos buscar los rollos de la factura que están devolviendo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#factura',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'factura',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Código de Factura!</h4>',
+    text: `<p>¡En este campo debemos colocar el codigo de la factura y presionar <b>'Enter'</b> para que nos salgan los rollos que esta tiene asignados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observacion!</h4>',
+    text: `<p>¡Aquí podemos escribir una observación sobre la devolución que estamos realizando. Este campo es opcional!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que la factura tenga asociados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirán todos los rollos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#devolverRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'devolverRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Facturar Rollos Seleccionados!</h4>',
+    text: `<p>¡Luego de haber seleccionado los rollos que queremos devolver presionamos <b>'Crear Devolución'</b>y listo, los rollos se habrán devuelto y estarán disponibles de nuvo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsMovimientosDespacho : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
+    text: `<p>¡Llenando estos filtros podemos realizar una busqueda mas selectiva de la información de los movimientos que han habido en la bodega de despacho, si no queremos colocar filtros se buscará automaticamente por el día de hoy!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'consultar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Movimientos!</h4>',
+    text: `<p>¡Luego de haber o no llenado los filtros se presionamos el botón <b>'Consultar'</b> para que despues de cargar nos aparezca la información de los movimientos en la bodega de despacho!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'table',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Movimientos Extrusión!</h4>',
+    text: `<p>¡En esta tabla veremos todos los movimientos de la bodega de extrusión que consultamos</p>`
+  },
+  {
+    attachTo: {
+      element: '#sort',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'sort',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
+    text: `<p>¡Con este botón se puede ordenar la información de la tabla por la columna en la que se implemente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pdf',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'pdf',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver PDF!</h4>',
+    text: `<p>¡al presionar este botón veremos la información completa del movimiento en un PDF!</p>`
+  },
+];
+
+export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Busqueda de rollos!</h4>',
+    text: `<p>¡Llenando estos filtros se pueden consultar los rollos que se quieren ingresar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultarRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'consultarRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Rollos!</h4>',
+    text: `<p>¡Luego de haber llenado los filtros debemos presionar el botón <b>'Consultar Rollos'</b> para obtener la información de los rollos!</p><br>
+            <p>Nota: Es necesario llenar el campo <b>'Proceso'</b>, porque este indicará de donde se buscarán los rollos a ingresar</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarFiltros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarFiltros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros!</h4>',
+    text: `<p>¡Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que coincidan con los filtros antes digitados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirán todos los rollos que se hayan consultado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
+    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollos2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollos2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirRollo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'elegirRollo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
+    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla3',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
+    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+          <ol>
+            <li>Producto.</li>
+            <li>Cantidad Total en kilos.</li>
+            <li>Numero de rollos.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#ingresarRollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'eliminarRollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Ingresar Rollos Seleccionados!</h4>',
+    text: `<p>¡Luego de haber seleccionado los rollos que queremos ingresar presionamos <b>'Ingresar Producción'</b> y se hará un pre-ingresaro de los rollos a la badega de despacho!</p>`
   },
   {
     attachTo: {

@@ -23,6 +23,10 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-search"></i> Consultar OT</h4>
   </div>
@@ -30,7 +34,7 @@
 
   <!-- Formulario para consultar una orden de trabajo -->
   <form [formGroup]="FormConsultarRollos">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario">
       <div class="row g-4">
 
         <!-- OT -->
@@ -78,8 +82,8 @@
 
     <!-- Botones -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
+      <button pButton class="p-button-danger" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
+      <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
     </div>
   </form>
 
@@ -94,17 +98,17 @@
         <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
-        <p-chip label="Rollos ingresados: {{rollosIngresados}}" icon="pi pi-check"></p-chip>
+        <p-chip label="Rollos ingresados: {{rollosIngresados}}" id="rollosIngresados" icon="pi pi-check"></p-chip>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
-        <p-chip label="Rollos no ingresados: {{rollosSinIngresar}}" icon="pi pi-ban"></p-chip>
+        <p-chip label="Rollos no ingresados: {{rollosSinIngresar}}" id="rollosNoIngresados" icon="pi pi-ban"></p-chip>
       </div>
     </div>
   </div>
 
   <!--Inicio tabla Rollos creados en OT -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
+    <div class="row g-3 font-size-14" id="tabla1">
       <p-table
           #dt
           [value]="rollos"
@@ -129,7 +133,7 @@
             <th scope="col">Presentacion</th>
             <th scope="col">Proceso</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="selccionarTodo()"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirRollos" (click)="selccionarTodo()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -156,7 +160,7 @@
               <td>{{rollo.Presentacion}}</td>
               <td>{{rollo.Estatus}}</td>
               <td>
-                <p-tableCheckbox [value]="rollo" (click)="cargarProducto(rollo)"></p-tableCheckbox>
+                <p-tableCheckbox [value]="rollo" id="elegirRollo" (click)="cargarProducto(rollo)"></p-tableCheckbox>
               </td>
             </ng-template>
           </tr>
@@ -176,7 +180,7 @@
 
   <!--Inicio tabla Rollos a Insertar -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
+    <div class="row g-3 font-size-14" id="tabla2">
       <p-table
           #dt
           [value]="rollosInsertar"
@@ -199,7 +203,7 @@
             <th scope="col">Presentacion</th>
             <th scope="col">Proceso</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodo()"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirRollos2" (click)="quitarTodo()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -214,7 +218,7 @@
             <td>{{rollo.Presentacion}}</td>
             <td>{{rollo.Estatus}}</td>
             <td>
-              <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
+              <p-tableCheckbox [value]="rollo" id="elegirRollo2" (click)="quitarRollo(rollo)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
@@ -233,6 +237,7 @@
 
   <!--Inicio tabla Rollos a Insertar -->
   <p-table #dt
+    id="tabla3"
     [value]="grupoProductos"
     [scrollable]="true"
     scrollHeight="900px"
@@ -268,8 +273,8 @@
   <!-- Botones -->
   <div class="bajarPagina" *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
     </div>
   </div>
 </p-card>

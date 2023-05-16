@@ -24,18 +24,22 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i> Consultar Factura</h4>
   </div>
   <br>
 
   <!-- Formulario para consultar Codigo de factura -->
-  <form [formGroup]="FormConsultarFactura">
+  <form [formGroup]="FormConsultarFactura" id="formulario">
     <div class="mb-3" >
       <div class="row g-4">
 
         <!-- Codigo Factura -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3" id="factura">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Fact_Id" id="Id" type="text" pInputText (keyup.Enter)="consultarFactura()" required/>
@@ -44,7 +48,7 @@
         </div>
 
        <!-- Conductor -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl" id="coductor">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-user"></i>
             <input formControlName="Conductor" id="Conductor" list="conductores" type="text" pInputText (change)='cambiarNombreConductor()' required/>
@@ -56,7 +60,7 @@
         </div>
 
          <!--Placa camión-->
-         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3" id="placaCamion">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-truck"></i>
             <input formControlName="PlacaCamion" id="placa"  type="text" pInputText required/>
@@ -79,7 +83,7 @@
 
   <!-- Tabla de Rollos Disponibles -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
+    <div class="row g-3 font-size-14" id="tabla1">
       <p-table
         #dt
         [value]="rollosDisponibles"
@@ -101,7 +105,7 @@
             <th scope="col">Cantidad</th>
             <th scope="col">Presentacion</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="seleccionTodos_Rollos()"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirRollos" (click)="seleccionTodos_Rollos()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -113,12 +117,12 @@
             <td>{{rollo.Cantidad | number : '1.2-2'}}</td>
             <td>{{rollo.Presentacion}}</td>
             <td>
-              <p-tableCheckbox [value]="rollo" (click)="seleccionRollo(rollo)"></p-tableCheckbox>
+              <p-tableCheckbox id="elegirRollo" [value]="rollo" (click)="seleccionRollo(rollo)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="summary">
-          <tr>
+          <tr id="cantidadTotal">
             <td colspan="5">Total:</td>
             <td>{{cantTotalProducto | number : '1.2-2'}} {{presentacionProducto}}</td>
           </tr>
@@ -138,7 +142,7 @@
 
   <!-- Tabla con Rollos Seleccionados -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
+    <div class="row g-3 font-size-14" id="tabla2">
       <p-table
         #dt
         [value]="rollosSeleccionados"
@@ -160,7 +164,7 @@
             <th scope="col">Cantidad</th>
             <th scope="col">Presentacion</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodos_Rollos()"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirRollos2" (click)="quitarTodos_Rollos()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -172,7 +176,7 @@
             <td>{{rollo.Cantidad}}</td>
             <td>{{rollo.Presentacion}}</td>
             <td>
-              <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
+              <p-tableCheckbox id="elegirRollo2" [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
@@ -192,6 +196,7 @@
   <!-- Tabla Consolidado -->
   <p-table
     #dt
+    id="tabla3"
     [value]="grupoProductos"
     styleClass="p-datatable-gridlines p-datatable-sm"
     responsiveLayout="scroll"
@@ -224,8 +229,8 @@
 
   <div class="bajarPagina">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Confirmar Rollos" icon="pi pi-check" (click)="actualizarFactura()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+      <button pButton class="p-button-danger" id="despachar" type="button" label="Confirmar Rollos" icon="pi pi-check" (click)="actualizarFactura()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
     </div>
   </div>
 </p-card>

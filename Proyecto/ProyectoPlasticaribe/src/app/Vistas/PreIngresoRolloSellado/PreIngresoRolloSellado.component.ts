@@ -1,13 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsPreIngresoRolloDespacho as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -38,7 +39,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                   private bagProService : BagproService,
                     private dtPreEntRollosService : DtPreEntregaRollosService,
                       private preEntRollosService : PreEntregaRollosService,
-                        private messageService: MessageService,) {
+                        private messageService: MessageService,
+                          private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
@@ -56,6 +58,15 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     this.minDate.setDate(25);
     this.minDate.setMonth(8);
     this.minDate.setFullYear(2022);
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
