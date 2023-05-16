@@ -222,7 +222,6 @@ html, body {
   font-size: calc(var(--font-size) * 16px);
 }
 
-.card {
-  padding: 1%;
-  border-color: none;
+.p-card .p-card-content {
+  padding: 0;
 }

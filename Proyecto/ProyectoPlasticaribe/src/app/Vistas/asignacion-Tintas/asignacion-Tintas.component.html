@@ -22,6 +22,9 @@
 
   <div class="contain">
     <p-card>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+      </div>
       <!-- Inicio Botones que llaman el modal de crear materias primas y Crear tintas-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="intro">
         <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" (click)="llamarModalCrearTintas()"></button>
@@ -36,7 +39,7 @@
 
       <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
       <form [formGroup]="FormAsignacionMP">
-        <div class="mb-3">
+        <div class="mb-3" id="creacion-tintas">
           <div class="row g-4">
 
             <!-- Tinta -->
@@ -85,8 +88,8 @@
       </div>
 
       <!-- Formulario de Materia Prima -->
-      <form [formGroup]="FormMateriaPrima">
-        <div class="mb-3">
+      <form [formGroup]="FormMateriaPrima" id="asig-matprima">
+        <div class="mb-3" >
           <div class="row g-4">
             <!-- Id Materia Prima -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
@@ -152,8 +155,8 @@
       </div>
 
       <!-- TABLA DE Materias Primas Asignadas -->
-      <div class="row g-3">
-        <div class="table-responsive">
+      <div class="mb-3" id="tabla">
+        <div class="row g-3">
           <p-table
           #dt
           [resizableColumns]="true"
@@ -187,13 +190,11 @@
       </div>
 
       <br>
-      <div class="mb-3">
+      <div class="mb-3" id="botones">
         <div class="row g-3">
-          <div class="mb-3">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="mostrarEleccion()"></button>
-              <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"></button>
-            </div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="mostrarEleccion()"></button>
+            <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"></button>
           </div>
         </div>
       </div>

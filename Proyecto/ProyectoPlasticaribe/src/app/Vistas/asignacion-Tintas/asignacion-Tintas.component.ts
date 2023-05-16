@@ -12,14 +12,14 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { ShepherdService } from 'angular-shepherd';
-import { steps as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { stepAsignacionTintas as defaultSteps, defaultStepOptions } from 'src/app/data';
 
 @Component({
   selector: 'app-asignacion-Tintas',
   templateUrl: './asignacion-Tintas.component.html',
   styleUrls: ['./asignacion-Tintas.component.css']
 })
-export class AsignacionTintasComponent implements OnInit, AfterViewInit {
+export class AsignacionTintasComponent implements OnInit {
 
   load: boolean = false;
   FormAsignacionMP !: FormGroup;
@@ -67,7 +67,7 @@ export class AsignacionTintasComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
+  verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
