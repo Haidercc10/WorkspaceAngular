@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/CreacionTintas/asignacionMPxTintas.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
@@ -10,13 +11,15 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { ShepherdService } from 'angular-shepherd';
+import { steps as defaultSteps, defaultStepOptions } from 'src/app/data';
 
 @Component({
   selector: 'app-asignacion-Tintas',
   templateUrl: './asignacion-Tintas.component.html',
   styleUrls: ['./asignacion-Tintas.component.css']
 })
-export class AsignacionTintasComponent implements OnInit {
+export class AsignacionTintasComponent implements OnInit, AfterViewInit {
 
   load: boolean = false;
   FormAsignacionMP !: FormGroup;
@@ -42,7 +45,8 @@ export class AsignacionTintasComponent implements OnInit {
                       private tintasService : TintasService,
                         private asignacionMPxTintas : AsignacionMPxTintasService,
                           private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
-                            private messageService: MessageService)  {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService)  {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormAsignacionMP = this.frmBuilder.group({
@@ -61,6 +65,14 @@ export class AsignacionTintasComponent implements OnInit {
       cantidadMateriaPrima : [null, Validators.required],
       undMedMateriaPrima : ['', Validators.required],
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   ngOnInit(): void {
@@ -362,4 +374,6 @@ export class AsignacionTintasComponent implements OnInit {
     this.mpSeleccionada = item;
     this.messageService.add({severity:'warn', key:'mp', summary:'Elección', detail: `¿Está seguro que desea quitar la materia prima ${this.mpSeleccionada.Nombre} de la tabla?`, sticky: true});
   }
+
+
 }

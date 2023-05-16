@@ -38,6 +38,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeflex/primeflex.min.css",
+              "node_modules/shepherd.js/dist/css/shepherd.css",
               {
                 "input": "src/theme-lara-light-blue.scss",
                 "bundleName": "lara-light-blue",
