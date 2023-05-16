@@ -1,13 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsInventarioExtrusion as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Inventario_Extrusion',
@@ -35,7 +36,8 @@ export class Inventario_ExtrusionComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private ingRollosService : DtIngRollos_ExtrusionService,
-                    private messageService: MessageService) {
+                    private messageService: MessageService,
+                      private shepherdService: ShepherdService) {
 
     this.FormInventario = this.frmBuilder.group({
       OrdenTrabajo : [null],
@@ -50,6 +52,15 @@ export class Inventario_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.consultar();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -193,18 +204,15 @@ export class Inventario_ExtrusionComponent implements OnInit {
 
   // Consultará los datos de la orden de trabajo y los rollo s que tiene
   consultarOrden(orden : number){
-    if (this.numeroOrden == 0 && this.aperturaModal == 0) {
-      this.numeroOrden = orden;
-      this.ArrayInfoOrden = [];
-      this.pesoTotalOrden = 0;
-      this.datosOrden = true;
-      this.ingRollosService.getRollosDisponiblesOT(this.numeroOrden).subscribe(datos_rollos => {
-        for (let i = 0; i < datos_rollos.length; i++) {
-          this.llenarTablaModal(datos_rollos[i]);
-        }
-      }, error => { this.mostrarError(`Error`,`No se pudo obtener información de los rollos en bodega de la OT N° ${this.numeroOrden}!`); });
-      this.aperturaModal += 1;
-    }
+    this.numeroOrden = orden;
+    this.ArrayInfoOrden = [];
+    this.pesoTotalOrden = 0;
+    this.datosOrden = true;
+    this.ingRollosService.getRollosDisponiblesOT(this.numeroOrden).subscribe(datos_rollos => {
+      for (let i = 0; i < datos_rollos.length; i++) {
+        this.llenarTablaModal(datos_rollos[i]);
+      }
+    }, error => { this.mostrarError(`Error`,`No se pudo obtener información de los rollos en bodega de la OT N° ${this.numeroOrden}!`); });
   }
 
   // Funcion que va a llenar la tabla del modal con los rollos de la orden de trabajo

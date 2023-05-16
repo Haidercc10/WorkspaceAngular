@@ -59,6 +59,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     this.lecturaStorage();
   }
 
+  // Funcion que va a hacer que se inicie el tutorial in-app
   tutorial(){
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;

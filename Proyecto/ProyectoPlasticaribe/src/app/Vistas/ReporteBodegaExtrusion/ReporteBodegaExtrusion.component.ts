@@ -1,14 +1,15 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsMovimientosExtrusion as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private estadosService : EstadosService,
                     private ingRollosService : DtIngRollos_ExtrusionService,
-                      private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
+                      private salidaRollosService : DetallesAsgRollos_ExtrusionService,
+                        private shepherdService: ShepherdService) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -66,6 +68,15 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

@@ -1,5 +1,4 @@
-import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { ShepherdService } from 'angular-shepherd';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -9,8 +8,7 @@ import { ShepherdService } from 'angular-shepherd';
 
 export class PruebaImagenCatInsumoComponent implements OnInit  {
 
-  constructor(private shepherdService: ShepherdService) { }
-
+  constructor() { }
 
   ngOnInit() {
   }

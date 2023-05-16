@@ -21,6 +21,10 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
@@ -28,7 +32,7 @@
 
   <!-- Formulario para consultar filtros -->
   <form [formGroup]="FormConsultarFiltros">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario">
       <div class="row g-4">
 
         <!-- Orden de Trabajo -->
@@ -68,8 +72,8 @@
     <!-- Botones -->
     <div class="mb-3" *ngIf="cargando">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarFiltros()"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton class="p-button-danger" id="consultar" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
+        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
       </div>
     </div>
   </form>
@@ -85,7 +89,7 @@
 
   <!-- Inicio tabla de registros consultados -->
   <div class="mb-3" *ngIf="cargando">
-    <div class="row g-3">
+    <div class="row g-3" id="table">
       <div class="table-responsive">
         <p-table
         #dt1
@@ -99,13 +103,13 @@
         [value]="registrosConsultados">
         <ng-template pTemplate="caption">
           <div class="flex">
-            <button pButton label="Limpiar" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
+            <button pButton label="Limpiar" id="limpiarFiltros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
           </div>
         </ng-template>
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">Código
-              <p-columnFilter type="text" field="Ot" display="menu"></p-columnFilter>
+              <p-columnFilter type="text" id="filter" field="Ot" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Usuario
               <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
@@ -125,7 +129,7 @@
             <td>{{registros.Usuario}}</td>
             <td>{{registros.Fecha}}</td>
             <td>{{registros.Tipo}}</td>
-            <td style="text-align: center;"><a style="width: 30px; height: 30px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="tipoPdf(registros)"></a></td>
+            <td style="text-align: center;"><a style="width: 30px; height: 30px;" id="pdf" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="tipoPdf(registros)"></a></td>
           </tr>
         </ng-template>
       </p-table>
