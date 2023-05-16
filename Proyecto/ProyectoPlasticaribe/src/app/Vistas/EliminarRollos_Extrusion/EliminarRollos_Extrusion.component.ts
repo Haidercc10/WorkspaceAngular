@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
@@ -9,6 +9,7 @@ import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoR
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsEliminarRollos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-EliminarRollos_Extrusion',
@@ -50,7 +51,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
                       private servicioProcesos : ProcesosService,
                         private servcioDetEntradaRollos : DetallesEntradaRollosService,
                           private servicioPreEntregaRollos : DtPreEntregaRollosService,
-                            private messageService: MessageService) {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -72,6 +74,14 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
       this.scrolly = window.scrollY;
       this.scrollx = window.scrollX;
     };
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

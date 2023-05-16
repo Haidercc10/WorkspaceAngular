@@ -5,6 +5,8 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -34,11 +36,15 @@ export class MovimientoMPComponent implements OnInit {
   movimientosBiorientados : any [] = []; //Variable que va a contener la informacion de los movimientos de los biorientados
   datosPdf : any [] = []; //Variable en la que se almacenará la información que se verá en el pdf
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  cantRestante : number = 0;
+  cantAsignada : number = 0;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private messageService: MessageService,
-                    private materiaPrimaService : MateriaPrimaService,) {
+                    private materiaPrimaService : MateriaPrimaService,
+                      private detallesAsignacionService : DetallesAsignacionService,
+                        private bagProServices : BagproService,) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -100,6 +106,8 @@ export class MovimientoMPComponent implements OnInit {
   // Funcion que va a consultar la información de los movimientos
   consultarMovimientos(){
     this.cargando = true;
+    this.cantRestante = 0;
+    this.cantAsignada = 0;
     this.movimientosPolietilenos = [];
     this.movimientosTintas = [];
     this.movimientosBiorientados = [];
@@ -160,6 +168,20 @@ export class MovimientoMPComponent implements OnInit {
       }
       if (datos.length == 0) this.mensajeAdvertencia(`¡No se encontró información con los parametros consultados!`);
     }, error => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
+
+    if (codigo != null) {
+      this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
+        for (let i = 0; i < datos_procesos.length; i++) {
+          this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(codigo)).subscribe(datos_asignacion => {
+            let asignacion : number = datos_asignacion[0] | 0, devolucion : number = datos_asignacion[1] | 0;
+            if (devolucion == null || devolucion == undefined) devolucion = 0;
+            this.cantRestante = (datos_procesos[i].datosotKg + (datos_procesos[i].datosotKg * 0.02)) - (asignacion - devolucion);
+            this.cantAsignada = (asignacion - devolucion);
+          });
+          break;
+        }
+      });
+    }
   }
 
   // Funcion que va a validar el tipo de movimiento para crear el pdf
