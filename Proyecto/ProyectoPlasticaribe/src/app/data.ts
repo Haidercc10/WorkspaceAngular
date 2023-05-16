@@ -114,7 +114,7 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'quitar-mp',
     title: '<h5 class="tituloRojo" style="margin: auto;">Quitar Materias Primas elegidas</h5>',
-    text: `En esta fila puedes <b>quitar material(es)</b> elegido(s) erroneamente, haciendo click sobre el icono <i class="pi pi-trash"></i>
+    text: `En esta fila puedes <b>quitar material(es)</b> elegido(s) erróneamente, haciendo click sobre el icono <i class="pi pi-trash"></i>
     que observarás <b>cuando existan materias primas cargadas en la tabla.</b>`
   },
   {
@@ -137,24 +137,22 @@ export const stepAsignacionTintas: Step.StepOptions[] = [
 export const stepAsignacionBopp: Step.StepOptions[] = [
   {
     attachTo: {
-      element: '#intro',
-      on: 'bottom-end'
+      element: '#formulario1',
+      on: 'bottom-start'
     },
     buttons: [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
     classes: 'card',
-    id: 'intro',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Creación de Materias Primas</h5>`,
-    text: `<p>
-            Aquí encontrarás 2 botones para realizar la <b>creación de tintas y materias primas </b>
-            que aún no se encuentran registradas en el sistema.
-          </p> `
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar Ordenes de Trabajo</h5>`,
+    text: `<b>En el campo OT</b> digita los números de ordenes de trabajo a las que deseas asignar BOPP y <b>presiona Enter</b> para consultar su información detallada.<br><br>
+    Además puedes agregar <b>una observación general de la asignación</b>`
   },
   {
     attachTo: {
-      element: '#creacion-tintas',
+      element: '#tabla1',
       on: 'bottom'
     },
     buttons: [
@@ -162,13 +160,13 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
       builtInButtons.next
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'creacion-tintas',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Crear Tintas</h5>',
-    text: `En estos campos debe agregar <b>la información detallada de la tinta que desea crear.</b>`
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de OT's a Asignar Bopp</h5>`,
+    text: `En esta tabla encontrarás la información detallada de la(s) orden(es) de trabajo a las cuales <b>se les realizará la asignación de BOPP.</b>`
   },
   {
     attachTo: {
-      element: '#asig-matprima',
+      element: '#quitar-OT',
       on: 'bottom'
     },
     buttons: [
@@ -176,14 +174,14 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
       builtInButtons.next
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'asig-matprima',
+    id: 'quitar-OT',
     title: '<h5 class="tituloRojo" style="margin: auto;">Elegir Materias Primas</h5>',
-    text: `Aquí debes <b>elegir la materia prima que asignarás para la creación de la tinta</b> elegida inicialmente y luego hacer clic sobre el <b>botón Agregar Materia Prima.</b><br><br>
-    Además puedes <b>limpiar los campos</b> si elegiste una materia prima erroneamente.`
+    text: `En esta fila puedes quitar las ordenes de trabajo elegidas erróneamente, <b>haciendo clic sobre el icono <i class="pi pi-trash"></i> cuando
+    existan OT's cargadas en la tabla</b>`
   },
   {
     attachTo: {
-      element: '#tabla',
+      element: '#formulario2',
       on: 'bottom'
     },
     buttons: [
@@ -192,12 +190,13 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Materias Primas a asignar</h5>',
-    text: `En esta tabla encontrarás las materias primas que <b>elegiste asignar para la creación de la tinta.</b>`
+    title: `<h5 class="tituloRojo" style="margin: auto;">BOPP's a asignar</h5>`,
+    text: `En estos campos puedes <b>realizar la búsqueda de los rollos de BOPP</b> que deseas asignar a las ordenes de trabajo elegidas previamente.<br><br>
+    <b>Nota: </b> Esta búsqueda puede ser por medio del serial, nombre, peso o micras del rollo.`
   },
   {
     attachTo: {
-      element: '#botones',
+      element: '#botones1',
       on: 'bottom'
     },
     buttons: [
@@ -205,10 +204,66 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
       builtInButtons.next
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'botones',
+    id: 'botones1',
     title: '<h5 class="tituloRojo" style="margin: auto;">Asignar Materias Primas</h5>',
-    text: `Luego de cargar las materias primas <b>haz clic sobre Asignar Materia Prima</b> para registrarla en el sistema!<br><br>
-    Si deseas volver a iniciar la asignación que llevas hasta ese momento por algún error de digitación, <b>haz clic sobre limpiar todo.</b>`
+    text: `Luego de elegir el BOPP a asignar <b>haz clic sobre Asignar Rollo</b> para añadirlo a la tabla que encontrarás acontinuación.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de rollos a asignar</h5>`,
+    text: `En esta tabla encontrarás <b>los rollos que serán asignados a las ordenes de trabajo</b> elegidas previamente.<br><br>
+    <b>Nota:</b> La cantidad asignada <b>será dividida proporcionalmente</b> por el número de ordenes de trabajo que se eligieron!`
+  },
+  {
+    attachTo: {
+      element: '#editar-cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'editar-cantidad',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Editar cantidad a asignar</h5>`,
+    text: `Recuerda que <b>puedes editar la cantidad a asignar por rollo.</b> Haz clic sobre la cantidad de Kg del rollo que desees y coloca la nueva cantidad a asignar.`
+  },
+  {
+    attachTo: {
+      element: '#quitar-rollo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'quitar-rollo',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Quitar rollos de la tabla</h5>`,
+    text: `<b>Haciendo clic sobre el icono</b> <i class="pi pi-trash"></i> puedes quitar los rollos elegidos previamente, si ya no deseas asignarlo o si te equivocaste de serial`
+  },
+  {
+    attachTo: {
+      element: '#botones2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'botones2',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Registrar Asignación</h5>',
+    text: `Por último registra la asignación al sistema <b>haciendo clic sobre crear asignación</b><br><br>
+    Además, puedes volver a iniciar la asignación si tienes algún error en la digitación, <b>solo haz clic en limpiar todo</b>`
   },
 ];
 

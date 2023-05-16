@@ -22,13 +22,18 @@
 </div>
 
 <p-card>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-3">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-file"></i> Consultar OT's</h4>
   </div>
   <br>
 
   <form [formGroup]="FormAsignacionBopp">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario1">
       <div class="row g-4">
         <!-- Buscar OT -->
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
@@ -51,8 +56,8 @@
   </form>
 
   <!-- Tabla de OT -->
-  <div class="row g-3">
-    <div class="table-responsive">
+  <div class="mb-3" id="tabla1">
+    <div class="row g-3">
       <p-table
       #dt
       [resizableColumns]="true"
@@ -71,7 +76,7 @@
             <th scope="col">Micras</th>
             <th scope="col">Ancho</th>
             <th scope="col">Kg</th>
-            <th scope="col"></th>
+            <th scope="col" id="quitar-OT">Quitar OT</th>
         </ng-template>
         <ng-template pTemplate="body" let-ot>
           <tr>
@@ -100,7 +105,7 @@
 
   <!-- Asignación de BOPP para la creación de tintas -->
   <form [formGroup]="FormularioBOPP">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario2">
       <div class="row g-3">
         <!--Serial-->
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
@@ -126,7 +131,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-3">
+    <div class="mb-3" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Asignar Rollo" icon="pi pi-send" (click)="validarCamposBOPP()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCamposBOPP()"> </button>
@@ -144,8 +149,8 @@
   </div>
 
   <!-- Tabla de BOPP por asignar -->
-  <div class="row g-3">
-    <div class="table-responsive">
+  <div class="mb-3" id="tabla2">
+    <div class="row g-3">
       <p-table
       #dt
       [resizableColumns]="true"
@@ -160,8 +165,8 @@
           <tr>
             <th scope="col">Pallet/Serial</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Cantidad</th>
-            <th scope="col"></th>
+            <th scope="col" id="editar-cantidad">Cantidad</th>
+            <th scope="col" id="quitar-rollo">Quitar rollo</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-bopp>
@@ -187,13 +192,11 @@
 
   <br>
   <div *ngIf="load">
-    <div class="mb-3">
+    <div class="mb-3" id="botones2">
       <div class="row g-3">
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check" (click)="validarAsignacion()"></button>
-            <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
-          </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check" (click)="validarAsignacion()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
         </div>
       </div>
     </div>

@@ -8,6 +8,8 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { AppComponent } from 'src/app/app.component';
+import { stepAsignacionBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -41,7 +43,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                       private asignacionBOPPService : AsignacionBOPPService,
                         private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
                           private bagProService : BagproService,
-                            private messageService: MessageService) {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -307,4 +310,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = (dato : any) => this.messageService.clear(dato);
+
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }
