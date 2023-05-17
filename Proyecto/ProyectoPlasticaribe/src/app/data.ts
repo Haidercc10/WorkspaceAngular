@@ -1,3 +1,4 @@
+import { builtinModules } from 'module';
 import Step from 'shepherd.js/src/types/step';
 
 export const builtInButtons = {
@@ -3531,3 +3532,247 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
     text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
   },
 ];
+
+/******************************************************** MANTENIMIENTO DE ACTIVOS ***************************************************************/
+export const stepsPedidoMtto: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar pedido de mtto.</h5>`,
+    text: `Selecciona el(los) activo(s) averiados, la fecha en que ocurrió el daño, el tipo de mantenimiento que necesita, y una observación concisa del
+    daño, <b>para quien reciba el pedido y tenga que realizar la reparación.</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Agregar activo</h5>`,
+    text: `Luego de diligenciar los campos, <b>haz clic sobre el botón añadir activo para agregarlo(s) a la tabla que se muestra acontinuación</b>. Allí puedes cargar los activos averiados que desees.`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
+    text: `En esta tabla podrás observar los activos que haz agregado previamente desde el formulario, <b>los cuales se registrarán en el detalle del pedido.</b>`
+  },
+  {
+    attachTo: {
+      element: '#quitar1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'quitar1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Quitar activos elegidos</h5>`,
+    text: `Haciendo clic sobre este icono, <b>podrás quitar todos los activos seleccionados de la tabla.</b><br><br>
+    Si solo deseas quitar uno de los activos de la tabla <b>haz clic sobre el icono <i class="pi pi-trash"></i></b> que aparecerá en cada una de filas.`
+  },
+  {
+    attachTo: {
+      element: '#botones2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'botones2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar Mtto.</h5>`,
+    text: `Luego de cargar en la tabla los activos que necesitan ser reparados, <b>haz clic sobre crear pedido, para registrar el detalle del pedido de mantenimiento.</b>`
+  }
+];
+
+export const stepsMttoActivos: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar pedido de mtto.</h5>`,
+    text: `Desde este formulario puedes realizar la busqueda de <b>los pedidos y mantenimientos de activos.</b><br><br>`
+  },
+  {
+    attachTo: {
+      element: '#Pedido',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'Pedido',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Campo pedido de mtto.</h5>`,
+    text: `En este campo puedes realizar la búsqueda de un número de pedido de mantenimiento en especifico,
+    <b>Pero recuerda que DEBES seleccionar un rango de fechas para efectuar una consulta óptima.</b>`
+  },
+  {
+    attachTo: {
+      element: '#idMtto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'idMtto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Campo Mantenimiento</h5>`,
+    text: `En este campo puedes realizar la búsqueda de un número de mantenimiento de activos en especifico,
+    <b>Pero recuerda que DEBES seleccionar un rango de fechas para efectuar una consulta óptima.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tipoMov',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tipoMov',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Campo tipo de movimientos.</h5>`,
+    text: `En este campo encontrarás <b>dos tipos de movimientos para realizar tus consultas</b>, entre ellos:<br><br>
+    1- Pedido de Mantenimiento.<br>
+    2- Mantenimiento.<br><br>
+    <b>Pero recuerda que DEBES seleccionar un rango de fechas para efectuar una consulta óptima.</b>`
+  },
+  {
+    attachTo: {
+      element: '#FechaInicial',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'FechaInicial',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Campo fecha inicial</h5>`,
+    text: `<b>Recuerda que DEBES seleccionar un rango de fechas</b> combinada con tus filtros de busqueda para realizar consultas óptimas.<br><br>
+    Si no diligencias los campos de fecha, <b>las consultas serán realizadas teniendo en cuenta solo la fecha de hoy.</b>`
+  },
+  {
+    attachTo: {
+      element: '#FechaFinal',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'FechaFinal',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Campo fecha final.</h5>`,
+    text: `En este campo <b>podrás colocar la fecha que limitará el lapso de tiempo que elijas consultar</b>, teniendo en cuenta la fecha inicial.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Agregar activo</h5>`,
+    text: `Luego de diligenciar los filtros, haz clic sobre el botón consultar <b>para cargar los registros de tu búsqueda en la tabla.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
+    text: `En esta tabla podrás observar <b>el encabezado de los pedidos y mantenimientos que aún se encuentran activos</b>,teniendo en cuenta los filtros consultados previamente.`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
+    text: `Luego de cargar los datos consultados en la tabla, haciendo clic sobre el botón <i class="pi pi-eye"></i> que aparecerá cada fila de esta columna, <b>podrás desplegar
+    un modal con el detalle</b> del pedido de mantenimiento o el mantenimiento seleccionado.<br><br>
+    En dicho modal podrás <b>aceptar un pedido</b> de mantenimiento, <b>actualizar el estado</b> de un item de mantenimiento, <b>realizar cambios</b> en el encabezado del mantenimiento. etc... `
+  },
+
+];
+
+export const stepsReporteActivos: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#table',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'table',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
+    text: `En esta tabla puedes apreciar de manera detallada <b>la información de los activos que hacen parte de la empresa.</b><br><br>`
+  },
+  {
+    attachTo: {
+      element: '#cuerpo-t1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'cuerpo-t1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver movimientos del activo</h5>`,
+    text: `Haciendo clic sobre cualquier registro de la tabla, <b>se cargará un modal en el cual podrás apreciar los movimientos de ese activo.<b>`
+  }
+];
+
+

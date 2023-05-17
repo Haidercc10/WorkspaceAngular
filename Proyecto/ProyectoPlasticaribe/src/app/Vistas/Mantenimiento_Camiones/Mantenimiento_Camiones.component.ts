@@ -12,6 +12,8 @@ import { MantenimientoService } from 'src/app/Servicios/Mantenimiento/Mantenimie
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
+import { stepsMttoActivos as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Mantenimiento_Camiones',
@@ -54,7 +56,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
                       private servicioDetMtto : Detalle_MantenimientoService,
                         private servicioProveedores : ProveedorService,
                           private servicioEstados : EstadosService,
-                            private messageService: MessageService,) {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarFormulario();
     this.inicializarFormulario2();
@@ -536,5 +539,14 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject() {
     this.messageService.clear('advertencia');
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

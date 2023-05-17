@@ -24,6 +24,10 @@
 </div>
 
 <p-card>
+  <!--Ver tutorial-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
 
   <!-- Informacion del pedido de mantenimiento -->
   <div class="mb-5">
@@ -32,7 +36,7 @@
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormPedidoMantenimiento">
-    <div class="mb-4">
+    <div class="mb-4" id="formulario1">
       <div class="row g-4">
 
         <!-- Consecutivo del pedido -->
@@ -85,7 +89,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-1">
+    <div class="mb-1" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Añadir Activo" icon="pi pi-send" (click)="seleccionarActivo()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
@@ -101,7 +105,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-car"></i> Activos Seleccionados</h4>
   </div>
 
-  <div class="row g-3">
+  <div class="row g-3" id="tabla1">
     <div class="table-responsive">
       <p-table
       #dt
@@ -119,7 +123,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Fecha Daño</th>
             <th scope="col">Tipo Mantenimiento</th>
-            <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" (click)="mostrarEleccion(0, 'todos')"></i></th>
+            <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" id="quitar1" (click)="mostrarEleccion(0, 'todos')"></i></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-activos>
@@ -137,7 +141,7 @@
 
   <!-- Botones Finales -->
   <br>
-  <div class="mb-1">
+  <div class="mb-3" id="botones2">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" type="button" label="Crear Pedido" icon="pi pi-check" (click)="crearPedido()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>

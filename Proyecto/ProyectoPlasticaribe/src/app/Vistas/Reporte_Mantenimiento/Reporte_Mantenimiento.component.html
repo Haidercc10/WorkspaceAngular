@@ -22,6 +22,11 @@
 </div>
 
 <p-card class="font-size-14">
+  <!--Ver tutorial-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Listado de activos</h2>
   </div>
@@ -77,7 +82,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-reporte>
-          <tr (click)="mostrarModalMovimientos(reporte)" class="cursor">
+          <tr (click)="mostrarModalMovimientos(reporte)" class="cursor" id="cuerpo-t1">
             <td>{{reporte.Id}}</td>
             <td>{{reporte.Nombre}}</td>
             <td>{{reporte.TipoActivo}}</td>

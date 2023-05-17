@@ -8,6 +8,8 @@ import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePed
 import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimiento/Pedido_Mantenimiento.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import { AppComponent } from 'src/app/app.component';
+import { stepsPedidoMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +44,8 @@ export class PedidoMantenimientoComponent implements OnInit {
                     private dtPedidoMantenimientoService : DetallePedido_MantenimientoService,
                       private activosService : ActivosService,
                         private tipoMantenimientoService : Tipo_MantenimientoService,
-                          private messageService: MessageService) {
+                          private messageService: MessageService,
+                            private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormPedidoMantenimiento = this.frmBuilder.group({
@@ -242,5 +245,14 @@ export class PedidoMantenimientoComponent implements OnInit {
 
   onReject(){
     this.messageService.clear(this.llave);
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

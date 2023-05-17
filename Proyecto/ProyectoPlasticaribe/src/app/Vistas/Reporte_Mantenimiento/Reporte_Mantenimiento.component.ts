@@ -1,17 +1,17 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
-import Swal from 'sweetalert2';
 import { Movimientos_MantenimientoComponent } from '../Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
+import { stepsReporteActivos as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +44,8 @@ export class Reporte_MantenimientoComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private activosService : ActivosService,
                     private tipoActivoService : Tipo_ActivoService,
-                      private messageService: MessageService) {
+                      private messageService: MessageService,
+                        private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormActivos = this.frmBuilderMateriaPrima.group({
@@ -220,18 +221,6 @@ export class Reporte_MantenimientoComponent implements OnInit {
     }, 50);
   }
 
-  // Funcion que pasará mensajes de advertencia
-  mensajesAdvertencia(texto : string){
-    Swal.fire({ icon : 'warning', title : `Advertencia`, text : texto });
-    this.cargando = false;
-  }
-
-  // Funcion que enviaraá mensajes de error
-  mensajesError(texto : string, error : any = ''){
-    Swal.fire({ icon : 'error', title : `Opps...`, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>` });
-    this.cargando = false;
-  }
-
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
@@ -250,5 +239,14 @@ export class Reporte_MantenimientoComponent implements OnInit {
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }
