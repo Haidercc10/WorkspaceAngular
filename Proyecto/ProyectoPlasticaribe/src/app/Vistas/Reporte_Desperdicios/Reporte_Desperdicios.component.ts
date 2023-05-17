@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -9,6 +10,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { defaultStepOptions, stepsReporteDesperdicio as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Reporte_Desperdicios',
@@ -43,7 +45,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
                   private servicioProductos : ProductoService,
                     private servicioDesperdicios : DesperdicioService,
                       private AppComponent : AppComponent,
-                        private messageService: MessageService) {
+                        private messageService: MessageService,
+                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.formBuilder.group({
       OT : [null],
@@ -59,6 +62,15 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   ngOnInit() {
     this.cargarMateriales();
     this.lecturaStorage();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

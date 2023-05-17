@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -13,6 +13,7 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTe
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { defaultStepOptions, stepsDesperdicio as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -48,7 +49,8 @@ export class DesperdicioComponent implements OnInit {
                           private maquinasService : ActivosService,
                             private deperdicioService : DesperdicioService,
                               private materiaService : MaterialProductoService,
-                                private messageService: MessageService) {
+                                private messageService: MessageService,
+                                  private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDesperdicio = this.frmBuilder.group({
@@ -79,6 +81,15 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerMaquinas();
     this.obtenerProcesos();
     this.obtenerMateriales();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

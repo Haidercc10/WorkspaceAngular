@@ -20,52 +20,56 @@
 
 <!--Card que contendrá los campos para gestionar archivos -->
 <p-card>
-  <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+  <!-- <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <button pButton class="p-button-danger" type="button" label="Crear Categorias" icon="pi pi-plus-circle" (click)="cargarModal()" pTooltip="Crear categorias de archivos" tooltipPosition="left"> </button>
       <br>
     </div>
-  </ng-container>
+  </ng-container> -->
 
   <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
-    <form [formGroup]="formularioArchivo" (ngSubmit)="subirArchivos()">
+    <form [formGroup]="formularioArchivo" (ngSubmit)="subirArchivos()" id="formulario">
       <div class="mb-4">
         <div class="row g-3">
 
-          <div class="col-md-6">
+          <div class="col-md-3" id="crearCarpeta">
             <span class="p-inputgroup">
               <input formControlName="carpetaNueva" type="text" pTooltip="¡Escribe el nombre de la nueva carpeta y haz clic en crear!" pInputText placeholder="Nueva Carpeta" required>
               <button type="button" pButton icon="pi pi-plus-circle" styleClass="p-button-warn" (click)="crearCarpeta()" label="Crear" pTooltip="Crear Carpeta" tooltipPosition="left"></button>
             </span>
           </div>
 
-          <div class="col-md-6">
+          <!-- <div class="col-md-6">
             <span class="p-float-label">
               <p-dropdown formControlName="CategoriaArchivos" inputId="catArchivos" [autoDisplayFirst]="false" [options]="categoriasArchivos" optionValue="categoria_Id" optionLabel="categoria_Name"></p-dropdown>
               <label for="catArchivos">Categorias</label>
             </span>
-          </div>
+          </div> -->
 
-          <div class="col-md-12">
+          <div class="col-md-9" id="archivo">
             <p-fileUpload (onSelect)="onSelectFile($event)" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir archivo(s)" [showUploadButton]="false" type="file"></p-fileUpload>
           </div>
         </div>
       </div>
 
-    <!-- Botones para agregar productos -->
-    <div class="mb-3">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+      <!-- Botones para agregar productos -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" id="subirArchivo" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
+          <!-- <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button> -->
+        </div>
       </div>
-    </div>
     </form>
   </ng-container>
 
   <div class="mb-3">
     <div class="row g-3">
-        <p-table
+      <p-table
         #dt
+        id="tabla"
         [value]="ArrayArchivos"
         [resizableColumns]="true"
         columnResizeMode="expand"
@@ -96,11 +100,11 @@
             <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
               <td style="width: 65%"><i id="margen" class="pi pi-file" ></i> {{archivos.nombre}}</td>
               <td class="text-center">
-                <p-button id="minimizar" pTooltip="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarArchivos(archivos.nombre)"></p-button>
+                <p-button id="descargar" pTooltip="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarArchivos(archivos.nombre)"></p-button>
               </td>
             </ng-container>
             <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
-              <td style="width: 65%" class="cursor" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left"><i class="pi pi-folder"></i> {{archivos.nombre}}</td>
+              <td style="width: 65%" id="abrirCarpeta" class="cursor" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left"><i class="pi pi-folder"></i> {{archivos.nombre}}</td>
               <td></td>
             </ng-container>
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
@@ -114,18 +118,18 @@
               </ng-container>
               <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="copiar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="mover" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
               </ng-container>
               <ng-container *ngIf="mover == true || copiar == true">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-clone" styleClass="p-button-rounded p-button-help" (click)="pegarArchivoCarpeta()" pTooltip="Pegar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="pegar" icon="pi pi-clone" styleClass="p-button-rounded p-button-help" (click)="pegarArchivoCarpeta()" pTooltip="Pegar Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-times" styleClass="p-button-rounded p-button-secondary" (click)="cancelarPegadoArchivoCarpeta()" pTooltip="Cancelar" tooltipPosition="left"></p-button>
+                  <p-button id="cancelar" icon="pi pi-times" styleClass="p-button-rounded p-button-secondary" (click)="cancelarPegadoArchivoCarpeta()" pTooltip="Cancelar" tooltipPosition="left"></p-button>
                 </td>
               </ng-container>
               <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
@@ -135,13 +139,13 @@
               </ng-container>
               <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-carpeta')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <p-button id="eliminar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-carpeta')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
                 </td>
               </ng-container>
             </ng-container>
           </tr>
         </ng-template>
-        </p-table>
+      </p-table>
     </div>
   </div>
 </p-card>

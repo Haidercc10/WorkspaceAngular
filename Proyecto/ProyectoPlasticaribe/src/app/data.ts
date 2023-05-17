@@ -784,7 +784,7 @@ export const stepsMovimientosExtrusion : Step.StepOptions[] = [
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
-    text: `<p>¡Llenando estos filtros podemos realizar una busqueda mas selectiva de la información de los movimientos que han habido en la bodega de extrusión, si no queremos colocar filtros se buscará automaticamente por el día de hoy!</p>`
+    text: `<p>¡Llenando estos filtros podemos realizar una busqueda más selectiva de la información de los movimientos que han habido en la bodega de extrusión, si no queremos colocar filtros se buscará automaticamente por el día de hoy!</p>`
   },
   {
     attachTo: {
@@ -2238,5 +2238,581 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
     id: 'limpiarTodo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
     text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsDesperdicio : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Entrada de Desperdicio!</h4>',
+    text: `<p>¡Llenando estos campos podemos registrar el desperdicio de una orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'ordenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
+    text: `<p>¡Inicialmente para crear un desperdicio debemos buscar la orden de trabajo de la cual vamos a registrar el desperdicio, para ello la digitamos y presionamos <b>'Enter'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#item',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'item',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Item!</h4>',
+    text: `<p>¡Al buscar la orden e trabajo se llenará este campo automaticamente con el codigo del producto que la orden de trabajo tiene asociado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#referencia',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'referencia',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Referencia!</h4>',
+    text: `<p>¡Igual que el campo anterior al buscar la orden e trabajo se llenará este campo automaticamente con el nombre del producto que la orden de trabajo tiene asociado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#material',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'material',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Material!</h4>',
+    text: `<p>¡Igual que el campo anterior al buscar la orden e trabajo se llenará este campo automaticamente con el nombre del material que la orden de trabajo tiene asociado, a diferencia de los 2 anteriores podemos buscar un nuevo material para digitar en este campo si se desea!</p>`
+  },
+  {
+    attachTo: {
+      element: '#impresion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'impresion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Impresión!</h4>',
+    text: `<p>¡Igual que el campo anterior al buscar la orden e trabajo se llenará este campo automaticamente marcando si la orden lleva impresión o no, de igual manera se puede cambiar si la orden lleva o no impresión!</p>`
+  },
+  {
+    attachTo: {
+      element: '#maquina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'maquina',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Maquina!</h4>',
+    text: `<p>¡Se debe seleccionar la maquina en la que se generó el desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#operario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'operario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Operario!</h4>',
+    text: `<p>¡Se debe seleccionar el operario que generó el desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#conformidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'conformidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Conformidad!</h4>',
+    text: `<p>¡Se debe seleccionar el tipo de no conformidad por la que se estaba generando el desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'cantidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Cantidad!</h4>',
+    text: `<p>¡Se debe registrar la cantidad que se generó de desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#area',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'area',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Área!</h4>',
+    text: `<p>¡Se debe registrar el área en que se generó de desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#fecha',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'fecha',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Fecha!</h4>',
+    text: `<p>¡Se debe registrar la fecha en la que se generó de desperdicio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
+    text: `<p>¡Aquí se puede colocar o no una observación general del desperdicio registrado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'agregar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Desperdicio!</h4>',
+    text: `<p>¡Al haber llenado todos los campos podemos presionar este botón y se envirará a la tabla siguiente la información digitada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarCampos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'limpiarCampos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Campos!</h4>',
+    text: `<p>¡Si queremos limpiar los campos de registro, presionamos este botón y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla con Registros!</h4>',
+    text: `<p>¡Aquí se irán agregando los desperdicios que se vayan registrando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'quitar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Registro!</h4>',
+    text: `<p>¡Para eliminar uno de los registros que tenemos en la tabla presionamos este botón y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crear',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'crear',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Crear Registros!</h4>',
+    text: `<p>¡Para <b>Crear</b> los desperdicios digitados presionamos este botón y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar Todo!</h4>',
+    text: `<p>¡Si queremos limpiar todo en este modulo podemos presionar este botón!</p>`
+  },
+];
+
+export const stepsReporteDesperdicio : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Filtros de Consulta!</h4>',
+    text: `<p>¡Llenando estos campos podemos realizar una busqueda más exacta de registros de desperdicios, si no los llenamos se buscará automaticamente por el día de hoy!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'consultar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar!</h4>',
+    text: `<p>¡Posterior a llenar o no los filtros debemos presionar este botón para iniciar la busqueda de los desperdicios registrados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'limpiar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros de Consulta!</h4>',
+    text: `<p>¡Presionando este botón se podemos limpiar los filtros de busqueda!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla!</h4>',
+    text: `<p>¡En esta tabla podremos ver las ordenes de trabajo a las cuales se les ha registrado desperdicios!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Tabla!</h4>',
+    text: `<p>¡Mediante estos campos se puede filtrar la información de los registros que hay en la tabla, los filtros se aplican por columna!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ver',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'ver',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Desperdicios De Una OT!</h4>',
+    text: `<p>¡En la tabla la información saldrá de manera consolidad, para ver todos los registros de desperdicio debemos presionar click en el boton con el icono <b><i class="pi pi-eye" style="color: var(--rojo)"></i></b>. <br>Al hacer esto saldrá un modal con la información de los desperdicios de la orden!</p>`
+  },
+];
+
+export const stepsArchivos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Creación de archios y carpetas!</h4>',
+    text: `<p>¡Desde aquí se pueden <b>crear</b> archivos y carpetas!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearCarpeta',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'crearCarpeta',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Creación de carpetas!</h4>',
+    text: `<p>¡Para <b>crear una carpeta</b> digitamos el nombre y presionamos el botón de <b>crear carpeta</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#archivo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'archivo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Archivos!</h4>',
+    text: `<p>¡Para elegir un archivo presionamos <b>'Elegir Archivo(s)'</b>, se nos abre el explorador de archivos y elegimos los que queramos!</p>
+    <br><p>¡Para quitar los archivos presionamos en <b>'Cancelar'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#subirArchivo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'subirArchivo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Subir Archivos!</h4>',
+    text: `<p>¡Despues de haber elegido el archivo a subir presionamos este botón y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Archivos!</h4>',
+    text: `<p>¡En esta tabla se verán todos los archivos de la carpeta que se encuentra en el servidor, aquí vamos a poder <b>copiar, mover, pegar, eliminar y descargar archivos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#abrirCarpeta',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'abrirCarpeta',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Abrir Carpeta!</h4>',
+    text: `<p>¡Para <b>abrir una carpeta</b> tenemos que <b>presionar click sobre el nombre de la carpeta</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#minimizar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'minimizar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Regresar Carpeta!</h4>',
+    text: `<p>¡Para <b>volver atras</b> tenemos que <b>presionar este botón</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#descargar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'descargar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Descargar Archivo!</h4>',
+    text: `<p>¡Para <b>descargar un archivo</b> debemos <b>presionar este botón</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#copiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'copiar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Copiar Archivos y Carpetas!</h4>',
+    text: `<p>¡Para <b>copiar un archivo o carpeta presionamos este botón y nos aparecerá un mensaje de confirmación</b>, luego de eso <b>vamos a la carpeta donde queremos copiar el archivo o carpeta y lo pegamos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#mover',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'mover',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Mover Archivos y Carpetas!</h4>',
+    text: `<p>¡Para <b>mover un archivo o carpeta presionamos este botón y nos aparecerá un mensaje de confirmación</b>, luego de eso <b>vamos a la carpeta a la que queremos mover el archivo o carpeta y lo pegamos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pegar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'pegar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pegar Archivos y Carpetas!</h4>',
+    text: `<p>¡Para <b>pegar un archivo o carpeta presionamos este botón en la cualquiera de los archivos o carpetas de la carpeta en donde lo queremos pegar</b> o bien podemos presionar el titulo <b>Pegar</b> de la columna!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cancelar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'cancelar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cancelar una copia o movimiento!</h4>',
+    text: `<p>¡Si luego de haber presionado <b>Copiar</b> o <b>Mover</b> no queremos ejecutar esta acción lo que debemos hacer es presionar <b>Cancelar</b> y listo, no se hará la acción!</p>`
+  },
+  {
+    attachTo: {
+      element: '#eliminar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'eliminar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Eliminar un archivo o carpeta!</h4>',
+    text: `<p>¡Para <b>eliminar un archivo o carpeta</b> presionamos el botón y nos saldrá un mensaje de confirmación!</p>`
   },
 ];

@@ -1,5 +1,5 @@
 <!-- Menú Principal -->
-<p-sidebar [(visible)]="display" id="sidebar" [style]="{width : '32rem'}">
+<p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
   <div class="imagen">
     <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
     <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
@@ -854,7 +854,7 @@
 </p-sidebar>
 
 <!-- Mesnú de Configuraciones -->
-<p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{width : '32rem'}">
+<p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
   <div class="escalabilidad">
     <div class="mb-2">
       <h4>Tamaño de Letra</h4>

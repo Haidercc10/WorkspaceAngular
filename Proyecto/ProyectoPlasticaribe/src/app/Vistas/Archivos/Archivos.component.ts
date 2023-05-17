@@ -8,6 +8,8 @@ import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos
 import { AppComponent } from 'src/app/app.component';
 import Swal from 'sweetalert2';
 import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
+import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Archivos',
@@ -44,7 +46,8 @@ export class ArchivosComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private archivosService : ArchivosService,
                     private categoriaArchivosService : Categorias_ArchivosService,
-                      private messageService : MessageService) {
+                      private messageService : MessageService,
+                        private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
@@ -58,6 +61,15 @@ export class ArchivosComponent implements OnInit {
     this.mostrarCarpetas();
     this.obtenerCategorias();
     this.cargarArchivos();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -155,7 +167,7 @@ export class ArchivosComponent implements OnInit {
       const formData = new FormData();
       formData.append('archivo', this.selectedFile[i]);
       try {
-        const data = await this.archivosService.srvGuardar(formData, this.today, categoria, this.storage_Id, filePath).toPromise();
+        const data = await this.archivosService.srvGuardar(formData, this.today, 1, this.storage_Id, filePath).toPromise();
         this.cargarArchivos(filePath);
         this.mostrarCarpetas(filePath);
         this.mostrarConfirmacion(`¡Se ha subido un archivo correcatamente!`);

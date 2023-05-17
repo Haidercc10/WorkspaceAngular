@@ -23,7 +23,7 @@ p-inputnumber, p-inputnumber, p-inputtext ::ng-deep span, p-dropdown ::ng-deep .
   width: 100%;
 }
 
-#minimizar ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+p-button ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
   width: 1.8rem;
   height: 1.8rem
 }
@@ -32,7 +32,7 @@ p-inputnumber, p-inputnumber, p-inputtext ::ng-deep span, p-dropdown ::ng-deep .
   margin-right: 1.5%;
 }
 
-#minimizar ::ng-deep .pi {
+p-button ::ng-deep .pi {
   font-size: 1rem;
 }
 
