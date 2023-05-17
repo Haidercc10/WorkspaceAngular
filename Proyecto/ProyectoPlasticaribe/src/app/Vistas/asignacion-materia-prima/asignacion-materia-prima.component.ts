@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -12,6 +12,7 @@ import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsAsignacionMateriaPrima as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
@@ -60,7 +61,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                             private bagProServices : BagproService,
                               private tintasService : TintasService,
                                 private detallesAsignacionTintas : DetallesAsignacionTintasService,
-                                  private messageService: MessageService) {
+                                  private messageService: MessageService,
+                                    private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
@@ -89,6 +91,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.obtenerProcesos();
     this.obtenerMateriaPrima();
     this.consultarCategorias();
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
