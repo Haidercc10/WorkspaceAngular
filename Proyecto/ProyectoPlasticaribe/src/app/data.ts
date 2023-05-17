@@ -267,6 +267,7 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
   },
 ];
 
+/*********************************************************** BODEGA EXTRUSIÓN **************************************************************************/
 export const stepsEliminarRollos : Step.StepOptions[] = [
   {
     attachTo: {
@@ -695,7 +696,7 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
     buttons: [
       builtInButtons.cancel,
       builtInButtons.next,
-      builtInButtons.back
+      builtInButtons.back,
     ],
     classes: 'card',
     id: 'table',
@@ -1073,6 +1074,7 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
   },
 ];
 
+/******************************************************************** DESPACHO ************************************************************************/
 export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
   {
     attachTo: {
@@ -2241,6 +2243,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
   },
 ];
 
+/************************************************************** DESPERDICIO ***********************************************************************/
 export const stepsDesperdicio : Step.StepOptions[] = [
   {
     attachTo: {
@@ -2619,6 +2622,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
   },
 ];
 
+/********************************************************* GESTIÓN DE ARCHIVOS *******************************************************************/
 export const stepsArchivos : Step.StepOptions[] = [
   {
     attachTo: {
@@ -2814,5 +2818,279 @@ export const stepsArchivos : Step.StepOptions[] = [
     id: 'eliminar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Eliminar un archivo o carpeta!</h4>',
     text: `<p>¡Para <b>eliminar un archivo o carpeta</b> presionamos el botón y nos saldrá un mensaje de confirmación!</p>`
+  },
+];
+
+/**************************************************************** MATERIA PRIMA ******************************************************************/
+export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información acerca de la asignación!</h4>',
+    text: `<p>¡Aquí se deberá llenar la información general de la asignación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'ordenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
+    text: `<p>¡Para realizar una <b>asignación de materia prima</b> debemos <b>primero buscar la orden</b> a la que le haremos la asignación, para ello diligenciamos este campo y presionamos <b>enter</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información de la OT!</h4>',
+    text: `<p>¡Al buscar la orden de trabajo se colocará en este espacio una breve información de la esta. <br>
+    La columna llamada <b>Kg Total</b> dirá la cantidad total de kilos que se deben pesar para esta OT. <br>
+    La columna llamada <b>Kg Restante</b> indicará la cantidad de materia prima que hace falta por asignar a la OT. Sí la cantidad es negativa no se podrá hacer la asignación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#maquina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'maquina',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Maquina!</h4>',
+    text: `<p>¡Debemos colocar el <b>número de la maquina</b> a la que irá la materia prima, simplemente colocamos ese número en este campo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
+    text: `<p>¡Si es necesario podemos colocar una descripción o observación acerca de la asignación de materia prima!</p>`
+  },
+  {
+    attachTo: {
+      element: '#materiaPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'materiaPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima!</h4>',
+    text: `<p>¡Para <b>elegir la Materia Prima</b> que se asignará debemos llenar estos campos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#idMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'idMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Id Materia Prima!</h4>',
+    text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en este campo y se llenarán automaticamente los otros campos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#nombreMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'nombreMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Nombre Materia Prima!</h4>',
+    text: `<p>¡La segunda opción para <b>elegir la Materia Prima</b> es seleccionarla de este campo, podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
+  },
+  {
+    attachTo: {
+      element: '#stockMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'stockMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Stock Materia Prima!</h4>',
+    text: `<p>¡Aquí podremos ver al <b>cantidad total de materia prima que hay en la bodega</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'cantidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad Materia Prima!</h4>',
+    text: `<p>¡Tenemos que digitar la <b>cantidad de materia prima que asignaremos</b>, esta cantidad no puede ser mayor a la cantidad que aparece en stock!</p>`
+  },
+  {
+    attachTo: {
+      element: '#und',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'und',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Unidad de medida!</h4>',
+    text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
+  },
+  {
+    attachTo: {
+      element: '#proceso',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'proceso',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Proceso!</h4>',
+    text: `<p>¡Debe quedar registro del proceso al que saldrá la materia prima, por eso tenemos que elegirlo aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'agregarMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
+    text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'limpiarMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
+    text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
+    text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente crear la asignación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'quitarMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
+    text: `<p>¡Antes de realizar la asignación debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#asignar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'asignar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Asignar Materia Prima!</h4>',
+    text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Crear la asignación</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje de 'Asignación creada' de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
   },
 ];
