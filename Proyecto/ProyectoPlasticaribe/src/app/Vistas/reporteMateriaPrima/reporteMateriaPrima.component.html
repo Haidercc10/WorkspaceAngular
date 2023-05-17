@@ -24,26 +24,30 @@
 
 <p-card class="font-size-14">
 
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
   </div>
 
   <p-toolbar styleClass="mb-5 gap-3">
       <ng-template pTemplate="left">
-        <span class="p-float-label">
-          <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
-          <label for="FechaInicial">Rango de Fechas</label>
+        <span class="p-float-label" id="rango-fechas">
+            <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Rango de Fechas</label>
         </span>
-        <button pButton pRipple pTooltip="Consultar Inventario" icon="pi pi-search" class="p-button-danger botonesOpciones" (click)="consultarInventario()"></button>
-        <button pButton pRipple pTooltip="Con Existencias" icon="pi pi-eject" class="p-button-warning botonesOpciones" (click)="existenciasMayorCero()"></button>
+        <button pButton pRipple pTooltip="Consultar Inventario" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultarInventario()"></button>
+        <button pButton pRipple pTooltip="Con Existencias" icon="pi pi-eject" class="p-button-warning botonesOpciones" id="con-existencias" (click)="existenciasMayorCero()"></button>
       </ng-template>
 
       <ng-template pTemplate="right">
-        <button pButton pRipple label="Exportar Todo a Excel" icon="pi pi-file-excel"class="p-button-success" (click)="exportarExcel(1)"></button>
+        <button pButton pRipple label="Exportar Todo a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
       </ng-template>
   </p-toolbar>
 
-  <p-tabView [scrollable]="true">
+  <p-tabView [scrollable]="true" id="materias-primas">
       <!-- Materias Primas -->
       <p-tabPanel
         header="Materias Primas"
@@ -62,18 +66,18 @@
                 [rowsPerPageOptions]="[10,25,50,100,ArrayMateriaPrima.length]"
                 [rowHover]="true"
                 dataKey="Id">
-              <ng-template pTemplate="header">
-                <tr class="font-size-16">
+              <ng-template pTemplate="header" >
+                <tr class="font-size-16" id="filtros">
                   <th></th>
-                  <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')"></th>
+                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
-                  <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains')"></th>
+                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Inicial', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Entrada', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Salida', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Diferencia', 'contains')"></th>
-                  <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'UndCant', 'contains')"></th>
+                  <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'UndCant', 'contains')"></th>
                   <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PrecioUnd', 'contains')"></th>
                   <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Categoria', 'contains')"></th>
@@ -88,19 +92,19 @@
                   </th>
                   <th scope="col">Ancho
                   </th>
-                  <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
+                  <th id="inicial" pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
                     <p-sortIcon field="Inicial"></p-sortIcon>
                   </th>
-                  <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
+                  <th id="entrada" pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
                     <p-sortIcon field="Entrada"></p-sortIcon>
                   </th>
-                  <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
+                  <th id="salida" pSortableColumn="Salida" pReorderableColumn scope="col">Salida
                     <p-sortIcon field="Salida"></p-sortIcon>
                   </th>
-                  <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock
+                  <th id="stock" pSortableColumn="Cant" pReorderableColumn scope="col">Stock
                     <p-sortIcon field="Cant"></p-sortIcon>
                   </th>
-                  <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
+                  <th id="diferencia" pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
                     <p-sortIcon field="Diferencia"></p-sortIcon>
                   </th>
                   <th scope="col">Medida
@@ -114,7 +118,7 @@
                   <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                     <p-sortIcon field="Categoria"></p-sortIcon>
                   </th>
-                  <th><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(2)"></button></th>
+                  <th><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar2" (click)="exportarExcel(2)"></button></th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
@@ -137,7 +141,7 @@
                 </tr>
               </ng-template>
               <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
-                <tr>
+                <tr id="totales">
                   <td colspan="4" class="text-right">Totales</td>
                   <td>{{cantInicial | number}}</td>
                   <td>{{cantEntrante | number}}</td>
@@ -147,7 +151,7 @@
                   <td colspan="2" class="text-right">{{'Kg'}}</td>
                   <td>{{valorTotal | number}}</td>
                   <td>COP</td>
-                  <td><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(2)"></button></td>
+                  <td><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
                 </tr>
               </ng-template>
             </p-table>
@@ -493,5 +497,4 @@
         </div>
       </p-tabPanel>
   </p-tabView>
-
 </p-card>

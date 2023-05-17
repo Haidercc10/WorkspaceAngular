@@ -311,6 +311,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = (dato : any) => this.messageService.clear(dato);
 
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;

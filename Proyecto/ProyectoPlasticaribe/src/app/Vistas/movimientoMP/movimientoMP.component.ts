@@ -10,6 +10,8 @@ import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaP
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { stepsMovimientosBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-movimientoMP',
@@ -44,7 +46,8 @@ export class MovimientoMPComponent implements OnInit {
                   private messageService: MessageService,
                     private materiaPrimaService : MateriaPrimaService,
                       private detallesAsignacionService : DetallesAsignacionService,
-                        private bagProServices : BagproService,) {
+                        private bagProServices : BagproService,
+                          private shepherdService: ShepherdService) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -1036,5 +1039,14 @@ export class MovimientoMPComponent implements OnInit {
   mensajeAdvertencia(mensaje : string) {
     this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
     this.cargando = false;
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

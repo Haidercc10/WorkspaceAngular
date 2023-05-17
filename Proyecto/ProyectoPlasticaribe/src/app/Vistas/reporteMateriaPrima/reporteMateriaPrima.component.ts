@@ -11,6 +11,8 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { stepInventarioBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -72,7 +74,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   private categoriMpService : CategoriaMateriaPrimaService,
                     private AppComponent : AppComponent,
                       private boppService : EntradaBOPPService,
-                        private messageService: MessageService) {
+                        private messageService: MessageService,
+                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -450,4 +453,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   /** Mostrar mensaje de advertencia */
   mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: mensaje, detail: `¡Advertencia!`, life: 2000});
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }

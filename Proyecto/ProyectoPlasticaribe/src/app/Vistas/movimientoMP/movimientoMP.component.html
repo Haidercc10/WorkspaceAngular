@@ -23,13 +23,17 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de Búsqueda</h2>
   </div>
   <br>
 
   <form [formGroup]="formMovimientos" (ngSubmit)="consultarMovimientos()">
-    <div class="mb-3">
+    <div class="mb-3" id="formulario1">
       <div class="row g-4">
 
         <!-- Codigo -->
@@ -79,7 +83,7 @@
     </div>
 
     <!-- Botones -->
-    <div class="mb-1">
+    <div class="mb-1" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
@@ -87,7 +91,7 @@
     </div>
   </form>
 
-  <p-tabView [scrollable]="true">
+  <p-tabView [scrollable]="true" id="tab">
     <p-tabPanel
       header="Materias Primas"
       leftIcon="pi pi-th-large"
@@ -105,7 +109,7 @@
         [value]="movimientosPolietilenos"
         *ngIf="!cargando">
         <ng-template pTemplate="header">
-          <tr>
+          <tr id="filtros">
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Codigo', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Tipo_Movimiento', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Fecha', 'contains')"></th>
@@ -121,7 +125,7 @@
             <th scope="col">Registrado Por:</th>
             <th scope="col">Materia Prima</th>
             <th scope="col">Cantidad</th>
-            <th scope="col">Ver</th>
+            <th scope="col" id="exportar1">Ver</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data>
@@ -136,7 +140,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
-          <tr>
+          <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
             <td colspan="3"></td>

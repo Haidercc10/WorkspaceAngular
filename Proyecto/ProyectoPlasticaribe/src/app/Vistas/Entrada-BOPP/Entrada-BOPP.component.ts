@@ -16,6 +16,8 @@ import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
+import { stepEntradaBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Entrada-BOPP',
@@ -63,7 +65,8 @@ export class EntradaBOPPComponent implements OnInit {
                                   private servicioOC_Remisiones : OrdenCompra_RemisionService,
                                     private servicioDetalleFacco_MatPrima : FacturaMpService,
                                       private servicioDetRemisiones : RemisionesMPService,
-                                        private messageService: MessageService) {
+                                        private messageService: MessageService,
+                                          private shepherdService: ShepherdService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -235,12 +238,13 @@ export class EntradaBOPPComponent implements OnInit {
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(item : any){
     this.boppSeleccionado = item;
-    this.messageService.add({severity:'warn', key:'bopp', summary:'Elección', detail: `Está seguro que desea eliminar el rollo ${item.id} de la tabla?`, sticky: true});
+    this.messageService.add({severity:'warn', key:'bopp', summary:'Elección', detail: `Está seguro que desea eliminar el rollo ${item.Serial} de la tabla?`, sticky: true});
   }
 
   // Funcion que va a quitar un rollo de la tabla
   quitarRollo(data : any){
     data = this.boppSeleccionado;
+    this.onReject();
     for (let i = 0; i < this.ArrayBOPP.length; i++) {
       if (data.Serial == this.ArrayBOPP[i].Serial) this.ArrayBOPP.splice(i, 1) ;
     }
@@ -568,4 +572,12 @@ export class EntradaBOPPComponent implements OnInit {
     this.messageService.clear('bopp');
   }
 
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }

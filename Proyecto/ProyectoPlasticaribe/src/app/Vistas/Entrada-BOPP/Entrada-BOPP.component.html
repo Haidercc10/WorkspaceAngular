@@ -23,18 +23,22 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-3">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Opcional</h4>
   </div>
 
   <!--Entrada opcional-->
-  <div class="mb-5">
+  <div class="mb-5" id="opcional">
     <p-accordion>
       <p-accordionTab header="Ingresar Factura de BOPP/BOPA/Poliester">
         <br>
 
         <form [formGroup]="FormOpcional">
-          <div class="mb-3">
+          <div class="mb-3" id="formulario1">
             <div class="row g-3">
 
               <!-- Orden de Trabajo -->
@@ -91,7 +95,7 @@
         </div>
 
         <!--Tabla de datos-->
-        <div class="row g-3">
+        <div class="row g-3" id="tabla1">
           <div class="table-responsive">
             <p-table
             #dt
@@ -167,7 +171,7 @@
   <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
   <form [formGroup]="FormEntradaBOPP">
     <!-- Fila 1 -->
-    <div class="mb-4">
+    <div class="mb-4" id="formulario2">
       <div class="row g-4">
 
         <!-- Nombre BOPP -->
@@ -250,7 +254,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-4">
+    <div class="mb-4" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Añadir Material" icon="pi pi-send" (click)="cargarBOPPTabla()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
@@ -267,7 +271,7 @@
   </div>
 
   <!-- Tabla de BOPP entrante -->
-  <div class="row g-3">
+  <div class="row g-3" id="tabla2">
     <div class="table-responsive">
       <p-table
       #dt
@@ -291,7 +295,7 @@
             <th id="cantidadMateriaPrima" scope="col">Precio Und</th>
             <th id="cantidadMateriaPrima" scope="col">Subtotal</th>
             <th id="cantidadMateriaPrima" scope="col">Categoria</th>
-            <th id="eliminar" scope="col">Eliminar</th>
+            <th id="eliminar" scope="col" id="quitar-rollo">Quitar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-bopp>
@@ -306,7 +310,7 @@
             <td id="cantidadMateriaPrima">{{bopp.Precio | number: '1.2-2'}}</td>
             <td id="cantidadMateriaPrima">{{bopp.Subtotal | number: '1.2-2'}}</td>
             <td id="cantidadMateriaPrima">{{bopp.Cat}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Rollo" (click)="quitarRollo(bopp)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Rollo" (click)="mostrarEleccion(bopp)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -321,13 +325,11 @@
 
   <br>
   <div *ngIf="load">
-    <div class="mb-3">
+    <div class="mb-3" id="botones2">
       <div class="row g-3">
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="validarTipoEntradaBopp()"></button>
-            <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
-          </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="validarTipoEntradaBopp()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
         </div>
       </div>
     </div>
