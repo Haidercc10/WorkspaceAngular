@@ -4320,6 +4320,182 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
     Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
     Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
   },
-]
+];
+
+export const stepsFacturacionMaquilas: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#campo1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'campo1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionar orden de maquila</h5>`,
+    text: `Digita el número de la orden de maquila en este campo y presiona ENTER para cargar el tercero y los detalles de la OM en la primera tabla.`
+  },
+  {
+    attachTo: {
+      element: '#campo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'campo2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Factura</h5>`,
+    text:  `En este campo puedes colocar <b>el código de la factura que estará asociada a la orden de maquila</b>.<br><br>
+    Recuerda que si este campo tiene información, <b>no puedes llenar el campo de remisión</b>`
+  },
+  {
+    attachTo: {
+      element: '#campo3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'campo3',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Remisión</h5>`,
+    text:  `En este campo puedes colocar <b>el código de la remisión que estará asociada a la orden de maquila</b>.<br><br>
+    Recuerda que si este campo tiene información, <b>no puedes llenar el campo de factura</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
+    text: `En esta tabla <b>se encontrarán las materias primas de la orden de maquila consultada previamente.</b>`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
+    text: `En este campo puedes ver la cantidad total por la que se realizó la orden de maquila para cada materia prima.`
+  },
+  {
+    attachTo: {
+      element: '#ver2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver2',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
+    text: `Este campo indica la cantidad de materia prima facturada y/o remisionada hasta el momento de la consulta.`
+  },
+  {
+    attachTo: {
+      element: '#ver3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver3',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
+    text: `En esta columna podrás apreciar la cantidad de materia prima faltante por entregar de cada materia prima en la orden de maquila.`
+  },
+  {
+    attachTo: {
+      element: '#agregar1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'agregar1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Agregar materiales a entregar</h5>`,
+    text: `Haz clic aquí para agregar materias primas a la facturación de maquilas, ten en cuenta que puedes agregar una por una o todas las materias primas que entregarás.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabla2',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas seleccionadas de la OM</h5>`,
+    text: `En esta tabla <b>se encontrarán las materias primas que elegiste previamente</b>, y las cuales serán facturadas o remisionadas al tercero seleccionado.`
+  },
+  {
+    attachTo: {
+      element: '#ver1-t2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: '#ver1-t2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
+    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
+    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
+    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+  },
+  {
+    attachTo: {
+      element: '#ver2-t2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: '#ver2-t2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
+    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
+    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
+    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+  },
+  {
+    attachTo: {
+      element: '#pie-t2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: '#pie-t2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
+    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
+    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
+    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+  },
+];
 
 

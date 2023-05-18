@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { modelDtFacturacion_OrdenMaquila } from 'src/app/Modelo/modelDtFacturacion_OrdenMaquila';
@@ -17,6 +16,8 @@ import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maqu
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { stepsFacturacionMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Facturacion_OrdenMaquila',
@@ -50,7 +51,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
                             private tintaService : TintasService,
                               private boppService : EntradaBOPPService,
                                 private ordenMaquilaService : Orden_MaquilaService,
-                                  private messageService: MessageService ) {
+                                  private messageService: MessageService,
+                                    private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFacturacionOrden = this.frmBuilder.group({
       OrdenMaquila : ['', Validators.required],
@@ -613,5 +615,14 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   /** Función para quitar mensaje de elección */
   onReject(){
     this.messageService.clear('pdf');
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }
