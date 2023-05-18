@@ -318,5 +318,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+    this.shepherdService.show('Hola')
   }
 }

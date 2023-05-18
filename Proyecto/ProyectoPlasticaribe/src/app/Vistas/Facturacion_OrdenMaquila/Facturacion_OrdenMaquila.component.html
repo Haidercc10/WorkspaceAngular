@@ -21,6 +21,11 @@
 </div>
 
 <p-card>
+  <!--Ver tutorial-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <!-- Inicio titulo -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-dollar"></i> Facturación de Ordenes de Maquilas</h4>
@@ -82,7 +87,7 @@
 
   <!--Inicio tabla Mat. Primas de la OC -->
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3">
+    <div class="row g-3" id="tabla1">
       <p-table
       #dt
       [value]="materiasPrimas"
@@ -100,13 +105,13 @@
           <tr>
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Cantidad Total</th>
-            <th scope="col">Cant. Facturada</th>
-            <th scope="col">Cantidad Faltante</th>
+            <th id="ver1" scope="col">Cantidad Total</th>
+            <th id="ver2" scope="col">Cant. Facturada</th>
+            <th id="ver3" scope="col">Cantidad Faltante</th>
             <th scope="col">Presentación</th>
             <th scope="col">Precio</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="validarMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="agregar1" (click)="validarMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -149,7 +154,7 @@
   </div>
 
   <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3">
+    <div class="row g-3" id="tabla2">
       <p-table
         #dt1
         [value]="materiaPrimasSeleccionadas"
@@ -165,11 +170,11 @@
           <tr>
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Cantidad</th>
+            <th id="ver1-t2" scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
             <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(materiaPrimasSeleccionadas)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="ver2-t2" (click)="quitarTodosMateriaPrima(materiaPrimasSeleccionadas)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -180,7 +185,7 @@
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input  type="number" [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" (keyup)="calcularPrecio()">
+                  <input type="number" [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" (keyup)="calcularPrecio()">
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{materiaPrimaSeleccionads.Cantidad_Faltante_Editar | number : '1.2-2'}}
@@ -195,7 +200,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
-          <tr>
+          <tr id="pie1-t2">
             <td colspan="2" class="text-right">Totales</td>
             <td colspan="2">{{pesoTotal | number : '1.2-2'}}</td>
             <td>{{precioTotal | number : '1.2-2'}}</td>
@@ -207,7 +212,7 @@
 
 
   <!-- BOTONES -->
-  <div class="mb-1">
+  <div class="mb-3" id="pie-t2">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" type="button" label="Facturar Maquila" icon="pi pi-check" (click)="validarDatos()"> </button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>

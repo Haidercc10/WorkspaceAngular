@@ -4325,7 +4325,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
 export const stepsFacturacionMaquilas: Step.StepOptions[] = [
   {
     attachTo: {
-      element: '#campo1',
+      element: '#orden',
       on: 'bottom'
     },
     buttons: [
@@ -4333,13 +4333,13 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.next,
     ],
     classes: '',
-    id: 'campo1',
+    id: 'orden',
     title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionar orden de maquila</h5>`,
-    text: `Digita el número de la orden de maquila en este campo y presiona ENTER para cargar el tercero y los detalles de la OM en la primera tabla.`
+    text: `<b>Digita el número de la orden de maquila en este campo y presiona ENTER</b> para cargar el tercero y los detalles de la OM en la primera tabla.`
   },
   {
     attachTo: {
-      element: '#campo2',
+      element: '#Factura',
       on: 'bottom'
     },
     buttons: [
@@ -4347,14 +4347,14 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.next,
     ],
     classes: '',
-    id: 'campo2',
+    id: 'Factura',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Factura</h5>`,
     text:  `En este campo puedes colocar <b>el código de la factura que estará asociada a la orden de maquila</b>.<br><br>
     Recuerda que si este campo tiene información, <b>no puedes llenar el campo de remisión</b>`
   },
   {
     attachTo: {
-      element: '#campo3',
+      element: '#Remision',
       on: 'bottom'
     },
     buttons: [
@@ -4362,7 +4362,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.next,
     ],
     classes: '',
-    id: 'campo3',
+    id: 'Remision',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Remisión</h5>`,
     text:  `En este campo puedes colocar <b>el código de la remisión que estará asociada a la orden de maquila</b>.<br><br>
     Recuerda que si este campo tiene información, <b>no puedes llenar el campo de factura</b>`
@@ -4378,7 +4378,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     ],
     classes: '',
     id: 'tabla1',
-    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Mat. primas asociadas a la OM</h5>`,
     text: `En esta tabla <b>se encontrarán las materias primas de la orden de maquila consultada previamente.</b>`
   },
   {
@@ -4392,8 +4392,8 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     ],
     classes: '',
     id: 'ver1',
-    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
-    text: `En este campo puedes ver la cantidad total por la que se realizó la orden de maquila para cada materia prima.`
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad solicitada</h5>`,
+    text: `En este campo puedes ver <b>la cantidad total de materia prima por la que se realizó la orden de maquila.</b>`
   },
   {
     attachTo: {
@@ -4406,8 +4406,8 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     ],
     classes: '',
     id: 'ver2',
-    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
-    text: `Este campo indica la cantidad de materia prima facturada y/o remisionada hasta el momento de la consulta.`
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad facturada</h5>`,
+    text: `Este campo <b>indica la cantidad de materia prima facturada y/o remisionada</b> hasta el momento de la consulta.`
   },
   {
     attachTo: {
@@ -4420,8 +4420,8 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     ],
     classes: '',
     id: 'ver3',
-    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas asociadas a la OM</h5>`,
-    text: `En esta columna podrás apreciar la cantidad de materia prima faltante por entregar de cada materia prima en la orden de maquila.`
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad faltante</h5>`,
+    text: `En esta columna <b>podrás apreciar la cantidad de materia prima faltante por entregar</b> en la orden de maquila.`
   },
   {
     attachTo: {
@@ -4435,7 +4435,8 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     classes: '',
     id: 'agregar1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Agregar materiales a entregar</h5>`,
-    text: `Haz clic aquí para agregar materias primas a la facturación de maquilas, ten en cuenta que puedes agregar una por una o todas las materias primas que entregarás.</b>`
+    text: `Haz clic aquí para agregar materias primas a la facturación de maquila.<br><br>
+    <b>Ten en cuenta que puedes agregar una por una o todas las materias primas</b> que serán facturadas y entregadas al tercero.</b>`
   },
   {
     attachTo: {
@@ -4448,8 +4449,8 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     ],
     classes: '',
     id: 'tabla2',
-    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas seleccionadas de la OM</h5>`,
-    text: `En esta tabla <b>se encontrarán las materias primas que elegiste previamente</b>, y las cuales serán facturadas o remisionadas al tercero seleccionado.`
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Mat. primas seleccionadas de la OM</h5>`,
+    text: `En esta tabla <b>se encontrarán las materias primas que elegiste previamente de la orden de maquila consultada</b>, y las cuales serán facturadas o remisionadas al tercero seleccionado.`
   },
   {
     attachTo: {
@@ -4457,14 +4458,14 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back
+      builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: '',
     id: '#ver1-t2',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
-    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
-    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
-    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+    title: `<h5 class="tituloRojo" style="margin: auto;">Editar cantidad de mat. Prima</h5>`,
+    text: `Haciendo clic sobre este campo, <b>puedes editar la cantidad de materia prima que será facturada o remisionada.</b><br><br>
+    Si se desea realizar una entrega <b>por la misma cantidad solicitada en la orden de maquila</b>, no es necesario editar este campo.`
   },
   {
     attachTo: {
@@ -4472,14 +4473,14 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back
+      builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: '',
     id: '#ver2-t2',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
-    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
-    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
-    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+    title: `<h5 class="tituloRojo" style="margin: auto;">Quitar materiales</h5>`,
+    text: `Haciendo clic sobre este checkbox <b>puedes quitar todas las materias primas elegidas previamente de la orden de maquila</b>, si ya no deseas realizar la facturación o si tuviste algún error de digitación.<br><br>
+    Si deseas quitar solo una materia prima cargada, <b>haz clic sobre el check que aparece en cada fila en esta misma columna.</b>`
   },
   {
     attachTo: {
@@ -4487,15 +4488,32 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back
+      builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: '',
     id: '#pie-t2',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
-    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
-    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
-    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver totales</h5>`,
+    text: `En este pie de la tabla puedes ver la <b>cantidad total en kilos de las materias primas que entregarás y el total facturado.</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: '#botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Facturar maquila</h5>`,
+    text: `Finalmente haz clic sobre facturar maquila para crear el registro con los detalles de las materias primas que serán vendidas al tercero.<br><br>
+    Recuerda que en cuanto se crea el registro, se decontarán del inventario las cantidades de las materias primas facturadas o remisionadas.<br><br>
+    Si te equivocas digitando o ya no deseas realizar la OM, <b>solo haz clic en el botón limpiar todo.</b>`
   },
 ];
+
+
+
 
 
