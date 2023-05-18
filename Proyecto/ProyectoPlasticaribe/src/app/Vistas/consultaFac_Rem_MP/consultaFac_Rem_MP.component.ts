@@ -9,6 +9,8 @@ import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisi
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { AppComponent } from 'src/app/app.component';
+import { stepsMovimientos as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-consultaFac_Rem_MP',
@@ -43,7 +45,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                   private tipoDocuemntoService : TipoDocumentoService,
                     private proveedorService : ProveedorService,
                       private remisionMpService : RemisionesMPService,
-                        private facturaCompraMPService : FacturaMpService,) {
+                        private facturaCompraMPService : FacturaMpService,
+                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null],
@@ -572,5 +575,14 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
         }
       });
     }
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

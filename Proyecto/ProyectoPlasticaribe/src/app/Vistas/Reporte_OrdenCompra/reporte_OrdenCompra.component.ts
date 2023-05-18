@@ -1,17 +1,16 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import Swal from 'sweetalert2';
 import { OcompraComponent } from '../ocompra/ocompra.component';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
+import { stepsMovOrdenCompra as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -41,7 +40,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private estadosService : EstadosService,
                     private dtOrdenCompraService : DetallesOrdenesCompraService,
-                      private messageService: MessageService) {
+                      private messageService: MessageService,
+                        private shepherdService: ShepherdService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
@@ -554,5 +554,14 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
+  }
+
+   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+   verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

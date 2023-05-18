@@ -8,7 +8,8 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Modal_RptRecuperadoMPComponent } from 'src/app/Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-
+import { stepsMovRecuperado as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Reporte_RecuperadoMP',
@@ -38,7 +39,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
                     private usuariosService : UsuarioService,
                       private recuperadoService : RecuperadoMPService,
                         private messageService: MessageService,
-                          private AppComponent : AppComponent) {
+                          private AppComponent : AppComponent,
+                            private shepherdService: ShepherdService) {
 
     this.formReporteRMP = this.frmBuilder.group({
       FechaInicial: [null],
@@ -148,12 +150,11 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     if (materiaPrima == null) materiaPrima = 0;
     if (operario == null) operario = 0;
     if (turno == null) turno = 'NE';
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
     if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
-
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     this.recuperadoService.consultaRecuperado(fechaInicial, fechaFinal, operario, turno, materiaPrima).subscribe(datos_recuperado => {
       if (datos_recuperado.length <= 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron registros para los filtros consultados`);
@@ -280,5 +281,14 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

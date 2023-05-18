@@ -1433,7 +1433,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Búsqueda por filtros</h5>`,
     text: `En este formulario puedes <b>filtrar tus busquedas</b> para ver los movimientos de cada materia prima.<br><br>
-    Ten en cuenta que puedes realizar distintas combinaciones de filtros, pero <b>DEBES elegir un rango de fechas específico para que se puede cargar la información solicitada en la tabla.</b><br><br>
+    Ten en cuenta que puedes realizar distintas combinaciones de filtros, pero <b>sino llenas ningún campo solo se cargará en la tabla información del día de hoy.</b><br><br>
     En el campo código de documento <b>puedes hacer referencia a las OT, facturas, remisiones y/o asignaciones de bopp o tinta</b> en que las materias primas tuvieron movimientos.`
   },
   {
@@ -3774,5 +3774,552 @@ export const stepsReporteActivos: Step.StepOptions[] = [
     text: `Haciendo clic sobre cualquier registro de la tabla, <b>se cargará un modal en el cual podrás apreciar los movimientos de ese activo.<b>`
   }
 ];
+
+/******************************************************** MOVIMIENTOS ***************************************************************/
+
+export const stepsMovimientos: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
+    text: `En este formulario podrás realizar las consultas que desees <b>combinando los diferentes filtros de búsqueda</b><br><br>
+     <b>Si no diligencias los campos,</b> la búsqueda será realizada teniendo en cuenta solo la fecha de hoy.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
+    text: `Luego de diligenciar los filtros, <b>pulsa sobre el botón consultar para ver los resultados de la búsqueda en la tabla .</b><br><br>
+    Si deseas reiniciar la búsqueda, <b>haz clic sobre limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#table',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'table',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
+    text: `En esta tabla <b>se cargará la información de las remisiones y/o facturas,</b> teniendo en cuenta los filtros consultados.<br><br>
+    <b>Pulsando sobre el icono <i class="pi pi-sort-alt"><i/></b> podrás organizar de manera ascendente o descendente los registros de esa columna de la tabla.`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
+    text: `Aquí podrás ver en PDF los detalles de la factura o remisión seleccionada. <b></b><br><br>`
+  },
+];
+
+export const stepsMovimientosMtto: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
+    text: `En este formulario podrás realizar las consultas que desees <b>combinando los diferentes filtros de búsqueda</b><br><br>
+     <b>Si no diligencias los campos,</b> la búsqueda será realizada teniendo en cuenta solo la fecha de hoy.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
+    text: `Luego de diligenciar los filtros, <b>pulsa sobre el botón consultar para ver los resultados de la búsqueda en la tabla .</b><br><br>
+    Si deseas reiniciar la búsqueda, <b>haz clic sobre limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#table',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'table',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
+    text: `En esta tabla <b>se cargará la información de los movimientos de mantenimiento de los activos,</b> teniendo en cuenta los filtros consultados.<br><br>
+    <b>Pulsando sobre el icono <i class="pi pi-sort-alt"><i/></b> podrás organizar de manera ascendente o descendente los registros de esa columna de la tabla.`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
+    text: `Aquí podrás ver en PDF los detalles del movimiento de mantenimiento de activos seleccionados. <b></b><br><br>`
+  },
+];
+
+export const stepsMovRecuperado: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
+    text: `En este formulario podrás realizar las consultas que desees acerca de los movimientos de orden de compra de materia prima <b>combinando los diferentes filtros de búsqueda</b><br><br>
+     <b>Si no diligencias los campos,</b> la búsqueda será realizada teniendo en cuenta solo la fecha de hoy.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
+    text: `Luego de diligenciar los filtros, <b>pulsa sobre el botón consultar para ver los resultados de la búsqueda en la tabla.</b><br><br>
+    Si deseas reiniciar la búsqueda, <b>haz clic sobre el botón limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
+    text: `En esta tabla <b>se cargará la información de los movimientos de recuperado de materia prima,</b> teniendo en cuenta los filtros consultados.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
+    text: `Si tienes registros cargados en la tabla, haz clic sobre este campo para apreciar en un modal de manera detallada y agrupado por el turno de día, <b>en que fecha, que operario y que cantidad fue recuperada del material seleccionado. </b>`
+  },
+  {
+    attachTo: {
+      element: '#ver2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: 'card',
+    id: 'ver2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
+    text: `Si tienes registros cargados en la tabla, haz clic sobre este campo para apreciar en un modal de manera detallada y agrupado por el turno de noche, <b>en que fecha, que operario y que cantidad fue recuperada del material seleccionado. </b>`
+  },
+];
+
+export const stepsMovOrdenCompra: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
+    text: `En este formulario podrás realizar las consultas que desees acerca de los movimientos de orden de compra de materia prima <b>combinando los diferentes filtros de búsqueda</b><br><br>
+     <b>Si no diligencias los campos,</b> la búsqueda será realizada teniendo en cuenta solo la fecha de hoy.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
+    text: `Luego de diligenciar los filtros, <b>pulsa sobre el botón consultar para ver los resultados de la búsqueda en la tabla.</b><br><br>
+    Si deseas reiniciar la búsqueda, <b>haz clic sobre el botón limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
+    text: `En esta tabla <b>se cargará la información de los movimientos de orden de compra de materia prima,</b> teniendo en cuenta los filtros consultados.<br><br>
+    Además puedes editar un movimiento de OC, <b>haciendo clic sobre cualquier registro de la tabla.</b>`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtrar registros de la tabla</h5>`,
+    text: `Haciendo clic sobre este icono, <b>podrás realizar filtros sobre la información que se encuentra cargada en la tabla.</b><br><br>
+    Entre los diferentes filtros se encuentran que la búsqueda:<br>
+    - <b>Empiece con.</b><br>
+    - <b>Contiene.</b><br>
+    - <b>No contiene.</b><br>
+    - <b>Termina con.</b><br>
+    - <b>Igual.</b><br>
+    - <b>No igual.</b><br><br>
+    Luego de elegir una de las opciones, <b>escribe la palabra clave o número del registro con el que deseas realizar la búsqueda en la tabla</b> y haz clic sobre el botón aplicar.`
+  },
+  {
+    attachTo: {
+      element: '#limpiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'limpiar',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Limpiar Filtros</h5>`,
+    text: `Si seleccionas uno o varios filtros en la tabla y <b>deseas limpiarlos haz clic sobre este botón</b>`
+  },
+  {
+    attachTo: {
+      element: '#ver2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver Estado</h5>`,
+    text: `En este campo de la tabla <b>podrás apreciar el estado en que se encuentra la orden de compra.</b><br><br>
+    Entre los diferentes estados se encuentran: <br>
+    - <b>Pendiente:</b> Indica que no se ha recibido por completo el material solicitado en la orden de compra.<br>
+    - <b>Finalizado:</b> Indica que ya ha sido recibido e ingresado por completo el material solicitado en la orden de compra.<br>`
+  },
+  {
+    attachTo: {
+      element: '#ver3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: 'ver3',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver PDF</h5>`,
+    text: `Pulsando sobre el boton <i class="pi pi-pdf-file"></i> que encontrarás en cada fila de esta columna, <b>podrás ver en PDF el detalle de la orden de compra seleccionada.</b><br><br>`
+  },
+];
+
+export const stepsMovMaquilas: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
+    text: `En este formulario podrás realizar las consultas que desees <b>acerca de los movimientos de ordenes de maquila de materia prima</b> combinando los diferentes filtros de búsqueda<br><br>
+     <b>Si no diligencias los campos,</b> la búsqueda será realizada teniendo en cuenta solo la fecha de hoy.`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
+    text: `Luego de diligenciar los filtros, <b>pulsa sobre el botón consultar para ver los resultados de la búsqueda en la tabla.</b><br><br>
+    Si deseas reiniciar la búsqueda, <b>haz clic sobre el botón limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabs',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabs',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Movimientos y facturación de<br> ordenes de maquila</h5>`,
+    text: `En cada uno de estos tabs encontrarás la información <b>acerca de los movimientos y la facturación de las ordenes de maquila.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
+    text: `En esta tabla <b>se cargará la información de los movimientos de ordenes de maquilas de materia prima,</b> teniendo en cuenta los filtros consultados.`
+  },
+  {
+    attachTo: {
+      element: '#ver1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Filtrar registros de la tabla</h5>`,
+    text: `Haciendo clic sobre este icono, <b>podrás realizar filtros sobre la información que se encuentra cargada en la tabla.</b><br><br>
+    Entre los diferentes filtros se encuentran que la búsqueda:<br>
+    - <b>Empiece con.</b><br>
+    - <b>Contiene.</b><br>
+    - <b>No contiene.</b><br>
+    - <b>Termina con.</b><br>
+    - <b>Igual.</b><br>
+    - <b>No igual.</b><br><br>
+    Luego de elegir una de las opciones, <b>escribe la palabra clave o número del registro con el que deseas realizar la búsqueda en la tabla</b> y haz clic sobre el botón aplicar.<br><br>
+    Para quitar los filtros consultados desde la tabla, <b>haz clic sobre el botón limpiar.</b>`
+  },
+  {
+    attachTo: {
+      element: '#ver2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'ver2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver Estado</h5>`,
+    text: `En este campo de la tabla <b>podrás apreciar el estado en que se encuentra la orden de maquila.</b><br><br>
+    Entre los diferentes estados se encuentran: <br>
+    - <b>Pendiente:</b> Indica que no se ha entregado por completo el material solicitado por el cliente/tercero en la orden de maquila.<br>
+    - <b>Finalizado:</b> Indica que ya ha sido entregado por completo el material solicitado en la orden de maquila.<br>`
+  },
+  {
+    attachTo: {
+      element: '#ver3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: 'ver3',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver PDF</h5>`,
+    text: `Pulsando sobre el boton <i class="pi pi-pdf-file"></i> que encontrarás en cada fila de esta columna, <b>podrás ver el detalle de la orden de maquila seleccionada en formato PDF.</b> `
+  },
+];
+
+/******************************************************** ORDENES DE MAQUILA ***************************************************************/
+
+export const stepsOrdenMaquila: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'botones1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar Tercero</h5>`,
+    text: `Haciendo clic sobre este botón, <b>se cargará un modal en el cual podrás registrar la información de un tercero</b> (Persona natural o jurídica que desea comprar materia prima a la empresa).`
+  },
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'formulario1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Elegir tercero</h5>`,
+    text: `En este primer formulario encontrarás el consecutivo de la orden de maquila y <b>debes elegir el tercero,</b> opcionalmente puedes
+    agregar una observación acerca de la orden de maquila.`
+  },
+  {
+    attachTo: {
+      element: '#formulario2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'formulario2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Elegir materia prima</h5>`,
+    text: `En este formulario <b>debes seleccionar la materia prima que deseas vender</b> al tercero elegido previamente<br><br>
+    Recuerda que no puedes agregar una materia prima a la tabla, <b>si el stock actual de la misma es inferior a la cantidad elegida.</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'botones2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Agregar material</h5>`,
+    text: `Luego de diligenciar los campos de la materia prima, <b>haz clic sobre agregar mat. prima para cargarlas a la tabla</b> que se encuentra acontinuación.<br><br>
+    Si deseas reiniciar la búsqueda de un material, <b>haz clic sobre limpiar campos.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas a vender</h5>`,
+    text: `En esta tabla <b>se encontrarán las materias primas que elegiste previamente</b>, y las cuales serán vendidas al tercero seleccionado.`
+  },
+  {
+    attachTo: {
+      element: '#quitar1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'quitar1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Quitar materiales</h5>`,
+    text: `Si deseas quitar una materia prima de la orden, haz clic sobre el icono <i class="pi pi-trash"></i> <b>que se mostrará en cada fila de esta columna cuando la tabla tenga registros.</b>`
+  },
+  {
+    attachTo: {
+      element: '#pie1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'pie1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Totales en kilos y precios</h5>`,
+    text: `En este pie de tabla podrás apreciar <b>la cantidad total en kilos de la materia prima seleccionada y el precio total estimado de la orden.</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: '',
+    id: 'botones3',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar orden de maquila</h5>`,
+    text: `Después de elegir las materias primas, haz clic sobre crear orden de maquila para registrarla.<br><br>
+    Recuerda que al registrar la orden <b>se descontarán del stock las cantidades de las materias primas</b> que elegiste.<br><br>
+    Si te equivocaste y deseas reiniciar la orden de maquila, <b>haz clic sobre limpiar todo.</b>`
+  },
+]
 
 

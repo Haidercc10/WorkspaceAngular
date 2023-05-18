@@ -12,6 +12,8 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { stepsMovimientosMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +49,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                       private estadosService : EstadosService,
                         private dtMantenimientoService : Detalle_MantenimientoService,
                           private dtPedidoMttoService : DetallePedido_MantenimientoService,
-                            private messageService: MessageService) {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -535,4 +538,12 @@ export class Movimientos_MantenimientoComponent implements OnInit {
    this.cargando = false;
   }
 
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }

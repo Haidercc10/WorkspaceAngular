@@ -15,6 +15,8 @@ import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maqu
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { stepsOrdenMaquila as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -62,7 +64,8 @@ export class Orden_MaquilaComponent implements OnInit {
                           private terceroService : TercerosService,
                             private ordenMaquilaService : Orden_MaquilaService,
                               private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
-                                private messageService: MessageService ) {
+                                private messageService: MessageService,
+                                  private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenMaquila = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -863,4 +866,13 @@ export class Orden_MaquilaComponent implements OnInit {
 
   /** Función para quitar mensaje de elección */
   onReject = () => this.messageService.clear(this.llave);
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }

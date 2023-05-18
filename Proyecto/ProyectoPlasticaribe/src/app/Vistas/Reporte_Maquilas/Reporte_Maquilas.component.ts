@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -12,6 +11,8 @@ import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturaci
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
+import { stepsMovMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Reporte_Maquilas',
@@ -47,7 +48,8 @@ export class Reporte_MaquilasComponent implements OnInit {
                       private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private servicioTerceros : TercerosService,
-                            private messageService: MessageService ) {
+                            private messageService: MessageService,
+                              private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
@@ -721,5 +723,14 @@ export class Reporte_MaquilasComponent implements OnInit {
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
    this.cargando = false;
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

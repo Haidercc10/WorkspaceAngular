@@ -24,6 +24,9 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
 
   <!-- Informacion del pedido de mantenimiento -->
   <div class="mb-4">
@@ -32,7 +35,7 @@
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormMovimientosMantenimiento">
-    <div class="mb-4">
+    <div class="mb-4" id="formulario1">
       <div class="row g-4">
 
         <!-- Consecutivo del pedido -->
@@ -100,7 +103,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-3">
+    <div class="mb-3" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar()"> </button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
@@ -159,7 +162,7 @@
               <th scope="col">Tipo Mtto
                 <p-sortIcon field="TipoMtto" title="Order por Tipo Mantenimiento"></p-sortIcon>
               </th>
-              <th></th>
+              <th id="ver1">Ver PDF</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-movimientos>
