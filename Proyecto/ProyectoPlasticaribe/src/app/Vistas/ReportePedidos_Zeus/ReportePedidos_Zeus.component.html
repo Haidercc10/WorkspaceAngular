@@ -25,9 +25,12 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
 
   <!-- Informacion sobre los colores -->
-  <p-toolbar>
+  <p-toolbar class="p-2" id="informacionColores">
     <ng-template pTemplate="right">
       <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
       <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-info" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
@@ -42,14 +45,13 @@
   <!-- Exportar a excel -->
   <p-toolbar>
     <ng-template pTemplate="right">
-      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
+      <button id="excel" pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
     </ng-template>
 
     <ng-template pTemplate="left">
       <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
     </ng-template>
   </p-toolbar>
-  <br>
 
   <div class="row g-2 p-2">
     <p-table
@@ -70,7 +72,8 @@
       *ngIf="!cargando"
       [expandedRowKeys]="expandedRows"
       sortField="id_color"
-      [sortOrder]="1">
+      [sortOrder]="1"
+      id="tablaPedidos">
       <!-- Buscador de columnas -->
       <ng-template pTemplate="caption">
         <p-multiSelect
@@ -79,18 +82,19 @@
           optionLabel="header"
           selectedItemsLabel="{0} columnas seleccionadas"
           [style]="{minWidth: '330px'}"
-          placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+          placeholder="Elige las columnas que quieres ver"
+          id="columnas"></p-multiSelect>
       </ng-template>
       <!-- Filtros y Titulos -->
       <ng-template pTemplate="header" let-columns>
-        <tr>
+        <tr id="filtros">
           <th *ngFor="let col of columns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
           <th style="width: 100px"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
           <th style="width: 100px"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
           <th style="width: 100px" *ngIf="ValidarRol == 1"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
           <th style="width: 100px" *ngIf="ValidarRol == 1"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
         </tr>
-        <tr>
+        <tr id="titulosColumnas">
           <th *ngFor="let col of columnasSeleccionadas" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
             <p-sortIcon [field]="col.field"></p-sortIcon>
           </th>
@@ -110,10 +114,10 @@
             </span>
             <span class="font-bold"> {{pedido.cliente}} </span>
           </td>
-          <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 1 ? mostrarPedidoPdf(pedido) : productosPedido(pedido.consecutivo)"></button></td>
-          <td style="text-align: center;" scope="col" title="Editar Pedido"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 0 ? editarPedido(pedido) : ''"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'aceptar')"></button></td>
-          <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'cancelar')"></button></td>
+          <td style="text-align: center;" id="ver" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 1 ? mostrarPedidoPdf(pedido) : productosPedido(pedido.consecutivo)"></button></td>
+          <td style="text-align: center;" id="editar" scope="col" title="Editar Pedido"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 0 ? editarPedido(pedido) : ''"></button></td>
+          <td style="text-align: center;" id="confirmar" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'aceptar')"></button></td>
+          <td style="text-align: center;" id="anular" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'cancelar')"></button></td>
         </tr>
       </ng-template>
       <!-- Footer de los agrupado -->
@@ -125,7 +129,7 @@
       </ng-template>
       <!-- Cuerpo con informacion dellada -->
       <ng-template pTemplate="rowexpansion" let-pedidos let-columns="columns">
-        <tr>
+        <tr id="filas">
           <td *ngFor="let col of columns" [ngClass]="{
             'azul' : pedidos.color == 'azul',
             'verde' : pedidos.color == 'verde' || (pedidos.color == 'verde'),

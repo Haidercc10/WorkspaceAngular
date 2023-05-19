@@ -490,55 +490,56 @@ export class Reporte_OrdenCompraComponent implements OnInit {
 
   // Funcion que abrirá y llenará el modal con la informacion de la orden de compra
   llenarModal(numeroOrden : number){
-    this.mostrarModal = true;
-    this.numeroOrdenCompra = numeroOrden;
-    this.EditarOrdenCompra.edicionOrdenCompra = true;
-    this.EditarOrdenCompra.FormOrdenCompra.reset();
-    this.EditarOrdenCompra.FormMateriaPrima.reset();
-    this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
-    this.EditarOrdenCompra.catidadTotalPeso = 0;
-    this.EditarOrdenCompra.cantidadTotalPrecio = 0;
-    this.EditarOrdenCompra.materiasPrimasSeleccionada_ID = [];
-    this.EditarOrdenCompra.consecutivoOrdenCompra = 0;
-    this.EditarOrdenCompra.informacionPDF = [];
-    this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
-      for (let i = 0; i < datos_orden.length; i++) {
-        this.EditarOrdenCompra.FormOrdenCompra.setValue({
-          ConsecutivoOrden : numeroOrden,
-          Proveedor : datos_orden[i].proveedor,
-          Id_Proveedor : datos_orden[i].proveedor_Id,
-          Observacion : datos_orden[i].observacion,
-        });
-        break;
-      }
-      for (let i = 0; i < datos_orden.length; i++) {
-        let info : any = {
-          Id : 0,
-          Id_Mp: datos_orden[i].mP_Id,
-          Id_Tinta: datos_orden[i].tinta_Id,
-          Id_Bopp: datos_orden[i].bopp_Id,
-          Nombre : '',
-          Cantidad : datos_orden[i].cantidad,
-          Und_Medida : datos_orden[i].unidad_Medida,
-          Precio : datos_orden[i].precio_Unitario,
-          SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
-        };
-        if (info.Id_Mp != 84) {
-          info.Id = info.Id_Mp;
-          info.Nombre = datos_orden[i].mp;
-        } else if (info.Id_Tinta != 2001) {
-          info.Id = info.Id_Tinta;
-          info.Nombre = datos_orden[i].tinta;
-        } else if (info.Id_Bopp != 1) {
-          info.Id = info.Id_Bopp;
-          info.Nombre = datos_orden[i].bopp;
+    if (this.ValidarRol == 1 || this.ValidarRol == 6) {
+      this.mostrarModal = true;
+      this.numeroOrdenCompra = numeroOrden;
+      this.EditarOrdenCompra.edicionOrdenCompra = true;
+      this.EditarOrdenCompra.FormOrdenCompra.reset();
+      this.EditarOrdenCompra.FormMateriaPrima.reset();
+      this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
+      this.EditarOrdenCompra.catidadTotalPeso = 0;
+      this.EditarOrdenCompra.cantidadTotalPrecio = 0;
+      this.EditarOrdenCompra.materiasPrimasSeleccionada_ID = [];
+      this.EditarOrdenCompra.consecutivoOrdenCompra = 0;
+      this.EditarOrdenCompra.informacionPDF = [];
+      this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
+        for (let i = 0; i < datos_orden.length; i++) {
+          this.EditarOrdenCompra.FormOrdenCompra.setValue({
+            ConsecutivoOrden : numeroOrden,
+            Proveedor : datos_orden[i].proveedor,
+            Id_Proveedor : datos_orden[i].proveedor_Id,
+            Observacion : datos_orden[i].observacion,
+          });
+          break;
         }
-        this.EditarOrdenCompra.materiasPrimasSeleccionadas.push(info);
-        this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
-        this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
-      }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`); });
-
+        for (let i = 0; i < datos_orden.length; i++) {
+          let info : any = {
+            Id : 0,
+            Id_Mp: datos_orden[i].mP_Id,
+            Id_Tinta: datos_orden[i].tinta_Id,
+            Id_Bopp: datos_orden[i].bopp_Id,
+            Nombre : '',
+            Cantidad : datos_orden[i].cantidad,
+            Und_Medida : datos_orden[i].unidad_Medida,
+            Precio : datos_orden[i].precio_Unitario,
+            SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+          };
+          if (info.Id_Mp != 84) {
+            info.Id = info.Id_Mp;
+            info.Nombre = datos_orden[i].mp;
+          } else if (info.Id_Tinta != 2001) {
+            info.Id = info.Id_Tinta;
+            info.Nombre = datos_orden[i].tinta;
+          } else if (info.Id_Bopp != 1) {
+            info.Id = info.Id_Bopp;
+            info.Nombre = datos_orden[i].bopp;
+          }
+          this.EditarOrdenCompra.materiasPrimasSeleccionadas.push(info);
+          this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
+          this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
+        }
+      }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`); });
+    }
   }
 
   /** Mostrar mensaje de confirmación  */

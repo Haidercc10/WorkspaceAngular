@@ -1,9 +1,9 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { MessageService } from 'primeng/api';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
@@ -15,9 +15,10 @@ import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.s
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
-import Swal from 'sweetalert2';
-import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsCrearPedidos as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,6 @@ export class PedidoExternoComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   cargando : boolean = false; //Variable que va a servir para mostrar o no la imagen de carga
-  AccionBoton = "Agregar"; //Variable que almanará informacio para saber si un producto está en edicion o no (Se editará un producto cargado en la tabla, no uno en la base de datos)
   Ide : number | undefined; //Variable para almacenar el ID del producto que está en la tabla y se va a editar
   id_pedido : number; //Variable que almacenará el ID del pedido que se va a mostrar
   ModalCrearProductos: boolean = false; //Funcion que va a mostrar o no el modal de productos
@@ -83,7 +83,9 @@ export class PedidoExternoComponent implements OnInit {
                                 private AppComponent : AppComponent,
                                   private ClientesProductosService : ClientesProductosService,
                                     private zeusService : InventarioZeusService,
-                                      private zeusCobtabilidadService : ZeusContabilidadService,) {
+                                      private zeusCobtabilidadService : ZeusContabilidadService,
+                                        private messageService: MessageService,
+                                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -117,6 +119,14 @@ export class PedidoExternoComponent implements OnInit {
     this.lecturaStorage();
     this.clientesComboBox();
     this.checkboxIva();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -306,11 +316,11 @@ export class PedidoExternoComponent implements OnInit {
               } else this.cargando = false;
             }
           }, error => {
-            this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`, error.message);
+            this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`);
             this.limpiarTodosCampos();
           });
         }
-      }, error => { this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`, error.message); });
+      }, error => { this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`); });
     } else this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
   }
 
@@ -493,47 +503,21 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    let mensaje : string = this.modalMode ? 'Editar Pedido' : 'Crear Pedido';
 
     if (this.FormPedidoExternoClientes.valid) {
       if (!this.ArrayProducto.length) this.mensajeAdvertencia('Debe cargar al menos un producto en la tabla.');
       else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Confirmación de Pedido',
-          width: 800,
-          heightAuto : true,
-          html:
+        this.messageService.add({
+          severity:'warn',
+          key: 'confimacionPedido',
+          summary:'Confirmación de Pedido',
+          detail:
           `<b>Cliente:</b> ${clienteNombre} <br> ` +
           `<b>Ciudad:</b> ${ciudad} <br>` +
           `<b>Direccion:</b> ${direccionSede} <br>` +
           `<b>Iva:</b> ${this.iva}% <b>Descuento:</b> ${this.formatonumeros(this.descuento.toFixed(2))}% <br>` +
           `<b>Valor del Pedido</b> ${this.formatonumeros(this.valorfinal.toFixed(2))}<br>`,
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: mensaje,
-          denyButtonText: `Seguir Editando`,
-          cancelButtonText : `Cancelar Pedido`,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            !this.modalMode ? this.CrearPedidoExterno() : this.editarPedido();
-          } else if (result.isDenied) {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'info',
-              title: 'Puede seguir editando el pedido'
-            });
-          } else if (result.isDismissed) this.limpiarTodosCampos();
+          sticky: true
         });
       }
     } else this.mensajeAdvertencia('¡Hay Campos Vacios!');
@@ -571,9 +555,9 @@ export class PedidoExternoComponent implements OnInit {
             this.limpiarTodosCampos();
             this.productosPedido(data.pedExt_Id);
           }, 2000);
-        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
+        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!'); });
       }
-    }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
+    }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!') });
   }
 
   // Funcion que creará los detalles del pedido
@@ -591,8 +575,8 @@ export class PedidoExternoComponent implements OnInit {
           PedExtProd_CantidadFacturada : 0,
         }
         this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
-          Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
-        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
+          this.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+        }, error => { this.mensajeError('¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!'); });
       }
     });
   }
@@ -603,8 +587,7 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    let observacion = this.FormPedidoExternoClientes.get('PedObservacion')?.value;
-    if (observacion == null) observacion = '';
+    let observacion = this.FormPedidoExternoClientes.get('PedObservacion')?.value == null ? '' : this.FormPedidoExternoClientes.get('PedObservacion')?.value;
     this.pedidoproductoService.srvObtenerListaPorId(this.pedidoEditar).subscribe(datos => {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
         for (let i = 0; i < datos_sedeCliente.length; i++) {
@@ -628,13 +611,13 @@ export class PedidoExternoComponent implements OnInit {
           this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(_data=> {
             this.editarDetallesPedido();
             setTimeout(() => {
-              Swal.fire({icon: 'success', title: 'Pedido Editado Exitosamente', text: 'El pedido fue Editado de manera satisfactoria'});
+              this.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
               this.productosPedido(this.pedidoEditar);
               this.limpiarTodosCampos();
             }, 2000);
-          }, error => { this.mensajeError('¡No se pudo editar el pedido, por favor intente de nuevo!', error.message); });
+          }, error => { this.mensajeError('¡No se pudo editar el pedido, por favor intente de nuevo!'); });
         }
-      }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
+      }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!') });
     });
   }
 
@@ -654,7 +637,7 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_CantidadFacturada : 0,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => { }, error => {
-            this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!', error.message);
+            this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!');
           });
         }
       });
@@ -840,69 +823,74 @@ export class PedidoExternoComponent implements OnInit {
 
   // Función para quitar un producto de la tabla
   QuitarProductoTabla(data : any) {
-    this.productoEliminado = data.Id
-    Swal.fire({
-      title: '¿Estás seguro de eliminar el producto del pedido?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.ArrayProducto.length; i++) {
-          if (this.ArrayProducto[i].Id == data.Id) {
-            this.ArrayProducto.splice(i, 1);
-            this.valorTotal -= data.SubTotal;
-            setTimeout(() => { this.ivaDescuento(); }, 200);
-            this.mensajeAdvertencia('Producto eliminado');
-            break;
-          }
-        }
-      }
+    this.productoEliminado = data.Id;
+    this.messageService.add({
+      severity:'warn',
+      key: 'quitarProducto',
+      summary:'¿Estás seguro de eliminar el producto del pedido?',
+      detail:
+      `<b>Item:</b> ${data.Id} <br> ` +
+      `<b>Referencia:</b> ${data.Nombre} <br>` +
+      `<b>Cantidad:</b> ${this.formatonumeros(data.Cant)} <br>`,
+      sticky: true
     });
+  }
+
+  // Funcion que va a quitar de la tabla el producto que haya sido seleccionado
+  quitarProducto() {
+    let item : any [] = this.ArrayProducto.filter((a) => a.Id == this.productoEliminado);
+    let index : number = this.ArrayProducto.findIndex((b) => b.Id == this.productoEliminado);
+    for (let i = 0; i < item.length; i++) {
+      this.valorTotal -= item[i].SubTotal;
+      this.ArrayProducto.splice(index, 1);
+      setTimeout(() => { this.ivaDescuento(); }, 200);
+      this.mensajeAdvertencia('¡Se ha quitado el Producto del pedido a crear!');
+      this.closeMessage('quitarProducto');
+      this.productoEliminado = 0;
+    }
   }
 
   //Funcion que va a eliminar de la base de datos un producto del pedido
   eliminarProducto(data : any){
-    this.PedidoProductosService.srvObtenerListaPorIdProducto_Pedido(data.Id, this.pedidoEditar).subscribe(datos => {
+    this.productoEliminado = data.Id;
+    this.PedidoProductosService.srvObtenerListaPorIdProducto_Pedido(this.productoEliminado, this.pedidoEditar).subscribe(datos => {
       if (datos.length > 0) {
-        Swal.fire({
-          title: '¿Estás seguro de eliminar el producto del pedido?',
-          text: `Al eliminar el producto en este apartado de edición se Eliminará Tambien de la Base de Datos`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Eliminar'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.PedidoProductosService.srvEliminar(data.Id, this.pedidoEditar).subscribe(_datos_Eliminados => {
-              for (let i = 0; i < this.ArrayProducto.length; i++) {
-                if (this.ArrayProducto[i].Id == data.Id) {
-                  this.ArrayProducto.splice(i, 1);
-                  this.valorTotal = this.valorTotal - data.SubTotal;
-                  this.ivaDescuento();
-                  this.mensajeAdvertencia('Producto eliminado');
-                  break;
-                }
-              }
-            });
-          }
+        this.messageService.add({
+          severity:'warn',
+          key: 'eliminarProducto',
+          summary:'¿Estás seguro de eliminar el producto del pedido?',
+          detail:
+          `<p>Al eliminar el producto en este apartado de edición se Eliminará Tambien de la Base de Datos</p>` +
+          `<b>Item:</b> ${data.Id} <br> ` +
+          `<b>Referencia:</b> ${data.Nombre} <br>` +
+          `<b>Cantidad:</b> ${this.formatonumeros(data.Cant)} <br>`,
+          sticky: true
         });
-      } else this.QuitarProductoTabla(data);
+      } else this.quitarProducto();
     });
   }
 
+  // Funcion que eliminará de la base de datos el producto que se haya seleccionado
+  eliminarProductoPedido = () => this.PedidoProductosService.srvEliminar(this.productoEliminado, this.pedidoEditar).subscribe(data => this.quitarProducto());
+
   // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+  mensajeAdvertencia(mensaje : string){
     this.cargando = false;
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.messageService.add({severity:'warn', summary: 'Advertencia', detail: mensaje, life : 2000});
   }
 
   // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
+  mensajeError(text : string){
     this.cargando = false;
-    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.messageService.add({severity:'error', summary: '¡Error!', detail: text, life : 5000});
   }
+
+  /** Mostrar mensaje de confirmación  */
+  mensajeConfirmacion = (titulo : any, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 2000});
+
+  /** Función para quitar mensaje de elección */
+  closeConfirmacion = () => this.messageService.clear('confimacionPedido');
+
+  // Funcion que va limpiar el mensage de que le sea pasado
+  closeMessage = (key : string) => this.messageService.clear(key);
 }

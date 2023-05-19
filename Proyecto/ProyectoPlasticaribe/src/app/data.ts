@@ -37,6 +37,7 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Eliminación de rollos!</h4>',
@@ -213,6 +214,7 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Busqueda de rollos!</h4>',
@@ -418,6 +420,7 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'exportarExcel',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Exportar a Excel!</h4>',
@@ -512,6 +515,7 @@ export const stepsMovimientosExtrusion : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
@@ -626,6 +630,7 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros y Campos Obligatorios!</h4>',
@@ -804,6 +809,7 @@ export const stepAsignacionBopp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar Ordenes de Trabajo</h5>`,
@@ -937,6 +943,7 @@ export const stepEntradaBopp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'opcional',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ingreso de rollos opcional</h5>`,
@@ -1062,6 +1069,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'rango-fechas',
     title: `<h5 class="tituloRojo" style="margin: auto;">Búsqueda por rango de fechas</h5>`,
@@ -1279,6 +1287,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Búsqueda por filtros</h5>`,
@@ -1295,6 +1304,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -1310,6 +1320,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tab',
     title: `<h5 class="tituloRojo" style="margin: auto;">Secciones por categoría</h5>`,
@@ -1327,6 +1338,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'filtros',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -1341,6 +1353,7 @@ export const stepsMovimientosBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'exportar1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Exportar</h5>`,
@@ -1373,6 +1386,7 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Busqueda de rollos!</h4>',
@@ -1577,6 +1591,7 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros y Datos de la asignación!</h4>',
@@ -1850,6 +1865,7 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Despacho de Mercancia!</h4>',
@@ -2053,6 +2069,7 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">Devolver Mercancia!</h4>',
@@ -2209,6 +2226,7 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
@@ -2223,6 +2241,7 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'consultar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Movimientos!</h4>',
@@ -2237,6 +2256,7 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
@@ -2251,6 +2271,7 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'table',
     title: '<h4 style="margin: auto; color: var(--rojo)">Movimientos Extrusión!</h4>',
@@ -2265,6 +2286,7 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'sort',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
@@ -2295,6 +2317,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Busqueda de rollos!</h4>',
@@ -2309,6 +2332,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'consultarRollos',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Rollos!</h4>',
@@ -2324,6 +2348,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarFiltros',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros!</h4>',
@@ -2338,6 +2363,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla1',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
@@ -2352,6 +2378,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
@@ -2366,6 +2393,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
@@ -2380,6 +2408,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
@@ -2394,6 +2423,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos2',
     title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
@@ -2408,6 +2438,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo2',
     title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
@@ -2422,6 +2453,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla3',
     title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
@@ -2441,6 +2473,7 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'eliminarRollos',
     title: '<h4 style="margin: auto; color: var(--rojo)">Ingresar Rollos Seleccionados!</h4>',
@@ -2472,6 +2505,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Entrada de Desperdicio!</h4>',
@@ -2486,6 +2520,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ordenTrabajo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
@@ -2500,6 +2535,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'item',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Item!</h4>',
@@ -2514,6 +2550,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'referencia',
     title: '<h4 style="margin: auto; color: var(--rojo)">Referencia!</h4>',
@@ -2528,6 +2565,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'material',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Material!</h4>',
@@ -2542,6 +2580,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'impresion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Impresión!</h4>',
@@ -2556,6 +2595,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'maquina',
     title: '<h4 style="margin: auto; color: var(--rojo)">Maquina!</h4>',
@@ -2570,6 +2610,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'operario',
     title: '<h4 style="margin: auto; color: var(--rojo)">Operario!</h4>',
@@ -2584,6 +2625,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'conformidad',
     title: '<h4 style="margin: auto; color: var(--rojo)">Conformidad!</h4>',
@@ -2598,6 +2640,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'cantidad',
     title: '<h4 style="margin: auto; color: var(--rojo)">Cantidad!</h4>',
@@ -2612,6 +2655,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'area',
     title: '<h4 style="margin: auto; color: var(--rojo)">Área!</h4>',
@@ -2626,6 +2670,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'fecha',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Fecha!</h4>',
@@ -2640,6 +2685,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'observacion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
@@ -2654,6 +2700,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'agregar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Desperdicio!</h4>',
@@ -2668,6 +2715,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'limpiarCampos',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Campos!</h4>',
@@ -2682,6 +2730,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla con Registros!</h4>',
@@ -2696,6 +2745,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'quitar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Registro!</h4>',
@@ -2710,6 +2760,7 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'crear',
     title: '<h4 style="margin: auto; color: var(--rojo)">Crear Registros!</h4>',
@@ -2740,6 +2791,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">Filtros de Consulta!</h4>',
@@ -2754,6 +2806,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'consultar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar!</h4>',
@@ -2768,6 +2821,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'limpiar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros de Consulta!</h4>',
@@ -2782,6 +2836,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla!</h4>',
@@ -2796,6 +2851,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'filtros',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Tabla!</h4>',
@@ -2827,6 +2883,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Creación de archios y carpetas!</h4>',
@@ -2841,6 +2898,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'crearCarpeta',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Creación de carpetas!</h4>',
@@ -2855,6 +2913,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'archivo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Archivos!</h4>',
@@ -2870,6 +2929,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'subirArchivo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Subir Archivos!</h4>',
@@ -2884,6 +2944,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Archivos!</h4>',
@@ -2898,6 +2959,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'abrirCarpeta',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Abrir Carpeta!</h4>',
@@ -2912,6 +2974,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'minimizar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Regresar Carpeta!</h4>',
@@ -2926,6 +2989,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'descargar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Descargar Archivo!</h4>',
@@ -2940,6 +3004,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'copiar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Copiar Archivos y Carpetas!</h4>',
@@ -2954,6 +3019,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'mover',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Mover Archivos y Carpetas!</h4>',
@@ -2968,6 +3034,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'pegar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Pegar Archivos y Carpetas!</h4>',
@@ -2982,6 +3049,7 @@ export const stepsArchivos : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'cancelar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Cancelar una copia o movimiento!</h4>',
@@ -3013,6 +3081,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Información acerca de la asignación!</h4>',
@@ -3027,6 +3096,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ordenTrabajo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
@@ -3041,6 +3111,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Información de la OT!</h4>',
@@ -3057,6 +3128,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'maquina',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Maquina!</h4>',
@@ -3071,6 +3143,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'observacion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
@@ -3085,6 +3158,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'materiaPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima!</h4>',
@@ -3099,6 +3173,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'idMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Id Materia Prima!</h4>',
@@ -3113,6 +3188,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'nombreMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Nombre Materia Prima!</h4>',
@@ -3127,6 +3203,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'stockMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Stock Materia Prima!</h4>',
@@ -3141,6 +3218,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'cantidad',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad Materia Prima!</h4>',
@@ -3155,6 +3233,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'und',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Unidad de medida!</h4>',
@@ -3169,6 +3248,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'proceso',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Proceso!</h4>',
@@ -3183,6 +3263,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'agregarMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
@@ -3197,6 +3278,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'limpiarMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
@@ -3211,6 +3293,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
@@ -3225,6 +3308,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'quitarMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
@@ -3239,6 +3323,7 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'asignar',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Asignar Materia Prima!</h4>',
@@ -3269,6 +3354,7 @@ export const stepAsignacionTintas : Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'intro',
     title: `<h5 class="tituloRojo" style="margin: auto;">Creación de Materias Primas</h5>`,
@@ -3377,6 +3463,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Devoluciones de Materia Prima!</h4>',
@@ -3391,6 +3478,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ordenTrabajo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
@@ -3405,6 +3493,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'observacion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
@@ -3419,6 +3508,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materias Primas!</h4>',
@@ -3433,6 +3523,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegirTodo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todo!</h4>',
@@ -3447,6 +3538,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegir',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Materia Prima!</h4>',
@@ -3461,6 +3553,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas Seleccionadas!</h4>',
@@ -3475,6 +3568,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegirTodo2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Todo!</h4>',
@@ -3489,6 +3583,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'cantidad',
     title: '<h4 style="margin: auto; color: var(--rojo)">Editar Cantidad Materia Prima!</h4>',
@@ -3503,6 +3598,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegir2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
@@ -3517,6 +3613,7 @@ export const stepsDevolucionesMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'agregarDevolucion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Devolución!</h4>',
@@ -3547,6 +3644,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Entrada de Materia Prima!</h4>',
@@ -3561,6 +3659,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ordenCompra',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Compra!</h4>',
@@ -3575,6 +3674,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'factura',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Factura!</h4>',
@@ -3589,6 +3689,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'remision',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Remisión!</h4>',
@@ -3603,6 +3704,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'proveedor',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Proveedor!</h4>',
@@ -3617,6 +3719,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'observacion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
@@ -3631,6 +3734,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Materia Prima!</h4>',
@@ -3645,6 +3749,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegirTodo',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todo!</h4>',
@@ -3659,6 +3764,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegir',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Materia Prima!</h4>',
@@ -3673,6 +3779,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas Seleccionadas!</h4>',
@@ -3687,6 +3794,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegirTodo2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Todo!</h4>',
@@ -3701,6 +3809,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'cantidad',
     title: '<h4 style="margin: auto; color: var(--rojo)">Editar Cantidad Materia Prima!</h4>',
@@ -3715,6 +3824,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'elegir2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
@@ -3729,6 +3839,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'acordeon',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Factura y Remisión!</h4>',
@@ -3743,6 +3854,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'remision2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Remisión a Relacionar!</h4>',
@@ -3757,6 +3869,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla3',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Remisiones!</h4>',
@@ -3771,6 +3884,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ver',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Remisiones!</h4>',
@@ -3785,6 +3899,7 @@ export const stepsEntradasMp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'crearIngreso',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Ingreso!</h4>',
@@ -3815,6 +3930,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crearProveedor',
     title: `<h4 class="tituloRojo" style="margin: auto;">Crear Proveedor</h4>`,
     text: `<p>¡Para crear un nuevo proveedor presionamos este botón, llenamos los campos y presionamos <b>'Crear Proveedor'</b>!</p>`
@@ -3828,6 +3944,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crearMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Crear Materia Prima</h5>`,
     text: `<p>¡Para crear una materia prima nueva presionamos este botón, seleccionamos el tipo de materia prima que vamos a crear, llenamos los campos y presionamos <b>'Crear...'</b>!</p>`
@@ -3841,6 +3958,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'formulario',
     title: `<h5 class="tituloRojo" style="margin: auto;">Orden de Compra</h5>`,
     text: `<p>¡Inicialmente para crear una orden de compra debemos elegir quien nos venderá la materia prima, en el campo <b>Proveedor</b> escribimos el nombre y luego lo seleccionamos.
@@ -3855,6 +3973,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'formularioMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Materias Primas</h5>`,
     text: `<p>¡Lo siguiente que debemos hacer es elegir la materia prima que vamos a comprar!</p>`
@@ -3868,6 +3987,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Id</h5>`,
     text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en el campo Id y presionando 'enter'!</p>`
@@ -3881,6 +4001,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'nombreMatprima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Nombre</h5>`,
     text: `<p>¡La segunda opción es seleccionarla de el campo 'Materia Prima', podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
@@ -3894,6 +4015,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'cantidadMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad</h5>`,
     text: `<p>¡Posterior a esto debemos digitar la cantidad de materia prima que queremos!</p>`
@@ -3907,6 +4029,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'undMatPtima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Unidad de Medida</h5>`,
     text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
@@ -3920,6 +4043,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'precioMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Precio</h5>`,
     text: `<p>¡Podemos o no cambiarle el precio (al crear la orden de compra las materias primas se actualizarán con el precio que se haya digitado para cada una)!</p>`
@@ -3933,6 +4057,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'agregarMatPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
     text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
@@ -3946,6 +4071,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'limpiarMatPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
     text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
@@ -3959,6 +4085,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
     text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente crear la orden de compra!</p>`
@@ -3972,6 +4099,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'quitarMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
     text: `<p>¡Antes de realizar la orden de compra debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
@@ -3985,6 +4113,7 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crearOrden',
     title: '<h4 style="margin: auto; color: var(--rojo)">Crear Orden de Compra!</h4>',
     text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Crear la Orden de compra</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje preguntando si queremos ver un pdf de la orden creada, de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
@@ -4014,6 +4143,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'formulario1',
     title: `<h4 class="tituloRojo" style="margin: auto;">Recuperado</h4>`,
     text: `<p>¡Para registrar la materia prima recuperada necesitamos llenar a siguiente información!</p>`
@@ -4027,6 +4157,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idOperario',
     title: `<h4 class="tituloRojo" style="margin: auto;">Id Operario</h4>`,
     text: `<p>¡Podemos seleccionar el operariocon base en su codigo del programa, para ello lo escribimos y presionamos 'enter'!</p>`
@@ -4040,6 +4171,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'nombreOperario',
     title: `<h5 class="tituloRojo" style="margin: auto;">Nombre Operario</h5>`,
     text: `<p>¡Podemos elegir el operario buscandolo en esta lista desplegable!</p>`
@@ -4053,6 +4185,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'turno',
     title: `<h5 class="tituloRojo" style="margin: auto;">Turno</h5>`,
     text: `<p>¡Hay que registrar el turno en el que salió el recuperado, esto lo hacemos eligiendolo en esta lista desplegable!</p>`
@@ -4066,6 +4199,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'fecha',
     title: `<h5 class="tituloRojo" style="margin: auto;">Fecha</h5>`,
     text: `<p>¡Otro de los campos que necesitamos es elegir la fecha en que salió el recuperado!</p>`
@@ -4079,6 +4213,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'observacion',
     title: `<h5 class="tituloRojo" style="margin: auto;">Observación</h5>`,
     text: `<p>¡La observcaión es un campo opcional, en este campo podemos escribir una breve descripción o observación del recuperado!</p>`
@@ -4092,6 +4227,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'formulario2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Materia Prima</h5>`,
     text: `<p>¡Con este formulario debemos elegir la materia prima que vamos a ingresar como recuperada!</p>`
@@ -4105,6 +4241,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Id</h5>`,
     text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en el campo Id y presionando 'enter'!</p>`
@@ -4118,6 +4255,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'nombreMatprima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Nombre</h5>`,
     text: `<p>¡La segunda opción es seleccionarla de el campo 'Materia Prima', podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
@@ -4131,6 +4269,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'cantidadMatPrima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad</h5>`,
     text: `<p>¡Posterior a esto debemos digitar la cantidad de materia prima que queremos!</p>`
@@ -4144,6 +4283,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'undMatPtima',
     title: `<h5 class="tituloRojo" style="margin: auto;">Unidad de Medida</h5>`,
     text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
@@ -4157,6 +4297,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'agregarMatPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
     text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
@@ -4170,6 +4311,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'limpiarMatPrima',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
     text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
@@ -4183,6 +4325,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
     text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente registrar el recuperado!</p>`
@@ -4196,6 +4339,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'quitarMp',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
     text: `<p>¡Antes de realizar el registro debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
@@ -4209,6 +4353,7 @@ export const stepsRecuperado: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'crear',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Registrar Recuperado!</h4>',
     text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Regitrar el Recuperado</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje de confirmación indicando que el registro se realizó de manera exitosa, de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
@@ -4239,6 +4384,7 @@ export const stepsPedidoMtto: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar pedido de mtto.</h5>`,
@@ -4254,6 +4400,7 @@ export const stepsPedidoMtto: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Agregar activo</h5>`,
@@ -4268,6 +4415,7 @@ export const stepsPedidoMtto: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
@@ -4282,6 +4430,7 @@ export const stepsPedidoMtto: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'quitar1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Quitar activos elegidos</h5>`,
@@ -4313,6 +4462,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar pedido de mtto.</h5>`,
@@ -4327,6 +4477,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'Pedido',
     title: `<h5 class="tituloRojo" style="margin: auto;">Campo pedido de mtto.</h5>`,
@@ -4342,6 +4493,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'idMtto',
     title: `<h5 class="tituloRojo" style="margin: auto;">Campo Mantenimiento</h5>`,
@@ -4357,6 +4509,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tipoMov',
     title: `<h5 class="tituloRojo" style="margin: auto;">Campo tipo de movimientos.</h5>`,
@@ -4374,6 +4527,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'FechaInicial',
     title: `<h5 class="tituloRojo" style="margin: auto;">Campo fecha inicial</h5>`,
@@ -4389,6 +4543,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'FechaFinal',
     title: `<h5 class="tituloRojo" style="margin: auto;">Campo fecha final.</h5>`,
@@ -4403,6 +4558,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Agregar activo</h5>`,
@@ -4417,6 +4573,7 @@ export const stepsMttoActivos: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
@@ -4450,6 +4607,7 @@ export const stepsReporteActivos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'table',
     title: `<h5 class="tituloRojo" style="margin: auto;">Tabla de activos</h5>`,
@@ -4481,6 +4639,7 @@ export const stepsMovimientos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -4496,6 +4655,7 @@ export const stepsMovimientos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -4511,6 +4671,7 @@ export const stepsMovimientos: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'table',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
@@ -4542,6 +4703,7 @@ export const stepsMovimientosMtto: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -4557,6 +4719,7 @@ export const stepsMovimientosMtto: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -4572,6 +4735,7 @@ export const stepsMovimientosMtto: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'table',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
@@ -4603,6 +4767,7 @@ export const stepsMovRecuperado: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -4618,6 +4783,7 @@ export const stepsMovRecuperado: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -4633,6 +4799,7 @@ export const stepsMovRecuperado: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
@@ -4647,6 +4814,7 @@ export const stepsMovRecuperado: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'ver1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ver detalle</h5>`,
@@ -4677,6 +4845,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -4692,6 +4861,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -4707,6 +4877,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
@@ -4722,6 +4893,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtrar registros de la tabla</h5>`,
@@ -4744,6 +4916,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'limpiar',
     title: `<h5 class="tituloRojo" style="margin: auto;">Limpiar Filtros</h5>`,
@@ -4758,6 +4931,7 @@ export const stepsMovOrdenCompra: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ver Estado</h5>`,
@@ -4791,6 +4965,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros</h5>`,
@@ -4806,6 +4981,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar</h5>`,
@@ -4821,6 +4997,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabs',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Movimientos y facturación de<br> ordenes de maquila</h5>`,
@@ -4835,6 +5012,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información consultada</h5>`,
@@ -4849,6 +5027,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtrar registros de la tabla</h5>`,
@@ -4872,6 +5051,7 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ver Estado</h5>`,
@@ -4906,6 +5086,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.cancel,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'botones1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Registrar Tercero</h5>`,
@@ -4920,6 +5101,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'formulario1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Elegir tercero</h5>`,
@@ -4935,6 +5117,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'formulario2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Elegir materia prima</h5>`,
@@ -4950,6 +5133,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'botones2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Agregar material</h5>`,
@@ -4965,6 +5149,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Materias primas a vender</h5>`,
@@ -4979,6 +5164,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'quitar1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Quitar materiales</h5>`,
@@ -4993,6 +5179,7 @@ export const stepsOrdenMaquila: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'pie1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Totales en kilos y precios</h5>`,
@@ -5025,6 +5212,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'orden',
     title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionar orden de maquila</h5>`,
@@ -5039,6 +5227,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'Factura',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Factura</h5>`,
@@ -5054,6 +5243,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'Remision',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diligenciar Remisión</h5>`,
@@ -5069,6 +5259,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabla1',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Mat. primas asociadas a la OM</h5>`,
@@ -5083,6 +5274,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver1',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad solicitada</h5>`,
@@ -5097,6 +5289,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver2',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad facturada</h5>`,
@@ -5111,6 +5304,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'ver3',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Cantidad faltante</h5>`,
@@ -5125,6 +5319,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'agregar1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Agregar materiales a entregar</h5>`,
@@ -5140,6 +5335,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'tabla2',
     title: `<h5 class="tituloRojo" style="margin: auto; text-align: center;">Mat. primas seleccionadas de la OM</h5>`,
@@ -5154,6 +5350,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: '#ver1-t2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Editar cantidad de mat. Prima</h5>`,
@@ -5169,6 +5366,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: '#ver2-t2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Quitar materiales</h5>`,
@@ -5184,6 +5382,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next,
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: '#pie-t2',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ver totales</h5>`,
@@ -5203,5 +5402,592 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     text: `Finalmente haz clic sobre facturar maquila para crear el registro con los detalles de las materias primas que serán vendidas al tercero.<br><br>
     Recuerda que en cuanto se crea el registro, se decontarán del inventario las cantidades de las materias primas facturadas o remisionadas.<br><br>
     Si te equivocas digitando o ya no deseas realizar la OM, <b>solo haz clic en el botón limpiar todo.</b>`
+  },
+];
+
+/*********************************************************** PEDIDOS DE PRODUCTOS ********************************************************************/
+export const stepsCrearPedidos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pedidos de Productos!</h4>',
+    text: `<p>¡Es un documento donde quedará evidencia de los pedidos realizados por los clientes. Posteriormente a la creación los pedidos serán revisados y aceptados o denegados por una persona encargada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información General del Pedido!</h4>',
+    text: `<p>¡Para crear un pedido necesitamos saber cierta información acerca del cliente al que se le creará. A continueación se explicará como se llena esta información!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cliente',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-users font-size-20"></i> ¡Cliente!</h4>',
+    text: `<p>¡Iniciamos <b>eligiendo el cliente</b>, podemos buscarlo ya sea <b>escribiendo el nombre o la identificación</b> o podemos buscarlo directamente en la lista desplegable!</p>
+          <br> <p>¡Algo a tener muy en cuenta es que al momento de seleccionar el cliente al que le vamos a crear el pedido el programa se encargará de <b>buscar si el cliente se encuentra o no en cartera, de ser así no se le podrá crear un pedido</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ciudad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ciudad',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-map-marker font-size-20"></i> ¡Ciudad!</h4>',
+    text: `<p>¡Al seleccionar el cliente al que le haremos el pedido, la opción <b>ciudad se autocompletará si el cliente tiene registrada una sola ciudad</b>, de lo contario se colocarán en esta lista desplegable las ciudades en las que se encuentra el cliente para que elijamos una!</p>`
+  },
+  {
+    attachTo: {
+      element: '#sedeCliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'sedeCliente',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-building font-size-20"></i> ¡Dirección Sede!</h4>',
+    text: `<p>¡Posterior a haber elegido la ciudad <b>este campo se llenará automaticamente si el cliente tiene una sede en la ciudad elegida</b>, si tiene más de una debemos elegir la direccion de las que están en la lista desplegable!</p>`
+  },
+  {
+    attachTo: {
+      element: '#vendedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'vendedor',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-user font-size-20"></i> ¡Vendedor!</h4>',
+    text: `<p>¡El vendedor se eligirá automaticamente al seleccionar un cliente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#descuento',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'descuento',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-percentage font-size-20"></i> ¡Descuento!</h4>',
+    text: `<p>¡Para realizar un <b>descuento sobre el valor total del pedido</b> debemos colocar el <b>porcentaje de descuento que realizaremos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-book font-size-20"></i> ¡Observacion!</h4>',
+    text: `<p>¡Si tenemos una observación o descripción sobre le pedido podemos colocarla aquí, sino lo dejamos vacio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#iva',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'iva',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square font-size-20"></i> ¡IVA!</h4>',
+    text: `<p>¡Si el cliente que seleccionamos no tiene IVA podemos desmarcar o deseleccionar este check!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Productos!</h4>',
+    text: `<p>¡Llenando estos campos podemos elegir los productos que tendrá el pedido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#item',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'item',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-shopping-bag font-size-20"></i> ¡Item!</h4>',
+    text: `<p>¡Podemos <b>buscar un item</b> por medio de este campo, para ello necesitamos <b>saber el código del item y digitarlo aquí</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#referencia',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'referencia',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-shopping-bag font-size-20"></i> ¡Referencia!</h4>',
+    text: `<p>¡Cuando elegimos el cliente otro de los campos que se llena automaticamente es la Referencia, esta es una lista desplegable en la que <b>saldrán unicamente los productos que ha comprado este cliente a lo largo de los años</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cantidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-cart-plus font-size-20"></i> ¡Cantidad!</h4>',
+    text: `<p>¡En este campo debemo digitar la cantidad del producto que nos están pidiendo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#presentacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'presentacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Presentación!</h4>',
+    text: `<p>¡Cuando elegimos o buscamos un producto este campo <b>se llenará automaticamente</b>, pero <b>si queremos podemos cambiar la presentación</b> en la que se venderá el producto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#precio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'precio',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-dollar font-size-20"></i>¡Precio!</h4>',
+    text: `<p>¡El precio de igual manerá se llenará con base el producto elegido, tambien podemos cambiar el precio. El precio que digitemos <b>debe ser mayor o igual al ultimo precio al que se vendió</b> este item!</p>`
+  },
+  {
+    attachTo: {
+      element: '#fecha',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'fecha',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-calendar font-size-20"></i>¡Fecha!</h4>',
+    text: `<p>¡En esta fecha debemos colocar el <b>día en que será entregado</b> el producto terminado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#stock',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'stock',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Stock!</h4>',
+    text: `<p>¡Aquí podremos <b>ver el stock actual</b> del producto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ultPrecio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ultPrecio',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-dollar font-size-20"></i>¡Ultimo Precio!</h4>',
+    text: `<p>¡<b>Ultimo precio al que se facturó</b> el item elegido o buscado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ultFecha',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ultFecha',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-calendar font-size-20"></i>¡Ultima Fecha!</h4>',
+    text: `<p>¡Está es la <b>ultima fecha en que se vendió</b> el producto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'agregar',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-send font-size-20"></i>¡Agregar!</h4>',
+    text: `<p>¡Una vez hayamos terminado de llenar todos los campos de productos <b>agregamos este mismo a la tabla siguiente</b> para poder ir guardando momentaneamente ahí los productos que tendrá el pedido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiar',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-eraser font-size-20"></i>¡Limpiar!</h4>',
+    text: `<p>¡Con este botón podemos <b>limpiar los campos de productos</b> para llenarlos nuevamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-table font-size-20"></i>¡Tabla Productos!</h4>',
+    text: `<p>¡Esta será la tabla donde ser estarán almacenando los productos que vayamos seleccionando para el pedido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarEliminar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'quitarEliminar',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-trash font-size-20"></i>¡Quitar o Eliminar Productos!</h4>',
+    text: `<p>¡Con este botón tenemos la opción de <b>quitar y/o eliminar productos</b> de pedidos ya existentes o pedidos que apenas estamos creando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#costosPedidos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'costosPedidos',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-wallet font-size-20"></i>¡Costos del Pedido!</h4>',
+    text: `<p>¡Se nos mostrarán los <b>costos que tendrá el pedido</b> con base a los productos seleccionados, descuentos e IVA!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearPedido',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'crearPedido',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-wallet font-size-20"></i>¡Crear Pedido!</h4>',
+    text: `<p>¡Por último tenemos que <b>crear el pedido</b>, al presionar este botón <b>nos saldrá un mensaje donde debemos confirmar (o no) que queremos crear el pedido</b>, luego de eso el pedido se habrá creado y <b>nos mostrará un PDF con la información del pedido creado</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-wallet font-size-20"></i>¡Limpiar Todo!</h4>',
+    text: `<p>¡Con este botón podrems <b>limpiar todos</b> los campos y tablas del modulo!</p>`
+  },
+];
+
+export const stepsVerPedidos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Pedidos!</h4>',
+    text: `<p>¡En este modulo podremos ver los pedidos de productos que tienen los estados <b>Pendiente</b> y <b>Parcialmente Satisfecho</b>, podremos aceptar o anular pedidos entre otras funciones que explicarán en el siguiente recorrido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#informacionColores',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'informacionColores',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información Colores!</h4>',
+    text: `<p>En este modulo veremos los pedidos divididos por colores que son y significan los siguiente: </p>
+          <ol>
+            <li><b>Verde:</b> Indica que todos los productos de un pedido pueden ser facturados porque el stock de estos productos es mayor o igual a la cantidad que se está pidiendo.</li>
+            <li><b>Azul:</b> Indica que algunos de los productos del pedido pueden ser facturados, pero no todo el pedido, porque algunos productos tienen stock suficiente y otros no. Los que tengan stock suficiente saldrán en verde dentro del pedido</li>
+            <li><b>Rojo:</b> El rojo es para los pedidos que fueron creados pero aún no han sido aceptados.</li>
+            <li><b>Blanco:</b> Indica que ninguno de los productos del pedido tiene stock suficiente para ser facturado.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#excel',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'excel',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-file-excel font-size-20"></i> ¡Excel!</h4>',
+    text: `<p>¡Podemos ver en excel la información de los pedidos para mayor comodidad!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaPedidos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaPedidos',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-table font-size-20"></i> ¡Tabla Pedidos!</h4>',
+    text: `<p>¡En esta tabla estaremos viendo la información de los pedidos. <br><br>Los pedidos saldrán agrupados, arriba del todo saldrá el número de pedido con el nombre del cliente y debajo de esto saldrán los productos relacionados a este pedido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#columnas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'columnas',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-bars font-size-20"></i> ¡Columnas de la Tabla!</h4>',
+    text: `<p>¡Con la lista desplegable que tenemos podemos seleccionar que columnas queremos ver y cuales no!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-bars font-size-20"></i> ¡Filtros de Columnas!</h4>',
+    text: `<p>¡Podemos filtrar la información de la tabla escribiendo en uno de los campos de las columnas por un dato en especifico o general que conozcamos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#titulosColumnas',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'titulosColumnas',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-bars font-size-20"></i> ¡Titulos de Columnas!</h4>',
+    text: `<p>En donde estan los titulos de las columnas tenemos las siguientes acciones disponibles:</p>
+          <ul>
+            <li><b>Ordenar los registros de la tabla por los datos de una columna:</b> Si presionamos click sobre el titulo de la columna veremos como esta se ordena de mayor a menor o menor a mayor.</li>
+            <li><b>Reorganizar las columnas:</b> Si dejamos presionado el click sobre el titulo de una columna y luego la arrastramos nos irán apareciendo flechas en los bordes de las otras columnas, esto indica que ahí podemos posicionar la columnas que estamos arrastrando.</li>
+            <li><b>Redimencionar columnas:</b> Para esto tenemos que posicionar nuestro mause sobre el borde demarcada de cada titulo, dejamos presionado y arrastramos.</li>
+          </ul>`
+  },
+  {
+    attachTo: {
+      element: '#filas',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filas',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-bars font-size-20"></i> ¡Ordenes de trabajo!</h4>',
+    text: `<p>¡Si el pedido tiene ordenes de trabajo asociadas podemos presionar doble click sobre la fila de productos para poder ver la información de la OT!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ver',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ver',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-file-pdf font-size-20"></i> ¡Ver Pedido!</h4>',
+    text: `<p>¡Podemos ver la información de un pedido en un PDF, esto lo hacemos presionando el botón con el icono <i class="pi pi-eye"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#editar',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'editar',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-pencil font-size-20"></i> ¡Editar Pedido!</h4>',
+    text: `<p>¡Si hay un pedido que no ha sido aceptado aún y quieres editarlo puedes hacerlo presionando el icono <i class="pi pi-pencil"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#confirmar',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'confirmar',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-check font-size-20"></i> ¡Confirmar Pedido!</h4>',
+    text: `<p>¡Cuando ya hemos revisado un pedido y queremos confirmarlo o aceptarlo presionamos el icono <i class="pi pi-check"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#anular',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'anular',
+    title: '<h4 style="margin: auto; color: var(--rojo)"><i class="pi pi-times font-size-20"></i> ¡Anular Pedido!</h4>',
+    text: `<p>¡Si queremos anular uno de los pedidos que no han sido aceptados presionamos el icono <i class="pi pi-times"></i>!</p>`
   },
 ];

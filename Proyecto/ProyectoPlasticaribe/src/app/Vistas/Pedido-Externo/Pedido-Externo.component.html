@@ -1,12 +1,14 @@
+<p-toast></p-toast>
+
 <ng-container *ngIf="!modalMode">
   <app-menuLateral></app-menuLateral>
-<br>
-<app-VistasFavoritas></app-VistasFavoritas>
+  <br>
+  <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
-  <div class="spinner-border text-danger" role="status" style="margin: auto;">
-    <!-- <span>Cargando...</span> -->
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
@@ -23,6 +25,10 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <ng-container *ngIf="ValidarRol == 1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <button pButton class="p-button-danger" type="button" label="Crear Clientes" icon="pi pi-check-circle" (click)="LlamarModalCrearCliente()"> </button>
@@ -37,16 +43,16 @@
   <br>
 
   <!--Inicio Crear Pedidos-->
-  <form [formGroup]="FormPedidoExternoClientes">
+  <form [formGroup]="FormPedidoExternoClientes" id="formulario1">
     <div class="mb-3">
       <div class="row g-4">
 
         <!-- Cliente -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="cliente">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="PedClienteNombre" id="PedClienteNombre" list="cliente" type="text" pInputText (change)="clienteSeleccionado()" required/>
-            <datalist id="cliente">
+            <input formControlName="PedClienteNombre" id="PedClienteNombre" list="clientes" type="text" pInputText (change)="clienteSeleccionado()" required/>
+            <datalist id="clientes">
               <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Id}}</option>
             </datalist>
             <label for="PedClienteNombre">Cliente</label>
@@ -54,7 +60,7 @@
         </div>
 
         <!-- Ciudad -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="ciudad">
           <span class="p-float-label">
             <p-dropdown formControlName="ciudad_sede" inputId="ciudad_sede" [autoDisplayFirst]="false" [options]="ciudad" optionLabel="" (onChange)="llenarDireccionCliente()" [required]="true"></p-dropdown>
             <label for="ciudad_sede">Ciudad(es)</label>
@@ -62,7 +68,7 @@
         </div>
 
         <!-- Sede Cliente -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="sedeCliente">
           <span class="p-float-label">
             <p-dropdown formControlName="PedSedeCli_Id" inputId="PedSedeCli_Id" [autoDisplayFirst]="false" [options]="sedeCliente" optionLabel="" (onChange)="verificarCartera()" [required]="true"></p-dropdown>
             <label for="PedSedeCli_Id">Dirección Sede</label>
@@ -70,7 +76,7 @@
         </div>
 
         <!-- Usuario -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
           <span class="p-float-label">
             <p-dropdown formControlName="PedUsuarioNombre" inputId="PedUsuarioNombre" [autoDisplayFirst]="false" [options]="usuarioVende" optionLabel="" [required]="true"></p-dropdown>
             <label for="PedUsuarioNombre">Vendedor</label>
@@ -78,7 +84,7 @@
         </div>
 
         <!-- Descuento -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="descuento">
           <span class="p-float-label">
             <p-inputNumber formControlName="PedDescuento" mode="decimal" inputId="Descuento" [minFractionDigits]="2" (onBlur)="ivaDescuento()" [(ngModel)]="descuento"></p-inputNumber>
             <label for="Descuento">(%) Descuento</label>
@@ -86,7 +92,7 @@
         </div>
 
         <!-- Campo Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-7 col-xxl-8">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-7 col-xxl-8" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="PedObservacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -94,7 +100,7 @@
         </div>
 
         <!-- Iva -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="iva">
           <div class="field-checkbox" style="padding: 5%;">
             <p-checkbox formControlName="PedIva" [(ngModel)]="checked" label="Iva (%)" (click)="checkboxIva()" [binary]="true"></p-checkbox>
           </div>
@@ -115,33 +121,33 @@
   </div>
   <br>
 
-  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off">
+  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off" id="formulario2">
     <div class="mb-3">
       <div class="row g-4">
 
         <!-- ID Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="item">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ProdId" id="ProdId" type="text" pInputText (keyup)="buscarProductoId()" required/>
-            <label for="ProdId">Id</label>
+            <label for="ProdId">Item</label>
           </span>
         </div>
 
         <!-- ID/Nombre Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="referencia">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ProdNombre" id="ProdNombre" list="producto" type="text" pInputText (change)="buscarProducto()" required/>
             <datalist id="producto">
               <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
             </datalist>
-            <label for="ProdNombre">Producto</label>
+            <label for="ProdNombre">Refeencia</label>
           </span>
         </div>
 
         <!-- Cantidad Pedida -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
           <span class="p-float-label">
             <p-inputNumber formControlName="ProdCantidad" mode="decimal" inputId="Cant" [minFractionDigits]="2"></p-inputNumber>
             <label for="Cant">Cant. Pedida</label>
@@ -149,7 +155,7 @@
         </div>
 
         <!-- Presentacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="presentacion">
           <span class="p-float-label">
             <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false" [options]="presentacion" [required]="true"></p-dropdown>
             <label for="Und">Presentación</label>
@@ -157,7 +163,7 @@
         </div>
 
         <!-- Precio Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
             <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
             <label for="Precio">Precio Und.</label>
@@ -165,7 +171,7 @@
         </div>
 
         <!-- Fecha Entrega Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="fecha">
           <span class="p-float-label">
             <p-calendar formControlName="ProdFechaEnt" inputId="FechaEntrega" [showIcon]="true"></p-calendar>
             <label for="FechaEntrega">Fecha Entrega</label>
@@ -173,7 +179,7 @@
         </div>
 
         <!-- Stock Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="stock">
           <span class="p-float-label">
             <p-inputNumber formControlName="ProdStock" mode="decimal" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
             <label for="Precio">Stock</label>
@@ -181,7 +187,7 @@
         </div>
 
         <!-- Ultima venta -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="ultPrecio">
           <span class="p-float-label">
             <p-inputNumber formControlName="ProdUltFacturacion" mode="decimal" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
             <label for="Precio">Ultimo Precio Facturado</label>
@@ -189,7 +195,7 @@
         </div>
 
         <!-- Ultima fecha Facturada -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-4" id="ultFecha">
           <span class="p-float-label">
             <p-chip label="Ultima Fecha Facturada: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
           </span>
@@ -201,8 +207,8 @@
   <!-- Inicio botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="{{AccionBoton}} Producto" icon="pi pi-send" (click)="validarCamposVacios()"> </button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
+      <button pButton class="p-button-danger" id="agregar" type="button" label="Agregar Producto" icon="pi pi-send" (click)="validarCamposVacios()"> </button>
+      <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
     </div>
   </div>
 
@@ -214,7 +220,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Productos</h4>
   </div>
 
-  <div class="mb-5" *ngIf="!cargando">
+  <div class="mb-5" *ngIf="!cargando" id="tabla">
     <div class="row g-3">
       <div class="table-responsive">
         <p-table
@@ -234,8 +240,8 @@
           dataKey="id">
           <ng-template pTemplate="header" let-columns>
             <tr>
-              <th scope="col" class="idProducto">ID</th>
-              <th id="nombre" scope="col">Nombre</th>
+              <th scope="col" class="idProducto">Item</th>
+              <th id="nombre" scope="col">Referencia</th>
               <th id="cantidad" scope="col">Cantidad</th>
               <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
               <th id="precioUnitario" scope="col">Precio Und</th>
@@ -254,7 +260,7 @@
               <td>{{listaProductos.SubTotal | number}}</td>
               <td>{{listaProductos.FechaEntrega}}</td>
               <td *ngIf="!modalMode" style="text-align: center;">
-                <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></button>
+                <button id="quitarEliminar" pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></button>
               </td>
               <td *ngIf="modalMode" style="text-align: center;">
                 <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="eliminarProducto(listaProductos)"></button>
@@ -267,7 +273,7 @@
     </div>
   </div>
 
-  <div class="mb-5">
+  <div class="mb-5" id="costosPedidos">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <div class="mb-3">
         <div class="row g-3">
@@ -283,7 +289,7 @@
       </div>
       <div class="mb-3">
         <div class="row g-3">
-          <p-chip label="Subtotal menos Dcto" pTooltip="Subtotal menos descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
+          <p-chip label="Subtotal menos Dcto" pTooltip="Subtotal descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
           <label class="text-center" for="">${{valorMenosDescuento | number}}</label>
         </div>
       </div>
@@ -310,19 +316,83 @@
 
   <div class="mb-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button pButton class="p-button-danger" type="button" label="Crear Pedido"  *ngIf="!modalMode && !cargando" icon="pi pi-check" (click)="confirmarPedido()"> </button>
-    <button pButton class="p-button-danger" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode && !cargando" (click)="confirmarPedido()"> </button>
-    <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Crear Pedido"  *ngIf="!modalMode && !cargando" icon="pi pi-check" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode && !cargando" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
-  <!-- Modal de crear producto -->
-  <p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" >
-     <app-crear-producto></app-crear-producto>
-  </p-dialog>
-  <!-- Modal de crear clientes -->
-  <p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" >
-    <app-crear-clientes></app-crear-clientes>
-  </p-dialog>
+</p-card>
 
+<!-- Modal de crear producto -->
+<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" >
+    <app-crear-producto></app-crear-producto>
+</p-dialog>
 
+<!-- Modal de crear clientes -->
+<p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" >
+  <app-crear-clientes></app-crear-clientes>
+</p-dialog>
 
+<!-- Mensaje de Confirmación del Pedido a crear -->
+<p-toast position="center" key="confimacionPedido" (onClose)="closeConfirmacion()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-matPrima>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button *ngIf="!modalMode" type="button" pButton (click)="CrearPedidoExterno()" icon="pi pi-check" label="Crear Pedido" class="p-button-success"></button>
+          <button *ngIf="modalMode" type="button" pButton (click)="editarPedido()" icon="pi pi-check" label="Editar Pedido" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeConfirmacion()" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de confirmación para quitar un producto de la tabla -->
+<p-toast position="center" key="quitarProducto" (onClose)="closeMessage('quitarProducto')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton (click)="quitarProducto()" icon="pi pi-check" label="Quitar" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMessage('quitarProducto')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de confirmación para eliminar un producto de un pedido ya existente, el producto se eliminará de la base de datos -->
+<p-toast position="center" key="eliminarProducto" (onClose)="closeMessage('eliminarProducto')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton (click)="eliminarProductoPedido()" icon="pi pi-check" label="Quitar" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMessage('eliminarProducto')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

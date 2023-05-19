@@ -183,7 +183,7 @@ export const routes: Routes = [
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
-  {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: OcompraComponent},
+  {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,13]}, component: OcompraComponent},
   {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: PedidomateriaprimaComponent},
   {path: 'asignacionMP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionMateriaPrimaComponent},
   {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
@@ -207,7 +207,7 @@ export const routes: Routes = [
   {path: 'reporte-Materia-Prima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: ReporteMateriaPrimaComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
-  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,13]}, component: Reporte_OrdenCompraComponent},
+  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_OrdenCompraComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos

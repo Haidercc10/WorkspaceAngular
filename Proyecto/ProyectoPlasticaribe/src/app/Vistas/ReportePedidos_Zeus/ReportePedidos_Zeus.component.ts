@@ -15,6 +15,9 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
+
 @Component({
   selector: 'app-ReportePedidos_Zeus',
   templateUrl: './ReportePedidos_Zeus.component.html',
@@ -54,7 +57,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                   private inventarioZeusService : InventarioZeusService,
                     private pedidoProductosService : PedidoProductosService,
                       private pedidoExternoService : OpedidoproductoService,
-                        private estadosProcesos_OTService : EstadosProcesos_OTService,) {
+                        private estadosProcesos_OTService : EstadosProcesos_OTService,
+                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -63,6 +67,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.seleccionarColumnas();
     this.consultarPedidosZeus();
     this.consultarPedidos();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
