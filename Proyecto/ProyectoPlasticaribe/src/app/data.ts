@@ -5991,3 +5991,418 @@ export const stepsVerPedidos : Step.StepOptions[] = [
     text: `<p>¡Si queremos anular uno de los pedidos que no han sido aceptados presionamos el icono <i class="pi pi-times"></i>!</p>`
   },
 ];
+
+/******************************************************** ORDENES DE TRABAJO ***************************************************************/
+
+export const stepsOrdenTrabajo: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#ultima-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'ultima-ot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Última OT</h5>`,
+    text: `Este número indica <b>el consecutivo de la última OT creada en BagPro.</b>`
+  },
+  {
+    attachTo: {
+      element: '#orden',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'orden',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Consultar OT</h5>`,
+    text: `En este campo puedes consultar una orden de trabajo, <b>ya sea para ver y/o editar su información.</b>`
+  },
+  {
+    attachTo: {
+      element: '#Pedido',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'Pedido',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionar Pedido</h5>`,
+    text: `En este campo tienes la opción de seleccionar pedidos, esto para <b>crear una orden de trabajo en base al pedido elegido.</b>`
+  },
+  {
+    attachTo: {
+      element: '#encabezado1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'encabezado1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Encabezado Pedido/OT</h5>`,
+    text: `Aquí encontrarás los datos del encabezado del pedido seleccionado o de la orden de trabajo consultada.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'tabla1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Productos del pedido</h5>`,
+    text: `En esta tabla <b>se cargarán los items del pedido consultado previamente.</b><br><br>
+    Para la creación de una orden de trabajo <b>debes hacer clic sobre uno de los items del pedido cargados aquí</b>,
+    luego de esto se consultará la última orden de trabajo creada para esta referencia.<br><br>
+    <b>Además se cargarán los checkbox's y los tabs de los procesos de producción por los que pasa el producto generalmente</b>.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#check',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'check',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Procesos de producción</h5>`,
+    text: `La selección de cualquiera de estos checkbox <b>indica que la orden de trabajo debe pasar por el proceso que se encuentra chequeado.</b><br><br>
+    <b>Se adicionarán tabs para cada proceso</b> donde se podrán visualizar diferentes campos <b>que estarán diligenciados con las caracteristicas
+    que tendrá la orden de trabajo,</b> dependiendo el producto seleccionado en la tabla y si ya tiene una orden de trabajo creada anteriormente<br><br>
+    Cabe resaltar que <b>si no existe una OT creada anteriormente para este producto, no se cargarán los checkbox, ni los tabs,</b> y deberás
+    chequear cada proceso por donde pasará la OT y diligenciar cada campo en los procesos seleccionados.<br><br>`,
+  },
+  {
+    attachTo: {
+      element: '#Cyrel',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'Cyrel',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cyrel</h5>`,
+    text: `Si este check está seleccionado <b>indicará que la orden de trabajo necesita cyrel.</b>`
+  },
+  {
+    attachTo: {
+      element: '#ext1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'ext1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Extrusión</h5>`,
+    text: `Si este checkbox esta seleccionado, <b>se realizará automáticamente una operación para calcular el valor que tendrá el campo peso extrusión</b>,
+    Revisa el cálculo en los siguientes pasos.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#ext2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'ext2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cálculo 1</h5>`,
+    text: `<b>Si la unidad de medida de extrusión es Centimetros</b>, el largo de la unidad será 100, y si el material es alta, entonces el cálculo quedará así:<br>
+    <b>(Valor Ancho 1 + Valor Ancho 2 + Valor Ancho 3) x Valor Calibre x 0.0048 x Valor largo unidad.</b><br><br>
+    Si el material es diferente de alta entonces el cálculo será este: <br>
+    <b>(Valor Ancho 1 + Valor Ancho 2 + Valor Ancho 3) x Valor Calibre x 0.00468 x Valor largo Unidad.</b><br><br>`
+    ,
+  },
+  {
+    attachTo: {
+      element: '#ext3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'ext3',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cálculo 2</h5>`,
+    text: `<b>Si la unidad de medida de extrusión es Pulgadas</b>, el largo de la unidad será 39.3701, y si el material es alta, entonces el cálculo quedará así:<br>
+    <b>(Valor Ancho 1 + Valor Ancho 2 + Valor Ancho 3) x Valor Calibre x 0.0317 x Valor largo unidad.</b><br><br>
+    Si el material es diferente de alta entonces el cálculo será este: <br>
+    <b>(Valor Ancho 1 + Valor Ancho 2 + Valor Ancho 3) x Valor Calibre x 0.0302 x Valor largo Unidad.</b><br>`
+    ,
+  },
+  {
+    attachTo: {
+      element: '#imp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'imp',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Impresión</h5>`,
+    text: `Si este checkbox esta seleccionado, se cargarán los siguientes datos del producto:<br><br>
+    - <b>Tipo impresión</b><br>
+    - <b>Rodillo</b><br>
+    - <b>Pista</b><br>
+    - <b>Tintas</b><br><br>
+    En el apartado de tintas, <b>debes elegir los colores que contiene el producto.</b>`
+  },
+  {
+    attachTo: {
+      element: '#rot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'rot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Rotograbado</h5>`,
+    text: `Si este checkbox esta seleccionado, se cargarán los siguientes datos del producto:<br><br>
+    - <b>Tipo impresión</b><br>
+    - <b>Rodillo</b><br>
+    - <b>Pista</b><br>
+    - <b>Tintas</b><br><br>
+    En el apartado de tintas, <b>puedes elegir los colores que contiene el producto, todos los campos son opcionales.</b>`
+  },
+  {
+    attachTo: {
+      element: '#lam',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'lam',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Laminado</h5>`,
+    text: `Si este checkbox está seleccionado, se cargarán los siguientes datos del producto:<br><br>
+    <b>* Capa 1 - Calibre 1 - Cantidad 1<br>
+       * Capa 2 - Calibre 2 - Cantidad 2<br>
+       * Capa 3 - Calibre 3 - Cantidad 3</b><br><br>`
+  },
+  {
+    attachTo: {
+      element: '#corte',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'corte',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Corte</h5>`,
+    text: `Si este checkbox está seleccionado, se cargarán los siguientes datos del producto:<br><br>
+    - <b>Formato.</b><br>
+    - <b>Ancho.</b><br>
+    - <b>Largo.</b><br>
+    - <b>Fuelle.</b><br>
+    - <b>Margen.</b><br>`
+  },
+  {
+    attachTo: {
+      element: '#sella',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'sella',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Sellado</h5>`,
+    text: `Si este checkbox está seleccionado, se cargarán los siguientes datos del producto:<br><br>
+    - <b>Formato.</b><br>
+    - <b>Ancho.</b><br>
+    - <b>Largo.</b><br>
+    - <b>Fuelle.</b><br>
+    - <b>Porcentaje de Margen.</b><br>
+    - <b>Margen Kg, que será calculado así:</b><br>
+        Si la presentación es Kg: Margen Adicional * (Cantidad / 100).<br>
+        Si la presentación es Und: Margen Adicional * (((Cantidad * Bolsas por Paquete * Peso Millar) / 1000) / 100).<br>
+        Si la presentación es Paquete: (Margen Adicional * ((Cantidad * Peso Millar) / 1000)) / 100.<br>
+    - <b>Peso Millar : se calcula así: (Peso del producto * 1000)</b><br>
+    - <b>Tipo Sellado.</b><br>
+    - <b>Precio Día.</b><br>
+    - <b>Precio Noche.</b><br>
+    - <b>Cantidad de bolsas por paquete.</b><br>
+    - <b>Peso del Paquete.</b><br>
+    - <b>Cantidad de bolsas por Bulto.</b><br>
+    - <b>Peso del bulto.</b><br>`
+  },
+  {
+    attachTo: {
+      element: '#datos-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'datos-ot',
+    id: 'procesos',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Datos OT</h5>`,
+    text: `En este apartado se encontrarán los datos de la OT, entre los cuales se destacan:<br><br>
+   `
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'cantidad',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad</h5>`,
+    text: `Será la cantidad que se va a crear del producto seleccionado en la tabla.`
+  },
+  {
+    attachTo: {
+      element: '#valor1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'valor1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Valor Unitario</h5>`,
+    text: `Será el <b>costo unitario del producto seleccionado</b> en la tabla`
+  },
+  {
+    attachTo: {
+      element: '#neto1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'neto1',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Neto Kg</h5>`,
+    text: `Será el resultado del siguiente cálculo. <b>Este dependerá de la presentación del producto.</b><br><br>
+    <b>Kg:</b> Cantidad + ((Cantidad * Margen Adicional) / 100)<br>
+    <b>Und:</b> ((1 + (Margen Adicional / 100)) * ((Peso Millar / 1000) * Cantidad))<br>
+    <b>Paquete:</b> ((1 + (Margen Adicional / 100)) * ((Peso Millar / 1000) * (Cantidad * Cantidad Und por Paquetes)))`
+  },
+  {
+    attachTo: {
+      element: '#valor-kg',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'valor-kg',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Valor Kilogramo</h5>`,
+    text: `Será el costo que tendrá el item por kilogramo. <b>Para saber esto tenemos los siguientes cálculos que dependerán de la presentación del producto.</b><br><br>
+    - Para <b>Kg:</b> Valor Unitario.<br>
+    - Para <b>Und:</b> Valor de la orden / ((Cantidad * Peso Millar) / 1000); <br>
+    - Para <b>Paquete:</b> Precio Unitario / Peso del Paquete.`
+  },
+  {
+    attachTo: {
+      element: '#valor-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'valor-ot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Valor orden de trabajo</h5>`,
+    text: `Será el resultado del siguiente calculo:<br><br>
+    - Para <b>Kg:</b> Cantidad * Valor Unitario.<br>
+    - Para <b>Und:</b> Cantidad * Valor Unitario.<br>
+    - Para </b>Paquete:</b> Cantidad * Valor Unitario.`
+  },
+  {
+    attachTo: {
+      element: '#crear',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'crear',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar OT</h5>`,
+    text: `Haciendo clic sobre este botón, <b>podrás crear una orden trabajo en base a un pedido seleccionado.</b> Así como también podrás editar una OT consultada.`
+  },
+  {
+    attachTo: {
+      element: '#limpiar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'limpiar',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Limpiar información</h5>`,
+    text: `<b>Haz clic sobre este botón para limpiar toda la información</b> que haz diligenciado hasta el momento.`
+  },
+  {
+    attachTo: {
+      element: '#pdf',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    id: 'pdf',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ver PDF</h5>`,
+    text: `Al hacer click sobre este botón, Luego de consultar, puedes ver su información de manera detalla en formato PDF`
+  },
+];
+
+

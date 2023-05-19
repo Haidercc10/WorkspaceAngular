@@ -1,7 +1,6 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -35,6 +34,8 @@ import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado
 import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
+import { stepsOrdenTrabajo as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -148,7 +149,8 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                               private tiposProductosService : TipoProductoService,
                                                                 private tipoSelladoService : TiposSelladoService,
                                                                   private pedidosZeusService : InventarioZeusService,
-                                                                    private sedeClienteService : SedeClienteService,) {
+                                                                    private sedeClienteService : SedeClienteService,
+                                                                      private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -4094,5 +4096,14 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').enable();
       this.cambiarNroCapas3();
     }, 300);
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 }

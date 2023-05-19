@@ -2,7 +2,7 @@
   <app-menuLateral></app-menuLateral>
   <br>
 </ng-container>
-
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -22,9 +22,14 @@
 </div>
 
 <p-card>
+  <!--Ver tutorial-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <!--Inicio info OT-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT"><i class="pi pi-file-edit"></i> OT N° <b>{{ultimaOrdenTrabajo}}</b></h4>
+    <h4 class="tituloRojo" id="ultima-ot" title="Consecutivo sobre el cual se crea una nueva OT"><i class="pi pi-file-edit"></i> OT N° <b>{{ultimaOrdenTrabajo}}</b></h4>
   </div>
 
   <div class="mb-4">
@@ -33,13 +38,13 @@
   </div>
 
   <form [formGroup]="FormOrdenTrabajo">
-    <div class="mb-3">
+    <div class="mb-3" id="encabezado1">
       <div class="row g-4">
         <!-- Número de Orden de Trabajo -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OT_Id" type="text" pInputText (keyup.enter)="ConsultarOrdenTrabajo()" required/>
+            <input formControlName="OT_Id" type="text" id="orden" pInputText (keyup.enter)="ConsultarOrdenTrabajo()" required/>
             <label for="orden">Nro. OT</label>
           </span>
         </div>
@@ -149,6 +154,7 @@
 
   <!-- Tabla producto -->
   <p-table
+    id="tabla1"
     #dt
     [value]="ArrayProducto"
     [resizableColumns]="true"
@@ -209,28 +215,28 @@
     <div class="row">
 
       <!-- Checkbox Procesos  -->
-      <div class="mb-4">
+      <div class="mb-4" id="check">
         <div class="row g-3 d-flex justify-content-center">
           <!-- Cyrel -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-            <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="checkedCyrel" [binary]="true" inputId="Cyrel"></p-checkbox>
+            <div class="field-checkbox" >
+              <p-checkbox [(ngModel)]="checkedCyrel" [binary]="true" inputId="Cyrel" id="Cyrel"></p-checkbox>
               <label for="Cyrel">Cyrel</label>
             </div>
           </div>
 
           <!-- Extrusión -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
-            <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="extrusion" [binary]="true" inputId="OT_Extrusion"></p-checkbox>
-              <label for="OT_Extrusion">Extrusión</label>
+            <div class="field-checkbox" id="ext2">
+              <p-checkbox [(ngModel)]="extrusion" [binary]="true" inputId="OT_Extrusion" id="ext1"></p-checkbox>
+              <label id="ext3" for="OT_Extrusion">Extrusión</label>
             </div>
           </div>
 
           <!-- Impresion -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="impresion" [binary]="true" inputId="OT_Impresion"></p-checkbox>
+              <p-checkbox [(ngModel)]="impresion" [binary]="true" inputId="OT_Impresion" id="imp"></p-checkbox>
               <label for="OT_Impresion">Impresión</label>
             </div>
           </div>
@@ -238,14 +244,14 @@
           <!-- Rotograbado -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="rotograbado" [binary]="true" inputId="OT_Rotograbado"></p-checkbox>
+              <p-checkbox [(ngModel)]="rotograbado" [binary]="true" inputId="OT_Rotograbado" id="rot"></p-checkbox>
               <label for="OT_Rotograbado">Rotograbado</label>
             </div>
           </div>
 
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="laminado" [binary]="true" inputId="OT_Laminado"></p-checkbox>
+              <p-checkbox [(ngModel)]="laminado" [binary]="true" inputId="OT_Laminado" id="lam"></p-checkbox>
               <label for="OT_Laminado">Laminado</label>
             </div>
           </div>
@@ -253,7 +259,7 @@
           <!-- Corte -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="checkedCorte" [binary]="true" inputId="OT_Corte"></p-checkbox>
+              <p-checkbox [(ngModel)]="checkedCorte" [binary]="true" inputId="OT_Corte" id="corte"></p-checkbox>
               <label for="OT_Corte">Corte</label>
             </div>
           </div>
@@ -261,7 +267,7 @@
           <!-- Doblado -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="doblado" [binary]="true" inputId="OT_Doblado"></p-checkbox>
+              <p-checkbox [(ngModel)]="doblado" [binary]="true" inputId="OT_Doblado" id="dobl"></p-checkbox>
               <label for="OT_Doblado">Doblado</label>
             </div>
           </div>
@@ -269,7 +275,7 @@
           <!-- Sellado -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="sellado" [binary]="true" inputId="OT_Sellado"></p-checkbox>
+              <p-checkbox [(ngModel)]="sellado" [binary]="true" inputId="OT_Sellado" id="sella"></p-checkbox>
               <label for="OT_Sellado">Sellado</label>
             </div>
           </div>
@@ -287,7 +293,7 @@
       </div>
 
       <!-- Tabs de Procesos -->
-      <p-tabView [scrollable]="true" class="justify-content-md-center">
+      <p-tabView [scrollable]="true" id="datos-ot" class="justify-content-md-center">
         <!-- Datos OT -->
         <p-tabPanel
           header="Datos OT"
@@ -296,31 +302,31 @@
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
             <div class="mb-3">
               <div class="row g-3">
-                <p-chip label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
+                <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
                 <label for="">{{cantidadProducto | number : '1.2-2'}}</label>
               </div>
             </div>
             <div class="mb-3">
               <div class="row g-3">
-                <p-chip label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
+                <p-chip  id="valor1" label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
                 <label for="">${{valorProducto | number : '1.2-2'}}</label>
               </div>
             </div>
             <div class="mb-3">
               <div class="row g-3">
-                <p-chip label="Neto Kg" icon="pi pi-th-large"></p-chip>
+                <p-chip id="neto1" label="Neto Kg" icon="pi pi-th-large"></p-chip>
                 <label for="">{{netoKg | number : '1.2-2'}}</label>
               </div>
             </div>
             <div class="mb-3">
-              <div class="row g-3">
-                <p-chip label="Valor Kg" icon="pi pi-money-bill"></p-chip>
+              <div  class="row g-3">
+                <p-chip id="valor-kg" label="Valor Kg" icon="pi pi-money-bill"></p-chip>
                 <label for="">${{valorKg | number : '1.2-2'}}</label>
               </div>
             </div>
             <div class="mb-3">
               <div class="row g-3">
-                <p-chip label="Valor OT" icon="pi pi-wallet"></p-chip>
+                <p-chip id="valor-ot" label="Valor OT" icon="pi pi-wallet"></p-chip>
                 <label for="">${{valorOt | number : '1.2-2'}}</label>
               </div>
             </div>
@@ -1929,10 +1935,10 @@
       <!-- Botones -->
       <div class="bajarPagina">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
-          <button pButton class="p-button-danger" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-          <button pButton class="p-button-danger" type="button" label="Ver PDF" icon="pi pi-file-pdf" (click)="pdfOrdenTrabajo()"></button>
+          <button pButton class="p-button-danger" id="crear" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
+          <button pButton class="p-button-danger" id="editar" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+          <button pButton class="p-button-danger" id="pdf" type="button" label="Ver PDF" icon="pi pi-file-pdf" (click)="pdfOrdenTrabajo()"></button>
         </div>
       </div>
     </div>
