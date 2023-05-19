@@ -1,10 +1,11 @@
 <ng-container *ngIf="!edicionOrdenCompra">
   <app-menuLateral></app-menuLateral>
-<br>
-<app-VistasFavoritas></app-VistasFavoritas>
+  <br>
+  <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
 
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -26,11 +27,14 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
 
   <!-- Botones que llamaran los modeles -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button pButton pRipple class="p-button-danger" label="Crear Proveedor" icon="pi pi-user-plus" (click)="LlamarModalCrearProveedor()"></button>
-    <button pButton pRipple class="p-button-danger" label="Crear Materia Prima" icon="pi pi-check-circle" (click)="LlamarModalCrearMateriaPrima()"></button>
+    <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Proveedor" icon="pi pi-user-plus" (click)="LlamarModalCrearProveedor()"></button>
+    <button pButton pRipple id="crearMatPrima" class="p-button-danger" label="Crear Materia Prima" icon="pi pi-check-circle" (click)="LlamarModalCrearMateriaPrima()"></button>
   </div>
 
   <!-- Informacion de la orden de compra -->
@@ -39,7 +43,7 @@
   </div>
   <br>
 
-  <form [formGroup]="FormOrdenCompra">
+  <form [formGroup]="FormOrdenCompra" id="formulario">
     <div class="mb-3">
       <div class="row g-4">
 
@@ -47,7 +51,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText (keyup.enter)="consultarOrdenCompra()" required/>
+            <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText required/>
             <label for="orden">Consecutivo OC</label>
           </span>
         </div>
@@ -85,11 +89,11 @@
   </div>
 
   <form [formGroup]="FormMateriaPrima">
-    <div class="mb-3">
+    <div class="mb-3" id="formularioMatPrima">
       <div class="row g-4">
 
         <!-- ID de la Materia prima -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="idMatPrima">
           <span class="p-float-label">
             <p-inputNumber formControlName="Id" inputId="Id" [useGrouping]="false" (keyup.enter)="cambiarNombreMateriaPrima()" tooltipPosition="top" pTooltip="Busca el Id de la materia prima aquí!" [required]="true"></p-inputNumber>
             <label for="Id">Id</label>
@@ -97,7 +101,7 @@
         </div>
 
         <!-- Nombre Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-3 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-3 col-xxl-4" id="nombreMatprima">
           <span class="p-float-label">
             <input formControlName="Nombre" autocomplete="off" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
             <datalist id="materiaprima">
@@ -108,7 +112,7 @@
         </div>
 
         <!-- CANTIDAD DE MATERIA PRIMA  -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="cantidadMatPrima">
           <span class="p-float-label">
             <p-inputNumber formControlName="Cantidad" inputId="Cantidad" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
@@ -116,7 +120,7 @@
         </div>
 
         <!-- Unidad medida-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="undMatPtima">
           <span class="p-float-label">
             <p-dropdown formControlName="UndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadesMedida" optionLabel=""></p-dropdown>
             <label for="Und">Und</label>
@@ -124,7 +128,7 @@
         </div>
 
         <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="precioMatPrima">
           <span class="p-float-label">
             <p-inputNumber formControlName="PrecioOculto" inputId="PrecioOculto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="PrecioOculto">Precio Unitario</label>
@@ -136,8 +140,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="cargarMateriaPrima()"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos Mat. Prima" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
+        <button pButton class="p-button-danger" id="agregarMatPrima" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="cargarMateriaPrima()"></button>
+        <button pButton class="p-button-secondary" id="limpiarMatPrima" type="button" label="Limpiar Campos Mat. Prima" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
       </div>
     </div>
   </form>
@@ -150,7 +154,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Materias Primas Seleccionadas</h4>
   </div>
 
-  <div class="row g-3">
+  <div class="row g-3" id="tabla2">
     <div class="table-responsive">
       <p-table
       #dt
@@ -181,7 +185,7 @@
             <td>{{materiasPrimas.Und_Medida}}</td>
             <td>{{materiasPrimas.Precio | number}}</td>
             <td>{{materiasPrimas.SubTotal | number}}</td>
-            <td>
+            <td id="quitarMp">
               <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
               <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
             </td>
@@ -207,9 +211,9 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra" (click)="validarDatosOrdenCompra()"></button>
+      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra" (click)="validarDatosOrdenCompra()"></button>
       <button pButton class="p-button-danger" type="button" label="Editar Orden de Compra" icon="pi pi-pencil" *ngIf="edicionOrdenCompra" (click)="editarOrdenCompra()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>
   </div>
 

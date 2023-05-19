@@ -1,15 +1,16 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
-import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
+import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDevolucionesMp as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-devolucionesMP',
@@ -40,7 +41,8 @@ export class DevolucionesMPComponent implements OnInit {
                         private servicioTintas : TintasService,
                           private detallesAsignacionService : DetallesAsignacionService,
                             private boppService : EntradaBOPPService,
-                              private messageService: MessageService) {
+                              private messageService: MessageService,
+                                private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
@@ -51,6 +53,14 @@ export class DevolucionesMPComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

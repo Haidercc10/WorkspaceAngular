@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
@@ -18,6 +18,7 @@ import { RemisionFacturaService } from 'src/app/Servicios/Remisiones_Facturas/re
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsEntradasMp as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app_pedidomateriaprima_component',
@@ -78,7 +79,8 @@ export class PedidomateriaprimaComponent implements OnInit {
                                       private OrdenesFacturasService : OrdenFactura_RelacionService,
                                         private ordenCompraRemisionService : OrdenCompra_RemisionService,
                                           private dtOrdenCompraService : DetallesOrdenesCompraService,
-                                            private messageService: MessageService) {
+                                            private messageService: MessageService,
+                                              private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -102,6 +104,14 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ColumnasTabla();
     this.ColumnasTablaRemisiones();
     this.obtenerProveeedor();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

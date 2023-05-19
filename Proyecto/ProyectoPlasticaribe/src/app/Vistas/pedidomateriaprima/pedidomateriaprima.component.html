@@ -23,6 +23,9 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
 
   <!-- Inicio titulo -->
   <div class="mb-4">
@@ -30,10 +33,10 @@
   </div>
   <br>
 
-  <form [formGroup]="FormMateriaPrimaFactura">
+  <form [formGroup]="FormMateriaPrimaFactura" id="formulario">
     <div class="mb-3">
       <div class="row g-4">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="ordenCompra">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="OrdenCompra" id="orden" type="text" pInputText (keyup.enter)="cargarInfoOrdenCompraEnTabla()"/>
@@ -42,7 +45,7 @@
         </div>
 
         <!-- Factura -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="factura">
           <span class="p-float-label">
             <input formControlName="MpFactura" id="Factura" type="text" pInputText/>
             <label for="Factura">Factura</label>
@@ -50,7 +53,7 @@
         </div>
 
         <!-- Remision -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="remision">
           <span class="p-float-label">
             <input formControlName="MpRemision" id="Remision" type="text" pInputText/>
             <label for="Remision">Remisión</label>
@@ -58,9 +61,9 @@
         </div>
 
         <!-- Proveedor -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6" id="proveedor">
           <span class="p-float-label">
-            <input formControlName="proveedorNombre" id="Proveedor" list="proveedor" type="text" pInputText (change)="cambiarNombreProveedor()"/>
+            <input formControlName="proveedorNombre" id="Proveedor" list="proveedor" type="text" pInputText (change)="cambiarNombreProveedor()" readonly/>
             <datalist id="proveedor">
               <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
             </datalist>
@@ -69,7 +72,7 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="MpObservacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -84,7 +87,7 @@
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
-  <div class="mb-3">
+  <div class="mb-3" id="tabla1">
     <div class="row g-3">
       <p-table
       #dt
@@ -110,7 +113,7 @@
             <th scope="col">Presentación</th>
             <ng-template ></ng-template>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo" *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -152,7 +155,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de Ingreso</h4>
   </div>
 
-  <div class="mb-3" *ngIf="load">
+  <div class="mb-3" *ngIf="load" id="tabla2">
     <div class="row g-3">
       <p-table
         #dt1
@@ -173,7 +176,7 @@
             <th scope="col">Presentación</th>
             <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(ArrayMateriaPrima)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo2" (click)="quitarTodosMateriaPrima(ArrayMateriaPrima)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -181,7 +184,7 @@
           <tr *ngIf="!ArrayMateriaPrima.Exits">
             <td>{{ArrayMateriaPrima.Id}}</td>
             <td>{{ArrayMateriaPrima.Nombre}}</td>
-            <td pEditableColumn>
+            <td pEditableColumn id="cantidad">
               <p-cellEditor>
                 <ng-template pTemplate="input">
                   <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
@@ -194,7 +197,7 @@
             <td>{{ArrayMateriaPrima.Medida}}</td>
             <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number}}</td>
             <td>
-              <p-tableCheckbox [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
+              <p-tableCheckbox id="elegir2" [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
@@ -213,53 +216,60 @@
   </div>
 
   <!-- Buscar remisiones para añadirlas a una factura -->
-  <p-accordion>
+  <p-accordion id="acordeon">
     <p-accordionTab header="Añadir Remisiones a una Factura">
       <div class="mb-4">
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i> Buscar Remisiones</h4>
       </div>
+
       <form [formGroup]="FormRemisiones">
-        <div class="form-floating col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
-          <input formControlName="idRemision" (keyup.enter)="consultarIdRemisiones()" type="text"   id="floatingInput">
-          <label for="floatingInput">Número Remisión</label>
+        <div class="form-floating col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2" id="remision2">
+          <span class="p-float-label">
+            <input formControlName="idRemision" id="rem" type="text" (keyup.enter)="consultarIdRemisiones()" pInputText/>
+            <label for="rem">Remisión</label>
+          </span>
         </div>
       </form>
+
       <br>
-      <div *ngIf="load">
+
+      <div *ngIf="load" id="tabla3">
         <div class="mb-2">
-          <div class="row g-1">
-            <div class="table-responsive">
-              <table class="table table-bordered" >
-                <thead class="TitulosTabla">
-                  <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
-                    <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
-                    <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
-                    <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
-                    <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
-                    <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
-                    <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
-                    <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
-                    <th id="archivo" scope="col">Archivo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
-                    <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
-                    <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
-                    <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
-                    <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
-                    <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
-                    <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
-                    <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
-                    <td id="archivo"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true" (click)="llenarDocumento(remisiones)"></i></a></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <p-table
+            #dt1
+            [value]="ArrayRemisiones"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="10"
+            [rowsPerPageOptions]="[10,25,50]"
+            [rowHover]="true"
+            dataKey="Id">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Id</th>
+                <th>Código</th>
+                <th>Fecha</th>
+                <th>Proveedor</th>
+                <th>Usuario</th>
+                <th>Costo</th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-remisiones>
+              <tr>
+                <td>{{remisiones.remisionId}}</td>
+                <td>{{remisiones.remisionCodigo}}</td>
+                <td>{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
+                <td>{{remisiones.remisionProveedor}}</td>
+                <td>{{remisiones.remisionUsuario}}</td>
+                <td>{{remisiones.remisionPrecio | number : '1.2-2'}}</td>
+                <td id="ver"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true" (click)="llenarDocumento(remisiones)"></i></a></td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </div>
-
     </p-accordionTab>
   </p-accordion>
 
@@ -270,8 +280,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Agregar Factura" icon="pi pi-check" (click)="validarCampos()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+      <button pButton class="p-button-danger" id="crearIngreso" type="button" label="Agregar Factura" icon="pi pi-check" (click)="validarCampos()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
 </p-card>

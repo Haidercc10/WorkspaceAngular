@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
@@ -11,6 +11,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsRecuperado as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app_MateriaPrimaRecuperada',
@@ -57,7 +58,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                           private recuperadoService : RecuperadoService,
                             private recuperadoMPService : RecuperadoMPService,
                               private turnosService : TurnosService,
-                                private messageService: MessageService) {
+                                private messageService: MessageService,
+                                  private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -83,6 +85,14 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerUsuarios();
     this.obtenerTurnos();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

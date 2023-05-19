@@ -2,7 +2,8 @@
 <app-menuLateral></app-menuLateral>
 <br>
 <app-VistasFavoritas></app-VistasFavoritas>
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -24,13 +25,18 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <!-- Inicio titulo -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i> Ingresar Materia Prima devuelta</h4>
   </div>
   <br>
+
   <!-- Fin titulo -->
-  <form [formGroup]="FormDevolucion">
+  <form [formGroup]="FormDevolucion" id="formulario">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
@@ -46,7 +52,7 @@
         <!-- Campo Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-10 col-xxl-10">
           <span class="p-float-label">
-            <textarea formControlName="MpObservacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="MpObservacion" id="observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -62,7 +68,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla Materia Prima asignada</h4>
   </div>
 
-  <div class="mb-3" *ngIf="load">
+  <div class="mb-3" *ngIf="load" id="tabla1">
     <div class="row g-3">
       <p-table
         #dt1
@@ -83,7 +89,7 @@
             <th scope="col">Presentación</th>
             <th scope="col">Proceso</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo" (click)="quitarTodosMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -95,7 +101,7 @@
             <td>{{materiasPrimas.Unidad_Medida}}</td>
             <td>{{materiasPrimas.Proceso_Nombre}}</td>
             <td>
-              <p-tableCheckbox [value]="materiasPrimas" (click)="quitarMateriaPrimaAIngresar(materiasPrimas)"></p-tableCheckbox>
+              <p-tableCheckbox id="elegir" [value]="materiasPrimas" (click)="quitarMateriaPrimaAIngresar(materiasPrimas)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
@@ -112,7 +118,7 @@
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
-  <div class="mb-3" *ngIf="load"> <!---->
+  <div class="mb-3" *ngIf="load" id="tabla2"> <!---->
     <div class="row g-3">
       <p-table
         #dt
@@ -133,7 +139,7 @@
             <th scope="col">Presentación</th>
             <th scope="col">Precio Unitario</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="seleccionarTodosMateriaPrima(materiasPrimasRetiradas)"></p-tableHeaderCheckbox> <!---->
+              <p-tableHeaderCheckbox id="elegirTodo2" (click)="seleccionarTodosMateriaPrima(materiasPrimasRetiradas)"></p-tableHeaderCheckbox> <!---->
             </th>
           </tr>
         </ng-template>
@@ -141,7 +147,7 @@
           <tr *ngIf="!materiasPrimasRetiradas.Exits && materiasPrimasRetiradas.Cantidad > 0" class="TextosInfoTabla"> <!---->
             <td>{{materiasPrimasRetiradas.Id}}</td>
             <td>{{materiasPrimasRetiradas.Nombre}}</td>
-            <td pEditableColumn>
+            <td pEditableColumn id="cantidad">
               <p-cellEditor>
                 <ng-template pTemplate="input">
                   <p-inputNumber [(ngModel)]="materiasPrimasRetiradas.Cantidad_Devuelta" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="materiasPrimasRetiradas.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
@@ -154,7 +160,7 @@
             <td>{{materiasPrimasRetiradas.Unidad_Medida}}</td>
             <td>{{materiasPrimasRetiradas.Proceso_Nombre}}</td>
             <td>
-              <p-tableCheckbox [value]="materiasPrimasRetiradas" (click)="llenarMateriaPrimaAIngresar(materiasPrimasRetiradas)"></p-tableCheckbox> <!---->
+              <p-tableCheckbox id="elegir2" [value]="materiasPrimasRetiradas" (click)="llenarMateriaPrimaAIngresar(materiasPrimasRetiradas)"></p-tableCheckbox> <!---->
             </td>
           </tr>
         </ng-template>
@@ -165,8 +171,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Agregar Devolución" icon="pi pi-check" (click)="registrarDevolucion()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+      <button pButton class="p-button-danger" id="agregarDevolucion" type="button" label="Agregar Devolución" icon="pi pi-check" (click)="registrarDevolucion()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
 </p-card>

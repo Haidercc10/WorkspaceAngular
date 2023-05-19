@@ -1,7 +1,6 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -13,6 +12,8 @@ import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/O
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { defaultStepOptions, stepsOrdenesCompra as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
   providedIn: 'root'
@@ -70,7 +71,8 @@ export class OcompraComponent implements OnInit {
                           private dtOrdenCompraService : DetallesOrdenesCompraService,
                             private servicioTintas : TintasService,
                               private messageService: MessageService,
-                                private boppService : EntradaBOPPService,) {
+                                private boppService : EntradaBOPPService,
+                                  private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -96,6 +98,14 @@ export class OcompraComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.generarConsecutivo();
     this.consultarCategorias();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

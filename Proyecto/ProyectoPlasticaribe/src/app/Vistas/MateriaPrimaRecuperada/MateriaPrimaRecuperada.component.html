@@ -1,10 +1,10 @@
 <ng-container *ngIf="!modalMode">
   <app-menuLateral></app-menuLateral>
-<br>
-<app-VistasFavoritas></app-VistasFavoritas>
+  <br>
+  <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
 
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
@@ -20,17 +20,21 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i> Ingresar Mat. Prima Recuperada</h4>
   </div>
   <br>
 
-  <form [formGroup]="FormMateriaPrimaRecuperada">
+  <form [formGroup]="FormMateriaPrimaRecuperada" id="formulario1">
     <div class="mb-3">
       <div class="row g-4">
 
         <!-- Id Operario -->
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2" id="idOperario">
           <span class="p-float-label">
             <input formControlName="usuarioId" id="usuarioId" type="text" pInputText required/>
             <label for="usuarioId">ID Operario</label>
@@ -38,7 +42,7 @@
         </div>
 
         <!-- Nombre Operario -->
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-4 col-xxl-4" id="nombreOperario">
           <span class="p-float-label">
             <p-dropdown formControlName="usuarioNombre" inputId="Und" [autoDisplayFirst]="false" [options]="usuarios" optionValue="usua_Id" optionLabel="usua_Nombre" (onChange)="llenarUsuarioSeleccionado()"></p-dropdown>
             <label for="Und">Nombre Operario</label>
@@ -46,7 +50,7 @@
         </div>
 
         <!-- Turno -->
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3" id="turno">
           <span class="p-float-label">
             <p-dropdown formControlName="Turno" inputId="Turno" optionValue="turno_Id" [autoDisplayFirst]="false" [options]="turnos" optionLabel="turno_Nombre"></p-dropdown>
             <label for="Turno">Turno</label>
@@ -54,7 +58,7 @@
         </div>
 
         <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3" id="fecha">
           <span class="p-float-label">
             <p-calendar formControlName="MpingresoFecha" inputId="FechaIngreso" [showIcon]="true"></p-calendar>
             <label for="FechaIngreso">Fecha Ingreso</label>
@@ -62,7 +66,7 @@
         </div>
 
         <!-- Campo Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="MpObservacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -77,12 +81,12 @@
   </div>
   <br>
 
-  <form [formGroup]="FormMateriaPrima">
+  <form [formGroup]="FormMateriaPrima" id="formulario2">
     <div class="mb-3">
       <div class="row g-4">
 
         <!-- ID Materia Prima -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idMatPrima">
           <span class="p-float-label">
             <input formControlName="MpId" id="MpId" type="text" pInputText (keyup.enter)="buscarMpId()" required/>
             <label for="MpId">ID</label>
@@ -90,7 +94,7 @@
         </div>
 
         <!-- ID/Nombre Producto -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-4 col-xxl-4" id="nombreMatprima">
           <span class="p-float-label">
             <input formControlName="MpNombre" id="MpNombre" list="mp" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
             <datalist id="mp">
@@ -101,7 +105,7 @@
         </div>
 
         <!-- CANTIDAD DE MATERIA PRIMA  -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="cantidadMatPrima">
           <span class="p-float-label">
             <p-inputNumber formControlName="MpCantidad" mode="decimal" inputId="MpCantidad" [minFractionDigits]="2"></p-inputNumber>
             <label for="MpCantidad">Cantidad Mat. Prima</label>
@@ -109,7 +113,7 @@
         </div>
 
         <!-- Unidad medida-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="undMatPtima">
           <span class="p-float-label">
             <p-dropdown formControlName="MpUnidadMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
             <label for="Und">Und</label>
@@ -121,8 +125,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="validarCamposVaciosMP()"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
+        <button pButton id="agregarMatPrima" class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="validarCamposVaciosMP()"></button>
+        <button pButton id="limpiarMatPrima" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
       </div>
     </div>
   </form>
@@ -136,7 +140,7 @@
   </div>
 
   <!-- TABLA DE INGRESO -->
-  <div class="row g-3">
+  <div class="row g-3" id="tabla2">
     <div class="table-responsive">
       <p-table
       #dt
@@ -163,7 +167,7 @@
             <td>{{materiaPrima.Nombre}}</td>
             <td>{{materiaPrima.Cant | number}}</td>
             <td>{{materiaPrima.UndCant}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiaPrima)"></i></td>
+            <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiaPrima)"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -174,8 +178,8 @@
   <br>
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Registrar Recuperado" icon="pi pi-check" (click)="registrarRecuperado()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"></button>
+      <button pButton id="crear" class="p-button-danger" type="button" label="Registrar Recuperado" icon="pi pi-check" (click)="registrarRecuperado()"></button>
+      <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"></button>
     </div>
   </div>
 </p-card>

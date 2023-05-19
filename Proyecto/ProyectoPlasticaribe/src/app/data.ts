@@ -1,4 +1,3 @@
-import { builtinModules } from 'module';
 import Step from 'shepherd.js/src/types/step';
 
 export const builtInButtons = {
@@ -27,114 +26,6 @@ export const defaultStepOptions: Step.StepOptions = {
   }
 };
 
-export const stepAsignacionTintas: Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#intro',
-      on: 'bottom-end'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    classes: 'card',
-    id: 'intro',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Creación de Materias Primas</h5>`,
-    text: `<p>
-            Aquí encontrarás 2 botones para realizar la <b>creación de tintas y materias primas </b>
-            que aún no se encuentran registradas en el sistema.
-          </p> `
-  },
-  {
-    attachTo: {
-      element: '#creacion-tintas',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'creacion-tintas',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Crear Tintas</h5>',
-    text: `En estos campos debe agregar <b>la información detallada de la tinta que desea crear.</b>`
-  },
-  {
-    attachTo: {
-      element: '#asig-matprima',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'asig-matprima',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Elegir Materias Primas</h5>',
-    text: `Aquí debes <b>elegir las materias primas necesarias que asignarás para la creación de la tinta.</b><br><br>
-    <b>Nota:</b>`
-  },
-  {
-    attachTo: {
-      element: '#botones-add',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'botones-add',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Agregar Materias Primas</h5>',
-    text: `Luego de elegir la materia prima que deseas asignar, <b>haz clic sobre el botón Agregar Mat. Prima</b> para añadirla a un listado en la tabla que se encuentra acontinuación<br><br>
-    Si te equivocas en la elección de una materia prima, <b>haz clic sobre limpiar campos</b>`
-  },
-  {
-    attachTo: {
-      element: '#tabla',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'tabla',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Materias Primas a asignar</h5>',
-    text: `En esta tabla encontrarás las materias primas que <b>elegiste asignar para la creación de la tinta.</b>`
-  },
-  {
-    attachTo: {
-      element: '#quitar-mp',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'quitar-mp',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Quitar Materias Primas elegidas</h5>',
-    text: `En esta fila puedes <b>quitar material(es)</b> elegido(s) erróneamente, haciendo click sobre el icono <i class="pi pi-trash"></i>
-    que observarás <b>cuando existan materias primas cargadas en la tabla.</b>`
-  },
-  {
-    attachTo: {
-      element: '#botones',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back
-    ],
-    classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'botones',
-    title: '<h5 class="tituloRojo" style="margin: auto;">Asignar Materias Primas</h5>',
-    text: `Luego de cargar las materias primas <b>haz clic sobre Asignar Materia Prima</b> para registrarla en el sistema!<br><br>
-    <b>Si deseas volver a iniciar la asignación</b> que llevas hasta ese momento por algún error de digitación, <b>haz clic sobre limpiar todo.</b>`
-  },
-
-];
-
 /*********************************************************** BODEGA EXTRUSIÓN **************************************************************************/
 export const stepsEliminarRollos : Step.StepOptions[] = [
   {
@@ -157,7 +48,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -172,7 +62,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -187,7 +76,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -202,7 +90,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -217,7 +104,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -232,7 +118,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -247,7 +132,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -262,7 +146,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -277,7 +160,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -298,7 +180,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -313,7 +194,6 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -344,7 +224,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -360,7 +239,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -375,7 +253,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -390,7 +267,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -405,7 +281,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -420,7 +295,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -435,7 +309,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -450,7 +323,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -465,7 +337,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -480,7 +351,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -495,7 +365,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -516,7 +385,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -531,7 +399,6 @@ export const stepsIngresoRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -562,7 +429,6 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.next,
       builtInButtons.back,
     ],
@@ -577,7 +443,6 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.next,
       builtInButtons.back
     ],
@@ -592,7 +457,6 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.next,
       builtInButtons.back
     ],
@@ -607,7 +471,6 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.next,
       builtInButtons.back
     ],
@@ -630,7 +493,6 @@ export const stepsInventarioExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back
     ],
     classes: 'card',
@@ -776,7 +638,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -791,7 +652,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -806,7 +666,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -821,7 +680,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -836,7 +694,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -851,7 +708,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -866,7 +722,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -881,7 +736,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -896,7 +750,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -917,7 +770,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -932,7 +784,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -943,7 +794,6 @@ export const stepsSalidaRollosExtrusion : Step.StepOptions[] = [
 ];
 
 /************************************************************* BOPP, BOPA Y POLIESTER ********************************************************************/
-
 export const stepAsignacionBopp: Step.StepOptions[] = [
   {
     attachTo: {
@@ -1534,7 +1384,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1550,7 +1399,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1565,7 +1413,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1580,7 +1427,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1595,7 +1441,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1610,7 +1455,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1625,7 +1469,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1640,7 +1483,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1655,7 +1497,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1670,7 +1511,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1685,7 +1525,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1705,7 +1544,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1720,7 +1558,6 @@ export const stepsIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -1751,7 +1588,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1766,7 +1602,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1781,7 +1616,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1796,7 +1630,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1811,7 +1644,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1826,7 +1658,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1841,7 +1672,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1856,7 +1686,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1871,7 +1700,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1886,7 +1714,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1901,7 +1728,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1916,7 +1742,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1931,7 +1756,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1946,7 +1770,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1961,7 +1784,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1976,7 +1798,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -1996,7 +1817,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2011,7 +1831,6 @@ export const stepsFacturarRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -2042,7 +1861,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2057,7 +1875,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2072,7 +1889,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2087,7 +1903,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2102,7 +1917,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2117,7 +1931,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2132,7 +1945,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2147,7 +1959,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2162,7 +1973,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2177,7 +1987,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2192,7 +2001,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2212,7 +2020,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2227,7 +2034,6 @@ export const stepsDespacharRollosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -2258,7 +2064,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2273,7 +2078,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2288,7 +2092,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2303,7 +2106,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2318,7 +2120,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2333,7 +2134,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2348,7 +2148,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2363,7 +2162,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2378,7 +2176,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
       builtInButtons.next
     ],
@@ -2393,7 +2190,6 @@ export const stepsDevolverRolloDespacho : Step.StepOptions[]= [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -2424,9 +2220,8 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'consultar',
@@ -2439,9 +2234,8 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiar',
@@ -2454,9 +2248,8 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'table',
@@ -2469,9 +2262,8 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'sort',
@@ -2484,7 +2276,6 @@ export const stepsMovimientosDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back
     ],
     classes: 'card',
@@ -2515,9 +2306,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'consultarRollos',
@@ -2531,9 +2321,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarFiltros',
@@ -2546,9 +2335,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla1',
@@ -2561,9 +2349,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos',
@@ -2576,9 +2363,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo',
@@ -2591,9 +2377,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla2',
@@ -2606,9 +2391,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos2',
@@ -2621,9 +2405,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo2',
@@ -2636,9 +2419,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla3',
@@ -2656,9 +2438,8 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
-      builtInButtons.next
+      builtInButtons.next,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'eliminarRollos',
@@ -2671,7 +2452,6 @@ export const stepsPreIngresoRolloDespacho : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -2703,9 +2483,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'ordenTrabajo',
@@ -2718,9 +2497,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'item',
@@ -2733,9 +2511,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'referencia',
@@ -2748,9 +2525,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'material',
@@ -2763,9 +2539,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'impresion',
@@ -2778,9 +2553,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'maquina',
@@ -2793,9 +2567,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'operario',
@@ -2808,9 +2581,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'conformidad',
@@ -2823,9 +2595,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'cantidad',
@@ -2838,9 +2609,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'area',
@@ -2853,9 +2623,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'fecha',
@@ -2868,9 +2637,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'observacion',
@@ -2883,9 +2651,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'agregar',
@@ -2898,9 +2665,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'limpiarCampos',
@@ -2913,9 +2679,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'tabla',
@@ -2928,9 +2693,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'quitar',
@@ -2943,9 +2707,8 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'crear',
@@ -2958,7 +2721,6 @@ export const stepsDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
       builtInButtons.back,
     ],
     classes: 'card',
@@ -2989,9 +2751,8 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'consultar',
@@ -3004,9 +2765,8 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'limpiar',
@@ -3019,9 +2779,8 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'tabla',
@@ -3034,9 +2793,8 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
+      builtInButtons.back,
       builtInButtons.next,
-      builtInButtons.back
     ],
     classes: 'card',
     id: 'filtros',
@@ -3049,9 +2807,7 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-      builtInButtons.back
+      builtInButtons.back,
     ],
     classes: 'card',
     id: 'ver',
@@ -3082,9 +2838,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'crearCarpeta',
@@ -3097,9 +2852,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'archivo',
@@ -3113,9 +2867,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'subirArchivo',
@@ -3128,9 +2881,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'tabla',
@@ -3143,9 +2895,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'abrirCarpeta',
@@ -3158,9 +2909,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'minimizar',
@@ -3173,9 +2923,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'descargar',
@@ -3188,9 +2937,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'copiar',
@@ -3203,9 +2951,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'mover',
@@ -3218,9 +2965,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'pegar',
@@ -3233,9 +2979,8 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'cancelar',
@@ -3248,8 +2993,6 @@ export const stepsArchivos : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
     ],
     classes: 'card',
@@ -3281,9 +3024,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'ordenTrabajo',
@@ -3296,9 +3038,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'tabla1',
@@ -3313,9 +3054,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'maquina',
@@ -3328,9 +3068,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'observacion',
@@ -3343,9 +3082,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'materiaPrima',
@@ -3358,9 +3096,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'idMp',
@@ -3373,9 +3110,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'nombreMp',
@@ -3388,9 +3124,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'stockMp',
@@ -3403,9 +3138,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'cantidad',
@@ -3418,9 +3152,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'und',
@@ -3433,9 +3166,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'proceso',
@@ -3448,9 +3180,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'agregarMp',
@@ -3463,9 +3194,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'limpiarMp',
@@ -3478,9 +3208,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'tabla2',
@@ -3493,9 +3222,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'quitarMp',
@@ -3508,9 +3236,8 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
       builtInButtons.back,
+      builtInButtons.next,
     ],
     classes: 'card',
     id: 'asignar',
@@ -3523,7 +3250,975 @@ export const stepsAsignacionMateriaPrima : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepAsignacionTintas : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#intro',
+      on: 'bottom-end'
+    },
+    buttons: [
       builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'intro',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Creación de Materias Primas</h5>`,
+    text: `<p>
+            Aquí encontrarás 2 botones para realizar la <b>creación de tintas y materias primas </b>
+            que aún no se encuentran registradas en el sistema.
+          </p> `
+  },
+  {
+    attachTo: {
+      element: '#creacion-tintas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'creacion-tintas',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Crear Tintas</h5>',
+    text: `En estos campos debe agregar <b>la información detallada de la tinta que desea crear.</b>`
+  },
+  {
+    attachTo: {
+      element: '#asig-matprima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'asig-matprima',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Elegir Materias Primas</h5>',
+    text: `Aquí debes <b>elegir las materias primas necesarias que asignarás para la creación de la tinta.</b><br><br>
+    <b>Nota:</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones-add',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'botones-add',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Agregar Materias Primas</h5>',
+    text: `Luego de elegir la materia prima que deseas asignar, <b>haz clic sobre el botón Agregar Mat. Prima</b> para añadirla a un listado en la tabla que se encuentra acontinuación<br><br>
+    Si te equivocas en la elección de una materia prima, <b>haz clic sobre limpiar campos</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'tabla',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Materias Primas a asignar</h5>',
+    text: `En esta tabla encontrarás las materias primas que <b>elegiste asignar para la creación de la tinta.</b>`
+  },
+  {
+    attachTo: {
+      element: '#quitar-mp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'quitar-mp',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Quitar Materias Primas elegidas</h5>',
+    text: `En esta fila puedes <b>quitar material(es)</b> elegido(s) erróneamente, haciendo click sobre el icono <i class="pi pi-trash"></i>
+    que observarás <b>cuando existan materias primas cargadas en la tabla.</b>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'botones',
+    title: '<h5 class="tituloRojo" style="margin: auto;">Asignar Materias Primas</h5>',
+    text: `Luego de cargar las materias primas <b>haz clic sobre Asignar Materia Prima</b> para registrarla en el sistema!<br><br>
+    <b>Si deseas volver a iniciar la asignación</b> que llevas hasta ese momento por algún error de digitación, <b>haz clic sobre limpiar todo.</b>`
+  },
+
+];
+
+export const stepsDevolucionesMp: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Devoluciones de Materia Prima!</h4>',
+    text: `<p>¡Podemos <b>crear devoluciones</b> de la materia prima asignada a una orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'ordenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
+    text: `<p>¡Para realizar una <b>devolución</b> necitamos saber a que <b>orden de trabajo</b> se le hará, por eso debemos <b>digitar el número de la orden aquí y presionar enter</b> para que nos cargue todas las <b>materias primas que esta orden tiene asignadas</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
+    text: `<p>¡Si queremos resgitrar una observación o descripción de la devolución podemos hacerlo aquí, si no tenemos ningún comentario omitimos este campo dejandolo vacio!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materias Primas!</h4>',
+    text: `<p>¡Al momento de <b>buscar la orden de trabajo</b> (como se mencionó 2 pasos atras) se nos <b>cargarán en esta tabla las materias primas que esta orden tiene asignadas</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegirTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todo!</h4>',
+    text: `<p>¡Si queremos devolver todas las materias primas de las ordenes de compra, presionamos aquí y se eligirán todas las materias primas!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegir',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegir',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Materia Prima!</h4>',
+    text: `<p>¡Para <b>elegir una de las materias primas presionamos el check</b> de la materia prima que queremos devolver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas Seleccionadas!</h4>',
+    text: `<p>¡Aquí podremos ver las <b>materias primas que hayamos elegido para ser devueltas</b>, podremos cambiar la cantidad a devolver y podremos quitar alguna materia prima si no la queremos devolver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirTodo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegirTodo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Todo!</h4>',
+    text: `<p>¡Para <b>deseleccionar todas las materias primas</b> que hemos seleccionado, presionamos click en este check y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'cantidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Editar Cantidad Materia Prima!</h4>',
+    text: `<p>¡Para <b>editar la cantidad de una de las materias primas</b> que hemos seleccionado, presionamos click en el campo donde se encuentra la cantidad y digitamos cuanto vamos a devolver. La cantidad a devolver <b>no puede ser mayor a la cantidad asignada</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegir2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegir2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
+    text: `<p>¡Si solo vamos a <b>deseleccionar una de las materias primas</b> que hemos seleccionado, presionamos click en este check y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarDevolucion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'agregarDevolucion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Devolución!</h4>',
+    text: `<p>¡Finalmente para <b>crear la devolución</b>, presionamos click en este botón y el programa se encargará de validar que todo lo que se haya digitado esté correcto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar Todo!</h4>',
+    text: `<p>¡Si queremos limpiar todo en este modulo podemos presionar este botón!</p>`
+  },
+];
+
+export const stepsEntradasMp: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Entrada de Materia Prima!</h4>',
+    text: `<p>¡Podemos <b>realizar entradas de materia prima</b> desde aquí teniendo en cuenta unos campos que debemos llenar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenCompra',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'ordenCompra',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Compra!</h4>',
+    text: `<p>¡Para realizar una <b>entrada</b> necitamos saber de que <b>orden de compra</b> es la factura o remisión que está entrando, por eso debemos <b>digitar el número de la orden aquí y presionar enter</b> para que nos cargue todas las <b>materias primas que esta orden tiene asignadas</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#factura',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'factura',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Factura!</h4>',
+    text: `<p>¡La materia prima que entra debe tener un documento contable, si es una factura debemos colocar el código de esa factura en este campo. Esto para saber y relacionar la factura a la orden de compra!</p>`
+  },
+  {
+    attachTo: {
+      element: '#remision',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'remision',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Remisión!</h4>',
+    text: `<p>¡La materia prima que entra debe tener un documento contable, si es una remisión debemos colocar el código de esa misma en este campo. Esto para saber y relacionarla a la orden de compra!</p>`
+  },
+  {
+    attachTo: {
+      element: '#proveedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'proveedor',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Proveedor!</h4>',
+    text: `<p>¡Al buscar la orden de compra se llenará información relacionada a esta, uno de los campos que se llenarán será el de proveedor!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
+    text: `<p>¡En este campo podemos digitar o no una observación sobre la entrada de materia prima!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Materia Prima!</h4>',
+    text: `<p>¡En la primera tabla podemos encontrar las materias primas (despues de buscar la orden de compra) asociadas a la orden buscada. Si al buscar una orden de compra vemos que en esta tabla salen las materias primas de color rojo significará que estas ya han sido ingresadas en su totalidad!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegirTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todo!</h4>',
+    text: `<p>¡Tenemos la opción de elegir todas las materias primas que tiene asociada la orden, para esto tenemos este check que al presionarlo seleccionará todo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegir',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegir',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Materia Prima!</h4>',
+    text: `<p>¡Para elegir una de las materias primas de la orden de compra y hacerle el ingreso, tenemos este check para eso!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas Seleccionadas!</h4>',
+    text: `<p>¡Aquí podremos ver las materias primas que hemos seleccionado previamente, tambien podemos deseleccionarlas y cambiar la cantidad que está ingresando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegirTodo2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegirTodo2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Todo!</h4>',
+    text: `<p>¡Para <b>deseleccionar todas las materias primas</b> que hemos seleccionado, presionamos click en este check y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'cantidad',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Editar Cantidad Materia Prima!</h4>',
+    text: `<p>¡Para <b>editar la cantidad de una de las materias primas</b> que hemos seleccionado, presionamos click en el campo donde se encuentra la cantidad y digitamos cuanto vamos a ingresar. La cantidad a ingresar <b>no puede ser mayor a la cantidad que estipula la orden de compra</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#elegir2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'elegir2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
+    text: `<p>¡Si solo vamos a <b>deseleccionar una de las materias primas</b> que hemos seleccionado, presionamos click en este check y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#acordeon',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'acordeon',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Factura y Remisión!</h4>',
+    text: `<p>¡Si queremos relacionar una factura con una o unas remisiones podemos hacerlo desde aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#remision2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'remision2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Remisión a Relacionar!</h4>',
+    text: `<p>¡Podemos buscar las remisiones que queremos relacionar desde aquí, solo colocamos el codigo y presionamos enter!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla3',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'tabla3',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Remisiones!</h4>',
+    text: `<p>¡La información de las remisiones que hayamos buscado para estará apareciendo aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ver',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'ver',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Remisiones!</h4>',
+    text: `<p>¡Adicional a la tabla informativa con la información general de la remisión podemos ver la mucho mas detalla la remisión si generamos un PDF de esta, para ello presionamos el icono <i class="pi pi-file-pdf"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearIngreso',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: 'card',
+    id: 'crearIngreso',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Ingreso!</h4>',
+    text: `<p>¡Finalmente para <b>crear el ingreso</b>, presionamos click en este botón y el programa se encargará de validar que todo lo que se haya digitado esté correcto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar Todo!</h4>',
+    text: `<p>¡Si queremos limpiar todo en este modulo podemos presionar este botón!</p>`
+  },
+];
+
+export const stepsOrdenesCompra: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#crearProveedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    id: 'crearProveedor',
+    title: `<h4 class="tituloRojo" style="margin: auto;">Crear Proveedor</h4>`,
+    text: `<p>¡Para crear un nuevo proveedor presionamos este botón, llenamos los campos y presionamos <b>'Crear Proveedor'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'crearMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Materia Prima</h5>`,
+    text: `<p>¡Para crear una materia prima nueva presionamos este botón, seleccionamos el tipo de materia prima que vamos a crear, llenamos los campos y presionamos <b>'Crear...'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'formulario',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Orden de Compra</h5>`,
+    text: `<p>¡Inicialmente para crear una orden de compra debemos elegir quien nos venderá la materia prima, en el campo <b>Proveedor</b> escribimos el nombre y luego lo seleccionamos.
+    <br>El campo de observación es opcional!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formularioMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'formularioMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Materias Primas</h5>`,
+    text: `<p>¡Lo siguiente que debemos hacer es elegir la materia prima que vamos a comprar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#idMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'idMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Id</h5>`,
+    text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en el campo Id y presionando 'enter'!</p>`
+  },
+  {
+    attachTo: {
+      element: '#nombreMatprima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'nombreMatprima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre</h5>`,
+    text: `<p>¡La segunda opción es seleccionarla de el campo 'Materia Prima', podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'cantidadMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad</h5>`,
+    text: `<p>¡Posterior a esto debemos digitar la cantidad de materia prima que queremos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#undMatPtima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'undMatPtima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Unidad de Medida</h5>`,
+    text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
+  },
+  {
+    attachTo: {
+      element: '#precioMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'precioMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Precio</h5>`,
+    text: `<p>¡Podemos o no cambiarle el precio (al crear la orden de compra las materias primas se actualizarán con el precio que se haya digitado para cada una)!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'agregarMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
+    text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'limpiarMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
+    text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
+    text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente crear la orden de compra!</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'quitarMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
+    text: `<p>¡Antes de realizar la orden de compra debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearOrden',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'crearOrden',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Crear Orden de Compra!</h4>',
+    text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Crear la Orden de compra</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje preguntando si queremos ver un pdf de la orden creada, de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
+  },
+];
+
+export const stepsRecuperado: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    id: 'formulario1',
+    title: `<h4 class="tituloRojo" style="margin: auto;">Recuperado</h4>`,
+    text: `<p>¡Para registrar la materia prima recuperada necesitamos llenar a siguiente información!</p>`
+  },
+  {
+    attachTo: {
+      element: '#idOperario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'idOperario',
+    title: `<h4 class="tituloRojo" style="margin: auto;">Id Operario</h4>`,
+    text: `<p>¡Podemos seleccionar el operariocon base en su codigo del programa, para ello lo escribimos y presionamos 'enter'!</p>`
+  },
+  {
+    attachTo: {
+      element: '#nombreOperario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'nombreOperario',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre Operario</h5>`,
+    text: `<p>¡Podemos elegir el operario buscandolo en esta lista desplegable!</p>`
+  },
+  {
+    attachTo: {
+      element: '#turno',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'turno',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Turno</h5>`,
+    text: `<p>¡Hay que registrar el turno en el que salió el recuperado, esto lo hacemos eligiendolo en esta lista desplegable!</p>`
+  },
+  {
+    attachTo: {
+      element: '#fecha',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'fecha',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Fecha</h5>`,
+    text: `<p>¡Otro de los campos que necesitamos es elegir la fecha en que salió el recuperado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'observacion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Observación</h5>`,
+    text: `<p>¡La observcaión es un campo opcional, en este campo podemos escribir una breve descripción o observación del recuperado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'formulario2',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Materia Prima</h5>`,
+    text: `<p>¡Con este formulario debemos elegir la materia prima que vamos a ingresar como recuperada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#idMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'idMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Id</h5>`,
+    text: `<p>¡Para <b>elegir la Materia Prima</b> tenemos 2 formas de hacerlo, la primera es digitando el <b>Id de la Materia Prima</b> en el campo Id y presionando 'enter'!</p>`
+  },
+  {
+    attachTo: {
+      element: '#nombreMatprima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'nombreMatprima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre</h5>`,
+    text: `<p>¡La segunda opción es seleccionarla de el campo 'Materia Prima', podemos filtrarla escribiendo el nombre o el código de la materia prima para que sea más rapida y sencilla la busqueda!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'cantidadMatPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad</h5>`,
+    text: `<p>¡Posterior a esto debemos digitar la cantidad de materia prima que queremos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#undMatPtima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'undMatPtima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Unidad de Medida</h5>`,
+    text: `<p>¡Esta es la unidad de medida en que se presenta la materia prima (Kg, Und, etc...), por lo general siempre es Kg!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'agregarMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Materia Prima!</h4>',
+    text: `<p>¡Al terminar de llenar todos los campos de materia prima debemos agregar esta a la tabla, esto lo hacemos presionando este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'limpiarMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Materia Prima!</h4>',
+    text: `<p>¡Si por X o Y motivo queremos limpiar todos los campos de materia prima presionamos aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'tabla2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
+    text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente registrar el recuperado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarMp',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'quitarMp',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Quitar Materia Prima!</h4>',
+    text: `<p>¡Antes de realizar el registro debemos verificar todas las materias primas, sí llegamos a encontrar una materia prima con información erronea la podemos quitar de la tabla presionando el icono <i class="pi pi-trash"></i>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crear',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    id: 'crear',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Registrar Recuperado!</h4>',
+    text: `<p>¡Si ya tenemos toda la información correcta procedemos a <b>Regitrar el Recuperado</b> presionando este botón. Al presionarlo se validará toda la información digitada y si está correcta aparecerá un mensaje de confirmación indicando que el registro se realizó de manera exitosa, de lo contrario enviará un mensaje indicando el fallo que ocurrió!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
       builtInButtons.back,
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
@@ -3776,7 +4471,6 @@ export const stepsReporteActivos: Step.StepOptions[] = [
 ];
 
 /******************************************************** MOVIMIENTOS ***************************************************************/
-
 export const stepsMovimientos: Step.StepOptions[] = [
   {
     attachTo: {
@@ -4202,7 +4896,6 @@ export const stepsMovMaquilas: Step.StepOptions[] = [
 ];
 
 /******************************************************** ORDENES DE MAQUILA ***************************************************************/
-
 export const stepsOrdenMaquila: Step.StepOptions[] = [
   {
     attachTo: {
@@ -4512,8 +5205,3 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
     Si te equivocas digitando o ya no deseas realizar la OM, <b>solo haz clic en el botón limpiar todo.</b>`
   },
 ];
-
-
-
-
-
