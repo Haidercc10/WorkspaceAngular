@@ -22,10 +22,8 @@
     </div>
 
     <p-card>
-      <div class="mb-3" *ngIf="ValidarRol != 6">
-        <div class="gap-2 d-grid d-md-flex justify-content-md-end">
-          <p-chip label="Total Stock Zeus $ {{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
-        </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
       </div>
 
       <div class="mb-4">
@@ -35,8 +33,16 @@
       <div class="contain">
         <div *ngIf="load">
           <p-toolbar styleClass="mb-4 gap-2">
+            <ng-template pTemplate="left">
+              <button pButton pRipple id="excel" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+            </ng-template>
+
             <ng-template pTemplate="right">
-              <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+              <div class="mb-3" *ngIf="ValidarRol != 6">
+                <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
+                  <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+                </div>
+              </div>
             </ng-template>
           </p-toolbar>
 
@@ -53,17 +59,18 @@
             [showCurrentPageReport]="true"
             currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
             [scrollable]="true"
-            scrollHeight="1000px">
+            scrollHeight="1000px"
+            id="tablaProductos">
 
             <ng-template pTemplate="caption">
-              <div style="text-align:left">
+              <div style="text-align:left" id="columnas">
                 <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
               </div>
             </ng-template>
 
             <!--Headers Tabla-->
             <ng-template pTemplate="header">
-              <tr>
+              <tr id="filtros">
                 <th style="width: 150px" pResizableColumn>
                   <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
                 </th>
@@ -85,9 +92,9 @@
                 <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
                 </th>
-                <th style="width: 150px" pResizableColumn>
+                <!-- <th style="width: 150px" pResizableColumn>
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
-                </th>
+                </th> -->
                 <th style="width: 200px" pResizableColumn>
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
                 </th>
@@ -99,7 +106,7 @@
                 </th>
               </tr>
 
-              <tr class="font-size-14">
+              <tr class="font-size-14" id="nombres">
                 <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
                   <p-sortIcon field="Id"></p-sortIcon>
                 </th>
@@ -121,9 +128,9 @@
                 <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="ValidarRol != 6">Subtotal
                   <p-sortIcon field="Precio_Total"></p-sortIcon>
                 </th>
-                <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
+                <!-- <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
                   <p-sortIcon field="Cant_Minima"></p-sortIcon>
-                </th>
+                </th> -->
                 <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
                   <p-sortIcon field="Vendedor"></p-sortIcon>
                 </th>
@@ -152,7 +159,7 @@
                 <td style="text-align: center;" *ngIf="ValidarRol != 6">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
                 <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
                 <td style="text-align: center;" *ngIf="ValidarRol != 6"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
-                <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
+                <!-- <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
                   <p-cellEditor>
                     <ng-template pTemplate="input">
                       <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
@@ -161,7 +168,7 @@
                       {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
                     </ng-template>
                   </p-cellEditor>
-                </td>
+                </td> -->
                 <td>{{ArrayProductoZeus.Vendedor}}</td>
                 <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
                 <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>

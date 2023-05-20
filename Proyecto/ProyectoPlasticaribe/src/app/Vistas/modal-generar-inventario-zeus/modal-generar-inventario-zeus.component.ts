@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -10,6 +11,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -44,7 +46,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   private existencias_ProductosService : ExistenciasProductosService,
                     private invMesProductoService : Inventario_Mes_ProductosService,
                       private messageService: MessageService,
-                        private AppComponent : AppComponent,) {
+                        private AppComponent : AppComponent,
+                          private shepherdService: ShepherdService) {
    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -53,41 +56,19 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.lecturaStorage();
   }
 
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
-  }
-
-  // Funcion que calculará cual es la fecha segun los parametros especificados
-  fechaBuscada(){
-    if (this.filtroFechas == 'Semana(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'week').format('YYYY-MM-DD');
-    else if (this.filtroFechas == 'Mes(es)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'month').format('YYYY-MM-DD');
-    else if (this.filtroFechas == 'Año(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'years').format('YYYY-MM-DD');
-  }
-
-  // Funcion que buscará la ultima fecha en que se editó cada producto
-  buscarPrecios(){
-    this.load = false;
-    this.fechaBuscada();
-    for (let i = 0; i < this.ArrayProductoZeus.length; i++) {
-      this.ArrayProductoZeus[i].fechaModificacion = '';
-      this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductoZeus[i].codigoItem, this.ArrayProductoZeus[i].PrecioItem).subscribe(datos_item => {
-        if(datos_item != null) this.ArrayProductoZeus[i].fechaModificacion = `${datos_item}`.replace('T00:00:00', '');
-      });
-    }
-    setTimeout(() => { this.ordenarItems(); }, 7000);
-  }
-
-  //Funcion que ordenará por fecha de la antugua a la mas reciente, y enviará los espacios en blanco al final
-  ordenarItems(){
-    this.ArrayProductoZeus.sort();
-    this.ArrayProductoZeus.sort((a,b) => {
-      if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
-      else return -1;
-    });
-    this.load = true;
   }
 
   // Funcion que va a exportar la informacion de los productos a un archivo de tipo excel
@@ -306,56 +287,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     setTimeout(() => { this.load = true; }, 3000);
   }
 
-  /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
-  InventarioExistenciaZeus(){
-    this.load = false;
-    this.ArrayProductoZeus = [];
-    this.numeroIdProd = 0;
-    this.totalProductos = 0;
-    this.cantProductos = 0;
-
-    this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
-      for (let exi = 0; exi < datosExistencias.length; exi++) {
-        this.clienteOtItems.srvObtenerItemsBagproXClienteItem(datosExistencias[exi].codigo).subscribe(datosCLOTI => {
-          for (let cl = 0; cl < datosCLOTI.length; cl++) {
-            if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              this.existencias_ProductosService.srvObtenerListaPorIdProducto2(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
-                for (let i = 0; i < datos_existenciasProd.length; i++) {
-                  const datosInventario: any = {
-                    codigoItem : datosCLOTI[cl].clienteItems,
-                    Cliente : datosCLOTI[cl].clienteNom,
-                    nombreItem : datosCLOTI[cl].clienteItemsNom,
-                    PrecioItem : datosExistencias[exi].precioVenta,
-                    cantidadItem : datosExistencias[exi].existencias,
-                    stock_real : datos_existenciasProd[i].exProd_Cantidad,
-                    presentacion : datosExistencias[exi].presentacion,
-                    PrecioTotalItem : datosExistencias[exi].precio_Total,
-                    ClienteNombre : datosCLOTI[cl].clienteNom,
-                    cantMinima : datos_existenciasProd[i].exProd_CantMinima,
-                    fechaModificacion : '',
-                    vendedor: datosCLOTI[cl].nombreCompleto,
-                  }
-                  this.ArrayProductoZeus.push(datosInventario);
-                  this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
-                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
-                  this.totalProductos += datosExistencias[exi].precio_Total;
-                  this.cantProductos += 1;
-                  break;
-                }
-              });
-            }
-          }
-        });
-      }
-    });
-    setTimeout(() => { this.load = true; }, 5000);
-  }
-
-  //
-  seleccionarProducto(item){
-    this.numeroIdProd = item.codigoItem;
-  }
-
   //
   actualizarCantMinima(fila){
     for (let index = 0; index < this.ArrayProductoZeus.length; index++) {
@@ -379,7 +310,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
               ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
             }
             this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-              this.InventarioExistenciaZeus();
+              this.invetarioProductos();
               this.confirmUsuarioCreado(fila.nombreItem);
             });
           }
@@ -389,14 +320,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //
-  aplicarfiltroGlobal($event, valorCampo : string){
-    this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
-  }
+  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
   /** */
   confirmUsuarioCreado(nombre) {
@@ -408,17 +335,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
 }
