@@ -172,6 +172,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 
 export const routes: Routes = [
 
@@ -208,6 +209,7 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_OrdenCompraComponent},
+  {path: 'reporte-solicitudes-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_SolicitudesMPComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
@@ -384,6 +386,7 @@ export const routes: Routes = [
     ReporteFacturacion_VendedoresComponent,
     Reporte_Consolidado_FacturacionComponent,
     VistasFavoritasComponent,
+    Reporte_SolicitudesMPComponent
   ],
 
   imports: [

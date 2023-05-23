@@ -253,3 +253,8 @@ html, body {
   background-color: palegreen;
   font-size: calc(var(--font-size) * 14px);
 }
+
+#texto-centrado {
+  text-align: center;
+}
+
