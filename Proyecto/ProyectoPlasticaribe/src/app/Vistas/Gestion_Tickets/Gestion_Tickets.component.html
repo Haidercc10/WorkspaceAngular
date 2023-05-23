@@ -24,7 +24,11 @@
 </div>
 
 <p-card>
-  <div class="row g-3 text-center">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <div class="row g-3 text-center" id="cantTickets">
     <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-lock-open font-size-20"></i> Tickets Abiertos </h3>
@@ -54,7 +58,7 @@
   </div>
 
   <div class="row g-3">
-    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12" id="tablaTickets">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-wrench font-size-20"></i> Nuevos Tickets y En Revisión</h3>
         <p-table
@@ -125,7 +129,7 @@
       </p-card>
     </div>
 
-    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-2 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12" id="infoTicket">
       <p-card>
         <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4 ajustar"><i class="pi pi-info-circle font-size-20"></i> Información de Tickets</h3>
         <div class="row p-2">
@@ -153,7 +157,7 @@
           </p-galleria>
         </div>
         <div class="row p-2">
-          <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center">
+          <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center" id="botones">
             <p-button label="En Revisión" icon="pi pi-wrench" iconPos="right" styleClass="p-button-danger" (click)="ticket_EnRevision()"></p-button>
             <p-button label="Resuelto" icon="pi pi-check" iconPos="right" styleClass="p-button-success" (click)="mostrarModalTicket_Resuelto()"></p-button>
           </div>

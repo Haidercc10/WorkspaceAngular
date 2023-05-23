@@ -1,11 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsCreacionTickets as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -28,7 +29,8 @@ export class TicketsComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private frmBuiler : FormBuilder,
                   private ticketService : TicketsService,
-                    private messageService: MessageService,) {
+                    private messageService: MessageService,
+                      private shepherdService: ShepherdService) {
 
     this.FormTickets = this.frmBuiler.group({
       Codigo_Ticket : [null, Validators.required],
@@ -39,6 +41,14 @@ export class TicketsComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.limpiarTodo();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

@@ -24,6 +24,10 @@
 </div>
 
 <p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <form [formGroup]="FormTickets">
     <div class="row g-4">
 
@@ -46,14 +50,14 @@
 
       <!-- Imagen -->
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <p-fileUpload (onSelect)="onUpload($event)" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir una Imagen" [showUploadButton]="false" accept="image/*"></p-fileUpload>
+        <p-fileUpload (onSelect)="onUpload($event)" id="imagen" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir una Imagen" [showUploadButton]="false" accept="image/*"></p-fileUpload>
       </div>
     </div>
 
     <div class="row g-4">
       <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center">
-        <p-button label="Crear Ticket" icon="pi pi-check" iconPos="right" styleClass="p-button-danger" (click)="enviarTickets()"></p-button>
-        <p-button label="Limpiar Todo" icon="pi pi-eraser" iconPos="right" styleClass="p-button-secondary" (click)="limpiarTodo()"></p-button>
+        <p-button label="Crear Ticket" icon="pi pi-check" id="enviarTicket" iconPos="right" styleClass="p-button-danger" (click)="enviarTickets()"></p-button>
+        <p-button label="Limpiar Todo" icon="pi pi-eraser" id="limpiarTodo" iconPos="right" styleClass="p-button-secondary" (click)="limpiarTodo()"></p-button>
       </div>
     </div>
 

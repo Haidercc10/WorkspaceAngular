@@ -1,12 +1,14 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { Tickets_ResueltosService } from 'src/app/Servicios/Tickets_Resueltos/Tickets_Resueltos.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsGetionTicktes as defaultSteps } from 'src/app/data';
+
 @Component({
   selector: 'app-Gestion_Tickets',
   templateUrl: './Gestion_Tickets.component.html',
@@ -35,7 +37,8 @@ export class Gestion_TicketsComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private ticketService : TicketsService,
                     private messageService: MessageService,
-                      private ticketsResueltosService : Tickets_ResueltosService,) {
+                      private ticketsResueltosService : Tickets_ResueltosService,
+                        private shepherdService: ShepherdService) {
 
     this.FormTicketResuelto = this.frmBuilder.group({
       Descripcion : [null],
@@ -45,6 +48,14 @@ export class Gestion_TicketsComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.limpiarTodo();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -170,9 +181,7 @@ export class Gestion_TicketsComponent implements OnInit {
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que devolverá un mensaje de satisfactorio
   mensajeConfirmacion(titulo : string, mensaje : any) {
