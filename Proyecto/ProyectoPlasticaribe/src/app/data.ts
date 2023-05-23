@@ -26,6 +26,22 @@ export const defaultStepOptions: Step.StepOptions = {
   }
 };
 
+export const defaultStepOptions2: Step.StepOptions = {
+  classes: '',
+  scrollTo: true,
+  cancelIcon: {
+    enabled: true
+  }
+};
+
+export const defaultStepOptions3: Step.StepOptions = {
+  classes: '',
+  scrollTo: true,
+  cancelIcon: {
+    enabled: true
+  }
+};
+
 /*********************************************************** BODEGA EXTRUSIÓN **************************************************************************/
 export const stepsEliminarRollos : Step.StepOptions[] = [
   {
@@ -5406,6 +5422,7 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
 ];
 
 /******************************************************** ORDENES DE TRABAJO ***************************************************************/
+
 export const stepsOrdenTrabajo: Step.StepOptions[] = [
   {
     attachTo: {
@@ -5465,7 +5482,7 @@ export const stepsOrdenTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'encabezado1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Encabezado Pedido/OT</h5>`,
-    text: `Aquí encontrarás los datos del encabezado del pedido seleccionado o de la orden de trabajo consultada.</b>`
+    text: `Aquí encontrarás <b>los datos del encabezado del pedido seleccionado o de la orden de trabajo consultada.</b>`
   },
   {
     attachTo: {
@@ -5479,11 +5496,41 @@ export const stepsOrdenTrabajo: Step.StepOptions[] = [
     classes: '',
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'tabla1',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Productos del pedido</h5>`,
+    title: `<h5 class="tituloRojo" style="margin: auto;">Productos del pedido / OT</h5>`,
     text: `En esta tabla <b>se cargarán los items del pedido consultado previamente.</b><br><br>
     Para la creación de una orden de trabajo <b>debes hacer clic sobre uno de los items del pedido cargados aquí</b>,
     luego de esto se consultará la última orden de trabajo creada para esta referencia.<br><br>
-    <b>Además se cargarán los checkbox's y los tabs de los procesos de producción por los que pasa el producto generalmente</b>.<br><br>`
+    <b>Además se cargarán los checkbox's y los tabs</b> de los procesos de producción por los que pasa el producto generalmente<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#pedida',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'pedida',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad pedida</h5>`,
+    text: `En este campo podrás apreciar la cantidad pedida para cada item.`
+  },
+  {
+    attachTo: {
+      element: '#aprobada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'aprobada',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad aprobada</h5>`,
+    text: `En este campo <b>podrás apreciar y/o editar la cantidad aprobada a producir</b> para cada item.`
   },
   {
     attachTo: {
@@ -5533,7 +5580,7 @@ export const stepsOrdenTrabajo: Step.StepOptions[] = [
     id: 'ext1',
     title: `<h5 class="tituloRojo" style="margin: auto;">Extrusión</h5>`,
     text: `Si este checkbox esta seleccionado, <b>se realizará automáticamente una operación para calcular el valor que tendrá el campo peso extrusión</b>,
-    Revisa el cálculo en los siguientes pasos.<br><br>`
+    Revisa los cálculos en los siguientes pasos.<br><br>`
   },
   {
     attachTo: {
@@ -5771,7 +5818,7 @@ export const stepsOrdenTrabajo: Step.StepOptions[] = [
     text: `Será el resultado del siguiente calculo:<br><br>
     - Para <b>Kg:</b> Cantidad * Valor Unitario.<br>
     - Para <b>Und:</b> Cantidad * Valor Unitario.<br>
-    - Para </b>Paquete:</b> Cantidad * Valor Unitario.`
+    - Para <b>Paquete:</b> Cantidad * Valor Unitario.`
   },
   {
     attachTo: {
@@ -5816,6 +5863,261 @@ export const stepsOrdenTrabajo: Step.StepOptions[] = [
     text: `Al hacer click sobre este botón, Luego de consultar, puedes ver su información de manera detalla en formato PDF`
   },
 ];
+
+export const stepsMezclasOT: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#mezclas-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'mezclas-ot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Mezclas predefinidas</h5>`,
+    text: `En este apartado podrás apreciar <b>las mezclas predefinidas del producto al cual deseas crearle una OT</b>, entre sus características
+    se encuentran: <br><br>
+    <b>- Nombre de la mezcla.</b><br>
+    <b>- Número de capas de la mezcla.</b><br>
+    <b>- Porcentaje de mezcla por capa.</b><br>
+    <b>- Porcentaje de mezcla de materiales</b>`
+  },
+  {
+    attachTo: {
+      element: '#crear-mezclas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crear-mezclas',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar nueva mezcla</h5>`,
+    text: `Haciendo clic sobre este botón, <b>se cargará un modal donde podrás crear nuevas mezclas predefinidas en base a las existentes</b>
+    y luego seleccionarlas para los productos a los que deseas crear ordenes de trabajo.`
+  },
+  {
+    attachTo: {
+      element: '#Mezcla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'Mezcla',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre mezcla predef.</h5>`,
+    text: `Aquí puedes ver <b>el nombre de la mezcla predefinida que tendrá el producto</b> en la OT que estás creando.<br><br>
+    Además, haciendo clic sobre este campo <b>se cargarán las diferentes mezclas predefinidas</b> <br><br>
+    Puedes cambiar la mezcla, eligiendo una de las opciones de la lista, <b>al realizar esta acción, se cargarán los demás campos con la información de la mezcla seleccionada.</b>`
+  },
+  {
+    attachTo: {
+      element: '#numero-capas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'numero-capas',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Número de capas.</h5>`,
+    text: `Aquí puedes ver <b>el número de capas</b> que contiene la mezcla predefinida seleccionada.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#porc-mezclas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'porc-mezclas',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Porc. de mezclas por capa.</h5>`,
+    text: `Este porcentaje de mezclas por capa depende de el número de capas seleccionadas.<br><br>
+    - Si el número de capas es 1, entonces <b>el porcentaje de la capa 1 será del 100% y el resto será 0%</b><br><br>
+    - Si el número de capas es 2, generalmente <b>el porcentaje será dividido entre la primera y segunda capa.</b><br><br>
+    - Si el número de capas es 3, entonces <b>el porcentaje será dividido entre las 3 capas, agregando el porcentaje deseado a cada capa, para completar el 100%</b><br>`
+  },
+  {
+    attachTo: {
+      element: '#porc-materiales',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'porc-materiales',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Porc. de mezclas por materiales.</h5>`,
+    text: `Aquí podrás ver el porcentaje de mezcla de materiales por capa.<br><br>
+    - Dependiendo el número de capas, <b>entonces se cargarán opcionalmente los materiales mezclados, quienes sumados deben completar un 100% y los pigmentos para cada capa</b><br><br>`
+  },
+]
+
+export const stepsCrearMezclasOT: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#mezclas-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'mezclas-ot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Crear nuevas mezclas</h5>`,
+    text: `En este apartado podrás <b>crear nuevas mezclas predefinidas</b>, para ello debes diligenciar los siguientes campos:
+    se encuentran: <br><br>
+    <b>- Nombre de la mezcla.</b><br>
+    <b>- Material de la mezcla.</b><br>
+    <b>- Número de capas de la mezcla.</b><br>
+    <b>- Porcentaje de mezcla por capa.</b><br>
+    <b>- Porcentaje de mezcla de materiales</b>`
+  },
+  {
+    attachTo: {
+      element: '#crear-material',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crear-material',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar material</h5>`,
+    text: `Haciendo clic sobre este botón, <b>se cargará un modal para crear un nuevo material</b>`
+  },
+  {
+    attachTo: {
+      element: '#crear-pigmento',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crear-pigmento',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Registrar pigmento</h5>`,
+    text: `Haciendo clic sobre este botón, <b>se cargará un modal para crear un nuevo pigmento</b>`
+  },
+  {
+    attachTo: {
+      element: '#Mezcla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'Mezcla',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre mezcla predef.</h5>`,
+    text: `Aquí debes colocar el nombre de la nueva mezcla o puedes crear una nueva mezcla en base a las que ya se encuentran registradas.</b><br><br>
+    Esto lo puedes realizar cambiando el nombre y los datos de la mezcla seleccionada.`
+  },
+  {
+    attachTo: {
+      element: '#material',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'material',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Material</h5>`,
+    text: `Aquí puedes elegir el material de la mezcla predefinida que deseas crear.`
+  },
+  {
+    attachTo: {
+      element: '#numero-capas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'numero-capas',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Número de capas.</h5>`,
+    text: `Aquí debes elegir <b>el número de capas</b> que contendrá la mezcla predefinida que deseas crear.<br><br>`
+  },
+  {
+    attachTo: {
+      element: '#porc-mezclas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'porc-mezclas',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Porc. de mezclas por capa.</h5>`,
+    text: `Este porcentaje de mezclas por capa depende de el número de capas seleccionadas.<br><br>
+    - Si el número de capas es 1, entonces <b>el porcentaje de la capa 1 será del 100% y el resto será 0%</b><br><br>
+    - Si el número de capas es 2, generalmente <b>el porcentaje será dividido entre la primera y segunda capa. </b><br><br>
+    - Si el número de capas es 3, entonces <b>el porcentaje será dividido el 100% entre las 3 capas.</b><br>`
+  },
+  {
+    attachTo: {
+      element: '#porc-materiales',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'porc-materiales',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Porc. de mezclas por materiales.</h5>`,
+    text: `Aquí podrás ver el porcentaje de mezcla de materiales por capa.<br><br>
+    Depende el número de capas que elijas, <b>deberás seleccionar materiales que sumados completen un 100% en cada capa y los pigmentos de dicha capa. </b><br><br>`
+  },
+  {
+    attachTo: {
+      element: '#crear-nueva',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crear-nueva',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Porc. de mezclas por materiales.</h5>`,
+    text: `<b>Haciendo clic sobre el botón crear mezcla</b>, se registrarán los datos de la nueva mezcla predefinida.<br><br>
+    Si haces clic sobre limpiar campos se reiniciará el formulario.`
+  },
+]
 
 /*********************************************************** PEDIDOS DE PRODUCTOS ********************************************************************/
 export const stepsCrearPedidos : Step.StepOptions[] = [

@@ -225,3 +225,7 @@ html, body {
 .p-card .p-card-content {
   padding: 0;
 }
+
+.font-size-18 {
+  font-size: calc(var(--font-size) * 18px);
+}

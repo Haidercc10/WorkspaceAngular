@@ -29,7 +29,7 @@
 
   <!--Inicio info OT-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <h4 class="tituloRojo" id="ultima-ot" title="Consecutivo sobre el cual se crea una nueva OT"><i class="pi pi-file-edit"></i> OT N° <b>{{ultimaOrdenTrabajo}}</b></h4>
+    <h4 class="tituloRojo" id="ultima-ot" title="Consecutivo sobre el cual se crea una nueva OT"><i class="pi pi-file-edit font-size-18" ></i> OT N° <b>{{ultimaOrdenTrabajo}}</b></h4>
   </div>
 
   <div class="mb-4">
@@ -174,8 +174,8 @@
       <tr class="font-size-13">
         <th scope="col">Id</th>
         <th scope="col">Producto</th>
-        <th scope="col">Cantidad Pedida</th>
-        <th scope="col">Cantidad Restante</th>
+        <th id="pedida" scope="col">Cantidad Pedida</th>
+        <th id="aprobada" scope="col">Cantidad Aprobada</th>
         <th scope="col">Und</th>
         <th scope="col">Fecha Entrega</th>
         <th scope="col">Precio</th>
@@ -810,23 +810,31 @@
         <!-- Mezclas -->
         <p-tabPanel
           header="Mezclas"
-          leftIcon="pi pi-slack">
+          leftIcon="pi pi-slack" id="mezclas-ot">
+          <!--Ver tutorial-->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial2()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+          </div>
 
           <!-- Boton para crear Mezclas -->
           <div class="container-fluid">
-            <div class="mb-4">
+            <div class="mb-4" >
               <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button pButton pRipple label="Crear Mezclas" icon="pi pi-check-circle" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+                <button id="crear-mezclas" pButton pRipple label="Crear Mezclas" icon="pi pi-check-circle" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
               </div>
             </div>
           </div>
 
           <!-- Modal para crear mezclas -->
-          <p-dialog header="Crear Mezclas Predefinidas" [(visible)]="modalMezclas" [style]="{width: '70%'}" [modal]="true" [resizable]="true">
+          <p-dialog header="Crear Mezclas Predefinidas" [(visible)]="modalMezclas" [style]="{width: '70%'}" [modal]="true" [resizable]="true" id="mezclas-ot">
+            <!--Ver tutorial-->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+              <p-button id="mezclas-ot" icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial3()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+            </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
-              <button pButton class="p-button-danger" type="button" label="Crear Materiales" icon="pi pi-check-circle" (click)="cargarModalMateriales()"> </button>
-              <button pButton class="p-button-danger" type="button" label="Crear Pigmentos" icon="pi pi-check-circle" (click)="cargarModalPigmentos()"> </button>
+              <button pButton id="crear-material" class="p-button-danger" type="button" label="Crear Materiales" icon="pi pi-check-circle" (click)="cargarModalMateriales()"> </button>
+              <button pButton id="crear-pigmento" class="p-button-danger" type="button" label="Crear Pigmentos" icon="pi pi-check-circle" (click)="cargarModalPigmentos()"> </button>
             </div>
 
             <!--Modal Materiales -->
@@ -903,8 +911,8 @@
               <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
               <!-- División 1 -->
-              <div class="container-fluid mb-4">
-                <p-divider align="left">
+              <div class="container-fluid mb-4" >
+                <p-divider align="left" id="form-mezcla">
                   <span class="p-tag"><i class="pi pi-slack"> </i> Ingresar mezcla / <i class="pi pi-box"> </i> Material</span>
                 </p-divider>
                 <br>
@@ -927,7 +935,7 @@
                   <!-- Material -->
                   <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                     <span class="p-float-label">
-                      <p-dropdown formControlName="Material_MatPrima" inputId="Material" [options]="arrayMateriales2" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
+                      <p-dropdown formControlName="Material_MatPrima" inputId="Material" id="material" [options]="arrayMateriales2" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
                       <label for="Material">Material</label>
                     </span>
                   </div>
@@ -941,7 +949,7 @@
                 </p-divider>
               </div>
 
-              <div class="mb-5">
+              <div class="mb-5" id="numero-capas">
                 <div class="row justify-content-md-center">
 
                   <!-- Check 1 / Capa 1 -->
@@ -972,7 +980,7 @@
                 <br>
               </div>
 
-              <div class="mb-5">
+              <div class="mb-5" id="porc-mezclas">
                 <div class="row g-4 justify-content-md-center justify-content-center">
 
                   <!--Capa 1 unica-->
@@ -1009,7 +1017,7 @@
                 <br>
               </div>
 
-              <div class="mb-3">
+              <div class="mb-3" id="porc-materiales">
                 <div class="row g-4">
                   <!--Materiales y pigmentos capa 1-->
                   <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 mb-2">
@@ -1415,12 +1423,13 @@
             </form>
 
             <!--Botones-->
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="crear-nueva">
               <button pButton class="p-button-danger" type="button" label="Crear Mezcla" icon="pi pi-check" (click)="crearMezclaPredefinida()"></button>
               <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="initFormCrearMezclas()"></button>
             </div>
           </p-dialog>
 
+          <!--Mezclas OT-->
           <div class="container">
             <form [formGroup]="FormOrdenTrabajoMezclas">
               <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
@@ -1456,7 +1465,7 @@
                 </p-divider>
               </div>
 
-              <div class="mb-5">
+              <div class="mb-5" id="numero-capas">
                 <div class="row justify-content-md-center">
 
                   <!-- Check 1 / Capa 1 -->
@@ -1487,7 +1496,7 @@
                 <br>
               </div>
 
-              <div class="mb-5">
+              <div class="mb-5" id="porc-mezclas">
                 <div class="row g-4 justify-content-md-center justify-content-center">
 
                   <!--Capa 1 unica-->
@@ -1524,8 +1533,9 @@
                 <br>
               </div>
 
-              <div class="mb-3">
+              <div class="mb-3" id="porc-materiales">
                 <div class="row g-4">
+
                   <!--Materiales y pigmentos capa 1-->
                   <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 mb-2">
                     <div class="mb-4" style="text-align: center;">
@@ -1795,7 +1805,7 @@
                   <!--Materiales y pigmentos capa 3-->
                   <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 mb-2">
                     <div class="mb-4" style="text-align: center;">
-                      <h6 class="tituloRojo">Capa 2</h6>
+                      <h6 class="tituloRojo">Capa 3</h6>
                     </div>
 
                     <div class="mb-4">

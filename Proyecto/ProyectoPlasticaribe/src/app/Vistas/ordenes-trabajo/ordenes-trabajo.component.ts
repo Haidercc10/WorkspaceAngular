@@ -35,6 +35,8 @@ import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 import { stepsOrdenTrabajo as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { stepsMezclasOT as defaultSteps2, defaultStepOptions2 } from 'src/app/data';
+import { stepsCrearMezclasOT as defaultSteps3, defaultStepOptions3 } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 
 @Injectable({
@@ -4106,4 +4108,24 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
   }
+
+   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de mezclas*/
+   verTutorial2() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions2;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps2);
+    this.shepherdService.start();
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de crear mezclas*/
+  verTutorial3() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions3;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps3);
+    this.shepherdService.start();
+  }
 }
+
+
