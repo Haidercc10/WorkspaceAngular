@@ -7213,3 +7213,178 @@ export const stepsReporteRollosEliminados : Step.StepOptions[] = [
     text: `<p>¡Luego de haber consultado y que se haya llenado la tabla podemos ver aquí columnas que podemos adicionar a la tabla!</p>`
   },
 ];
+
+/******************************************************************* TICKETS **************************************************************************/
+export const stepsCreacionTickets : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tickets!</h4>',
+    text: `<p>¡Si quieremos informar sobre una inconsistencia en el sistema o proponer una mejora podemos hacerlo mediante los tickets. Si creamos un ticket los encargados de administrar el programa lo revisarán y nos darán una solución!</p>`
+  },
+  {
+    attachTo: {
+      element: '#Ticket',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'Ticket',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Código del Ticket!</h4>',
+    text: `<p>¡Este es el código del ticket que estamos creando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#descripcion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'descripcion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Descripción del Ticket!</h4>',
+    text: `<p>¡Debemos agregar una descripción al ticket que estamos creando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#imagen',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'imagen',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Imagen(es)!</h4>',
+    text: `<p>¡Tenemos la opción de agregar imagenes al ticket que estamos generando para ello elegimos las imagenes!</p>`
+  },
+  {
+    attachTo: {
+      element: '#enviarTicket',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'enviarTicket',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Ticket!</h4>',
+    text: `<p>¡Luego de haber llenado los campos procedemos a presionar este botón y se creará el ticket!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todos!</h4>',
+    text: `<p>¡Limpiará todos los campos!</p>`
+  },
+];
+
+export const stepsGetionTicktes : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tickets!</h4>',
+    text: `<p>¡En la gestión de tickets podemos ver los tickets que tenemos por revisar y los tickets a los que les hemos iniciado un proceso. Tambien podemos cambiar el estado de los tickets!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantTickets',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cantTickets',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad de Tickets!</h4>',
+    text: `<p>¡Veremos la cantidad de tickets que hemos resuelto en el mes, la cantidad de tickets abiertos y la cantidad de tickets en revisión!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaTickets',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaTickets',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla de Tickets!</h4>',
+    text: `<p>¡En esta tabla aparecerán los tickets que están en revisión y los que están abiertos, los que están en revisión tendrán un color amarillo de fondo y lo que estan abiertos aparecerán en blanco!</p><br><p>¡Presionando click sobre el circulo que se encuentra en la prima columna seleccionaremos el ticket para verlo detalladamente en el cuadro acontinuación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#infoTicket',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'infoTicket',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información del Ticket!</h4>',
+    text: `<p>¡Una vez hayamos seleccionado el ticket en este cuadro nos saldrá la descripción completa y si tiene imagenes tambien las visualizaremos aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Botones!</h4>',
+    text: `<p>Para cambiar el estado de un ticket tenemos estos 2 botones, acontinuación los explicaremos:</p>`
+    + `<ul>
+        <li><b>En Revisión:</b> Con este botón cambiamos el estado del ticket a 'En Revisión', el cual nos dice que le ticket ya fue visto y se está solucionando el problema planteado en él</li>
+        <li><b>Resuelto:</b> Si ya hemos culminado con la revisión del ticket y lo hemos solucionado, presionamos este botón y nos saldrá un modal en el que podremos (si quieremos) escribir una descripción de como solucionamos el problema</li>
+      </ul>`
+  },
+];
