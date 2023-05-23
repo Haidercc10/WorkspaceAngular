@@ -7,7 +7,6 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SrvTipos_UsuariosService } from 'src/app/Servicios/TiposUsuarios/srvTipos_Usuarios.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table'
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
@@ -16,6 +15,8 @@ import { modelAreas } from 'src/app/Modelo/modelAreas';
 import { modelRol } from 'src/app/Modelo/modelRol';
 import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
 import { AppComponent } from 'src/app/app.component';
+import { stepsUsuarios as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-registro-component',
@@ -57,7 +58,8 @@ export class RegistroComponentComponent implements OnInit {
                     private servicioEstados : EstadosService,
                       private servicioTpUsuarios : SrvTipos_UsuariosService,
                        private messageService: MessageService,
-                        private AppComponent : AppComponent) {
+                        private AppComponent : AppComponent,
+                          private shepherdService: ShepherdService) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
@@ -503,4 +505,12 @@ export class RegistroComponentComponent implements OnInit {
   this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
   }
 
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
 }
