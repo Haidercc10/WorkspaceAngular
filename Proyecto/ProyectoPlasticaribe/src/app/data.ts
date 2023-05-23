@@ -7691,6 +7691,184 @@ export const stepsGetionTicktes : Step.StepOptions[] = [
   },
 ];
 
+/********************************************************************* USUARIOS **********************************************************************/
+export const stepsUsuarios : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#usuarios',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'usuarios',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-users font-size-16"></i> Gestionar usuarios</h5>',
+    text: `Este módulo será el encargado de la gestión de usuarios de nuestro sistema de información. <br><br><b>Aquí podrás ver, crear, editar e inactivar los usuarios que desees!</b>`
+  },
+  {
+    attachTo: {
+      element: '#nuevo-rol',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'nuevo-rol',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nuevo rol</h5>',
+    text: `Haciendo clic sobre este botón se cargará un modal para <b>registrar nuevos roles para los usuarios en el nuevo sistema de la empresa.</b><br><br>
+    Al crear un rol desde este modal, también se <b>registrará un nuevo tipo de usuario con las mismas caracteristicas del rol creado.</b>`
+  },
+  {
+    attachTo: {
+      element: '#nueva-area',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'nueva-area',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nueva área</h5>',
+    text: `Haciendo clic sobre este botón se cargará un modal para <b>registrar una nueva área de la empresa</b>`
+  },
+  {
+    attachTo: {
+      element: '#nuevo-usuario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'nuevo-usuario',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-plus-circle font-size-16"></i> Registrar nuevo usuario</h5>',
+    text: `Al hacer clic sobre este botón, <b>se cargará un modal para crear un nuevo usuario en el sistema</b>, para ello debes diligenciar los siguientes campos: <br><br>
+    - <b>Id Usuario</b><br>
+    - <b>Nombre</b><br>
+    - <b>Tipo</b><br>
+    - <b>Área</b><br>
+    - <b>Rol</b><br>
+    - <b>Estado</b><br>
+    - <b>Contraseña</b>
+    `
+  },
+  {
+    attachTo: {
+      element: '#eliminar-usuario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'eliminar-usuario',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-minus font-size-16"></i> Inactivar usuario</h5>',
+    text: `Este botón solo se habilitará cuando selecciones un usuario de la tabla.<br><br>
+    Si haces clic sobre él, luego de seleccionar un usuario, <b>este quedará con un estado inactivo y por ende, no podrá ingresar al sistema.</b>`
+  },
+  {
+    attachTo: {
+      element: '#exportar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'exportar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-file-excel font-size-16"></i> Exportar datos</h5>',
+    text: `Haciendo clic sobre este botón <b>se exportará en formato excel el listado de todos los usuarios del sistema.</b>`
+  },
+  {
+    attachTo: {
+      element: '#buscar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'buscar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search font-size-16"></i> Buscar usuarios</h5>',
+    text: `Aquí puedes buscar el usuario que desees, <b>por Id, nombre o área.</b>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-table font-size-16"></i> Tabla de usuarios</h5>',
+    text: `En esta tabla <b>se cargarán todos los usuarios del sistema</b>, con sus respectivas areas, roles, tipos y estados.`
+  },
+  {
+    attachTo: {
+      element: '#check',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'check',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square font-size-16"></i> Elegir usuarios</h5>',
+    text: `Haciendo click sobre estos checkbox y luego sobre el botón eliminar usuarios <b>podrás inactivar usuarios masivamente.<B>`
+  },
+  {
+    attachTo: {
+      element: '#editar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'editar',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-edit font-size-16"></i> Editar usuarios</h5>',
+    text: `Pulsando sobre este botón, <b>se cargará un modal para para editar la información del usuario seleccionado en la tabla.</b>`
+  },
+  {
+    attachTo: {
+      element: '#inactivar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'inactivar',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-minus font-size-16"></i> Inactivar usuarios</h5>',
+    text: `Al hacer click sobre este botón, <b>podrás inactivar el usuario seleccionado en la tabla.</b>`
+  },
+];
+
 /******************************************************************** DASHBOARD **********************************************************************/
 export const stepsDashboardOT : Step.StepOptions[] = [
   {
