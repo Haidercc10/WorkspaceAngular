@@ -7690,3 +7690,510 @@ export const stepsGetionTicktes : Step.StepOptions[] = [
       </ul>`
   },
 ];
+
+/******************************************************************** DASHBOARD **********************************************************************/
+export const stepsDashboardOT : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Ordenes de Trabajo!</h4>',
+    text: `<p>¡Veremos información general sobre los movimientos de las ordenes de trabajo en el mes actual!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantProcesos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cantProcesos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad Producida Por Procesos!</h4>',
+    text: `<p>¡En esta sección se puede apreciar <b>la cantidad producida en Kilogramos/Unidades</b> en cada <b>proceso de producción</b> en la empresa durante el mes en curso!</p>`
+  },
+  {
+    attachTo: {
+      element: '#estadoOrdenes',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'estadoOrdenes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Estados de Ordenes de Trabajo!</h4>',
+    text: `<p>¡Aquí puedes ver la <b>cantidad de ordenes de trabajo creadas durante el mes</b> y su estado actual<br><br>
+    Adicionalmente haciendo clic sobre <img src="assets/Iconos_Menu/lupa.PNG" alt="" style="width: 30px; height: 30px">, puedes verificar <b>cuanto se ha pesado</b> en cada proceso y el <b>reporte de costos de cada OT.</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenesCreadas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ordenesCreadas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ordenes de Trabajo Creadas!</h4>',
+    text: `<p>¡Listado con la <b>cantidad de veces que se han usado los materiales de producción</b> para la creación de ordenes de trabajo, su costo, y la cantidad en kilos.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#clientesCompras',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'clientesCompras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Compras de Clientes este mes!</h4>',
+    text: `<p>¡En este listado encontrarás <b>el ranking de clientes a quienes más se les ha facturado</b> durante el mes en curso, <b>ordenado por la cantidad de veces</b> que compró.<br><br>
+    Haciendo clic sobre el icono <i class="pi pi-sort-alt"></i> <b> en cada campo de la tabla puedes ordenar la información</b> por el dato que desees.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#productosCompras',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'productosCompras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Compras de Productos este mes!</h4>',
+    text: `<p>¡A continuación podrás visualizar el listado de <b>productos más vendidos en el mes actual,</b> ordenado por la cantidad de veces que se vendió.<br><br>
+    <b>Nota:</b> Haz clic sobre el icono <i class="pi pi-sort-alt"></i> <b> en cada campo de la tabla para ordenar la información</b> por el dato que desees.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#vendedoresCompras',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'vendedoresCompras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ventas de vendedores este mes!</h4>',
+    text: `<p>¡Aquí puedes ver el <b>ranking de los vendedores con mayor rentabilidad en facturación en este mes,</b> ordenado por la cantidad de veces que facturó.<br><br>
+    Además puedes hacer clic sobre el icono <i class="pi pi-sort-alt"></i> <b> en cada campo de la tabla para ordenar la información</b> por el dato que desees!</p>`
+  },
+  {
+    attachTo: {
+      element: '#RankingClientes',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'RankingClientes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Raking de Clientes!</h4>',
+    text: `<p>¡En esta sección podrás ver el listado de clientes con <b>más ordenes de trabajo creadas durante el mes actual</b> y el costo total de las mismas<br><br>
+    Además puedes <b>graficar la tabla</b> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">!</p>`
+  },
+  {
+    attachTo: {
+      element: '#RankingProductos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'RankingClientes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Raking de Productos!</h4>',
+    text: `<p>¡ En este apartado <b>podrá visualizar el listado de productos</b> a los cuales se les ha realizado más<b> ordenes de trabajo</b> durante el mes.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#RankingVendedores',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'RankingClientes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Raking de Vendedores!</h4>',
+    text: `<p>¡En este listado se puede apreciar <b>la cantidad de ordenes de trabajo realizadas a cada asesor comercial durante el mes actual</b>, el costo total y la cantidad en kilos.<br><br>
+    Además puedes <b>graficar la tabla</b> a través del botón <img src="assets/Iconos_Menu/graficar.PNG" alt="" style="width: 30px; height: 30px">!</p>`
+  },
+];
+
+export const stepsDashboardFacturacion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Facturación!</h4>',
+    text: `<p>¡Es este dashboard estaremos viendo información sobre la facturación que va del día, del mes, etc!</p>`
+  },
+  {
+    attachTo: {
+      element: '#facturacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'facturacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Facturación!</h4>',
+    text: `<p>¡Aquí estaremos viendo diferentes cards con datos a cerca de la facturación del mes y del día!</p>`
+  },
+  {
+    attachTo: {
+      element: '#grafica',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'grafica',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Grafica de Facturación!</h4>',
+    text: `<p>¡En esta grafica podemos apreciar la curva que ha tenido la facturación mes a mes en el año actual!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar Año!</h4>',
+    text: `<p>¡Si deseamos ver un año anterior en la grafica podemos cambiarlos en la lista desplegable que tenemos aquí, al cambiar el año automaticamente se cambiará la información de la grafica!</p>`
+  },
+];
+
+export const stepsDashboardMateriaPrima : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Materia Prima!</h4>',
+    text: `<p>¡En este dashboard podemos ver información sobre la materia prima como su inventario, la que más se asigna, etc!</p>`
+  },
+  {
+    attachTo: {
+      element: '#materiaPrimaUsada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'materiaPrimaUsada',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas más usadas!</h4>',
+    text: `<p>¡En esta sección se puede apreciar el <b >listado de materias primas más usadas / asignadas durante el mes actual</b> ordenado por la cantidad en kilogramos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#asignadaExtruida',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'asignadaExtruida',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima Asignada y Extruida!</h4>',
+    text: `<p>¡En este apartado podrás visualizar una grafica comparativa entre <b>la cantidad en kilos de materia prima que se ha asignado y la cantidad que ha sido extruida.</b><br><br>
+    <b>Nota:</b> Colocando el puntero del mouse <b>sobre la grafica</b> podrás ver la cantidad asignada / extruida en kilos.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#inventario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'inventario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Inventario de Materia Prima!</h4>',
+    text: `<p>¡Aquí puedes ver de forma rápida <b  >el estado, la cantidad con la que inició el día y el stock actual</b> de cada polietileno, tinta y BOPP. <br><br>
+    Los estados están distribuidos así: <br><br>
+      <b>Si es polietileno:</b><br>
+      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
+      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 1000.<br>
+      <span class="badge bg-warning1">Medio:</span> Cantidades entre 1000 y 3000.<br>
+      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 3000.<br><br>
+      <b>Si es Tinta y/o BOPP:</b><br>
+      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
+      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 100.<br>
+      <span class="badge bg-warning1">Medio:</span> Cantidades entre 100 y 200<br>
+      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 200.<br><br>
+      Nota: Sujeto a cambios de gerencia.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#asigHoy',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'asigHoy',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima Asignada Hoy!</h4>',
+    text: `<p>¡En esta card se puede visualizar la <b >lista ordenada por kilogramos</b> de las materias primas asignadas el día de hoy.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tintasCreadas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tintasCreadas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tintas Creadas en el Mes!</h4>',
+    text: `<p>¡En esta sección podrás ver un <b>listado ordenado por kilogramos de las tintas creadas en este mes.</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rollos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rollos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Biorientados!</h4>',
+    text: `<p>¡Este apartado muestra la cantidad de rollos de <b>BOPP, BOPA y poliester disponibles.</b><br><br>
+    Además se muestra el total de <b>rollos ingresados y utilizados</b> en el mes en curso.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#mpCreacionTintas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'mpCreacionTintas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Mat. Prima - Creación Tintas!</h4>',
+    text: `<p>¡Aquí podrás ver el <b>ranking de materias primas que más se han utilizado en el mes en curso</b> para crear tintas.!</p>`
+  },
+];
+
+export const stepsDashboardPedidos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Pedidos!</h4>',
+    text: `<p>¡Podemos ver información sobre los pedidos que hay en el sistemas!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantPedidos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cantPedidos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad de Pedidos!</h4>',
+    text: `<p>¡Este apartado indica la <b>cantidad total de pedidos y el valor estimado</b> de los mismos.<br><br>
+    <b>Al colocar el puntero del mouse</b> sobre cada color de la grafica se muestra la cantidad de pedidos:<br>
+    <i class="pi pi-circle-fill rosado" ></i> Parcialmentes satisfechos<br>
+    <i class="pi pi-circle-fill azul" ></i> Pendientes!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pedidosOT',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'pedidosOT',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pedidos con OT!</h4>',
+    text: `<p>¡En esta sección se muestran los pedidos a los cuales <b>ya se les creó una orden de trabajo.</b><br><br>
+    Además en la tabla se puede verificar <b>en cual de los procesos se encuentra la OT</b> y la <b>cantidad producida en kilos o unidades.</b><br><br>
+    <b>Nota:</b> Si el campo de la tabla <b>"proceso de la OT"</b> está en blanco en porque la orden de trabajo no se ha iniciado.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pedidosFacturables',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'pedidosFacturables',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pedidos Facturables!</h4>',
+    text: `<p>¡En este apartado se mostrarán los pedidos<b> que pueden ser facturados</b>. Pueden ser facturados porque en los productos pedidos tienen en existencias una cantidad mayor o igual a la pedida!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pedidosClientes',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'pedidosClientes',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pedidos de Clientes!</h4>',
+    text: `<p>¡En este apartado se mostrarán los clientes con la<b> mayor cantidad de items pedidos pendientes actualmente y su valor en pesos.</b><br><br>
+    También puedes ver esta información de manera detallada <b>haciendo clic sobre el botón </b> <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt="">!`
+  },
+  {
+    attachTo: {
+      element: '#productosPedidos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'productosPedidos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Productos Pedidos!</h4>',
+    text: `<p>¡En esta gráfica podrás visualizar <b>la cantidad de pedidos con más items pendientes de una misma referencia</b> y su costo total.<br><br>
+    <b>Haciendo clic sobre el botón </b> <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt=""> puedes ver los datos en una tabla.!`
+  },
+  {
+    attachTo: {
+      element: '#vendedoresPedidos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'vendedoresPedidos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Pedidos Vendedores!</h4>',
+    text: `<p>¡Esta sección muestra los <b>vendedores con más pedidos pendientes vigentes</b> y el valor total. <br><br>
+    Si haces clic sobre el botón <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt=""> puedes ver la información detallada en una tabla.!`
+  },
+];
+
+export const stepsDashboardVentasVendedor : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Facturación Vendedores!</h4>',
+    text: `<p>¡Aquí podemos ver información de la facturación de los vendedores mes a mes en el año que elijamos, podemos realizar comparativas agregando varios años a la grafica!</p>`
+  },
+  {
+    attachTo: {
+      element: '#graficaVentas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'graficaVentas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cantidad de Pedidos!</h4>',
+    text: `<p>¡En esta sección podrás ver en la gráfica de manera detallada <b>los valores facturados por mes de cada vendedor en el/los años que elijas.</b><br><br>
+    Solo debes buscar el año y el asesor comercial que desees en las listas desplegables y <b>hacer clic sobre el botón</b> <img src="assets/Iconos_Menu/graficar.PNG" class="imagen"><br><br>
+    Además <b>puedes realizar comparativas eligiendo vendedores y años distintos</b>, para ver dinámicamente la rentabilidad de cada asesor.<br><br>
+    <b>Nota:</b> Para limpiar la gráfica haz clic en el botón <img src="assets/Iconos_Menu/limpiar.PNG" class="imagen">!</p>`
+  },
+];

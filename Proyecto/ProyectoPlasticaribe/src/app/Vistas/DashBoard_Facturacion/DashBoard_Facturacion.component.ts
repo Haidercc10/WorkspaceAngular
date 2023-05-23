@@ -1,9 +1,11 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -11,8 +13,6 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./DashBoard_Facturacion.component.css']
 })
 export class DashBoard_FacturacionComponent implements OnInit {
-
-  @ViewChild('op') op: OverlayPanel | undefined;
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -54,7 +54,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
-                  ) {
+                  private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -62,6 +62,14 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.lecturaStorage();
     this.llenarArrayAnos();
     this.tiempoExcedido();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -177,10 +185,5 @@ export class DashBoard_FacturacionComponent implements OnInit {
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
-  }
-
-  mostrarDescripcion($event){
-    this.op!.toggle($event);
-    //$event.stopPropagation();
   }
 }

@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardVentasVendedor as defaultSteps } from 'src/app/data';
+
 
 @Component({
   selector: 'app-ReporteFacturacion_Vendedores',
@@ -15,7 +17,6 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
-  @ViewChild('op') op: OverlayPanel | undefined;
   @ViewChild('dt') dt: Table | undefined;
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -39,16 +40,24 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private usuarioService : UsuarioService,
-                    private messageService: MessageService,) {
+                    private messageService: MessageService,
+                      private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
-
 
   ngOnInit() {
     this.lecturaStorage();
     this.llenarArrayAnios();
     this.consultarVendedores();
     this.graficarDatos();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que va a llenar el array de años
@@ -221,9 +230,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   }
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a calcular el subtotal de lo vendido en un año
   calcularTotalVendidoAno(ano : any){
@@ -239,13 +246,4 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
 
   /** Mostrar mensaje de advertencia */
   mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
-
-   /** Función que mostrará la descripción de cada una de las card de los dashboard's */
-   mostrarDescripcion($event, card : string){
-    this.nroCard = card;
-    setTimeout(() => {
-      this.op!.toggle($event);
-      $event.stopPropagation();
-    }, 500);
-  }
 }

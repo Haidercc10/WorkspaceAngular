@@ -1,12 +1,13 @@
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
 <div class="fondo" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 2">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="row">
     <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <p-card>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-        </div>
+      <p-card id="graficaVentas">
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-chart-line"></i> Facturación de Vendedores</h2>
         <p-toolbar>
           <div class="row g-2 justify-content-center align-middle">
@@ -38,100 +39,4 @@
   </div>
 
   <hr>
-
-  <!-- <div class="row">
-    <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <p-card header="Consolidado de Facturación">
-        <p-table
-          #dt
-          [value]="consolidado"
-          sortField="Num_Mes"
-          sortMode="single"
-          [scrollable]="true"
-          scrollHeight="900px"
-          rowGroupMode="subheader"
-          groupRowsBy="Ano"
-          [rowHover]="true"
-          styleClass="p-datatable-sm"
-          columnResizeMode="expand"
-          responsiveLayout="scroll"
-          *ngIf="!cargando">
-          <ng-template pTemplate="header">
-            <tr class="font-size-16">
-              <th></th>
-              <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Producto', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Devolucion', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
-              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
-            </tr>
-            <tr>
-              <th>#</th>
-              <th>Mes</th>
-              <th>Vendedor</th>
-              <th>Cliente</th>
-              <th>Id Producto</th>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Devolución</th>
-              <th>Presentación</th>
-              <th>Precio</th>
-              <th>SubTotal</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="groupheader" let-consolidado>
-            <tr pRowGroupHeader style="background-color: #83D3FF;">
-              <td colspan="11">
-                <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
-            <tr class="font-size-15">
-              <td>{{rowIndex + 1}}</td>
-              <td><b>{{consolidado.Mes}}</b></td>
-              <td>{{consolidado.Vendedor}}</td>
-              <td>{{consolidado.Cliente}}</td>
-              <td>{{consolidado.Id_Producto}}</td>
-              <td>{{consolidado.Producto}}</td>
-              <td><b>{{consolidado.Cantidad | number}}</b></td>
-              <td><b>{{consolidado.Devolucion | number}}</b></td>
-              <td>{{consolidado.Presentacion}}</td>
-              <td>{{consolidado.Precio | number}}</td>
-              <td><b>{{consolidado.SubTotal | number}}</b></td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="groupfooter" let-consolidado>
-            <tr style="background-color: palegreen;">
-              <td colspan="10" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
-              <td class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr>
-              <td colspan="10">Totales</td>
-              <td>{{costoTotal | currency : 'COP $'}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
-    </div>
-  </div>
-</div> -->
-
-<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }">
-
-  <ng-container *ngIf="nroCard == 'card-1' then card1;"></ng-container>
-  <ng-template #card1>
-    En esta sección podrás ver en la gráfica de manera detallada <b>los valores facturados por mes de cada vendedor en el/los años que elijas.</b><br><br>
-    Solo debes buscar el año y el asesor comercial que desees en las listas desplegables y <b>hacer clic sobre el botón</b> <img src="assets/Iconos_Menu/graficar.PNG" class="imagen"><br><br>
-    Además <b>puedes realizar comparativas eligiendo vendedores y años distintos</b>, para ver dinámicamente la rentabilidad de cada asesor.<br><br>
-    <b>Nota:</b> Para limpiar la gráfica haz clic en el botón <img src="assets/Iconos_Menu/limpiar.PNG" class="imagen"><br>
-  </ng-template>
-
-</p-overlayPanel>
+</div>
