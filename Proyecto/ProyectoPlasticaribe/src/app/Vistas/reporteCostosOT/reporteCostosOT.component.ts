@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
@@ -12,9 +12,9 @@ import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/de
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsReporteCostos as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -88,8 +88,8 @@ export class ReporteCostosOTComponent implements OnInit {
                             private boppService : EntradaBOPPService,
                               private tintaService : TintasService,
                                 private estadosProcesos_OTService : EstadosProcesos_OTService,
-                                  private paginaPrincipal : PaginaPrincipalComponent,
-                                    private messageService: MessageService) {
+                                  private messageService: MessageService,
+                                    private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -114,6 +114,14 @@ export class ReporteCostosOTComponent implements OnInit {
     this.lecturaStorage();
     this.cargarEstados();
     this.inhabilitarCampos();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   limpiarCampos(){
@@ -598,7 +606,7 @@ export class ReporteCostosOTComponent implements OnInit {
                       [
                         `Producido`,
                         `$${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
-                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad.toFixed(2))}`,
+                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad)}`,
                         `${this.formatonumeros(Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado).toFixed(2))}`
                       ],
                       [

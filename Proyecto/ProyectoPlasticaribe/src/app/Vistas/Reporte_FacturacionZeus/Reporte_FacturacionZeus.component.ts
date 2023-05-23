@@ -7,6 +7,9 @@ import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -40,7 +43,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
-                    private messageService: MessageService) {
+                    private messageService: MessageService,
+                      private shepherdService: ShepherdService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -60,6 +64,14 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     setTimeout(() => { this.llenarCampoVendedorLogueado(); }, 500);
   }
 
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -74,52 +86,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  /** FuncióN para limpiar los campos del formulario */
-  limpiarTodo(){
-    if(this.ValidarRol == 1) {
-      this.formFiltros.reset();
-      this.arrayClientes = [];
-      this.arrayVendedores = [];
-    } else {
-      this.formFiltros = this.frmBuilder.group({
-        vendedor: this.formFiltros.value.vendedor,
-        idvendedor : this.formFiltros.value.idvendedor,
-        cliente: [null],
-        idcliente : [null],
-        item: [null],
-        idItem : [null],
-        anio1: [null],
-        anio2: [null],
-      });
-    }
-    this.arrayItems = [];
-  }
-
-  /** cargar vendedores al datalist que se encuentra en los filtros de busqueda*/
-  cargarVendedores(){
-    this.arrayVendedores = [];
-    let vendedor : any = this.formFiltros.value.vendedor;
-    if(vendedor != null && vendedor.length > 2) this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(dataUsuarios => { this.arrayVendedores = dataUsuarios; });
-  }
-
-  /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
-  cargarClientes(){
-    let cliente : any = this.formFiltros.value.cliente;
-    if(this.formFiltros.value.vendedor == null) {
-      this.arrayClientes = [];
-      if(cliente != null && cliente.length > 2) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
-    }
-  }
-
-   /** cargar items al datalist que se encuentra en los filtros de busqueda*/
-  cargarProductos(){
-    let item : any = this.formFiltros.value.item;
-    if(this.formFiltros.value.cliente == null) {
-      this.arrayItems = [];
-      if(item != null && item.length > 2) this.invetarioZeusService.LikeGetItems(item).subscribe(dataItems => { this.arrayItems = dataItems; });
-    }
-  }
-
   /** Función para cargar los años en el combobox de años. */
   cargarAnios(){
     this.arrayAnios = [];
@@ -128,28 +94,72 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     }
   }
 
+  /** FuncióN para limpiar los campos del formulario */
+  limpiarTodo(){
+    if (this.ValidarRol == 1) {
+      this.formFiltros.reset();
+      this.arrayClientes = [];
+      this.arrayVendedores = [];
+    } else if (this.ValidarRol == 2) {
+      this.formFiltros.patchValue({
+        vendedor: this.formFiltros.value.vendedor,
+        idvendedor : this.formFiltros.value.idvendedor,
+        cliente: null,
+        idcliente : null,
+        item: null,
+        idItem : null,
+        anio1: null,
+        anio2: null,
+      });
+    }
+    this.arrayItems = [];
+  }
+
+  /** llenar el campo del vendedor logueado. */
+  llenarCampoVendedorLogueado(){
+    if (this.ValidarRol == 2) {
+      let vendedor : any = this.storage_Nombre;
+      this.formFiltros.patchValue({ vendedor : vendedor });
+      this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(data => this.arrayVendedores = data);
+      setTimeout(() => { this.seleccionarVendedores(); }, 500);
+    }
+  }
+
+  /** cargar vendedores al datalist que se encuentra en los filtros de busqueda*/
+  cargarVendedores(){
+    let vendedor : any = this.formFiltros.value.vendedor;
+    if(vendedor != null) this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(data => this.arrayVendedores = data);
+  }
+
+  /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
+  cargarClientes(){
+    let cliente : any = this.formFiltros.value.cliente;
+    if(this.formFiltros.value.vendedor == null) {
+      if(cliente != null && cliente.length > 2) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);
+    }
+  }
+
+   /** cargar items al datalist que se encuentra en los filtros de busqueda*/
+  cargarProductos(){
+    let item : any = this.formFiltros.value.item;
+    if(this.formFiltros.value.cliente == null) {
+      if(item != null && item.length > 2) this.invetarioZeusService.LikeGetItems(item).subscribe(dataItems => { this.arrayItems = dataItems; });
+    }
+  }
+
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
-    this.formFiltros = this.frmBuilder.group({
+    let nuevo : any[] = this.arrayVendedores.filter((item) => item.nombvende == vendedorSeleccionado);
+    this.formFiltros.patchValue({
       vendedor: nuevo[0].nombvende,
       idvendedor : nuevo[0].idvende,
-      cliente: this.formFiltros.value.cliente,
-      idcliente : this.formFiltros.value.idcliente,
-      item: this.formFiltros.value.item,
-      idItem : this.formFiltros.value.idItem,
-      anio1: this.formFiltros.value.anio1,
-      anio2: this.formFiltros.value.anio2,
     });
     this.cargarClientesxVendedor(nuevo[0].idvende);
   }
 
   /** Se cargarán los clientes del vendedor seleccionado. */
-  cargarClientesxVendedor(vendedor : any){
-    this.arrayClientes = [];
-    this.invetarioZeusService.getClientesxVendedor(vendedor).subscribe(dataClientes2 => { this.arrayClientes = dataClientes2; });
-  }
+  cargarClientesxVendedor = (vendedor : any) => this.invetarioZeusService.getClientesxVendedor(vendedor).subscribe(data => this.arrayClientes = data);
 
   /** Al momento de seleccionar un cliente, se cargaran sus items */
   seleccionarClientes() {
@@ -158,28 +168,19 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let nuevo : any[] = this.arrayClientes.filter((item) => item.idcliente == clienteSeleccionado);
 
     if(clienteSeleccionado.match(expresion) != null) {
-      this.formFiltros.setValue({
-        vendedor: this.formFiltros.value.vendedor,
-        idvendedor : this.formFiltros.value.idvendedor,
+      this.formFiltros.patchValue({
         cliente: nuevo[0].razoncial,
         idcliente : nuevo[0].idcliente,
-        item: this.formFiltros.value.item,
-        idItem : this.formFiltros.value.idItem,
-        anio1: this.formFiltros.value.anio1,
-        anio2: this.formFiltros.value.anio2,
       });
       this.cargarItemsxClientes(nuevo[0].idcliente);
     } else {
-      if(this.formFiltros.value.vendedor != null) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
+      if (this.formFiltros.value.vendedor != null) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
       else this.arrayClientes = []; this.arrayItems = [];
     }
   }
 
   /** Cargar los items del cliente seleccionado */
-  cargarItemsxClientes(cliente : any) {
-    this.arrayItems = [];
-    this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(dataArticulo => { this.arrayItems = dataArticulo });
-  }
+  cargarItemsxClientes = (cliente : any) => this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(data => { this.arrayItems = data });
 
   /** Funcion que se ejecutará al seleccionar un producto. */
   seleccionarProductos() {
@@ -223,21 +224,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
         }
       }
     }, 500);
-  }
-
-  /** llenar el campo del vendedor logueado. */
-  llenarCampoVendedorLogueado(){
-    if (this.ValidarRol == 2) {
-      setTimeout(() => {
-        const campoVendedor : any = document.getElementById('campoVendedor');
-        campoVendedor.readOnly = true;
-      }, 500);
-      let vendedor : any = this.storage_Id;
-      if (vendedor.toString().length == 2) vendedor = `0${vendedor}`
-      else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`
-      this.formFiltros.patchValue({ vendedor : vendedor });
-      setTimeout(() => { this.seleccionarVendedores(); }, 500);
-    }
   }
 
   // Funcion que va a consultar el consolidado de los clientes, productos y vendedores

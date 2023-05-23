@@ -1,9 +1,9 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -15,6 +15,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import Swal from 'sweetalert2';
+import { defaultStepOptions, stepsReporteRollosEliminados as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -61,7 +62,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                         private servicioRollos : SrvRollosEliminadosService,
                           private AppComponent : AppComponent,
                             private servicioProcesos : ProcesosService,
-                              private messageService: MessageService) {
+                              private messageService: MessageService,
+                                private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -78,6 +80,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   ngOnInit() {
     this.obtenerProcesos();
     this.lecturaStorage();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

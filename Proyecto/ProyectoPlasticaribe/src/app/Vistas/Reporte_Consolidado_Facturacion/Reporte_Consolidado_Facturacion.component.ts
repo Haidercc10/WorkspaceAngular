@@ -8,6 +8,8 @@ import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Reporte_Consolidado_Facturacion',
@@ -41,7 +43,8 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
-                    private messageService: MessageService) {
+                    private messageService: MessageService,
+                      private shepherdService: ShepherdService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null, Validators.required],
@@ -61,6 +64,14 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
     setTimeout(() => { this.llenarCampoVendedorLogueado(); }, 500);
   }
 
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -78,14 +89,9 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   /** llenar el campo del vendedor logueado. */
   llenarCampoVendedorLogueado(){
     if (this.ValidarRol == 2) {
-      setTimeout(() => {
-        const campoVendedor : any = document.getElementById('campoVendedor');
-        campoVendedor.readOnly = true;
-      }, 500);
-      let vendedor : any = this.storage_Id;
-      if (vendedor.toString().length == 2) vendedor = `0${vendedor}`
-      else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`
+      let vendedor : any = this.storage_Nombre;
       this.formFiltros.patchValue({ vendedor : vendedor });
+      this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(data => this.arrayVendedores = data);
       setTimeout(() => { this.seleccionarVendedores(); }, 500);
     }
   }
@@ -132,7 +138,7 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
+    let nuevo : any[] = this.arrayVendedores.filter((item) => item.nombvende == vendedorSeleccionado);
     this.formFiltros.patchValue({
       vendedor: nuevo[0].nombvende,
       idvendedor : nuevo[0].idvende,

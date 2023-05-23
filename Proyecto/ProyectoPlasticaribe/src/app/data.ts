@@ -6511,3 +6511,705 @@ export const stepsProductos : Step.StepOptions[] = [
     text: `<p>¡En cada uno de los campos en los que aparecen los nombres de las columnas tenemos el siguiente icono '<i class="pi pi-sort-alt"></i>', esto indica que la columnas puede ser ordenada de mayor a menor o de menor a mayor haciendo click sobre este campo!</p>`
   },
 ];
+
+/******************************************************************** REPORTES *************************************************************************/
+export const stepsReporteCostos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Reporte de Costos!</h4>',
+    text: `<p>¡Con el reporte de costos vamos a poder saber que materia prima tiene una orden de trabajo, el costo de la materia prima, el proceso por el que está pasando y cuanto lleva pesado, las ganacias de la orden, podemos cambiar su estado si lo deseamos, etc...!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Formulario!</h4>',
+    text: `<p>¡Para ver la información de una orden debemos buscar la orden, para eso tenemos el campo <b>OT</b>, en el que <b>digitamos el número de la OT y presionamos enter o el botón Consultar OT</b>. Los otros campos se llenarán dependiendo de la información de la OT!</p>`
+  },
+  {
+    attachTo: {
+      element: '#estado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'estado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Estado!</h4>',
+    text: `<p>¡Cuando busquemos la OT, este campo se llenará automaticamente pero podemos cambiar su valor con el fin de cambiar el estado de la orden!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarEstado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarEstado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar Estado!</h4>',
+    text: `<p>¡Posterior a haber seleccionado otro estado presionamos este botón y listo, habremos cambiado el estado de la OT!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultarOT',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'consultarOT',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar OT!</h4>',
+    text: `<p>¡Una de la opciones para consultar una orden es presionando este botón luego de haber diligenciado el campo OT!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarCampos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarCampos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Campos!</h4>',
+    text: `<p>¡Este botón limpiará todos los campos, tablas y etiquetas con información!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pdf',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'pdf',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear PDF!</h4>',
+    text: `<p>¡Toda la información que vemos en este modulo la podemos ver en un archivo PDF si se nos hace más sencillo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cerrarOrden',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cerrarOrden',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cerrar Orden!</h4>',
+    text: `<p>¡Si una orden de trabajo ya está completa y necesitamos que ya no deje pesar más, podemos cambiarle el estado a <b>Cerrada</b> solo con presionar este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
+    text: `<p>¡En esta tabla estará la información de las materias peimas asignadas a la orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#kilosMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'kilosMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Total Kg Mat. Prima!</h4>',
+    text: `<p>¡Este es el total de kilos de materia prima que se le asignaron a una orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#valorMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'valorMatPrima',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Valor Mat. Prima!</h4>',
+    text: `<p>¡Costo total de la materia prima asignada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaProcesos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaProcesos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Procesos!</h4>',
+    text: `<p>¡Cada uno de los procesos estará en una columna de la tabla, bajo cada proceso saldrá la cantidad que se ha pesado en el proceso correspondiente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#costoTotalProducido',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'costoTotalProducido',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Costo Producido!</h4>',
+    text: `<p>¡Si la OT buscada ya llegó al proceso de Empaque, Sellado o Wiketiado, se calculará el costo del producto producido en una de estás áreas, este será la multiplicación de la cantidad producida por el valor de kg o unidad, dependiendo de la presentación del producto!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ganancia',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ganancia',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ganancia!</h4>',
+    text: `<p>¡La ganancia es el restante de la operación del <b>Costo Producido</b> menos <b>el costo de las materias primas</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#porcentajeGanacia',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'porcentajeGanacia',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Porcentaje Ganancia!</h4>',
+    text: `<p>¡Porcentaje de ganancia generada!</p>`
+  },
+];
+
+export const stepsReporteFacturacion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consolidad de Facturación!</h4>',
+    text: `<p>¡Se podrá visualizar la cantidad de cada uno de los items que se piden mes a mes, esto se verá de manera consolidada por Item, Cliente, Vendedor, Mes y Año. Se podrá consultar por vendedor, cliente, item y un rango de años. <br><br>En el caso de los vendedores tendrán diligenciado con su nombre el filtro de vendedor y solo podrán editar los filtros de cliente, item y años.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formularioFiltros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formularioFiltros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Consulta!</h4>',
+    text: `<p>¡Tenemos diferentes opciones de consultar la información de facturación, acontinuación las explicaremos una a una!</p>`
+  },
+  {
+    attachTo: {
+      element: '#vendedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'vendedor',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Vendedores!</h4>',
+    text: `<p>¡Podemos seleccionar un vendedor en especifico para poder consultar la información de su facturación!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cliente',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Clientes!</h4>',
+    text: `<p>¡Cuando seleccionamos un vendedor se nos cargarán todos los clientes de este, de entre esos podemos escoger uno para una busqueda más eficiente. Tambien podemos escribir el nombre del cliente y nos irá saliendo una lista con los clientes a los que les conincide el nombre escrito!</p>`
+  },
+  {
+    attachTo: {
+      element: '#producto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'producto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Productos!</h4>',
+    text: `<p>¡Si hemos seleccionado un cliente, nos saldrán los productos que ese cliente ha compra. Si queremos elegir un producto diferente simplemente escribimos el nombre y lo seleccionamos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#anio1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'anio1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Año Incial!</h4>',
+    text: `<p>¡Elegimos el año desde el que queremos buscar la facturación. Si no elegimos ningún año se consultará el año actual!</p>`
+  },
+  {
+    attachTo: {
+      element: '#anio2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'anio2',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Año Final!</h4>',
+    text: `<p>¡Elegimos el año hasta el que queremos buscar la facturación. Si no elegimos ningún año se consultará el año actual!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Botones!</h4>',
+    text: `<p>Tenemos 3 botones con las siguientes opciones:</p>
+          <br>
+          <ul>
+            <li>Consultar: Al terminar de llenar los filtros lo presionamos e iniciará la busqueda. Si no llenamos ningún filtro buscará absolutamente toda la información de facturación del año actual</li>
+            <li>Limpiar Campos: Limpiará todos los filtros.</li>
+            <li>Exportar Excel: Tenemos la opción de ver la información consultada en un archivo de excel.</li>
+          </ul>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla con Registros!</h4>',
+    text: `<p>En esta tabla saldrá la información resultante de la busqueda realizada anteriormente, esta información saldrá consolidada de la siguiente manera:</p>
+          <br>
+          <ul>
+            <li>Año.</li>
+            <li>Mes.</li>
+            <li>Vendedor.</li>
+            <li>Cliente al que se le vendió el producto.</li>
+            <li>Producto.</li>
+            <li>Cantidad Vendidad del producto en el mes.</li>
+            <li>Precio al que se vendió el producto. (Cabe la posibilidad de que salga un producto repetido en un mismo mes, esto es porque se vendió a precios diferentes).</li>
+            <li>Presentación del producto.</li>
+          </ul>
+          <br>
+          Podemos ordenar los registros de la tabla presionando click en el nombre de la columna.`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de la tabla!</h4>',
+    text: `<p>¡Si necesitamos buscar un producto en especifico podemos filtrar la información por medio de estos campos, colocamos la información que conocemos en la conlumna correspondiente y automaticamente se reducirán la cantidad de productos que hay en la tabla!</p>`
+  },
+];
+
+export const stepsReportesProcesosOT : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Reporte de Proceso OT!</h4>',
+    text: `<p>¡El reporte de procesos OT es en podemos ver diferentes datos a cerca de las ordenes de trabajo, acontinuación se enumerarán los datos y acciones que podemos realizar!</p>
+          <ol>
+            <li>Agregar una falla a una orden de trabajo.</li>
+            <li>Exportar la información consultada a excel.</li>
+            <li>Ver los procesos por los que pasó o está pasando la orden de trabajo y cuanto lleva pesado en cada uno.</li>
+            <li>Ver el reporte de costos de una orden de trabajo.</li>
+            <li>Ver los rollos pesados en cada uno de los procesos.</li>
+            <li>Cambiar el estado de una orden de trabajo.</li>
+          </ol>`
+  },
+  {
+    attachTo: {
+      element: '#filtrosBusqueda',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtrosBusqueda',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
+    text: `<p>¡Incialmente veremos todos los filtros por los que podemos consultar una orden de trabajo, llenadolos podremos consultar una(s) orden(es) en especifico con las caracteristicas que estamos colocando en los filtros!</p>`
+  },
+  {
+    attachTo: {
+      element: '#fallas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'fallas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Fallas!</h4>',
+    text: `<p>¡Este campo no solo nos sirve para adicionar información a los filtros de busqueda, tambien nos sirve para agregar fallas a una orden de trbajo, falla que explicaria porqué no se completo o cualquier otro motivo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'observacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Observación!</h4>',
+    text: `<p>¡La observación no es un filtro como el resto de campos, es un complemento al campo falla. Si queremos agregar una falla podemos colocarle una descripción o observación sobre el porqué falló!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'consultar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar!</h4>',
+    text: `<p>¡Al terminar de llenar los filtros presionamos consultar y empezará a buscar ordenes de trabajo con la información que le pasamos en los filtros. Si no queremos llenar los filtros presionamos directamente este botón y nos traerá todas las ordenes creadas el día de hoy!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Este botón limpiará tanto los filtros como la tabla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarFalla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'agregarFalla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Falla!</h4>',
+    text: `<p>¡Para agregar una falla debemos hacer click en la tabla sobre la orden de trabajo a la que le registraremos la falla y luego con los campos 'Fallas' y 'Observcaión' (que es opcional) llenos presionamos este botón y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#excel',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'excel',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Excel!</h4>',
+    text: `<p>¡Podemos exportar la información que hayamos consultado a un archivo de excel presionando este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#columnas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'columnas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Columnas Disponibles!</h4>',
+    text: `<p>¡Si desplegamos esta lista veremos que hay columnas que podemos añadir a la tabla para mayor información, simplemente seleccionamos la tabla que queremos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesColores',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesColores',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Colores!</h4>',
+    text: `<p>¡Presionando cada uno de esto botones podremos ver que significa cada color en la tabla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#columnas',
+      on: 'bottom-start'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'columnas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Columnas!</h4>',
+    text: `<p>¡Podemos redimencionar las columnas situando el mause al borde de titulo de cada donde el cursor cambiará de icono, presionamos click y arrastramos!</p><br><p>¡Tambien podemos ordenar de mayor a menor o de menor a mayor presionando click sobre las columnas con el icono '<i class="pi pi-sort-alt"></i>'!</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ordenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Reporte de Costos!</h4>',
+    text: `<p>¡Podremos ver los costos de una orden de compra si presionamos click sobre el número de la orden. Se abrirá un modal donde se verá el reporte de costos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#procesos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'procesos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Procesos!</h4>',
+    text: `<p>¡Cuando alguno de los procesos tenga cantidades pesadas podemos presionar click sobre el procesos y veremos de manera detallada los rollos que pertenecen a la orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarEstado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarEstado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar Estado de OT!</h4>',
+    text: `<p>¡En la última orden de trabajo podremos ver un botón con lapiz, si lo presionamos nos aparecerá un modal en el que vamos a poder cambiar el estado de la orden de trabajo!</p>`
+  },
+];
+
+export const stepsReporteRollosEliminados : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Eliminados!</h4>',
+    text: `<p>¡En este apartado podremos todos los rollos que han sido eliminados delas bodegas de extrusión, despacho e incluso los rollos que se han eliminado de la base de datos de BagPro!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros!</h4>',
+    text: `<p>¡Los filtros nos ayudan a realizar una busqueda más enfocada y precisa al momento de consultar los rollos eliminados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Botones!</h4>',
+    text: `<p>Tenemos los siguientes botones con las siguientes acciones: </p>` + `
+    <br>
+    <ul>
+      <li><b>Consultar:</b> Luego de haber llenado los filtros podemos consultar presionando este botón. Sí no llenamos los filtros el programa buscará los rollos eliminados del día de hoy.</li>
+      <li><b>Limpiar Campos:</b> Limpiará todos los filtros y la información de la tabla.</li>
+      <li><b>Exportar:</b> Una vez hayamos consultamos podremos exportar la información a excel.</li>
+    </ul>`
+  },
+  {
+    attachTo: {
+      element: '#tableProcesos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tableProcesos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla!</h4>',
+    text: `<p>¡En esta tabla estará apareciendo toda la información relacionada a los rollos consultados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#columnasAdicionales',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'columnasAdicionales',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Columnas adicionales!</h4>',
+    text: `<p>¡Luego de haber consultado y que se haya llenado la tabla podemos ver aquí columnas que podemos adicionar a la tabla!</p>`
+  },
+];

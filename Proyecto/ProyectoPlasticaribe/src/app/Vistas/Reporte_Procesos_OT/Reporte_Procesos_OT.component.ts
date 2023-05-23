@@ -1,24 +1,23 @@
-import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
-import Swal from 'sweetalert2';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
-import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { MessageService } from 'primeng/api';
-import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
-import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src/app/data';
+import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
+import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +78,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             private usuarioService : UsuarioService,
                               private clientesService : ClientesService,
                                 private messageService: MessageService,
-                                  private paginaPrincipal : PaginaPrincipalComponent) {
+                                  private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -101,7 +100,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.obtenerEstados();
     this.obtenerVendedores();
     this.obtenerClientes();
-    // this.obtenerProductos();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -417,9 +423,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   selectEventCliente() {
     let cliente = this.formularioOT.value.cliente;
     let nuevo: any[] = this.clientes.filter((item) => item.cli_Id == cliente)
-    //this.clientesService.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
-      this.formularioOT.patchValue({ cliente : nuevo[0].cli_Nombre, });
-    //});
+    this.formularioOT.patchValue({ cliente : nuevo[0].cli_Nombre, });
   }
 
   // Funcion que traerá los vendedores
@@ -436,17 +440,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que va a llenar y buscar el campos vendedor
   buscarVendedor(){
     let vendedor : any = this.formularioOT.value.Vendedor;
-    let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == vendedor)
-    this.formularioOT.patchValue({
-      Vendedor : nuevo[0].usua_Nombre,
-      Id_Vendedor : nuevo[0].usua_Id,
-    });
+    let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == vendedor);
+    this.formularioOT.patchValue({ Vendedor : nuevo[0].usua_Nombre, Id_Vendedor : nuevo[0].usua_Id, });
   }
 
   // Funcion que mostrará las posibles fallas que puede tener una orden de trabajo en produccion
-  ObternerFallas(){
-    this.fallasTecnicasService.srvObtenerLista().subscribe(datos_fallas => { this.fallas = datos_fallas; });
-  }
+  ObternerFallas = () => this.fallasTecnicasService.srvObtenerLista().subscribe(datos_fallas => this.fallas = datos_fallas);
 
   //Funcion que consultará los estados para ordenes de trabajo
   obtenerEstados(){
@@ -1310,24 +1309,16 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // cierra el modal de cambio de estado de ordenes de trabajo
-  hideDialog() {
-    this.modalEstadosOT = false;
-  }
+  hideDialog = () => this.modalEstadosOT = false;
 
   // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-  }
+  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
 
   // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-  }
+  mensajeError = (titulo : string, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
 
   // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
-  }
+  mensajeAdvertencia = (titulo : string, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color : string){
