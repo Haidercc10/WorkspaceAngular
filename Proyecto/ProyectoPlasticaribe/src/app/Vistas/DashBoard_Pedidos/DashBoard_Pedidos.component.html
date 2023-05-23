@@ -1,11 +1,12 @@
 <div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <!-- Cards de CAntidad de Pedidos -->
   <div class="row g-2 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
-    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12" id="cantPedidos">
       <p-card >
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción"></p-button>
-        </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-chart-pie"></i> Cantidad Total de Pedidos</h2>
         <p-toolbar>
           <span class="font-size-15">Cantidad de Pedidos: <label><b>{{cantidadTotalPedidos| number}}</b></label>. Costo Total: <b>{{costoTotalPedidos | currency : ' COP $'}}</b></span><br>
@@ -14,11 +15,8 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12" id="pedidosOT">
       <p-card>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-        </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-check-circle"></i> Pedidos con ordenes de trabajo asociadas</h2>
         <p-table
           #dt1
@@ -57,7 +55,7 @@
   </div>
 
   <div class="row g-2 text-center fila-2">
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="pedidosFacturables">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-dollar"></i> Listado de pedidos facturables</h2>
         <p-toolbar>
@@ -99,11 +97,8 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="pedidosClientes">
       <p-card>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-        </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Clientes con más pedidos vigentes</h2>
 
         <p-chart type="bar" width="100%" height="500px" [data]="graficaPedidosClientes" [options]="opcionesPedidosClientes"></p-chart>
@@ -115,11 +110,8 @@
   </div>
 
   <div class="row g-2 text-center fila-3">
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="productosPedidos">
       <p-card>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-        </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-box"></i> Productos con más pedidos vigentes</h2>
 
         <p-chart type="bar" width="100%" height="500px" [data]="graficaPedidosProductos" [options]="opcionesPedidosProductos"></p-chart>
@@ -129,11 +121,8 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="vendedoresPedidos">
       <p-card>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-          <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-        </div>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-briefcase"></i> Vendedores con más pedidos vigentes</h2>
 
         <p-chart type="bar" width="100%" height="500px" [data]="graficaPedidosVendedores" [options]="opcionesPedidosVendedores"></p-chart>
@@ -176,41 +165,4 @@
   </p-table>
 </p-dialog>
 <br>
-
-<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
-
-  <ng-container *ngIf="nroCard == 'card-1' then card1;"></ng-container>
-  <ng-template #card1>
-    Este apartado indica la <b>cantidad total de pedidos y el valor estimado</b> de los mismos.<br><br>
-    <b>Al colocar el puntero del mouse</b> sobre cada color de la grafica se muestra la cantidad de pedidos:<br>
-    <i class="pi pi-circle-fill rosado" ></i> Parcialmentes satisfechos<br>
-    <i class="pi pi-circle-fill azul" ></i> Pendientes
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-2' then card2;"></ng-container>
-  <ng-template #card2>
-    En esta sección se muestran los pedidos a los cuales <b>ya se les creó una orden de trabajo.</b><br><br>
-    Además en la tabla se puede verificar <b>en cual de los procesos se encuentra la OT</b> y la <b>cantidad producida en kilos o unidades.</b><br><br>
-    <b>Nota:</b> Si el campo de la tabla <b>"proceso de la OT"</b> está en blanco en porque la orden de trabajo no se ha iniciado.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-4' then card4;"></ng-container>
-  <ng-template #card4>
-    En este apartado se mostrarán los clientes con la<b> mayor cantidad de items pedidos pendientes actualmente y su valor en pesos.</b><br><br>
-    También puedes ver esta información de manera detallada <b>haciendo clic sobre el botón </b> <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt="">
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-5' then card5;"></ng-container>
-  <ng-template #card5>
-    En esta gráfica podrás visualizar <b>la cantidad de pedidos con más items pendientes de una misma referencia</b> y su costo total.<br><br>
-    <b>Haciendo clic sobre el botón </b> <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt=""> puedes ver los datos en una tabla.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-6' then card6;" ></ng-container>
-  <ng-template #card6>
-    Esta sección muestra los <b>vendedores con más pedidos pendientes vigentes</b> y el valor total. <br><br>
-    Si haces clic sobre el botón <img src="assets/Iconos_Menu/tabla.PNG" class="imagen" alt=""> puedes ver la información detallada en una tabla.
-  </ng-template>
-
-</p-overlayPanel>
 

@@ -1,8 +1,12 @@
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <!-- Cards de Costos -->
   <div class="row g-3 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
-    <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12" id="facturacion">
       <div class="p-3">
         <p-card >
           <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
@@ -48,16 +52,12 @@
       </div>
     </div>
 
-
     <!-- Grafica y Estados de Ordenes -->
-    <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-xxl-9 col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12" id="grafica">
       <div class="p-3">
         <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event)" pTooltip="Ver descripción" tooltipPosition="top" tooltipPosition="top"></p-button>
-          </div>
           <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Facturación Mensual</h2>
-          <p-toolbar>
+          <p-toolbar id="cambiarAnio">
             <div class="p-toolbar-group-left">
               <h5>¡Elige el año que deseas graficar!</h5>
             </div>
@@ -77,10 +77,3 @@
   <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
 </p-dialog>
 <br>
-<!--style="background-color: rgb(255, 252, 222);" -->
-<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }">
-  <ng-template pTemplate>
-    En este apartado encontrarás el <b>valor total facturado</b> en cada mes del año.<br><br>
-    Aparte <b>podrás graficar el año que desees</b>, desde la lista desplegable <img src="assets/Iconos_Menu/combo.PNG" alt="" class="imagen"> que se encuentra en la parte superior de la gráfica.
-  </ng-template>
-</p-overlayPanel>

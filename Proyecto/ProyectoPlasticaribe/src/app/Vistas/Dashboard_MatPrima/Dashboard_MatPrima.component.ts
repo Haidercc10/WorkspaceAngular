@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { OverlayPanel } from 'primeng/overlaypanel';
@@ -7,6 +8,7 @@ import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCr
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardMateriaPrima as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -59,13 +61,22 @@ export class Dashboard_MatPrimaComponent implements OnInit {
                     private ordenTrabajoService : EstadosProcesos_OTService,
                         private materiaPrimaService : MateriaPrimaService,
                           private boppService : EntradaBOPPService,
-                            private tintasCreadasService : DetallesAsignacionMPxTintasService,) {
+                            private tintasCreadasService : DetallesAsignacionMPxTintasService,
+                              private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.tiempoExcedido();
     this.lecturaStorage();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -292,14 +303,5 @@ export class Dashboard_MatPrimaComponent implements OnInit {
         key: 'nested.value'
       }
     }
-  }
-
-  /** Función que mostrará la descripción de cada una de las card de los dashboard's */
-  mostrarDescripcion($event, card : string){
-    this.nroCard = card;
-    setTimeout(() => {
-      this.op!.toggle($event);
-      $event.stopPropagation();
-    }, 500);
   }
 }

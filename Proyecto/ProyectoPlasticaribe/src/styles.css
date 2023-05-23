@@ -229,3 +229,27 @@ html, body {
 .font-size-18 {
   font-size: calc(var(--font-size) * 18px);
 }
+
+.bg-danger1 {
+  color: rgb(255, 255, 255);
+  background-color: palevioletred;
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-secondary1 {
+  color: rgb(255, 255, 255);
+  background-color: rgb(102, 102, 102);
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-warning1 {
+  color: rgb(129, 116, 0);
+  background-color: palegoldenrod;
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.bg-success1 {
+  color: rgb(6, 100, 3);
+  background-color: palegreen;
+  font-size: calc(var(--font-size) * 14px);
+}

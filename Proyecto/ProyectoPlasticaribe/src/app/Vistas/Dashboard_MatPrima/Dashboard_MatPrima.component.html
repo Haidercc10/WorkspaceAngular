@@ -1,360 +1,285 @@
-
-
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
+
 <div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
 
-    <div class="row g-3 p-3">
+  <div class="row g-3 p-3">
 
-      <!--Materias Primas más usadas en el mes-->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-1')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+    <!--Materias Primas más usadas en el mes-->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4" id="materiaPrimaUsada">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> Materias primas más usadas en el mes actual</h2>
+        <ng-container *ngIf="materiasPrimasMasUtilizadasMes.length > 0; then Tabla1 else Texto1;" ></ng-container>
+        <ng-template #Tabla1>
+          <p-table
+          [value]="materiasPrimasMasUtilizadasMes"
+          [scrollable]="true"
+          scrollHeight="300px"
+          [rowHover]="true">
+            <ng-template pTemplate="header">
+              <tr>
+                <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
+                <th scope="col" pSortableColumn="nombre" style="min-width: 50%; max-width: 50%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="cantidad" style="min-width: 40%; max-width: 40%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
+              <tr class="font-size-12" pTooltip="Cantidad de asignaciones {{stock.asignaciones}}">
+                <td style="min-width: 10%; max-width: 10%">{{rowIndex + 1}}</td>
+                <td style="min-width: 50%; max-width: 50%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
+                <td style="min-width: 40%; max-width: 40%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
+              </tr>
+            </ng-template>
+        </p-table>
+        </ng-template>
+        <ng-template #Texto1>
+          <div class="container advertencia">
+            <div class="mb-3">
+              <img src="assets/Iconos_Menu/advertencia.png">
+            </div>
+            <h4>No se han realizado movimientos de materia prima en el mes actual!</h4>
           </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-sort-numeric-up"></i> Materias primas más usadas en el mes actual</h2>
-          <ng-container *ngIf="materiasPrimasMasUtilizadasMes.length > 0; then Tabla1 else Texto1;" ></ng-container>
-          <ng-template #Tabla1>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <!-- Grafica Asignada vs Extruida -->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="asignadaExtruida">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-bolt"></i> Mat. Prima Asignada vs Extruida</h2>
+        <p-chart type="bar" width="100%" height="320px" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
+      </p-card>
+    </div>
+
+    <!--Inventario de Materias Primas -->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5" id="inventario">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-box"></i> Inventario de Materias Primas</h2>
+          <ng-container *ngIf="inventarioMateriaPrima.length > 0; then Tabla5; else Texto5"></ng-container>
+            <ng-template #Tabla5>
             <p-table
-            [value]="materiasPrimasMasUtilizadasMes"
+              [value]="inventarioMateriaPrima"
+              [scrollable]="true"
+              scrollHeight="300px"
+              styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th scope="col" style="min-width: 20%; max-width: 20%" class="font-size-13">N°</th>
+                    <th scope="col" pSortableColumn="nombre" style="min-width: 30%; max-width: 30%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                    <th scope="col" pSortableColumn="estado"  style="min-width: 20%; max-width: 20%" class="font-size-13">Estado<p-sortIcon field="estado"></p-sortIcon></th>
+                    <th scope="col" pSortableColumn="actual" style="min-width: 15%; max-width: 15%" class="font-size-13">Actual<p-sortIcon field="actual"></p-sortIcon></th>
+                    <th scope="col" pSortableColumn="inicial" style="min-width: 15%; max-width: 15%" class="font-size-13">Inicial<p-sortIcon field="inicial"></p-sortIcon></th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
+                  <tr class="font-size-12">
+                    <td style="min-width: 20%; max-width: 20%">{{rowIndex + 1}}</td>
+                    <td style="min-width: 30%; max-width: 30%"><b>{{stock.nombre}}</b></td>
+                    <ng-container *ngIf="stock.estado == 'Sin stock'">
+                      <td style="min-width: 20%; max-width: 20%"><span class="badge bg-danger1">{{stock.estado}}</span></td>
+                    </ng-container>
+                    <ng-container *ngIf="stock.estado == 'Bajo'">
+                      <td style="min-width: 20%; max-width: 20%"><span class="badge bg-secondary1">{{stock.estado}}</span></td>
+                    </ng-container>
+                    <ng-container *ngIf="stock.estado == 'Medio'">
+                      <td style="min-width: 20%; max-width: 20%"><span class="badge bg-warning1">{{stock.estado}}</span></td>
+                    </ng-container>
+                    <ng-container *ngIf="stock.estado == 'Alto'">
+                      <td style="min-width: 20%; max-width: 20%"><span class="badge bg-success1">{{stock.estado}}</span></td>
+                    </ng-container>
+                    <td style="min-width: 15%; max-width: 15%">{{stock.actual | number : '1.2-2'}}</td>
+                    <td style="min-width: 15%; max-width: 15%">{{stock.inicial | number : '1.2-2'}}</td>
+                  </tr>
+                </ng-template>
+            </p-table>
+            </ng-template>
+            <ng-template #Texto5>
+            <div class="container advertencia">
+              <div class="mb-3">
+                <img src="assets/Iconos_Menu/advertencia.png">
+              </div>
+              <h4>No existen materias primas creadas actualmente!</h4>
+            </div>
+            </ng-template>
+
+      </p-card>
+    </div>
+  </div>
+
+  <div class="row g-3 p-3">
+
+      <!--Asignadas hoy-->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3" id="asigHoy">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-cloud-upload"></i> Ranking de materias primas asignadas hoy</h2>
+        <ng-container *ngIf="materiasPrimasMovidasHoy.length > 0; then Tabla2 else Texto2;"></ng-container>
+        <ng-template #Tabla2>
+          <p-table
+          #dt
+          [value]="materiasPrimasMovidasHoy"
+          [scrollable]="true"
+          scrollHeight="300px"
+          styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
+                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
+                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
+                <th scope="col" style="min-width: 20%; max-width: 20%" pSortableColumn="cantidad" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-mp let-rowIndex="rowIndex">
+              <tr class="font-size-12" >
+                <td style="min-width: 10%; max-width: 10%; text-align: center;">{{rowIndex + 1}}</td>
+                <td style="min-width: 35%; max-width: 35%"><b>{{mp.nombre}}</b></td>
+                <td style="min-width: 35%; max-width: 35%; text-align: center;"><b>{{mp.asignaciones}}</b></td>
+                <td style="min-width: 20%; max-width: 20%; text-align: center;">{{mp.cantidad | number : '1.2-2'}} Kg</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-template>
+        <ng-template #Texto2>
+          <div class="container advertencia">
+            <div class="mb-3">
+              <img src="assets/Iconos_Menu/advertencia.png">
+            </div>
+            <h4>No se han realizado asignaciones de materia prima el día de hoy!</h4>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <!--Tintas creadas en el mes actual-->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3" id="tintasCreadas">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-palette"></i> Ranking de Tintas creadas en el mes actual</h2>
+        <ng-container *ngIf="tintasCreadas.length > 0; then Tabla3 else Texto3;"></ng-container>
+        <ng-template #Tabla3>
+          <p-table
+            [value]="tintasCreadas"
             [scrollable]="true"
             scrollHeight="300px"
             [rowHover]="true">
               <ng-template pTemplate="header">
                 <tr>
                   <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                  <th scope="col" pSortableColumn="nombre" style="min-width: 50%; max-width: 50%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="cantidad" style="min-width: 40%; max-width: 40%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="tinta_Nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="tinta_Nombre"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
-                <tr class="font-size-12" pTooltip="Cantidad de asignaciones {{stock.asignaciones}}">
-                  <td style="min-width: 10%; max-width: 10%">{{rowIndex + 1}}</td>
-                  <td style="min-width: 50%; max-width: 50%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
-                  <td style="min-width: 40%; max-width: 40%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
+                <tr class="font-size-12">
+                  <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}}</b></td>
+                  <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/tinta2.png" alt=""> {{stock.tinta_Nombre}}</td>
+                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
                 </tr>
               </ng-template>
           </p-table>
-          </ng-template>
-          <ng-template #Texto1>
-            <div class="container advertencia">
-              <div class="mb-3">
-                <img src="assets/Iconos_Menu/advertencia.png">
-              </div>
-              <h4>No se han realizado movimientos de materia prima en el mes actual!</h4>
+        </ng-template>
+        <ng-template #Texto3>
+          <div class="container advertencia">
+            <div class="mb-3">
+              <img src="assets/Iconos_Menu/advertencia.png">
             </div>
-          </ng-template>
-        </p-card>
-      </div>
-
-      <!-- Grafica Asignada vs Extruida -->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-2')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+            <h4>No se han creado tintas en el mes actual!</h4>
           </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-bolt"></i> Mat. Prima Asignada vs Extruida</h2>
-          <p-chart type="bar" width="100%" height="320px" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
-        </p-card>
-      </div>
+        </ng-template>
 
-      <!--Inventario de Materias Primas -->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-3')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-          </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-box"></i> Inventario de Materias Primas</h2>
-            <ng-container *ngIf="inventarioMateriaPrima.length > 0; then Tabla5; else Texto5"></ng-container>
-             <ng-template #Tabla5>
-              <p-table
-                [value]="inventarioMateriaPrima"
-                [scrollable]="true"
-                scrollHeight="300px"
-                styleClass="p-datatable-sm">
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th scope="col" style="min-width: 20%; max-width: 20%" class="font-size-13">N°</th>
-                      <th scope="col" pSortableColumn="nombre" style="min-width: 30%; max-width: 30%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                      <th scope="col" pSortableColumn="estado"  style="min-width: 20%; max-width: 20%" class="font-size-13">Estado<p-sortIcon field="estado"></p-sortIcon></th>
-                      <th scope="col" pSortableColumn="actual" style="min-width: 15%; max-width: 15%" class="font-size-13">Actual<p-sortIcon field="actual"></p-sortIcon></th>
-                      <th scope="col" pSortableColumn="inicial" style="min-width: 15%; max-width: 15%" class="font-size-13">Inicial<p-sortIcon field="inicial"></p-sortIcon></th>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
-                    <tr class="font-size-12">
-                      <td style="min-width: 20%; max-width: 20%">{{rowIndex + 1}}</td>
-                      <td style="min-width: 30%; max-width: 30%"><b>{{stock.nombre}}</b></td>
-                      <ng-container *ngIf="stock.estado == 'Sin stock'">
-                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-danger1">{{stock.estado}}</span></td>
-                      </ng-container>
-                      <ng-container *ngIf="stock.estado == 'Bajo'">
-                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-secondary1">{{stock.estado}}</span></td>
-                      </ng-container>
-                      <ng-container *ngIf="stock.estado == 'Medio'">
-                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-warning1">{{stock.estado}}</span></td>
-                      </ng-container>
-                      <ng-container *ngIf="stock.estado == 'Alto'">
-                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-success1">{{stock.estado}}</span></td>
-                      </ng-container>
-                      <td style="min-width: 15%; max-width: 15%">{{stock.actual | number : '1.2-2'}}</td>
-                      <td style="min-width: 15%; max-width: 15%">{{stock.inicial | number : '1.2-2'}}</td>
-                    </tr>
-                  </ng-template>
-              </p-table>
-             </ng-template>
-             <ng-template #Texto5>
-              <div class="container advertencia">
-                <div class="mb-3">
-                  <img src="assets/Iconos_Menu/advertencia.png">
-                </div>
-                <h4>No existen materias primas creadas actualmente!</h4>
-              </div>
-             </ng-template>
-
-        </p-card>
-      </div>
-
+      </p-card>
     </div>
 
-    <div class="row g-3 p-3">
+    <!-- Cantidades BOPP's actualmente -->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3" id="rollos">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-database"></i> Cantidad de rollos <br>de polipropileno biorientado</h2>
+        <!--<p-chart type="pie" [data]="this.arrayBopps" [options]="chartOptions" [style]="{width: '100%', height: '200px'}"></p-chart>-->
 
-       <!--Asignadas hoy-->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-4')" pTooltip="Ver descripción"></p-button>
+        <!--Fila 1-->
+        <div class="mb-4">
+          <div class="row g-3" style="text-align: center;">
+            <div class="col-md">
+              <h6>BOPP</h6>
+              <p-knob [readonly]="true" [size]="65" [(ngModel)]="cantRollosBopp"[min]="0" ></p-knob>
+            </div>
+
+            <div class="col-md">
+              <h6>BOPA</h6>
+              <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosBopa" [min]="0" ></p-knob>
+            </div>
+
           </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-cloud-upload"></i> Ranking de materias primas asignadas hoy</h2>
-          <ng-container *ngIf="materiasPrimasMovidasHoy.length > 0; then Tabla2 else Texto2;"></ng-container>
-          <ng-template #Tabla2>
-            <p-table
-            #dt
-            [value]="materiasPrimasMovidasHoy"
+        </div>
+
+        <!--Fila 2-->
+        <div class="mb-4">
+          <div class="row g-3" style="text-align: center;">
+            <div class="col-md">
+              <h6>Poliester</h6>
+              <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosPoliester"[min]="0"></p-knob>
+            </div>
+
+            <div class="col-md">
+              <h6 style="text-align: center;">Ingresados {{mesActual}}</h6>
+              <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosEntrantes"[min]="0"></p-knob>
+            </div>
+          </div>
+        </div>
+
+        <!--Fila 3-->
+        <div class="row g-3" style="text-align: center;">
+            <div class="col-md">
+              <h6>Utilizados {{mesActual}}</h6>
+              <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosUtilizados"[min]="0"></p-knob>
+            </div>
+        </div>
+
+      </p-card>
+    </div>
+
+      <!-- Mas usada para crear tintas -->
+    <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3" id="mpCreacionTintas">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-palette"></i> Materias primas más usadas en el mes para crear tintas.</h2>
+        <ng-container *ngIf="materiasPrimasMasUtilizadasCrearTintaMes.length > 0; then Tabla4 else Texto4 ;"></ng-container>
+        <ng-template #Tabla4>
+          <p-table
+            [value]="materiasPrimasMasUtilizadasCrearTintaMes"
             [scrollable]="true"
             scrollHeight="300px"
-            styleClass="p-datatable-sm">
+            [rowHover]="true">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                  <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
-                  <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
-                  <th scope="col" style="min-width: 20%; max-width: 20%" pSortableColumn="cantidad" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 30%; max-width: 30%" class="font-size-13">N°</th>
+                  <th scope="col" pSortableColumn="nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-mp let-rowIndex="rowIndex">
-                <tr class="font-size-12" >
-                  <td style="min-width: 10%; max-width: 10%; text-align: center;">{{rowIndex + 1}}</td>
-                  <td style="min-width: 35%; max-width: 35%"><b>{{mp.nombre}}</b></td>
-                  <td style="min-width: 35%; max-width: 35%; text-align: center;"><b>{{mp.asignaciones}}</b></td>
-                  <td style="min-width: 20%; max-width: 20%; text-align: center;">{{mp.cantidad | number : '1.2-2'}} Kg</td>
+              <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
+                <tr class="font-size-12">
+                  <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}} </b></td>
+                  <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</td>
+                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
                 </tr>
               </ng-template>
-            </p-table>
-          </ng-template>
-          <ng-template #Texto2>
-            <div class="container advertencia">
-              <div class="mb-3">
-                <img src="assets/Iconos_Menu/advertencia.png">
-              </div>
-              <h4>No se han realizado asignaciones de materia prima el día de hoy!</h4>
+          </p-table>
+        </ng-template>
+        <ng-template #Texto4>
+          <div class="container advertencia">
+            <div class="mb-3">
+              <img src="assets/Iconos_Menu/advertencia.png">
             </div>
-          </ng-template>
-        </p-card>
-      </div>
-
-      <!--Tintas creadas en el mes actual-->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-5')" pTooltip="Ver descripción"></p-button>
+            <h4>No se han creado tintas en el mes actual!</h4>
           </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-palette"></i> Ranking de Tintas creadas en el mes actual</h2>
-          <ng-container *ngIf="tintasCreadas.length > 0; then Tabla3 else Texto3;"></ng-container>
-          <ng-template #Tabla3>
-            <p-table
-              [value]="tintasCreadas"
-              [scrollable]="true"
-              scrollHeight="300px"
-              [rowHover]="true">
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                    <th scope="col" pSortableColumn="tinta_Nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="tinta_Nombre"></p-sortIcon></th>
-                    <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
-                  </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
-                  <tr class="font-size-12">
-                    <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}}</b></td>
-                    <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/tinta2.png" alt=""> {{stock.tinta_Nombre}}</td>
-                    <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
-                  </tr>
-                </ng-template>
-            </p-table>
-          </ng-template>
-          <ng-template #Texto3>
-            <div class="container advertencia">
-              <div class="mb-3">
-                <img src="assets/Iconos_Menu/advertencia.png">
-              </div>
-              <h4>No se han creado tintas en el mes actual!</h4>
-            </div>
-          </ng-template>
+        </ng-template>
 
-        </p-card>
-      </div>
-
-      <!-- Cantidades BOPP's actualmente -->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-6')" pTooltip="Ver descripción"></p-button>
-          </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-database"></i> Cantidad de rollos <br>de polipropileno biorientado</h2>
-          <!--<p-chart type="pie" [data]="this.arrayBopps" [options]="chartOptions" [style]="{width: '100%', height: '200px'}"></p-chart>-->
-
-          <!--Fila 1-->
-          <div class="mb-4">
-            <div class="row g-3" style="text-align: center;">
-              <div class="col-md">
-                <h6>BOPP</h6>
-                <p-knob [readonly]="true" [size]="65" [(ngModel)]="cantRollosBopp"[min]="0" ></p-knob>
-              </div>
-
-              <div class="col-md">
-                <h6>BOPA</h6>
-                <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosBopa" [min]="0" ></p-knob>
-              </div>
-
-            </div>
-          </div>
-
-          <!--Fila 2-->
-          <div class="mb-4">
-            <div class="row g-3" style="text-align: center;">
-              <div class="col-md">
-                <h6>Poliester</h6>
-                <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosPoliester"[min]="0"></p-knob>
-              </div>
-
-              <div class="col-md">
-                <h6 style="text-align: center;">Ingresados {{mesActual}}</h6>
-                <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosEntrantes"[min]="0"></p-knob>
-              </div>
-            </div>
-          </div>
-
-          <!--Fila 3-->
-          <div class="row g-3" style="text-align: center;">
-              <div class="col-md">
-                <h6>Utilizados {{mesActual}}</h6>
-                <p-knob [readonly]="true"  [size]="65" [(ngModel)]="cantRollosUtilizados"[min]="0"></p-knob>
-              </div>
-          </div>
-
-        </p-card>
-      </div>
-
-       <!-- Mas usada para crear tintas -->
-      <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-3">
-        <p-card>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="mostrarDescripcion($event, 'card-7')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
-          </div>
-          <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-palette"></i> Materias primas más usadas en el mes para crear tintas.</h2>
-          <ng-container *ngIf="materiasPrimasMasUtilizadasCrearTintaMes.length > 0; then Tabla4 else Texto4 ;"></ng-container>
-          <ng-template #Tabla4>
-            <p-table
-              [value]="materiasPrimasMasUtilizadasCrearTintaMes"
-              [scrollable]="true"
-              scrollHeight="300px"
-              [rowHover]="true">
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th scope="col" style="min-width: 30%; max-width: 30%" class="font-size-13">N°</th>
-                    <th scope="col" pSortableColumn="nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                    <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
-                  </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
-                  <tr class="font-size-12">
-                    <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}} </b></td>
-                    <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</td>
-                    <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
-                  </tr>
-                </ng-template>
-            </p-table>
-          </ng-template>
-          <ng-template #Texto4>
-            <div class="container advertencia">
-              <div class="mb-3">
-                <img src="assets/Iconos_Menu/advertencia.png">
-              </div>
-              <h4>No se han creado tintas en el mes actual!</h4>
-            </div>
-          </ng-template>
-
-        </p-card>
-      </div>
-
+      </p-card>
     </div>
-
+  </div>
 </div>
-
-<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
-
-  <ng-container *ngIf="nroCard == 'card-1' then card1;"></ng-container>
-  <ng-template #card1>
-    En esta sección se puede apreciar el <b >listado de materias primas más usadas / asignadas durante el mes actual</b> ordenado por la cantidad en kilogramos
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-2' then card2;"></ng-container>
-  <ng-template #card2>
-    En este apartado podrás visualizar una grafica comparativa entre <b>la cantidad en kilos de materia prima que se ha asignado y la cantidad que ha sido extruida.</b><br><br>
-    <b>Nota:</b> Colocando el puntero del mouse <b>sobre la grafica</b> podrás ver la cantidad asignada / extruida en kilos.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-3' then card3;"></ng-container>
-  <ng-template #card3>
-    Aquí puedes ver de forma rápida <b  >el estado, la cantidad con la que inició el día y el stock actual</b> de cada polietileno, tinta y BOPP. <br><br>
-    Los estados están distribuidos así: <br><br>
-      <b>Si es polietileno:</b><br>
-      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
-      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 1000.<br>
-      <span class="badge bg-warning1">Medio:</span> Cantidades entre 1000 y 3000.<br>
-      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 3000.<br><br>
-      <b>Si es Tinta y/o BOPP:</b><br>
-      <span class="badge bg-danger1">Sin Stock:</span> Cantidad en 0. <br>
-      <span class="badge bg-secondary1">Bajo:</span> Cantidades entre 1 y 100.<br>
-      <span class="badge bg-warning1">Medio:</span> Cantidades entre 100 y 200<br>
-      <span class="badge bg-success1">Alto:</span> Cantidades mayores a 200.<br><br>
-      Nota: Sujeto a cambios de gerencia.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-4' then card4;"></ng-container>
-  <ng-template #card4>
-    En esta card se puede visualizar la <b >lista ordenada por kilogramos</b> de las materias primas asignadas el día de hoy.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-5' then card5;"></ng-container>
-  <ng-template #card5>
-    En esta sección podrás ver un <b>listado ordenado por kilogramos de las tintas creadas en este mes.</b>
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-6' then card6;" ></ng-container>
-  <ng-template #card6>
-    Este apartado muestra la cantidad de rollos de <b>BOPP, BOPA y poliester disponibles.</b><br><br>
-    Además se muestra el total de <b>rollos ingresados y utilizados</b> en el mes en curso.
-  </ng-template>
-
-  <ng-container *ngIf="nroCard == 'card-7' then card7;" ></ng-container>
-  <ng-template #card7>
-    Aquí podrás ver el <b>ranking de materias primas que más se han utilizado en el mes en curso</b> para crear tintas.
-  </ng-template>
-
-</p-overlayPanel>
 

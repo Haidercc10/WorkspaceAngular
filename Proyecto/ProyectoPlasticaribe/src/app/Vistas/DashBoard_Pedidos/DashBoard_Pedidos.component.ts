@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardPedidos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -12,7 +13,7 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./DashBoard_Pedidos.component.css']
 })
 export class DashBoard_PedidosComponent implements OnInit {
-  @ViewChild('op') op: OverlayPanel | undefined;
+
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -56,13 +57,22 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
-                  private ordenTrabajoService : EstadosProcesos_OTService,) {
+                  private ordenTrabajoService : EstadosProcesos_OTService,
+                    private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
     if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.tiempoExcedido();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -381,14 +391,5 @@ export class DashBoard_PedidosComponent implements OnInit {
       }
     }
     this.infoTablaModal.sort((a,b) => Number(b.Cantidad) - Number(a.Cantidad));
-  }
-
-   /** Función que mostrará la descripción de cada una de las card de los dashboard's */
-  mostrarDescripcion($event, card : string){
-    this.nroCard = card;
-    setTimeout(() => {
-      this.op!.toggle($event);
-      $event.stopPropagation();
-    }, 500);
   }
 }

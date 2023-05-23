@@ -1,12 +1,14 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardOT as defaultSteps } from 'src/app/data';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Component({
   selector: 'app-Dashboard-OT',
@@ -16,7 +18,6 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 export class DashboardOTComponent implements OnInit {
 
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
-  @ViewChild('op') op: OverlayPanel | undefined;
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -58,15 +59,24 @@ export class DashboardOTComponent implements OnInit {
   modoSeleccionado : boolean
 
   constructor(private AppComponent : AppComponent,
-    private bagProService : BagproService,
-      private ordenTrabajoService : EstadosProcesos_OTService,
-        private zeusService : InventarioZeusService,) {
+                private bagProService : BagproService,
+                  private ordenTrabajoService : EstadosProcesos_OTService,
+                    private zeusService : InventarioZeusService,
+                      private shepherdService: ShepherdService) {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.tiempoExcedido();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -659,13 +669,4 @@ export class DashboardOTComponent implements OnInit {
       this.modalEstadosProcesos_OT.consultarOT();
     }
   }
-
-  mostrarDescripcion($event, card : string){
-    this.nroCard = card;
-    setTimeout(() => {
-      this.op!.toggle($event);
-      $event.stopPropagation();
-    }, 500);
-  }
-
 }
