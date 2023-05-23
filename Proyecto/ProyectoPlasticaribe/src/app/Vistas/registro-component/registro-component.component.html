@@ -13,7 +13,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-32">Gestión de Usuarios</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="usuarios" class="font-size-32">Gestión de Usuarios</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -22,9 +22,14 @@
 </div>
 
     <p-card>
+      <!--Ver tutorial-->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3" >
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+      </div>
+
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button pButton pRipple label="Nuevo Rol" icon="pi pi-plus" class="p-button-success r-2" (click)="modalRoles_TiposUsuarios()"></button>
-        <button pButton pRipple label="Nueva Area" icon="pi pi-plus" (click)="modalAreas()" class="p-button-success"></button>
+        <button pButton pRipple label="Nuevo Rol" icon="pi pi-plus" id="nuevo-rol" class="p-button-success r-2" (click)="modalRoles_TiposUsuarios()"></button>
+        <button pButton pRipple label="Nueva Area" icon="pi pi-plus" id="nueva-area" (click)="modalAreas()" class="p-button-success"></button>
       </div>
 
       <div class="mb-4">
@@ -34,19 +39,20 @@
       <div *ngIf="load">
         <p-toolbar styleClass="mb-4 gap-2">
           <ng-template pTemplate="left">
-            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button>
-            <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" class="p-button-danger" (click)="inactivarUsuarios()"></button>
+            <button pButton pRipple id="nuevo-usuario" label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button>
+            <button pButton pRipple id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" class="p-button-danger" (click)="inactivarUsuarios()"></button>
             <ng-template #inactivo>
-              <button pButton pRipple label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
+              <button pButton pRipple id="eliminar-usuario" label="Eliminar"  icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
             </ng-template>
           </ng-template>
 
           <ng-template pTemplate="right">
-            <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+            <button pButton pRipple id="exportar" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
           </ng-template>
         </p-toolbar>
         <!--Inicio Tabla-->
         <p-table
+          id="tabla"
           #dt
           [value]="arrayUsuarios"
           [resizableColumns]="true"
@@ -66,14 +72,14 @@
             <div class="flex align-items-center justify-content-between">
               <span class="p-input-icon-left">
                 <i class="pi pi-search"></i>
-                <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" pTooltip="Busca usuarios por su Id, Nombre o Área" tooltipPosition="top"/>
+                <input pInputText type="text" id="buscar" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" pTooltip="Busca usuarios por su Id, Nombre o Área" tooltipPosition="top"/>
               </span>
             </div>
           </ng-template>
           <!--Headers Tabla-->
           <ng-template pTemplate="header">
-            <tr >
-              <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+            <tr>
+              <th style="width: 4rem"><p-tableHeaderCheckbox id="check"></p-tableHeaderCheckbox></th>
               <th scope="col" pSortableColumn="Id">ID Usuario <p-sortIcon field="Id"></p-sortIcon></th>
               <th scope="col" pSortableColumn="Nombre"> Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
               <th scope="col" pSortableColumn="Tipo">Tipo <p-sortIcon field="Tipo"></p-sortIcon></th>
@@ -95,8 +101,8 @@
               <td>{{arrayUsuarios.Rol}}</td>
               <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
               <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
-              <td style="text-align: center;"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
-              <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;" (click)="colocarUsuarioInactivo(arrayUsuarios.Id)"></button></td>
+              <td style="text-align: center;"><button id="editar" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
+              <td style="text-align: center;"><button id="inactivar" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;" (click)="colocarUsuarioInactivo(arrayUsuarios.Id)"></button></td>
             </tr>
           </ng-template>
           <ng-template pTemplate="summary">
