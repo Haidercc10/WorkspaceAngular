@@ -247,12 +247,11 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.dtSolicitudService.GetMateriaPrimaSolicitud(this.formSolicitud.value.Id_Solicitud, this.mpSeleccionada.Id).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.dtSolicitudService.Delete(data[i].dtSolicitud_Id).subscribe(datos => {
-          this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == this.mpSeleccionada.Id), 1);
-          this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == this.mpSeleccionada.Id), 1);
           this.mensajeSatisfactorio(`¡Materia Prima Eliminada!`, `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
         });
       }
     });
+    this.quitarMateriaPrima();
   }
 
   // Función que va a validar si la información para crear la solicitud es correcta
@@ -271,9 +270,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       Solicitud_Hora: moment().format('H:mm:ss'),
       Estado_Id: 11,
     }
-    this.solicitudService.Post(info).subscribe(data => {
-      this.crearDetallesSolicitud(data.solicitud_Id);
-    }, error => this.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la solicitud de materia prima!`));
+    this.solicitudService.Post(info).subscribe(data => this.crearDetallesSolicitud(data.solicitud_Id),
+    error => this.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la solicitud de materia prima!`));
   }
 
   // Función que va a crear los detalles de solicitud de materia prima
@@ -411,7 +409,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         this.informacionPDF.push(info);
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => {this.crearPDF(solicitud_Id); }, 1000);
+      setTimeout(() => this.crearPDF(solicitud_Id), 1000);
     }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitu con el Número ${solicitud_Id}!`));
   }
 
@@ -421,13 +419,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Solicitud de Materia Prima N° ${data[i].consecutivo}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Solicitud de Materia Prima N° ${data[i].consecutivo}` },
+          pageSize: { width: 630, height: 760 },
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -442,18 +435,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           content : [
             {
               columns: [
-                {
-                  image : logoParaPdf,
-                  width : 220,
-                  height : 50,
-                  margin : [0, 20]
-                },
-                {
-                  text: `Solicitud de Materia Prima N° ${data[i].consecutivo}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 30
-                }
+                { image : logoParaPdf, width : 220, height : 50, margin : [0, 20] },
+                { text: `Solicitud de Materia Prima N° ${data[i].consecutivo}`, alignment: 'right', style: 'titulo', margin: 30 }
               ]
             },
             '\n \n',
@@ -508,21 +491,19 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
                       border: [false, false, false, true],
                       text: `${data[i].empresa_Direccion}`
                     },
-                    {},
-                    {}
+                    {
+                      border: [false, false, false, false],
+                      text: `Usuario`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].usuario}`
+                    },
                   ]
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `Usuario: ${data[i].usuario}\n`,
-              alignment: 'left',
-              style: 'header',
             },
             '\n \n',
             {
@@ -539,14 +520,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
             }
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);

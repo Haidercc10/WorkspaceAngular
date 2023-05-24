@@ -99,7 +99,7 @@
         </div>
 
         <!-- Unidad medida-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="undMatPtima">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="undMatPrima">
           <span class="p-float-label">
             <p-dropdown formControlName="UnidadMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadesMedida" optionLabel="" [required]="true"></p-dropdown>
             <label for="Und">Und</label>
@@ -124,7 +124,7 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Materias Primas Seleccionadas</h4>
   </div>
 
-  <div class="row g-3" id="tabla2">
+  <div class="row g-3" id="tabla">
     <div class="table-responsive">
       <p-table
       #dt
@@ -142,7 +142,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Und. Medida</th>
-            <th scope="col">Acción</th>
+            <th scope="col" id="accion">Acción</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimas>
@@ -165,7 +165,7 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Solicitud" icon="pi pi-check" *ngIf="!edicionSolicitud" (click)="validarDatosSolicitud()"></button>
+      <button pButton class="p-button-danger" id="crearSolicitud" type="button" label="Crear Solicitud" icon="pi pi-check" *ngIf="!edicionSolicitud" (click)="validarDatosSolicitud()"></button>
       <button pButton class="p-button-danger" type="button" label="Editar Solicitud" icon="pi pi-pencil" *ngIf="edicionSolicitud" (click)="validarDatosSolicitud()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>

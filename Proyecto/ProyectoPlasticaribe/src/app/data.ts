@@ -4389,7 +4389,224 @@ export const stepsRecuperado: Step.StepOptions[] = [
   },
 ];
 
-export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [];
+export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'none',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Solicitud de Materia Prima!</h4>`,
+    text: `<p>¡El operador a cargo de esa área presentará a la gerencia sus pedidos de materia prima.!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'formulario',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Creación y edición!</h4>`,
+    text: `<p>¡Desde aquí podremos consultar solicitudes pasadas para editarlas o simplemente para ver un PDF de las mismas, tambien podemos colocar una observación a una solicitud que estemos creando!</p>`
+  },
+  {
+    attachTo: {
+      element: '#codigoSolicitud',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'codigoSolicitud',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Código Solicitud!</h4>`,
+    text: `<p>¡Desde aquí podemos <b>cosultar otras solicitudes de materias primas</b>, esto lo hacemos <b>digitando el código de la solicitud y presionando enter</b>. Si quieremos ver el PDF de esta solicitud digitamos el código y presionamos el botón rojo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formularioMateriaPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'formularioMateriaPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Materias Primas!</h4>`,
+    text: `<p>¡Para elegir las materias primas llenamos los siguientes campos de la siguiente manera!</p>`
+  },
+  {
+    attachTo: {
+      element: '#idMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idMatPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Id de Materia Prima!</h4>`,
+    text: `<p>¡La primera forma de buscar las materias primas es <b>digitar el código de la materia prima y presionar enter</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#nombreMatprima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'nombreMatprima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Nombre de Materia Prima!</h4>`,
+    text: `<p>¡La segunda forma de buscar una materia prima es buscarlo por esta lista desplegable, para facilitar la busqueda podemos escribir el código o el nombre de la materia prima!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cantidadMatPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Cantidad de Materia Prima!</h4>`,
+    text: `<p>¡En este campo digitamos la <b>cantidad de materia prima que queremos solicitar</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#undMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'undMatPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Medida de Materia Prima!</h4>`,
+    text: `<p>¡Este campo se llenará automaticamente al buscar la materia prima!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'botones',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Botones Materia Prima!</h4>`,
+    text: `<p>¡Con estos botones podemos seleccionar las materias primas y/o limpiar los campos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#agregarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'agregarMatPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Agregar Materia Prima!</h4>`,
+    text: `<p>¡Luego de llenar los campos de materias primas podemos presionar este botón para que se vayan agregando a la tabla que tenemos acontinuación, si los campos de materia prima no están llenos este botón estará deshabilitado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarMatPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'limpiarMatPrima',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Limpiar Campos!</h4>`,
+    text: `<p>¡Para limpiar los campos de materias primas presionamos este botón!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'tabla',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Tabla Materia Prima!</h4>`,
+    text: `<p>¡En esta tabla se estarán guardando las materias primas que hayamos seleccionado anteriormente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#accion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'accion',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Quitar y Eliminar!</h4>`,
+    text: `<p>En ese apartado podemos eliminar y quitar materias primas.</p>
+          <p>
+            Cuando tenemos una solicitud de materia prima creada desde cero, si presionamos el icono <i class="pi pi-trash"></i> y nos saldrá un mensaje de confirmación.
+          </p>`
+  },
+  {
+    attachTo: {
+      element: '#crearSolicitud',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crearSolicitud',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Crear y Editar Solicitud!</h4>`,
+    text: `<p>Aquí podemos crear y editar la solicitud de materias primas</p>
+          <ul>
+            <li><b>Crear Solicitud:</b> Luego de haber completado todos los campos, podemos presionar este botón y se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
+            <li><b>Editar Solicitud:</b> Si estamos editando una solicitud el nombre del botón cambiará, de igual manera que al crear las solicitudes, se empezarán a validar todos los pasos, si están correctos nos saldrá un mensaje de confirmación y se generará un PDF</li>
+          </ul>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'limpiarTodo',
+    title: `<h4 class="tituloRojo" style="margin: auto;">¡Limpiar Todo!</h4>`,
+    text: `<p>¡Para limpiar todos los campos y tablas presionamos este botón!</p>`
+  },
+];
 
 /******************************************************** MANTENIMIENTO DE ACTIVOS ***************************************************************/
 export const stepsPedidoMtto: Step.StepOptions[] = [
