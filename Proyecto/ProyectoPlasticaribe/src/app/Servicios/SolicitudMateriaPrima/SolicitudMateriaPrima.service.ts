@@ -21,4 +21,16 @@ constructor(private http : HttpClient) { }
   Post = (data : modelSolicitudMateriaPrima) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Solicitud_MateriaPrima`, data);
 
   Put = (id : number, data : modelSolicitudMateriaPrima) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Solicitud_MateriaPrima/${id}`, data);
+
+  getFechasEstado(fecha1 : any, fecha2 : any, estado : any):Observable<any[]> {
+    return this.http.get<any>(`${rutaPlasticaribeAPI} + /Solicitud_MateriaPrima/getFechasEstado/${fecha1}/${fecha2}/${estado}`);
+  }
+
+  getFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(`${rutaPlasticaribeAPI}  + /Solicitud_MateriaPrima/getFechas/${fecha1}/${fecha2}`);
+  }
+
+  getEstados(estado : any):Observable<any[]> {
+    return this.http.get<any>(`${rutaPlasticaribeAPI}  + /Solicitud_MateriaPrima/getEstados/${estado}`);
+  }
 }
