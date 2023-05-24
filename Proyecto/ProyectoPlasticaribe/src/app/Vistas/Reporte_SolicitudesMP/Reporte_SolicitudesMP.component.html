@@ -31,35 +31,27 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-file font-size-16"></i> <b> Solicitudes</b></h4>
   </div>
 
-  <div class="mb-5">
-    <div class="row g-3">
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-        <p-card>
-          <div class="mb-3">
-            <h5 id="texto-centrado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" ><i class="pi pi-hourglass font-size-16"></i> N° Pendientes</h5>
-          </div>
-        </p-card>
+  <div class="mb-3">
+    <div class="row g-3" id="fila">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3 justify-content-center">
+        <div class="mb-3">
+          <p-chip label="Apple" icon="pi pi-hourglass"  label="N° Pendientes {{cantPendientes}}"></p-chip>
+        </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-        <p-card>
-          <div class="mb-3">
-            <h5 id="texto-centrado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-check font-size-16"></i> N° Aceptadas</h5>
-          </div>
-        </p-card>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3 justify-content-center">
+        <div class="mb-3">
+          <p-chip label="Apple" icon="pi pi-check"label="N° Aceptadas {{cantAceptadas}}"></p-chip>
+        </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-        <p-card>
-          <div class="mb-3">
-            <h6 id="texto-centrado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-check-square font-size-16"></i> N° Finalizadas</h6>
-          </div>
-        </p-card>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3 justify-content-center">
+        <div class="mb-3">
+          <p-chip label="Apple" icon="pi pi-check-square" label="N° Finalizadas {{cantFinalizadas}}"></p-chip>
+        </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-        <p-card>
-          <div class="mb-3">
-            <h6 id="texto-centrado" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-ban font-size-16"></i> N° Canceladas</h6>
-          </div>
-        </p-card>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3 justify-content-center">
+        <div class="mb-3">
+          <p-chip label="Apple" icon="pi pi-ban" label="N° Canceladas {{cantCanceladas}}"></p-chip>
+        </div>
       </div>
     </div>
   </div>
@@ -170,10 +162,10 @@
           </ng-template>
           <ng-template pTemplate="body" let-registros>
             <tr>
-              <td>{{1}}</td>
-              <td>{{1}}</td>
-              <td>{{1}}</td>
-              <td>{{1}}</td>
+              <td>{{registros.id}}</td>
+              <td><b>{{registros.usuario}}</b></td>
+              <td>{{registros.fecha}}</td>
+              <td><b>{{registros.estado}}</b></td>
               <td style="text-align: center;"><p-button style="font-size: medium; width: 30px; height: 30px; text-decoration: none;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" ></p-button></td>
             </tr>
           </ng-template>
