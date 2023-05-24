@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { stepsMovMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
@@ -7,9 +7,15 @@ import { AppComponent } from 'src/app/app.component';
 import moment from 'moment';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Table } from 'primeng/table';
-import { Reporte_SolicitudesMPService } from 'src/app/Servicios/Reporte_SolicitudesMP/Reporte_SolicitudesMP.service';
 import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
 import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
+import { SolicitudMateriaPrimaComponent } from '../Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Reporte_SolicitudesMP',
@@ -32,6 +38,9 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   cantAceptadas : number = 0; /** Variable que mostrará el número de solicitudes aceptadas */
   cantFinalizadas : number = 0; /** Variable que mostrará el número de solicitudes finalizadas */
   cantCanceladas : number = 0; /** Variable que mostrará el número de solicitudes canceladas */
+  @ViewChild(SolicitudMateriaPrimaComponent) SolicitudMatPrima : SolicitudMateriaPrimaComponent;
+  informacionPDF: any;
+
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -62,6 +71,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
@@ -71,7 +87,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     this.shepherdService.start();
   }
 
-    // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
+  // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
   obtenerEstados(){
     this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let i = 0; i < datos_estados.length; i++) {
@@ -171,11 +187,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(fechaInicial != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaInicial, estado).subscribe(data => {
-        if(data.length > 0) {
-          for (let index = 0; index < data.length; index++) {
+        tamanoConsulta = data.length;
+        for (let index = 0; index < data.length; index++) {
+          if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
+            arrayId.push(data[index].consecutivo);
           }
-        } else this.mostrarAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados!`);
+        }
       });
     } else if(solicitud != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
@@ -218,13 +236,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         }
       });
     }
-
-    if(tamanoConsulta == 0) {
-      setTimeout(() => {
-        this.cargando = false;
-        this.mostrarAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados!`)
-      }, 2000);
-    }
+    console.log(tamanoConsulta);
+    setTimeout(() => { this.cargando = false; }, 1500);
   }
 
   /** Función para limpiar los campos del formulario */
@@ -261,5 +274,212 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo , life : 2000});
+  }
+
+  // Funcion que va a consultar los detalles del pdf
+  llenarInfoPdf(solicitud_Id : number = 0){
+    this.informacionPDF = [];
+    this.cargando = true;
+    if (solicitud_Id == 0) solicitud_Id = parseInt(this.formFiltros.value.documento);
+    this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud_Id).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        let info : any = {
+          Id : 0,
+          Id_Mp: data[i].mP_Id,
+          Id_Tinta: data[i].tinta_Id,
+          Id_Bopp: data[i].bopp_Id,
+          Nombre : '',
+          Cantidad : this.formatonumeros(data[i].cantidad),
+          Medida : data[i].unidad_Medida,
+          Estado : data[i].estado_MP,
+        }
+        if (info.Id_Mp != 84) {
+          info.Id = info.Id_Mp;
+          info.Nombre = data[i].mp;
+        } else if (info.Id_Tinta != 2001) {
+          info.Id = info.Id_Tinta;
+          info.Nombre = data[i].tinta;
+        } else if (info.Id_Bopp != 1) {
+          info.Id = info.Id_Bopp;
+          info.Nombre = data[i].bopp;
+        }
+        this.informacionPDF.push(info);
+        this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+      }
+      setTimeout(() => {this.generarPDF(solicitud_Id); }, 1000);
+    }, error => this.mostrarError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
+  }
+
+  // Funcion que va a crear un pdf de las solicitudes de materia prima
+  generarPDF(solicitud_Id : number){
+    let nombre : string = this.storage_Nombre;
+    this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud_Id).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        const pdfDefinicion : any = {
+          info: {
+            title: `Solicitud de Materia Prima N° ${data[i].consecutivo}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                columns: [
+                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          content : [
+            {
+              columns: [
+                {
+                  image : logoParaPdf,
+                  width : 220,
+                  height : 50,
+                  margin : [0, 20]
+                },
+                {
+                  text: `Solicitud de Mat. Prima N° ${data[i].consecutivo}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
+              ]
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, 167, 90, 166],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Nombre Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].empresa}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Fecha`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `NIT Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].empresa_Id}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Ciudad`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].empresa_Ciudad}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Dirección`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${data[i].empresa_Direccion}`
+                    },
+                    {},
+                    {}
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              text: `Usuario: ${data[i].usuario}\n`,
+              alignment: 'left',
+              style: 'header',
+            },
+            '\n \n',
+            {
+              text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+              alignment: 'center',
+              style: 'header'
+            },
+
+            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Estado']),
+
+            {
+              text: `\n \nObservación sobre la Solicitud: \n ${data[i].observacion}\n`,
+              style: 'header',
+            }
+          ],
+          styles: {
+            header: {
+              fontSize: 10,
+              bold: true
+            },
+            titulo: {
+              fontSize: 20,
+              bold: true
+            }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        this.cargando = false;
+        break;
+      }
+    }, error => this.mostrarError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data : any, columns : any) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [60, 247, 60, 60, 70],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
   }
 }

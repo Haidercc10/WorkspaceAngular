@@ -166,7 +166,7 @@
               <td><b>{{registros.usuario}}</b></td>
               <td>{{registros.fecha}}</td>
               <td><b>{{registros.estado}}</b></td>
-              <td style="text-align: center;"><p-button style="width: 30px; height: 30px; text-decoration: none;" pButton pRipple icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger mr-2" pTooltip="PDF"></p-button></td>
+              <td style="text-align: center;"><p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger" (click)="llenarInfoPdf(registros.id)"></p-button></td>
             </tr>
           </ng-template>
         </p-table>

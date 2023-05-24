@@ -57,3 +57,9 @@ p-chip ::ng-deep .p-chip-text {
 #fila {
   text-align: center;
 }
+
+#botonPdf ::ng-deep .p-button {
+  width: 30px;
+  height: 30px;
+  text-decoration: none;
+}
