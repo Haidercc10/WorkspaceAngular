@@ -4389,6 +4389,8 @@ export const stepsRecuperado: Step.StepOptions[] = [
   },
 ];
 
+export const stepsSolicitudMateriaPrima : Step.StepOptions[] = [];
+
 /******************************************************** MANTENIMIENTO DE ACTIVOS ***************************************************************/
 export const stepsPedidoMtto: Step.StepOptions[] = [
   {

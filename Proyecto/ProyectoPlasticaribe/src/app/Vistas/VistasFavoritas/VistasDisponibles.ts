@@ -37,6 +37,7 @@ export let vistasDisponibles : any = [
   { id : 25, nombre : 'Movimientos MP', icono : 'assets/Iconos_Menu/materiaPrima.png', categoria: 'Movimientos', ruta : './movimiento-mp', roles : [1,3,4], },
   { id : 27, nombre : 'Movimientos Recuperado', icono : 'assets/Iconos_Menu/recuperado.png', categoria: 'Movimientos', ruta : './reporte-recuperado-mp', roles : [1,3], },
   { id : 28, nombre : 'Movimientos Ordenes de Compra', icono : 'assets/Iconos_Menu/recibos.png', categoria: 'Movimientos', ruta : './reporte-orden-compra', roles : [1,6,13], },
+  { id : 55, nombre : 'Solicitud de Materia Prima', icono : 'assets/Iconos_Menu/crearOrden.png', categoria: 'Materia Prima', ruta : './solicitud-materia-prima', roles : [1,6,13], },
 
   // MANTENIMIENTO Y PEDIDOS DE MANTENIMIENTO
   { id : 41, nombre : 'Pedido de Mantenimiento de Activos', icono : 'assets/Iconos_Menu/pedido_mantenimiento.png', categoria: 'Mantenimiento', ruta : './pedido-mantenimiento', roles : [1], },
@@ -77,5 +78,5 @@ export let vistasDisponibles : any = [
   // USUARIOS
   { id : 40, nombre : 'Usuarios', icono : 'assets/Iconos_Menu/usuarios.png', categoria: 'Usuarios', ruta : './registro-usuario', roles : [1], },
 
-  // SIGUIENTE 55
+  // SIGUIENTE 56
 ];

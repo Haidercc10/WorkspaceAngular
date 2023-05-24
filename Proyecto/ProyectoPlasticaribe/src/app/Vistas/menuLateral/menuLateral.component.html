@@ -294,25 +294,25 @@
           <b>Materia Prima</b>
         </a>
         <div class="collapse" id="collapseExample3">
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
               Asignación Materia Prima
             </a>
           </div>
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-plus-circle font-size-15" style="margin-right: 2%;"></i>
               Creación Tintas
             </a>
           </div>
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
               Devoluciones
             </a>
           </div>
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
               Entradas
@@ -372,10 +372,16 @@
               </a>
             </div>
           </ng-container>
-            <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-window-minimize font-size-15" style="margin-right: 2%;"></i>
               Recuperado
+            </a>
+          </div>
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/solicitud-materia-prima" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
+              Solicitud de Materia Prima
             </a>
           </div>
             <div class="mb-2 sangria">

@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule, Routes } from '@angular/router';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NgChartsModule } from 'ng2-charts';
 import { CookieService } from 'ngx-cookie-service';
@@ -64,7 +63,6 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
-import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
 import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVendedores.pipe';
 import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
@@ -122,6 +120,7 @@ import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Repor
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
+import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
 import { VistasFavoritasComponent } from './Vistas/VistasFavoritas/VistasFavoritas.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
@@ -173,117 +172,6 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
-
-export const routes: Routes = [
-
-  /******************************************************************** Inicio y Login **********************************************************************/
-  {path: 'inicio', component: InicioComponent},
-  {path: 'Login', component: LoginComponentComponent},
-  {path: '', component: LoginComponentComponent},
-  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60,61]}, component: PaginaPrincipalComponent},
-  {path: 'Archivos', component: ArchivosComponent},
-
-  /******************************************************************* Materia Prima ************************************************************************/
-  {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,13]}, component: OcompraComponent},
-  {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: PedidomateriaprimaComponent},
-  {path: 'asignacionMP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionMateriaPrimaComponent},
-  {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
-  {path: 'mp-devoluciones', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: DevolucionesMPComponent},
-  // Tintas
-  {path: 'Entrada-Tintas', canActivate : [RoleGuardServiceGuard], component : Entrada_TintasComponent},
-  {path: 'asignacion-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionTintasComponent},
-  // BOPP
-  {path: 'asignacion-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPPComponent},
-  {path: 'entrada-BOPP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: EntradaBOPPComponent},
-  {path: 'AsignacionBOPPTemporal', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPP_TEMPORALComponent},
-  // Creacion
-  {path: 'crear-proveedor', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearProveedorComponent},
-  {path: 'crear-materiaprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearMateriaprimaComponent},
-  {path: 'crear-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearBoppComponent},
-  {path: 'crear-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearTintasComponent},
-  // Movimientos
-  {path: 'movimiento-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: MovimientoMPComponent},
-  {path: 'materias_primas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: MateriasPrimasComponent},
-  // Reportes de materia prima
-  {path: 'reporte-Materia-Prima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: ReporteMateriaPrimaComponent},
-  {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
-  {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
-  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_OrdenCompraComponent},
-  {path: 'reporte-solicitudes-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_SolicitudesMPComponent},
-
-  /************************************************************************ DESPACHO ************************************************************************/
-  // Pre ingresos
-  {path: 'preingreso-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,7]}, component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion
-  {path: 'preingreso-sellado', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,8,9]}, component : PreIngresoRolloSelladoComponent}, // Pre Ingreso rollos sellado
-  // Ingresos
-  {path: 'ingresar-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,10]}, component : Ingresar_ProductosComponent},
-  // Facturacion de rollos
-  {path: 'asignacion-productos-facturas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6]}, component : AsignarProductosFacturasComponent},
-  // Despacho de maercancia
-  {path: 'factura-rollos-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,10]}, component : RollosAsignadasFacturaComponent},
-  // Devolucion de Rollos
-  {path: 'devolucion-rollos-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,10]}, component : Devoluciones_Productos_RollosComponent},
-  // Reporte
-  {path: 'reporte-despacho', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,7,8,9,10]}, component : ReporteDespachoComponent}, // Ingresar Productos
-
-  /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
-  {path: 'ordenes-trabajo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OrdenesTrabajoComponent},
-  {path: 'reportes-procesos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,12]}, component: Reporte_Procesos_OTComponent},
-  {path: 'estados-ot-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
-  {path: 'reporte-pedidos-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,60]}, component : Reporte_PedidosVendedoresComponent}, // Pedidos Vendedores
-
-  /************************************** Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos **********************************************/
-  {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
-  {path: 'AsignacionRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
-  {path: 'ReporteRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
-  {path: 'Inventario-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component: Inventario_ExtrusionComponent},
-  {path: 'Eliminar-rollos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : EliminarRollos_ExtrusionComponent}, //Eliminar Rollos de Extrusion
-  {path: 'reporte-rollos-eliminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component :Reporte_RollosDesechosComponent}, /** Reporte de rollos eliminados en extrusión */
-  {path: 'reporte-costos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteCostosOTComponent},
-
-  /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
-  {path: 'inventario-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : InventarioProductosPBDDComponent},
-  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,10,60,61]}, component: ModalGenerarInventarioZeusComponent},
-
-  /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
-  {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
-  {path: 'pedido-externo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: PedidoExternoComponent},
-  {path: 'crearproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:CrearProductoComponent},
-  {path: 'crear-clientes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:ClientesComponent},
-
- /***************************************************************** USUARIOS **********************************************************************************/
-  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-  {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RegistroComponentComponent},
-
- /*************************************************************************************************************************************************************/
-  {path: 'prueba-cat-insumo', data: {expectedRole : [1]}, component: PruebaImagenCatInsumoComponent},
-
- /******************************************************************* MANTENIMIENTO ***************************************************************************/
-  {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
-  {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
-  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
-  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
-
-/*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
-  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,6,10,60,61]}, component: ReportePedidos_ZeusComponent},
-  {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
-
- /*************************************************************** DESPERDICIO *********************************************************************************/
-  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},
-  {path: 'reporte-desperdicios', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: Reporte_DesperdiciosComponent },
-
-  /*************************************************************** ORDEN DE MAQUILA **************************************************************************/
-  {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
-  {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Facturacion_OrdenMaquilaComponent},
-  {path: 'Reporte-Maquilas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Reporte_MaquilasComponent},
-
-  /*************************************************************** DASBOARD **************************************************************************/
-  {path: 'Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,3,4,5,6,7,8,9,10,11,12,13,59,60]}, component: TicketsComponent},
-  {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent},
-
-  /** */
-  {path: 'Reporte-Facturacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_Consolidado_FacturacionComponent},
-]
 
 @NgModule({
   declarations: [
@@ -386,14 +274,14 @@ export const routes: Routes = [
     ReporteFacturacion_VendedoresComponent,
     Reporte_Consolidado_FacturacionComponent,
     VistasFavoritasComponent,
-    Reporte_SolicitudesMPComponent
+    Reporte_SolicitudesMPComponent,
+    SolicitudMateriaPrimaComponent,
   ],
 
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
     NgxPaginationModule,
