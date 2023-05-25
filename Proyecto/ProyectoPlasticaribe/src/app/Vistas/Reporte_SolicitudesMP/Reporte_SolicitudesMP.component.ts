@@ -13,6 +13,8 @@ import { SolicitudMateriaPrimaComponent } from '../Solicitud-Materia-Prima/Solic
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
+import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
+import { OcompraComponent } from '../ocompra/ocompra.component';
 
 @Injectable({
   providedIn: 'root'
@@ -39,11 +41,12 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   cantAceptadas : number = 0; /** Variable que mostrará el número de solicitudes aceptadas */
   cantFinalizadas : number = 0; /** Variable que mostrará el número de solicitudes finalizadas */
   cantCanceladas : number = 0; /** Variable que mostrará el número de solicitudes canceladas */
-  @ViewChild(SolicitudMateriaPrimaComponent) SolicitudMatPrima : SolicitudMateriaPrimaComponent;
+  @ViewChild(OcompraComponent) OrdenCompra : OcompraComponent;
   informacionPDF: any;
   arrayMatPrimas : any = []; /** Array que cargará las materias primas de la solicitud seleccionada */
   solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
   usuarioSolicitante : string = ''
+  modalOc : boolean = false;
 
 
   constructor(private frmBuilder : FormBuilder,
@@ -513,6 +516,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
   llenarTablaDetalles(data : any) {
     let info : any = {
+      Codigo : data.codigo,
+      Solicitud : data.consecutivo,
       Id : 0,
       Id_Mp: data.mP_Id,
       Id_Tinta: data.tinta_Id,
@@ -547,17 +552,56 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   }
 
   cancelarSolicitud(solicitud_Id : number) {
+    this.onReject();
     solicitud_Id = this.solicitudSeleccionada;
 
     this.servicioSolicitudesMP.Get_Id(solicitud_Id).subscribe(data => {
       let modelo : modelSolicitudMateriaPrima = {
+        Solicitud_Id : solicitud_Id,
         Usua_Id: data.usua_Id,
         Solicitud_Observacion: data.solicitud_Observacion,
         Solicitud_Fecha: data.solicitud_Fecha,
         Solicitud_Hora: data.solicitud_Hora,
         Estado_Id: 4
       }
-      console.log(modelo);
-   })
+      console.log(modelo)
+      console.log('----------')
+      this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => {
+        this.cancelarDtlSolicitud();
+      },error => this.mostrarError(`No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
+   });
+  }
+
+  cancelarDtlSolicitud(){
+    for (let i = 0; i < this.arrayMatPrimas.length; i++) {
+      this.servicioDtSolicitudesMP.GetInfoSolicitud(this.arrayMatPrimas[i].Solicitud).subscribe(dataDtSolicitud => {
+        let modelo : modelDtSolcitudMP = {
+          DtSolicitud_Id : this.arrayMatPrimas[i].Codigo,
+          Solicitud_Id: this.arrayMatPrimas[i].Solicitud,
+          MatPri_Id: this.arrayMatPrimas[i].Id_Mp,
+          Tinta_Id: this.arrayMatPrimas[i].Id_Tinta,
+          Bopp_Id: this.arrayMatPrimas[i].Id_Bopp,
+          DtSolicitud_Cantidad: this.arrayMatPrimas[i].Cantidad,
+          UndMed_Id: this.arrayMatPrimas[i].Medida,
+          Estado_Id: 4
+        }
+        console.log(modelo);
+        this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => {
+          this.mostrarConfirmacion(`Confirmación`, `Solicitud cancelada exitosamente!`);
+          this.getEstadoSolitudes();
+        },error => this.mostrarError(`No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`));
+      });
+    }
+  }
+
+  /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
+  cargarModalCrearOrden(){
+    this.modalOc = true;
+    this.OrdenCompra.solicitud = true;
+
+    this.OrdenCompra.FormOrdenCompra.patchValue({
+      Solicitud : this.solicitudSeleccionada
+    });
+    this.OrdenCompra.consultarSolicitudMP();
   }
 }

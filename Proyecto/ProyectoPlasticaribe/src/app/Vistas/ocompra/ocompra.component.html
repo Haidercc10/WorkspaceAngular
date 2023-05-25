@@ -1,4 +1,4 @@
-<ng-container *ngIf="!edicionOrdenCompra">
+<ng-container *ngIf="!edicionOrdenCompra || solicitud">
   <app-menuLateral></app-menuLateral>
   <br>
   <app-VistasFavoritas></app-VistasFavoritas>
@@ -12,7 +12,7 @@
   </div>
 </div>
 
-<div class="contain" *ngIf="!edicionOrdenCompra">
+<div class="contain">
   <div class="container-fluid">
     <!-- Titulo principal -->
     <div class="mb-4 Titulo">
@@ -235,7 +235,7 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra" (click)="validarDatosOrdenCompra()"></button>
+      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra || solicitud" (click)="validarDatosOrdenCompra()"></button>
       <button pButton class="p-button-danger" type="button" label="Editar Orden de Compra" icon="pi pi-pencil" *ngIf="edicionOrdenCompra" (click)="editarOrdenCompra()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>

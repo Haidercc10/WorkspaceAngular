@@ -23,4 +23,6 @@ constructor(private http : HttpClient) { }
   Put = (id : number, data : modelDtSolcitudMP) => this.http.put(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/${id}`, data);
 
   Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/${id}`);
+
+  GetDtlSolicitud = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/${id}`);
 }

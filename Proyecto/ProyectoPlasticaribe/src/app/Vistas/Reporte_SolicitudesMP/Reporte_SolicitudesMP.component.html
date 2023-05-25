@@ -221,11 +221,11 @@
           </p-table>
         </div>
 
-        <ng-container *ngIf="arrayMatPrimas.length > 0 then habilitar; else inhabilitar"></ng-container>
+        <ng-container *ngIf="arrayMatPrimas.length > 0 && ValidarRol == 1 then habilitar; else inhabilitar"></ng-container>
         <ng-template #habilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" >
-              <button pButton class="p-button-danger" type="button" label="Crear orden de compra" icon="pi pi-check-square"></button>
+              <button pButton class="p-button-danger" type="button" label="Crear orden de compra" (click)="cargarModalCrearOrden()" icon="pi pi-check-square"></button>
               <button pButton class="p-button-secondary" type="button" label="Cancelar Solicitud" (click)="mostrarEleccion(0)" icon="pi pi-ban"></button>
               <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="llenarInfoPdf(0)" pTooltip="Ver Pdf"></button>
             </div>
@@ -244,6 +244,10 @@
     </div>
   </div>
 </p-card>
+
+<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [(visible)]="modalOc" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
+  <app_ocompra_component></app_ocompra_component>
+</p-dialog>
 
 <p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-idSolicitud>
