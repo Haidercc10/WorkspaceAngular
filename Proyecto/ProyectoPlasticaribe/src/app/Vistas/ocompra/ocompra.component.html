@@ -57,7 +57,7 @@
         </div>
 
         <!-- Código de solicitus -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="solicitud">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="Solicitud" type="text" (keyup.enter)="consultarSolicitudMP()" pInputText/>
@@ -179,7 +179,7 @@
           <tr>
             <th scope="col">ID</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Cantidad</th>
+            <th scope="col" id="cantidadTabla">Cantidad</th>
             <th scope="col">Und. Medida</th>
             <th scope="col">Precio Unitario</th>
             <th scope="col">Subtotal</th>

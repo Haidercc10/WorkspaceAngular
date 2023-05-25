@@ -442,7 +442,6 @@ export class OcompraComponent implements OnInit {
         Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
       }
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => {
-        this.GuardadoExitoso();
         error = false;
       }, error => {
         this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
@@ -451,6 +450,7 @@ export class OcompraComponent implements OnInit {
         this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
+    setTimeout(() => !error ? this.GuardadoExitoso() : undefined, 1500);
   }
 
   // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
@@ -506,7 +506,7 @@ export class OcompraComponent implements OnInit {
         }
       });
     }
-    setTimeout(() => err ? this.cambiarEstadoSolicitud(solicitud_Id) : undefined, 1500);
+    setTimeout(() => !err ? this.cambiarEstadoSolicitud(solicitud_Id) : undefined, 2500);
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
@@ -546,7 +546,7 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF.push(info);
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => {this.generarPDF(); }, 1000);
+      setTimeout(() => {this.generarPDF(); }, 2000);
     }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
   }
 

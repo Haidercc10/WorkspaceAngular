@@ -3978,7 +3978,8 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
     id: 'formulario',
     title: `<h5 class="tituloRojo" style="margin: auto;">Orden de Compra</h5>`,
     text: `<p>¡Inicialmente para crear una orden de compra debemos elegir quien nos venderá la materia prima, en el campo <b>Proveedor</b> escribimos el nombre y luego lo seleccionamos.
-    <br>El campo de observación es opcional!</p>`
+    <br>El campo de observación es opcional!</p>
+    <p>Si queremos hacer una orden de compra con base en una <b>Solicitud de Materia Prima</b>, podemos <b>llenar el campo 'Num. Solicitud' y presionar enter</b>. Al hacer lo anterior se cargará toda la información de la solicitud y podremos agregar, editar o quitar materias primas.</p>`
   },
   {
     attachTo: {
@@ -4105,6 +4106,20 @@ export const stepsOrdenesCompra: Step.StepOptions[] = [
     id: 'tabla2',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla Materia Prima!</h4>',
     text: `<p>¡Todas las materias primas que hayamos elegido se estarán guardando y mostrando en esta tabla para posteriormente crear la orden de compra!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadTabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cantidadTabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar Cantidad!</h4>',
+    text: `<p>¡Desde la misma tabla <b>podemos editar la cantidad de materia prima que tendrá la orden de compra</b>, esto lo hacemos <b>presionando click sobre la cantidad que vamos a editar y colocar la cantidad correcta</b>!</p>`
   },
   {
     attachTo: {
