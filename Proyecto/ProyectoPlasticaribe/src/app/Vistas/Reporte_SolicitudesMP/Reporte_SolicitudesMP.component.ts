@@ -12,6 +12,7 @@ import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSo
 import { SolicitudMateriaPrimaComponent } from '../Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 
 @Injectable({
   providedIn: 'root'
@@ -33,13 +34,16 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   formFiltros !: FormGroup; /** Formulario de filtros de búsqueda */
   estados : any = []; /** Array que contendrá los estados de las solicitudes */
   arrayRegistros : any = []; /** Array que contendrá la tabla luego de realizar una consulta */
-  @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dt1') dt1: Table | undefined;
   cantPendientes : number = 0; /** Variable que mostrará el número de solicitudes pendientes */
   cantAceptadas : number = 0; /** Variable que mostrará el número de solicitudes aceptadas */
   cantFinalizadas : number = 0; /** Variable que mostrará el número de solicitudes finalizadas */
   cantCanceladas : number = 0; /** Variable que mostrará el número de solicitudes canceladas */
   @ViewChild(SolicitudMateriaPrimaComponent) SolicitudMatPrima : SolicitudMateriaPrimaComponent;
   informacionPDF: any;
+  arrayMatPrimas : any = []; /** Array que cargará las materias primas de la solicitud seleccionada */
+  solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
+  usuarioSolicitante : string = ''
 
 
   constructor(private frmBuilder : FormBuilder,
@@ -132,7 +136,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
-          if(!arrayId.includes(data[index].consecutivo)) {
+          if(!arrayId.includes(data[index].consecutivo) && estado == data[index].estado_Solicitud_Id) {
             this.llenarTabla(data[index]);
             arrayId.push(data[index].consecutivo);
           }
@@ -142,7 +146,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
-          if(!arrayId.includes(data[index].consecutivo)) {
+          if(!arrayId.includes(data[index].consecutivo) && estado == data[index].estado_Solicitud_Id) {
             this.llenarTabla(data[index]);
             arrayId.push(data[index].consecutivo);
           }
@@ -150,6 +154,16 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(solicitud != null && fechaInicial != null && fechaFinal != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
+        tamanoConsulta = data.length;
+        for (let index = 0; index < data.length; index++) {
+          if(!arrayId.includes(data[index].consecutivo)) {
+            this.llenarTabla(data[index]);
+            arrayId.push(data[index].consecutivo);
+          }
+        }
+      });
+    } else if(fechaInicial != null && fechaFinal != null && estado != null) {
+      this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaFinal, estado).subscribe(data => {
         tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
@@ -168,6 +182,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
           }
         }
       });
+
     } else if(solicitud != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         tamanoConsulta = data.length;
@@ -246,14 +261,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   }
 
   aplicarFiltro($event, campo : any, valorCampo : string) {
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
-  /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
+  /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
   llenarTabla(datos : any) {
     let solicitudes : any = {
       id : datos.consecutivo,
-      usuario : datos.usuario,
       fecha : datos.fecha.replace('T00:00:00', ''),
       estado : datos.estado_Solicitud,
     }
@@ -278,6 +292,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   // Funcion que va a consultar los detalles del pdf
   llenarInfoPdf(solicitud_Id : number = 0){
+    solicitud_Id = this.solicitudSeleccionada;
     this.informacionPDF = [];
     this.cargando = true;
     if (solicitud_Id == 0) solicitud_Id = parseInt(this.formFiltros.value.documento);
@@ -481,5 +496,68 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         }
       }
     };
+  }
+
+  /** Cargar detalles de la solicitud en la segunda tabla. */
+  cargarDetalleSolicitud(id : number) {
+    this.arrayMatPrimas = [];
+    this.solicitudSeleccionada = id;
+
+    this.servicioDtSolicitudesMP.GetInfoSolicitud(this.solicitudSeleccionada).subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.llenarTablaDetalles(data[index]);
+      }
+    })
+  }
+
+  /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
+  llenarTablaDetalles(data : any) {
+    let info : any = {
+      Id : 0,
+      Id_Mp: data.mP_Id,
+      Id_Tinta: data.tinta_Id,
+      Id_Bopp: data.bopp_Id,
+      Nombre : '',
+      Cantidad : data.cantidad,
+      Medida : data.unidad_Medida,
+      Estado : data.estado_MP,
+      Usuario : data.usuario
+    }
+    if (info.Id_Mp != 84) {
+      info.Id = info.Id_Mp;
+      info.Nombre = data.mp;
+    } else if (info.Id_Tinta != 2001) {
+      info.Id = info.Id_Tinta;
+      info.Nombre = data.tinta;
+    } else if (info.Id_Bopp != 1) {
+      info.Id = info.Id_Bopp;
+      info.Nombre = data.bopp;
+    }
+    this.usuarioSolicitante = info.Usuario;
+    this.arrayMatPrimas.push(info);
+  }
+
+  mostrarEleccion(solicitud_Id : number) {
+    solicitud_Id = this.solicitudSeleccionada;
+    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea cancelar la solicitud N° ${solicitud_Id}?`, sticky: true});
+  }
+
+  onReject(){
+    this.messageService.clear('eleccion');
+  }
+
+  cancelarSolicitud(solicitud_Id : number) {
+    solicitud_Id = this.solicitudSeleccionada;
+
+    this.servicioSolicitudesMP.Get_Id(solicitud_Id).subscribe(data => {
+      let modelo : modelSolicitudMateriaPrima = {
+        Usua_Id: data.usua_Id,
+        Solicitud_Observacion: data.solicitud_Observacion,
+        Solicitud_Fecha: data.solicitud_Fecha,
+        Solicitud_Hora: data.solicitud_Hora,
+        Estado_Id: 4
+      }
+      console.log(modelo);
+   })
   }
 }

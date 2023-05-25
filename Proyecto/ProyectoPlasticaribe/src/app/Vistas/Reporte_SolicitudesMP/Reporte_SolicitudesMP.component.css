@@ -37,7 +37,7 @@ p-calendar ::ng-deep span button span {
 ::ng-deep .p-card {
   align-items: center;
   margin: auto;
-  width: 90%;
+  width: 95%;
   height: 100%;
   padding: 2%;
   border-radius: 10px;
