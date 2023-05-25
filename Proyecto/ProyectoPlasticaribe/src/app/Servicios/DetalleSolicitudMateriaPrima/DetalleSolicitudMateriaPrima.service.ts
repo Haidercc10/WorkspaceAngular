@@ -18,5 +18,7 @@ constructor(private http : HttpClient) { }
 
   Post = (data : modelDtSolcitudMP) => this.http.post(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima`, data);
 
+  Put = (id : number, data : modelDtSolcitudMP) => this.http.put(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/${id}`, data);
+
   Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/${id}`);
 }

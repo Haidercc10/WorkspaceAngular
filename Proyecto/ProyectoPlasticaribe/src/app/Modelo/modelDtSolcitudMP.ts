@@ -1,4 +1,5 @@
 export interface modelDtSolcitudMP {
+  DtSolicitud_Id? : number;
   Solicitud_Id : number;
   MatPri_Id : number;
   Tinta_Id : number;

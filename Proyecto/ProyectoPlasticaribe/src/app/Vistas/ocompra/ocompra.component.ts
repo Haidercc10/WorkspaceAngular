@@ -14,6 +14,9 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { defaultStepOptions, stepsOrdenesCompra as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
+import { RelacionSolicitud_OrdenCompraService } from 'src/app/Servicios/RelacionSolicitud_OrdenCompra/RelacionSolicitud_OrdenCompra.service';
+import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
 
 @Injectable({
   providedIn: 'root'
@@ -72,10 +75,13 @@ export class OcompraComponent implements OnInit {
                             private servicioTintas : TintasService,
                               private messageService: MessageService,
                                 private boppService : EntradaBOPPService,
-                                  private shepherdService: ShepherdService) {
+                                  private shepherdService: ShepherdService,
+                                    private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
+                                      private relacionSolOcService : RelacionSolicitud_OrdenCompraService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
+      Solicitud : [''],
       Proveedor : ['', Validators.required],
       Id_Proveedor : ['', Validators.required],
       Observacion : [''],
@@ -124,7 +130,6 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que limpiará todos los campos de la vista
   limpiarTodo(){
-    this.edicionOrdenCompra = false;
     this.FormMateriaPrima.reset();
     this.FormOrdenCompra.reset();
     this.materiasPrimasSeleccionada_ID = [];
@@ -253,6 +258,24 @@ export class OcompraComponent implements OnInit {
     this.llave = 'pdf';
   }
 
+  // Funcion que va a calcular la cantidad de materia prima
+  calcularCantMateriaPrima(){
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].Cantidad;
+    }
+    return total;
+  }
+
+  // Funcion que va a calcular el costo de toda la materia prima seleccionada
+  calcularCostoMateriaPrima(){
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].SubTotal
+    }
+    return total;
+  }
+
   // Funcion para llamar el modal que crea proveedores
   LlamarModalCrearProveedor = () => this.ModalCrearProveedor = true;
 
@@ -344,22 +367,66 @@ export class OcompraComponent implements OnInit {
     });
   }
 
+  // Funcion que va a consultar una solicitud de materia prima
+  consultarSolicitudMP(){
+    this.materiasPrimasSeleccionada_ID = [];
+    this.materiasPrimasSeleccionadas = [];
+    let solicitud : number = this.FormOrdenCompra.value.Solicitud;
+    this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        this.FormOrdenCompra.patchValue({ Observacion : data[i].observacion, });
+
+        let info : any = {
+          Id : 0,
+          Id_Mp: data[i].mP_Id,
+          Id_Tinta: data[i].tinta_Id,
+          Id_Bopp: data[i].bopp_Id,
+          Nombre : '',
+          Cantidad : data[i].cantidad,
+          Und_Medida : data[i].unidad_Medida,
+          Precio : 0,
+          SubTotal : 0,
+        }
+        if (info.Id_Mp != 84) {
+          info.Id = info.Id_Mp;
+          info.Nombre = data[i].mp;
+          info.Precio = data[i].precio_MP;
+          info.SubTotal = info.Cantidad * data[i].precio_MP;
+        } else if (info.Id_Tinta != 2001) {
+          info.Id = info.Id_Tinta;
+          info.Nombre = data[i].tinta;
+          info.Precio = data[i].precio_Tinta;
+          info.SubTotal = info.Cantidad * data[i].precio_Tinta;
+        } else if (info.Id_Bopp != 1) {
+          info.Id = info.Id_Bopp;
+          info.Nombre = data[i].bopp;
+          info.Precio = data[i].precio_Bopp;
+          info.SubTotal = info.Cantidad * data[i].precio_Bopp;
+        }
+        this.materiasPrimasSeleccionada_ID.push(info.Id);
+        this.materiasPrimasSeleccionadas.push(info);
+      }
+    }, err => this.mostrarError(`¡Error Solicitud!`, `¡No se encontró ninguna solicitud con el número ${solicitud}!`));
+  }
+
   // Funcion que va a crear la orden de compra
   crearOrdenCompra(){
     this.cargando = false;
+    let solicitud : number = (this.FormOrdenCompra.value.Solicitud).trim();
     let info : any = {
       Usua_Id : this.storage_Id,
       Oc_Fecha : moment().format('YYYY-MM-DD'),
       Oc_Hora : moment().format("H:mm:ss"),
       Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
       Estado_Id : 11,
-      Oc_ValorTotal : this.cantidadTotalPrecio,
-      Oc_PesoTotal : this.catidadTotalPeso,
+      Oc_ValorTotal : this.calcularCostoMateriaPrima(),
+      Oc_PesoTotal : this.calcularCantMateriaPrima(),
       TpDoc_Id : 'OCMP',
       Oc_Observacion : this.FormOrdenCompra.value.Observacion == null ? '' : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
+      if (solicitud != null) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
       this.mostrarEleccion(0, 'pdf')
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
     }, error => {
@@ -391,6 +458,45 @@ export class OcompraComponent implements OnInit {
         this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
+  }
+
+  // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
+  crearRelacionOc_Solicitud(orden : number, solicitud : number){
+    let info : any = {
+      Oc_Id : orden,
+      Solicitud_Id : solicitud,
+    }
+    this.relacionSolOcService.Post(info).subscribe(data => {
+      this.cambiarEstadoMpSolicitud(solicitud);
+    }, err => this.mostrarError(``, ``));
+  }
+
+  // Funcion que va a cambiar el estado de la solicitud
+  cambiarEstadoSolicitud(solicitud : number){
+
+  }
+
+  // Funcion que va a cambiar el estado de las materias primas de la solicitud
+  cambiarEstadoMpSolicitud(solicitud_Id : number) {
+    let err : boolean = false;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      this.dtSolicitudMp.GetMateriaPrimaSolicitud(solicitud_Id, this.materiasPrimasSeleccionadas[i].Id).subscribe(data => {
+        for (let j = 0; j < data.length; j++) {
+          let info : modelDtSolcitudMP = {
+            DtSolicitud_Id : data[j].dtSolicitud_Id,
+            Solicitud_Id: data[j].solicitud_Id,
+            MatPri_Id: data[j].matPri_Id,
+            Tinta_Id: data[j].tinta_Id,
+            Bopp_Id: data[j].bopp_Id,
+            DtSolicitud_Cantidad: data[j].dtSolicitud_Cantidad,
+            UndMed_Id: data[j].undMed_Id,
+            Estado_Id: data[j].dtSolicitud_Cantidad >= this.materiasPrimasSeleccionadas[i].Cantidad ? 5 : 12,
+          }
+          this.dtSolicitudMp.Put(data[j].dtSolicitud_Id, info).subscribe(datosOrden => {}, error => err = true);
+        }
+      });
+    }
+    setTimeout(() => err ? this.cambiarEstadoSolicitud(solicitud_Id) : undefined, 1500);
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
@@ -772,8 +878,8 @@ export class OcompraComponent implements OnInit {
             Oc_Hora : datos_Orden.oc_Hora,
             Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
             Estado_Id : datos_Orden.estado_Id,
-            Oc_ValorTotal : this.cantidadTotalPrecio,
-            Oc_PesoTotal : this.catidadTotalPeso,
+            Oc_ValorTotal : this.calcularCostoMateriaPrima(),
+            Oc_PesoTotal : this.calcularCantMateriaPrima(),
             TpDoc_Id : 'OCMP',
             Oc_Observacion : (observacion).toUpperCase(),
           }
@@ -807,6 +913,22 @@ export class OcompraComponent implements OnInit {
             this.cargando = false;
             error = true;
           });
+        } else {
+          let info : any = {
+            Doc_Codigo: datos_orden[0],
+            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
+            MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
+            Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
+            BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
+            Doc_CantidadPedida : this.materiasPrimasSeleccionadas[i].Cantidad,
+            UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
+            Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
+          }
+          this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(datos_dtOrden => { error = false; }, error => {
+            this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
+            this.cargando = false;
+            error = true;
+          });
         }
       });
     }
@@ -815,13 +937,13 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life : 2000});
 
   /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life : 5000});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(item : any, modo : string){

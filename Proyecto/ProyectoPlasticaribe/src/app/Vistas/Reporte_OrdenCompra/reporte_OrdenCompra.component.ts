@@ -504,7 +504,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.EditarOrdenCompra.informacionPDF = [];
       this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
-          this.EditarOrdenCompra.FormOrdenCompra.setValue({
+          this.EditarOrdenCompra.FormOrdenCompra.patchValue({
             ConsecutivoOrden : numeroOrden,
             Proveedor : datos_orden[i].proveedor,
             Id_Proveedor : datos_orden[i].proveedor_Id,

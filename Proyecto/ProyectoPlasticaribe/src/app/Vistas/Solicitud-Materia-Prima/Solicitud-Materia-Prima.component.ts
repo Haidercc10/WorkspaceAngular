@@ -138,13 +138,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   }
 
   // Funcion que va a cargar las unidades de medida
-  obtenerUnidadesMedida(){
-    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => {
-      for (let i = 0; i < datos_undMedida.length; i++) {
-        this.unidadesMedida.push(datos_undMedida[i].undMed_Id);
-      }
-    });
-  }
+  obtenerUnidadesMedida = () => this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => this.unidadesMedida = datos_undMedida);
 
   // Funcion que va a consultar la materia prima
   obtenerMateriaPrima(){
@@ -366,7 +360,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
           Estado_Id: 11
         }
-        this.dtSolicitudService.Post(info).subscribe(data => {
+        this.dtSolicitudService.Post(info).subscribe(datos => {
           this.mensajeSatisfactorio(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`);
         }, error => err = true);
       });
@@ -410,7 +404,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => this.crearPDF(solicitud_Id), 1000);
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitu con el Número ${solicitud_Id}!`));
+    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitud con el Número ${solicitud_Id}!`));
   }
 
   // Funcion que va a crear un pdf de la solicitud creada o editada
@@ -529,7 +523,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitu con el Número ${solicitud_Id}!`));
+    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitud con el Número ${solicitud_Id}!`));
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

@@ -48,7 +48,7 @@
       <div class="row g-4">
 
         <!-- Consecutivo de la orden de compra -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText required/>
@@ -56,8 +56,17 @@
           </span>
         </div>
 
+        <!-- Código de solicitus -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Solicitud" id="Solicitud" type="text" (keyup.enter)="consultarSolicitudMP()" pInputText/>
+            <label for="Solicitud">Num. Solicitud</label>
+          </span>
+        </div>
+
         <!-- Proveedor -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Proveedor" id="Proveedores" autocomplete="off" list="Proveedor" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" required/>
@@ -69,7 +78,7 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-7">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
           <span class="p-float-label">
             <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -181,10 +190,19 @@
           <tr>
             <td>{{materiasPrimas.Id}}</td>
             <td>{{materiasPrimas.Nombre}}</td>
-            <td>{{materiasPrimas.Cantidad | number}}</td>
+            <td [pEditableColumn]="materiasPrimas.Cantidad" pEditableColumnField="price" class="cursor">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="number" [(ngModel)]="materiasPrimas.Cantidad" />
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ materiasPrimas.Cantidad | number : '1.2-2' }}
+                </ng-template>
+              </p-cellEditor>
+          </td>
             <td>{{materiasPrimas.Und_Medida}}</td>
-            <td>{{materiasPrimas.Precio | number}}</td>
-            <td>{{materiasPrimas.SubTotal | number}}</td>
+            <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td>
+            <td>{{materiasPrimas.SubTotal | currency : 'COP $'}}</td>
             <td id="quitarMp">
               <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
               <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
@@ -194,10 +212,10 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="2" class="text-right">Totales</td>
-            <td>{{catidadTotalPeso | number}}</td>
+            <td>{{calcularCantMateriaPrima() | number : '1.2-2'}}</td>
             <td>Kg</td>
             <td></td>
-            <td colspan="2" class="text-left">{{cantidadTotalPrecio | number}}</td>
+            <td colspan="2" class="text-left">{{calcularCostoMateriaPrima() | currency : 'COP $'}}</td>
           </tr>
         </ng-template>
       </p-table>
