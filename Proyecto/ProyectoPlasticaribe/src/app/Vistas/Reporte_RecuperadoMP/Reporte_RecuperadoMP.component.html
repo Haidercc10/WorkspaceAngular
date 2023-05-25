@@ -105,7 +105,9 @@
         styleClass="p-datatable-gridlines p-datatable-sm"
         [rowHover]="true"
         dataKey="id"
-        responsiveLayout="scroll">
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns">{{col.header}}</th>

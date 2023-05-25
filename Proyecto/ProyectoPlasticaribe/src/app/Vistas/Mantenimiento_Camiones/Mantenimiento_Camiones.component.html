@@ -101,7 +101,9 @@
       [rowHover]="true"
       [rowsPerPageOptions]="[10, 20, 30, 50, 100, 120, 150]"
       responsiveLayout="scroll"
-      currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+      currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+      [scrollable]="true"
+      scrollHeight="50rem">
       <ng-template pTemplate="header">
         <tr>
           <th scope="col">Consecutivo</th>

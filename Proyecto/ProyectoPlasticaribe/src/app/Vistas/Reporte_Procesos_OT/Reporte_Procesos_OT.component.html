@@ -186,10 +186,12 @@
           [rows]="30"
           [showCurrentPageReport]="true"
           currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length]"
           [rowHover]="true"
           dataKey="ot"
-          selectionMode="single">
+          selectionMode="single"
+          [scrollable]="true"
+          scrollHeight="50rem">
 
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>

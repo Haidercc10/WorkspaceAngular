@@ -100,7 +100,9 @@
         [paginator]="true"
         [rows]="20"
         [rowHover]="true"
-        [value]="registrosConsultados">
+        [value]="registrosConsultados"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="caption">
           <div class="flex">
             <button pButton label="Limpiar" id="limpiarFiltros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>

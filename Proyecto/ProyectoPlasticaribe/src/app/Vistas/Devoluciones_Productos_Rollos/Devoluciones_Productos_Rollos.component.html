@@ -70,7 +70,9 @@
           [rowsPerPageOptions]="[10,25,50]"
           [rowHover]="true"
           dataKey="Id"
-          [(selection)]="rollosSeleccionados">
+          [(selection)]="rollosSeleccionados"
+          [scrollable]="true"
+          scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">ID Rollo</th>
@@ -124,7 +126,9 @@
         [rowsPerPageOptions]="[10,25,50]"
         [rowHover]="true"
         dataKey="Id"
-        [(selection)]="rollosDisponibles">
+        [(selection)]="rollosDisponibles"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">ID Rollo</th>

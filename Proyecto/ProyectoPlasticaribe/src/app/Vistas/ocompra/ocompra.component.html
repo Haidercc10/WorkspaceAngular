@@ -183,6 +183,8 @@
             <th scope="col">Und. Medida</th>
             <th scope="col">Precio Unitario</th>
             <th scope="col">Subtotal</th>
+            <th scope="col">IVA 19%</th>
+            <th scope="col">Valor Total</th>
             <th scope="col">Acción</th>
           </tr>
         </ng-template>
@@ -199,11 +201,13 @@
                   {{ materiasPrimas.Cantidad | number : '1.2-2' }}
                 </ng-template>
               </p-cellEditor>
-          </td>
+            </td>
             <td>{{materiasPrimas.Und_Medida}}</td>
             <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td>
             <td>{{materiasPrimas.SubTotal | currency : 'COP $'}}</td>
-            <td id="quitarMp">
+            <td>{{(materiasPrimas.SubTotal * .19) | currency : 'COP $'}}</td>
+            <td>{{materiasPrimas.SubTotal + (materiasPrimas.SubTotal * .19) | currency : 'COP $'}}</td>
+            <td id="quitarMp" class="text-center">
               <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
               <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
             </td>
@@ -215,7 +219,9 @@
             <td>{{calcularCantMateriaPrima() | number : '1.2-2'}}</td>
             <td>Kg</td>
             <td></td>
-            <td colspan="2" class="text-left">{{calcularCostoMateriaPrima() | currency : 'COP $'}}</td>
+            <td class="text-left">{{calcularCostoMateriaPrima() | currency : 'COP $'}}</td>
+            <td class="text-left">{{calcularIVAMateriaPrima() | currency : 'COP $'}}</td>
+            <td colspan="2" class="text-left">{{calcularCostoTotalMateriaPrima() | currency : 'COP $'}}</td>
           </tr>
         </ng-template>
       </p-table>

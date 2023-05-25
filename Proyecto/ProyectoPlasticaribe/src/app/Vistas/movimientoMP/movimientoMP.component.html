@@ -107,7 +107,9 @@
         [rowHover]="true"
         [rowsPerPageOptions]="[10,20,30,40,50]"
         [value]="movimientosPolietilenos"
-        *ngIf="!cargando">
+        *ngIf="!cargando"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr id="filtros">
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro1($event, 'Codigo', 'contains')"></th>
@@ -164,7 +166,9 @@
         [rowHover]="true"
         [rowsPerPageOptions]="[10,20,30,40,50]"
         [value]="movimientosTintas"
-        *ngIf="!cargando">
+        *ngIf="!cargando"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Codigo', 'contains')"></th>
@@ -214,7 +218,9 @@
         [rowHover]="true"
         [rowsPerPageOptions]="[10,20,30,40,50]"
         [value]="movimientosBiorientados"
-        *ngIf="!cargando">
+        *ngIf="!cargando"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro3($event, 'Codigo', 'contains')"></th>

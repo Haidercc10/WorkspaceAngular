@@ -133,7 +133,9 @@
             currentPageReportTemplate="Mostrando de {first} al {last} de {totalRecords} Movimientos"
             [rowsPerPageOptions]="[10,25,50,100,movimientosConsultados.length]"
             [rowHover]="true"
-            dataKey="Id">
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
           <ng-template pTemplate="caption">
             <div class="flex">
               <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>

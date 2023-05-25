@@ -112,7 +112,9 @@
             currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords}"
             [rowsPerPageOptions]="[10,25,50,100,ArrayDocumento.length]"
             [rowHover]="true"
-            dataKey="Id">
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">Código Documento

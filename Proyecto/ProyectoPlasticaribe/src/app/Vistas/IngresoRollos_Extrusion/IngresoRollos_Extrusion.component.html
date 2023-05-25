@@ -127,7 +127,9 @@
           [rowsPerPageOptions]="[10,25,50]"
           [rowHover]="true"
           dataKey="Id"
-          [(selection)]="rollosInsertar">
+          [(selection)]="rollosInsertar"
+          [scrollable]="true"
+          scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">OT</th>
@@ -194,7 +196,9 @@
         [rowHover]="true"
         [value]="rollosInsertar"
         dataKey="Id"
-        [(selection)]="rollos">
+        [(selection)]="rollos"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">OT</th>
@@ -249,7 +253,9 @@
         [paginator]="true"
         [rows]="20"
         [rowHover]="true"
-        [value]="grupoProductos">
+        [value]="grupoProductos"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">OT</th>

@@ -118,7 +118,9 @@
                 [rowsPerPageOptions]="[10,20,30,50,70,100]"
                 [rowHover]="true"
                 [value]="registrosConsultados"
-                dataKey="Oc">
+                dataKey="Oc"
+                [scrollable]="true"
+                scrollHeight="50rem">
                 <ng-template pTemplate="header">
                   <tr>
                     <th scope="col" style="text-align: center;">Código

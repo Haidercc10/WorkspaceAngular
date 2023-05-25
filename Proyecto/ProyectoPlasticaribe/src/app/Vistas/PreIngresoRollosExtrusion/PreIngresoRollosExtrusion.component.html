@@ -108,7 +108,9 @@
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
       [(selection)]="rollosSeleccionados"
       dataKey="Rollo"
-      [showCurrentPageReport]="true">
+      [showCurrentPageReport]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
       <ng-template pTemplate="header">
         <tr>
           <th scope="col">OT</th>
@@ -158,7 +160,9 @@
       [rowsPerPageOptions]="[10,25,50,rollosSeleccionados.length]"
       responsiveLayout="scroll"
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-      [showCurrentPageReport]="true">
+      [showCurrentPageReport]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
       <ng-template pTemplate="header">
         <tr>
           <th scope="col">OT</th>
@@ -207,7 +211,9 @@
       [rowsPerPageOptions]="[10,25,50]"
       responsiveLayout="scroll"
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-      [showCurrentPageReport]="true">
+      [showCurrentPageReport]="true"
+      [scrollable]="true"
+      scrollHeight="50rem">
       <ng-template pTemplate="header">
         <tr>
           <th scope="col">ID Producto</th>

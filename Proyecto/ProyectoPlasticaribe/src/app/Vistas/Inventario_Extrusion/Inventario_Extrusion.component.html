@@ -50,7 +50,9 @@
           currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
           [rowsPerPageOptions]="[10,25,50,100,ArrayRollos.length]"
           [rowHover]="true"
-          dataKey="Id">
+          dataKey="Id"
+          [scrollable]="true"
+          scrollHeight="50rem">
         <ng-template pTemplate="caption">
           <div class="flex">
             <button pButton label="Limpiar Filtros" id="limpiarFiltros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
@@ -111,7 +113,9 @@
           currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
           [rowsPerPageOptions]="[10,25,50,ArrayInfoOrden.length]"
           [rowHover]="true"
-          dataKey="Id">
+          dataKey="Id"
+          [scrollable]="true"
+          scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr>
               <th scope="col" pSortableColumn="Rollo">Rollo

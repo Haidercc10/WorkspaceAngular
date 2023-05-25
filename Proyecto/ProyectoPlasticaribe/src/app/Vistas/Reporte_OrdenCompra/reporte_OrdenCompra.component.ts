@@ -419,19 +419,45 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     '',
                     {
                       border: [true, false, true, true],
-                      text: `Valor Total`
+                      text: `Subtotal`
                     },
                     {
                       border: [false, false, true, true],
                       text: `$${this.formatonumeros(datos_orden[i].valor_Total)}`
                     },
                   ],
+                  [
+                    '',
+                    '',
+                    '',
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `IVA 19%`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_orden[i].valor_Total * 0.19)}`
+                    },
+                  ],
+                  [
+                    '',
+                    '',
+                    '',
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `Valor Total`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19))}`
+                    },
+                  ],
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
-              fontSize: 9,
+              layout: { defaultBorder: false, },
+              fontSize: 8,
             },
             {
               text: `\n \nObservación sobre la Orden: \n ${datos_orden[i].observacion}\n`,

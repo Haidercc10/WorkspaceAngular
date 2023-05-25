@@ -65,7 +65,9 @@
                 [rows]="ArrayMateriaPrima.length"
                 [rowsPerPageOptions]="[10,25,50,100,ArrayMateriaPrima.length]"
                 [rowHover]="true"
-                dataKey="Id">
+                dataKey="Id"
+                [scrollable]="true"
+                scrollHeight="50rem">
               <ng-template pTemplate="header" >
                 <tr class="font-size-16" id="filtros">
                   <th></th>
@@ -178,7 +180,9 @@
                 currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
                 [rowsPerPageOptions]="[10,25,50,100,polietilenos.length]"
                 [rowHover]="true"
-                dataKey="Id">
+                dataKey="Id"
+                [scrollable]="true"
+                scrollHeight="50rem">
               <ng-template pTemplate="header">
                 <tr class="font-size-16">
                   <th></th>
@@ -291,7 +295,9 @@
                 currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
                 [rowsPerPageOptions]="[10,25,50,100,tintas.length]"
                 [rowHover]="true"
-                dataKey="Id">
+                dataKey="Id"
+                [scrollable]="true"
+                scrollHeight="50rem">
               <ng-template pTemplate="header">
                 <tr class="font-size-16">
                   <th></th>
@@ -403,7 +409,9 @@
                 currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
                 [rowsPerPageOptions]="[10,25,50,100,biorientados.length]"
                 [rowHover]="true"
-                dataKey="Id">
+                dataKey="Id"
+                [scrollable]="true"
+                scrollHeight="50rem">
               <ng-template pTemplate="header">
                 <tr class="font-size-16">
                   <th></th>

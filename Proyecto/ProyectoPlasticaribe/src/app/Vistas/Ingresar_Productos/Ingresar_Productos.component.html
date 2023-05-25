@@ -121,7 +121,9 @@
           [rowsPerPageOptions]="[10,25,50]"
           [rowHover]="true"
           dataKey="Id"
-          [(selection)]="rollosInsertar">
+          [(selection)]="rollosInsertar"
+          [scrollable]="true"
+          scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">OT</th>
@@ -191,7 +193,9 @@
           [rowsPerPageOptions]="[10,25,50]"
           [rowHover]="true"
           dataKey="Id"
-          [(selection)]="rollos">
+          [(selection)]="rollos"
+          [scrollable]="true"
+          scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">OT</th>
@@ -246,7 +250,9 @@
     columnResizeMode="expand"
     responsiveLayout="scroll"
     [rowHover]="true"
-    *ngIf="!cargando">
+    *ngIf="!cargando"
+    [scrollable]="true"
+    scrollHeight="50rem">
     <ng-template pTemplate="header">
       <tr>
         <th>#</th>

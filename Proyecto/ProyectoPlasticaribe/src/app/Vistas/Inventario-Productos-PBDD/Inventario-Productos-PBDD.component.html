@@ -38,6 +38,8 @@
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[10,20,30,50,70,100,ArrayProductosBDNueva.length]"
       [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem"
       [globalFilterFields]="['Item','NombreItem','Stock']"
       currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" >
       <ng-template pTemplate="caption">

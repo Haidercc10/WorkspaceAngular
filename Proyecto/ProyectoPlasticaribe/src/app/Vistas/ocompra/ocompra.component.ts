@@ -272,6 +272,24 @@ export class OcompraComponent implements OnInit {
     return total;
   }
 
+  // Funcion que va a calcular el costo de toda la materia prima seleccionada
+  calcularIVAMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].SubTotal * 0.19;
+    }
+    return total;
+  }
+
+  // Funcion que va a calcular el costo de toda la materia prima seleccionada
+  calcularCostoTotalMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].SubTotal + (this.materiasPrimasSeleccionadas[i].SubTotal * 0.19);
+    }
+    return total;
+  }
+
   // Funcion para llamar el modal que crea proveedores
   LlamarModalCrearProveedor = () => this.ModalCrearProveedor = true;
 
@@ -556,13 +574,8 @@ export class OcompraComponent implements OnInit {
     this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Orden de Compra N° ${datos_orden[i].consecutivo}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Orden de Compra N° ${datos_orden[i].consecutivo}` },
+          pageSize: { width: 630, height: 760 },
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -577,17 +590,8 @@ export class OcompraComponent implements OnInit {
           content : [
             {
               columns: [
-                {
-                  image : logoParaPdf,
-                  width : 220,
-                  height : 50
-                },
-                {
-                  text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 30
-                }
+                { image : logoParaPdf, width : 220, height : 50 },
+                { text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`, alignment: 'right', style: 'titulo', margin: 30 }
               ]
             },
             '\n \n',
@@ -717,18 +721,44 @@ export class OcompraComponent implements OnInit {
                     '',
                     {
                       border: [true, false, true, true],
-                      text: `Valor Total`
+                      text: `Subtotal`
                     },
                     {
                       border: [false, false, true, true],
                       text: `$${this.formatonumeros(datos_orden[i].valor_Total)}`
                     },
                   ],
+                  [
+                    '',
+                    '',
+                    '',
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `IVA 19%`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_orden[i].valor_Total * 0.19)}`
+                    },
+                  ],
+                  [
+                    '',
+                    '',
+                    '',
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `Valor Total`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19))}`
+                    },
+                  ],
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 8,
             },
             {
@@ -737,14 +767,8 @@ export class OcompraComponent implements OnInit {
             }
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);

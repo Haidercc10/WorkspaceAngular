@@ -106,7 +106,9 @@
       [rowHover]="true"
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[5, 10, 15, 20]"
-      currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+      currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+      [scrollable]="true"
+      scrollHeight="50rem">
       <ng-template pTemplate="header">
         <tr title="Filtros para realizar busquedas de cada campo" id="filtros">
           <th style="width: 10%;">
@@ -173,7 +175,9 @@
           [value]="arrayModal"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[5, 10, 15, 20]"
-        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [scrollable]="true"
+          scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr title="Filtros para realizar busquedas de cada campo">
               <th>

@@ -121,7 +121,9 @@
           currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
           [rowsPerPageOptions]="[10,20,30,50,70,100]"
           [rowHover]="true"
-          dataKey="id">
+          dataKey="id"
+          [scrollable]="true"
+          scrollHeight="50rem">
           <!-- Buscador de columnas -->
           <ng-template pTemplate="caption">
             <p-multiSelect

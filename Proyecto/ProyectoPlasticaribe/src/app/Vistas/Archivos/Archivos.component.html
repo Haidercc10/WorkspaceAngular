@@ -76,7 +76,9 @@
         styleClass="p-datatable-sm"
         responsiveLayout="scroll"
         [rowHover]="true"
-        dataKey="id">
+        dataKey="id"
+        [scrollable]="true"
+        scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr class="font-size-13">
             <th scope="col" style="width: 65%" pResizableColumn><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
