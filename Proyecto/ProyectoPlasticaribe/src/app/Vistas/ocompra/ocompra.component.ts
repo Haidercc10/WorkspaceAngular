@@ -17,6 +17,8 @@ import { ShepherdService } from 'angular-shepherd';
 import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
 import { RelacionSolicitud_OrdenCompraService } from 'src/app/Servicios/RelacionSolicitud_OrdenCompra/RelacionSolicitud_OrdenCompra.service';
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
+import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
+import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 
 @Injectable({
   providedIn: 'root'
@@ -76,8 +78,9 @@ export class OcompraComponent implements OnInit {
                               private messageService: MessageService,
                                 private boppService : EntradaBOPPService,
                                   private shepherdService: ShepherdService,
-                                    private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
-                                      private relacionSolOcService : RelacionSolicitud_OrdenCompraService,) {
+                                    private solicitudMpService : SolicitudMateriaPrimaService,
+                                      private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
+                                        private relacionSolOcService : RelacionSolicitud_OrdenCompraService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -244,34 +247,27 @@ export class OcompraComponent implements OnInit {
   quitarMateriaPrima(data : any){
     data = this.mpSeleccionada;
     this.onReject();
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-        this.materiasPrimasSeleccionadas.splice(i, 1);
-        this.catidadTotalPeso -= data.Cantidad;
-        this.cantidadTotalPrecio -= data.SubTotal;
-        for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-          if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-        }
-        this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
-      }
-    }
+    this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
+    this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == data.Id), 1);
+    this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
     this.llave = 'pdf';
   }
 
   // Funcion que va a calcular la cantidad de materia prima
-  calcularCantMateriaPrima(){
+  calcularCantMateriaPrima() : number{
     let total : number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       total += this.materiasPrimasSeleccionadas[i].Cantidad;
+      this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
     }
     return total;
   }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularCostoMateriaPrima(){
+  calcularCostoMateriaPrima() : number{
     let total : number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      total += this.materiasPrimasSeleccionadas[i].SubTotal
+      total += this.materiasPrimasSeleccionadas[i].SubTotal;
     }
     return total;
   }
@@ -323,15 +319,12 @@ export class OcompraComponent implements OnInit {
         this.consecutivoOrdenCompra = 0;
         this.informacionPDF = [];
         for (let i = 0; i < datos_orden.length; i++) {
-          this.FormOrdenCompra.setValue({
+          this.FormOrdenCompra.patchValue({
             ConsecutivoOrden : ordenCompra,
             Proveedor : datos_orden[i].proveedor,
             Id_Proveedor : datos_orden[i].proveedor_Id,
             Observacion : datos_orden[i].observacion,
           });
-          break;
-        }
-        for (let i = 0; i < datos_orden.length; i++) {
           let info : any = {
             Id : 0,
             Id_Mp: datos_orden[i].mP_Id,
@@ -462,18 +455,35 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
   crearRelacionOc_Solicitud(orden : number, solicitud : number){
-    let info : any = {
-      Oc_Id : orden,
-      Solicitud_Id : solicitud,
-    }
+    let info : any = { Oc_Id : orden, Solicitud_Id : solicitud, }
     this.relacionSolOcService.Post(info).subscribe(data => {
       this.cambiarEstadoMpSolicitud(solicitud);
-    }, err => this.mostrarError(``, ``));
+    }, err => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
   }
 
-  // Funcion que va a cambiar el estado de la solicitud
+  // Funcion que va a cambiar el estado de la solicitud. Posiciones Array => 0 : Pendiente, 1 : Parciales, 2 : Totales, 3 : Cantidad de Materias Primas
   cambiarEstadoSolicitud(solicitud : number){
-
+    this.solicitudMpService.Get_Id(solicitud).subscribe(datos_Sol => {
+      let info : modelSolicitudMateriaPrima = {
+        Solicitud_Id : datos_Sol.solicitud_Id,
+        Usua_Id: datos_Sol.usua_Id,
+        Solicitud_Observacion: datos_Sol.solicitud_Observacion,
+        Solicitud_Fecha: datos_Sol.solicitud_Fecha,
+        Solicitud_Hora: datos_Sol.solicitud_Hora,
+        Estado_Id: 0,
+      }
+      this.dtSolicitudMp.GetEstadosMateriasPrimas(solicitud).subscribe(data => {
+        if ((data[1] > 0 && data[1] == data[3]) || (data[2] > 0 && data[2] < data[3])) {
+          info.Estado_Id = 12;
+          this.solicitudMpService.Put(solicitud, info).subscribe(datos_Act => {
+          }, error => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+        } else if (data[2] > 0 && data[2] == data[3]) {
+          info.Estado_Id = 5;
+          this.solicitudMpService.Put(solicitud, info).subscribe(datos_Act => {
+          }, error => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+        }
+      });
+    });
   }
 
   // Funcion que va a cambiar el estado de las materias primas de la solicitud
@@ -490,7 +500,7 @@ export class OcompraComponent implements OnInit {
             Bopp_Id: data[j].bopp_Id,
             DtSolicitud_Cantidad: data[j].dtSolicitud_Cantidad,
             UndMed_Id: data[j].undMed_Id,
-            Estado_Id: data[j].dtSolicitud_Cantidad >= this.materiasPrimasSeleccionadas[i].Cantidad ? 5 : 12,
+            Estado_Id: this.materiasPrimasSeleccionadas[i].Cantidad >= data[j].dtSolicitud_Cantidad ? 5 : 12,
           }
           this.dtSolicitudMp.Put(data[j].dtSolicitud_Id, info).subscribe(datosOrden => {}, error => err = true);
         }
