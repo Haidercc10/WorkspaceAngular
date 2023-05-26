@@ -47,7 +47,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
   usuarioSolicitante : string = ''
   modalOc : boolean = false;
-
+  cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
+  estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -98,7 +99,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   obtenerEstados(){
     this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 11 || datos_estados[i].estado_Id == 5 || datos_estados[i].estado_Id == 4 || datos_estados[i].estado_Id == 26) this.estados.push(datos_estados[i]);
+        if (datos_estados[i].estado_Id == 11 || datos_estados[i].estado_Id == 5 || datos_estados[i].estado_Id == 4 || datos_estados[i].estado_Id == 26 || datos_estados[i].estado_Id == 12) this.estados.push(datos_estados[i]);
       }
     });
   }
@@ -116,6 +117,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         if(data[index].estado_Id == 26) this.cantAceptadas += 1;
         if(data[index].estado_Id == 5) this.cantFinalizadas += 1;
         if(data[index].estado_Id == 4) this.cantCanceladas += 1;
+        if(data[index].estado_Id == 12) this.cantParciales += 1;
       }
     });
   }
@@ -275,7 +277,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       estado : datos.estado_Solicitud,
     }
     this.arrayRegistros.push(solicitudes);
-    console.log(this.arrayRegistros);
   }
 
    /** Mostrar mensaje de confirmación  */
@@ -437,6 +438,12 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
               alignment: 'left',
               style: 'header',
             },
+            '\n',
+            {
+              text: `Estado Solicitud: ${data[i].estado_Solicitud}\n`,
+              alignment: 'left',
+              style: 'header',
+            },
             '\n \n',
             {
               text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
@@ -526,7 +533,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       Cantidad : data.cantidad,
       Medida : data.unidad_Medida,
       Estado : data.estado_MP,
-      Usuario : data.usuario
+      Usuario : data.usuario,
+      EstadoSolicitud : data.estado_Solicitud,
     }
     if (info.Id_Mp != 84) {
       info.Id = info.Id_Mp;
@@ -538,21 +546,32 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       info.Id = info.Id_Bopp;
       info.Nombre = data.bopp;
     }
+
+    this.estadoSolicitud = info.EstadoSolicitud;
     this.usuarioSolicitante = info.Usuario;
     this.arrayMatPrimas.push(info);
   }
 
+  /** Mostrar mensaje de confirmación al momento de presionar el botón de cancelar solicitud. */
   mostrarEleccion(solicitud_Id : number) {
     solicitud_Id = this.solicitudSeleccionada;
-    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea cancelar la solicitud N° ${solicitud_Id}?`, sticky: true});
+
+    if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
+      this.mostrarAdvertencia(`Advertencia`, `No es posible cancelar solicitudes con estado ${this.estadoSolicitud}!`)
+    } else {
+      this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea cancelar la solicitud N° ${solicitud_Id}?`, sticky: true});
+    }
   }
 
+  /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */
   onReject(){
     this.messageService.clear('eleccion');
   }
 
+  /** Función que cancelará una solicitud de materia prima y sus detalles. */
   cancelarSolicitud(solicitud_Id : number) {
     this.onReject();
+    this.cargando = true;
     solicitud_Id = this.solicitudSeleccionada;
 
     this.servicioSolicitudesMP.Get_Id(solicitud_Id).subscribe(data => {
@@ -564,44 +583,62 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         Solicitud_Hora: data.solicitud_Hora,
         Estado_Id: 4
       }
-      console.log(modelo)
-      console.log('----------')
       this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => {
         this.cancelarDtlSolicitud();
       },error => this.mostrarError(`No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
    });
   }
 
+  /** Función que servirá para cancelar los detalles de la solicitud, excepto los que sean diferentes de pendientes */
   cancelarDtlSolicitud(){
+    let error : boolean = false;
     for (let i = 0; i < this.arrayMatPrimas.length; i++) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(this.arrayMatPrimas[i].Solicitud).subscribe(dataDtSolicitud => {
-        let modelo : modelDtSolcitudMP = {
-          DtSolicitud_Id : this.arrayMatPrimas[i].Codigo,
-          Solicitud_Id: this.arrayMatPrimas[i].Solicitud,
-          MatPri_Id: this.arrayMatPrimas[i].Id_Mp,
-          Tinta_Id: this.arrayMatPrimas[i].Id_Tinta,
-          Bopp_Id: this.arrayMatPrimas[i].Id_Bopp,
-          DtSolicitud_Cantidad: this.arrayMatPrimas[i].Cantidad,
-          UndMed_Id: this.arrayMatPrimas[i].Medida,
-          Estado_Id: 4
+        if(this.arrayMatPrimas[i].Estado != 'Finalizado') {
+          let modelo : modelDtSolcitudMP = {
+            DtSolicitud_Id : this.arrayMatPrimas[i].Codigo,
+            Solicitud_Id: this.arrayMatPrimas[i].Solicitud,
+            MatPri_Id: this.arrayMatPrimas[i].Id_Mp,
+            Tinta_Id: this.arrayMatPrimas[i].Id_Tinta,
+            Bopp_Id: this.arrayMatPrimas[i].Id_Bopp,
+            DtSolicitud_Cantidad: this.arrayMatPrimas[i].Cantidad,
+            UndMed_Id: this.arrayMatPrimas[i].Medida,
+            Estado_Id: 4
+          }
+          this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => {
+            error = false;
+          },error => {
+            this.mostrarError(`No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
+            error = true;
+          });
         }
-        console.log(modelo);
-        this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => {
-          this.mostrarConfirmacion(`Confirmación`, `Solicitud cancelada exitosamente!`);
-          this.getEstadoSolitudes();
-        },error => this.mostrarError(`No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`));
       });
+    }
+    if(!error) {
+      setTimeout(() => {
+        this.cargando = false;
+        this.mostrarConfirmacion(`Confirmación`, `Solicitud cancelada exitosamente!`);
+        this.getEstadoSolitudes();
+        this.consultarFiltros();
+        this.cargarDetalleSolicitud(this.arrayMatPrimas[0].Solicitud);
+      }, 1000);
     }
   }
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearOrden(){
-    this.modalOc = true;
-    this.OrdenCompra.solicitud = true;
+    if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado' || this.estadoSolicitud == 'Parcial' || this.estadoSolicitud == 'Aceptado') {
+      this.mostrarAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes con estado ${this.estadoSolicitud}!`)
+    } else {
+      this.modalOc = true;
+      this.OrdenCompra.solicitud = true;
 
-    this.OrdenCompra.FormOrdenCompra.patchValue({
-      Solicitud : this.solicitudSeleccionada
-    });
-    this.OrdenCompra.consultarSolicitudMP();
+      this.OrdenCompra.FormOrdenCompra.patchValue({
+        Solicitud : this.solicitudSeleccionada
+      });
+      this.OrdenCompra.consultarSolicitudMP();
+    }
+
+
   }
 }

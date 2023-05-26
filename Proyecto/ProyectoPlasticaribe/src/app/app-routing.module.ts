@@ -104,7 +104,7 @@ export const routes: Routes = [
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_OrdenCompraComponent},
   {path: 'solicitud-materia-prima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: SolicitudMateriaPrimaComponent},
-  {path: 'reporte-solicitudes-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,13]}, component: Reporte_SolicitudesMPComponent},
+  {path: 'reporte-solicitudes-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,13]}, component: Reporte_SolicitudesMPComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos

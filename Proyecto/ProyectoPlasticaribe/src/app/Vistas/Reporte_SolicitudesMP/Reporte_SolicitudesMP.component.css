@@ -63,3 +63,24 @@ p-chip ::ng-deep .p-chip-text {
   height: 30px;
   text-decoration: none;
 }
+
+#rojo ::ng-deep .p-chip {
+  background-color: palevioletred;
+  color : white;
+}
+
+#amarillo ::ng-deep .p-chip {
+  background-color: rgb(255, 246, 152);
+}
+
+#azul ::ng-deep .p-chip {
+  background-color: paleturquoise;
+}
+
+#verde ::ng-deep .p-chip {
+  background-color: palegreen;
+}
+
+#naranja ::ng-deep .p-chip {
+  background-color: rgb(255, 211, 101);
+}

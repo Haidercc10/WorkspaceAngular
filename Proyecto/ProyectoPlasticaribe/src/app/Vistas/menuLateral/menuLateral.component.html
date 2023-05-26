@@ -691,7 +691,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 60">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 13 ||  ValidarRol == 60">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -782,7 +782,17 @@
                 Reporte Rollos Eliminados
               </a>
             </div>
+         </ng-container>
+            <!-- Reporte de rollos eliminados -->
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
+            <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+                Reporte Solicitud Mat. Prima
+              </a>
+            </div>
           </ng-container>
+
           <div class="mb-2 sangria">
             <hr>
           </div>
