@@ -33,27 +33,22 @@
 
   <div class="mb-3">
     <div class="row g-3" id="fila">
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-3 justify-content-center">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
           <p-chip id="rojo" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}"></p-chip>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2 justify-content-center">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
           <p-chip id="naranja" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}"></p-chip>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2 justify-content-center">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="amarillo" icon="pi pi-check" label="Aceptadas {{cantAceptadas}}"></p-chip>
+          <p-chip id="amarillo" icon="pi pi-spinner" label="Parciales {{cantParciales}}"></p-chip>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-2 justify-content-center">
-        <div class="mb-3">
-          <p-chip id="azul" icon="pi pi-spinner" label="Parciales {{cantParciales}}"></p-chip>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-3 justify-content-center">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
           <p-chip id="verde" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}"></p-chip>
         </div>
@@ -230,8 +225,9 @@
         <ng-template #habilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" >
-              <button pButton class="p-button-danger" type="button" label="Crear orden de compra" (click)="cargarModalCrearOrden()" icon="pi pi-check-square"></button>
-              <button pButton class="p-button-secondary" type="button" label="Cancelar Solicitud" (click)="mostrarEleccion(0)" icon="pi pi-ban"></button>
+              <button pButton class="p-button-danger" type="button" label="Crear OC" pTooltip="Crear orden de compra de materia prima" (click)="cargarModalCrearOrden()" icon="pi pi-check-square"></button>
+              <button pButton class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban"></button>
+              <button pButton class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" (click)="mostrarEleccion(0, 'finalizar')" icon="pi pi-check"></button>
               <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="llenarInfoPdf(0)" pTooltip="Ver PDF"></button>
             </div>
           </div>
@@ -239,8 +235,9 @@
         <ng-template #inhabilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" #inhabilitar>
-              <button pButton [disabled]="true" class="p-button-danger" type="button" label="Crear orden de compra" icon="pi pi-check-square"></button>
-              <button pButton [disabled]="true" class="p-button-secondary" type="button" label="Cancelar Solicitud" icon="pi pi-ban"></button>
+              <button pButton [disabled]="true" class="p-button-danger" type="button" pTooltip="Crear orden de compra de materia prima" label="Crear OC" icon="pi pi-check-square"></button>
+              <button pButton [disabled]="true" class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban"></button>
+              <button pButton [disabled]="true" class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" icon="pi pi-check"></button>
               <button pButton *ngIf="arrayMatPrimas.length > 0" class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="llenarInfoPdf(0)" label="Ver PDF" pTooltip="Ver solicitud en formato PDF"></button>
             </div>
           </div>
@@ -254,7 +251,7 @@
   <app_ocompra_component></app_ocompra_component>
 </p-dialog>
 
-<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
+<p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-idSolicitud>
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
@@ -264,7 +261,8 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="cancelarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="clave == 'cancelar'" pButton (click)="cancelarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="clave == 'finalizar'" pButton (click)="cancelarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-database" label="No" class="p-button-secondary"></button>
