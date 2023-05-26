@@ -421,11 +421,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que nu cliente y guardará su id y mostrará en el campo el nombre
-  selectEventCliente() {
-    let cliente = this.formularioOT.value.cliente;
-    let nuevo: any[] = this.clientes.filter((item) => item.cli_Id == cliente)
-    this.formularioOT.patchValue({ cliente : nuevo[0].cli_Nombre, });
-  }
+  selectEventCliente = () => this.formularioOT.patchValue({ cliente : this.clientes.filter((item) => item.cli_Id == this.formularioOT.value.cliente)[0].cli_Nombre, });
 
   // Funcion que traerá los vendedores
   obtenerVendedores(){
@@ -440,8 +436,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va a llenar y buscar el campos vendedor
   buscarVendedor(){
-    let vendedor : any = this.formularioOT.value.Vendedor;
-    let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == vendedor);
+    let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == this.formularioOT.value.Vendedor);
     this.formularioOT.patchValue({ Vendedor : nuevo[0].usua_Nombre, Id_Vendedor : nuevo[0].usua_Id, });
   }
 
@@ -451,10 +446,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   //Funcion que consultará los estados para ordenes de trabajo
   obtenerEstados(){
     this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].tpEstado_Id == 4 || datos_estados[i].estado_Id == 3) this.estados.push(datos_estados[i]);
-        this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
-      }
+      this.estados = datos_estados.filter((item) => item.tpEstado_Id == 4 || item.estado_Id == 3);
+      this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
     })
   }
 

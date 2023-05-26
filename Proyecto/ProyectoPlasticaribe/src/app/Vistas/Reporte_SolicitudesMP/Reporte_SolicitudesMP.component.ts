@@ -96,10 +96,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
   obtenerEstados(){
-    this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 11 || datos_estados[i].estado_Id == 5 || datos_estados[i].estado_Id == 4 || datos_estados[i].estado_Id == 26 || datos_estados[i].estado_Id == 12) this.estados.push(datos_estados[i]);
-      }
+    this.servicioEstados.srvObtenerListaEstados().subscribe(data => {
+      this.estados = data.filter((item) => item.estado_Id == 11 || item.estado_Id == 5 || item.estado_Id == 4 || item.estado_Id == 26 || item.estado_Id == 12);
     });
   }
 
@@ -129,7 +127,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.formFiltros.value.estadoDoc;
-    let tamanoConsulta : number = 0;
     let arrayId : any = [];
 
     if (fechaInicial == 'Invalid date') fechaInicial = null;
@@ -138,7 +135,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
     if(solicitud != null && estado != null && fechaInicial != null && fechaFinal != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo) && estado == data[index].estado_Solicitud_Id) {
             this.llenarTabla(data[index]);
@@ -148,7 +144,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(solicitud != null && fechaInicial != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo) && estado == data[index].estado_Solicitud_Id) {
             this.llenarTabla(data[index]);
@@ -158,7 +153,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(solicitud != null && fechaInicial != null && fechaFinal != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -168,7 +162,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(fechaInicial != null && fechaFinal != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaFinal, estado).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -178,7 +171,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(solicitud != null && fechaInicial != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -189,14 +181,12 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
     } else if(solicitud != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           this.llenarTabla(data[index]);
         }
       });
     } else if(fechaInicial != null && fechaFinal != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaFinal).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -206,7 +196,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(fechaInicial != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaInicial, estado).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -216,7 +205,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(solicitud != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -226,7 +214,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(estado != null) {
       this.servicioSolicitudesMP.getEstados(estado).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -236,7 +223,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else if(fechaInicial != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaInicial).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -246,7 +232,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       });
     } else {
       this.servicioSolicitudesMP.getFechas(this.today, this.today).subscribe(data => {
-        tamanoConsulta = data.length;
         for (let index = 0; index < data.length; index++) {
           if(!arrayId.includes(data[index].consecutivo)) {
             this.llenarTabla(data[index]);
@@ -255,43 +240,32 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         }
       });
     }
-    console.log(tamanoConsulta);
-    setTimeout(() => { this.cargando = false; }, 1500);
-  }
-
-  /** Función para limpiar los campos del formulario */
-  limpiarCampos() {
-    this.formFiltros.reset();
-  }
-
-  aplicarFiltro($event, campo : any, valorCampo : string) {
-    this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => this.cargando = false, 1500);
   }
 
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
-  llenarTabla(datos : any) {
-    let solicitudes : any = {
+  llenarTabla(datos : any){
+    let info : any = {
       id : datos.consecutivo,
       fecha : datos.fecha.replace('T00:00:00', ''),
       estado : datos.estado_Solicitud,
     }
-    this.arrayRegistros.push(solicitudes);
+    this.arrayRegistros.push(info);
   }
+
+  /** Función para limpiar los campos del formulario */
+  limpiarCampos = () => this.formFiltros.reset();
+
+  aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje, detail: titulo, life : 3000});
-  }
+  mostrarConfirmacion = (titulo : any, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 3000});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo , life : 5000});
-  }
+  mostrarError = (titulo : any, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail:  mensaje, life : 5000});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo , life : 4000});
-  }
+  mostrarAdvertencia = (titulo : any, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 4000});
 
   // Funcion que va a consultar los detalles del pdf
   llenarInfoPdf(solicitud_Id : number = 0){
@@ -511,7 +485,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   cargarDetalleSolicitud(id : number) {
     this.arrayMatPrimas = [];
     this.solicitudSeleccionada = id;
-
     this.servicioDtSolicitudesMP.GetInfoSolicitud(this.solicitudSeleccionada).subscribe(data => {
       for (let index = 0; index < data.length; index++) {
         this.llenarTablaDetalles(data[index]);
@@ -545,7 +518,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       info.Id = info.Id_Bopp;
       info.Nombre = data.bopp;
     }
-
     this.estadoSolicitud = info.EstadoSolicitud;
     this.usuarioSolicitante = info.Usuario;
     this.arrayMatPrimas.push(info);
@@ -555,23 +527,14 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   mostrarEleccion(solicitud_Id : number, palabraClave : string) {
     solicitud_Id = this.solicitudSeleccionada;
     this.clave = palabraClave;
-
     setTimeout(() => {
-      if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
-        console.log(1)
-        this.mostrarAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
-      } else {
-        console.log(2)
-        this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, sticky: true});
-      }
+      if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.mostrarAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
+      else this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, sticky: true});
     }, 1000);
-
   }
 
   /** Quitar el mensaje que sale luego de presionar si o no, en el mensaje de cancelar solicitud. */
-  onReject(){
-    this.messageService.clear(this.clave);
-  }
+  onReject = () => this.messageService.clear(this.clave);
 
   /** Función que cancelará una solicitud de materia prima y sus detalles. */
   cancelarFinalizarSolicitud(solicitud_Id : number) {
@@ -588,9 +551,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         Solicitud_Hora: data.solicitud_Hora,
         Estado_Id: this.clave == 'finalizar' ? 5 : 4
       }
-      this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => {
-        this.cancelarFinalizarDtlSolicitud();
-      },error => this.mostrarError(`No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
+      this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => this.cancelarFinalizarDtlSolicitud(),
+      error => this.mostrarError(`¡Error!`, `No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
    });
   }
 
@@ -598,51 +560,44 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   cancelarFinalizarDtlSolicitud(){
     let error : boolean = false;
     for (let i = 0; i < this.arrayMatPrimas.length; i++) {
-      this.servicioDtSolicitudesMP.GetInfoSolicitud(this.arrayMatPrimas[i].Solicitud).subscribe(dataDtSolicitud => {
-          let modelo : modelDtSolcitudMP = {
-            DtSolicitud_Id : this.arrayMatPrimas[i].Codigo,
-            Solicitud_Id: this.arrayMatPrimas[i].Solicitud,
-            MatPri_Id: this.arrayMatPrimas[i].Id_Mp,
-            Tinta_Id: this.arrayMatPrimas[i].Id_Tinta,
-            Bopp_Id: this.arrayMatPrimas[i].Id_Bopp,
-            DtSolicitud_Cantidad: this.arrayMatPrimas[i].Cantidad,
-            UndMed_Id: this.arrayMatPrimas[i].Medida,
-            Estado_Id: this.arrayMatPrimas[i].Estado
-          }
-          if(this.arrayMatPrimas[i].Estado == 'Finalizado') {
-          } else if(this.arrayMatPrimas[i].Estado == 'Parcial') {
-            modelo.Estado_Id = 5
-            this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => {
-              error = false;
-            },error => {
-              this.mostrarError(`No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
-              error = true;
-            });
-          } else if(this.arrayMatPrimas[i].Estado == 'Pendiente') {
-            modelo.Estado_Id = 4
-            this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => {
-              error = false;
-            },error => {
-              this.mostrarError(`No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
-              error = true;
-            });
-          }
-      });
+      let modelo : modelDtSolcitudMP = {
+        DtSolicitud_Id : this.arrayMatPrimas[i].Codigo,
+        Solicitud_Id: this.arrayMatPrimas[i].Solicitud,
+        MatPri_Id: this.arrayMatPrimas[i].Id_Mp,
+        Tinta_Id: this.arrayMatPrimas[i].Id_Tinta,
+        Bopp_Id: this.arrayMatPrimas[i].Id_Bopp,
+        DtSolicitud_Cantidad: this.arrayMatPrimas[i].Cantidad,
+        UndMed_Id: this.arrayMatPrimas[i].Medida,
+        Estado_Id: this.arrayMatPrimas[i].Estado
+      }
+      if(this.arrayMatPrimas[i].Estado == 'Parcial') {
+        modelo.Estado_Id = 5
+        this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData =>  error = false, err => {
+          this.mostrarError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
+          error = true;
+        });
+      } else if(this.arrayMatPrimas[i].Estado == 'Pendiente') {
+        modelo.Estado_Id = 4
+        this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => error = false, err => {
+          this.mostrarError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
+          error = true;
+        });
+      }
     }
-    if(!error) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if(!error) {
         this.cargando = false;
         this.mostrarConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
-      }, 1000);
-    }
+      }
+    }, 1000);
   }
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearOrden(){
     if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado' || this.estadoSolicitud == 'Parcial') {
-      this.mostrarAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`)
+      this.mostrarAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalOc = true;
       this.OrdenCompra.solicitud = true;
@@ -660,5 +615,4 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     this.estadoSolicitud = '';
     this.clave = '';
   }
-
 }

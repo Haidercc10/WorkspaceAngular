@@ -291,100 +291,53 @@ export class ReporteCostosOTComponent implements OnInit {
     this.diferenciaPorcentaje = 0;
     const cant : any = {
       Ot : ot,
-      Ext : Math.round(this.cantidadTotalExt),
-      Imp : Math.round(this.cantidadTotalImp),
-      Rot : Math.round(this.cantidadTotalRot),
-      Dbld : Math.round(this.cantidadTotalDbl),
-      Lam : Math.round(this.cantidadTotalLaminado),
-      Emp : Math.round(this.cantidadTotalEmpaque),
-      Corte : Math.round(this.cantidadTotalCorte),
+      Ext : this.cantidadTotalExt,
+      Imp : this.cantidadTotalImp,
+      Rot : this.cantidadTotalRot,
+      Dbld : this.cantidadTotalDbl,
+      Lam : this.cantidadTotalLaminado,
+      Emp : this.cantidadTotalEmpaque,
+      Corte : this.cantidadTotalCorte,
       Sel : `${this.formatonumeros(Math.round(this.cantidadTotalSella))} KG - ${this.formatonumeros(Math.round(this.cantidadSellandoUnidad))} Und`,
       Wik : `${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))} KG - ${this.formatonumeros(Math.round(this.cantidadWiketiadoUnidad))} Und`,
     }
     this.ArrayProcesos.push(cant);
     for (const item of this.ArrayProcesos) {
-      let Sellado = item.Sel;
-      let SelladoNuevo = Sellado.indexOf(" KG");
-      let SelladoFinal = Sellado.substring(0, SelladoNuevo);
-      let wiketiado = item.Wik;
-      let wiketiadoNuevo = wiketiado.indexOf(" KG");
-      let wiketiadoFinal = wiketiado.substring(0, wiketiadoNuevo);
+      let Sellado = item.Sel.replace('KG', '');
+      let wiketiado = item.Wik.replace('KG', '');
 
-      if (SelladoFinal == 0 && item.Emp != 0 && wiketiadoFinal == 0) {
+      if (Sellado == 0 && item.Emp != 0 && wiketiado == 0) {
         this.bagProServices.srvObtenerListaProcExtOt_fechaFinal(ot).subscribe(datos_extrusion => {
-          let empaque : any = [];
-          empaque.push(datos_extrusion)
-          for (const item of empaque) {
-            let FechaDatetime = item.fecha;
-            let FechaCreacionNueva = FechaDatetime.indexOf("T");
-            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-            this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.patchValue({
-              ot : ot,
-              fechaFinOT : this.fechaFinalOT,
-            });
-          }
+          this.fechaFinalOT = datos_extrusion.fecha.replace('T00:00:00', '');
+          this.infoOT.patchValue({ ot : ot, fechaFinOT : this.fechaFinalOT, });
         });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Emp * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo' || this.presentacionProducto == 'Paquete') this.valorFinalOT = item.Emp * this.valorUnitarioProdUnd;
-      } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal == 0) {
+      } else if (Sellado != 0 && item.Emp == 0 && wiketiado == 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
-          let sellado : any = [];
-          sellado.push(datos_sellado)
-          for (const itemSel of sellado) {
-            let FechaDatetime = itemSel.fechaEntrada;
-            let FechaCreacionNueva = FechaDatetime.indexOf("T");
-            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-            this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.patchValue({
-              ot : ot,
-              fechaFinOT : this.fechaFinalOT,
-            });
-            break;
-          }
+          this.fechaFinalOT = datos_sellado.fechaEntrada.replace('T00:00:00', '');
+          this.infoOT.patchValue({ ot : ot, fechaFinOT : this.fechaFinalOT, });
         });
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = SelladoFinal * this.valorUnitarioProdKg;
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = Sellado * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = this.cantidadSellandoUnidad * this.valorUnitarioProdUnd;
-      } else if (SelladoFinal == 0 && item.Emp == 0 && wiketiadoFinal != 0) {
+      } else if (Sellado == 0 && item.Emp == 0 && wiketiado != 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
-          let sellado : any = [];
-          sellado.push(datos_sellado)
-          for (const item of sellado) {
-            let FechaDatetime = item.fechaEntrada;
-            let FechaCreacionNueva = FechaDatetime.indexOf("T");
-            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-            this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.patchValue({
-              ot : ot,
-              fechaFinOT : this.fechaFinalOT,
-            });
-            break;
-          }
+          this.fechaFinalOT = datos_sellado.fechaEntrada.replace('T00:00:00', '');
+          this.infoOT.patchValue({ ot : ot, fechaFinOT : this.fechaFinalOT, });
         });
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = wiketiadoFinal * this.valorUnitarioProdKg;
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = wiketiado * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd;
-      } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal != 0) {
+      } else if (Sellado != 0 && item.Emp == 0 && wiketiado != 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
-          let sellado : any = [];
-          sellado.push(datos_sellado)
-          for (const itemOT of sellado) {
-            let FechaDatetime = itemOT.fechaEntrada;
-            let FechaCreacionNueva = FechaDatetime.indexOf("T");
-            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-            this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.patchValue({
-              ot : ot,
-              fechaFinOT :fechaCreacionFinal,
-            });
-            break;
-          }
+          this.fechaFinalOT = datos_sellado.fechaEntrada.replace('T00:00:00', '');
+          this.infoOT.patchValue({ ot : ot, fechaFinOT : this.fechaFinalOT, });
         });
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = (wiketiadoFinal * this.valorUnitarioProdKg) + (SelladoFinal * this.valorUnitarioProdKg);
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = (wiketiado * this.valorUnitarioProdKg) + (Sellado * this.valorUnitarioProdKg);
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = (this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd) + (this.cantidadSellandoUnidad * this.valorUnitarioProdUnd);
       }
     }
     this.diferencia = this.valorFinalOT - this.ValorMPEntregada;
-    Math.round((this.diferenciaPorcentaje) = (this.diferencia / this.valorFinalOT) * 100);
+    this.diferenciaPorcentaje = (this.diferencia / this.valorFinalOT) * 100;
     this.load = true;
   }
 
