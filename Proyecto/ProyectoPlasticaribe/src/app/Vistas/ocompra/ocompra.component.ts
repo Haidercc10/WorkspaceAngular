@@ -424,7 +424,7 @@ export class OcompraComponent implements OnInit {
   // Funcion que va a crear la orden de compra
   crearOrdenCompra(){
     this.cargando = false;
-    let solicitud : number = (this.FormOrdenCompra.value.Solicitud).trim();
+    let solicitud : number = this.FormOrdenCompra.value.Solicitud;
     let info : any = {
       Usua_Id : this.storage_Id,
       Oc_Fecha : moment().format('YYYY-MM-DD'),

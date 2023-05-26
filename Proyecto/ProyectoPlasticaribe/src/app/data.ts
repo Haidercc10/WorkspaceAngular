@@ -7578,7 +7578,7 @@ export const stepsReportesProcesosOT : Step.StepOptions[] = [
   },
   {
     attachTo: {
-      element: '#columnas',
+      element: '#columnasSeleccionables',
       on: 'bottom'
     },
     buttons: [
@@ -7587,9 +7587,24 @@ export const stepsReportesProcesosOT : Step.StepOptions[] = [
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
-    id: 'columnas',
+    id: 'columnasSeleccionables',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Columnas Disponibles!</h4>',
     text: `<p>¡Si desplegamos esta lista veremos que hay columnas que podemos añadir a la tabla para mayor información, simplemente seleccionamos la tabla que queremos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarEstados',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarEstados',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar Estados!</h4>',
+    text: `<p>¡Tenemos la opción de cambiar los estados de manera masiva, es decir, a varias ordenes al mismo tiempo. Podemos hacerlo seleccionando las ordenes a las que le queremos cambiar el estado y presionamos este botón, al presionarlo se abrirá un modal en el que podemos elegir el estado que tendrán las ordenes que elegimos!</p>`
   },
   {
     attachTo: {
@@ -7623,6 +7638,22 @@ export const stepsReportesProcesosOT : Step.StepOptions[] = [
   },
   {
     attachTo: {
+      element: '#elegirTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'elegirTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Ordenes de Trabajo!</h4>',
+    text: `<p>¡Podemos elegir todas las ordenes de trabajo que tenemos en el tabla presionando este check en la fila de las columnas!</p>
+           <p>¡Podemos elegir solo una o unas de las ordenes de trabajo de la tabla presionando el check que se encuentra al lado izquierdo de los numeros de las ordenes de trabajo!</p>`
+  },
+  {
+    attachTo: {
       element: '#ordenTrabajo',
       on: 'bottom'
     },
@@ -7649,7 +7680,7 @@ export const stepsReportesProcesosOT : Step.StepOptions[] = [
     classes: 'card',
     id: 'procesos',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Procesos!</h4>',
-    text: `<p>¡Cuando alguno de los procesos tenga cantidades pesadas podemos presionar click sobre el procesos y veremos de manera detallada los rollos que pertenecen a la orden de trabajo!</p>`
+    text: `<p>¡Cuando alguno de los procesos tenga cantidades pesadas podemos presionar click sobre el proceso y veremos de manera detallada los rollos que pertenecen a la orden de trabajo!</p>`
   },
   {
     attachTo: {

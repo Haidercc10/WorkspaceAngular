@@ -67,6 +67,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   infoColor : string = ''; /** Variable que servirá para mostrar la descripción de cada color */
   @ViewChild('op') op: OverlayPanel | undefined;
+  ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -1225,87 +1226,97 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
   }
 
-  // Sirve para abrir el modal en el que se editará el estado de la orden de trabajo
-  editProduct(dato) {
-    this.otInfo = {...dato};
-    this.otSeleccionada = dato.ot;
+  // Funcion que va abrir el modal donde se podrá editar el estado de las ordenes de trabajo
+  abrirModalCambioEstado(dato? : any){
+    if (dato != null) {
+      this.ordenesSeleccionadas = [dato];
+      this.otInfo = {...dato.ot};
+      this.otSeleccionada = dato.ot;
+      if (dato.est == 'Terminada') this.estadoModal = '17';
+      else if (dato.est == 'En proceso') this.estadoModal = '16';
+      else if (dato.est == 'Asignada') this.estadoModal = '14';
+      else if (dato.est == 'Abierta') this.estadoModal = '15';
+      else if (dato.est == 'Anulado') this.estadoModal = '3';
+      else if (dato.est == 'Cerrada') this.estadoModal = '18';
+    }
     this.modalEstadosOT = true;
-    if (dato.est == 'Terminada') this.estadoModal = '17';
-    else if (dato.est == 'En proceso') this.estadoModal = '16';
-    else if (dato.est == 'Asignada') this.estadoModal = '14';
-    else if (dato.est == 'Abierta') this.estadoModal = '15';
-    else if (dato.est == 'Anulado') this.estadoModal = '3';
-    else if (dato.est == 'Cerrada') this.estadoModal = '18';
   }
 
-  // Cambia el estado de la orden de trabajo en la nueva base de datos
-  cambiarEstado() {
-    this.estadosProcesos_OTService.srvObtenerListaPorOT(this.otInfo.ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        let info : any = {
-          EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
-          EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
-          EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
-          EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
-          EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
-          EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
-          EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
-          EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
-          EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
-          EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
-          EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
-          EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
-          EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
-          EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
-          EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
-          UndMed_Id : datos_ot[i].undMed_Id,
-          Estado_Id : this.estadoModal,
-          Falla_Id : datos_ot[i].falla_Id,
-          EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
-          EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
-          EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
-          Usua_Id : datos_ot[i].usua_Id,
-          EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
-          EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
-          EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
-          EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
-          EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
-          EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
-          Cli_Id : datos_ot[i].cli_Id,
-          Prod_Id : datos_ot[i].prod_Id,
-          EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
-          EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
+  // Funcion que va a validar que una orden de trabajo esrá siendo eitada. Si validará si se está cambiando el estado por medio del botón con el lapiz o por medio de la selección de una o varias ot
+  cambirEstadoOT() {
+    for (let i = 0; i < this.ordenesSeleccionadas.length; i++){
+      this.estadosProcesos_OTService.srvObtenerListaPorOT(this.ordenesSeleccionadas[i].ot).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          let info : any = {
+            EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
+            EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
+            EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
+            EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
+            EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
+            EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg,
+            EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+            EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
+            EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
+            EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
+            EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+            EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+            EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+            EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
+            EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
+            UndMed_Id : datos_ot[i].undMed_Id,
+            Estado_Id : this.estadoModal,
+            Falla_Id : datos_ot[i].falla_Id,
+            EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
+            EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
+            EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+            Usua_Id : datos_ot[i].usua_Id,
+            EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
+            EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
+            EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
+            EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
+            EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
+            EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
+            Cli_Id : datos_ot[i].cli_Id,
+            Prod_Id : datos_ot[i].prod_Id,
+            EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
+            EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
+          }
+          this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+            this.cambiarEstadoOTBagpro();
+            this.modalEstadosOT = false;
+          });
         }
-        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-          this.consultarOT();
-          this.cambiarEstadoBagPro();
-          this.modalEstadosOT = false;
-        });
-      }
-    });
+      });
+    }
+    setTimeout(() => {
+      this.ordenesSeleccionadas = [];
+      this.consultarOT();
+    }, 2500);
   }
 
-  // Camvia el estado de una orden de trabajo en la base de datos de bagpro
-  cambiarEstadoBagPro(){
+  // Funcion que va a cambiar el estado de las ordenes de trabajo en la base de datos de bagpro
+  cambiarEstadoOTBagpro(){
     let estado = this.estadoModal;
     let estadoFinal : any = '';
     if (estado == 18) estadoFinal = '1'; //Cerrada
     if (estado != 18 && estado != 3) estadoFinal = '0'; //Abierta
     if (estado == 3) estadoFinal = '4'; //Anulada
-    this.servicioBagPro.srvObtenerListaClienteOT_Item(this.otInfo.ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        const data : any = {
-          item : this.otInfo.ot,
-          clienteNom : datos_ot[i].clienteNom,
-          clienteItemsNom : datos_ot[i].clienteItemsNom,
-          usrCrea : datos_ot[i].usrCrea,
-          estado : estadoFinal,
+    for (let i = 0; i < this.ordenesSeleccionadas.length; i++) {
+      this.servicioBagPro.srvObtenerListaClienteOT_Item(this.ordenesSeleccionadas[i].ot).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          const data : any = {
+            item : this.ordenesSeleccionadas[i].ot,
+            clienteNom : datos_ot[i].clienteNom,
+            clienteItemsNom : datos_ot[i].clienteItemsNom,
+            usrCrea : datos_ot[i].usrCrea,
+            estado : estadoFinal,
+          }
+          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(datos_clientesOT => {
+            this.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
+          });
         }
-        this.servicioBagPro.srvActualizar(this.otInfo.ot, data, estadoFinal).subscribe(datos_clientesOT => {
-          this.mensajeConfirmacion(`¡Orden de Trabajo N°${this.otInfo.ot} Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
-        });
-      }
-    });
+      });
+    }
   }
 
   // cierra el modal de cambio de estado de ordenes de trabajo
