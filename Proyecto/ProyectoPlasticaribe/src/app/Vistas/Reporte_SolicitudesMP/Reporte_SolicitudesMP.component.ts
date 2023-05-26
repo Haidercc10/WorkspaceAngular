@@ -632,7 +632,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     if(!error) {
       setTimeout(() => {
         this.cargando = false;
-        this.mostrarConfirmacion(`Confirmación`, `Solicitud cancelada exitosamente!`);
+        this.mostrarConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
         this.cargarDetalleSolicitud(this.arrayMatPrimas[0].Solicitud);
