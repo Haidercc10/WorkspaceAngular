@@ -71,16 +71,21 @@ p-chip ::ng-deep .p-chip-text {
 
 #amarillo ::ng-deep .p-chip {
   background-color: rgb(255, 246, 152);
+  color : #495057;
 }
 
 #azul ::ng-deep .p-chip {
   background-color: paleturquoise;
+  color : #495057;
+
 }
 
 #verde ::ng-deep .p-chip {
   background-color: palegreen;
+  color : #495057;
 }
 
 #naranja ::ng-deep .p-chip {
   background-color: rgb(255, 211, 101);
+  color : #495057;
 }

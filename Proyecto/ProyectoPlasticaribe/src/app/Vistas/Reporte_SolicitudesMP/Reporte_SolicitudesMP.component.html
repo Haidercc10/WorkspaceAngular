@@ -261,8 +261,8 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" *ngIf="clave == 'cancelar'" pButton (click)="cancelarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-          <button type="button" *ngIf="clave == 'finalizar'" pButton (click)="cancelarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="clave == 'cancelar'" pButton (click)="cancelarFinalizarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="clave == 'finalizar'" pButton (click)="cancelarFinalizarSolicitud(idSolicitud)" icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-database" label="No" class="p-button-secondary"></button>

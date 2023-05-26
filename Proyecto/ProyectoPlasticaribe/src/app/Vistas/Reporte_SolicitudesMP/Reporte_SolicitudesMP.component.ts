@@ -9,7 +9,6 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Table } from 'primeng/table';
 import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
 import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
-import { SolicitudMateriaPrimaComponent } from '../Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
@@ -125,6 +124,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   consultarFiltros(){
     this.cargando = true;
     this.arrayRegistros = [];
+    this.arrayMatPrimas = [];
     let solicitud : number = this.formFiltros.value.documento;
     let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
@@ -280,7 +280,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
    /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje, detail: titulo, life : 2000});
+   this.messageService.add({severity: 'success', summary: mensaje, detail: titulo, life : 3000});
   }
 
   /** Mostrar mensaje de error  */
@@ -290,7 +290,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo , life : 2000});
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo , life : 4000});
   }
 
   // Funcion que va a consultar los detalles del pdf
@@ -574,7 +574,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   }
 
   /** Función que cancelará una solicitud de materia prima y sus detalles. */
-  cancelarSolicitud(solicitud_Id : number) {
+  cancelarFinalizarSolicitud(solicitud_Id : number) {
     this.onReject();
     this.cargando = true;
     solicitud_Id = this.solicitudSeleccionada;
@@ -589,13 +589,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         Estado_Id: this.clave == 'finalizar' ? 5 : 4
       }
       this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => {
-        this.cancelarDtlSolicitud();
+        this.cancelarFinalizarDtlSolicitud();
       },error => this.mostrarError(`No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
    });
   }
 
   /** Función que servirá para cancelar los detalles de la solicitud, excepto los que sean diferentes de pendientes */
-  cancelarDtlSolicitud(){
+  cancelarFinalizarDtlSolicitud(){
     let error : boolean = false;
     for (let i = 0; i < this.arrayMatPrimas.length; i++) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(this.arrayMatPrimas[i].Solicitud).subscribe(dataDtSolicitud => {
@@ -635,7 +635,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         this.mostrarConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
-        this.cargarDetalleSolicitud(this.arrayMatPrimas[0].Solicitud);
       }, 1000);
     }
   }
@@ -650,6 +649,16 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       this.OrdenCompra.FormOrdenCompra.patchValue({Solicitud : this.solicitudSeleccionada});
       this.OrdenCompra.consultarSolicitudMP();
     }
+  }
+
+  limpiarTodo(){
+    this.formFiltros.reset();
+    this.arrayRegistros = [];
+    this.arrayMatPrimas = [];
+    this.solicitudSeleccionada = 0;
+    this.usuarioSolicitante = '';
+    this.estadoSolicitud = '';
+    this.clave = '';
   }
 
 }
