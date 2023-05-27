@@ -1,6 +1,6 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { stepsMovMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { stepsMovSolicitudesMP as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -96,8 +96,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
   obtenerEstados(){
-    this.servicioEstados.srvObtenerListaEstados().subscribe(data => {
-      this.estados = data.filter((item) => item.estado_Id == 11 || item.estado_Id == 5 || item.estado_Id == 4 || item.estado_Id == 26 || item.estado_Id == 12);
+    this.servicioEstados.srvObtenerListaEstados().subscribe(datos_estados => {
+      this.estados = datos_estados.filter(item => item.estado_Id == 11 || item.estado_Id == 5 || item.estado_Id == 4 || item.estado_Id == 12);
     });
   }
 
@@ -141,7 +141,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -150,7 +150,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null && fechaFinal != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -159,7 +159,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && fechaFinal != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaFinal, estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -168,7 +168,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -177,14 +177,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
-
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
           this.llenarTabla(data[index]);
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && fechaFinal != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaFinal).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -193,7 +192,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaInicial, estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -202,7 +201,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -211,7 +210,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(estado != null) {
       this.servicioSolicitudesMP.getEstados(estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -220,7 +219,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaInicial).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -229,7 +228,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else {
       this.servicioSolicitudesMP.getFechas(this.today, this.today).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -238,9 +237,9 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      });
+      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     }
-    setTimeout(() => this.cargando = false, 1500);
+    setTimeout(() => { this.cargando = false; }, 1500);
   }
 
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
@@ -256,6 +255,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Función para limpiar los campos del formulario */
   limpiarCampos = () => this.formFiltros.reset();
 
+  /** Función para filtrar los registros de la tabla */
   aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
    /** Mostrar mensaje de confirmación  */
@@ -483,8 +483,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   /** Cargar detalles de la solicitud en la segunda tabla. */
   cargarDetalleSolicitud(id : number) {
-    this.arrayMatPrimas = [];
     this.solicitudSeleccionada = id;
+    this.arrayMatPrimas = [];
     this.servicioDtSolicitudesMP.GetInfoSolicitud(this.solicitudSeleccionada).subscribe(data => {
       for (let index = 0; index < data.length; index++) {
         this.llenarTablaDetalles(data[index]);
@@ -528,7 +528,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     solicitud_Id = this.solicitudSeleccionada;
     this.clave = palabraClave;
     setTimeout(() => {
-      if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.mostrarAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
+      if (this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.mostrarAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
       else this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, sticky: true});
     }, 1000);
   }
@@ -604,6 +604,12 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       this.OrdenCompra.FormOrdenCompra.patchValue({Solicitud : this.solicitudSeleccionada});
       this.OrdenCompra.consultarSolicitudMP();
     }
+  }
+
+  /** Consultar solicitudes por estado. */
+  consultarPorEstado(estado : number){
+    this.OrdenCompra.FormOrdenCompra.patchValue({estadoDoc : estado});
+    this.consultarFiltros();
   }
 
   limpiarTodo(){

@@ -11,7 +11,7 @@
 <div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
-    <div class="mb-4 Titulo">
+    <div class="mb-4 Titulo" id="movimientos">
       <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Solicitudes de Mat. Prima</h2>
     </div>
     <div class="mb-4">
@@ -35,22 +35,22 @@
     <div class="row g-3" id="fila">
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="rojo" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}"></p-chip>
+          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="naranja" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}"></p-chip>
+          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="amarillo" icon="pi pi-spinner" label="Parciales {{cantParciales}}"></p-chip>
+          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h" label="Parciales {{cantParciales}}"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="verde" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}"></p-chip>
+          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}"></p-chip>
         </div>
       </div>
     </div>
@@ -66,8 +66,8 @@
   </div>
 
    <!-- Formulario para consultar filtros -->
-  <form [formGroup]="formFiltros">
-    <div class="mb-4" id="">
+   <form [formGroup]="formFiltros">
+    <div class="mb-4" id="formulario1">
       <div class="row g-3 justify-content-md-center">
 
         <!-- Documento -->
@@ -108,7 +108,7 @@
 
   <!-- Botones -->
   <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
       <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
@@ -132,7 +132,7 @@
           <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-list"></i> <b> Registros consultados</b></h4>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive" id="tabla1">
           <p-table
             [tableStyle]="{ 'min-width': '45%' }"
             #dt1
@@ -160,7 +160,7 @@
                 <th>N° Solicitud</th>
                 <th>Fecha</th>
                 <th>Estado</th>
-                <th>Ver detalle</th>
+                <th id="detalle">Ver detalle</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-registros>
@@ -176,9 +176,9 @@
       </div>
 
       <!--Detalles-->
-      <div class="col-md-6 px-4">
+      <div class="col-md-6 px-4" id="matprimas">
         <div class="mb-5 text-center">
-          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-table"></i> <b> Solicitud N° {{solicitudSeleccionada}}</b></h4>
+          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="font-size-20"><i class="pi pi-table"></i> <b> Detalles de la solicitud N° {{solicitudSeleccionada}}</b></h4>
         </div>
 
         <div class="table-responsive mb-4">
@@ -193,12 +193,12 @@
             [scrollable]="true"
             scrollHeight="500px">
             <ng-template pTemplate="caption">
-              <div class="flex align-items-center justify-content-between" style="margin: 2% 0 0 0;">
+              <div class="flex align-items-center justify-content-between" style="margin: 2% 0 0 0;" id="usuario">
                 <p><i class="pi pi-user"></i> Usuario Solicitante: {{usuarioSolicitante}}</p>
               </div>
           </ng-template>
             <ng-template pTemplate="header">
-              <tr>
+              <tr id="tabla2">
                 <th>Id</th>
                 <th>Mat. Prima</th>
                 <th>Cant. Solicitada</th>
@@ -222,9 +222,9 @@
         <ng-template #habilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" >
-              <button pButton class="p-button-danger" type="button" label="Crear OC" pTooltip="Crear orden de compra de materia prima" (click)="cargarModalCrearOrden()" icon="pi pi-check-square"></button>
-              <button pButton class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban"></button>
-              <button pButton class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" (click)="mostrarEleccion(0, 'finalizar')" icon="pi pi-check"></button>
+              <button pButton class="p-button-danger" type="button" label="Crear OC" pTooltip="Crear orden de compra de materia prima" (click)="cargarModalCrearOrden()" icon="pi pi-check-square" id="crear-oc"></button>
+              <button pButton class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" (click)="mostrarEleccion(0, 'finalizar')" icon="pi pi-check" id="finalizar"></button>
+              <button pButton class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" (click)="mostrarEleccion(0, 'cancelar')" icon="pi pi-ban" id="cancelar"></button>
               <button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="llenarInfoPdf(0)" pTooltip="Ver PDF"></button>
             </div>
           </div>
@@ -232,9 +232,9 @@
         <ng-template #inhabilitar>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="" #inhabilitar>
-              <button pButton [disabled]="true" class="p-button-danger" type="button" pTooltip="Crear orden de compra de materia prima" label="Crear OC" icon="pi pi-check-square"></button>
-              <button pButton [disabled]="true" class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban"></button>
-              <button pButton [disabled]="true" class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" icon="pi pi-check"></button>
+              <button pButton [disabled]="true" class="p-button-danger" type="button" pTooltip="Crear orden de compra de materia prima" label="Crear OC" icon="pi pi-check-square" id="crear-oc"></button>
+              <button pButton [disabled]="true" class="p-button-success" type="button" label="Finalizar" pTooltip="Finalizar Solicitud" icon="pi pi-check" id="finalizar"></button>
+              <button pButton [disabled]="true" class="p-button-secondary" type="button" label="Cancelar" pTooltip="Cancelar Solicitud" icon="pi pi-ban" id="cancelar"></button>
               <button pButton *ngIf="arrayMatPrimas.length > 0" class="p-button-danger" type="button" icon="pi pi-file-pdf" (click)="llenarInfoPdf(0)" label="Ver PDF" pTooltip="Ver solicitud en formato PDF"></button>
             </div>
           </div>

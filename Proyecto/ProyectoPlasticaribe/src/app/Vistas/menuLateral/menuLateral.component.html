@@ -538,6 +538,17 @@
             </a>
           </div>
         </ng-container>
+
+        <!-- Mov. SOLICITUDES DE MAT. PRIMA -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
+          <div class="mb-2 sangria">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+              Movimientos Solicitud Mat. Prima
+            </a>
+          </div>
+        </ng-container>
+
           <div class="mb-2 sangria">
             <hr>
           </div>
@@ -783,15 +794,6 @@
               </a>
             </div>
          </ng-container>
-            <!-- Reporte de rollos eliminados -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
-            <div class="mb-2 sangria">
-              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
-                <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
-                Reporte Solicitud Mat. Prima
-              </a>
-            </div>
-          </ng-container>
 
           <div class="mb-2 sangria">
             <hr>
