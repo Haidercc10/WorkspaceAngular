@@ -186,22 +186,28 @@
             [tableStyle]="{ 'min-width': '45%' }"
             #dt2
             [resizableColumns]="true"
-            styleClass="p-datatable-striped p-datatable-sm"
+            styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines"
             responsiveLayout="scroll"
             [rowHover]="true"
             [value]="arrayMatPrimas"
             [scrollable]="true"
             scrollHeight="500px">
             <ng-template pTemplate="caption">
-              <div class="flex align-items-center justify-content-between" style="margin: 2% 0 0 0;" id="usuario">
+              <div class="flex align-items-center justify-content-between" style="margin: 2% 0 0 0" id="usuario">
                 <p><i class="pi pi-user"></i> Usuario Solicitante: {{usuarioSolicitante}}</p>
               </div>
           </ng-template>
             <ng-template pTemplate="header">
+              <tr>
+                <th colspan="2"></th>
+                <th colspan="2" class="text-center">Cantidad</th>
+                <th colspan="2"></th>
+              </tr>
               <tr id="tabla2">
                 <th>Id</th>
                 <th>Mat. Prima</th>
-                <th>Cant. Solicitada</th>
+                <th>Solicitada</th>
+                <th id="aprobada">Aprobada</th>
                 <th>Unidad</th>
                 <th>Estado</th>
               </tr>
@@ -211,6 +217,7 @@
                 <td><b>{{matPrimas.Id}}</b></td>
                 <td>{{matPrimas.Nombre}}</td>
                 <td><b>{{matPrimas.Cantidad}}</b></td>
+                <td><b>{{matPrimas.CantAprobada}}</b></td>
                 <td>{{matPrimas.Medida}}</td>
                 <td><b>{{matPrimas.Estado}}</b></td>
               </tr>

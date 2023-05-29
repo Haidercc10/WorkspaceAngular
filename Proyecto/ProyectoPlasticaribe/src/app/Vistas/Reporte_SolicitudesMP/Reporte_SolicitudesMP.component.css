@@ -89,3 +89,7 @@ p-chip ::ng-deep .p-chip-text {
   background-color: rgb(255, 211, 101);
   color : #495057;
 }
+
+::ng-deep .p-datatable.p-datatable-sm ::ng-deep .p-datatable-header {
+    padding: 0 0 0 2% !important;
+}

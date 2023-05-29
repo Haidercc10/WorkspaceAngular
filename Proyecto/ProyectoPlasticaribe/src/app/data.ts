@@ -8848,7 +8848,22 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
     classes: '',
     id: 'tabla2',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Materias Primas</h5>',
-    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, unidad de medida y el estado de las mismas</b><br><br></p>`
+    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, la cantidad aprobada, unidad de medida y el estado de las mismas</b><br><br></p>`
+  },
+  {
+    attachTo: {
+      element: '#aprobada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'aprobada',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Cantidad aprobada</h5>',
+    text: `<p>Este campo se refiere a <b>la cantidad de cada item de materia prima que se pidió en la(s) orden(es) de compra asociada a la solicitud</b> que esté visualizando en el momento.<br><br></p>`
   },
   {
     attachTo: {

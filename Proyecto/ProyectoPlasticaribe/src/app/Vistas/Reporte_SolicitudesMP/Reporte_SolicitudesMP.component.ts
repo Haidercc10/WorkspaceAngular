@@ -489,11 +489,14 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       for (let index = 0; index < data.length; index++) {
         this.llenarTablaDetalles(data[index]);
       }
-    })
+    });
   }
 
   /** Llenar array con los registros de los detalles de las solicitudes de materia prima. */
   llenarTablaDetalles(data : any) {
+    let arrayIds : any = [];
+    let arrayOc : any = [];
+
     let info : any = {
       Codigo : data.codigo,
       Solicitud : data.consecutivo,
@@ -503,6 +506,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       Id_Bopp: data.bopp_Id,
       Nombre : '',
       Cantidad : data.cantidad,
+      CantAprobada : 0,
       Medida : data.unidad_Medida,
       Estado : data.estado_MP,
       Usuario : data.usuario,
@@ -520,6 +524,20 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     }
     this.estadoSolicitud = info.EstadoSolicitud;
     this.usuarioSolicitante = info.Usuario;
+    arrayIds.push(info.Id)
+
+    this.servicioDtSolicitudesMP.getRelacionSolicitudesMp_Oc(this.solicitudSeleccionada).subscribe(data2 => {
+      for (let i = 0; i < data2.length; i++) {
+        let infoOc : any = { Ident : 0, Id_Mp: data2[i].idMatPrima, Id_Tinta: data2[i].idTinta, Id_Bopp: data2[i].idBopp, CantidadOc : data2[i].cantidad }
+
+        if (infoOc.Id_Mp != 84) infoOc.Ident = infoOc.Id_Mp;
+        else if (infoOc.Id_Tinta != 2001) infoOc.Ident = infoOc.Id_Tinta;
+        else if (infoOc.Id_Bopp != 1) infoOc.Ident = infoOc.Id_Bopp;
+
+        if(arrayIds.includes(infoOc.Ident)) info.CantAprobada = infoOc.CantidadOc;
+      }
+    });
+
     this.arrayMatPrimas.push(info);
   }
 
@@ -596,7 +614,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearOrden(){
-    if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado' || this.estadoSolicitud == 'Parcial') {
+    if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
       this.mostrarAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalOc = true;
