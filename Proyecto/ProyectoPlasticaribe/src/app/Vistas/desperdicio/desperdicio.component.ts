@@ -120,47 +120,19 @@ export class DesperdicioComponent implements OnInit {
   }
 
   // Funcion que va a consultar los operarios
-  obtenerOperarios(){
-    this.operariosService.getUsuarios().subscribe(datos_operarios => {
-      for (let i = 0; i < datos_operarios.length; i++) {
-        if (datos_operarios[i].rolUsu_Id == 59) this.operarios.push(datos_operarios[i]);
-      }
-    });
-  }
+  obtenerOperarios = () => this.operariosService.getUsuarios().subscribe(datos => this.operarios = datos.filter((item) => item.rolUsu_Id == 59));
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
-  obtenerProcesos(){
-    this.procesos = [];
-    this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
-      for (let i = 0; i < datos_procesos.length; i++) {
-        let pro : number [] = [10,11,12];
-        if (pro.includes(datos_procesos[i].proceso_Codigo)) this.procesos.push(datos_procesos[i]);
-      }
-    });
-  }
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter((item) => [10,11,12].includes(item.proceso_Codigo)));
 
   // Funcion que va a consultar y obtener la informacion de las fallas
-  obtenerFallas(){
-    this.fallasService.srvObtenerLista().subscribe(datos_fallas => {
-      for (let i = 0; i < datos_fallas.length; i++) {
-        if (datos_fallas[i].tipoFalla_Id == 11) this.fallas.push(datos_fallas[i]);
-      }
-    });
-  }
+  obtenerFallas = () => this.fallasService.srvObtenerLista().subscribe(datos => this.fallas = datos.filter((item) => item.tipoFalla_Id == 11));
 
   // Funcion que va a consultar y obtener la informacion de las maquinas
-  obtenerMaquinas(){
-    this.maquinasService.GetTodo().subscribe(datos_maquinas => {
-      for (let i = 0; i < datos_maquinas.length; i++) {
-        if (datos_maquinas[i].tpActv_Id == 4) this.maquinas.push(datos_maquinas[i]);
-      }
-    });
-  }
+  obtenerMaquinas = () => this.maquinasService.GetTodo().subscribe(datos => this.maquinas = datos.filter((item) => item.tpActv_Id == 4));
 
   // Funcion que va a consultar y obtener la inforamcion de los materiales
-  obtenerMateriales(){
-    this.materiaService.srvObtenerLista().subscribe(datos_materiales => { this.materiales = datos_materiales });
-  }
+  obtenerMateriales = () => this.materiaService.srvObtenerLista().subscribe(datos => this.materiales = datos);
 
   // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
   buscarFalla(){
@@ -294,8 +266,7 @@ export class DesperdicioComponent implements OnInit {
           Desp_HoraRegistro : moment().format('H:mm:ss'),
           Proceso_Id : this.grupoDespercios[i].IdArea,
         }
-        this.deperdicioService.Insert(info).subscribe(datos_insertados => { this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`);
-        }, error => {
+        this.deperdicioService.Insert(info).subscribe(datos_insertados => this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`), () => {
           this.mostrarError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
           error = true;
         });
@@ -441,18 +412,12 @@ export class DesperdicioComponent implements OnInit {
   quitarDesperdicio(data: any){
     data = this.registroSeleccionado;
     this.onReject();
-    for (let i = 0; i < this.grupoDespercios.length; i++) {
-      if (this.grupoDespercios[i].Ot == data.Ot && this.grupoDespercios[i].NoConformidad == data.NoConformidad) {
-        this.grupoDespercios.splice(i, 1);
-        this.mostrarConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
-      }
-    }
+    this.grupoDespercios.splice(this.grupoDespercios.findIndex((item) => item.Ot == data.Ot && item.NoConformidad == data.NoConformidad), 1);
+    this.mostrarConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
   }
 
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
@@ -466,9 +431,7 @@ export class DesperdicioComponent implements OnInit {
    this.cargando =false;
   }
 
-  onReject(){
-    this.messageService.clear('eleccion');
-  }
+  onReject = () => this.messageService.clear('eleccion');
 
   mostrarEleccion(item : any){
     this.registroSeleccionado = item;

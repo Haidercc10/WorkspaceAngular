@@ -109,55 +109,26 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion que buscará las tintas que se utilizan en la empresa
   obtenerTintas(){
-    this.tintasService.srvObtenerListaXColores().subscribe(datos_tintas => {
-      for (let i = 0; i < datos_tintas.length; i++) {
-        let mp : number [] = [84, 2001, 88, 89, 2072];
-        if (!mp.includes(datos_tintas[i].tinta_Id)) {
-          let tinta : any = { id : datos_tintas[i].tinta_Id, name : datos_tintas[i].tinta_Nombre, und : datos_tintas[i].undMed_Id}
-          this.tintas.push(tinta);
-        }
-      }
-    });
+    this.tintasService.srvObtenerListaXColores().subscribe(data => this.tintas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.tinta_Id)));
   }
 
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
   buscarTintaSeleccionada(){
-    let tinta : any = this.FormAsignacionMP.value.Tinta;
-    let nuevo : any[] = this.tintas.filter((item) => item.id == tinta);
-    let mp : number [] = [84, 2001, 88, 89, 2072];
-    if (!mp.includes(nuevo[0].id)) {
-      this.FormAsignacionMP .patchValue({
-        Id_Tinta: nuevo[0].id,
-        Tinta : nuevo[0].name,
-        undMedTinta : nuevo[0].und,
-      });
-    }
+    let nuevo : any[] = this.tintas.filter((item) => item.tinta_Id == this.FormAsignacionMP.value.Tinta);
+    this.FormAsignacionMP.patchValue({
+      Id_Tinta: nuevo[0].tinta_Id,
+      Tinta : nuevo[0].tinta_Nombre,
+      undMedTinta : nuevo[0].undMed_Id,
+    });
   }
 
   // Función que buscará las materias primas que se utilizan para crear tintas
   obtenerMateriaPrima(){
-    this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data_materiasPrimas => {
-      for (let i = 0; i < data_materiasPrimas.length; i++) {
-        let mp : number [] = [84, 2001, 88, 89, 2072];
-        if (!mp.includes(data_materiasPrimas[i].matPrima)) {
-          let mp : any = {
-            id : data_materiasPrimas[i].matPrima,
-            name : data_materiasPrimas[i].nombreMP,
-          }
-          this.materiasPrimas.push(mp);
-        }
-      }
-    });
+    this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data => this.materiasPrimas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.matPrima)));
   }
 
   //Funcion para  obtener las unidades de medidas
-  obtenerUnidadesMedida() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let i = 0; i < datos_unidadesMedida.length; i++) {
-        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
-      }
-    });
-  }
+  obtenerUnidadesMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos);
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada(){
@@ -336,9 +307,7 @@ export class AsignacionTintasComponent implements OnInit {
   QuitarMateriaPrimaTabla(formulario : any) {
     formulario = this.mpSeleccionada;
     this.onReject('mp');
-    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-      if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
-    }
+    this.ArrayMateriaPrima.splice(this.ArrayMateriaPrima.findIndex((item) => item.Id == formulario.Id), 1);
   }
 
   //

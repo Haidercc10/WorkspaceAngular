@@ -496,52 +496,34 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que colocará los rollos que se van a insertar
   llenarRollosAIngresar(item : any){
-    this.cargando = false;
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
-    }
+    this.rollos.splice(this.rollos.findIndex((data) => item.Id == data.Id), 1);
     this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
-    setTimeout(() => { this.cargando = true; }, 50);
   }
 
   // Funcion que seleccionará y colocará todos los rollos que se van a insertar
   seleccionarTodosRollos(item : any){
-    this.cargando = false;
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits != true) this.rollos = [];
-    }
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits == true) this.rollos.push(item[i]);
-    }
+    this.rollos = item.filter((data) => data.exits);
     this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
-    setTimeout(() => { this.cargando = true; }, 50);
-
   }
 
   //Funcion que va a quitar lo rollos que se van a insertar
   quitarRollosAIngresar(item : any){
-    this.cargando = false;
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i, 1);
-    }
+    this.rollosInsertar.splice(this.rollosInsertar.findIndex((data) => item.Id == data.Id), 1);
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
-    setTimeout(() => { this.cargando = true; }, 50);
   }
 
   // Funcion que va a quitar todos los rollos que se van a insertar
-  quitarTodosRollos(item : any){
-    this.cargando = false;
+  quitarTodosRollos(){
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.rollosInsertar = [];
     this.GrupoProductos();
-    setTimeout(() => { this.cargando = true; }, 50);
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
@@ -609,11 +591,11 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
     if(proceso == 'Extrusion' && this.bodegaExtrusion == true) {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.dtIngRollosService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  });
+        this.dtIngRollosService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe();
       }
     }else if ((proceso == 'Sellado' || proceso == 'Empaque' || proceso == 'Extrusion') && this.bodegaDespacho == true) {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.servcioDetEntradaRollos.deleteRollosDespacho(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => { });
+        this.servcioDetEntradaRollos.deleteRollosDespacho(this.rollosInsertar[i].Id).subscribe();
         this.eliminarRollosPreEntrega();
       }
     }
@@ -629,7 +611,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     if(this.bodegaExtrusion == true) {
       if(proceso == 'Extrusion') {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
+          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
             this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
@@ -639,7 +621,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     } else if (this.bodegaDespacho == true) {
       if(proceso == 'Empaque' || proceso == 'Extrusion') {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
+          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
             this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
@@ -647,7 +629,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         }
       } else if (proceso == 'Sellado') {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
+          this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
             this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
@@ -661,7 +643,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   // Eliminación de rollos de la pre entrega
   eliminarRollosPreEntrega() {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => { });
+      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe(() => { }, () => { });
     }
   }
 
@@ -674,29 +656,16 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   }
 
   /** Cargar los procesos de donde puede venir el rollo. */
-  obtenerProcesos(){
-    this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => {
-      for (let index = 0; index < dataProcesos.length; index++) {
-        let pro : string [] = ['EXT', 'EMP', 'SELLA'];
-        if(pro.includes(dataProcesos[index].proceso_Id)) this.arrayProcesos.push(dataProcesos[index]);
-      }
-    });
-  }
+  obtenerProcesos = () => this.servicioProcesos.srvObtenerLista().subscribe(data =>  this.arrayProcesos = data.filter((item) => ['EXT', 'EMP', 'SELLA'].includes(item.proceso_Id)));
 
     /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
 
   /** Mostrar mensaje de Eleccion */
   mostrarEleccion(){
@@ -718,7 +687,5 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   }
 
   /** Cerrar Dialogo de eliminación de rollos.*/
-  onReject() {
-    this.messageService.clear('eleccion');
-  }
+  onReject = () => this.messageService.clear('eleccion');
 }

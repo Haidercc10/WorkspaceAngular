@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';

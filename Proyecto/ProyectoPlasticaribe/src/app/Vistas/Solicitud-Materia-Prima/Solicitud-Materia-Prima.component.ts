@@ -281,9 +281,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
         Estado_Id: 11
       }
-      this.dtSolicitudService.Post(info).subscribe(data => {
-        this.mensajeSatisfactorio(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`);
-      }, error => err = true);
+      this.dtSolicitudService.Post(info).subscribe(data => this.mensajeSatisfactorio(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`),
+      error => err = true);
     }
     setTimeout(() => {
       if (!err) {
@@ -295,38 +294,42 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a consultar la información de la solicitud
   consultarSolicitud(){
-    let solicitud_Id = parseInt(this.formSolicitud.value.Id_Solicitud);
-    this.limpiarTodo();
-    this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.edicionSolicitud = true;
-        this.formSolicitud.patchValue({
-          Id_Solicitud : data[i].consecutivo,
-          Observacion : data[i].observacion,
-        });
-        let info : any = {
-          Id : 0,
-          Id_Mp: data[i].mP_Id,
-          Id_Tinta: data[i].tinta_Id,
-          Id_Bopp: data[i].bopp_Id,
-          Nombre : '',
-          Cantidad : data[i].cantidad,
-          Und_Medida : data[i].unidad_Medida,
+    let solicitud_Id = this.formSolicitud.value.Id_Solicitud;
+    let exp = /^([0-9])*$/;
+
+    if (solicitud_Id.match(exp)) {
+      this.limpiarTodo();
+      this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          this.edicionSolicitud = true;
+          this.formSolicitud.patchValue({
+            Id_Solicitud : data[i].consecutivo,
+            Observacion : data[i].observacion,
+          });
+          let info : any = {
+            Id : 0,
+            Id_Mp: data[i].mP_Id,
+            Id_Tinta: data[i].tinta_Id,
+            Id_Bopp: data[i].bopp_Id,
+            Nombre : '',
+            Cantidad : data[i].cantidad,
+            Und_Medida : data[i].unidad_Medida,
+          }
+          if (info.Id_Mp != 84) {
+            info.Id = info.Id_Mp;
+            info.Nombre = data[i].mp;
+          } else if (info.Id_Tinta != 2001) {
+            info.Id = info.Id_Tinta;
+            info.Nombre = data[i].tinta;
+          } else if (info.Id_Bopp != 1) {
+            info.Id = info.Id_Bopp;
+            info.Nombre = data[i].bopp;
+          }
+          this.materiasPrimasSeleccionada_ID.push(info.Id);
+          this.materiasPrimasSeleccionadas.push(info);
         }
-        if (info.Id_Mp != 84) {
-          info.Id = info.Id_Mp;
-          info.Nombre = data[i].mp;
-        } else if (info.Id_Tinta != 2001) {
-          info.Id = info.Id_Tinta;
-          info.Nombre = data[i].tinta;
-        } else if (info.Id_Bopp != 1) {
-          info.Id = info.Id_Bopp;
-          info.Nombre = data[i].bopp;
-        }
-        this.materiasPrimasSeleccionada_ID.push(info.Id);
-        this.materiasPrimasSeleccionadas.push(info);
-      }
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitu con el Número ${solicitud_Id}!`));
+      }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
+    } else this.mensajeAdvertencia(`¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a editar la información de la solicitud
@@ -340,9 +343,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       Solicitud_Hora: moment().format('H:mm:ss'),
       Estado_Id: 11,
     }
-    this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => {
-      this.editarDtSolicitud(info.Solicitud_Id);
-    }, error => this.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`));
+    this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => this.editarDtSolicitud(info.Solicitud_Id),
+    error => this.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`));
   }
 
   // Funcion que agregará las materias primas a la solicitud que está siendo editada
@@ -360,9 +362,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
           Estado_Id: 11
         }
-        this.dtSolicitudService.Post(info).subscribe(datos => {
-          this.mensajeSatisfactorio(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`);
-        }, error => err = true);
+        this.dtSolicitudService.Post(info).subscribe(datos => this.mensajeSatisfactorio(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`),
+        error => err = true);
       });
     }
     setTimeout(() => {
@@ -374,37 +375,40 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   }
 
   // Funcion que va a conasultar las materias primas que tiene el pdf
-  buscarInfoSolicitud_PDF(solicitud_Id : number = 0){
+  buscarInfoSolicitud_PDF(solicitud_Id : any = 0){
     this.informacionPDF = [];
-    this.cargando = true;
-    if (solicitud_Id == 0) solicitud_Id = parseInt(this.formSolicitud.value.Id_Solicitud);
-    this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        let info : any = {
-          Id : 0,
-          Id_Mp: data[i].mP_Id,
-          Id_Tinta: data[i].tinta_Id,
-          Id_Bopp: data[i].bopp_Id,
-          Nombre : '',
-          Cantidad : this.formatonumeros(data[i].cantidad),
-          Medida : data[i].unidad_Medida,
-          Estado : data[i].estado_MP,
+    if (solicitud_Id == 0) solicitud_Id = this.formSolicitud.value.Id_Solicitud;
+    let exp = /^([0-9])*$/;
+    if (solicitud_Id.match(exp)) {
+      this.cargando = true;
+      this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          let info : any = {
+            Id : 0,
+            Id_Mp: data[i].mP_Id,
+            Id_Tinta: data[i].tinta_Id,
+            Id_Bopp: data[i].bopp_Id,
+            Nombre : '',
+            Cantidad : this.formatonumeros(data[i].cantidad),
+            Medida : data[i].unidad_Medida,
+            Estado : data[i].estado_MP,
+          }
+          if (info.Id_Mp != 84) {
+            info.Id = info.Id_Mp;
+            info.Nombre = data[i].mp;
+          } else if (info.Id_Tinta != 2001) {
+            info.Id = info.Id_Tinta;
+            info.Nombre = data[i].tinta;
+          } else if (info.Id_Bopp != 1) {
+            info.Id = info.Id_Bopp;
+            info.Nombre = data[i].bopp;
+          }
+          this.informacionPDF.push(info);
+          this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
-        if (info.Id_Mp != 84) {
-          info.Id = info.Id_Mp;
-          info.Nombre = data[i].mp;
-        } else if (info.Id_Tinta != 2001) {
-          info.Id = info.Id_Tinta;
-          info.Nombre = data[i].tinta;
-        } else if (info.Id_Bopp != 1) {
-          info.Id = info.Id_Bopp;
-          info.Nombre = data[i].bopp;
-        }
-        this.informacionPDF.push(info);
-        this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-      }
-      setTimeout(() => this.crearPDF(solicitud_Id), 1000);
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitud con el Número ${solicitud_Id}!`));
+        setTimeout(() => this.crearPDF(solicitud_Id), 1000);
+      }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
+    } else this.mensajeAdvertencia(`¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear un pdf de la solicitud creada o editada
@@ -523,7 +527,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `¡No se encontró información sobre una solicitud con el Número ${solicitud_Id}!`));
+    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -556,5 +560,4 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       }
     };
   }
-
 }

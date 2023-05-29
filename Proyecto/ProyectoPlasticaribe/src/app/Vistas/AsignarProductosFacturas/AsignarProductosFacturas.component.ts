@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
@@ -11,7 +11,6 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsFacturarRolloDespacho as defaultSteps } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-AsignarProductosFacturas',
@@ -95,12 +94,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que va a buscar lo clientes
   obtenerClientes(){
-    this.clienteService.srvObtenerLista().subscribe(registrosClientes => {
-      for (let index = 0; index < registrosClientes.length; index++) {
-        let Clientes : any = registrosClientes[index];
-        this.arrayClientes.push(Clientes);
-        this.arrayClientes.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-      }
+    this.clienteService.srvObtenerLista().subscribe(data => {
+      this.arrayClientes = data;
+      this.arrayClientes.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
     });
   }
 
@@ -125,34 +121,31 @@ export class AsignarProductosFacturasComponent implements OnInit {
     let id : any = this.FormConsultarProductos.value.IdProducto;
     let cantidadPedida : number = this.FormConsultarProductos.value.CantidadProducto;
     this.dtEntradaRolloService.srvConsultarProducto(id).subscribe(datos_rollos => {
-      for (let i = 0; i < datos_rollos.length; i++) {
-        if (datos_rollos[i].estado_Id == 19 || datos_rollos[i].estado_Id == 24) {
-          let info : any = {
-            Id : datos_rollos[i].rollo_Id,
-            IdProducto : datos_rollos[i].prod_Id,
-            Producto : datos_rollos[i].prod_Nombre,
-            Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
-            Presentacion : datos_rollos[i].undMed_Rollo,
-            CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
-            CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
-            CantPaqRestantes : datos_rollos[i].prod_CantBolsasRestates,
-            CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
-            CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
-            suma : false,
-          }
-          this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
-          this.presentacionProducto = datos_rollos[i].undMed_Rollo;
-          if (info.CantPaqRestantes > 0) this.rollosDisponibles.push(info);
-          this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
-          this.FormConsultarProductos.patchValue({ ProdNombre: datos_rollos[i].prod_Nombre, });
+      for (let i = 0; i < datos_rollos.filter((item) => item.estado_Id == 19 || item.estado_Id == 24).length; i++) {
+        let info : any = {
+          Id : datos_rollos[i].rollo_Id,
+          IdProducto : datos_rollos[i].prod_Id,
+          Producto : datos_rollos[i].prod_Nombre,
+          Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+          Presentacion : datos_rollos[i].undMed_Rollo,
+          CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
+          CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
+          CantPaqRestantes : datos_rollos[i].prod_CantBolsasRestates,
+          CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
+          CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
+          suma : false,
         }
+        this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
+        this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+        if (info.CantPaqRestantes > 0) this.rollosDisponibles.push(info);
+        this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
+        this.FormConsultarProductos.patchValue({ ProdNombre: datos_rollos[i].prod_Nombre, });
       }
       setTimeout(() => {
         if (cantidadPedida > 0) {
           let sumaCantidad : number = 0;
           this.cantTotalProducto = 0;
           for (let i = 0; i < this.rollosDisponibles.length; i++) {
-
             if (sumaCantidad == cantidadPedida) break;
             else if (sumaCantidad >= cantidadPedida) break;
             else if (sumaCantidad < cantidadPedida) {
@@ -166,7 +159,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.cargando = false;
       }, 1000);
       if (datos_rollos.length == 0) this.mensajeError(`¡Sin Rollos disponibles!`, `¡El producto con el código ${id} no tiene rollos disponibles!`);
-    }, error => { this.mensajeError(`¡Producto No Encontrado!`, `¡No se pudo obtener información del producto con el codigo ${id}!`) });
+    }, () => { this.mensajeError(`¡Producto No Encontrado!`, `¡No se pudo obtener información del producto con el codigo ${id}!`) });
     if (id.match(this.datosNumeros) == null) this.mensajeError(`¡Debe colocar un Codigo de Producto valido!`,``);
   }
 
@@ -176,10 +169,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     let cliente = this.FormConsultarProductos.value.Cliente;
     if (cliente.match(datosNumeros) != null){
       this.clienteService.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
-        this.FormConsultarProductos.patchValue({
-          Cliente : datos_cliente.cli_Nombre,
-          Cliente_Id : cliente,
-        });
+        this.FormConsultarProductos.patchValue({ Cliente : datos_cliente.cli_Nombre, Cliente_Id : cliente, });
       });
     }
   }
@@ -199,9 +189,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.cargando = true;
     let rolloSeleccionado : any [] = this.rollosDisponibles.filter((item) => item.Id === data.Id);
     this.cantTotalProducto -= rolloSeleccionado[0].CantPaqRestantes;
-    for (let i = 0; i < this.rollosDisponibles.length; i++) {
-      if (this.rollosDisponibles[i].Id === data.Id) this.rollosDisponibles.splice(i, 1);
-    }
+    this.rollosDisponibles.splice(this.rollosDisponibles.findIndex((item) => item.Id === data.Id), 1);
     this.rollosSeleccionados.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.GrupoProductos();
   }
@@ -224,9 +212,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     let rolloSeleccionado : any [] = this.rollosSeleccionados.filter((item) => item.Id === data.Id);
     this.cantTotalSeleccionados -= rolloSeleccionado[0].CantPaqRestantes;
     this.cantTotalProducto += rolloSeleccionado[0].CantPaqRestantes;
-    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
-      if (this.rollosSeleccionados[i].Id === data.Id) this.rollosSeleccionados.splice(i, 1);
-    }
+    this.rollosSeleccionados.splice(this.rollosSeleccionados.findIndex((item) => item.Id === data.Id), 1);
     this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.GrupoProductos();
   }
@@ -292,7 +278,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
           }
           this.asgProdFacturaService.srvGuardar(info).subscribe(datos_asignacion => { this.crearDetallesAsignacion(datos_asignacion.asigProdFV_Id);
-          }, error => { this.mensajeError(`¡Error!`,`¡Ocurrió un error al facturar los rollos!`); });
+          }, () => { this.mensajeError(`¡Error!`,`¡Ocurrió un error al facturar los rollos!`); });
         } else this.mensajeAdvertencia(`¡EL campos factura debe tener información!`);
       } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
     } else this.mensajeAdvertencia("¡Debe haber minimo un rollo seleccionado!");
@@ -309,8 +295,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Rollo_Id : this.rollosSeleccionados[i].Id,
         Prod_CantidadUnidades : this.rollosSeleccionados[i].CantUndRestantes,
       }
-      this.dtAsgProdFacturaService.srvGuardar(info).subscribe(datos_dtAsignacion => {
-      }, error => { this.mensajeError('Error', '¡Error al asignar los rollos!'); });
+      this.dtAsgProdFacturaService.srvGuardar(info).subscribe(() => {
+      }, () => { this.mensajeError('Error', '¡Error al asignar los rollos!'); });
     }
     setTimeout(() => { this.cambiarEstado(); }, this.rollosSeleccionados.length * 50);
   }
@@ -341,7 +327,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               Prod_CantBolsasFacturadas : (this.rollosSeleccionados[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
               Proceso_Id : datos_rollos[j].proceso_Id,
             }
-            this.dtEntradaRolloService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => { });
+            this.dtEntradaRolloService.srvActualizar(datos_rollos[j].codigo, info).subscribe(() => { });
           } else {
             estado = 20;
             if (this.rollosSeleccionados[i].CantUndRestantes < datos_rollos[j].prod_CantPaquetesRestantes) estado = 19;
@@ -362,7 +348,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               Prod_CantBolsasFacturadas : (this.rollosSeleccionados[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
               Proceso_Id : datos_rollos[j].proceso_Id,
             }
-            this.dtEntradaRolloService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => { });
+            this.dtEntradaRolloService.srvActualizar(datos_rollos[j].codigo, info).subscribe(() => { });
           }
         }
       });
@@ -387,7 +373,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             TpMoneda_Id: datos_productos[j].tpMoneda_Id,
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
           }
-          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
             this.mensajeConfirmacion(`¡Asignación Registrada!`,`¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`)
           });
         }
@@ -613,7 +599,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       },
       fontSize: 7,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -630,7 +616,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       },
       fontSize: 7,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }

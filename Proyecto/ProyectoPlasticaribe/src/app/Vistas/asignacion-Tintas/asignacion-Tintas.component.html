@@ -1,6 +1,7 @@
 <app-menuLateral></app-menuLateral>
 <br>
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <div class="fondo">
   <div class="d-flex justify-content-center overlay" *ngIf="load">
     <div style="margin: auto;">
@@ -48,7 +49,7 @@
                 <i class="pi pi-search"></i>
                 <input formControlName="Tinta" id="Tinta" list="ListaTinta" type="text" pInputText (change)="buscarTintaSeleccionada()" required/>
                 <datalist id="ListaTinta">
-                  <option value={{item.id}} *ngFor="let item of tintas">{{item.name}}</option>
+                  <option value={{item.tinta_Id}} *ngFor="let item of tintas">{{item.tinta_Nombre}}</option>
                 </datalist>
                 <label for="Tinta">Tinta</label>
               </span>
@@ -65,7 +66,7 @@
             <!-- Unidad de Medida -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
               <span class="p-float-label">
-                <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
+                <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
                 <label for="Und">Und</label>
               </span>
             </div>
@@ -104,7 +105,7 @@
               <span class="p-float-label">
                 <input formControlName="nombreMateriaPrima" id="MP"  list="materiaprima" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
                 <datalist id="materiaprima">
-                  <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.name}}</option>
+                  <option value={{item.matPrima}} *ngFor="let item of materiasPrimas">{{item.nombreMP}}</option>
                 </datalist>
                 <label for="MP">Materia Prima</label>
               </span>
@@ -129,7 +130,7 @@
             <!-- Unidad de Medida -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
+                <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
                 <label for="Und">Und</label>
               </span>
             </div>

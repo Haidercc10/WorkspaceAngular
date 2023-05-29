@@ -1,15 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { AppComponent } from 'src/app/app.component';
-import { stepAsignacionBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepAsignacionBopp as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -163,12 +162,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.messageService.clear('OT');
     data = this.itemSeleccionado;
     this.cantidadKG = this.cantidadKG - data.kg;
-    for (let i = 0; i < this.ordenesTrabajo.length; i++) {
-      if (this.ordenesTrabajo[i].ot == data.ot)  this.ordenesTrabajo.splice(i, 1);
-    }
-    for (let i = 0; i < this.arrayOT.length; i++) {
-      if (this.arrayOT[i] == data.ot)  this.arrayOT.splice(i, 1);
-    }
+    this.ordenesTrabajo.splice(this.ordenesTrabajo.findIndex((item) => item.ot == data.ot), 1);
+    this.arrayOT.splice(this.arrayOT.findIndex((item) => item.ot == data.ot), 1);
     this.mostrarConfirmacion(`Confirmación`, 'OT eliminada de la tabla!');
   }
 
@@ -187,17 +182,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   quitarBOPP(data : any){
     this.messageService.clear('Bopp');
     data = this.boppSeleccionado;
-    for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
-      if (this.ArrayBoppPedida[i].Serial == data.Serial) this.ArrayBoppPedida.splice(i, 1);
-    }
+    this.ArrayBoppPedida.splice(this.ArrayBoppPedida.findIndex((item) => item.Serial == data.Serial), 1);
     this.mostrarConfirmacion(`Confirmación`, 'BOPP eliminado de la tabla!');
   }
 
   // funcion que validará que haya un rollo seleccionado para asignar
-  validarCamposBOPP(){
-    if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
-    else this.mostrarAdvertencia('Advertencia', `Debe cargar al menos un rollo!`);
-  }
+  validarCamposBOPP = () => this.FormularioBOPP.valid ? this.cargarBOPPTabla() : this.mostrarAdvertencia('Advertencia', `Debe cargar al menos un rollo!`);
 
   //funcion que cargará la informacion de los rollos en la tabla
   cargarBOPPTabla(){

@@ -136,31 +136,23 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   limpiarCamposMP = () => this.FormMateriaPrimaRetirada.reset();
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida() { this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => { this.unidadMedida = datos_unidadesMedida }) }
+  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.unidadMedida = data });
 
   //Funcion que se encagará de obtener los procesos de la empresa
-  obtenerProcesos(){
-    this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
-      for (let index = 0; index < datos_procesos.length; index++) {
-        if (datos_procesos[index].proceso_Id != 'TINTAS') this.procesos.push(datos_procesos[index].proceso_Nombre);
-      }
-    });
-  }
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(data => this.procesos = data.filter((item) => item.proceso_Id != 'TINTAS'));
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriaPrima(){
-    this.materiaPrimaService.getMpTintaBopp().subscribe(datos_materiaPrimas => {
-      for (let i = 0; i < datos_materiaPrimas.length; i++) {
-        if (datos_materiaPrimas[i].categoria != 6) this.materiaPrima.push(datos_materiaPrimas[i]);
-        this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
-      }
+    this.materiaPrimaService.getMpTintaBopp().subscribe(data => {
+      this.materiaPrima = data.filter((item) => item.categoria != 6)
+      this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
     });
   }
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias(){
-    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => { this.categoriasMP = datos; });
-    this.tintasService.GetCategoriasTintas().subscribe(datos => { this.categoriasTintas = datos; });
+    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => this.categoriasMP = datos);
+    this.tintasService.GetCategoriasTintas().subscribe(datos => this.categoriasTintas = datos);
   }
 
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
@@ -200,7 +192,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           break;
         }
       } else this.mostrarAdvertencia(`La OT N° ${ot} no se encuentra registrada en BagPro`);
-    }, error => this.mostrarError(`¡Error al consultar la OT ${ot}!`));
+    }, () => this.mostrarError(`¡Error al consultar la OT ${ot}!`));
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -223,7 +215,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           }
         }
       }
-    }, error => {
+    }, () => {
       this.load = true;
       this.error = true;
       this.limpiarCamposMP();
@@ -265,17 +257,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   quitarMateriaPrima(data : any){
     this.onReject('eleccion');
     data = this.mpSeleccionada;
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-        this.materiasPrimasSeleccionadas.splice(i, 1);
-        for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-          if (data.Id == this.materiasPrimasSeleccionada_ID[j]) {
-            this.materiasPrimasSeleccionada_ID.splice(j, 1);
-            this.categoriasSeleccionadas.splice(j, 1);
-          }
-        }
-      }
-    }
+    this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
+    this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == data.Id), 1);
   }
 
   // Funcion que hará validaciones antes de realizar la asignación
@@ -327,7 +310,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Estado_OrdenTrabajo : 14,
       AsigMp_Hora : moment().format('H:mm:ss'),
     }
-    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
+    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(() => { this.obtenerUltimoIdAsignacaion(); }, () => {
       this.error = true;
       this.mostrarError(`¡Error al crear la asignación de materia prima!`);
     });
@@ -336,7 +319,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que va a buscar y obtener el id de la ultima asignacion
   obtenerUltimoIdAsignacaion(){
     if (!this.error) {
-      this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => { this.obtenerProcesoId(datos_asignaciones.asigMp_Id); }, error => {
+      this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => { this.obtenerProcesoId(datos_asignaciones.asigMp_Id); }, () => {
         this.error = true;
         this.mostrarError(`¡No se pudo extraer el último Id de asignación!`);
       });
@@ -361,7 +344,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                   UndMed_Id : presentacionMateriaPrima,
                   Proceso_Id : datos_proceso[i].proceso_Id,
                 }
-                this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {}, error => {
+                this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(() => {}, () => {
                   this.error = true;
                   this.mostrarError(`¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
                 });
@@ -374,7 +357,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                   UndMed_Id : presentacionMateriaPrima,
                   Proceso_Id : datos_proceso[i].proceso_Id,
                 }
-                this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {}, error => {
+                this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(() => {}, () => {
                   this.error = true;
                   this.mostrarError(`¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
                 });
@@ -382,7 +365,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               }
             }
           }
-        }, error => {
+        }, () => {
           this.error = true;
           this.mostrarError(`¡Error al consultar el proceso!`);
         });
@@ -414,7 +397,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
-        this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => { }, error => {
+        this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(() => { }, () => {
           this.error = true;
           this.mostrarError(`¡Error al mover el inventario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`);
         });
@@ -440,7 +423,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           Tinta_Fecha : datos_tintas.tinta_FechaIngreso,
           Tinta_Hora : datos_tintas.tinta_Hora,
         }
-        this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => { }, error => {
+        this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(() => { }, () => {
           this.error = true;
           this.mostrarError(`¡Error al mover el inventario de la tinta ${datos_tintas.tinta_Nombre}!`);
         });

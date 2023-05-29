@@ -1,4 +1,5 @@
 export interface modelTintas{
+  Tinta_Id? : number;
   Tinta_Nombre : string;
   Tinta_Descripcion : string;
   Tinta_CodigoHexadecimal : string;

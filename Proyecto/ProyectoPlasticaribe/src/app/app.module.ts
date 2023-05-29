@@ -63,17 +63,6 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
-import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
-import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVendedores.pipe';
-import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
-import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
-import { FiltroXClienteDespachoPipe } from './Pipes/filtroXClienteDespacho.pipe';
-import { FiltroXEstadoDespachoPipe } from './Pipes/filtroXEstadoDespacho.pipe';
-import { FiltroXFacturasPipe } from './Pipes/filtroXFacturas.pipe';
-import { FiltroXProducto_RptDespachoPipe } from './Pipes/filtroXProducto_RptDespacho.pipe';
-import { FiltroXRollo_RptDespachoPipe } from './Pipes/filtroXRollo_RptDespacho.pipe';
-import { FiltroXTipoDocumentoPipe } from './Pipes/filtroXTipoDocumento.pipe';
-import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
@@ -87,8 +76,6 @@ import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.c
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
-import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.component';
-import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
@@ -119,6 +106,7 @@ import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVend
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
+import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
@@ -127,7 +115,6 @@ import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompensacion.component';
 import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
@@ -140,15 +127,9 @@ import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.compone
 import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/crear-unidades-medidas.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
-import { EpsComponent } from './Vistas/eps/eps.component';
-import { EstadosComponent } from './Vistas/estados/estados.component';
-import { FpensionComponent } from './Vistas/fpension/fpension.component';
-import { InicioComponent } from './Vistas/inicio/inicio.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
-import { MateriasPrimasComponent } from './Vistas/materias-primas/materias-primas.component';
 import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
 import { ModalCrearMateriasPrimasComponent } from './Vistas/modal-crear-materias-primas/modal-crear-materias-primas.component';
-import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
@@ -157,7 +138,6 @@ import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabaj
 import { PedidomateriaprimaComponent } from './Vistas/pedidomateriaprima/pedidomateriaprima.component';
 import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
-import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
@@ -171,18 +151,12 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RegistroComponentComponent,
     LoginComponentComponent,
-    InicioComponent,
-    InicioComponent,
-    FpensionComponent,
-    EpsComponent,
-    CajacompensacionComponent,
     OpedidoproductoComponent,
     PedidoExternoComponent,
     OcompraComponent,
@@ -190,7 +164,6 @@ import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/R
     CrearProductoComponent,
     ClientesComponent,
     CrearSedesClientesComponent,
-    EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
     CrearProveedorComponent,
@@ -202,7 +175,6 @@ import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/R
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,
-    MateriasPrimasComponent,
     CrearCategoriasMPComponent,
     CrearUnidadesMedidasComponent,
     ReporteCostosOTComponent,
@@ -213,35 +185,20 @@ import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/R
     AsignacionBOPPComponent,
     EntradaBOPPComponent,
     AsignacionBOPP_TEMPORALComponent,
-    ModalEditarAsignacionesBOPPComponent,
     ModalGenerarInventarioZeusComponent,
-    FiltrosProductosTerminadosZeusPipe,
-    FiltroNombreClientePTPipe,
-    ReporteEstadosOTComponent,
     MenuLateralComponent,
     ArchivosComponent,
     CrearCategoriasComponent,
     OrdenesTrabajoComponent,
     Reporte_Procesos_OTComponent,
-    Entrada_TintasComponent,
     Ingresar_ProductosComponent,
     RollosAsignadasFacturaComponent,
     Devoluciones_Productos_RollosComponent,
     AsignarProductosFacturasComponent,
     ReporteDespachoComponent,
-    FiltroXFacturasPipe,
-    FiltroXRollo_RptDespachoPipe,
-    FiltroXProducto_RptDespachoPipe,
-    FiltroXTipoDocumentoPipe,
-    FiltroXEstadoDespachoPipe,
-    FiltroXClienteDespachoPipe,
     PreIngresoRollosExtrusionComponent,
     PreIngresoRolloSelladoComponent,
     InventarioProductosPBDDComponent,
-    BuscarInventarioXProductoPipe,
-    EstadosOT_VendedoresComponent,
-    FiltroXClientes_OTVendedoresPipe,
-    FiltroXProducto_OTVendedoresPipe,
     DatosOTStatusComponent,
     Reporte_RecuperadoMPComponent,
     Modal_RptRecuperadoMPComponent,

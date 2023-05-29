@@ -7,8 +7,6 @@ import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFact
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
-import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.component';
-import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
@@ -53,9 +51,7 @@ import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedo
 import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
-import { InicioComponent } from './Vistas/inicio/inicio.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
-import { MateriasPrimasComponent } from './Vistas/materias-primas/materias-primas.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
@@ -71,7 +67,6 @@ import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/R
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60,61]}, component: PaginaPrincipalComponent},
@@ -84,7 +79,6 @@ export const routes: Routes = [
   {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
   {path: 'mp-devoluciones', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: DevolucionesMPComponent},
   // Tintas
-  {path: 'Entrada-Tintas', canActivate : [RoleGuardServiceGuard], component : Entrada_TintasComponent},
   {path: 'asignacion-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionTintasComponent},
   // BOPP
   {path: 'asignacion-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPPComponent},
@@ -97,7 +91,6 @@ export const routes: Routes = [
   {path: 'crear-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearTintasComponent},
   // Movimientos
   {path: 'movimiento-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: MovimientoMPComponent},
-  {path: 'materias_primas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: MateriasPrimasComponent},
   // Reportes de materia prima
   {path: 'reporte-Materia-Prima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: ReporteMateriaPrimaComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
@@ -124,7 +117,6 @@ export const routes: Routes = [
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
   {path: 'ordenes-trabajo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OrdenesTrabajoComponent},
   {path: 'reportes-procesos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,12]}, component: Reporte_Procesos_OTComponent},
-  {path: 'estados-ot-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
   {path: 'reporte-pedidos-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,60]}, component : Reporte_PedidosVendedoresComponent}, // Pedidos Vendedores
 
   /************************************** Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos **********************************************/

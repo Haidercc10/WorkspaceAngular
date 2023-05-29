@@ -374,46 +374,50 @@ export class OcompraComponent implements OnInit {
   consultarSolicitudMP(){
     this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
-    let solicitud : number = this.FormOrdenCompra.value.Solicitud;
-    this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].estado_Solicitud_Id != 5){
-          if (data[i].estado_Solicitud_Id != 4) {
-            this.FormOrdenCompra.patchValue({ Observacion : data[i].observacion, });
+    let solicitud = this.FormOrdenCompra.value.Solicitud;
+    let exp = /^([0-9])*$/;
 
-            let info : any = {
-              Id : 0,
-              Id_Mp: data[i].mP_Id,
-              Id_Tinta: data[i].tinta_Id,
-              Id_Bopp: data[i].bopp_Id,
-              Nombre : '',
-              Cantidad : data[i].cantidad,
-              Und_Medida : data[i].unidad_Medida,
-              Precio : 0,
-              SubTotal : 0,
-            }
-            if (info.Id_Mp != 84) {
-              info.Id = info.Id_Mp;
-              info.Nombre = data[i].mp;
-              info.Precio = data[i].precio_MP;
-              info.SubTotal = info.Cantidad * data[i].precio_MP;
-            } else if (info.Id_Tinta != 2001) {
-              info.Id = info.Id_Tinta;
-              info.Nombre = data[i].tinta;
-              info.Precio = data[i].precio_Tinta;
-              info.SubTotal = info.Cantidad * data[i].precio_Tinta;
-            } else if (info.Id_Bopp != 1) {
-              info.Id = info.Id_Bopp;
-              info.Nombre = data[i].bopp;
-              info.Precio = data[i].precio_Bopp;
-              info.SubTotal = info.Cantidad * data[i].precio_Bopp;
-            }
-            this.materiasPrimasSeleccionada_ID.push(info.Id);
-            this.materiasPrimasSeleccionadas.push(info);
-          } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha sido cancelada!`);
-        } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
-      }
-    }, err => this.mostrarError(`¡Error Solicitud!`, `¡No se encontró ninguna solicitud con el número ${solicitud}!`));
+    if (solicitud.match(exp)) {
+      this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].estado_Solicitud_Id != 5){
+            if (data[i].estado_Solicitud_Id != 4) {
+              this.FormOrdenCompra.patchValue({ Observacion : data[i].observacion, });
+
+              let info : any = {
+                Id : 0,
+                Id_Mp: data[i].mP_Id,
+                Id_Tinta: data[i].tinta_Id,
+                Id_Bopp: data[i].bopp_Id,
+                Nombre : '',
+                Cantidad : data[i].cantidad,
+                Und_Medida : data[i].unidad_Medida,
+                Precio : 0,
+                SubTotal : 0,
+              }
+              if (info.Id_Mp != 84) {
+                info.Id = info.Id_Mp;
+                info.Nombre = data[i].mp;
+                info.Precio = data[i].precio_MP;
+                info.SubTotal = info.Cantidad * data[i].precio_MP;
+              } else if (info.Id_Tinta != 2001) {
+                info.Id = info.Id_Tinta;
+                info.Nombre = data[i].tinta;
+                info.Precio = data[i].precio_Tinta;
+                info.SubTotal = info.Cantidad * data[i].precio_Tinta;
+              } else if (info.Id_Bopp != 1) {
+                info.Id = info.Id_Bopp;
+                info.Nombre = data[i].bopp;
+                info.Precio = data[i].precio_Bopp;
+                info.SubTotal = info.Cantidad * data[i].precio_Bopp;
+              }
+              this.materiasPrimasSeleccionada_ID.push(info.Id);
+              this.materiasPrimasSeleccionadas.push(info);
+            } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha sido cancelada!`);
+          } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
+        }
+      }, error => this.mostrarError(`¡El número de la solicitud no existe!`, `${error.error}`));
+    } else this.mostrarAdvertencia(`¡Advertencia!`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear la orden de compra
@@ -495,7 +499,7 @@ export class OcompraComponent implements OnInit {
           }, error => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
         }
       });
-    });
+    }, err => this.mostrarError(`¡Error Solicitud!`, `¡${err}!`));
   }
 
   // Funcion que va a cambiar el estado de las materias primas de la solicitud

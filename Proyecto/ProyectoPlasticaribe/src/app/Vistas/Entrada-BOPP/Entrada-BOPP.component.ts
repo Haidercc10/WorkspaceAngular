@@ -1,23 +1,20 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
-import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
-import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
-import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
-import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remision/OrdenCompra_Remision.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
-import { MessageService } from 'primeng/api';
+import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
+import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
+import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remision/OrdenCompra_Remision.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { AppComponent } from 'src/app/app.component';
-import { stepEntradaBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Entrada-BOPP',
@@ -33,7 +30,6 @@ export class EntradaBOPPComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  unidadMedida = []; //Variable que almacenará las unidades de medida
   ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
   categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
   nombresBopp : any =[]; /** Variable que cargará los nombres de BOPP que más suelen comprarse en la empresa */
@@ -54,19 +50,18 @@ export class EntradaBOPPComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
-                  private unidadMedidaService : UnidadMedidaService,
-                    private entradaBOPPService : EntradaBOPPService,
-                      private categoriaService : CategoriaMateriaPrimaService,
-                        private servicioProveedores : ProveedorService,
-                          private servicioOC_MatPrimas : OrdenCompra_MateriaPrimaService,
-                            private servicioFacturasCompras : FactuaMpCompradaService,
-                              private servicioOC_Faccompra : OrdenFactura_RelacionService,
-                                private servicioRemisiones : RemisionService,
-                                  private servicioOC_Remisiones : OrdenCompra_RemisionService,
-                                    private servicioDetalleFacco_MatPrima : FacturaMpService,
-                                      private servicioDetRemisiones : RemisionesMPService,
-                                        private messageService: MessageService,
-                                          private shepherdService: ShepherdService) {
+                  private entradaBOPPService : EntradaBOPPService,
+                    private categoriaService : CategoriaMateriaPrimaService,
+                      private servicioProveedores : ProveedorService,
+                        private servicioOC_MatPrimas : OrdenCompra_MateriaPrimaService,
+                          private servicioFacturasCompras : FactuaMpCompradaService,
+                            private servicioOC_Faccompra : OrdenFactura_RelacionService,
+                              private servicioRemisiones : RemisionService,
+                                private servicioOC_Remisiones : OrdenCompra_RemisionService,
+                                  private servicioDetalleFacco_MatPrima : FacturaMpService,
+                                    private servicioDetRemisiones : RemisionesMPService,
+                                      private messageService: MessageService,
+                                        private shepherdService: ShepherdService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -96,7 +91,6 @@ export class EntradaBOPPComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerUnidadesMedida();
     this.obtenerCategorias();
     this.getNombresBOPP();
     this.getMicrasBOPP();
@@ -113,25 +107,8 @@ export class EntradaBOPPComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  //Funcion para  obtener las unidades de medidas
-  obtenerUnidadesMedida() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let i = 0; i < datos_unidadesMedida.length; i++) {
-        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
-      }
-    });
-  }
-
   // Funcion que servirá para cargar las categorias
-  obtenerCategorias(){
-    this.categorias = [],
-    this.categoriaService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        let cat : number [] = [6,14,15];
-        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
-      }
-    });
-  }
+  obtenerCategorias = () => this.categoriaService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15].includes(item.catMP_Id)));
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
@@ -227,10 +204,10 @@ export class EntradaBOPPComponent implements OnInit {
             BOPP_TipoDoc: this.tipoDoc,
             BOPP_CodigoDoc : this.campoRemi_Faccompra,
           }
-          this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
+          this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
             this.mostrarConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
             this.load = true;
-          }, error => { this.mostrarError(`Error`, `Error al ingresar el rollo!`); });
+          }, () => { this.mostrarError(`Error`, `Error al ingresar el rollo!`); });
         }
     }
   }
@@ -245,9 +222,7 @@ export class EntradaBOPPComponent implements OnInit {
   quitarRollo(data : any){
     data = this.boppSeleccionado;
     this.onReject();
-    for (let i = 0; i < this.ArrayBOPP.length; i++) {
-      if (data.Serial == this.ArrayBOPP[i].Serial) this.ArrayBOPP.splice(i, 1) ;
-    }
+    this.ArrayBOPP.splice(this.ArrayBOPP.findIndex((item) => item.Serial == data.Serial), 1);
     this.obtenerValorTotal();
   }
 
@@ -258,25 +233,13 @@ export class EntradaBOPPComponent implements OnInit {
     this.FormEntradaBOPP.patchValue({ Observacion : this.FormEntradaBOPP.value.Nombre });
   }
 
-  getMicrasBOPP() {
-    this.micrasBopp = [];
-    this.entradaBOPPService.getMicras().subscribe(data => {this.micrasBopp = data});
-  }
+  getMicrasBOPP = () => this.entradaBOPPService.getMicras().subscribe(data => {this.micrasBopp = data});
 
-  getPreciosBOPP() {
-    this.preciosBopp = [];
-    this.entradaBOPPService.getPrecios().subscribe(data => {this.preciosBopp = data});
-  }
+  getPreciosBOPP = () => this.entradaBOPPService.getPrecios().subscribe(data => {this.preciosBopp = data});
 
-  getAnchosBOPP() {
-    this.anchosBopp = [];
-    this.entradaBOPPService.getAnchos().subscribe(data => {this.anchosBopp = data});
-  }
+  getAnchosBOPP = () => this.entradaBOPPService.getAnchos().subscribe(data => {this.anchosBopp = data});
 
-  getSerialesBOPP() {
-    this.serialesBopp = [];
-    this.entradaBOPPService.getSeriales().subscribe(data => {this.serialesBopp = data});
-  }
+  getSerialesBOPP = () => this.entradaBOPPService.getSeriales().subscribe(data => {this.serialesBopp = data});
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
@@ -289,13 +252,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   // Funcion que se encargará de obtener los proveedores
-  obtenerProveeedor(){
-    this.servicioProveedores.srvObtenerLista().subscribe(datos_proveedor => {
-      for (let index = 0; index < datos_proveedor.length; index++) {
-        this.proveedor.push(datos_proveedor[index]);
-      }
-    });
-  }
+  obtenerProveeedor = () => this.servicioProveedores.srvObtenerLista().subscribe(datos_proveedor => this.proveedor = datos_proveedor);
 
   /** Función para consultar solo ordenes de compra de BOPP */
   consultarOrdenCompra_Bopp() {
@@ -385,16 +342,16 @@ export class EntradaBOPPComponent implements OnInit {
 
   /**Función que cargará la información de los rollos de la tabla a los campos */
   editarRolloBopp(item : any) {
-      this.FormEntradaBOPP.patchValue({
-        Id : item.id,
-        Nombre: item.nombre,
-        cantidad: item.micras,
-        cantidadKG: item.cantidad,
-        precio: item.precio,
-        ancho: item.ancho,
-        Observacion: item.nombre,
-        Categoria: item.categoria,
-      });
+    this.FormEntradaBOPP.patchValue({
+      Id : item.id,
+      Nombre: item.nombre,
+      cantidad: item.micras,
+      cantidadKG: item.cantidad,
+      precio: item.precio,
+      ancho: item.ancho,
+      Observacion: item.nombre,
+      Categoria: item.categoria,
+    });
   }
 
   /** Factura */
@@ -414,7 +371,7 @@ export class EntradaBOPPComponent implements OnInit {
         Usua_Id : this.storage_Id,
         TpDoc_Id : 'FCO',
       }
-      this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(datos_EncabezadoFactura => { this.obtenerUltimoIdFacturaCompra(); }, error => {
+      this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(() => { this.obtenerUltimoIdFacturaCompra(); }, () => {
         this.mostrarError(`Error`,`Error al crear la factura!`);
       });
     }
@@ -422,7 +379,7 @@ export class EntradaBOPPComponent implements OnInit {
 
   /** Funcion para registrar el máximo ID de la factura */
   obtenerUltimoIdFacturaCompra() {
-    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos_facturas => { this.creacionDetalleFactura(datos_facturas); }, error => {
+    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos_facturas => this.creacionDetalleFactura(datos_facturas), () => {
       this.mostrarError(`Error`, `Error al obtener la ultima factura creada!`);
     });
   }
@@ -440,12 +397,12 @@ export class EntradaBOPPComponent implements OnInit {
         UndMed_Id: this.ArrayBOPP[index].UndCantKg,
         FaccoMatPri_ValorUnitario: this.ArrayBOPP[index].Precio,
       }
-      this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(dataDetalleFaccompraMP => { detalleError = false; }, error => {
-        this.mostrarError('No fue posible registrar el detalle de la factura, verifique!'); detalleError = true
+      this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(() => { detalleError = false; }, () => {
+        this.mostrarError('No fue posible registrar el detalle de la factura, verifique!');
+        detalleError = true;
       });
     }
     setTimeout(() => { if(!detalleError) this.crearRelacionOrdenCompra_Faccompra(idUltimafactura); }, 500);
-
   }
 
   /** Funcion para registrar la relación entre la factura y la OC */
@@ -454,7 +411,7 @@ export class EntradaBOPPComponent implements OnInit {
       Oc_Id : this.FormOpcional.value.OrdenCompra,
       Facco_Id : factura,
     }
-    this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(datos_insertados => { this.crearEntrada(); }, error => {
+    this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
       this.mostrarError(`Error`, `No se ha creado la relación entre la factura y la OC!`);
     });
   }
@@ -473,14 +430,14 @@ export class EntradaBOPPComponent implements OnInit {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormOpcional.value.Observacion,
     }
-    this.servicioRemisiones.srvGuardar(datosRemision).subscribe(datos_remisionCreada => { this.obtenerUltimoIdRemision(); }, error => {
+    this.servicioRemisiones.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => {
       this.mostrarError(`Error`, `Error al crear la remisión!`);
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las remisiones
   obtenerUltimoIdRemision(){
-    this.servicioRemisiones.UltimoIdRemision().subscribe(datos_remision => { this.crearDetalleRemision(datos_remision); }, error => {
+    this.servicioRemisiones.UltimoIdRemision().subscribe(datos_remision => this.crearDetalleRemision(datos_remision), () => {
       this.mostrarError(`Error`, `Error al obtener el Id de la última remisión!`);
       this.load = true;
     });
@@ -501,7 +458,7 @@ export class EntradaBOPPComponent implements OnInit {
           UndMed_Id : this.ArrayBOPP[index].UndCantKg,
           RemiMatPri_ValorUnitario : this.ArrayBOPP[index].Precio,
         }
-        this.servicioDetRemisiones.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => { detalleError = false; }, error => {
+        this.servicioDetRemisiones.srvGuardar(datosRemisionMp).subscribe(() => detalleError = false, () => {
           detalleError = true;
           this.mostrarError(`Error`, `Error al crear el detalle de la remisión!`);
           this.load = true;
@@ -517,7 +474,7 @@ export class EntradaBOPPComponent implements OnInit {
       Oc_Id : this.FormOpcional.value.OrdenCompra,
       Rem_Id : remision,
     }
-    this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(datos_insertados => { this.crearEntrada(); }, error => {
+    this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
       this.mostrarError(`Error`, `No se ha creado la relacion entre la remisión y la OC!`);
     });
   }
@@ -552,25 +509,17 @@ export class EntradaBOPPComponent implements OnInit {
     }
   }
 
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
-  onReject() {
-    this.messageService.clear('bopp');
-  }
+  onReject = () => this.messageService.clear('bopp');
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {

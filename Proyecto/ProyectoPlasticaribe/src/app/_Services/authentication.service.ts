@@ -23,14 +23,13 @@ export class AuthenticationService {
   public user: Observable<User | null>;
   data:any=[];
 
-  constructor(private router: Router,
-                private http: HttpClient,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private movAplicacionService : MovimientosAplicacionService,
-                      private authenticationInvZeusService : AuthenticationService_InvZeus,
-                        private authenticationContaZeusService : authentication_ContaZeus,
-                          private authenticationBagPro : authentication_BagPro,
-                            private encriptacion : EncriptacionService,) {
+  constructor(private http: HttpClient,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private movAplicacionService : MovimientosAplicacionService,
+                    private authenticationInvZeusService : AuthenticationService_InvZeus,
+                      private authenticationContaZeusService : authentication_ContaZeus,
+                        private authenticationBagPro : authentication_BagPro,
+                          private encriptacion : EncriptacionService,) {
 
     let token = this.encriptacion.decrypt(localStorage.getItem('user') == undefined ? '' : localStorage.getItem('user'));
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
@@ -65,7 +64,7 @@ export class AuthenticationService {
       "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }
-    this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => {
+    this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
       localStorage.clear();
       this.storage.clear();
       this.userSubject.next(null);
@@ -73,6 +72,6 @@ export class AuthenticationService {
       this.authenticationContaZeusService.logout();
       this.authenticationBagPro.logout();
       window.location.pathname = '/';
-    }, error => { Swal.fire({ icon: 'error', title: 'Error de Cierre de Sesión', text: '¡No se registró el cierre de sesión del usuario!' }); });
+    }, () => { Swal.fire({ icon: 'error', title: 'Error de Cierre de Sesión', text: '¡No se registró el cierre de sesión del usuario!' }); });
   }
 }

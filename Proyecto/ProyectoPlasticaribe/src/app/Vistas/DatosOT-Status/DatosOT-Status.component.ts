@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, ViewChild } from '@angular/core';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Injectable({
@@ -11,7 +11,7 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
   templateUrl: './DatosOT-Status.component.html',
   styleUrls: ['./DatosOT-Status.component.css']
 })
-export class DatosOTStatusComponent implements OnInit {
+export class DatosOTStatusComponent {
 
   @ViewChild(Reporte_Procesos_OTComponent) Reporte_ProcesosOT : Reporte_Procesos_OTComponent;
 
@@ -20,13 +20,5 @@ export class DatosOTStatusComponent implements OnInit {
   ArrayDatosAgrupados : any [] = [] //variable que va a almacenar todos los agrupados de la OT en el proceso seleccionado
 
   constructor() { }
-
-  ngOnInit() {
-  }
-
-
-  cargarDatosTablaProcesos(){
-
-  }
 
 }

@@ -110,7 +110,7 @@ export class DevolucionesMPComponent implements OnInit {
           }
         }
       }
-    }, error => { this.mostrarAdvertencia(`Error`, `¡No hay materias primas asignadas a la OT ${ot}!`); });
+    }, () => { this.mostrarAdvertencia(`Error`, `¡No hay materias primas asignadas a la OT ${ot}!`); });
     setTimeout(() => {
       this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
         for (let j = 0; j < datos_devolucion.length; j++) {
@@ -124,7 +124,7 @@ export class DevolucionesMPComponent implements OnInit {
             }
           }
         }
-      }, error => { this.mostrarError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`); });
+      }, () => { this.mostrarError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`); });
       this.load = true;
     }, 2500);
   }
@@ -132,40 +132,33 @@ export class DevolucionesMPComponent implements OnInit {
   //Funcion que va a seleccionar una materia prima
   llenarMateriaPrimaAIngresar(item : any){
     this.load = false;
-    for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
-      if (this.materiasPrimasRetiradas[i].Id == item.Id) this.materiasPrimasRetiradas.splice(i, 1);
-    }
+    this.materiasPrimasRetiradas.splice(this.materiasPrimasRetiradas.findIndex((data) => data.Id == item.Id), 1);
     this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   // Funcion que seleccionará y colocará todos los MateriaPrima que se van a insertar
-  seleccionarTodosMateriaPrima(item : any){
+  seleccionarTodosMateriaPrima(){
     this.load = false;
     this.materiasPrimasRetiradas = [];
     this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   //Funcion que va a quitar lo MateriaPrima que se van a insertar
   quitarMateriaPrimaAIngresar(item : any){
     this.load = false;
-    for (let i = 0; i < this.materiasPrimas.length; i++) {
-      if (this.materiasPrimas[i].Id == item.Id) this.materiasPrimas.splice(i, 1);
-    }
+    this.materiasPrimas.splice(this.materiasPrimas.findIndex((data) => data.Id == item.Id), 1);
     this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
-  quitarTodosMateriaPrima(item : any){
+  quitarTodosMateriaPrima(){
     this.load = false;
-    for (let index = 0; index < item.length; index++) {
-      if (item[index].Exits == true) this.materiasPrimas.push(item[index]);
-    }
     this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.materiasPrimas = [];
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
@@ -178,9 +171,7 @@ export class DevolucionesMPComponent implements OnInit {
         DevMatPri_Motivo : this.FormDevolucion.value.MpObservacion,
         Usua_Id : this.storage_Id,
       }
-
-      this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => { this.creacionDevolucionMateriaPrima();
-      }, error => { this.mostrarError(`Error`, `¡Error al crear la devolución de materia prima!`); });
+      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => this.creacionDevolucionMateriaPrima(), () => this.mostrarError(`Error`, `¡Error al crear la devolución de materia prima!`));
     } else this.mostrarAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
   }
 
@@ -198,8 +189,8 @@ export class DevolucionesMPComponent implements OnInit {
             UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
-          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => { this.mostrarError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`); });
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(() => {
+          }, () => { this.mostrarError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`); });
         }
       }
     });
@@ -231,9 +222,9 @@ export class DevolucionesMPComponent implements OnInit {
             MatPri_Precio : datos_materiaPrima.matPri_Precio,
             TpBod_Id : datos_materiaPrima.tpBod_Id,
           }
-          this.materiaPrimaService.srvActualizar(this.materiasPrimasRetiradas[index].Id_MateriaPrima, datosMP).subscribe(datos_mp_creada => {
+          this.materiaPrimaService.srvActualizar(this.materiasPrimasRetiradas[index].Id_MateriaPrima, datosMP).subscribe(() => {
             this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito`);
-          }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
+          }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
         });
       }
     }
@@ -261,9 +252,9 @@ export class DevolucionesMPComponent implements OnInit {
             TpBod_Id : datos_tinta.tpBod_Id,
             tinta_InvInicial : datos_tinta.tinta_InvInicial,
           }
-          this.servicioTintas.srvActualizar(this.materiasPrimasRetiradas[index].Id_Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
+          this.servicioTintas.srvActualizar(this.materiasPrimasRetiradas[index].Id_Tinta, datosTintaActualizada).subscribe(() => {
             this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
-          }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
+          }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
         });
       }
     }
@@ -298,9 +289,9 @@ export class DevolucionesMPComponent implements OnInit {
               bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
               Usua_Id : item.usua_Id
             }
-            this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(datos_boppActualizado => {
+            this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(() => {
               this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
-            }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!`); });
+            }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!`); });
           }
         });
       }

@@ -1,8 +1,7 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table/table';
 import { AppComponent } from 'src/app/app.component';
@@ -13,6 +12,11 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { stepInventarioBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
+import { modelTintas } from 'src/app/Modelo/modelTintas';
+import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -22,6 +26,7 @@ import { ShepherdService } from 'angular-shepherd';
 
 export class ReporteMateriaPrimaComponent implements OnInit {
 
+  FormEdicionMateriaPrima !: FormGroup;
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt_Polientileno') dt_Polientileno: Table | undefined;
   @ViewChild('dt_Tintas') dt_Tintas: Table | undefined;
@@ -32,6 +37,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   categorias : any = []; //variable que almacenará las categorias existentes
+  undMedidas : any [] = []; //Variable que almacenará las unidades de medidas
   bodegas : any = []; //variable que almacenará las bodegas
   rongoFechas : any [] = []; //Variable que va a guardar el rango de fechas en el que se buscará informacion
   categoriasMP : any [] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
@@ -69,14 +75,31 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   cantDiferenciaBiorientado : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los biorientados
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
+  modalCreacionMateriaPrima : boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
+  ModalCrearMateriaPrima: boolean= false; //Variable para validar que se abra el modal de creacion de polietileno
+  ModalCrearTintas: boolean= false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenetes
+  modalEditarMateriasPrimas : boolean = false;
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
                     private AppComponent : AppComponent,
                       private boppService : EntradaBOPPService,
                         private messageService: MessageService,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private frmBuilder : FormBuilder,
+                              private undMedidaService : UnidadMedidaService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.FormEdicionMateriaPrima = this.frmBuilder.group({
+      Id : [null, Validators.required],
+      Nombre : [null, Validators.required],
+      Categoria : [null, Validators.required],
+      Ancho : [null, Validators.required],
+      Stock : [null, Validators.required],
+      UndMed : [null, Validators.required],
+      Precio : [null, Validators.required],
+      Micras : [null, Validators.required],
+    });
   }
 
   ngOnInit(): void {
@@ -84,6 +107,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.obtenerCategorias();
     this.consultarInventario();
     this.consultarCategorias();
+    this.obtenerUnidadesMedidas();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -109,9 +133,12 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias(){
-    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => { this.categorias = datos_categorias; });
+    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => this.categorias = datos_categorias);
     this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
   }
+
+  // Funcion que va a obtener las diferentes materias primas
+  obtenerUnidadesMedidas = () => this.undMedidaService.srvObtenerLista().subscribe(data => this.undMedidas = data);
 
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data : any){
@@ -136,6 +163,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         PrecioUnd : data.precio,
         SubTotal : data.subTotal,
         Categoria : data.categoria,
+        Categoria_Id : data.categoria_Id
       }
       if (this.ValidarRol == 1 || this.ValidarRol == 3) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
@@ -204,14 +232,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que va a mostrar las materias primas con existencias mayor a cero
   existenciasMayorCero(){
     this.load = false;
-    let materiaPrima : unknown [] = this.ArrayMateriaPrima.filter((item) => item.Cant > 0);
-    this.ArrayMateriaPrima = materiaPrima;
-    let polientilenos : unknown [] = this.polietilenos.filter((item) => item.Cant > 0);
-    this.ArrayMateriaPrima = polientilenos;
-    let tintas : unknown [] = this.tintas.filter((item) => item.Cant > 0);
-    this.ArrayMateriaPrima = tintas;
-    let biorientados : unknown [] = this.biorientados.filter((item) => item.Cant > 0);
-    this.ArrayMateriaPrima = biorientados;
+    this.ArrayMateriaPrima = this.ArrayMateriaPrima.filter((item) => item.Cant > 0);
+    this.polietilenos = this.polietilenos.filter((item) => item.Cant > 0);
+    this.tintas = this.tintas.filter((item) => item.Cant > 0);
+    this.biorientados = this.biorientados.filter((item) => item.Cant > 0);
     this.load = true;
   }
 
@@ -446,13 +470,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life: 2000});
 
   /** Mostrar mensaje de error  */
-  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
 
   /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: mensaje, detail: `¡Advertencia!`, life: 2000});
+  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
@@ -461,5 +485,122 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+  }
+
+  // Funcion para llamar el modal que pregunta que materia prima se va a crear
+  LlamarModalCrearMateriaPrima = () => this.modalCreacionMateriaPrima = true;
+
+  // Funcion para llamar el modal que crea polientileno
+  crearPolientileno(){
+    this.modalCreacionMateriaPrima = false;
+    this.ModalCrearMateriaPrima = true;
+  }
+
+  // Funcion para llamar el modal que crea tintas
+  creartinta(){
+    this.modalCreacionMateriaPrima = false;
+    this.ModalCrearTintas = true;
+  }
+
+  // Funcion que va a llamar el modal donde se editará la información de la materia prima
+  llamarModalEdicionMateriaPrima(data : any){
+    this.modalEditarMateriasPrimas = true;
+    this.FormEdicionMateriaPrima.patchValue({
+      Id : data.Id,
+      Nombre : data.Nombre,
+      Categoria : data.Categoria_Id,
+      Ancho : data.Ancho,
+      Stock : data.Cant,
+      UndMed : data.UndCant,
+      Precio : data.PrecioUnd,
+      Micras : 0
+    });
+    if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)){
+      this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          this.FormEdicionMateriaPrima.patchValue({ Micras: data[i].bopP_CantidadMicras});
+        }
+      });
+    }
+  }
+
+  // Funcion que va a editar una materia primas
+  editarMateriaPrima() {
+    if (this.categoriasMP.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+      const info : modelMateriaPrima = {
+        MatPri_Id: this.FormEdicionMateriaPrima.value.Id,
+        MatPri_Nombre: this.FormEdicionMateriaPrima.value.Nombre,
+        MatPri_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
+        MatPri_Stock: this.FormEdicionMateriaPrima.value.Stock,
+        UndMed_Id: this.FormEdicionMateriaPrima.value.UndMed,
+        CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
+        MatPri_Precio: this.FormEdicionMateriaPrima.value.Precio,
+        TpBod_Id: 4
+      }
+      this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
+        this.consultarInventario();
+        this.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
+        this.modalEditarMateriasPrimas = false;
+      }, () => {
+        this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la materia prima!`);
+        this.modalEditarMateriasPrimas = false;
+      });
+    } else if (this.categoriasTintas.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
+      this.tintasService.srvObtenerListaPorId(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
+        const info : modelTintas = {
+          Tinta_Id : this.FormEdicionMateriaPrima.value.Id,
+          Tinta_Nombre: this.FormEdicionMateriaPrima.value.Nombre,
+          Tinta_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
+          Tinta_CodigoHexadecimal: this.FormEdicionMateriaPrima.value.Nombre,
+          Tinta_Stock: this.FormEdicionMateriaPrima.value.Stock,
+          UndMed_Id: this.FormEdicionMateriaPrima.value.UndMed,
+          Tinta_Precio: this.FormEdicionMateriaPrima.value.Precio,
+          CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
+          TpBod_Id: data.tpBod_Id,
+          Tinta_InvInicial: data.tinta_InvInicial,
+          Tinta_FechaIngreso: data.tinta_FechaIngreso,
+          Tinta_Hora: data.tinta_Hora,
+        }
+        this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
+          this.consultarInventario();
+          this.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
+          this.modalEditarMateriasPrimas = false;
+        }, () => {
+          this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la tinta!`);
+          this.modalEditarMateriasPrimas = false;
+        })
+      });
+    } else if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)){
+      this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          const info : modelBOPP = {
+            BOPP_Id : data[i].bopP_Id,
+            BOPP_Nombre: `${this.FormEdicionMateriaPrima.value.Nombre}`,
+            BOPP_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
+            BOPP_Serial: data[i].bopP_Serial,
+            BOPP_CantidadMicras: this.FormEdicionMateriaPrima.value.Micras,
+            UndMed_Id: data[i].undMed_Id,
+            CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
+            BOPP_Precio: this.FormEdicionMateriaPrima.value.Precio,
+            TpBod_Id: data[i].tpBod_Id,
+            BOPP_FechaIngreso: data[i].bopP_FechaIngreso,
+            BOPP_Ancho: this.FormEdicionMateriaPrima.value.Ancho,
+            BOPP_Stock: this.FormEdicionMateriaPrima.value.Stock,
+            UndMed_Kg: this.FormEdicionMateriaPrima.value.UndMed,
+            BOPP_CantidadInicialKg: data[i].bopP_CantidadInicialKg,
+            Usua_Id: data[i].usua_Id,
+            BOPP_Hora: data[i].bopP_Hora
+          }
+          this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
+            this.consultarInventario();
+            this.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
+            this.modalEditarMateriasPrimas = false;
+          }, () => {
+            this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar el biorientado!`);
+            this.modalEditarMateriasPrimas = false;
+          })
+        }
+      });
+    }
   }
 }

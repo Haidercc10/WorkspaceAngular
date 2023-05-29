@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder} from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
@@ -85,29 +84,20 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   //
   obtenerTipoDocumento(){
-    this.tipoDocuemntoService.srvObtenerLista().subscribe(datos_tiposDocumentos => {
-      for (let index = 0; index < datos_tiposDocumentos.length; index++) {
-        let doc : string [] = ['REM', 'FCO'];
-        if (doc.includes(datos_tiposDocumentos[index].tpDoc_Id)) this.tipoDocumento.push(datos_tiposDocumentos[index])
-      }
-    });
+    this.tipoDocuemntoService.srvObtenerLista().subscribe(datos => this.tipoDocumento = datos.filter((item) => ['REM', 'FCO'].includes(item.tpDoc_Id)));
   }
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarProveedores(){
-    this.proveedor = [];
     let nombre : string = this.FormDocumentos.value.proveedorNombre.trim();
-    if (nombre != '') this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => { this.proveedor = datos_Proveedores; });
+    if (nombre != '') this.proveedorService.getProveedorLike(nombre).subscribe(datos => this.proveedor = datos);
   }
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormDocumentos.value.proveedorNombre;
     let nuevo : any[] = this.proveedor.filter((item) => item.prov_Id == id);
-    this.FormDocumentos.patchValue({
-      proveedorNombre : ` ${nuevo[0].prov_Nombre}`,
-      proveedorId : nuevo[0].prov_Id,
-    });
+    this.FormDocumentos.patchValue({ proveedorNombre : ` ${nuevo[0].prov_Nombre}`, proveedorId : nuevo[0].prov_Id, });
   }
 
   //Función que consultará segun los filtros seleccionados
@@ -294,7 +284,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     }
     this.ArrayDocumento.push(infoDoc);
     this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
-    this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => { infoDoc.proveedor = datos_proveedor.prov_Nombre; });
+    this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => infoDoc.proveedor = datos_proveedor.prov_Nombre);
     this.load = true;
   }
 

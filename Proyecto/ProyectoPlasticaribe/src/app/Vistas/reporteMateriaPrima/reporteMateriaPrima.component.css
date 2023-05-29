@@ -15,6 +15,7 @@ p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p
   width: 100%;
 }
 
+
 p-calendar ::ng-deep span button {
   background-color: var(--rojo);
   border: 0;
@@ -35,6 +36,11 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
 
 p-calendar ::ng-deep span button span {
   display: block;
+}
+
+p-dialog ::ng-deep .p-dialog-header span {
+  color: var(--rojo);
+  align-items: center;
 }
 
 .botonesOpciones {

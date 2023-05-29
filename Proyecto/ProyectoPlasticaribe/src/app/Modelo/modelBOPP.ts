@@ -1,4 +1,5 @@
 export interface modelBOPP{
+  BOPP_Id? : number;
   BOPP_Nombre : string;
   BOPP_Descripcion : string;
   BOPP_Serial : string;
@@ -13,4 +14,5 @@ export interface modelBOPP{
   UndMed_Kg : string;
   BOPP_CantidadInicialKg : number;
   Usua_Id : number;
+  BOPP_Hora : string;
 }

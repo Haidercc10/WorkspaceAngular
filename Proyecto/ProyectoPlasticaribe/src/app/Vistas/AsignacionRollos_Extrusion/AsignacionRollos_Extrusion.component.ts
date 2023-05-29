@@ -85,9 +85,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm(){
-    this.FormConsultarRollos.reset();
-  }
+  limpiarForm = () => this.FormConsultarRollos.reset();
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
@@ -102,11 +100,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que se encargará de consultar los procesos
   obtenerProcesos(){
-    this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
-      for (let i = 0; i < datos_procesos.length; i++) {
-        if (datos_procesos[i].proceso_Id != 'RECUP' && datos_procesos[i].proceso_Id != 'TINTAS') this.procesos.push(datos_procesos[i]);
-      }
-    });
+    this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter((data) => data.proceso_Id != 'RECUP' && data.proceso_Id != 'TINTAS'));
   }
 
   // Funcion que va a consultar los rollos
@@ -268,9 +262,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que colocará los rollos que se van a insertar
   llenarRollosAIngresar(item : any){
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
-    }
+    this.rollos.splice(this.rollos.findIndex((data) => item.Id == data.Id), 1);
     this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
@@ -278,12 +270,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que seleccionará y colocará todos los rollos que se van a insertar
   seleccionarTodosRollos(item : any){
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits != true) this.rollos = [];
-    }
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits == true) this.rollos.push(item[i]);
-    }
+    this.rollos = item.filter((data) => data.exits);
     this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
@@ -291,16 +278,14 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que va a quitar lo rollos que se van a insertar
   quitarRollosAIngresar(item : any){
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i, 1);
-    }
+    this.rollosInsertar.splice(this.rollosInsertar.findIndex((data) => item.Id == data.Id), 1);
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
   }
 
   // Funcion que va a quitar todos los rollos que se van a insertar
-  quitarTodosRollos(item : any){
+  quitarTodosRollos(){
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.rollosInsertar = [];
@@ -375,10 +360,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         AsgRollos_Observacion : Observacion,
         Usua_Id : this.storage_Id,
       }
-      this.asgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id);
-        }, error => { this.mostrarError(`Error al obtener el último Id de asignación!`); });
-      }, error => {
+      this.asgRollos.srvGuardar(info).subscribe(() => {
+        this.asgRollos.obtenerUltimoId().subscribe(data => this.dtSalidaRollos(data.asgRollos_Id),() => this.mostrarError(`Error al obtener el último Id de asignación!`));
+      }, () => {
         this.mostrarError(`Error`, `Error al asignar los rollos!`);
         this.cargando = true;
       });
@@ -388,20 +372,17 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   // Funcion que ingresará los rollos que están saliendo
   dtSalidaRollos(id : number){
     let procesos : string = this.FormConsultarRollos.value.Proceso;
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (!this.rollosInsertar[i].exits) {
-        let info : any = {
-          AsgRollos_Id : id,
-          DtAsgRollos_OT : this.rollosInsertar[i].Ot,
-          Rollo_Id : this.rollosInsertar[i].Id,
-          DtAsgRollos_Cantidad : this.rollosInsertar[i].Cantidad,
-          UndMed_Id : this.rollosInsertar[i].Presentacion,
-          Proceso_Id : procesos,
-          Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
-        }
-        this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => { this.mostrarError(`Error`, `Error al dar salida a los rollos!!`); });
+    for (let i = 0; i < this.rollosInsertar.filter((item) => !item.exits).length; i++) {
+      let info : any = {
+        AsgRollos_Id : id,
+        DtAsgRollos_OT : this.rollosInsertar[i].Ot,
+        Rollo_Id : this.rollosInsertar[i].Id,
+        DtAsgRollos_Cantidad : this.rollosInsertar[i].Cantidad,
+        UndMed_Id : this.rollosInsertar[i].Presentacion,
+        Proceso_Id : procesos,
+        Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
       }
+      this.dtAsgRollos.srvGuardar(info).subscribe(() => {}, () => this.mostrarError(`Error`, `Error al dar salida a los rollos!!`));
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 3000);
   }
@@ -422,8 +403,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Proceso_Id : datos_Rollos[j].proceso_Id,
             Prod_Id : datos_Rollos[j].prod_Id,
           }
-          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {
-          }, error => { this.mostrarError(`Error`, `No fue posible actualizar el estado de los rollos!`); });
+          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, `No fue posible actualizar el estado de los rollos!`));
         }
       });
     }
@@ -569,7 +549,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         setTimeout(() => { (this.limpiarCampos()); }, 1200);
         break;
       }
-    }, error => { this.mostrarError(`Error`,`No se pudo obtener la información necesaria para crear el archivo PDF!`); });
+    }, () => { this.mostrarError(`Error`,`No se pudo obtener la información necesaria para crear el archivo PDF!`); });
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -590,7 +570,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
       setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, error => {  this.mostrarError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
+    }, () => {  this.mostrarError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -618,7 +598,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       },
       fontSize: 7,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -635,7 +615,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       },
       fontSize: 7,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -643,17 +623,11 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000 });
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000 });
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000 });
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000 });
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000 });
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000 });
 }

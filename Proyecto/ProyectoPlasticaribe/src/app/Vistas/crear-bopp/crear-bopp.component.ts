@@ -78,7 +78,7 @@ export class CrearBoppComponent implements OnInit {
 
   /** Mostrar mensaje de advertencia al crear tinta */
   mostrarAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warning', detail: mensaje});
+    this.messageService.add({severity:'warn', detail: mensaje});
   }
 
 }
