@@ -1,7 +1,6 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
@@ -112,7 +111,7 @@ export class Orden_MaquilaComponent implements OnInit {
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
     this.ordenMaquilaService.GetUltimoId().subscribe(datos_ordenCompra => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
-    }, error => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : 1, }); });
+    }, () => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : 1, }); });
   }
 
   // Funcion que limpiará todos los campos de la vista
@@ -142,7 +141,6 @@ export class Orden_MaquilaComponent implements OnInit {
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarTercero(){
-    this.terceros = [];
     let nombre : string = this.FormOrdenMaquila.value.Tercero.trim();
     if (nombre != '') this.terceroService.getTerceroLike(nombre).subscribe(datos_Terceros => { this.terceros = datos_Terceros; });
   }
@@ -233,7 +231,7 @@ export class Orden_MaquilaComponent implements OnInit {
           Stock : datos_materiaPrima[i].stock,
         });
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -295,7 +293,7 @@ export class Orden_MaquilaComponent implements OnInit {
         if (datos_orden.length > 0) {
           this.onReject();
           for (let i = 0; i < datos_orden.length; i++) {
-            this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(datos_eliminados => {
+            this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(() => {
               for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
                 if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
                   this.sumarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
@@ -342,7 +340,7 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Fecha : moment().format('YYYY-MM-DD'),
       OM_Hora : moment().format("H:mm:ss"),
     }
-    this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => { this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id); }, error => {
+    this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => { this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id); }, () => {
       this.mostrarError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
     });
   }
@@ -363,8 +361,8 @@ export class Orden_MaquilaComponent implements OnInit {
       this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
       this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
       this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-      this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; },
-      error => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`); error = true;});
+      this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; },
+      () => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`);});
     }
     if(!error) {
       this.itemSeleccionado = id;
@@ -389,7 +387,7 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Fecha : moment().format('YYYY-MM-DD'),
       OM_Hora : moment().format("H:mm:ss"),
     }
-    this.ordenMaquilaService.put(id, info).subscribe(datos_ordenMaquila => { this.editarDtOrdenMaquila(); }, error => {
+    this.ordenMaquilaService.put(id, info).subscribe(() => { this.editarDtOrdenMaquila(); }, () => {
       this.mostrarError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
     });
   }
@@ -413,9 +411,9 @@ export class Orden_MaquilaComponent implements OnInit {
           this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
           this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
           this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-          this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`); });
+          this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; }, () => { this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`); });
         }
-      }, error => {
+      }, () => {
         this.mostrarError(``);
         error = true;
       });
@@ -442,7 +440,7 @@ export class Orden_MaquilaComponent implements OnInit {
           MatPri_Fecha : datos.matPri_Fecha,
           MatPri_Hora : datos.matPri_Hora,
         }
-        this.materiaPrimaService.srvActualizar(id, info).subscribe(datosActualizados => { });
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(() => { });
       });
     }
   }
@@ -465,7 +463,7 @@ export class Orden_MaquilaComponent implements OnInit {
           tinta_FechaIngreso : datos.tinta_FechaIngreso,
           tinta_Hora : datos.tinta_Hora,
         }
-        this.tintasService.srvActualizar(id, info).subscribe(datosactualizados => { });
+        this.tintasService.srvActualizar(id, info).subscribe(() => { });
       });
     }
   }
@@ -492,7 +490,7 @@ export class Orden_MaquilaComponent implements OnInit {
           bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
           usua_Id: datos.usua_Id,
         }
-        this.boppService.srvActualizar(id, info).subscribe(dato_Actualizado => {  });
+        this.boppService.srvActualizar(id, info).subscribe(() => {  });
       });
     }
   }
@@ -513,7 +511,7 @@ export class Orden_MaquilaComponent implements OnInit {
           MatPri_Fecha : datos.matPri_Fecha,
           MatPri_Hora : datos.matPri_Hora,
         }
-        this.materiaPrimaService.srvActualizar(id, info).subscribe(datosActualizados => { });
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(() => { });
       });
     }
   }
@@ -536,7 +534,7 @@ export class Orden_MaquilaComponent implements OnInit {
           tinta_FechaIngreso : datos.tinta_FechaIngreso,
           tinta_Hora : datos.tinta_Hora,
         }
-        this.tintasService.srvActualizar(id, info).subscribe(datosactualizados => { });
+        this.tintasService.srvActualizar(id, info).subscribe(() => { });
       });
     }
   }
@@ -563,7 +561,7 @@ export class Orden_MaquilaComponent implements OnInit {
           bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
           usua_Id: datos.usua_Id,
         }
-        this.boppService.srvActualizar(id, info).subscribe(dato_Actualizado => {  });
+        this.boppService.srvActualizar(id, info).subscribe(() => {  });
       });
     }
   }
@@ -600,7 +598,7 @@ export class Orden_MaquilaComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.crearPDF(id); }, 2500);
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
   }
 
   // Funcion que va a crear un PDF que será una orde de Maquila
@@ -785,7 +783,7 @@ export class Orden_MaquilaComponent implements OnInit {
         this.limpiarTodo();
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -812,7 +810,7 @@ export class Orden_MaquilaComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -834,7 +832,7 @@ export class Orden_MaquilaComponent implements OnInit {
    this.cargando = false;
   }
 
-  mostrarEleccion(modo : any, item?: any,  mensaje?: any, titulo?: any){
+  mostrarEleccion(modo : any, item?: any,  mensaje?: any){
     this.llave = modo;
     this.itemSeleccionado = item;
 

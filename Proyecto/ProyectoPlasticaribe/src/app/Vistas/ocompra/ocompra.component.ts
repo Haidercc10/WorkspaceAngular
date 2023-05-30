@@ -171,7 +171,7 @@ export class OcompraComponent implements OnInit {
 
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
-    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos => this.FormOrdenCompra.patchValue({ ConsecutivoOrden : datos + 1, }), error => {
+    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos => this.FormOrdenCompra.patchValue({ ConsecutivoOrden : datos + 1, }), () => {
       this.FormOrdenCompra.patchValue({ ConsecutivoOrden : 1, });
     });
   }
@@ -202,7 +202,7 @@ export class OcompraComponent implements OnInit {
           Categoria : datos_materiaPrima[i].categoria,
         });
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -364,7 +364,7 @@ export class OcompraComponent implements OnInit {
         this.mostrarAdvertencia(`Advertencia`, `¡No se encontraron registros para orden de compra N° ${ordenCompra}!`);
         this.limpiarTodo();
       }
-    }, error => {
+    }, () => {
       this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${ordenCompra}!`);
       this.limpiarTodo();
     });
@@ -440,7 +440,7 @@ export class OcompraComponent implements OnInit {
       if (solicitud != null) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
       this.mostrarEleccion(0, 'pdf')
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
-    }, error => {
+    }, () => {
       this.mostrarError(`Error`, `¡Error al crear la orden de compra!`);
       this.cargando = false;
     });
@@ -459,7 +459,7 @@ export class OcompraComponent implements OnInit {
         UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
         Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
       }
-      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => error = false, error => {
+      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => error = false, error => {
         this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
         this.cargando = false;
         error = true;
@@ -472,9 +472,9 @@ export class OcompraComponent implements OnInit {
   // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
   crearRelacionOc_Solicitud(orden : number, solicitud : number){
     let info : any = { Oc_Id : orden, Solicitud_Id : solicitud, }
-    this.relacionSolOcService.Post(info).subscribe(data => {
+    this.relacionSolOcService.Post(info).subscribe(() => {
       this.cambiarEstadoMpSolicitud(solicitud);
-    }, err => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
+    }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
   }
 
   // Funcion que va a cambiar el estado de la solicitud. Posiciones Array => 0 : Pendiente, 1 : Parciales, 2 : Totales, 3 : Cantidad de Materias Primas
@@ -491,12 +491,12 @@ export class OcompraComponent implements OnInit {
       this.dtSolicitudMp.GetEstadosMateriasPrimas(solicitud).subscribe(data => {
         if ((data[1] > 0 && data[1] == data[3]) || (data[2] > 0 && data[2] < data[3])) {
           info.Estado_Id = 12;
-          this.solicitudMpService.Put(solicitud, info).subscribe(datos_Act => {
-          }, error => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          this.solicitudMpService.Put(solicitud, info).subscribe(() => {
+          }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
         } else if (data[2] > 0 && data[2] == data[3]) {
           info.Estado_Id = 5;
-          this.solicitudMpService.Put(solicitud, info).subscribe(datos_Act => {
-          }, error => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          this.solicitudMpService.Put(solicitud, info).subscribe(() => {
+          }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
         }
       });
     }, err => this.mostrarError(`¡Error Solicitud!`, `¡${err}!`));
@@ -518,7 +518,7 @@ export class OcompraComponent implements OnInit {
             UndMed_Id: data[j].undMed_Id,
             Estado_Id: this.materiasPrimasSeleccionadas[i].Cantidad >= data[j].dtSolicitud_Cantidad ? 5 : 12,
           }
-          this.dtSolicitudMp.Put(data[j].dtSolicitud_Id, info).subscribe(datosOrden => {}, error => err = true);
+          this.dtSolicitudMp.Put(data[j].dtSolicitud_Id, info).subscribe(() => {}, () => err = true);
         }
       });
     }
@@ -563,7 +563,7 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.generarPDF(); }, 2000);
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -775,7 +775,7 @@ export class OcompraComponent implements OnInit {
         this.limpiarTodo();
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -802,7 +802,7 @@ export class OcompraComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -834,7 +834,7 @@ export class OcompraComponent implements OnInit {
       MatPri_Fecha:data.matPri_Fecha,
       MatPri_Hora: data.matPri_Hora,
     }
-    this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(datos => {}, err => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
+    this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
   }
 
   /** Actualizar Precio de la materia prima al momento de crear la OC */
@@ -863,7 +863,7 @@ export class OcompraComponent implements OnInit {
       Tinta_FechaIngreso : data.tinta_FechaIngreso,
       Tinta_Hora : data.tinta_Hora,
     }
-    this.servicioTintas.srvActualizar(info.Tinta_Id, info).subscribe(datos => {}, err => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las tintas'));
+    this.servicioTintas.srvActualizar(info.Tinta_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las tintas'));
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
@@ -873,11 +873,11 @@ export class OcompraComponent implements OnInit {
       if (datos_orden.length > 0) {
           this.onReject();
           for (let i = 0; i < datos_orden.length; i++) {
-            this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(datos_eliminados => {
+            this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(() => {
               this.quitarMateriaPrima(data);
               this.llave = 'pdf';
               this.mostrarAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima ${data.Nombre} de la orden de compra!`);
-            }, error => { this.mostrarError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`); });
+            }, () => { this.mostrarError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`); });
           }
       } else this.quitarMateriaPrima(data);
     });
@@ -904,11 +904,11 @@ export class OcompraComponent implements OnInit {
             Oc_Observacion : (observacion).toUpperCase(),
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
-          this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(datos_ordenCompra => { this.editarDtOrdenCompa(); }, error => {
+          this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => { this.editarDtOrdenCompa(); }, () => {
             this.mostrarError(`Error`, `¡Error al Editar la Orden de Compra!`);
             this.cargando = false;
           });
-        }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra a editar!`); });
+        }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra a editar!`); });
       } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
     } else this.mostrarAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
@@ -928,7 +928,7 @@ export class OcompraComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
-          this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { error = false; }, error => {
+          this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => { error = false; }, error => {
             this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
             error = true;
@@ -944,7 +944,7 @@ export class OcompraComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
-          this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(datos_dtOrden => { error = false; }, error => {
+          this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(() => { error = false; }, error => {
             this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
             error = true;

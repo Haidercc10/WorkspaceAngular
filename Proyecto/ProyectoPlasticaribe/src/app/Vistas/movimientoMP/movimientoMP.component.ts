@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -9,9 +9,8 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { stepsMovimientosBopp as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-movimientoMP',
@@ -170,16 +169,14 @@ export class MovimientoMPComponent implements OnInit {
         this.cargando = false;
       }
       if (datos.length == 0) this.mensajeAdvertencia(`¡No se encontró información con los parametros consultados!`);
-    }, error => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
+    }, () => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
 
     if (codigo != null) {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
         for (let i = 0; i < datos_procesos.length; i++) {
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(codigo)).subscribe(datos_asignacion => {
-            let asignacion : number = datos_asignacion[0] | 0, devolucion : number = datos_asignacion[1] | 0;
-            if (devolucion == null || devolucion == undefined) devolucion = 0;
-            this.cantRestante = (datos_procesos[i].datosotKg + (datos_procesos[i].datosotKg * 0.02)) - (asignacion - devolucion);
-            this.cantAsignada = (asignacion - devolucion);
+            this.cantRestante = (datos_procesos[i].datosotKg + (datos_procesos[i].datosotKg * 0.02)) - datos_asignacion;
+            this.cantAsignada = datos_asignacion;
           });
           break;
         }
@@ -985,7 +982,7 @@ export class MovimientoMPComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }

@@ -26,22 +26,6 @@ export const defaultStepOptions: Step.StepOptions = {
   }
 };
 
-export const defaultStepOptions2: Step.StepOptions = {
-  classes: '',
-  scrollTo: true,
-  cancelIcon: {
-    enabled: true
-  }
-};
-
-export const defaultStepOptions3: Step.StepOptions = {
-  classes: '',
-  scrollTo: true,
-  cancelIcon: {
-    enabled: true
-  }
-};
-
 /*********************************************************** BODEGA EXTRUSIÓN **************************************************************************/
 export const stepsEliminarRollos : Step.StepOptions[] = [
   {
@@ -1100,6 +1084,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'consultar',
     title: `<h5 class="tituloRojo" style="margin: auto;">Consultar Inventario</h5>`,
@@ -1114,10 +1099,26 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'con-existencias',
     title: '<h5 class="tituloRojo" style="margin: auto;">Materiales con existencias</h5>',
     text: `Al hacer clic sobre este botón se cargarán en la tabla <b>solo las materias primas que tienen existencias mayores a cero.</b>`
+  },
+  {
+    attachTo: {
+      element: '#nuevaMateriaPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'custom-class-name-1 custom-class-name-2',
+    id: 'nuevaMateriaPrima',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Materia Prima</h5>`,
+    text: `<p>¡Para crear una materia prima nueva presionamos este botón, seleccionamos el tipo de materia prima que vamos a crear, llenamos los campos y presionamos <b>'Crear...'</b>!</p>`
   },
   {
     attachTo: {
@@ -1128,6 +1129,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'exportar1',
     title: '<h5 class="tituloRojo" style="margin: auto;">Exportar todo a excel</h5>',
@@ -1142,6 +1144,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'materias-primas',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información de Materiales</h5>`,
@@ -1161,6 +1164,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'filtros',
     title: `<h5 class="tituloRojo" style="margin: auto;">Filtros por campos</h5>`,
@@ -1175,6 +1179,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'inicial',
     title: `<h5 class="tituloRojo" style="margin: auto;">Inventario inicial</h5>`,
@@ -1189,6 +1194,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'entrada',
     title: `<h5 class="tituloRojo" style="margin: auto;">Entrada diaria</h5>`,
@@ -1207,6 +1213,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'salida',
     title: `<h5 class="tituloRojo" style="margin: auto;">Salidas de materiales</h5>`,
@@ -1225,6 +1232,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'stock',
     title: `<h5 class="tituloRojo" style="margin: auto;">Stock de materiales</h5>`,
@@ -1239,6 +1247,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'diferencia',
     title: `<h5 class="tituloRojo" style="margin: auto;">Diferencia de materiales</h5>`,
@@ -1246,17 +1255,18 @@ export const stepInventarioBopp: Step.StepOptions[] = [
   },
   {
     attachTo: {
-      element: '#exportar2',
+      element: '#editar',
       on: 'bottom'
     },
     buttons: [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
-    id: 'exportar2',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Exportar Información</h5>`,
-    text: `Desde este botón puedes <b>exportar a excel la información de la tabla, teniendo en cuenta si realizaste algún filtro</b>, sino, se descargará todo el inventario.`
+    id: 'editar',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Editar Materia Prima</h5>`,
+    text: `<p>¡Si presionamos uno de los botones de esta columna se nos abrirá un modal desde el que podremos editar la información de la materia prima!</p>`
   },
   {
     attachTo: {
@@ -1267,6 +1277,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
       builtInButtons.back,
       builtInButtons.next
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'totales',
     title: `<h5 class="tituloRojo" style="margin: auto;">Totales</h5>`,
@@ -1286,6 +1297,7 @@ export const stepInventarioBopp: Step.StepOptions[] = [
     buttons: [
       builtInButtons.back
     ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'exportar3',
     title: `<h5 class="tituloRojo" style="margin: auto;">Exportar Información</h5>`,

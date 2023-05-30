@@ -47,15 +47,15 @@
       <div class="col p-2">
         <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultarInventario()"></button>
       </div>
-      <!--  -->
+      <!-- Con existencias -->
       <div class="col p-2">
         <button pButton pRipple pTooltip="Materias Primas Con Existencias" label="Con Existencias" icon="pi pi-eject" class="p-button-warning botonesOpciones" id="con-existencias" (click)="existenciasMayorCero()"></button>
       </div>
-      <!--  -->
-      <div class="col p-2">
-        <button pButton pRipple id="nuevaMp" label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" (click)="LlamarModalCrearMateriaPrima()"></button>
+      <!-- Nueva materias prima -->
+      <div class="col p-2" *ngIf="ValidarRol == 1">
+        <button pButton pRipple id="nuevaMp" label="Nuevo" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success r-2" (click)="LlamarModalCrearMateriaPrima()"></button>
       </div>
-      <!--  -->
+      <!-- Exportar excel -->
       <div class="col p-2">
         <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
       </div>
@@ -138,7 +138,7 @@
                 <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                   <p-sortIcon field="Categoria"></p-sortIcon>
                 </th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">

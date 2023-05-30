@@ -34,10 +34,9 @@ import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado
 import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
-import { stepsOrdenTrabajo as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { stepsMezclasOT as defaultSteps2, defaultStepOptions2 } from 'src/app/data';
-import { stepsCrearMezclasOT as defaultSteps3, defaultStepOptions3 } from 'src/app/data';
+import { stepsOrdenTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsCrearMezclasOT as defaultSteps3, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +151,8 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                                 private tipoSelladoService : TiposSelladoService,
                                                                   private pedidosZeusService : InventarioZeusService,
                                                                     private sedeClienteService : SedeClienteService,
-                                                                      private shepherdService: ShepherdService) {
+                                                                      private shepherdService: ShepherdService,
+                                                                        private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -374,11 +374,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -389,29 +385,8 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que colocará los campos del formulario principal con datos predeterminados
   limpiarFormOrdenTrabajo(){
-    this.FormOrdenTrabajo.patchValue({
-      OT_Id: null,
-      Pedido_Id: null,
-      Nombre_Vendedor: null,
-      OT_FechaCreacion: this.today,
-      OT_FechaEntrega: null,
-      Id_Sede_Cliente : null,
-      ID_Cliente: null,
-      Nombre_Cliente: null,
-      Ciudad_SedeCliente: null,
-      Direccion_SedeCliente : null,
-      OT_Estado : null,
-      OT_Observacion : null,
-      Margen : 0,
-      OT_Cyrel : false,
-      OT_Extrusion : false,
-      OT_Impresion : false,
-      OT_Rotograbado : false,
-      OT_Laminado : false,
-      OT_Corte : false,
-      OT_Doblado : false,
-      OT_Sellado : false,
-    });
+    this.FormOrdenTrabajo.reset();
+    this.FormOrdenTrabajo.patchValue({ OT_FechaCreacion : this.today });
   }
 
   // Funcion que va a limpiar los campos del formulario de extrusión
@@ -541,95 +516,75 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.informacionSeleccionada = 0;
   }
 
-  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion(){
-    this.servicioTintas.srvObtenerLista().subscribe(registrosTintas => { this.arrayTintas = registrosTintas; });
+  // Funcion que va a limpiar los campos de los formularios de cada proceso y tambien los checkbox
+  limpiarProducto(){
+    this.limpiarFormExtrusion();
+    this.limpiarFormImpresion();
+    this.limpiarFormLaminado();
+    this.limpiarFormCorte();
+    this.limpiarFormSellado();
+    this.limpiarFormMezclas();
+    this.extrusion = false;
+    this.impresion = false;
+    this.rotograbado = false;
+    this.laminado = false;
+    this.sellado = false;
+    this.checkedCorte = false;
+    this.checkedCyrel = false;
+    this.cantidadProducto = 0;
+    this.valorProducto = 0;
+    this.netoKg = 0;
+    this.valorKg = 0;
+    this.valorOt = 0;
+    this.margenKg = 0;
+    this.pesoPaquete = 0;
+    this.pesoBulto = 0;
   }
+
+  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
+  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas);
 
   /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
-  cargarPigmentosEnProcesoExtrusion(){
-    this.servicioPigmentos.srvObtenerLista().subscribe(registrosPigmentos => { this.arrayPigmentos = registrosPigmentos; });
-  }
+  cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
 
   //Funcion que cargará los estados que puede tener una orden de trabajo
-  cargarEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => { this.estados = datos_estados; });
-  }
+  cargarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(datos => this.estados = datos);
 
   /** Función que cargará los materiales en el combobox al momento de crear la OT. */
-  cargarMaterialEnProcesoExtrusion(){
-    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales = registrosMateriasProd; });
-  }
+  cargarMaterialEnProcesoExtrusion = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales = materiasProd);
 
    /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
-  cargarMateriales_MatPrima(){
-    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales2 = registrosMateriasProd; });
-  }
+  cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
   /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
-  cargarUnidadMedidaEnProcesoExtrusion(){
-    this.servicioUnidadMedida.srvObtenerLista().subscribe(datos_und => {
-      for (let i = 0; i < datos_und.length; i++) {
-        if (datos_und[i].undMed_Id == 'Cms' || datos_und[i].undMed_Id == 'Plgs') this.arrayUnidadesMedidas.push(datos_und[i].undMed_Id);
-      }
-    });
-  }
+  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => item.undMed_Id == 'Cms' || item.undMed_Id == 'Plgs'));
 
   //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
-  cargarTratadoEnProcesoExtrusion(){
-    this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => { this.tratado = datos_tratado; });
-  }
+  cargarTratadoEnProcesoExtrusion = () => this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => this.tratado = datos_tratado);
 
   //Funcion que cargará los formatos para el proceso de extrusion
-  cargarFormatosEnProcesoExtrusion(){
-    this.formatoService.srvObtenerLista().subscribe(datos_formatos => { this.formatos = datos_formatos; });
-  }
+  cargarFormatosEnProcesoExtrusion = () => this.formatoService.srvObtenerLista().subscribe(datos_formatos => this.formatos = datos_formatos);
 
   //Funcion que cargará los diferentes tipos de impresion que maneja la empresa
-  cargarTiposImpresion(){
-    this.tiposImpresionService.srvObtenerLista().subscribe(datos_tiposImpresion => { this.tiposImpresion = datos_tiposImpresion; });
-  }
+  cargarTiposImpresion = () => this.tiposImpresionService.srvObtenerLista().subscribe(datos => this.tiposImpresion = datos);
 
   //Funcion que cargará los diferentes laminados
-  cargarLaminados(){
-    this.laminadoCapasService.srvObtenerLista().subscribe(datos_laminado => { this.laminado_capas = datos_laminado; });
-  }
+  cargarLaminados = () => this.laminadoCapasService.srvObtenerLista().subscribe(datos => this.laminado_capas = datos);
 
   // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria(){
-    this.mezclasMateriales = [];
-    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => { this.mezclasMateriales = datos_mezclasMateriales; });
-  }
+  cargarMezclaMateria = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales = datos);
 
   // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria2(){
-    this.mezclasMateriales2 = [];
-    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => {
-      for (let i = 0; i < datos_mezclasMateriales.length; i++) {
-        this.mezclasMateriales2.push(datos_mezclasMateriales[i]);
-      }
-    });
-  }
+  cargarMezclaMateria2 = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales2 = datos);
 
   // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento(){
-    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => { this.mezclasPigmentos = datos_mezclaPigmentos; });
-  }
+  cargarMezclaPigmento = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos = datos);
 
     // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento2(){
-    this.mezclasPigmentos2 = [];
-    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => {
-      for (let i = 0; i < datos_mezclaPigmentos.length; i++) {
-        this.mezclasPigmentos2.push(datos_mezclaPigmentos[i])
-      }
-    });
-  }
+  cargarMezclaPigmento2 = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos2 = datos);
 
   // Funcion que cargará el nombre de las mezclas
-  cargarMezclas(){
-    this.mezclasService.srvObtenerLista().subscribe(datos_mezclas => { this.mezclas = datos_mezclas; });
-  }
+  cargarMezclas = () => this.mezclasService.srvObtenerLista().subscribe(datos => this.mezclas = datos);
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
@@ -639,7 +594,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.FormOrdenTrabajoMezclas.disable();
         this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
         this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-        this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
+        this.FormOrdenTrabajoMezclas.patchValue({
           Id_Mezcla : datos_mezcla.mezcla_Id,
           Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
           Chechbox_Capa1 : this.nroCapasOT,
@@ -693,7 +648,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           this.FormOrdenTrabajoMezclas.disable();
           this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
           this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-          this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
+          this.FormOrdenTrabajoMezclas.patchValue({
             Id_Mezcla : datos_mezcla.mezcla_Id,
             Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
             Chechbox_Capa1 : this.nroCapasOT,
@@ -745,24 +700,16 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Funcion que va cargará la informacion de los tipos de productos
-  cargarTiposProductos(){
-    this.tiposProductosService.srvObtenerLista().subscribe(datos => { this.tipoProductos = datos });
-  }
+  cargarTiposProductos = () => this.tiposProductosService.srvObtenerLista().subscribe(datos => this.tipoProductos = datos);
 
   // Funcion que va a cargar la informacion de los tipos de sellado
-  cargarTiposSellado(){
-    this.tipoSelladoService.srvObtenerLista().subscribe(datos => { this.tipoSellado = datos });
-  }
+  cargarTiposSellado = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos => this.tipoSellado = datos);
 
   // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
-  ultimaOT(){
-    this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => { this.ultimaOrdenTrabajo = datos_ot.item + 1;  });
-  }
+  ultimaOT = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => this.ultimaOrdenTrabajo = datos_ot.item + 1);
 
   //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
-  pedidos(){
-    this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => { this.pedidosSinOT = datos });
-  }
+  pedidos = () => this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => this.pedidosSinOT = datos);
 
   // Funcion que va a obtener los pedidos provenientes de zeus
   pedidosZues(){
@@ -782,13 +729,8 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que va a validar si el pedido viene de zeus
   validarPedido(){
-    let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
-    for (const item of this.pedidosSinOT){
-      if (item.id_Pedido == pedido){
-        if (!item.zeus) this.informacionPedido();
-        else if (item.zeus) this.informacionPedidoZeus();
-      }
-    }
+    let nuevo = this.pedidosSinOT.filter((item) => item.id_Pedido == this.FormOrdenTrabajo.value.Pedido_Id);
+    !nuevo[0].zeus ? this.informacionPedido() : this.informacionPedidoZeus();
   }
 
   // funcion que consultará la informacion de un pedido de Zeus
@@ -928,27 +870,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
   consultarInfoProducto(data : any){
     this.informacionSeleccionada = data;
-    this.limpiarFormExtrusion();
-    this.limpiarFormImpresion();
-    this.limpiarFormLaminado();
-    this.limpiarFormCorte();
-    this.limpiarFormSellado();
-    this.limpiarFormMezclas();
-    this.extrusion = false;
-    this.impresion = false;
-    this.rotograbado = false;
-    this.laminado = false;
-    this.sellado = false;
-    this.checkedCorte = false;
-    this.checkedCyrel = false;
-    this.cantidadProducto = 0;
-    this.valorProducto = 0;
-    this.netoKg = 0;
-    this.valorKg = 0;
-    this.valorOt = 0;
-    this.margenKg = 0;
-    this.pesoPaquete = 0;
-    this.pesoBulto = 0;
+    this.limpiarProducto();
     this.producto = data.Id;
     this.presentacionProducto = data.UndCant;
     this.ordenTrabajoService.GetInfoUltOT(data.Id, data.UndCant).subscribe(datos_Ot => {
@@ -1154,7 +1076,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
           }, 1000);
         }
-      }, () => { this.mensajeAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
+      }, () => { this.mostrarAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
     });
   }
 
@@ -1237,7 +1159,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           }
         }
       }
-    } else this.mensajeAdvertencia(`¡Debe elegir una unidad de medida para extrusión!`);
+    } else this.mostrarAdvertencia(`¡Debe elegir una unidad de medida para extrusión!`);
   }
 
   // Funcion que se se ejecurá cuando hayan deseleccionado un producto
@@ -1296,14 +1218,14 @@ export class OrdenesTrabajoComponent implements OnInit {
               if (this.FormOrdenTrabajoCorte.valid) {
                 if (this.FormOrdenTrabajoSellado.valid) {
                   if (this.FormOrdenTrabajoMezclas.valid) this.guardarOt();
-                  else this.mensajeAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.mensajeAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
-              } else this.mensajeAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
-            } else this.mensajeAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.mensajeAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
-        } else this.mensajeAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+                  else this.mostrarAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.mostrarAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
+              } else this.mostrarAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
+            } else this.mostrarAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.mostrarAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
+        } else this.mostrarAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
       }, 700);
-    } else this.mensajeAdvertencia(`¡Hay campos del formulario vacios!`);
+    } else this.mostrarAdvertencia(`¡Hay campos del formulario vacios!`);
   }
 
   //Funcion que va a guardar la información de la orden de trabajo
@@ -1346,11 +1268,11 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
       setTimeout(() => { this.pdfOrdenTrabajo(datos_ot.ot_Id); }, 1500);
       setTimeout(() => {
-        if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon: 'success', title: '¡Orden de Trabajo Creada!', text: `Se ha creado la de trabajo N°${datos_ot.ot_Id}`});
+        if (!errorExt && !errorImp && !errorLam && !errorSelCor) this.mostrarConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
         this.limpiarCampos();
       }, 2000);
-    }, () => {
-      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`);
+    }, error => {
+      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
       this.cargando = false;
     });
   }
@@ -1370,7 +1292,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message); });
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => true, error => this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message));
     return false;
   }
 
@@ -1402,7 +1324,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message); });
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => true, error => this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message));
       }
     });
     return false;
@@ -1483,10 +1405,10 @@ export class OrdenesTrabajoComponent implements OnInit {
           Prod_Peso_Bulto : 0,
         }
         this.productoService.PutEstadoProducto(producto, info).subscribe(() => { }, error => {
-          Swal.fire({icon: 'error', title: 'Opps...', html: `<b>¡No fue posible actualizar el estado del producto ${producto}!</b><br><span style="color: #F00">${error.message}</span>`})
+          this.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error);
         });
       }
-    }, error => { Swal.fire({icon: 'error', title: 'Opps...', html: `<b>¡El producto ${producto} no se ha encontrado!</b><br><span style="color: #F00">${error.message}</span>`}) });
+    }, error => this.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
 
   // Funcion que va a cambiar el estado de un cliente a "Activo"
@@ -1504,8 +1426,8 @@ export class OrdenesTrabajoComponent implements OnInit {
         Cli_Fecha : datos_cliente.cli_Fecha,
         Cli_Hora : datos_cliente.cli_Hora,
       }
-      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => { this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.message); });
-    }, error => { this.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.message) });
+      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
+    }, error => this.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.error));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -2923,14 +2845,14 @@ export class OrdenesTrabajoComponent implements OnInit {
                         Toast.fire({ icon: 'info', title: 'Puede seguir editando la Orden de Trabajo' });
                       }
                     });
-                  } else this.mensajeAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.mensajeAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
-              } else this.mensajeAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
-            } else this.mensajeAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.mensajeAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
-        } else this.mensajeAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+                  } else this.mostrarAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.mostrarAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
+              } else this.mostrarAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
+            } else this.mostrarAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.mostrarAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
+        } else this.mostrarAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
       }, 700);
-    } else this.mensajeAdvertencia(`¡Hay campos del formulario vacios!`);
+    } else this.mostrarAdvertencia(`¡Hay campos del formulario vacios!`);
   }
 
   // Funcion que va actualizar con nueva información la orden de trabajo
@@ -2977,8 +2899,8 @@ export class OrdenesTrabajoComponent implements OnInit {
               this.limpiarCampos();
             }
           }, 1500);
-        }, () => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
-      }, () => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`); });
+        }, () => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, ''); });
+      }, () => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`, ''); });
     }
   }
 
@@ -3006,7 +2928,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -3049,12 +2971,12 @@ export class OrdenesTrabajoComponent implements OnInit {
             });
           }
         }, () => {
-          this.mensajeError(`¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`);
+          this.mensajeError(`¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`, '');
           return true;
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -3083,7 +3005,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -3123,7 +3045,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         });
       }
     }, () => {
-      this.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`);
+      this.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -3308,18 +3230,13 @@ export class OrdenesTrabajoComponent implements OnInit {
           });
         }
       });
-    } else this.mensajeAdvertencia('Debe llenar el campo nombre de mezclas');
-  }
-
-  // Funcion que enviará un mensaje de advertencia
-  mensajeAdvertencia(text : string){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', showCloseButton: true, html: `<b>${text}</b><br>` });
+    } else this.mostrarAdvertencia('Debe llenar el campo nombre de mezclas');
   }
 
   // Funcion que devolverá un mensaje de error con la informacion que se le envie
-  mensajeError(text : string, error : string = ''){
+  mensajeError(titulo : string, texto : string){
     this.cargando = false;
-    Swal.fire({icon : 'error', title: 'Opps...', html: `<b>${text}</b>` + `<span style="#f00">${error}</span>`});
+    this.messageService.add({severity:'success', summary: titulo, detail: texto });
   }
 
   //
@@ -3711,7 +3628,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Mezcla_FechaIngreso: this.today
                     }
                     this.mezclasService.srvGuardar(modelo).subscribe(() => {
-                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
                       setTimeout(() => {
                         this.initFormCrearMezclas();
                         this.cargarMezclas();
@@ -3785,7 +3702,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Mezcla_FechaIngreso: this.today
                     }
                     this.mezclasService.srvGuardar(modelo).subscribe(() => {
-                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
                       setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                     });
                   } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
@@ -3857,7 +3774,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Mezcla_FechaIngreso: this.today
                     }
                     this.mezclasService.srvGuardar(modelo).subscribe(() => {
-                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
                       setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                     });
                   } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
@@ -3935,7 +3852,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezMaterial_Descripcion: descripcionMaterial,
         }
         this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
-          this.mostrarConfirmacion('Registro creado con éxito!');
+          this.mostrarConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
             this.formCrearMateriales.reset();
             this.cargarMezclaMateria();
@@ -3960,7 +3877,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezPigmto_Descripcion: descripcionPigmento,
         }
         this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
-          this.mostrarConfirmacion('Registro creado con éxito!');
+          this.mostrarConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
           this.formCrearPigmentos.reset();
           this.mezclasPigmentos();
@@ -3982,9 +3899,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación */
-  mostrarConfirmacion(texto : string) {
-    this.messageService.add({severity:'success', detail: texto } );
-  }
+  mostrarConfirmacion = (titulo: string, texto : string) => this.messageService.add({severity:'success', summary: titulo, detail: texto });
 
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1
   habilitarCapa1(){
@@ -4110,8 +4025,8 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
    /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de mezclas*/
-   verTutorial2() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions2;
+  verTutorial2() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps2);
@@ -4120,7 +4035,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de crear mezclas*/
   verTutorial3() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions3;
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps3);

@@ -3,6 +3,7 @@
   <br>
 </ng-container>
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -410,7 +411,7 @@
                 <!-- Unidad Medida -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
                     <label for="UndMedida">Und. Medida</label>
                   </span>
                 </div>

@@ -1,7 +1,6 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -87,33 +86,13 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   }
 
   // Funcion que cargará los activos
-  obtenerActivos(){
-    this.activosService.GetTodo().subscribe(datos_activos => {
-      for (let i = 0; i < datos_activos.length; i++) {
-        this.activos.push(datos_activos[i]);
-      }
-    }, error => { this.mostrarError(`Error`, `¡No se encontraron activos para realizar la consulta!`) });
-  }
+  obtenerActivos = () => this.activosService.GetTodo().subscribe(datos => this.activos = datos);
 
   // Función que obtendrá todos los tipos de mantenimiento
-  obtenerTiposMantenimiento(){
-    this.tipoMantenimientoService.GetTodo().subscribe(datos_tiposMantenimiento => {
-      for (let i = 0; i < datos_tiposMantenimiento.length; i++) {
-        this.tiposMantenimiento.push(datos_tiposMantenimiento[i]);
-      }
-    }, error => { this.mostrarError(`Error`, `¡No se pudieron obtener los diferentes tipos de mantenimientos!`) });
-  }
+  obtenerTiposMantenimiento = () => this.tipoMantenimientoService.GetTodo().subscribe(datos => this.tiposMantenimiento = datos);
 
   // Funcion que obtendrá todos los posibles estados que pueden tener los movimientos de mantenimiento
-  obtenerEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        let estados : number [] = [11,26,4,2,17];
-        if (estados.includes(datos_estados[i].estado_Id)) this.estados.push(datos_estados[i]);
-        this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
-      }
-    }, error => { this.mostrarError(`Error`, `¡Error al consultar los estados de los movimientos de mantenimiento!`); });
-  }
+  obtenerEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(datos => this.estados = datos.filter((item) => [11,26,4,2,17].includes(item.estado_Id)));
 
   // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
   buscarActivoSeleccionado(){
@@ -187,7 +166,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_movimientos.length; i++) {
         this.llenarTabla(datos_movimientos[i]);
       }
-    }, error => { this.mostrarError(`Error`, `¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`); });
   }
 
   // Funcion que va a llenar la tabla con la información colsutada
@@ -228,7 +207,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfPedido(data); }, datos_pedido.length * 5);
-    }, error => { this.mostrarError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mostrarError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a llenar un array con la información de los activos de un mantenimiento
@@ -246,7 +225,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfMantenimiento(data); }, datos_mantenimiento.length * 5);
-    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -307,7 +286,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -482,7 +461,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // funcion que se encagará de llenar la tabla del pdf
@@ -509,7 +488,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -517,14 +496,10 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
-  clear(table: Table) {
-    table.clear();
-  }
+  clear = (table: Table) => table.clear();
 
     /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {

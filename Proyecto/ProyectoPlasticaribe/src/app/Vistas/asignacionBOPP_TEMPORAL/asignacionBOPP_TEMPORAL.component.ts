@@ -34,6 +34,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   arrayOT : any = [];
   itemSeleccionado : any;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -112,6 +113,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         for (const item of datos_OT) {
           this.arrayOT.push(ordenTrabajo);
           if (item.estado == null || item.estado == '' || item.estado == '0') {
+            let adicional : number = item.datosotKg * 0.02;
+            this.kgOT = item.datosotKg + adicional;
             const infoOT : any = {
               ot : item.item,
               cliente : item.clienteNom,
@@ -132,6 +135,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
           for (const itemOT of datos_OT) {
             if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
+              let adicional : number = itemOT.datosotKg * 0.02;
+              this.kgOT = itemOT.datosotKg + adicional;
               const infoOT : any = {
                 ot : itemOT.item,
                 cliente : itemOT.clienteNom,
@@ -203,6 +208,15 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     }
     this.ArrayBoppPedida.push(bopp);
     this.FormularioBOPP.reset();
+  }
+
+  // Funcion que va a contar la cantidad de kg que van a ser asignados
+  calcularCantidadAsignar(){
+    let total : number = 0;
+    for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
+      total += this.ArrayBoppPedida[i].Cantidad2;
+    }
+    return total;
   }
 
   // funcion que validará los campos para poder realizar la asignación
