@@ -9,13 +9,13 @@ import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCom
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
 import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remision/OrdenCompra_Remision.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { RemisionFacturaService } from 'src/app/Servicios/Remisiones_Facturas/remisionFactura.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsEntradasMp as defaultSteps } from 'src/app/data';
@@ -65,22 +65,22 @@ export class PedidomateriaprimaComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-                private rolService : RolesService,
-                  private frmBuilderMateriaPrima : FormBuilder,
-                    private AppComponent : AppComponent,
-                      private proveedorservices : ProveedorService,
-                        private facturaMpComService : FactuaMpCompradaService,
-                          private facturaMpService : FacturaMpService,
-                            private remisionService : RemisionService,
-                              private remisionMPService : RemisionesMPService,
-                                private remisionFacturaService : RemisionFacturaService,
-                                  private tintasService : TintasService,
-                                    private servicioOCMatPrima : OrdenCompra_MateriaPrimaService,
-                                      private OrdenesFacturasService : OrdenFactura_RelacionService,
-                                        private ordenCompraRemisionService : OrdenCompra_RemisionService,
-                                          private dtOrdenCompraService : DetallesOrdenesCompraService,
-                                            private messageService: MessageService,
-                                              private shepherdService: ShepherdService) {
+                private frmBuilderMateriaPrima : FormBuilder,
+                  private AppComponent : AppComponent,
+                    private proveedorservices : ProveedorService,
+                      private facturaMpComService : FactuaMpCompradaService,
+                        private facturaMpService : FacturaMpService,
+                          private remisionService : RemisionService,
+                            private remisionMPService : RemisionesMPService,
+                              private remisionFacturaService : RemisionFacturaService,
+                                private tintasService : TintasService,
+                                  private servicioOCMatPrima : OrdenCompra_MateriaPrimaService,
+                                    private OrdenesFacturasService : OrdenFactura_RelacionService,
+                                      private ordenCompraRemisionService : OrdenCompra_RemisionService,
+                                        private dtOrdenCompraService : DetallesOrdenesCompraService,
+                                          private messageService: MessageService,
+                                            private shepherdService: ShepherdService,
+                                              private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -122,11 +122,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
@@ -141,22 +137,19 @@ export class PedidomateriaprimaComponent implements OnInit {
         proveedorNombre: datos_proveedor.prov_Nombre,
         MpObservacion : this.FormMateriaPrimaFactura.value.MpObservacion,
       });
-    }, error => { this.mostrarError(`Error`, `No se encontró información del proveedor`); });
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `No se encontró información del proveedor`);
+      this.load = true;
+    });
   }
 
   // Funcion que se encargará de obtener los proveedores
-  obtenerProveeedor(){
-    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedor => {
-      for (let index = 0; index < datos_proveedor.length; index++) {
-        this.proveedor.push(datos_proveedor[index]);
-      }
-    });
-  }
+  obtenerProveeedor = () => this.proveedorservices.srvObtenerLista().subscribe(datos => this.proveedor = datos);
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
     this.load = true;
-    this.FormMateriaPrimaFactura.setValue({
+    this.FormMateriaPrimaFactura.patchValue({
       ConsecutivoFactura : this.ultimoIdFactura,
       OrdenCompra : null,
       MpFactura: '',
@@ -169,7 +162,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que limpiará todos los campos
   limpiarTodosCampos(){
-    this.FormMateriaPrimaFactura.setValue({
+    this.FormMateriaPrimaFactura.patchValue({
       ConsecutivoFactura : this.ultimoIdFactura,
       OrdenCompra : '',
       MpFactura: '',
@@ -278,17 +271,21 @@ export class PedidomateriaprimaComponent implements OnInit {
               }
             });
           }
-        } else this.mostrarAdvertencia(`Advertencia`,`La orden de compra '${Orden_Compra}' no existe!`);
-      }, error => { this.mostrarError(`Error`, `¡No existe la Orden de Compra #${Orden_Compra}, por favor verifique!`); });
+        } else {
+          this.mensajeService.mensajeAdvertencia(`Advertencia`,`La orden de compra '${Orden_Compra}' no existe!`);
+          this.load = false;
+        }
+      }, () => {
+        this.mensajeService.mensajeError(`Error`, `¡No existe la Orden de Compra #${Orden_Compra}, por favor verifique!`);
+        this.load = false;
+      });
     }
   }
 
   //Funcion que va a seleccionar una materia prima
   llenarMateriaPrimaAIngresar(item : any){
     this.load = false;
-    for (let i = 0; i < this.arrayOrdenCompra.length; i++) {
-      if (this.arrayOrdenCompra[i].Id == item.Id) this.arrayOrdenCompra.splice(i, 1);
-    }
+    this.arrayOrdenCompra.splice(this.arrayOrdenCompra.findIndex((data) => data.Id == item.Id), 1);
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
@@ -296,12 +293,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   // Funcion que seleccionará y colocará todos los MateriaPrima que se van a insertar
-  seleccionarTodosMateriaPrima(item : any){
+  seleccionarTodosMateriaPrima(){
     this.load = false;
     this.arrayOrdenCompra = [];
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].Exits == true) this.arrayOrdenCompra.push(item[i]);
-    }
+    this.arrayOrdenCompra.splice(this.arrayOrdenCompra.findIndex((data) => data.Exits), 1);
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
@@ -311,9 +306,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que va a quitar lo MateriaPrima que se van a insertar
   quitarMateriaPrimaAIngresar(item : any){
     this.load = false;
-    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-      if (this.ArrayMateriaPrima[i].Id == item.Id) this.ArrayMateriaPrima.splice(i, 1);
-    }
+    this.ArrayMateriaPrima.splice(this.ArrayMateriaPrima.findIndex((data) => data.Id == item.Id), 1);
     this.arrayOrdenCompra.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.arrayOrdenCompra.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
@@ -321,7 +314,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
-  quitarTodosMateriaPrima(item : any){
+  quitarTodosMateriaPrima(){
     this.load = false;
     this.arrayOrdenCompra.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.arrayOrdenCompra.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
@@ -346,13 +339,13 @@ export class PedidomateriaprimaComponent implements OnInit {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         if (item.Id == this.ArrayMateriaPrima[i].Id) this.ArrayMateriaPrima[i].Cantidad = this.ArrayMateriaPrima[i].Cantidad_Oculta;
       }
-      this.mostrarAdvertencia(`Cantidad insuficiente`, `¡La cantidad ${item.Cantidad} no está disponible para la materia prima ${item.Nombre}!`);
+      this.mensajeService.mensajeAdvertencia(`Cantidad insuficiente`, `¡La cantidad ${item.Cantidad} no está disponible para la materia prima ${item.Nombre}!`);
     }
   }
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
-    if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.mostrarAdvertencia(`Advertencia`, "Solo debe llenar el campo Remisión o Factura.");
+    if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.mensajeService.mensajeAdvertencia(`Advertencia`, "Solo debe llenar el campo Remisión o Factura.");
     else if (this.FormMateriaPrimaFactura.value.MpRemision != '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.registrarRemisionMP();
     else if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura != '') this.registrarFacturaMP();
   }
@@ -372,16 +365,16 @@ export class PedidomateriaprimaComponent implements OnInit {
       Usua_Id : this.storage_Id,
       TpDoc_Id : 'FCO',
     }
-    this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => { this.obtenerUltimoIdFacturaCompra(); }, error => {
-      this.mostrarError(`Error`, `¡Error al crear la factura!`);
+    this.facturaMpComService.srvGuardar(datosFactura).subscribe(() => this.obtenerUltimoIdFacturaCompra(), () => {
+      this.mensajeService.mensajeError(`Error`, `¡Error al crear la factura!`);
       this.load = true;
     });
   }
 
   // Funicion que va a colocar el id de la ultimo factura
   obtenerUltimoIdFacturaCompra(){
-    this.facturaMpComService.UltimoIdFactura().subscribe(datos_facturas => { this.creacionFacturaMateriaPrima(datos_facturas); }, error => {
-      this.mostrarError(`Error`, `¡Error al obtener la ultima factura creada!`);
+    this.facturaMpComService.UltimoIdFactura().subscribe(datos_facturas => this.creacionFacturaMateriaPrima(datos_facturas), () => {
+      this.mensajeService.mensajeError(`Error`, `¡Error al obtener la ultima factura creada!`);
       this.load = true;
     });
   }
@@ -389,8 +382,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionFacturaMateriaPrima(idFactura : any){
     let errorConsulta : boolean;
-    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
-    else {
+    if (this.ArrayMateriaPrima.length == 0) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
+      this.load = true;
+    } else {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         const datosFacturaMp : any = {
           Facco_Id : idFactura,
@@ -401,9 +396,9 @@ export class PedidomateriaprimaComponent implements OnInit {
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
           FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
-        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(datos_facturaMpCreada => {  }, error => {
+        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(() => { }, () => {
           errorConsulta = true;
-          this.mostrarError(`Advertencia`, `¡Error al crear la factura con las materia primas seleccionadas!`);
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Error al crear la factura con las materia primas seleccionadas!`);
           this.load = true;
         });
       }
@@ -428,8 +423,8 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Facco_Id : factura,
     }
-    this.OrdenesFacturasService.insert_OrdenCompra(info).subscribe(datos_insertados => { }, error => {
-      this.mostrarError(`Error`, `¡No se ha creado la relacion entre la factura y la orden de compra!`);
+    this.OrdenesFacturasService.insert_OrdenCompra(info).subscribe(() => { }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se ha creado la relacion entre la factura y la orden de compra!`);
       this.load = true;
     });
   }
@@ -468,8 +463,8 @@ export class PedidomateriaprimaComponent implements OnInit {
             TpDoc_Id : datos_orden.tpDoc_Id,
             Oc_Observacion : datos_orden.oc_Observacion,
           }
-          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(datos_ordenActualizada => { }, error => {
-            this.mostrarError(`Error`,`¡Error al cambiar el estado de la orden de compra!`);
+          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(() => { }, () => {
+            this.mensajeService.mensajeError(`Error`,`¡Error al cambiar el estado de la orden de compra!`);
             this.load = true;
           });
         });
@@ -484,8 +479,8 @@ export class PedidomateriaprimaComponent implements OnInit {
         Rem_Id : rem.remisionId,
         Facco_Id : idFactura,
       }
-      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(datosFacRemision => { }, error => {
-        this.mostrarError(`Error`, `¡Error al añadir la(s) remision(es) a la factura!`);
+      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(() => { }, () => {
+        this.mensajeService.mensajeError(`Error`, `¡Error al añadir la(s) remision(es) a la factura!`);
         this.load = true;
       });
     }
@@ -505,16 +500,16 @@ export class PedidomateriaprimaComponent implements OnInit {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
     }
-    this.remisionService.srvGuardar(datosRemision).subscribe(datos_remisionCreada => { this.obtenerUltimoIdRemision(); }, error => {
-      this.mostrarError(`Error`, `¡Error al crear la remisión!`);
+    this.remisionService.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => {
+      this.mensajeService.mensajeError(`Error`, `¡Error al crear la remisión!`);
       this.load = true;
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdRemision(){
-    this.remisionService.UltimoIdRemision().subscribe(datos_remision => { this.creacionRemisionMateriaPrima(datos_remision); }, error => {
-      this.mostrarError(`Error`, `¡Error al obtener el Id de la ultima remisión!`);
+    this.remisionService.UltimoIdRemision().subscribe(datos_remision => this.creacionRemisionMateriaPrima(datos_remision), () => {
+      this.mensajeService.mensajeError(`Error`, `¡Error al obtener el Id de la ultima remisión!`);
       this.load = true;
     });
   }
@@ -522,8 +517,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionRemisionMateriaPrima(idRemision : any){
     let errorConsulta : boolean;
-    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla")
-    else {
+    if (this.ArrayMateriaPrima.length == 0) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
+      this.load = true;
+    } else {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         const datosRemisionMp : any = {
           Rem_Id : idRemision,
@@ -534,9 +531,9 @@ export class PedidomateriaprimaComponent implements OnInit {
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
           RemiMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
-        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => { }, error => {
+        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(() => { }, () => {
           errorConsulta = true;
-          this.mostrarError(`Error`, `¡Error al añadir la(s) materia(s) prima(s) a la remisión!`);
+          this.mensajeService.mensajeError(`Error`, `¡Error al añadir la(s) materia(s) prima(s) a la remisión!`);
           this.load = true;
         });
       }
@@ -560,8 +557,8 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Rem_Id : idRemision,
     }
-    this.ordenCompraRemisionService.insert_OrdenCompra(info).subscribe(datos_insertados => { }, error => {
-      this.mostrarError(`Error`, `¡No se ha creado la relacion entre la remisión y la orden de compra!`);
+    this.ordenCompraRemisionService.insert_OrdenCompra(info).subscribe(() => { }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se ha creado la relacion entre la remisión y la orden de compra!`);
       this.load = true;
     });
   }
@@ -582,16 +579,16 @@ export class PedidomateriaprimaComponent implements OnInit {
             TpBod_Id : datos_materiaPrima.tpBod_Id,
           }
 
-          this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(datos_mp_creada => {
-            this.mostrarConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`)
+          this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {
+            this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`)
             this.load = true;
-           }, error => {
-            this.mostrarError(`Error`, `¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
+           }, () => {
+            this.mensajeService.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
             this.load = true;
           });
         }
-      }, error => {
-        this.mostrarError(`Error`, `¡No se ha encontrado la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
+      }, () => {
+        this.mensajeService.mensajeError(`Error`, `¡No se ha encontrado la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
         this.load = true;
       });
     }
@@ -614,15 +611,15 @@ export class PedidomateriaprimaComponent implements OnInit {
           tinta_InvInicial : datos_tinta.tinta_InvInicial,
         }
 
-        this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(datos_mp_creada => {
-          this.mostrarConfirmacion(`Confirmación`, `Registro de factura/remisión creado con exito!`);
+        this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(() => {
+          this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de factura/remisión creado con exito!`);
           this.load = true;
-        }, error => {
-          this.mostrarError(`Error`,`¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Tinta}!`);
+        }, () => {
+          this.mensajeService.mensajeError(`Error`,`¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Tinta}!`);
           this.load = true;
         });
-      }, error => {
-        this.mostrarError(`Error`,`¡No se ha podido encontrar la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
+      }, () => {
+        this.mensajeService.mensajeError(`Error`,`¡No se ha podido encontrar la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
         this.load = true;
       });
     }
@@ -650,7 +647,10 @@ export class PedidomateriaprimaComponent implements OnInit {
         this.ArrayRemisiones.push(datosTablaRemisiones);
         this.load = true;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la remisión!`); });
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la remisión!`);
+      this.load = true;
+    });
   }
 
   //
@@ -740,7 +740,10 @@ export class PedidomateriaprimaComponent implements OnInit {
         }
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la remisión!`);});
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la remisión!`);
+      this.load = true;
+    });
   }
 
   //
@@ -760,7 +763,10 @@ export class PedidomateriaprimaComponent implements OnInit {
         this.mpAgregada.push(items);
       }
       setTimeout(() => { this.cargarPDF(formulario); }, 2000);
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la remisión!`) });
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la remisión!`);
+      this.load = true;
+    });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -787,27 +793,10 @@ export class PedidomateriaprimaComponent implements OnInit {
       },
       fontSize: 9,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
     };
-  }
-
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 2000});
-   this.load = true;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000 });
-   this.load = true;
   }
 }

@@ -6,6 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsPreIngresoRolloDespacho as defaultSteps } from 'src/app/data';
@@ -40,7 +41,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     private dtPreEntRollosService : DtPreEntregaRollosService,
                       private preEntRollosService : PreEntregaRollosService,
                         private messageService: MessageService,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private mensajeService : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
@@ -70,11 +72,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -139,8 +137,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           }, 1500);
         });
         setTimeout(() => { this.cargando = false; }, 5000);
-      } else this.mensajeAdvertencia(`¡Las digitadas no son validas!`);
-    } else this.mensajeAdvertencia(`¡Debe seleccionar un proceso!`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Las digitadas no son validas!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar un proceso!`);
   }
 
   // Funcion que va a llenar el arry con la información de los rollos
@@ -165,9 +163,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   cargarRollosInsertar(item) {
     let scrollable : number = window.scrollY;
     this.cargando = true;
-    for (let i = 0; i < this.rollosDisponibles.length; i++) {
-      if (this.rollosDisponibles[i].Rollo == item.Rollo) this.rollosDisponibles.splice(i, 1);
-    }
+    this.rollosDisponibles.splice(this.rollosDisponibles.findIndex((data) => data.Rollo == item.Rollo), 1);
     this.rollosDisponibles.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
     setTimeout(() => { window.scroll(0, scrollable) }, 10);
     setTimeout(() => { this.GrupoProductos(); }, 50);
@@ -187,9 +183,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   quitarRollosInsertar(item) {
     let scrollable : number = window.scrollY;
     this.cargando = true;
-    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
-      if (this.rollosSeleccionados[i].Rollo == item.Rollo) this.rollosSeleccionados.splice(i, 1);
-    }
+    this.rollosSeleccionados.splice(this.rollosSeleccionados.findIndex((data) => data.Rollo == item.Rollo), 1);
     this.rollosDisponibles.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
     setTimeout(() => { window.scroll(0, scrollable) }, 10);
     setTimeout(() => { this.GrupoProductos(); }, 50);
@@ -235,7 +229,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   //Funcion para meter el encabezado de la entrada
   IngresarInfoRollos(){
-    if (this.rollosSeleccionados.length == 0) this.mensajeAdvertencia(`!Debe seleccionar minimo un rollo!`);
+    if (this.rollosSeleccionados.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, `!Debe seleccionar minimo un rollo!`);
     else {
       this.cargando = true;
       let info : any = {
@@ -245,7 +239,10 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         PreEntRollo_Hora : moment().format('H:mm:ss'),
       }
       this.preEntRollosService.srvGuardar(info).subscribe(datos_entradaRollo => { this.ingresarRollos(datos_entradaRollo.preEntRollo_Id);
-      }, error => { this.mensajeError(`¡Ha Ocurrido Un Error!`, `¡No ha sido posible crear la PreEntrega de rollo!`); });
+      }, error => {
+        this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`, `¡No ha sido posible crear la PreEntrega de rollo!`);
+        this.cargando = false;
+      });
     }
   }
 
@@ -270,9 +267,13 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       if (info.UndMed_Producto == 'UND') info.UndMed_Producto = 'Und';
       if (info.UndMed_Rollo == 'UND') info.UndMed_Rollo = 'Und';
 
-      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {
-        this.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
-      }, error => { this.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`); });
+      this.dtPreEntRollosService.srvGuardar(info).subscribe(() => {
+        this.mensajeService.mensajeConfirmacion(`¡PreEntrega Realizada!`, `¡Se ha registrado la PreEntrega de rollos!`);
+        this.cargando = false;
+      }, () => {
+        this.mensajeService.mensajeError(`¡Ha Ocurrido Un Error!`,`¡No fue posible guardar los detalles de cada rollos PreEntregado!`);
+        this.cargando = false;
+      });
     }
     setTimeout(() => { this.buscarRolloPDF(idEntrada); }, 2000);
   }
@@ -503,23 +504,5 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         }
       }
     };
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }

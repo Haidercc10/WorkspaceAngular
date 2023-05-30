@@ -4,7 +4,7 @@
 <br>
 <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
- <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -113,7 +113,7 @@
             <th scope="col">Presentación</th>
             <ng-template ></ng-template>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox id="elegirTodo" *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo" *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
@@ -176,7 +176,7 @@
             <th scope="col">Presentación</th>
             <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox id="elegirTodo2" (click)="quitarTodosMateriaPrima(ArrayMateriaPrima)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox id="elegirTodo2" (click)="quitarTodosMateriaPrima()"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
