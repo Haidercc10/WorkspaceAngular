@@ -17,6 +17,7 @@ import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
 import { AppComponent } from 'src/app/app.component';
 import { stepsUsuarios as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-registro-component',
@@ -57,9 +58,9 @@ export class RegistroComponentComponent implements OnInit {
                   private servicioUsuarios : UsuarioService,
                     private servicioEstados : EstadosService,
                       private servicioTpUsuarios : SrvTipos_UsuariosService,
-                       private messageService: MessageService,
                         private AppComponent : AppComponent,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private msj : MensajesAplicacionService) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
@@ -173,8 +174,9 @@ export class RegistroComponentComponent implements OnInit {
         }
         this.dialogUsuarios = false;
         this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => {
-          this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
-        }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`); });
+          this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
+          this.cargarUsuarios();
+        }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`); });
       }
     });
   }
@@ -207,7 +209,7 @@ export class RegistroComponentComponent implements OnInit {
     let Id : number = this.FormUsuarios.value.usuId;
     if(this.FormUsuarios.valid) {
       this.servicioUsuarios.getUsuariosxId(Id).subscribe(dataUsuarios => {
-        if(dataUsuarios.length > 0) this.mensajeAdvertencia(`¡Ya existe un usuario con el Id ${Id}!`);
+        if(dataUsuarios.length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Ya existe un usuario con el Id ${Id}!`);
         else {
           const data : modelUsuario = {
             Usua_Id: this.FormUsuarios.value.usuId,
@@ -230,11 +232,12 @@ export class RegistroComponentComponent implements OnInit {
           }
           this.dialogUsuarios = false;
           this.servicioUsuarios.srvGuardarUsuario(data).subscribe(dataUsuario => {
-            this.mensajeConfirmacion(`¡Usuairo creado!`, `¡Se ha creado un nuevo usuario!`);
-          }, error => { this.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
+            this.msj.mensajeConfirmacion(`¡Usuairo creado!`, `¡Se ha creado un nuevo usuario!`);
+            this.cargarUsuarios();
+          }, error => { this.msj.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
         }
       });
-    } else this.mensajeAdvertencia(`¡Para poder crear un usuario debe diligenciar todos los campos!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un usuario debe diligenciar todos los campos!`);
   }
 
   // Funcion permitirá a una u otra de las funciones que tiene el modal
@@ -268,8 +271,9 @@ export class RegistroComponentComponent implements OnInit {
         }
         this.dialogUsuarios = false;
         this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => {
-          this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
-        }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
+          this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
+          this.cargarUsuarios();
+        }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
       }
     });
   }
@@ -329,7 +333,7 @@ export class RegistroComponentComponent implements OnInit {
         this.load = true;
       }, 1000);
     }, 3500);
-    setTimeout(() => { this.mensajeConfirmacion(`¡Exportación a excel!`, `¡Se ha exportado a un archivo de excel la información de todos los usuarios!`); }, 4000);
+    setTimeout(() => { this.msj.mensajeConfirmacion(`¡Exportación a excel!`, `¡Se ha exportado a un archivo de excel la información de todos los usuarios!`); }, 4000);
   }
 
   // Funcion que va a innactivar varios usuarios
@@ -357,8 +361,9 @@ export class RegistroComponentComponent implements OnInit {
           }
 		      this.dialogUsuarios = false;
           this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {
-            this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
-          }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
+            this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
+            this.cargarUsuarios();
+          }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
         }
       });
     }
@@ -417,25 +422,26 @@ export class RegistroComponentComponent implements OnInit {
     let descripcionRol : any = this.formRoles.value.rolDescripcion;
     if(this.formRoles.valid) {
       this.servicioRoles.getRolxNombre(nombreRol).subscribe(dataRoles => {
-        if(dataRoles.length > 0) this.mensajeAdvertencia(`¡No se pudo crear el rol debido a que ya existe uno con el nombre indicado!`);
+        if(dataRoles.length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡No se pudo crear el rol debido a que ya existe uno con el nombre indicado!`);
         else {
           const roles : modelRol = { RolUsu_Id : 0, RolUsu_Nombre : nombreRol, RolUsu_Descripcion : descripcionRol, }
           const tipoUsu : modelTipoUsuario = { tpUsu_Id: 0, tpUsu_Nombre: nombreRol, tpUsu_Descripcion: descripcionRol, }
           this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {  this.crearTipo_Usuario(tipoUsu); }, error => {
-            this.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`);
+            this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`);
           });
         }
       });
-    } else this.mensajeAdvertencia(`¡Para poder crear un rol debe diligenciar todos los campos!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un rol debe diligenciar todos los campos!`);
   }
 
   /** Crea tipo de usuario con el mismo nombre de rol */
   crearTipo_Usuario(tipo_usuario : any) {
     this.servicioTpUsuarios.Insert(tipo_usuario).subscribe(dataRol => {
-      this.mensajeConfirmacion(`¡Se ha creado un tipo de usuario!`, `¡Se creó un tipo de usuario!`)
+      this.msj.mensajeConfirmacion(`¡Se ha creado un tipo de usuario!`, `¡Se creó un tipo de usuario!`);
+      this.cargarUsuarios();
       this.formRoles.reset();
       setTimeout(() => { this.cargarRoles(); this.cargarTiposUsuarios();  }, 1000);
-    }, error => { this.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el tipo de usuario!`) });
+    }, error => { this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el tipo de usuario!`) });
   }
 
   /** Crear areas desde el modal */
@@ -444,17 +450,17 @@ export class RegistroComponentComponent implements OnInit {
     let descripcionArea : any = this.formAreas.value.areaDescripcion;
     if(this.formAreas.valid){
       this.servicioAreas.getNombre(nombreArea).subscribe(dataAreas => {
-        if(dataAreas.length > 0) this.mensajeAdvertencia(`¡Ya existe un área con el nombre ${nombreArea}!`);
+        if(dataAreas.length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Ya existe un área con el nombre ${nombreArea}!`);
         else {
           const areas : modelAreas = {area_Id: 0, area_Nombre: nombreArea, area_Descripcion: descripcionArea, }
           this.servicioAreas.srvGuardar(areas).subscribe(dataArea => {
-            this.mensajeConfirmacion(`¡Área creada!`, `¡Se creó un área satisfactoriamente!`);
+            this.msj.mensajeConfirmacion(`¡Área creada!`, `¡Se creó un área satisfactoriamente!`);
             this.formAreas.reset();
             setTimeout(() => { this.cargarAreas(); }, 1000);
-          }, error => { this.mensajeError(`¡Ocurrió un error!`, `¡Ha ocurrido un error al intentar crear una nueva área!`); })
+          }, error => { this.msj.mensajeError(`¡Ocurrió un error!`, `¡Ha ocurrido un error al intentar crear una nueva área!`); })
         }
       });
-    } else this.mensajeAdvertencia(`¡Para poder crear un area debe diligenciar todos los campos!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un area debe diligenciar todos los campos!`);
   }
 
   /** Agregar roles o areas dependiendo la acción del dialogo. */
@@ -487,22 +493,6 @@ export class RegistroComponentComponent implements OnInit {
         }
       });
     }
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-    this.cargarUsuarios();
-   }
-
-  /** Mostrar mensaje de error  */
-  mensajeError(titulo : string, mensaje : string) {
-  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : string) {
-  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Reporte_Consolidado_Facturacion',
@@ -43,8 +44,8 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
-                    private messageService: MessageService,
-                      private shepherdService: ShepherdService,) {
+                      private shepherdService: ShepherdService,
+                        private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null, Validators.required],
@@ -138,7 +139,7 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    let nuevo : any[] = this.arrayVendedores.filter((item) => item.nombvende == vendedorSeleccionado);
+    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
     this.formFiltros.patchValue({
       vendedor: nuevo[0].nombvende,
       idvendedor : nuevo[0].idvende,
@@ -247,7 +248,7 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
       else if (vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
 
       this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
-        if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+        if(datos_consolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
         else {
           for (let i = 0; i < datos_consolidado.length; i++) {
             this.llenarConsolidado(datos_consolidado[i], i);
@@ -255,7 +256,7 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
         }
         setTimeout(() => this.cargando = false, datos_consolidado.length);
       });
-    } else this.mensajeAdvertencia(`¡Debe elegir un vendedor!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir un vendedor!`);
   }
 
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
@@ -328,7 +329,7 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
   exportarExcel(){
-    if (this.arrayConsolidado.length == 0) this.mensajeAdvertencia('Debe haber al menos un pedido en la tabla.');
+    if (this.arrayConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
@@ -402,26 +403,10 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
             fs.saveAs(blob, `Consolidado Facturacion - ${this.today}.xlsx`);
           });
           this.cargando = false;
-          this.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
         }, 1000);
 
       }, 1000);
     }
   }
-
-  // Mostrar mensaje de confirmación
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life: 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mensajeError(titulo : string, mensaje : string) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : string) {
-    this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
-  }
-
 }

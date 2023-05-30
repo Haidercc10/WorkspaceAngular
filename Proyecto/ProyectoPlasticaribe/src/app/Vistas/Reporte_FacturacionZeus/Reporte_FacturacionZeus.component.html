@@ -1,5 +1,3 @@
-<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
-
 <app-menuLateral></app-menuLateral>
 <br>
 <app-VistasFavoritas></app-VistasFavoritas>
@@ -127,7 +125,7 @@
       <ng-template pTemplate="header">
         <tr class="font-size-16" id="filtros">
           <th></th>
-          <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>

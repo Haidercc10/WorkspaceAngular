@@ -3,13 +3,12 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -43,8 +42,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
-                    private messageService: MessageService,
-                      private shepherdService: ShepherdService,) {
+                      private shepherdService: ShepherdService,
+                        private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -257,7 +256,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     else if (vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
-      if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+      if(datos_consolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
       else {
         for (let i = 0; i < datos_consolidado.length; i++) {
           this.llenarConsolidado(datos_consolidado[i], i);
@@ -343,7 +342,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
   exportarExcel(){
-    if (this.arrayConsolidado.length == 0) this.mensajeAdvertencia('Debe haber al menos un pedido en la tabla.');
+    if (this.arrayConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
@@ -419,26 +418,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
             fs.saveAs(blob, `Consolidado Facturacion - ${this.today}.xlsx`);
           });
           this.cargando = false;
-          this.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
         }, 1000);
 
       }, 1500);
     }
   }
-
-  // Mostrar mensaje de confirmación
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mensajeError(titulo : string, mensaje : string) {
-  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : string) {
-  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
-  }
-
 }

@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -11,6 +10,7 @@ import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.se
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { defaultStepOptions, stepsReporteDesperdicio as defaultSteps } from 'src/app/data';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Reporte_Desperdicios',
@@ -45,8 +45,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
                   private servicioProductos : ProductoService,
                     private servicioDesperdicios : DesperdicioService,
                       private AppComponent : AppComponent,
-                        private messageService: MessageService,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.formBuilder.group({
       OT : [null],
@@ -116,7 +116,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
         Producto: nuevo[0].prod_Nombre,
       });
       console.log(this.formFiltros.value)
-    } else this.mostrarAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
+    } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
   }
 
   /** Función que consultará según los campos de busqueda diferentes de vacio. */
@@ -146,7 +146,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-        if (dataDesperdicios.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
+        if (dataDesperdicios.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
         else {
           for (let index = 0; index < dataDesperdicios.length; index++) {
             this.llenarTabla(dataDesperdicios[index]);
@@ -371,7 +371,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
          const pdf = pdfMake.createPdf(infoPdf);
          pdf.open();
          this.load = true;
-         this.mostrarConfirmacion(`Confirmación`,`PDF generado con éxito!`);
+         this.msj.mensajeConfirmacion(`Confirmación`,`PDF generado con éxito!`);
          break;
       }
     });
@@ -470,21 +470,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       "No Conformidades" : cantDesperdicios
     }
     this.arrayDatosAgrupadosPdf.push(info);
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life:2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life:2000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life:2000});
   }
 }
 
