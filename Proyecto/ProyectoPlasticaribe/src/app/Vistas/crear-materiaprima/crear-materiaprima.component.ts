@@ -1,12 +1,11 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MpProveedorService } from 'src/app/Servicios/MateriaPrima_Proveedor/MpProveedor.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +27,10 @@ export class CrearMateriaprimaComponent implements OnInit {
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
-                  private unidadMedidaService : UnidadMedidaService,
-                    private frmBuilderMateriaPrima : FormBuilder,
-                      private proveedorservices : ProveedorService,
-                        private proveedorMPService : MpProveedorService,
-                          private messageService: MessageService) {
+                  private frmBuilderMateriaPrima : FormBuilder,
+                    private proveedorservices : ProveedorService,
+                      private proveedorMPService : MpProveedorService,
+                        private mensajeService : MensajesAplicacionService,) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       mpNombre: ['', Validators.required],
@@ -49,41 +47,17 @@ export class CrearMateriaprimaComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerNombreCategoriasMp();
-    this.obtenerUnidadMedida();
     this.obtenerProceedor();
   }
 
-  //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida(){
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let index = 0; index < datos_unidadesMedida.length; index++) {
-        this.unidadMedida.push(datos_unidadesMedida[index].undMed_Id);
-      }
-    });
-  }
-
    //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
-   obtenerNombreCategoriasMp(){
-    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let index = 0; index < datos_categorias.length; index++) {
-        this.nombreCategoriasMP.push(datos_categorias[index]);
-      }
-    });
-  }
+   obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos);
 
   /** Limpiar campos al momento de crear la mat. prima. */
-  limpiarCampos(){
-    this.materiPrima.reset();
-  }
+  limpiarCampos = () => this.materiPrima.reset();
 
   /** Obtener Proveedor y cargarlo en el array de la vista. */
-  obtenerProceedor(){
-    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
-      for (let index = 0; index < datos_proveedores.length; index++) {
-        this.proveedores.push(datos_proveedores[index])
-      }
-    });
-  }
+  obtenerProceedor = () => this.proveedorservices.srvObtenerLista().subscribe(datos => this.proveedores = datos);
 
   /** Crear el registro de la materia prima en la base de datos. */
   registrarMateriPrima(){
@@ -93,11 +67,6 @@ export class CrearMateriaprimaComponent implements OnInit {
     let categoriaMateriaPrima : any = this.materiPrima.value.mpCategoria;
     let precioMateriaPrima : number = this.materiPrima.value.mpValor;
 
-    this.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, categoriaMateriaPrima, precioMateriaPrima);
-  }
-
-  //Funacion que crea una materia prima y la guarda en la base de datos
-  CreacionMateriaPrima(nombreMateriaPrima : string, descripcionMateriaPrima : string, stockMateriaPrima : number, categoriaMateriaPrima : number, precioMateriaPrima : number){
     const datosMP : any = {
       MatPri_Nombre : nombreMateriaPrima,
       MatPri_Descripcion : descripcionMateriaPrima,
@@ -110,12 +79,10 @@ export class CrearMateriaprimaComponent implements OnInit {
       MatPri_Hora : moment().format('H:mm:ss'),
     }
 
-    this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
-      this.mostrarConfirmacion('¡Materia Prima creada con éxito!');
+    this.materiaPrimaService.srvGuardar(datosMP).subscribe(() => {
+      this.mensajeService.mensajeConfirmacion('¡Materia Prima creada con éxito!', '');
       setTimeout(() => { this.materiPrima.reset(); }, 1000);
-    }, error => {
-      this.mostrarError('Falló al crear la materia prima, verifique!');
-    });
+    }, () => this.mensajeService.mensajeError(`¡Mensaje Error!`, 'Falló al crear la materia prima, verifique!'));
   }
 
   //Funcion qu creará la relacion de materia prima y proveedores
@@ -124,17 +91,7 @@ export class CrearMateriaprimaComponent implements OnInit {
       Prov_Id : proveedor,
       MatPri_Id : idMateriaPrima,
     }
-    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {});
-  }
-
-  /** Mostrar mensaje de confirmación al crear materia prima */
-  mostrarConfirmacion(mensaje : any) {
-    this.messageService.add({severity:'success', detail: mensaje});
-  }
-
-   /** Mostrar mensaje de confirmación al crear materia prima */
-  mostrarError(mensaje : any) {
-    this.messageService.add({severity:'error', detail: mensaje});
+    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(() => {});
   }
 
   /** Cargar nombre en la descripción. */

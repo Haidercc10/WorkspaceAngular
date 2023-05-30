@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDevolucionesMp as defaultSteps } from 'src/app/data';
@@ -41,8 +41,8 @@ export class DevolucionesMPComponent implements OnInit {
                         private servicioTintas : TintasService,
                           private detallesAsignacionService : DetallesAsignacionService,
                             private boppService : EntradaBOPPService,
-                              private messageService: MessageService,
-                                private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
@@ -71,11 +71,7 @@ export class DevolucionesMPComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos = () => this.FormDevolucion.patchValue({ ot : '', MpingresoFecha: this.today, MpObservacion : '', });
@@ -110,7 +106,7 @@ export class DevolucionesMPComponent implements OnInit {
           }
         }
       }
-    }, () => { this.mostrarAdvertencia(`Error`, `¡No hay materias primas asignadas a la OT ${ot}!`); });
+    }, () => this.mensajeService.mensajeError(`Error`, `¡No hay materias primas asignadas a la OT ${ot}!`));
     setTimeout(() => {
       this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
         for (let j = 0; j < datos_devolucion.length; j++) {
@@ -124,7 +120,7 @@ export class DevolucionesMPComponent implements OnInit {
             }
           }
         }
-      }, () => { this.mostrarError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`); });
+      }, () => this.mensajeService.mensajeError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`));
       this.load = true;
     }, 2500);
   }
@@ -171,8 +167,8 @@ export class DevolucionesMPComponent implements OnInit {
         DevMatPri_Motivo : this.FormDevolucion.value.MpObservacion,
         Usua_Id : this.storage_Id,
       }
-      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => this.creacionDevolucionMateriaPrima(), () => this.mostrarError(`Error`, `¡Error al crear la devolución de materia prima!`));
-    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
+      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => this.creacionDevolucionMateriaPrima(), () => this.mensajeService.mensajeError(`Error`, `¡Error al crear la devolución de materia prima!`));
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -190,7 +186,7 @@ export class DevolucionesMPComponent implements OnInit {
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
           this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(() => {
-          }, () => { this.mostrarError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`); });
+          }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
         }
       }
     });
@@ -223,8 +219,8 @@ export class DevolucionesMPComponent implements OnInit {
             TpBod_Id : datos_materiaPrima.tpBod_Id,
           }
           this.materiaPrimaService.srvActualizar(this.materiasPrimasRetiradas[index].Id_MateriaPrima, datosMP).subscribe(() => {
-            this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito`);
-          }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
+            this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de devolución creado con éxito`);
+          }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`));
         });
       }
     }
@@ -253,8 +249,8 @@ export class DevolucionesMPComponent implements OnInit {
             tinta_InvInicial : datos_tinta.tinta_InvInicial,
           }
           this.servicioTintas.srvActualizar(this.materiasPrimasRetiradas[index].Id_Tinta, datosTintaActualizada).subscribe(() => {
-            this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
-          }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
+            this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
+          }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`));
         });
       }
     }
@@ -290,8 +286,8 @@ export class DevolucionesMPComponent implements OnInit {
               Usua_Id : item.usua_Id
             }
             this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(() => {
-              this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
-            }, () => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!`); });
+              this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
+            }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!`));
           }
         });
       }
@@ -305,13 +301,4 @@ export class DevolucionesMPComponent implements OnInit {
     this.materiasPrimas = [];
     this.materiasPrimasRetiradas = [];
   }
-
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
 }

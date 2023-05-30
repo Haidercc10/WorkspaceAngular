@@ -7,6 +7,7 @@ import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsInventarioExtrusion as defaultSteps } from 'src/app/data';
 
@@ -37,7 +38,8 @@ export class Inventario_ExtrusionComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private ingRollosService : DtIngRollos_ExtrusionService,
                     private messageService: MessageService,
-                      private shepherdService: ShepherdService) {
+                      private shepherdService: ShepherdService,
+                        private mensajeService : MensajesAplicacionService,) {
 
     this.FormInventario = this.frmBuilder.group({
       OrdenTrabajo : [null],
@@ -79,7 +81,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayRollos.length == 0) this.mostrarAdvertencia('Advertencia', '¡Para exportar el archivo a Excel debe cargar rollos en la tabla!');
+    if (this.ArrayRollos.length == 0) this.mensajeService.mensajeAdvertencia('Advertencia', '¡Para exportar el archivo a Excel debe cargar rollos en la tabla!');
     else {
       const title = `Inventario Extrusión - ${this.today}`;
       const header = ["OT", "Producto", "Nombre Producto", "Peso", "Unidad Medida"]
@@ -117,7 +119,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           fs.saveAs(blob, `Inventario Extrusión - ${this.today}.xlsx`);
-          this.mostrarConfirmacion(`Confirmación`,`Inventario de extrusión exportado con éxito!`);
+          this.mensajeService.mensajeConfirmacion(`Confirmación`,`Inventario de extrusión exportado con éxito!`);
         });
       }, 500);
     }
@@ -163,7 +165,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, `Inventario Extrusión OT ${this.numeroOrden} - ${this.today}.xlsx`);
-        this.mostrarConfirmacion(`Confirmación`,`Inventario de extrusión de la OT ${this.numeroOrden} exportado con éxito!`)
+        this.mensajeService.mensajeConfirmacion(`Confirmación`,`Inventario de extrusión de la OT ${this.numeroOrden} exportado con éxito!`)
       });
     }, 500);
   }
@@ -184,7 +186,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       for (let i = 0; i < datos_rollos.length; i++) {
         this.llenarTabla(datos_rollos[i]);
       }
-    }, error => { this.mostrarError(`Error`,`No se pudo obtener el inventario de la bodega de extrusión!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`No se pudo obtener el inventario de la bodega de extrusión!`));
   }
 
   // funcion que va a lenar la tabla con la informacion cosultada
@@ -212,7 +214,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       for (let i = 0; i < datos_rollos.length; i++) {
         this.llenarTablaModal(datos_rollos[i]);
       }
-    }, error => { this.mostrarError(`Error`,`No se pudo obtener información de los rollos en bodega de la OT N° ${this.numeroOrden}!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`No se pudo obtener información de los rollos en bodega de la OT N° ${this.numeroOrden}!`));
   }
 
   // Funcion que va a llenar la tabla del modal con los rollos de la orden de trabajo
@@ -242,22 +244,5 @@ export class Inventario_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
-  clear(table: Table) {
-    table.clear();
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
-  }
+  clear = (table: Table) => table.clear();
 }

@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-crear-tintas',
@@ -24,7 +23,7 @@ export class CrearTintasComponent implements OnInit {
                 private servicioUnidadMedida : UnidadMedidaService,
                   private servicioTintas : TintasService,
                     private categoriasService : CategoriaMateriaPrimaService,
-                      private messageService: MessageService) {
+                      private mensajeService: MensajesAplicacionService) {
 
     this.formularioTintas = this.frmBuilderCT.group({
       TintaNombre : [null, Validators.required],
@@ -43,24 +42,10 @@ export class CrearTintasComponent implements OnInit {
   }
 
   /** Cargar categorias en el combobox del modal de tintas */
-  obtenerCategorias(){
-    this.categoriasService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        let cat : number [] = [7,8,13];
-        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
-      }
-    });
-  }
+  obtenerCategorias = () => this.categoriasService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [7,8,13].includes(item.catMP_Id)));
 
   /** Cargar unidades medidas en combobox */
-  obtenerUnidadMedida(){
-    this.servicioUnidadMedida.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let index = 0; index < datos_unidadesMedida.length; index++) {
-        this.unidadMedida.push(datos_unidadesMedida[index]);
-        this.unidadMedida.sort();
-      }
-    });
-  }
+  obtenerUnidadMedida = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.unidadMedida = datos);
 
   /** Agregar registros no existentes de tintas a la Base de Datos. */
   agregarTintas(){
@@ -81,10 +66,10 @@ export class CrearTintasComponent implements OnInit {
         Tinta_FechaIngreso : moment().format('YYYY-MM-DD'),
         Tinta_Hora : moment().format('H:mm:ss'),
       }
-      this.servicioTintas.srvGuardar(datosTintas).subscribe(datosTintas => {
-        this.mostrarConfirmacion('Tinta creada con éxito!');
+      this.servicioTintas.srvGuardar(datosTintas).subscribe(() => {
+        this.mensajeService.mensajeConfirmacion('Tinta creada con éxito!', '');
         setTimeout(() => { this.limpiarCampos(); }, 500);
-      }, error => { this.mostrarError('Fallo al crear la tinta, por favor, verifique!'); });
+      }, () => this.mensajeService.mensajeError(`Error`, 'Fallo al crear la tinta, por favor, verifique!'));
     }
   }
 
@@ -101,30 +86,8 @@ export class CrearTintasComponent implements OnInit {
   }
 
   /** Valida que los campos esten llenos. */
-  validarCampos(){
-    if(this.formularioTintas.valid) this.agregarTintas();
-    else this.mostrarAdvertencia('Debe llenar los campos vacios!');
-  }
-
-  /** Mostrar mensaje de confirmación al crear tinta */
-  mostrarConfirmacion(mensaje : any) {
-    this.messageService.add({severity:'success', detail: mensaje});
-  }
-
-  /** Mostrar mensaje de error al crear tinta */
-  mostrarError(mensaje : any) {
-    this.messageService.add({severity:'error', detail: mensaje});
-  }
-
-  /** Mostrar mensaje de advertencia al crear tinta */
-  mostrarAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warning', detail: mensaje});
-  }
+  validarCampos = () => this.formularioTintas.valid ? this.agregarTintas() : this.mensajeService.mensajeAdvertencia('Advertencia', 'Debe llenar los campos vacios!');
 
   /** Cargar el nombre en la descripción. */
-  cargarDescripcion(){
-    let nombre : any = this.formularioTintas.value.TintaNombre
-    this.formularioTintas.patchValue({ TintaDescripcion : nombre, });
-  }
-
+  cargarDescripcion = () => this.formularioTintas.patchValue({ TintaDescripcion : this.formularioTintas.value.TintaNombre, });
 }

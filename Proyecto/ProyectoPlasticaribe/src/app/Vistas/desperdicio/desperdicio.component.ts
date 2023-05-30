@@ -14,6 +14,7 @@ import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/mate
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { defaultStepOptions, stepsDesperdicio as defaultSteps } from 'src/app/data';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -50,7 +51,8 @@ export class DesperdicioComponent implements OnInit {
                             private deperdicioService : DesperdicioService,
                               private materiaService : MaterialProductoService,
                                 private messageService: MessageService,
-                                  private shepherdService: ShepherdService) {
+                                  private shepherdService: ShepherdService,
+                                    private mensajeService : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDesperdicio = this.frmBuilder.group({
@@ -182,7 +184,6 @@ export class DesperdicioComponent implements OnInit {
       IdTipoMaterial : nuevo[0].material_Id,
       TipoMaterial : nuevo[0].material_Nombre,
     });
-
   }
 
   // Funcion que consultará la informacion de la orden de trabajo
@@ -192,7 +193,7 @@ export class DesperdicioComponent implements OnInit {
     this.bagProService.srvObtenerListaClienteOT_Item(orden).subscribe(datos_orden => {
       if (datos_orden.length == 0) {
         this.cargando = false;
-        this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de trabajo N° ${orden}!`);
+        this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de trabajo N° ${orden}!`);
       }
       for (let i = 0; i < datos_orden.length; i++) {
         let imp : any = datos_orden[i].impresion.trim();
@@ -208,7 +209,10 @@ export class DesperdicioComponent implements OnInit {
         });
         this.cargando = false;
       }
-    }, error => { this.mostrarError(`Error`, `No se pudo obtener información de la OT N° ${orden}!`); });
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `No se pudo obtener información de la OT N° ${orden}!`);
+      this.cargando = false;
+    });
   }
 
   // Funcion que va a llenar la tabla con la informacion del desperdicio digitadi
@@ -239,7 +243,10 @@ export class DesperdicioComponent implements OnInit {
       }
       this.grupoDespercios.push(info);
       this.cargando = false;
-    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+    } else {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+      this.cargando = false;
+    }
   }
 
   // Funcion que va a crear el registro de desperdicio
@@ -266,12 +273,16 @@ export class DesperdicioComponent implements OnInit {
           Desp_HoraRegistro : moment().format('H:mm:ss'),
           Proceso_Id : this.grupoDespercios[i].IdArea,
         }
-        this.deperdicioService.Insert(info).subscribe(datos_insertados => this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`), () => {
-          this.mostrarError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
+        this.deperdicioService.Insert(info).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`), () => {
+          this.mensajeService.mensajeError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
+          this.cargando = false;
           error = true;
         });
       }
-    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe añadir minimo un registro a la tabla para crear un desperdicio!`);
+    } else {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe añadir minimo un registro a la tabla para crear un desperdicio!`);
+      this.cargando = false;
+    }
 
     setTimeout(() => {
       if (!error) {
@@ -349,7 +360,7 @@ export class DesperdicioComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mostrarError(`Error`,`¡Error al consultar la información del último registro!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`¡Error al consultar la información del último registro!`));
   }
 
   // Funcion que va a consultar los datos de desperdicio
@@ -372,8 +383,8 @@ export class DesperdicioComponent implements OnInit {
         }
         this.datosPdf.push(info);
       }
-      setTimeout(() => { this.crearPdf(); }, 2000);
-    }, error => { this.mostrarError(`Error`, `¡Error al consultar la información del último registro!`); });
+      setTimeout(() => this.crearPdf(), 2000);
+    }, () => this.mensajeService.mensajeError(`Error`, `¡Error al consultar la información del último registro!`));
   }
 
   // Funcion que se encagará de llenar la tabla del pdf
@@ -413,22 +424,7 @@ export class DesperdicioComponent implements OnInit {
     data = this.registroSeleccionado;
     this.onReject();
     this.grupoDespercios.splice(this.grupoDespercios.findIndex((item) => item.Ot == data.Ot && item.NoConformidad == data.NoConformidad), 1);
-    this.mostrarConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-   this.cargando =false;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
-   this.cargando =false;
+    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
   }
 
   onReject = () => this.messageService.clear('eleccion');

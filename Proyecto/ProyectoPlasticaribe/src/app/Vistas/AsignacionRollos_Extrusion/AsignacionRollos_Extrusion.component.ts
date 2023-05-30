@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { AsignacionRollos_ExtrusionService } from 'src/app/Servicios/AsignaciinRollosExtrusion/AsignacionRollos_Extrusion.service';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSalidaRollosExtrusion as defaultSteps } from 'src/app/data';
@@ -42,8 +42,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
                     private procesosService : ProcesosService,
                       private asgRollos : AsignacionRollos_ExtrusionService,
                         private dtAsgRollos : DetallesAsgRollos_ExtrusionService,
-                          private messageService: MessageService,
-                            private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private mensajeService : MensajesAplicacionService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -254,7 +254,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         });
       }
       setTimeout(() => {
-        if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No hay rollos por salir!`);
+        if (consulta <= 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`No hay rollos por salir!`);
         this.cargando = true;
       }, 2000);
     }, 4000);
@@ -350,7 +350,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que almacenará en la base de datos la información general de la salida de los rollos
   salidaRollos(){
-    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) this.mostrarAdvertencia(`Advertencia`, `Para realizar la asignación debe seleccionar minimo un rollo y el proceso hacía el que va dirigido!`);
+    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Para realizar la asignación debe seleccionar minimo un rollo y el proceso hacía el que va dirigido!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -361,9 +361,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         Usua_Id : this.storage_Id,
       }
       this.asgRollos.srvGuardar(info).subscribe(() => {
-        this.asgRollos.obtenerUltimoId().subscribe(data => this.dtSalidaRollos(data.asgRollos_Id),() => this.mostrarError(`Error al obtener el último Id de asignación!`));
+        this.asgRollos.obtenerUltimoId().subscribe(data => this.dtSalidaRollos(data.asgRollos_Id), () => this.mensajeService.mensajeError(`¡Error!`, `Error al obtener el último Id de asignación!`));
       }, () => {
-        this.mostrarError(`Error`, `Error al asignar los rollos!`);
+        this.mensajeService.mensajeError(`Error`, `Error al asignar los rollos!`);
         this.cargando = true;
       });
     }
@@ -382,7 +382,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         Proceso_Id : procesos,
         Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
       }
-      this.dtAsgRollos.srvGuardar(info).subscribe(() => {}, () => this.mostrarError(`Error`, `Error al dar salida a los rollos!!`));
+      this.dtAsgRollos.srvGuardar(info).subscribe(() => {}, () => this.mensajeService.mensajeError(`Error`, `Error al dar salida a los rollos!!`));
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 3000);
   }
@@ -403,7 +403,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Proceso_Id : datos_Rollos[j].proceso_Id,
             Prod_Id : datos_Rollos[j].prod_Id,
           }
-          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, `No fue posible actualizar el estado de los rollos!`));
+          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(() => {}, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el estado de los rollos!`));
         }
       });
     }
@@ -413,7 +413,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   finalizarInsercion(id : number){
     this.cambioEstado();
     setTimeout(() => {
-      this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} fueron asignados correctamente!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`,`${this.totalRollos} fueron asignados correctamente!`);
       this.buscarRolloPDF(id);
     }, 2000);
   }
@@ -549,7 +549,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         setTimeout(() => { (this.limpiarCampos()); }, 1200);
         break;
       }
-    }, () => { this.mostrarError(`Error`,`No se pudo obtener la información necesaria para crear el archivo PDF!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`No se pudo obtener la información necesaria para crear el archivo PDF!`));
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -570,7 +570,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
       setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, () => {  this.mostrarError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
+    }, () => {  this.mensajeService.mensajeError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -621,13 +621,4 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       }
     };
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000 });
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000 });
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000 });
 }

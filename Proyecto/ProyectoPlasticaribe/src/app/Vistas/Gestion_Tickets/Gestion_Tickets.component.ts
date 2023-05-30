@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { Tickets_ResueltosService } from 'src/app/Servicios/Tickets_Resueltos/Tickets_Resueltos.service';
 import { AppComponent } from 'src/app/app.component';
@@ -36,9 +36,9 @@ export class Gestion_TicketsComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private ticketService : TicketsService,
-                    private messageService: MessageService,
-                      private ticketsResueltosService : Tickets_ResueltosService,
-                        private shepherdService: ShepherdService) {
+                    private ticketsResueltosService : Tickets_ResueltosService,
+                      private shepherdService: ShepherdService,
+                        private mensajeService : MensajesAplicacionService,) {
 
     this.FormTicketResuelto = this.frmBuilder.group({
       Descripcion : [null],
@@ -126,7 +126,7 @@ export class Gestion_TicketsComponent implements OnInit {
 
   // Funcion que va a cambiar el estado del ticket a "En revisión"
   ticket_EnRevision(){
-    if (this.ticketSeleccionado.Codigo == '') this.mensajeAdvertencia(`¡Debe seleccionar un ticket para cambiar su estado!`);
+    if (this.ticketSeleccionado.Codigo == '') this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar un ticket para cambiar su estado!`);
     else {
       this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).subscribe(datos => {
         if (datos.estado_Id != 29) {
@@ -140,15 +140,20 @@ export class Gestion_TicketsComponent implements OnInit {
             Ticket_RutaImagen : datos.ticket_RutaImagen,
             Ticket_NombreImagen : datos.ticket_NombreImagen,
           }
-          this.ticketService.actualizarTicket(datos.ticket_Id, info).subscribe(data => this.mensajeConfirmacion(`¡EL Ticket #${datos.ticket_Id} ha cambiado de estado!`, `¡Se ha cambiado el estado del ticket, el ticket ahora se encuentra en revisión!`),
-          error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`); });
-        } else this.mensajeAdvertencia(`¡El ticket ya se encuentra en estado de revisión!`);
+          this.ticketService.actualizarTicket(datos.ticket_Id, info).subscribe(() => {
+            this.mensajeService.mensajeConfirmacion(`¡EL Ticket #${datos.ticket_Id} ha cambiado de estado!`, `¡Se ha cambiado el estado del ticket, el ticket ahora se encuentra en revisión!`);
+            this.limpiarTodo();
+          }, () => {
+            this.cargando = false;
+            return this.mensajeService.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`);
+          });
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El ticket ya se encuentra en estado de revisión!`);
       });
     }
   }
 
   // Funcion que va a mostrar el modal donde se puede cambiar el estado del ticket a resuelto
-  mostrarModalTicket_Resuelto = () => this.ticketSeleccionado.Codigo == '' ? this.mensajeAdvertencia(`¡Debe seleccionar un ticket para cambiar su estado!`) : this.visible = true;
+  mostrarModalTicket_Resuelto = () => this.ticketSeleccionado.Codigo == '' ? this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar un ticket para cambiar su estado!`) : this.visible = true;
 
   // Funcion que va a colocar el ticket con estado 'Resuleto' y va a crear un registro en la tabla 'Tickets_Revisados'
   ticket_Resuelto(){
@@ -172,32 +177,21 @@ export class Gestion_TicketsComponent implements OnInit {
             TicketRev_Descripcion : this.FormTicketResuelto.value.Descripcion == null ? '' : this.FormTicketResuelto.value.Descripcion,
             Ticket_Id : datos.ticket_Id,
           }
-          this.ticketsResueltosService.Insert(info).subscribe(data_TicketResuelto => {
-            this.mensajeConfirmacion(`¡EL Ticket #${datos.ticket_Id} ha cambiado de estado!`, `¡Se ha cambiado el estado del ticket, el ticket ahora se encuentra resuelto!`)
-          }, err => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el registro del ticket resuelto!`); });
-        }, error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`); });
-      } else this.mensajeAdvertencia(`¡El ticket ya se encuentra en estado de revisión!`);
+          this.ticketsResueltosService.Insert(info).subscribe(() => {
+            this.mensajeService.mensajeConfirmacion(`¡EL Ticket #${datos.ticket_Id} ha cambiado de estado!`, `¡Se ha cambiado el estado del ticket, el ticket ahora se encuentra resuelto!`)
+            this.limpiarTodo();
+          }, () => {
+            this.cargando = false;
+            this.mensajeService.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el registro del ticket resuelto!`);
+          });
+        }, () => {
+          this.cargando = false;
+          this.mensajeService.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`);
+        });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El ticket ya se encuentra en estado de revisión!`);
     });
   }
 
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.limpiarTodo();
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
-  }
 }

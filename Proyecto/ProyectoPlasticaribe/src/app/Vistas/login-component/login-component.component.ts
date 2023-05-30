@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 import { CookieService } from 'ngx-cookie-service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -43,7 +44,8 @@ export class LoginComponentComponent implements OnInit {
                                 private http : HttpClient,
                                   private messageService: MessageService,
                                     private encriptacion : EncriptacionService,
-                                      private cookiesServices : CookieService,) {
+                                      private cookiesServices : CookieService,
+                                        private mensajeService : MensajesAplicacionService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -74,20 +76,13 @@ export class LoginComponentComponent implements OnInit {
   }
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
-  cargaDatosComboBox(){
-    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ this.mensajeError('Error', '¡No fue posible consultar la Empresa, verifique!'); });
-  }
+  cargaDatosComboBox = () => this.empresaServices.srvObtenerLista().subscribe(datos => this.empresas = datos, () => this.mensajeService.mensajeError('Error', '¡No fue posible consultar la Empresa, verifique!'));
 
   // Funcion que va a redireccionar al apartado de archivos
-  redireccionarArchivos(){
-    window.location.pathname = '/Archivos';
-  }
+  redireccionarArchivos = () => window.location.pathname = '/Archivos';
 
   //Funcion que va a validar si hay campos vacios
-  validarCamposVacios() : any{
-    if (this.formularioUsuario.valid) this.consultaLogin();
-    else this.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
-  }
+  validarCamposVacios = () => this.formularioUsuario.valid ? this.consultaLogin() : this.mensajeService.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
   consultaLogin(){
@@ -97,9 +92,9 @@ export class LoginComponentComponent implements OnInit {
     let contrasena : string = this.formularioUsuario.value.Contrasena;
     let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
     this.authenticationService.login(data).subscribe(datos => {
-      this.authenticationInvZeusService.login().subscribe(datos_InvZeus => {
-        this.authenticationContaZeusService.login().subscribe(datos_ContZeus => {
-          this.authenticationBagPro.login().subscribe(datos_BagPro => {
+      this.authenticationInvZeusService.login().subscribe(() => {
+        this.authenticationContaZeusService.login().subscribe(() => {
+          this.authenticationBagPro.login().subscribe(() => {
             let idUsuario : number = datos.usua_Id;
             let nombre: string = datos.usuario;
             let rol: number = datos.rolUsu_Id;
@@ -115,11 +110,26 @@ export class LoginComponentComponent implements OnInit {
               this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
               this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
               window.location.pathname = '/home';
-            }, err => { this.mensajeError(`¡Error al registrar el inicio de sesión!`); });
-          }, err => { this.mensajeError(`¡Error al conectarse con BagPro!`); });
-        }, err => { this.mensajeError(`¡Error al conectarse con Contabilidad de Zeus!`); });
-      }, err => { this.mensajeError(`¡Error al conectarse con Inventario de Zeus!`); });
-    }, err => { this.mensajeError(`¡No fue posible iniciar sesión!`) });
+            }, () => {
+              this.mensajeService.mensajeError(`¡Error!`, `¡Error al registrar el inicio de sesión!`);
+              this.cargando = false;
+            });
+          }, () => {
+            this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con BagPro!`);
+            this.cargando = false;
+          });
+        }, () => {
+          this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con Contabilidad de Zeus!`);
+          this.cargando = false;
+        });
+      }, () => {
+        this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con Inventario de Zeus!`);
+        this.cargando = false;
+      });
+    }, () => {
+      this.mensajeService.mensajeError(`¡Error!`, `¡No fue posible iniciar sesión!`);
+      this.cargando = false;
+    });
   }
 
   // Funcin que va a mostrar o no la contraseña del usuario
@@ -132,22 +142,5 @@ export class LoginComponentComponent implements OnInit {
       password.type = 'password';
       this.mostrarPass = false;
     }
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
-
-  /** Mostrar mensaje de error  */
-  mensajeError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-   this.cargando = false;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
-   this.cargando = false;
   }
 }

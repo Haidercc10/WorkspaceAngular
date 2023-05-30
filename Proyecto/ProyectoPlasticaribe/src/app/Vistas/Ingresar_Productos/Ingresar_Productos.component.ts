@@ -12,6 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsIngresoRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Ingresar_Productos',
@@ -53,7 +54,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                         private productosService : ProductoService,
                           private dtPreEntregaService : DtPreEntregaRollosService,
                             private messageService: MessageService,
-                              private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
@@ -82,11 +84,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -97,14 +95,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarRollos.patchValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Observacion : '',
-      Proceso : null,
-    });
+    this.FormConsultarRollos.reset();
     this.rollos = [];
     this.rollosInsertar = [];
     this.grupoProductos = [];
@@ -114,16 +105,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm(){
-    this.FormConsultarRollos.patchValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Observacion : '',
-      Proceso : null,
-    });
-  }
+  limpiarForm = () => this.FormConsultarRollos.reset();
 
   // Funcion que va a consultar los rollos que estan por ingresar
   consultarRollos(){
@@ -174,8 +156,8 @@ export class Ingresar_ProductosComponent implements OnInit {
           }, 1500);
         });
         setTimeout(() => { this.cargando = false; }, 5000);
-      } else this.mensajeAdvertencia(`¡Las fechas digitadas no son validas!`);
-    } else this.mensajeAdvertencia(`¡Debe seleccionar un proceso!`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Las fechas digitadas no son validas!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar un proceso!`);
   }
 
   // Funcion que va a llenar los rollos que están por ingresar
@@ -219,9 +201,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   //Funcion que va a agregar Productos en la tabla
   cargarProducto(item : any){
     this.cargando = true;
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
-    }
+    this.rollos.splice(this.rollos.findIndex((data) => data.Id == item.Id), 1);
     setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
@@ -237,12 +217,10 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion que va a quitar todo lo que hay en la tabla
   quitarTodo(){
     this.cargando = true;
-    for (const item of this.rollosInsertar) {
-      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-    }
+    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+    this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     setTimeout(() => { this.rollosInsertar = []; }, 500);
     setTimeout(() => { this.GrupoProductos(); }, 100);
   }
@@ -254,9 +232,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
-    }
+    this.rollosInsertar.splice(this.rollosInsertar.findIndex((data) => data.Id == item.Id), 1);
     setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
@@ -292,7 +268,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   //Funcion para meter el encabezado de la entrada
   IngresarInfoRollos(){
-    if (this.rollosInsertar.length == 0) this.mensajeAdvertencia("¡Debe tener minimo un rollo seleccionado!");
+    if (this.rollosInsertar.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "¡Debe tener minimo un rollo seleccionado!");
     else {
       this.cargando = true;
       let info : any = {
@@ -302,10 +278,13 @@ export class Ingresar_ProductosComponent implements OnInit {
         EntRolloProd_Hora : moment().format('H:mm:ss'),
       }
       this.entradaRolloService.srvGuardar(info).subscribe(datos_entradaRollo => {
-        this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
+        this.entradaRolloService.srvObtenerUltimoId().subscribe(() => {
           this.ingresarRollos(datos_entradaRollo.entRolloProd_Id);
         });
-      }, error => { this.mensajeError('¡Rollos No Ingresados!', `¡Error al ingresar los rollos!`); });
+      }, () => {
+        this.mensajeService.mensajeError('¡Rollos No Ingresados!', `¡Error al ingresar los rollos!`);
+        this.cargando = false;
+      });
     }
   }
 
@@ -335,8 +314,9 @@ export class Ingresar_ProductosComponent implements OnInit {
                 Prod_CantBolsasFacturadas : 0,
                 Proceso_Id : proceso,
               }
-              this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-                this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
+              this.dtEntradaRollosService.srvGuardar(info).subscribe(() => { }, () => {
+                this.cargando = false;
+                this.mensajeService.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
               });
             } else {
               let info : any = {
@@ -355,8 +335,9 @@ export class Ingresar_ProductosComponent implements OnInit {
                 Prod_CantBolsasFacturadas : 0,
                 Proceso_Id : proceso,
               }
-              this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-                this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
+              this.dtEntradaRollosService.srvGuardar(info).subscribe(() => { }, () => {
+                this.cargando = false;
+                this.mensajeService.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
               });
             }
           }
@@ -383,10 +364,11 @@ export class Ingresar_ProductosComponent implements OnInit {
             TpMoneda_Id: datos_productos[j].tpMoneda_Id,
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
           }
-          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-            this.mensajeConfirmacion('¡Rollos Ingresados!', `¡Entrada de Rollos registrada con exito!`);;
-          }, error => {
-            this.mensajeError('¡Rollos Ingresados con Er!', `¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
+            this.cargando = false;
+            this.mensajeService.mensajeConfirmacion('¡Rollos Ingresados!', `¡Entrada de Rollos registrada con exito!`);
+          }, () => {
+            this.mensajeService.mensajeError('¡Rollos Ingresados con Error!', `¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
             this.limpiarCampos();
           });
         }
@@ -586,35 +568,17 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 260, 70, 40, 80],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 260, 70, 40, 80],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }

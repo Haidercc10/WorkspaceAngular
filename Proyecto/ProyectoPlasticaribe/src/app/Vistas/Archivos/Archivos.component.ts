@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
 import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Archivos',
@@ -46,8 +47,9 @@ export class ArchivosComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private archivosService : ArchivosService,
                     private categoriaArchivosService : Categorias_ArchivosService,
-                      private messageService : MessageService,
-                        private shepherdService: ShepherdService) {
+                      private mensajeService : MensajesAplicacionService,
+                        private messageService : MessageService,
+                          private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
@@ -136,18 +138,18 @@ export class ArchivosComponent implements OnInit {
   crearCarpeta(){
     let nombresArchivosCarpetas : any = [];
     let nombreCarpeta : any = this.formularioArchivo.value.carpetaNueva;
-    if (nombreCarpeta == '') this.mostrarAdvertencia(`Advertencia`, `Debe diligenciar el campo nombre de carpeta`);
+    if (nombreCarpeta == '') this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo nombre de carpeta`);
     else {
       for (let i = 0; i < this.ArrayArchivos.length; i++) {
         nombresArchivosCarpetas.push(this.ArrayArchivos[i].nombre);
       }
-      if (nombresArchivosCarpetas.includes(`${nombreCarpeta}`)) this.mostrarAdvertencia(`Advertencia`, `Ya existe una archivo o carpeta con este nombre, debe cambiarlo!`);
+      if (nombresArchivosCarpetas.includes(`${nombreCarpeta}`)) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una archivo o carpeta con este nombre, debe cambiarlo!`);
       else {
         this.nombreCarpeta = `${this.nombreCarpeta}\\${nombreCarpeta}`
         let ruta : string = this.nombreCarpeta;
         this.ruta = ruta.replace(`D:\\Calidad\\`, '');
         this.archivosService.crearCarpetas(ruta).subscribe(datos_archivo => {
-          this.mostrarConfirmacion(`Confirmación`, `La carpeta ha sido creada exitosamente!`);
+          this.mensajeService.mensajeConfirmacion(`Confirmación`, `La carpeta ha sido creada exitosamente!`);
           this.cargarArchivos(this.nombreCarpeta);
           this.mostrarCarpetas(this.nombreCarpeta);
           this.formularioArchivo.reset();
@@ -170,9 +172,9 @@ export class ArchivosComponent implements OnInit {
         const data = await this.archivosService.srvGuardar(formData, this.today, 1, this.storage_Id, filePath).toPromise();
         this.cargarArchivos(filePath);
         this.mostrarCarpetas(filePath);
-        this.mostrarConfirmacion(`¡Se ha subido un archivo correcatamente!`);
+        this.mensajeService.mensajeConfirmacion(`¡Se subió el archivo seleccionado!`, `¡Se ha subido un archivo correcatamente!`);
       } catch (error) {
-        this.mostrarError(`¡Ha ocurrido un error al intentar subir el archivo!`);
+        this.mensajeService.mensajeError(`Error`, `¡Ha ocurrido un error al intentar subir el archivo!`);
       }
     }
   }
@@ -208,7 +210,7 @@ export class ArchivosComponent implements OnInit {
       a.target = '_blank';
       a.click();
       document.body.removeChild(a);
-      this.mostrarConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
     });
   }
 
@@ -244,8 +246,8 @@ export class ArchivosComponent implements OnInit {
       if(this.ArrayArchivos[i].nombre == index.nombre)
       this.ArrayArchivos.splice(i, 1);
      }
-      this.mostrarConfirmacion(`Confirmación`, `Archivo eliminado con éxito!`);
-    }, error => { this.mostrarError(`Error`, `No fue posible eliminar el archivo`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Archivo eliminado con éxito!`);
+    }, error => { this.mensajeService.mensajeError(`Error`, `No fue posible eliminar el archivo`);
     });
     this.clave = '';
   }
@@ -260,8 +262,8 @@ export class ArchivosComponent implements OnInit {
         if(this.ArrayArchivos[i].nombre == index.nombre)
         this.ArrayArchivos.splice(i, 1);
        }
-      this.mostrarConfirmacion(`Confirmación`, `Carpeta eliminada con éxito!`);
-    }, error => { this.mostrarError(`Error`, `No fue posible eliminar la carpeta`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Carpeta eliminada con éxito!`);
+    }, error => { this.mensajeService.mensajeError(`Error`, `No fue posible eliminar la carpeta`);
     });
     this.clave = '';
   }
@@ -274,14 +276,10 @@ export class ArchivosComponent implements OnInit {
       if (this.clave == 'copiar') {
         this.rutaInicial = ruta;
         this.nombreArchivo = nombre;
-        console.log(this.rutaInicial)
-        console.log(this.nombreArchivo)
         this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere copiar el archivo/carpeta?`, sticky: true});
       } else if (this.clave == 'mover'){
         this.rutaInicial = ruta;
         this.nombreArchivo = nombre;
-        console.log(this.rutaInicial)
-        console.log(this.nombreArchivo)
         this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que quiere mover este archivo/carpeta?`, sticky: true});
       }
     }, 500);
@@ -295,9 +293,7 @@ export class ArchivosComponent implements OnInit {
     nombre = this.nombreArchivo;
     if (validador == 1) this.validarArchivo_Carpeta = true;
     else this.validarArchivo_Carpeta = false;
-    console.log(validador);
     this.clave = '';
-    console.log(this.clave)
   }
 
   /** Función que valida la acción de confirmar el movimiento de un archivo, contiene su ruta y nombre */
@@ -383,20 +379,4 @@ export class ArchivosComponent implements OnInit {
     this.modal = true;
     this.modalCrearCategorias.limpiarCampos();
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-    this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life: 2000});
-  }
-
-   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-  }
-
-   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-    this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life: 2000});
-  }
-
 }

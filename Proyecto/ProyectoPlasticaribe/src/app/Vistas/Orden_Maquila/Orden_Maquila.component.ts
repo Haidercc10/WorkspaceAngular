@@ -16,6 +16,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { stepsOrdenMaquila as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +65,8 @@ export class Orden_MaquilaComponent implements OnInit {
                             private ordenMaquilaService : Orden_MaquilaService,
                               private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                                 private messageService: MessageService,
-                                  private shepherdService: ShepherdService) {
+                                  private shepherdService: ShepherdService,
+                                    private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenMaquila = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -212,7 +214,7 @@ export class Orden_MaquilaComponent implements OnInit {
           this.catidadTotalPeso += datos_Orden[i].cantidad;
           this.cantidadTotalPrecio += (datos_Orden[i].cantidad * datos_Orden[i].precio);
         }
-      } else this.mostrarAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
     });
   }
 
@@ -231,7 +233,7 @@ export class Orden_MaquilaComponent implements OnInit {
           Stock : datos_materiaPrima[i].stock,
         });
       }
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -261,10 +263,10 @@ export class Orden_MaquilaComponent implements OnInit {
             this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
             this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
             this.FormMateriaPrima.reset();
-          } else this.mostrarAdvertencia(`Advertencia`, `¡La cantidad a entegar es superior a la cantidad en stock!`);
-        } else this.mostrarAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
-      } else this.mostrarAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad a entegar es superior a la cantidad en stock!`);
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
@@ -279,7 +281,7 @@ export class Orden_MaquilaComponent implements OnInit {
         for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
           if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
         }
-        this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
+        this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
         this.llave = 'pdf';
       }
     }
@@ -305,12 +307,12 @@ export class Orden_MaquilaComponent implements OnInit {
                   for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
                     if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
                   }
-                  this.mostrarConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
+                  this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
                   this.llave = 'pdf';
                   break;
                 }
               }
-            }, error => { this.mostrarError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
+            }, error => { this.mensajeService.mensajeError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
           }
         } else this.quitarMateriaPrima();
       });
@@ -322,8 +324,8 @@ export class Orden_MaquilaComponent implements OnInit {
     if (this.FormOrdenMaquila.valid) {
       if (this.materiasPrimasSeleccionadas.length > 0) {
         !this.edidcionOrdenMaquila ? this.crearOrdenMaquila() : this.editarOrdenMaquila();
-      } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
-    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a crear una Orden de Maquila
@@ -341,7 +343,8 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Hora : moment().format("H:mm:ss"),
     }
     this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => { this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id); }, () => {
-      this.mostrarError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
+      this.cargando = false;
+      this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
     });
   }
 
@@ -362,7 +365,10 @@ export class Orden_MaquilaComponent implements OnInit {
       this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
       this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
       this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; },
-      () => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`);});
+      () => {
+        this.cargando = false;
+        this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`);
+      });
     }
     if(!error) {
       this.itemSeleccionado = id;
@@ -388,7 +394,7 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Hora : moment().format("H:mm:ss"),
     }
     this.ordenMaquilaService.put(id, info).subscribe(() => { this.editarDtOrdenMaquila(); }, () => {
-      this.mostrarError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
+      this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
     });
   }
 
@@ -411,10 +417,13 @@ export class Orden_MaquilaComponent implements OnInit {
           this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
           this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
           this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-          this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; }, () => { this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`); });
+          this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; }, () => {
+            this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`);
+            this.cargando = false;
+          });
         }
       }, () => {
-        this.mostrarError(``);
+        this.mensajeService.mensajeError(``, ``);
         error = true;
       });
     }
@@ -598,7 +607,10 @@ export class Orden_MaquilaComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.crearPDF(id); }, 2500);
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
+    }, () => {
+      this.cargando = false;
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`);
+    });
   }
 
   // Funcion que va a crear un PDF que será una orde de Maquila
@@ -783,7 +795,10 @@ export class Orden_MaquilaComponent implements OnInit {
         this.limpiarTodo();
         break;
       }
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
+    }, () => {
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`);
+      this.cargando = false;
+    });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -815,21 +830,6 @@ export class Orden_MaquilaComponent implements OnInit {
         }
       }
     };
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life : 5000});
-   this.cargando = false;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
-   this.cargando = false;
   }
 
   mostrarEleccion(modo : any, item?: any,  mensaje?: any){

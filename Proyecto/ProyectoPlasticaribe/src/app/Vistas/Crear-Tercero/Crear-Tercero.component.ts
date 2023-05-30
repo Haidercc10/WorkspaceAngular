@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { modelTercero } from 'src/app/Modelo/modelTercero';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
 
@@ -11,6 +11,7 @@ import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/
   templateUrl: './Crear-Tercero.component.html',
   styleUrls: ['./Crear-Tercero.component.css']
 })
+
 export class CrearTerceroComponent implements OnInit {
 
   FormCrearTercero !: FormGroup;
@@ -19,7 +20,7 @@ export class CrearTerceroComponent implements OnInit {
   constructor(private formBuilder : FormBuilder,
                 private terceroService : TercerosService,
                   private tipoIdentificacionService : TipoIdentificacionService,
-                    private messageService: MessageService) {
+                    private mensajeService: MensajesAplicacionService) {
 
     //Creación formulario crear proveedor en modal.
     this.FormCrearTercero = this.formBuilder.group({
@@ -45,14 +46,9 @@ export class CrearTerceroComponent implements OnInit {
     });
   }
 
-  validarCamposVacios() : any{
-    if (this.FormCrearTercero.valid) this.registro();
-    else this.messageService.add({key: 'Advertencia', severity:'warn', summary:'¡Hay campos vacios!'});
-  }
+  validarCamposVacios = () => this.FormCrearTercero.valid ? this.registro() : this.mensajeService.mensajeAdvertencia('Advertencia', '¡Hay campos vacios!');
 
-  LimpiarCampos() {
-    this.FormCrearTercero.reset();
-  }
+  LimpiarCampos = () => this.FormCrearTercero.reset();
 
   registro(){
     let info : modelTercero = {
@@ -67,15 +63,8 @@ export class CrearTerceroComponent implements OnInit {
     }
 
     this.terceroService.insert(info).subscribe(datos => {
-      this.messageService.add({severity:'success', detail: '¡Registro Exitoso!'});
+      this.mensajeService.mensajeConfirmacion('¡Registro Exitoso!', 'El tercero ha sido creado');
       this.LimpiarCampos();
-    }, error => {
-
     });
   }
-
-  onReject() {
-    this.messageService.clear('Advertencia');
-  }
-
 }

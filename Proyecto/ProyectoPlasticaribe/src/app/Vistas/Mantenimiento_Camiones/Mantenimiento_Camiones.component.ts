@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { modelDtMantenimiento } from 'src/app/Modelo/modelDtMantenimiento';
 import { modelMantenimiento } from 'src/app/Modelo/modelMantenimiento';
@@ -9,11 +9,10 @@ import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePed
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { MantenimientoService } from 'src/app/Servicios/Mantenimiento/Mantenimiento.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { AppComponent } from 'src/app/app.component';
-import Swal from 'sweetalert2';
-import { stepsMttoActivos as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepsMttoActivos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Mantenimiento_Camiones',
@@ -57,7 +56,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
                         private servicioProveedores : ProveedorService,
                           private servicioEstados : EstadosService,
                             private messageService: MessageService,
-                              private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarFormulario();
     this.inicializarFormulario2();
@@ -82,7 +82,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataProveedores.length; index++) {
         this.arrayProveedores.push(dataProveedores[index]);
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información de las proveedores!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información de las proveedores!`); });
   }
 
   /** Cargar Inicialmente los estados del pedido/Mantenimiento */
@@ -92,7 +92,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         if(dataEstados[index].estado_Id == 11 || dataEstados[index].estado_Id == 16 || dataEstados[index].estado_Id == 17)
         this.arrayEstados.push(dataEstados[index].estado_Nombre);
       }
-    }, error => { this.mostrarError(`Error`,'¡No se ha podido obtener información de los estados!'); });
+    }, error => { this.mensajeService.mensajeError(`Error`,'¡No se ha podido obtener información de los estados!'); });
   }
 
   /** Cargar Inicialmente los estados del pedido/Mantenimiento */
@@ -179,13 +179,13 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     }
 
     this.servicioMtto.GetPedido_Mantenimiento(fechaInicio, fechaFin, ruta).subscribe(dataPedMtto => {
-      if(dataPedMtto.length == 0) this.mostrarAdvertencia(`Advertencia`,`¡No se ha encontrado información de los pedidos y/o mantenimientos con los filtros consultados!`);
+      if(dataPedMtto.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`¡No se ha encontrado información de los pedidos y/o mantenimientos con los filtros consultados!`);
       else {
         for (let index = 0; index < dataPedMtto.length; index++) {
           this.cargarTablaInicial(dataPedMtto[index])
         }
       }
-    }, error => { this.mostrarError(`Error`,'¡No se pudo obtener información de los pedidos y/o mantenimientos consultados!') });
+    }, error => { this.mensajeService.mensajeError(`Error`,'¡No se pudo obtener información de los pedidos y/o mantenimientos consultados!') });
     setTimeout(() => { this.cargando = true }, 1000);
   }
 
@@ -214,7 +214,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataDetPedido.length; index++) {
         this.cargarDetallePedidoModal(dataDetPedido[index]);
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha encontrado información del pedido ${item.pedidoId}!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha encontrado información del pedido ${item.pedidoId}!`); });
   }
 
   /** Cargar detalle del pedido en la tabla alojada en el modal. */
@@ -268,8 +268,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     }
     this.servicioMtto.Insert(encabezado).subscribe(dataMtto => {
       this.servicioMtto.GetUltimoId().subscribe(dataUltimoMtto => {  this.guardarDetallePedido(dataMtto.mtto_Id);
-      }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del último pedido creado!`); });
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido guardar el pedido!`) });
+      }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del último pedido creado!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido guardar el pedido!`) });
   }
 
     /** Funcion que insertará en la base de datos los detalles del mantenimiento. */
@@ -284,14 +284,14 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         DtMtto_Descripcion: '',
         Estado_Id : 11
       }
-      this.servicioDetMtto.Insert(detallePedido).subscribe(data_DetalleMtto => { error = false; }, error => { error = true; this.mostrarError(`Error`,`¡No se han gusrdado los activos del pedido!`); })
+      this.servicioDetMtto.Insert(detallePedido).subscribe(data_DetalleMtto => { error = false; }, error => { error = true; this.mensajeService.mensajeError(`Error`,`¡No se han gusrdado los activos del pedido!`); })
     }
     if(!error) {
       this.onReject();
       this.cargando = false;
       setTimeout(() => {
         this.cargando = true;
-         this.mostrarConfirmacion(`Confirmación`, `¡Entrada de mantenimiento aceptada con éxito!`);
+         this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Entrada de mantenimiento aceptada con éxito!`);
          this.modal = false;
          this.consultar();
          //this.limpiarCampoPedido();
@@ -327,7 +327,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
           this.cargarMantenimiento(dataMtto[index]);
           this.PedMtto = 'Mantenimiento';
         }
-      }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
+      }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
 
     } else if (item.tipoMov == 'Pedido de Mantenimiento') {
       this.servicioMtto.GetPedidoAceptado(item.pedidoId).subscribe(dataPedAceptado => {
@@ -340,7 +340,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
             this.PedMtto = 'Pedido';
           }
         }
-      }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del pedido!`); });
+      }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del pedido!`); });
 
     }
     setTimeout(() => {this.cargando = true; }, 500);
@@ -393,7 +393,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         this.cargarDetalleMttoModal(dataDetalleMtto[index]);
         this.precioTotalMtto += dataDetalleMtto[index].dtMtto_Precio;
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
   }
 
   /** Cargar tabla del detalle de mantenimiento en el modal */
@@ -419,7 +419,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
         this.getDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto, item.descripcionMtto);
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
     this.obtenerPrecio(this.arrayDetalleMtto);
   }
 
@@ -447,10 +447,10 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Actualizar campos estado y/o precio de la tabla de mantenimiento. */
   actualizarDetallexCodigo(detalleMtto : any){
     this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(data => {
-      this.mostrarConfirmacion(`Confirmación`, `Registro actualizado con éxito!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro actualizado con éxito!`);
       setTimeout(() => { this.obtenerNuevoEstadoEncabezado(detalleMtto.Mtto_Id); }, 1000);
     }, error => {
-      this.mostrarError(`Error`,`¡No se ha podido actualizar el estado del activo!`);
+      this.mensajeService.mensajeError(`Error`,`¡No se ha podido actualizar el estado del activo!`);
     });
   }
 
@@ -463,7 +463,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataMatto.length; index++) {
         this.cargarDatosActualizarProveedor(dataMatto[index], identProveedor, Observacion);
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del pedido ${this.numeroPedido}!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del pedido ${this.numeroPedido}!`); });
   }
 
   /** cargar la data del pedido para actualizar el proveedor  **/
@@ -487,8 +487,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   /** Actualizar el proveedor al momento de realizar de hacer clic sobre un proveedor distinto al cargado inicialmente */
   actualizarProveedor(encabezadoMatto : any){
-    this.servicioMtto.Put(encabezadoMatto.Mtto_Id, encabezadoMatto).subscribe(dataProv => { this.mostrarConfirmacion(`Confirmación`, `Proveedor actualizado exitosamente!`);
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido actualizar la información del mantenimiento!`); });
+    this.servicioMtto.Put(encabezadoMatto.Mtto_Id, encabezadoMatto).subscribe(dataProv => { this.mensajeService.mensajeConfirmacion(`Confirmación`, `Proveedor actualizado exitosamente!`);
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido actualizar la información del mantenimiento!`); });
   }
 
   /** Actualizar precio total al momento de cambiar un precio de detalle */
@@ -505,7 +505,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataEstado.length; index++) {
         this.cambiarEstadoEncabezado(dataEstado[index]);
       }
-    }, error => { this.mostrarError(`Error`,`¡No se ha podido obtener información del mantneimiento!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantneimiento!`); });
   }
 
   /** Cambia Estado del Mantenimiento en los campos del encabezado*/
@@ -519,21 +519,6 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       mttoUsuario: encabezado.usua_Nombre,
       mttoObservacion : encabezado.mtto_Observacion
     });
-  }
-
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
   }
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/

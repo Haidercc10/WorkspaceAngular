@@ -83,9 +83,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   }
 
   //
-  obtenerTipoDocumento(){
-    this.tipoDocuemntoService.srvObtenerLista().subscribe(datos => this.tipoDocumento = datos.filter((item) => ['REM', 'FCO'].includes(item.tpDoc_Id)));
-  }
+  obtenerTipoDocumento = () => this.tipoDocuemntoService.srvObtenerLista().subscribe(datos => this.tipoDocumento = datos.filter((item) => ['REM', 'FCO'].includes(item.tpDoc_Id)));
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarProveedores(){
@@ -349,7 +347,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
       },
       fontSize: 9,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex, _node, _columnIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }

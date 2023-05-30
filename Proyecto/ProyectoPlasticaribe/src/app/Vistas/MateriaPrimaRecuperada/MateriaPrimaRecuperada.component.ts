@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
@@ -59,7 +60,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                             private recuperadoMPService : RecuperadoMPService,
                               private turnosService : TurnosService,
                                 private messageService: MessageService,
-                                  private shepherdService: ShepherdService) {
+                                  private shepherdService: ShepherdService,
+                                    private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -174,12 +176,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
     this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
       this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: datos_usuario.usua_Id, });
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`); });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarRecuperado(){
-    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla")
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla")
     else {
       let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
       let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
@@ -200,7 +202,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
       this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
         this.obtenerUltimoIdRecuperado();
-      }, error => { this.mostrarError(`Error`, `¡Error al ingresar el peletizado!`); });
+      }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`); });
     }
   }
 
@@ -227,17 +229,17 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             TpRecu_Id : tipoRecuperado,
           }
           this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => { this.mostrarError(`Error`, `¡Error al registrar la materia prima recuperada!`); });
+          }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al registrar la materia prima recuperada!`); });
           this.moverInventarioMpAgregada();
         }
       }
-    }, error => { this.mostrarError(`Error`, `¡Error al consultar el último Id de recuperado!`); });
+    }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de recuperado!`); });
   }
 
   //Funcion que va a validar la informacion que se ingresa a la tabla
   validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas();
-    else this.mostrarAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de materia prima ");
+    else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de materia prima ");
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
@@ -256,7 +258,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     if(productoExt.Cant > 0) {
       this.ArrayMateriaPrima.push(productoExt);
       this.FormMateriaPrima.reset();
-    } else this.mostrarAdvertencia(`Advertencia`, `La cantidad de mat. prima recuperada debe ser mayor a 0!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad de mat. prima recuperada debe ser mayor a 0!`);
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
@@ -279,11 +281,11 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           this.limpiarTodosCampos();
         });
       }, error => {
-        this.mostrarError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
+        this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
         error = true;
       });
     }
-    if(!error) this.mostrarConfirmacion(`Confirmación`, `¡Registro de materia prima recuperada creado con éxito!`);
+    if(!error) this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro de materia prima recuperada creado con éxito!`);
   }
 
   // Funcion que limpiará todos los campos
@@ -299,7 +301,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.onReject();
     for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
       if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
-      this.mostrarConfirmacion(`Confirmación`,`Se ha quitado la mat. prima ${formulario.Nombre} de la tabla`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`,`Se ha quitado la mat. prima ${formulario.Nombre} de la tabla`);
     }
   }
 
@@ -325,21 +327,6 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       MpCantidad: 0,
       MpUnidadMedida : 'Kg',
     });
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 
   /** Mostrar mensaje de elección */

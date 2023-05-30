@@ -19,6 +19,7 @@ import { RelacionSolicitud_OrdenCompraService } from 'src/app/Servicios/Relacion
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
 import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,7 +82,8 @@ export class OcompraComponent implements OnInit {
                                   private shepherdService: ShepherdService,
                                     private solicitudMpService : SolicitudMateriaPrimaService,
                                       private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
-                                        private relacionSolOcService : RelacionSolicitud_OrdenCompraService,) {
+                                        private relacionSolOcService : RelacionSolicitud_OrdenCompraService,
+                                          private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -126,11 +128,7 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpiará todos los campos de la vista
   limpiarTodo(){
@@ -202,7 +200,7 @@ export class OcompraComponent implements OnInit {
           Categoria : datos_materiaPrima[i].categoria,
         });
       }
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`));
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -230,9 +228,9 @@ export class OcompraComponent implements OnInit {
           this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
           this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
           this.FormMateriaPrima.reset();
-        } else this.mostrarAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
-      } else this.mostrarAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else this.mostrarAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
@@ -241,7 +239,7 @@ export class OcompraComponent implements OnInit {
     this.onReject();
     this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
     this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == data.Id), 1);
-    this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
+    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
     this.llave = 'pdf';
   }
 
@@ -308,8 +306,8 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la ORden de Compra
   validarDatosOrdenCompra(){
-    if (this.FormOrdenCompra.valid) this.materiasPrimasSeleccionadas.length > 0 ? this.crearOrdenCompra() : this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
-    else this.mostrarAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
+    if (this.FormOrdenCompra.valid) this.materiasPrimasSeleccionadas.length > 0 ? this.crearOrdenCompra() : this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
+    else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Funcion que va a consultar la información de una orden de compra existente y prepará los campos para que sea editable
@@ -361,11 +359,11 @@ export class OcompraComponent implements OnInit {
           this.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
         }
       } else {
-        this.mostrarAdvertencia(`Advertencia`, `¡No se encontraron registros para orden de compra N° ${ordenCompra}!`);
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡No se encontraron registros para orden de compra N° ${ordenCompra}!`);
         this.limpiarTodo();
       }
     }, () => {
-      this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${ordenCompra}!`);
+      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${ordenCompra}!`);
       this.limpiarTodo();
     });
   }
@@ -413,11 +411,11 @@ export class OcompraComponent implements OnInit {
               }
               this.materiasPrimasSeleccionada_ID.push(info.Id);
               this.materiasPrimasSeleccionadas.push(info);
-            } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha sido cancelada!`);
-          } else this.mostrarError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
+            } else this.mensajeService.mensajeError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha sido cancelada!`);
+          } else this.mensajeService.mensajeError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
         }
-      }, error => this.mostrarError(`¡El número de la solicitud no existe!`, `${error.error}`));
-    } else this.mostrarAdvertencia(`¡Advertencia!`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
+      }, error => this.mensajeService.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
+    } else this.mensajeService.mensajeError(`¡Advertencia!`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear la orden de compra
@@ -441,7 +439,7 @@ export class OcompraComponent implements OnInit {
       this.mostrarEleccion(0, 'pdf')
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
     }, () => {
-      this.mostrarError(`Error`, `¡Error al crear la orden de compra!`);
+      this.mensajeService.mensajeError(`Error`, `¡Error al crear la orden de compra!`);
       this.cargando = false;
     });
   }
@@ -460,10 +458,10 @@ export class OcompraComponent implements OnInit {
         Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
       }
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => error = false, error => {
-        this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
+        this.mensajeService.mensajeError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
         this.cargando = false;
         error = true;
-        this.mostrarError(`Error`, 'No se mostrará la informacion del PDF');
+        this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF');
       });
     }
     setTimeout(() => !error ? this.GuardadoExitoso() : undefined, 1500);
@@ -474,7 +472,7 @@ export class OcompraComponent implements OnInit {
     let info : any = { Oc_Id : orden, Solicitud_Id : solicitud, }
     this.relacionSolOcService.Post(info).subscribe(() => {
       this.cambiarEstadoMpSolicitud(solicitud);
-    }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
+    }, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
   }
 
   // Funcion que va a cambiar el estado de la solicitud. Posiciones Array => 0 : Pendiente, 1 : Parciales, 2 : Totales, 3 : Cantidad de Materias Primas
@@ -492,14 +490,14 @@ export class OcompraComponent implements OnInit {
         if ((data[1] > 0 && data[1] == data[3]) || (data[2] > 0 && data[2] < data[3])) {
           info.Estado_Id = 12;
           this.solicitudMpService.Put(solicitud, info).subscribe(() => {
-          }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          }, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
         } else if (data[2] > 0 && data[2] == data[3]) {
           info.Estado_Id = 5;
           this.solicitudMpService.Put(solicitud, info).subscribe(() => {
-          }, () => this.mostrarError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
+          }, () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo actualizar el estado de la solicitud de materia prima!`));
         }
       });
-    }, err => this.mostrarError(`¡Error Solicitud!`, `¡${err}!`));
+    }, err => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡${err}!`));
   }
 
   // Funcion que va a cambiar el estado de las materias primas de la solicitud
@@ -563,7 +561,7 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.generarPDF(); }, 2000);
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -775,7 +773,7 @@ export class OcompraComponent implements OnInit {
         this.limpiarTodo();
         break;
       }
-    }, () => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -834,7 +832,7 @@ export class OcompraComponent implements OnInit {
       MatPri_Fecha:data.matPri_Fecha,
       MatPri_Hora: data.matPri_Hora,
     }
-    this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
+    this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {}, () => this.mensajeService.mensajeError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
   }
 
   /** Actualizar Precio de la materia prima al momento de crear la OC */
@@ -863,7 +861,7 @@ export class OcompraComponent implements OnInit {
       Tinta_FechaIngreso : data.tinta_FechaIngreso,
       Tinta_Hora : data.tinta_Hora,
     }
-    this.servicioTintas.srvActualizar(info.Tinta_Id, info).subscribe(() => {}, () => this.mostrarError(`Error`, 'No fue posible actualizar el precio de las tintas'));
+    this.servicioTintas.srvActualizar(info.Tinta_Id, info).subscribe(() => {}, () => this.mensajeService.mensajeError(`Error`, 'No fue posible actualizar el precio de las tintas'));
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
@@ -876,8 +874,8 @@ export class OcompraComponent implements OnInit {
             this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(() => {
               this.quitarMateriaPrima(data);
               this.llave = 'pdf';
-              this.mostrarAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima ${data.Nombre} de la orden de compra!`);
-            }, () => { this.mostrarError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`); });
+              this.mensajeService.mensajeAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima ${data.Nombre} de la orden de compra!`);
+            }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`); });
           }
       } else this.quitarMateriaPrima(data);
     });
@@ -905,12 +903,12 @@ export class OcompraComponent implements OnInit {
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => { this.editarDtOrdenCompa(); }, () => {
-            this.mostrarError(`Error`, `¡Error al Editar la Orden de Compra!`);
+            this.mensajeService.mensajeError(`Error`, `¡Error al Editar la Orden de Compra!`);
             this.cargando = false;
           });
-        }, () => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra a editar!`); });
-      } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
-    } else this.mostrarAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
+        }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra a editar!`); });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Funcion que va a editar los detalles de la orden de compra
@@ -929,7 +927,7 @@ export class OcompraComponent implements OnInit {
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => { error = false; }, error => {
-            this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
+            this.mensajeService.mensajeError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
             error = true;
           });
@@ -945,25 +943,16 @@ export class OcompraComponent implements OnInit {
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
           this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(() => { error = false; }, error => {
-            this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
+            this.mensajeService.mensajeError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
             error = true;
           });
         }
       });
     }
-    !error ? this.mostrarEleccion(0, 'pdf') : this.mostrarError(`Error`, 'No se mostrará la informacion del PDF') ;
+    !error ? this.mostrarEleccion(0, 'pdf') : this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF') ;
     setTimeout(() => { this.GuardadoExitoso(); }, this.materiasPrimasSeleccionadas.length * 10);
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (titulo : any, mensaje: any) => this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life : 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (titulo : any, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life : 5000});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (titulo : any, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(item : any, modo : string){

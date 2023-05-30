@@ -1,6 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
@@ -8,9 +7,9 @@ import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/Det
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { AppComponent } from 'src/app/app.component';
-import Swal from 'sweetalert2';
 import { defaultStepOptions, stepsDevolverRolloDespacho as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Devoluciones_Productos_Rollos',
@@ -39,7 +38,8 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                       private dtDevolucionService : DetallesDevolucionesProductosService,
                         private devolcuionesService : DevolucionesProductosService,
                           private ExistenciasProdService : ExistenciasProductosService,
-                            private shepherdService: ShepherdService){
+                            private shepherdService: ShepherdService,
+                              private mensajeService : MensajesAplicacionService,){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
@@ -65,11 +65,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
@@ -101,7 +97,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
       }
     });
     setTimeout(() => {
-      if (this.rollosDisponibles.length <= 0) this.mensajeAdvertencia(`¡La factura ${this.facturaConsultada} no se encuentra disponible para devoluciones!`);
+      if (this.rollosDisponibles.length <= 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La factura ${this.facturaConsultada} no se encuentra disponible para devoluciones!`);
       this.cargando = false;
     }, 1200);
   }
@@ -117,9 +113,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   // Funcion que va a validar cuando se seleccione 1 rollo
   seleccionRollo(data : any){
     this.cargando = true;
-    for (let i = 0; i < this.rollosDisponibles.length; i++) {
-      if (this.rollosDisponibles[i].Id === data.Id) this.rollosDisponibles.splice(i, 1);
-    }
+    this.rollosDisponibles.splice(this.rollosDisponibles.findIndex((item) => item.Id == data.Id), 1);
     this.rollosSeleccionados.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.GrupoProductos();
   }
@@ -135,9 +129,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   // Funcion que va a validar cuando se deseleccione 1 rollo
   quitarRollo(data : any){
     this.cargando = true;
-    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
-      if (this.rollosSeleccionados[i].Id === data.Id) this.rollosSeleccionados.splice(i, 1);
-    }
+    this.rollosSeleccionados.splice(this.rollosSeleccionados.findIndex((item) => item.Id == data.Id), 1);
     this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.GrupoProductos();
   }
@@ -173,7 +165,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   // Funcion para crear devolucion de rollos de productos
   creardevolucion(){
-    if (this.rollosSeleccionados.length == 0) Swal.fire("¡Debe tener minimo un rollo seleccionado!");
+    if (this.rollosSeleccionados.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "¡Debe tener minimo un rollo seleccionado!");
     else {
       this.cargando = true;
       let info : any = {
@@ -185,8 +177,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         Usua_Id : this.storage_Id,
         DevProdFact_Hora : moment().format('H:mm:ss'),
       }
-      this.devolcuionesService.srvGuardar(info).subscribe(datos_devolucion => { this.crearDtDevolucion(datos_devolucion.devProdFact_Id);
-      }, error => { this.mensajeError(`Opps...`, `¡Error al crear la devolución de rollos!`); });
+      this.devolcuionesService.srvGuardar(info).subscribe(datos_devolucion => this.crearDtDevolucion(datos_devolucion.devProdFact_Id), () => this.mensajeService.mensajeError(`Opps...`, `¡Error al crear la devolución de rollos!`));
     }
   }
 
@@ -200,8 +191,11 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         UndMed_Id : this.rollosSeleccionados[i].Presentacion,
         Rollo_Id : this.rollosSeleccionados[i].Id,
       }
-      this.dtDevolucionService.srvGuardar(info).subscribe(datos_devolcuion => {
-      }, error => { this.mensajeError(`Opps...`, `¡Error al crear la devolución de rollos!`); });
+      this.dtDevolucionService.srvGuardar(info).subscribe(() => {
+      }, () => {
+        this.mensajeService.mensajeError(`Opps...`, `¡Error al crear la devolución de rollos!`);
+        this.cargando = false;
+      });
     }
     setTimeout(() => { this.actualizarRollos(); }, 2000);
   }
@@ -229,8 +223,11 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
               Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasRestates - (this.rollosSeleccionados[i].Cantidad * datos_rollos[j].prod_CantBolsasPaquete),
               Proceso_Id : datos_rollos[j].proceso_Id,
             }
-            this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-            }, error => { this.mensajeError(`¡Opps...!`, `¡Error, no se pudo actualizar el rollo ${info.Rollo_Id}!`); });
+            this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(() => {
+            }, () => {
+              this.mensajeService.mensajeError(`¡Opps...!`, `¡Error, no se pudo actualizar el rollo ${info.Rollo_Id}!`)
+              this.cargando = false;
+            });
           } else {
             let info : any = {
               Codigo : datos_rollos[j].codigo,
@@ -249,8 +246,11 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
               Prod_CantBolsasFacturadas : (this.rollosSeleccionados[i].Cantidad - datos_rollos[j].prod_CantBolsasFacturadas),
               Proceso_Id : datos_rollos[j].proceso_Id,
             }
-            this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-            }, error => { this.mensajeError(`¡Opps...!`, `¡Error, no se pudo actualizar el rollo ${info.Rollo_Id}!`); });
+            this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(() => {
+            }, () => {
+              this.mensajeService.mensajeError(`¡Opps...!`, `¡Error, no se pudo actualizar el rollo ${info.Rollo_Id}!`);
+              this.cargando = false;
+            });
           }
         }
       });
@@ -278,30 +278,15 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
             ExProd_Fecha : datos_productos[j].exProd_Fecha,
             ExProd_Hora: datos_productos[j].exProd_Hora,
           }
-          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-            this.mensajeConfirmacion(`¡Devolución Exitosa!`,`¡Se ha creado la devolución de manera satisfactoria!`);
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
+            this.mensajeService.mensajeConfirmacion(`¡Devolución Exitosa!`,`¡Se ha creado la devolución de manera satisfactoria!`);
             this.limpiarCampos();
-          }, error => { this.mensajeError(`¡Opps...!`, `¡Error al mover el inventario de productos!`) });
+          }, () => {
+            this.mensajeService.mensajeError(`¡Opps...!`, `¡Error al mover el inventario de productos!`)
+            this.cargando = false;
+          });
         }
       });
     }
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }

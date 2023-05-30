@@ -1,12 +1,10 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Component, Injectable, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
 import { Tipo_ProveedorService } from 'src/app/Servicios/TipoProveedor/tipo_Proveedor.service';
-import Swal from 'sweetalert2';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +15,7 @@ import { MessageService } from 'primeng/api';
   templateUrl: './crear-proveedor.component.html',
   styleUrls: ['./crear-proveedor.component.css']
 })
+
 export class CrearProveedorComponent implements OnInit {
 
   public FormCrearProveedor !: FormGroup; /** Formulario para crear proveedores */
@@ -27,7 +26,7 @@ export class CrearProveedorComponent implements OnInit {
                 private Crearproveerdor : ProveedorService,
                   private tipoIdentificacionService : TipoIdentificacionService,
                     private tipoProveedorService : Tipo_ProveedorService,
-                      private messageService: MessageService ) {
+                      private mensajeService : MensajesAplicacionService,) {
 
     //Creación formulario crear proveedor en modal.
     this.FormCrearProveedor = this.formBuilderCrearProveedor.group({
@@ -57,24 +56,13 @@ export class CrearProveedorComponent implements OnInit {
   }
 
   /** Cargar los tipos de proveedores */
-  tipoProveedor(){
-    this.tipoProveedorService.srvObtenerLista().subscribe(datos_tiposProveedores => {
-      for (let index = 0; index < datos_tiposProveedores.length; index++) {
-        this.tiposProveedores.push(datos_tiposProveedores[index])
-      }
-    });
-  }
+  tipoProveedor = () => this.tipoProveedorService.srvObtenerLista().subscribe(datos_tiposProveedores => this.tiposProveedores = datos_tiposProveedores);
 
   /** Crear el registro del proveedor en la BD.  */
-  validarCamposVaciosProveedor() : any{
-    if (this.FormCrearProveedor.valid) this.registroProveedor();
-    else this.mostrarAdvertencia('Debe llenar los campos vacios!');
-  }
+  validarCamposVaciosProveedor = () => this.FormCrearProveedor.valid ? this.registroProveedor() : this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacios!');
 
   /** Función para resetear el formulario */
-  LimpiarCampos() {
-    this.FormCrearProveedor.patchValue({ provId: null, ProvNombre: null, provTipoId: null, TipoProv: null, ProvCiudad: '', ProvTelefono: '', ProvEmail: '',});
-  }
+  LimpiarCampos = () => this.FormCrearProveedor.reset();
 
    /** Registrar proveedores en la BD. */
   registroProveedor(){
@@ -85,48 +73,21 @@ export class CrearProveedorComponent implements OnInit {
     let ciudad : string = this.FormCrearProveedor.value.ProvCiudad;
     let telefono : string = this.FormCrearProveedor.value.ProvTelefono;
     let email : string = this.FormCrearProveedor.value.ProvEmail;
-    this.CreacionProveedor(id, tipoId, nombre, tipoProveedor, ciudad, telefono, email);
+    const datosProveedor : any = {
+      Prov_Id : id,
+      TipoIdentificacion_Id : tipoId,
+      Prov_Nombre : nombre,
+      TpProv_Id : tipoProveedor,
+      Prov_Ciudad : ciudad,
+      Prov_Telefono : telefono,
+      Prov_Email : email,
+      Prov_Fecha : moment().format('YYYY-MM-DD'),
+      Prov_Hora : moment().format('H:mm:ss'),
+    }
+
+    this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(() => {
+      this.mensajeService.mensajeConfirmacion(`Proveedor Creado`, 'Proveedor creado con éxito!');
+      setTimeout(() => { this.LimpiarCampos(); }, 500);
+    }, () => this.mensajeService.mensajeError(`Error`, 'No fue posible crear el registro, por favor, verifique!'));
   }
-
-  //Funcion que creará un proveedor y lo guardará en la base de datos
-  CreacionProveedor( idProveedor : number,
-    TipoIdProveedor : string,
-    nombreProveedor : string,
-    tipoproveedor : any,
-    ciudadProveedor : string,
-    telefonoProveedor : string,
-    emailProveedor : string){
-
-   const datosProveedor : any = {
-     Prov_Id : idProveedor,
-     TipoIdentificacion_Id : TipoIdProveedor,
-     Prov_Nombre : nombreProveedor,
-     TpProv_Id : tipoproveedor,
-     Prov_Ciudad : ciudadProveedor,
-     Prov_Telefono : telefonoProveedor,
-     Prov_Email : emailProveedor,
-     Prov_Fecha : moment().format('YYYY-MM-DD'),
-     Prov_Hora : moment().format('H:mm:ss'),
-   }
-
-   this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
-     this.mostrarConfirmacion('Proveedor creado con éxito!');
-     setTimeout(() => { this.LimpiarCampos(); }, 500);
-   }, error => { this.mostrarError('No fue posible crear el registro, por favor, verifique!') });
- }
-
- /** Mostrar mensaje de confirmación al crear materia prima */
- mostrarConfirmacion(mensaje : any) {
-    this.messageService.add({severity:'success', detail: mensaje});
- }
-
- /** Mostrar mensaje de confirmación al crear materia prima */
- mostrarError(mensaje : any) {
-    this.messageService.add({severity:'error', detail: mensaje});
- }
-
- /** Mostrar mensaje de confirmación al crear materia prima */
- mostrarAdvertencia(mensaje : any) {
-  this.messageService.add({severity:'warning', detail: mensaje});
- }
 }

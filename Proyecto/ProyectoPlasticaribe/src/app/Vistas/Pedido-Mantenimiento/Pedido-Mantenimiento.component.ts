@@ -1,15 +1,14 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimiento/Pedido_Mantenimiento.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import { AppComponent } from 'src/app/app.component';
-import { stepsPedidoMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepsPedidoMtto as defaultSteps } from 'src/app/data';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +78,7 @@ export class PedidoMantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_activos.length; i++) {
         this.activos.push(datos_activos[i]);
       }
-    }, error => { this.mostrarError(`Error`, `¡No se encontraron activos para realizar el pedido!`) });
+    }, error => {this.mostrarError(`Error`, `¡No se encontraron activos para realizar el pedido!`) });
   }
 
   // Funcion que obtendrá el id el ultimo pedido creado para saber que consecutivo es el siguiente

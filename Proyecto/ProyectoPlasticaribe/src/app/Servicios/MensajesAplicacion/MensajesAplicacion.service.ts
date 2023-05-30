@@ -11,5 +11,5 @@ export class MensajesAplicacionService {
 
   mensajeAdvertencia = (titulo : string, detalles : string) => this.messageService.add({severity:'warn', summary: titulo, detail: detalles });
 
-  mensajeConfirmación = (titulo : string, detalles : string) => this.messageService.add({severity:'success', summary: titulo, detail: detalles });
+  mensajeConfirmacion = (titulo : string, detalles : string) => this.messageService.add({severity:'success', summary: titulo, detail: detalles });
 }

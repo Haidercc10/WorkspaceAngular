@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-crear-bopp',
@@ -20,8 +20,8 @@ export class CrearBoppComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 private boppGenericoService : BoppGenericoService,
-                    private categoriasService : CategoriaMateriaPrimaService,
-                      private messageService: MessageService) {
+                  private mensajeService : MensajesAplicacionService,
+                    private categoriasService : CategoriaMateriaPrimaService) {
 
     this.FormBopp = this.frmBuilder.group({
       Nombre : [null, Validators.required],
@@ -35,19 +35,10 @@ export class CrearBoppComponent implements OnInit {
   }
 
   //Funcion que va a limpoar todos los campos
-  limpiarCampos(){
-    this.FormBopp.reset();
-  }
+  limpiarCampos = () => this.FormBopp.reset();
 
   // Funcion que va a abtener las categorias
-  obtenerCategorias(){
-    this.categoriasService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        let cat : number [] = [6,14,15];
-        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
-      }
-    });
-  }
+  obtenerCategorias = () => this.categoriasService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15].includes(item.catMP_Id)));
 
   // Funcion que creará el bopp generico en la base de datos
   crearBoppGenerico(){
@@ -59,26 +50,10 @@ export class CrearBoppComponent implements OnInit {
         BoppGen_FechaIngreso : moment().format('YYYY-MM-DD'),
         BoppGen_Hora : moment().format('H:mm:ss'),
       }
-      this.boppGenericoService.srvGuardar(info).subscribe(datos_bopp => {
-        this.mostrarConfirmacion('¡El rollo ha sido creado con éxito!')
+      this.boppGenericoService.srvGuardar(info).subscribe(() => {
+        this.mensajeService.mensajeConfirmacion(`¡Creación Exitosa!`, '¡El rollo ha sido creado con éxito!')
         setTimeout(() => { this.limpiarCampos(); }, 500);
-      }, error => { this.mostrarError(`No fue posible crear el rollo, verifique!`) });
-    } else this.mostrarAdvertencia('Debe llenar los campos vacios!')
+      }, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear el rollo, verifique!`));
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacios!')
   }
-
-  /** Mostrar mensaje de confirmación al crear tinta */
-  mostrarConfirmacion(mensaje : any) {
-    this.messageService.add({severity:'success', detail: mensaje});
-  }
-
-  /** Mostrar mensaje de error al crear tinta */
-  mostrarError(mensaje : any) {
-    this.messageService.add({severity:'error', detail: mensaje});
-  }
-
-  /** Mostrar mensaje de advertencia al crear tinta */
-  mostrarAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', detail: mensaje});
-  }
-
 }

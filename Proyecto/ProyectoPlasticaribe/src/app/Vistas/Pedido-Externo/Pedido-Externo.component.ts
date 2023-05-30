@@ -19,6 +19,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsCrearPedidos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -85,7 +86,8 @@ export class PedidoExternoComponent implements OnInit {
                                     private zeusService : InventarioZeusService,
                                       private zeusCobtabilidadService : ZeusContabilidadService,
                                         private messageService: MessageService,
-                                          private shepherdService: ShepherdService) {
+                                          private shepherdService: ShepherdService,
+                                            private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -310,18 +312,24 @@ export class PedidoExternoComponent implements OnInit {
               let hoy = moment([moment().year(), moment().month(), moment().date()]);
               let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
               if (hoy.diff(fechaDocumento, 'days') >= 70) {
-                this.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
+                this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
                 this.limpiarTodosCampos();
                 break;
               } else this.cargando = false;
             }
           }, error => {
-            this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`);
+            this.mensajeService.mensajeError(`Error`, `¡Error al consultar la cartera del cliente selecionado!`);
             this.limpiarTodosCampos();
           });
         }
-      }, error => { this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`); });
-    } else this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
+      }, error => {
+        this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al consultar el código del cliente seleccionado!`);
+        this.cargando = false;
+      });
+    } else {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
+      this.cargando = false;
+    }
   }
 
   // Funcion para cargar los productos de un solo cliente
@@ -443,7 +451,7 @@ export class PedidoExternoComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios(){
     if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
-    else this.mensajeAdvertencia("Hay campos vacios en el formulario de producto");
+    else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de producto");
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
@@ -473,7 +481,7 @@ export class PedidoExternoComponent implements OnInit {
           this.ArrayProducto.push(productoExt);
           this.LimpiarCamposProductos();
           this.productoCliente();
-        } else this.mensajeAdvertencia(`El precio digitado debe ser mayor a 0`);
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El precio digitado debe ser mayor a 0`);
       } else if (datos_existencias.length != 0) {
         for (let index = 0; index < datos_existencias.length; index++) {
           if (precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
@@ -490,7 +498,10 @@ export class PedidoExternoComponent implements OnInit {
             this.ArrayProducto.push(productoExt);
             this.LimpiarCamposProductos();
             this.productoCliente();
-          } else this.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+          } else {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+            this.cargando = false;
+          }
         }
       }
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
@@ -505,7 +516,7 @@ export class PedidoExternoComponent implements OnInit {
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
 
     if (this.FormPedidoExternoClientes.valid) {
-      if (!this.ArrayProducto.length) this.mensajeAdvertencia('Debe cargar al menos un producto en la tabla.');
+      if (!this.ArrayProducto.length) this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un producto en la tabla.');
       else {
         this.messageService.add({
           severity:'warn',
@@ -520,7 +531,7 @@ export class PedidoExternoComponent implements OnInit {
           sticky: true
         });
       }
-    } else this.mensajeAdvertencia('¡Hay Campos Vacios!');
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡Hay Campos Vacios!');
   }
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
@@ -555,9 +566,15 @@ export class PedidoExternoComponent implements OnInit {
             this.limpiarTodosCampos();
             this.productosPedido(data.pedExt_Id);
           }, 2000);
-        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!'); });
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, '¡No se pudo crear el pedido, por favor intente de nuevo!');
+          this.cargando = false;
+        });
       }
-    }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!') });
+    }, error => {
+      this.mensajeService.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
+      this.cargando = false;
+    });
   }
 
   // Funcion que creará los detalles del pedido
@@ -575,8 +592,11 @@ export class PedidoExternoComponent implements OnInit {
           PedExtProd_CantidadFacturada : 0,
         }
         this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
-          this.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
-        }, error => { this.mensajeError('¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!'); });
+          this.mensajeService.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+        }, error => {
+          this.mensajeService.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
+          this.cargando = false;
+        });
       }
     });
   }
@@ -611,13 +631,19 @@ export class PedidoExternoComponent implements OnInit {
           this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(_data=> {
             this.editarDetallesPedido();
             setTimeout(() => {
-              this.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+              this.mensajeService.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
               this.productosPedido(this.pedidoEditar);
               this.limpiarTodosCampos();
             }, 2000);
-          }, error => { this.mensajeError('¡No se pudo editar el pedido, por favor intente de nuevo!'); });
+          }, error => {
+            this.mensajeService.mensajeError(`Error`, '¡No se pudo editar el pedido, por favor intente de nuevo!');
+            this.cargando = false;
+          });
         }
-      }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!') });
+      }, error => {
+        this.mensajeService.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
+        this.cargando = false;
+      });
     });
   }
 
@@ -637,7 +663,8 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_CantidadFacturada : 0,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => { }, error => {
-            this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!');
+            this.mensajeService.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');
+            this.cargando = false;
           });
         }
       });
@@ -844,7 +871,7 @@ export class PedidoExternoComponent implements OnInit {
       this.valorTotal -= item[i].SubTotal;
       this.ArrayProducto.splice(index, 1);
       setTimeout(() => { this.ivaDescuento(); }, 200);
-      this.mensajeAdvertencia('¡Se ha quitado el Producto del pedido a crear!');
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡Se ha quitado el Producto del pedido a crear!');
       this.closeMessage('quitarProducto');
       this.productoEliminado = 0;
     }
@@ -872,21 +899,6 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que eliminará de la base de datos el producto que se haya seleccionado
   eliminarProductoPedido = () => this.PedidoProductosService.srvEliminar(this.productoEliminado, this.pedidoEditar).subscribe(data => this.quitarProducto());
-
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string){
-    this.cargando = false;
-    this.messageService.add({severity:'warn', summary: 'Advertencia', detail: mensaje, life : 2000});
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string){
-    this.cargando = false;
-    this.messageService.add({severity:'error', summary: '¡Error!', detail: text, life : 5000});
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion = (titulo : any, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 2000});
 
   /** Función para quitar mensaje de elección */
   closeConfirmacion = () => this.messageService.clear('confimacionPedido');

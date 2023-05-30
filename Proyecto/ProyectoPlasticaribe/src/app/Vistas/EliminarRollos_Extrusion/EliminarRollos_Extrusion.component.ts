@@ -7,6 +7,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsEliminarRollos as defaultSteps } from 'src/app/data';
@@ -52,7 +53,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
                         private servcioDetEntradaRollos : DetallesEntradaRollosService,
                           private servicioPreEntregaRollos : DtPreEntregaRollosService,
                             private messageService: MessageService,
-                              private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -85,11 +87,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -158,7 +156,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
     if(proceso != null && bodega != null) {
       if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT')
-      this.mostrarAdvertencia(`Advertencia`, `La combinación de búsqueda es incorrecta, por favor verifique`);
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La combinación de búsqueda es incorrecta, por favor verifique`);
       else {
         this.cargando = false;
         if(bodega == 'EXT') this.bodegaExtrusion = true;
@@ -486,12 +484,12 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
             }
           }
           setTimeout(() => {
-            if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No se encontraron rollos con la combinación de búsqueda realizada!`)
+            if (consulta <= 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`No se encontraron rollos con la combinación de búsqueda realizada!`)
             this.cargando = true;
           }, 3000);
         }, 1500);
        }
-    } else this.mostrarAdvertencia(`Advertencia`,`Debe diligenciar los campos Proceso y/o Bodega!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`Debe diligenciar los campos Proceso y/o Bodega!`);
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -613,7 +611,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
-            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
+            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -623,7 +621,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
-            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
+            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -631,7 +629,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
             this.error = true;
-            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
+            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -643,14 +641,14 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   // Eliminación de rollos de la pre entrega
   eliminarRollosPreEntrega() {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe(() => { }, () => { });
+      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe();
     }
   }
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarEliminacion(){
     setTimeout(() => {
-      this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} rollo(s) han sido eliminado(s) correctamente!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`,`${this.totalRollos} rollo(s) han sido eliminado(s) correctamente!`);
       this.limpiarCampos();
     }, 2000);
   }
@@ -658,20 +656,11 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   /** Cargar los procesos de donde puede venir el rollo. */
   obtenerProcesos = () => this.servicioProcesos.srvObtenerLista().subscribe(data =>  this.arrayProcesos = data.filter((item) => ['EXT', 'EMP', 'SELLA'].includes(item.proceso_Id)));
 
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
-
   /** Mostrar mensaje de Eleccion */
   mostrarEleccion(){
     if (this.rollosInsertar.length > 0) {
       this.messageService.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `De cual base de datos desea eliminar la información?`, sticky: true});
-    } else this.mostrarAdvertencia(`Advertencia`,`Debe cargar al menos un rollo en la tabla!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`Debe cargar al menos un rollo en la tabla!`);
   }
 
   /** Eliminar rollos de bagpro al confirmar con el primer botón */

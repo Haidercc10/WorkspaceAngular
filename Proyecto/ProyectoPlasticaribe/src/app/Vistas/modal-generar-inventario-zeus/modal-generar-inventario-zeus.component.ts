@@ -12,6 +12,7 @@ import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Me
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -47,7 +48,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     private invMesProductoService : Inventario_Mes_ProductosService,
                       private messageService: MessageService,
                         private AppComponent : AppComponent,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private mensajeService : MensajesAplicacionService,) {
    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -73,7 +75,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   // Funcion que va a exportar la informacion de los productos a un archivo de tipo excel
   exportarExcel() : void {
-    if (this.ArrayProductoZeus.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
+    if (this.ArrayProductoZeus.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
         const title = `Inventario de Productos Terminados ${this.today}`;
@@ -169,7 +171,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             fs.saveAs(blob, `Inventario de Productos Terminados ${this.today}.xlsx`);
           });
           this.load = true;
-          this.mostrarConfirmacion(`Confirmación`,`Archivo excel generado con éxito!`)
+          this.mensajeService.mensajeConfirmacion(`Confirmación`,`Archivo excel generado con éxito!`)
         }, 500);
       }, 2000);
     }
@@ -330,16 +332,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.load = false
     setTimeout(() => {
       this.load = true;
-      this.mostrarConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${nombre} actualizada con éxito!`);
+      this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${nombre} actualizada con éxito!`);
     }, 5500);
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
 }

@@ -8,6 +8,7 @@ import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateri
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
 import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remision/OrdenCompra_Remision.service';
@@ -61,7 +62,8 @@ export class EntradaBOPPComponent implements OnInit {
                                   private servicioDetalleFacco_MatPrima : FacturaMpService,
                                     private servicioDetRemisiones : RemisionesMPService,
                                       private messageService: MessageService,
-                                        private shepherdService: ShepherdService) {
+                                        private shepherdService: ShepherdService,
+                                          private mensajeService : MensajesAplicacionService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -143,7 +145,7 @@ export class EntradaBOPPComponent implements OnInit {
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {
-          this.mostrarAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
           this.load = true;
         } else {
           this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
@@ -171,44 +173,44 @@ export class EntradaBOPPComponent implements OnInit {
           });
         }
       });
-    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
   // funcion que crea los rollos en la tabla
   crearEntrada(){
-    if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla!");
+    if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla!");
     else {
       this.load = false
-        for (let i = 0; i < this.ArrayBOPP.length; i++) {
-          let bodega : number;
-          if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
-          else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
-          else if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
+      for (let i = 0; i < this.ArrayBOPP.length; i++) {
+        let bodega : number;
+        if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
+        else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
+        else if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
 
-          let datosBOPP : any = {
-            bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
-            bopP_Descripcion : this.ArrayBOPP[i].Descripcion,
-            bopP_Serial : this.ArrayBOPP[i].Serial,
-            bopP_CantidadMicras : this.ArrayBOPP[i].Cant,
-            undMed_Id : 'µm',
-            catMP_Id : this.ArrayBOPP[i].Cat_Id,
-            bopP_Precio : this.ArrayBOPP[i].Precio,
-            tpBod_Id : bodega,
-            bopP_FechaIngreso : this.today,
-            bopP_Ancho : this.ArrayBOPP[i].Ancho,
-            BOPP_Stock : this.ArrayBOPP[i].CantKg,
-            undMed_Kg : 'Kg',
-            bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
-            Usua_Id : this.storage_Id,
-            BOPP_Hora : moment().format('H:mm:ss'),
-            BOPP_TipoDoc: this.tipoDoc,
-            BOPP_CodigoDoc : this.campoRemi_Faccompra,
-          }
-          this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
-            this.mostrarConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
-            this.load = true;
-          }, () => { this.mostrarError(`Error`, `Error al ingresar el rollo!`); });
+        let datosBOPP : any = {
+          bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
+          bopP_Descripcion : this.ArrayBOPP[i].Descripcion,
+          bopP_Serial : this.ArrayBOPP[i].Serial,
+          bopP_CantidadMicras : this.ArrayBOPP[i].Cant,
+          undMed_Id : 'µm',
+          catMP_Id : this.ArrayBOPP[i].Cat_Id,
+          bopP_Precio : this.ArrayBOPP[i].Precio,
+          tpBod_Id : bodega,
+          bopP_FechaIngreso : this.today,
+          bopP_Ancho : this.ArrayBOPP[i].Ancho,
+          BOPP_Stock : this.ArrayBOPP[i].CantKg,
+          undMed_Kg : 'Kg',
+          bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
+          Usua_Id : this.storage_Id,
+          BOPP_Hora : moment().format('H:mm:ss'),
+          BOPP_TipoDoc: this.tipoDoc,
+          BOPP_CodigoDoc : this.campoRemi_Faccompra,
         }
+        this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
+          this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
+          this.load = true;
+        }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
+      }
     }
   }
 
@@ -275,7 +277,7 @@ export class EntradaBOPPComponent implements OnInit {
         }
         /** Cargar lista de OC */
         this.servicioOC_MatPrimas.getListaOrdenesComprasxId(OC).subscribe(data => {
-          if (data.length == 0) this.mostrarAdvertencia(`Advertencia` ,`No existe la OC ${OC}, por favor, verifique!`);
+          if (data.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia` ,`No existe la OC ${OC}, por favor, verifique!`);
           else {
             for (let index = 0; index < data.length; index++) {
               this.cargarBopps(data[index], dataFacturada, dataRemisionada);
@@ -357,7 +359,7 @@ export class EntradaBOPPComponent implements OnInit {
   /** Factura */
   /** Funcion para registrar el encabezado de la factura */
   registrarFacturaBopp(){
-    if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla");
+    if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla");
     else {
       const datosFactura : any = {
         Facco_Codigo : this.FormOpcional.value.Factura,
@@ -372,15 +374,15 @@ export class EntradaBOPPComponent implements OnInit {
         TpDoc_Id : 'FCO',
       }
       this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(() => { this.obtenerUltimoIdFacturaCompra(); }, () => {
-        this.mostrarError(`Error`,`Error al crear la factura!`);
+        this.mensajeService.mensajeError(`Error`,`Error al crear la factura!`);
       });
     }
   }
 
   /** Funcion para registrar el máximo ID de la factura */
   obtenerUltimoIdFacturaCompra() {
-    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos_facturas => this.creacionDetalleFactura(datos_facturas), () => {
-      this.mostrarError(`Error`, `Error al obtener la ultima factura creada!`);
+    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos => this.creacionDetalleFactura(datos), () => {
+      this.mensajeService.mensajeError(`Error`, `Error al obtener la ultima factura creada!`);
     });
   }
 
@@ -398,7 +400,7 @@ export class EntradaBOPPComponent implements OnInit {
         FaccoMatPri_ValorUnitario: this.ArrayBOPP[index].Precio,
       }
       this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(() => { detalleError = false; }, () => {
-        this.mostrarError('No fue posible registrar el detalle de la factura, verifique!');
+        this.mensajeService.mensajeError(`Error`, 'No fue posible registrar el detalle de la factura, verifique!');
         detalleError = true;
       });
     }
@@ -412,7 +414,7 @@ export class EntradaBOPPComponent implements OnInit {
       Facco_Id : factura,
     }
     this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
-      this.mostrarError(`Error`, `No se ha creado la relación entre la factura y la OC!`);
+      this.mensajeService.mensajeError(`Error`, `No se ha creado la relación entre la factura y la OC!`);
     });
   }
 
@@ -431,14 +433,14 @@ export class EntradaBOPPComponent implements OnInit {
       Rem_Observacion : this.FormOpcional.value.Observacion,
     }
     this.servicioRemisiones.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => {
-      this.mostrarError(`Error`, `Error al crear la remisión!`);
+      this.mensajeService.mensajeError(`Error`, `Error al crear la remisión!`);
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las remisiones
   obtenerUltimoIdRemision(){
     this.servicioRemisiones.UltimoIdRemision().subscribe(datos_remision => this.crearDetalleRemision(datos_remision), () => {
-      this.mostrarError(`Error`, `Error al obtener el Id de la última remisión!`);
+      this.mensajeService.mensajeError(`Error`, `Error al obtener el Id de la última remisión!`);
       this.load = true;
     });
   }
@@ -446,7 +448,7 @@ export class EntradaBOPPComponent implements OnInit {
   //Funcion que creará el detalle de la remisión
   crearDetalleRemision(idRemision : any){
     let detalleError : boolean;
-    if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla")
+    if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla")
     else {
       for (let index = 0; index < this.ArrayBOPP.length; index++) {
         const datosRemisionMp : any = {
@@ -460,7 +462,7 @@ export class EntradaBOPPComponent implements OnInit {
         }
         this.servicioDetRemisiones.srvGuardar(datosRemisionMp).subscribe(() => detalleError = false, () => {
           detalleError = true;
-          this.mostrarError(`Error`, `Error al crear el detalle de la remisión!`);
+          this.mensajeService.mensajeError(`Error`, `Error al crear el detalle de la remisión!`);
           this.load = true;
         });
       }
@@ -475,7 +477,7 @@ export class EntradaBOPPComponent implements OnInit {
       Rem_Id : remision,
     }
     this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
-      this.mostrarError(`Error`, `No se ha creado la relacion entre la remisión y la OC!`);
+      this.mensajeService.mensajeError(`Error`, `No se ha creado la relacion entre la remisión y la OC!`);
     });
   }
 
@@ -498,7 +500,7 @@ export class EntradaBOPPComponent implements OnInit {
       this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
       setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
-    } else this.mostrarAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
   /** Función para obtener el valor total del Bopp a ingresar */
@@ -508,15 +510,6 @@ export class EntradaBOPPComponent implements OnInit {
       this.valorTotal += parseInt(this.ArrayBOPP[index].Subtotal);
     }
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = () => this.messageService.clear('bopp');

@@ -1,9 +1,7 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
@@ -37,16 +35,16 @@ export class ClientesComponent implements OnInit {
   cliente = []; //Variable que almacenará el nombre de los clientes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
-  constructor(private rolService : RolesService,
-                private AppComponent : AppComponent,
-                  private formBuilderCrearClientes : FormBuilder,
-                    private tiposClientesService : TipoClienteService,
-                      private tipoIdentificacionService : TipoIdentificacionService,
-                        private usuarioService : UsuarioService,
-                          private pedidoCliente : OpedidoproductoComponent,
-                            private crearProducto : CrearProductoComponent,
-                              private clientesService :ClientesService,
-                                private sedesClientesService: SedeClienteService,) {
+  constructor(private AppComponent : AppComponent,
+                private formBuilderCrearClientes : FormBuilder,
+                  private tiposClientesService : TipoClienteService,
+                    private tipoIdentificacionService : TipoIdentificacionService,
+                      private usuarioService : UsuarioService,
+                        private pedidoCliente : OpedidoproductoComponent,
+                          private crearProducto : CrearProductoComponent,
+                            private clientesService :ClientesService,
+                              private sedesClientesService: SedeClienteService,) {
+
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: [null, Validators.required],
@@ -106,22 +104,10 @@ export class ClientesComponent implements OnInit {
   }
 
   // Funcion que consultará y almacenará los tipos de identificaciones
-  tipoIdntificacion() {
-    this.tipoIdentificacionService.srvObtenerLista().subscribe(datos_tipoIdentificacion => {
-      for(let index = 0; index < datos_tipoIdentificacion.length; index++){
-        this.tipoIdentificacion.push(datos_tipoIdentificacion[index].tipoIdentificacion_Id);
-      }
-    });
-  }
+  tipoIdntificacion = () => this.tipoIdentificacionService.srvObtenerLista().subscribe(datos => this.tipoIdentificacion = datos);
 
   // Funcion que consultará y almacenará los tipos de clientes
-  tipoClienteComboBox() {
-    this.tiposClientesService.srvObtenerLista().subscribe(datos_tiposClientes => {
-      for (let index = 0; index < datos_tiposClientes.length; index++) {
-        this.tiposClientes.push(datos_tiposClientes[index]);
-      }
-    });
-  }
+  tipoClienteComboBox = () => this.tiposClientesService.srvObtenerLista().subscribe(datos => this.tiposClientes = datos);
 
   // Funcion que consultará y almacneará los vendedores
   usuarioComboBox() {

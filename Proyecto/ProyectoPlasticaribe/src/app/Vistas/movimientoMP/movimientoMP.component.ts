@@ -8,6 +8,7 @@ import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -46,7 +47,8 @@ export class MovimientoMPComponent implements OnInit {
                     private materiaPrimaService : MateriaPrimaService,
                       private detallesAsignacionService : DetallesAsignacionService,
                         private bagProServices : BagproService,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private mensajeService : MensajesAplicacionService,) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -168,8 +170,14 @@ export class MovimientoMPComponent implements OnInit {
         this.movimientosBiorientados.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
         this.cargando = false;
       }
-      if (datos.length == 0) this.mensajeAdvertencia(`¡No se encontró información con los parametros consultados!`);
-    }, () => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
+      if (datos.length == 0) {
+        this.cargando = false;
+        this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
+      }
+    }, () => {
+      this.cargando = false;
+      this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`)
+    });
 
     if (codigo != null) {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
@@ -1018,24 +1026,6 @@ export class MovimientoMPComponent implements OnInit {
 
   aplicarfiltro3($event, campo : any, valorCampo : string) {
     this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
-
-  // Mostrar mensaje de confirmación
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Mostrar mensaje de error
-  mensajeError(titulo : string, mensaje : string) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Mostrar mensaje de advertencia
-  mensajeAdvertencia(mensaje : string) {
-    this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
-    this.cargando = false;
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

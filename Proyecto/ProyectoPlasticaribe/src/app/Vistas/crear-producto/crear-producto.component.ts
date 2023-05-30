@@ -1,14 +1,13 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
@@ -56,7 +55,8 @@ export class CrearProductoComponent implements OnInit {
                                 private materialService : MaterialProductoService,
                                   private pigmentoServices : PigmentoProductoService,
                                     private tipoSelladoService : TiposSelladoService,
-                                      private ClientesProductosService : ClientesProductosService,) {
+                                      private ClientesProductosService : ClientesProductosService,
+                                        private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       ProduId:[null, Validators.required],
@@ -105,11 +105,7 @@ export class CrearProductoComponent implements OnInit {
   }
 
   // Funcion que va a limpiar los campos del formulario de producto
-  LimpiarCampos() {
-    this.productoService.GetIdUltimoProducto().subscribe(datos => {
-      this.FormCrearProducto.patchValue({ ProduId:datos + 1, });
-    });
-  }
+  LimpiarCampos = () => this.productoService.GetIdUltimoProducto().subscribe(datos => this.FormCrearProducto.patchValue({ ProduId:datos + 1, }));
 
   // Funcion que va a limpiar los campos del formulario de existencias
   LimpiarCamposPresentacion() {
@@ -123,9 +119,7 @@ export class CrearProductoComponent implements OnInit {
   }
 
   // Funcion que consultará y almacenará los tipos de sellado
-  tiposSelladoComboBox(){
-    this.tipoSelladoService.srvObtenerLista().subscribe(datos_tpSelado => { this.tiposSellado = datos_tpSelado; });
-  }
+  tiposSelladoComboBox = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos_tpSelado => this.tiposSellado = datos_tpSelado);
 
   // Funcion que consultará y almacenará los clientes
   clientesComboBox() {
@@ -141,41 +135,25 @@ export class CrearProductoComponent implements OnInit {
   }
 
   // Funcion que consultará y almacenará las unidades de medida
-  undMedidaComboBox() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => { this.unidadMedida = datos_undMed; });
-  }
+  undMedidaComboBox = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => this.unidadMedida = datos_undMed);
 
   // Funcion que consultará y almacenará los tipos de productos
-  tipoProductoComboBox(){
-    this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => { this.tipoProducto = datos_tiposProductos; });
-  }
+  tipoProductoComboBox = () => this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => this.tipoProducto = datos_tiposProductos);
 
   // Funcion para llenar el comboBox de material del producto
-  matrialProductoComboBox(){
-    this.materialService.srvObtenerLista().subscribe(datos_material => { this.materialProducto = datos_material; });
-  }
+  matrialProductoComboBox = () => this.materialService.srvObtenerLista().subscribe(datos_material => this.materialProducto = datos_material);
 
   // Funcion para llenar el comboBox de pigmentos del producto
-  pigmentoProductocomboBox(){
-    this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => { this.pigmentoProducto = datos_pigmentos; });
-  }
+  pigmentoProductocomboBox = () => this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => this.pigmentoProducto = datos_pigmentos);
 
   // Funcion que consultará y almacenará los tipos de monedas
-  tipoMondedaComboBox(){
-    this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => { this.tipoMoneda = datos_tiposMoneda; })
-  }
+  tipoMondedaComboBox = () => this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => this.tipoMoneda = datos_tiposMoneda);
 
   // Funcion que va a validar los campos del formulario de productos
-  validarCamposVacios() : any{
-    if(this.FormCrearProducto.valid) this.llenarTabla();
-    else this.mensajeAdvertencia("Hay campos vacios");
-  }
+  validarCamposVacios = () => this.FormCrearProducto.valid ? this.llenarTabla() : this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios");
 
   // Funcion que va a validar los campos del formulario de existencias
-  validarCamposVaciosPresentacion() : any{
-    if(this.FormCrearPresentacionProducto.valid) this.llenarTablaPresentacion();
-    else this.mensajeAdvertencia("Hay campos vacios");
-  }
+  validarCamposVaciosPresentacion = () => this.FormCrearPresentacionProducto.valid ? this.llenarTablaPresentacion() : this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios");
 
   // Funcion que va a crear un producto y lo va a asociar a un cliente
   llenarTabla(){
@@ -212,11 +190,11 @@ export class CrearProductoComponent implements OnInit {
       }
       this.productoService.srvGuardar(datosProductos).subscribe(datos => {
         this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-          this.mensajeSatisfactorio('Se creó el producto de manera satisfactoria y se asoció al cliente');
+          this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
           this.LimpiarCampos();
-        }, error => { this.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message); });
-      }, error => { this.mensajeError('¡Ocurrió un error al crear el producto!', error.message); });
-    }else if (this.ValidarRol == 1){
+        }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
+      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
+    } else if (this.ValidarRol == 1){
       const datosProductos : any = {
         Prod_Id: this.FormCrearProducto.value.ProduId,
         Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
@@ -249,10 +227,10 @@ export class CrearProductoComponent implements OnInit {
       }
       this.productoService.srvGuardar(datosProductos).subscribe(datos => {
         this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-          this.mensajeSatisfactorio('Se creó el producto de manera satisfactoria y se asoció al cliente');
+          this.mensajeService.mensajeConfirmacion(`¡Producto Creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
           this.LimpiarCampos();
-        }, error => { this.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message); });
-      }, error => { this.mensajeError('¡Ocurrió un error al crear el producto!', error.message); });
+        }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
+      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
     }
   }
 
@@ -273,23 +251,8 @@ export class CrearProductoComponent implements OnInit {
       ExProd_Hora : moment().format('H:mm:ss'),
     };
     this.existenciasService.srvGuardar(datosExistencias).subscribe(datos_existencias => {
-      this.mensajeSatisfactorio(`La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
+      this.mensajeService.mensajeConfirmacion(`Existencia Creada`, `La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
       this.LimpiarCamposPresentacion();
-    }, error => { this.mensajeError('¡Ocurrió un error, no fue posible guardar la presentación!', error.message); });
-  }
-
-  // Mensaje Satisfactorio
-  mensajeSatisfactorio(mensaje : string){
-    Swal.fire({ icon: 'success', title: 'Guardado Exitoso', html:`<b>${mensaje}</b><hr> `, showCloseButton: true, });
-  }
-
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    }, error => this.mensajeService.mensajeError('¡Ocurrió un error, no fue posible guardar la presentación!', error.message));
   }
 }

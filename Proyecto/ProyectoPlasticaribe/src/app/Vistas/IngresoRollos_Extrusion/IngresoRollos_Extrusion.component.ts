@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngresoRollosBodegaExtrusion/IngRollos_Extrusuion.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsIngresoRollosExtrusion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -40,8 +40,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
                   private bagProService : BagproService,
                     private IngRollosService : IngRollos_ExtrusuionService,
                       private dtIngRollosService : DtIngRollos_ExtrusionService,
-                        private messageService: MessageService,
-                          private shepherdService: ShepherdService) {
+                        private shepherdService: ShepherdService,
+                          private mensajeService : MensajesAplicacionService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -69,11 +69,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -83,9 +79,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm(){
-    this.FormConsultarRollos.reset();
-  }
+  limpiarForm = () => this.FormConsultarRollos.reset();
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
@@ -151,7 +145,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }, 2500);
       });
       setTimeout(() => { this.cargando = true; }, 6000);
-    } else this.mostrarAdvertencia(`Advertencia`,`La fecha seleccionada no es valida!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`La fecha seleccionada no es valida!`);
 
   }
 
@@ -195,9 +189,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que colocará los rollos que se van a insertar
   llenarRollosAIngresar(item : any){
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
-    }
+    this.rollos.splice(this.rollos.findIndex((data) => data.Id == item.Id), 1);
     this.rollosInsertar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
@@ -206,9 +198,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   // Funcion que seleccionará y colocará todos los rollos que se van a insertar
   seleccionarTodosRollos(item : any){
     this.rollos = [];
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits == true) this.rollos.push(item[i]);
-    }
+    this.rollos = item.filter((data) => data.exits);
     this.rollosInsertar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
@@ -216,9 +206,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que va a quitar lo rollos que se van a insertar
   quitarRollosAIngresar(item : any){
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i, 1);
-    }
+    this.rollosInsertar.splice(this.rollosInsertar.findIndex((data) => data.Id == item.Id), 1);
     this.rollos.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
@@ -291,7 +279,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que creará el ingreso de los rollos
   ingresaroRollos(){
-    if (this.rollosInsertar.length == 0) this.mostrarAdvertencia(`Advertencia`,`Debe selecionar minimo un rollo para realizar el ingreso!`);
+    if (this.rollosInsertar.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`Debe selecionar minimo un rollo para realizar el ingreso!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -302,7 +290,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         IngRollo_Hora : moment().format("H:mm:ss"),
       }
       this.IngRollosService.srvGuardar(info).subscribe(datos_rollos => { this.DtIngresarRollos(datos_rollos.ingRollo_Id);
-      }, error => { this.mostrarError(`Error`,`Error al ingresar los rollos!`); });
+      }, () => this.mensajeService.mensajeError(`Error`,`Error al ingresar los rollos!`));
     }
   }
 
@@ -320,8 +308,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           Proceso_Id : 'EXT',
           Prod_Id : parseInt(this.rollosInsertar[i].Id_Producto),
         }
-        this.dtIngRollosService.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => { this.mostrarError(`Error`,`Error al ingresar los rollos!`); });
+        this.dtIngRollosService.srvGuardar(info).subscribe(() => {
+        }, () => this.mensajeService.mensajeError(`Error`,`Error al ingresar los rollos!`));
       }
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 5000);
@@ -329,7 +317,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarInsercion(id : number){
-    this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} rollos han sido ingresados correctamente!`);
+    this.mensajeService.mensajeConfirmacion(`Confirmación`,`${this.totalRollos} rollos han sido ingresados correctamente!`);
     this.buscarRolloPDF(id);
   }
 
@@ -467,7 +455,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }
         break;
       }
-    }, error => { this.mostrarError(`Error`,`No se pudo obtener la información del último ingreso de rollos!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`No se pudo obtener la información del último ingreso de rollos!`));
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -487,7 +475,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
       setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, error => { this.mostrarError(`Error`,`No se pudo obtener información del último ingreso de rollos!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`No se pudo obtener información del último ingreso de rollos!`));
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -537,20 +525,5 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }
       }
     };
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
   }
 }

@@ -9,6 +9,7 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsFacturarRolloDespacho as defaultSteps } from 'src/app/data';
 
@@ -49,7 +50,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
                         private asgProdFacturaService : AsignacionProductosFacturaService,
                           private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
                             private ExistenciasProdService : ExistenciasProductosService,
-                              private shepherdService: ShepherdService){
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService,){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarProductos = this.frmBuilder.group({
@@ -158,9 +160,17 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
         this.cargando = false;
       }, 1000);
-      if (datos_rollos.length == 0) this.mensajeError(`¡Sin Rollos disponibles!`, `¡El producto con el código ${id} no tiene rollos disponibles!`);
-    }, () => { this.mensajeError(`¡Producto No Encontrado!`, `¡No se pudo obtener información del producto con el codigo ${id}!`) });
-    if (id.match(this.datosNumeros) == null) this.mensajeError(`¡Debe colocar un Codigo de Producto valido!`,``);
+      if (datos_rollos.length == 0) {
+        this.mensajeService.mensajeError(`¡Sin Rollos disponibles!`, `¡El producto con el código ${id} no tiene rollos disponibles!`);
+        this.cargando = false;
+      }
+    }, () => {
+      this.mensajeService.mensajeError(`¡Producto No Encontrado!`, `¡No se pudo obtener información del producto con el codigo ${id}!`);
+      this.cargando = false;
+    });
+    if (id.match(this.datosNumeros) == null) {
+      this.mensajeService.mensajeError(`¡Debe colocar un Codigo de Producto valido!`,``);
+    }
   }
 
   // Funcion que va a buscar informacion de un cliente
@@ -278,10 +288,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
             AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
           }
           this.asgProdFacturaService.srvGuardar(info).subscribe(datos_asignacion => { this.crearDetallesAsignacion(datos_asignacion.asigProdFV_Id);
-          }, () => { this.mensajeError(`¡Error!`,`¡Ocurrió un error al facturar los rollos!`); });
-        } else this.mensajeAdvertencia(`¡EL campos factura debe tener información!`);
-      } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
-    } else this.mensajeAdvertencia("¡Debe haber minimo un rollo seleccionado!");
+          }, () => {
+            this.mensajeService.mensajeError(`¡Error!`,`¡Ocurrió un error al facturar los rollos!`);
+            this.cargando = true;
+          });
+        } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡EL campos factura debe tener información!`);
+      } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios!`);
+    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, "¡Debe haber minimo un rollo seleccionado!");
   }
 
   // Funcion para subir los detalles de la asignacion, es decir, cada rollo que se asignó a la factura
@@ -296,7 +309,10 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Prod_CantidadUnidades : this.rollosSeleccionados[i].CantUndRestantes,
       }
       this.dtAsgProdFacturaService.srvGuardar(info).subscribe(() => {
-      }, () => { this.mensajeError('Error', '¡Error al asignar los rollos!'); });
+      }, () => {
+        this.mensajeService.mensajeError('Error', '¡Error al asignar los rollos!');
+        this.cargando = false;
+      });
     }
     setTimeout(() => { this.cambiarEstado(); }, this.rollosSeleccionados.length * 50);
   }
@@ -374,7 +390,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(() => {
-            this.mensajeConfirmacion(`¡Asignación Registrada!`,`¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`)
+            this.cargando = false;
+            this.mensajeService.mensajeConfirmacion(`¡Asignación Registrada!`,`¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`)
           });
         }
       });
@@ -621,23 +638,5 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       }
     };
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }

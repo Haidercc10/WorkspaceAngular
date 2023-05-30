@@ -13,6 +13,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { stepsMovimientosMtto as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +50,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                         private dtMantenimientoService : Detalle_MantenimientoService,
                           private dtPedidoMttoService : DetallePedido_MantenimientoService,
                             private messageService: MessageService,
-                              private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -166,7 +168,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_movimientos.length; i++) {
         this.llenarTabla(datos_movimientos[i]);
       }
-    }, () => { this.mostrarError(`Error`, `¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`); });
   }
 
   // Funcion que va a llenar la tabla con la información colsutada
@@ -207,7 +209,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfPedido(data); }, datos_pedido.length * 5);
-    }, () => { this.mostrarError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a llenar un array con la información de los activos de un mantenimiento
@@ -225,7 +227,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfMantenimiento(data); }, datos_mantenimiento.length * 5);
-    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -286,7 +288,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -461,7 +463,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, () => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // funcion que se encagará de llenar la tabla del pdf
@@ -497,21 +499,6 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   // Funcion que limpiará los filtros utilizados en la tabla
   clear = (table: Table) => table.clear();
-
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
-   this.cargando = false;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
-   this.cargando = false;
-  }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
