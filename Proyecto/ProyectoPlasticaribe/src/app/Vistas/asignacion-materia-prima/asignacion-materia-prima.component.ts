@@ -174,13 +174,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
-            let asignacion : number = datos_asignacion[0], devolucion : number = datos_asignacion[1];
-            if (asignacion == null || asignacion == undefined) {
-              asignacion = 0;
-              devolucion = 0;
-            }
-            if (devolucion == null || devolucion == undefined) devolucion = 0;
-            this.cantRestante = this.kgOT - (asignacion - devolucion);
+            this.cantRestante = this.kgOT - datos_asignacion;
             let info : any = {
               ot : ot,
               cliente : datos_procesos[index].clienteNom,
