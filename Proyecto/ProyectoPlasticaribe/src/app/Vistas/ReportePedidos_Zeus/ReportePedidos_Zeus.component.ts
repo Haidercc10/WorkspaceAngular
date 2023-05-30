@@ -17,6 +17,7 @@ import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.compone
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -58,7 +59,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                     private pedidoProductosService : PedidoProductosService,
                       private pedidoExternoService : OpedidoproductoService,
                         private estadosProcesos_OTService : EstadosProcesos_OTService,
-                          private shepherdService: ShepherdService) {
+                          private shepherdService: ShepherdService,
+                            private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -324,7 +326,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que creará un archivo de excel con base de lo que esté en la tabla
   exportarExcel(){
-    if (this.ArrayPedidos.length == 0) this.mostrarAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
+    if (this.ArrayPedidos.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       const title = `Reporte de Pedidos Zeus - ${this.today}`;
@@ -424,7 +426,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           fs.saveAs(blob, `Reporte de Pedidos Zeus - ${this.today}.xlsx`);
         });
-        setTimeout(() => {  this.mostrarConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!'); }, 3100);
+        setTimeout(() => {
+          this.msj.mensajeConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!');
+          this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+        }, 3100);
         this.datosExcel = this.ArrayPedidos;
         this.cargando = false;
       }, 2000);
@@ -549,8 +554,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
             }
           }, 500);
-        } else this.mostrarAdvertencia(`Advertencia`, `¡No hay orden asociada al pedido ${data.consecutivo}!`);
-      }, error => { this.mostrarError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡No hay orden asociada al pedido ${data.consecutivo}!`);
+      }, error => { this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
     }
   }
 
@@ -595,12 +600,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_Pedido : null,
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-              this.mostrarConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
+              this.msj.mensajeConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
+              this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
             });
           }
         }
       }
-    }, error => { this.mostrarError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
 
     this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
@@ -641,10 +647,11 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_Pedido : data.consecutivo,
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-              this.mostrarConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
+              this.msj.mensajeConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
+              this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
             });
-          } else this.mostrarAdvertencia(`Advertencia`, `¡El producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
-        } else this.mostrarAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
+          } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
       }
     });
     setTimeout(() => { this.consultarPedidos(); }, 1000);
@@ -682,12 +689,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         Creador_Id : dataPedidos.creador_Id,
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
-        this.mostrarConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
+        this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.mostrarError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+      }, error => { this.msj.mensajeError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
     });
   }
 
@@ -713,12 +721,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         Creador_Id : dataPedidos.creador_Id,
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
-        this.mostrarConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
+        this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.mostrarError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
+      }, error => { this.msj.mensajeError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
     });
   }
 
@@ -842,7 +851,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         const pdf = pdfMake.createPdf(infoPdf);
         pdf.open();
         this.cargando = false;
-        this.mostrarConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
+        this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         break;
       }
     });
@@ -989,7 +999,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.mostrarConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
+        this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         break;
       }
     });
@@ -1042,22 +1053,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }
       }
     };
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-   this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
   }
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/

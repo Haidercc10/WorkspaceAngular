@@ -95,7 +95,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     });
   }
 
-  //
+  //Función que limpiará los campos de los formularios y las tablas.
   limpiarCampos(){
     this.cargando = true;
     this.FormConsultarFiltros.reset();

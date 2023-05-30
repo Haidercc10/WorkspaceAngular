@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -11,6 +10,7 @@ import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMater
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteCostos as defaultSteps } from 'src/app/data';
@@ -88,8 +88,8 @@ export class ReporteCostosOTComponent implements OnInit {
                             private boppService : EntradaBOPPService,
                               private tintaService : TintasService,
                                 private estadosProcesos_OTService : EstadosProcesos_OTService,
-                                  private messageService: MessageService,
-                                    private shepherdService: ShepherdService) {
+                                    private shepherdService: ShepherdService,
+                                      private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -176,7 +176,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.limpiarCampos();
     let porcentajeMargen : number = 0;
     this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
-      if (datos_OT.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
+      if (datos_OT.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
       else {
         for (const item of datos_OT) {
           porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
@@ -454,7 +454,7 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
     let nombre : string = this.storage_Nombre;
-    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
+    if (this.ArrayMateriaPrima.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {
@@ -1121,7 +1121,7 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cambiará el estado de una Orden de trabajo consultada
   cambiarEstado(){
     let estado : any = this.infoOT.value.estadoOT;
-    if (this.ordenTrabajo == 0) this.mostrarAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    if (this.ordenTrabajo == 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -1132,14 +1132,14 @@ export class ReporteCostosOTComponent implements OnInit {
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, estado);
-        this.mostrarConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`)
-      }, error => { this.mostrarError(`Error`, 'No se ha podido cambiar el estado de la OT'); });
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`)
+      }, error => { this.msj.mensajeError(`Error`, 'No se ha podido cambiar el estado de la OT'); });
     }
   }
 
   // Cerrar Orden
   cerrarOrden(){
-    if (this.ordenTrabajo == 0) this.mostrarAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    if (this.ordenTrabajo == 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -1150,19 +1150,10 @@ export class ReporteCostosOTComponent implements OnInit {
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
-        this.mostrarConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
-      }, error => this.mostrarError(`Error`, `No se ha podido cambiar el estado de la OT`));
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
+      }, error => this.msj.mensajeError(`Error`, `No se ha podido cambiar el estado de la OT`));
     }
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
 
   inhabilitarCampos = () => setTimeout(() => { this.infoOT.disable(); this.infoOT.get('ot').enable();this.infoOT.get('estadoOT').enable(); }, 1000);
 

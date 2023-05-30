@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsCreacionTickets as defaultSteps } from 'src/app/data';
@@ -29,7 +29,7 @@ export class TicketsComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private frmBuiler : FormBuilder,
                   private ticketService : TicketsService,
-                    private messageService: MessageService,
+                    private msj : MensajesAplicacionService,
                       private shepherdService: ShepherdService) {
 
     this.FormTickets = this.frmBuiler.group({
@@ -43,6 +43,7 @@ export class TicketsComponent implements OnInit {
     this.limpiarTodo();
   }
 
+  /** Mostrar tutorial escrito dentro del programa que especificará la funcionalidad de este módulo */
   tutorial(){
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
@@ -90,10 +91,17 @@ export class TicketsComponent implements OnInit {
       }
       this.ticketService.crearTicket(info).subscribe(data => {
         this.crearPDF(data.ticket_Id);
-        this.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`)
-      }, error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`); });
+        this.msj.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`);
+      }, error => {
+         this.msj.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`);
+         this.cargando = false;
+        });
       if (this.archivoSeleccionado.length > 0) this.enviarArchivos(this.archivoSeleccionado);
-    } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
+      this.limpiarTodo();
+    } else {
+      this.msj.mensajeAdvertencia(`Advertencia`, `¡Hay Campos Vacios!`);
+      this.cargando = false;
+    }
   }
 
   // Funcion que va a enaviar los datos de los archivos al api
@@ -103,9 +111,10 @@ export class TicketsComponent implements OnInit {
       formData.append('archivo', archivos[i]);
       try {
         const data = await this.ticketService.crearImgTicket(formData).toPromise();
-        this.mensajeConfirmacion(`¡Se ha subido el Archivo!`, `¡Archivo adjuntado al ticket creado!`);
+        this.msj.mensajeConfirmacion(`¡Se ha subido el Archivo!`, `¡Archivo adjuntado al ticket creado!`);
       } catch (error) {
-        this.mensajeError(`¡Ha ocurrido un error al subir la imagen!`, `¡Ocurrió un error al intentar subir la imagen : ${error}!`);
+        this.msj.mensajeError(`¡Ha ocurrido un error al subir la imagen!`, `¡Ocurrió un error al intentar subir la imagen : ${error}!`);
+        this.cargando = false;
       }
     }
   }
@@ -161,23 +170,5 @@ export class TicketsComponent implements OnInit {
         pdf.open();
       }
     });
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.limpiarTodo();
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }

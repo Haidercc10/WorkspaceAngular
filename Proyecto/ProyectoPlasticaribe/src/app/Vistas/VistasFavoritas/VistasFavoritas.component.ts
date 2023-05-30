@@ -4,6 +4,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { AppComponent } from 'src/app/app.component';
 import { vistasDisponibles } from './VistasDisponibles';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-VistasFavoritas',
@@ -28,7 +29,7 @@ export class VistasFavoritasComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
-                  private messageService: MessageService,) {
+                  private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -132,7 +133,7 @@ export class VistasFavoritasComponent implements OnInit {
   // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
   elegirFavoritos(){
     if (this.targetProducts.length > 5) {
-      this.messageService.add({key: 'tc', severity:'warn', summary: 'Advertencia', detail: 'Solo puede elegir 5 favoritos'});
+      this.msj.mensajeAdvertencia('Advertencia', 'Solo puede elegir 5 favoritos');
       for (let i = 0; i < this.targetProducts.length; i++) {
         this.disponiblesMostrar.push(this.targetProducts[i]);
         this.targetProducts.splice(i, 1);
@@ -157,7 +158,7 @@ export class VistasFavoritasComponent implements OnInit {
             datos_vistasFav[i].vistaFav_Num5,
           ];
         }
-      }, error => this.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
+      }, error => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
     }
   }
 
@@ -178,7 +179,7 @@ export class VistasFavoritasComponent implements OnInit {
         this.vistasFavService.insertVistasFavoritas(info).subscribe(() => {
           this.buscarFavoritos();
           setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-        }, error => { this.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'); });
+        }, error => { this.msj.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'); });
         break;
       }
     } else {
@@ -199,7 +200,7 @@ export class VistasFavoritasComponent implements OnInit {
             this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
               this.buscarFavoritos();
               setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-            }, error => this.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
+            }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
           } else {
             for (let j = 0; j < this.targetProducts.length; j++) {
               let info : any = {
@@ -216,7 +217,7 @@ export class VistasFavoritasComponent implements OnInit {
               this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
                 this.buscarFavoritos();
                 setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-              }, error => this.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
+              }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
               break;
             }
           }
@@ -224,7 +225,4 @@ export class VistasFavoritasComponent implements OnInit {
       });
     }
   }
-
-  // Funcion que tomará unos parametros para mostrar un mensaje de error
-  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', key: 'tc', summary: titulo, detail: mensaje, sticky: true});
 }

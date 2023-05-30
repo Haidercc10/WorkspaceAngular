@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDespacharRollosDespacho as defaultSteps } from 'src/app/data';
@@ -44,7 +45,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                       private usuariosService : UsuarioService,
                         private facturaService : AsignacionProductosFacturaService,
                           private rollosService : DetallesEntradaRollosService,
-                            private shepherdService: ShepherdService){
+                            private shepherdService: ShepherdService,
+                              private msj : MensajesAplicacionService){
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFactura = this.frmBuilder.group({
@@ -117,7 +119,10 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.cantTotalProducto = 0;
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     this.dtAsgProdFacturaService.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
-      if (datos_factura.length == 0) this.mensajeAdvertencia(`¡La factura ${factura} no existe!`);
+      if (datos_factura.length == 0) {
+        this.msj.mensajeAdvertencia(`Advertencia`, `¡La factura ${factura} no existe!`);
+        this.cargando = false;
+      }
       for (let i = 0; i < datos_factura.length; i++) {
         if ((datos_factura[i].estado_Id == 20 || datos_factura[i].estado_Id == 19) && datos_factura[i].asigProdFV_PlacaCamion == '') {
           let info : any = {
@@ -134,7 +139,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       }
       setTimeout(() => {
         this.cargando = false;
-        if (this.rollosDisponibles.length == 0 && datos_factura.length != 0) this.mensajeAdvertencia(`¡Todos los rollos de la factura ${factura} fueron enviados!`);
+        if (this.rollosDisponibles.length == 0 && datos_factura.length != 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Todos los rollos de la factura ${factura} fueron enviados!`);
       }, 500);
     });
   }
@@ -240,10 +245,14 @@ export class RollosAsignadasFacturaComponent implements OnInit {
           AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
         }
         this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
-          this.mensajeError(`¡Ha ocurrido un Error!`,`¡Ocurrió un error al momento de despachar los rollos seleccionados!`);
+          this.msj.mensajeError(`¡Ha ocurrido un Error!`,`¡Ocurrió un error al momento de despachar los rollos seleccionados!`);
+          this.cargando = false;
         });
       });
-    } else this.mensajeAdvertencia("¡Hay campos vacios!");
+    } else {
+      this.msj.mensajeAdvertencia(`Advertencia`, "¡Hay campos vacios!");
+      this.cargando = false;
+    }
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
@@ -271,7 +280,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-              }, error => { this.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de la factura!`); });
+              }, error => { this.msj.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de la factura!`); this.cargando = false; });
             } else if (datos_rollos[j].prod_CantBolsasRestates > 0) {
               let info : any = {
                 Codigo : datos_rollos[j].codigo,
@@ -291,13 +300,16 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-              }, error => { this.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de los rollos seleccionados!`); });
+              }, error => { this.msj.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de los rollos seleccionados!`); this.cargando = false; });
             }
           }
         });
       }
       setTimeout(() => { this.buscarRolloPDF(); }, 100 * this.rollosSeleccionados.length);
-    } else this.mensajeAdvertencia("¡Debe cargar minimo un rollo en la tabla!");
+    } else {
+      this.msj.mensajeAdvertencia(`Advertencia`, "¡Debe cargar minimo un rollo en la tabla!");
+      this.cargando = false;
+    }
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
@@ -322,8 +334,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
           }
           this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
-            this.mensajeConfirmacion(`¡Registro Exitoso!`, '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!');
-          }, error => { this.mensajeError(`¡Ha ocurrido un error!`, `¡No se pudo actualizar el estado de los rollos seleccionados!`); });
+            this.msj.mensajeConfirmacion(`¡Registro Exitoso!`, '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!');
+            this.cargando = false;
+          }, error => { this.msj.mensajeError(`¡Ha ocurrido un error!`, `¡No se pudo actualizar el estado de los rollos seleccionados!`); this.cargando = false; });
         }
       });
     }
@@ -561,23 +574,5 @@ export class RollosAsignadasFacturaComponent implements OnInit {
         }
       }
     };
-  }
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-    this.cargando = false;
-  }
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : any) {
-    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = false;
   }
 }
