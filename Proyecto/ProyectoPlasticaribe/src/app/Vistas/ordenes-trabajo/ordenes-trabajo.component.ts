@@ -640,7 +640,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
           PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
         });
-      }, 300);
+      }, 1000);
     }, () => {
       this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas.replace('%', '%25')).subscribe(datos_mezcla => {
         this.nroCapasOT = datos_mezcla.mezcla_NroCapas;

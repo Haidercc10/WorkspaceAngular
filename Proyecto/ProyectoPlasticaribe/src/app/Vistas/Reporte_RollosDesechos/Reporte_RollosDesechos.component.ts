@@ -5,7 +5,6 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -16,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import Swal from 'sweetalert2';
 import { defaultStepOptions, stepsReporteRollosEliminados as defaultSteps } from 'src/app/data';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -62,8 +62,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                         private servicioRollos : SrvRollosEliminadosService,
                           private AppComponent : AppComponent,
                             private servicioProcesos : ProcesosService,
-                              private messageService: MessageService,
-                                private shepherdService: ShepherdService) {
+                                private shepherdService: ShepherdService,
+                                  private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -110,7 +110,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         });
       });
     } else {
-      this.mensajeAdvertencia('Debe cargar un item válido');
+      this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un item válido');
       this.idProducto = 0;
     }
   }
@@ -558,7 +558,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Mensaje que aparecerá cuando no se encuentrén resultados luego de una busqueda. */
   rollosNoEncontrados() {
-    this.mensajeAdvertencia('No se encontraron resultados de búsqueda!');
+    this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda!');
   }
 
   /** NO USADA: Función para cargar los turnos en el combobox de la vista */
@@ -860,7 +860,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         this.load = true;
       }, 1000);
     }, 3500);
-    setTimeout(() => { this.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!') }, 4000);
+    setTimeout(() => { this.msj.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!') }, 4000);
   }
 
   /** Elegir formato en el que desea exportar el documento. */
@@ -877,7 +877,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         if (result.isDenied) this.exportarExcel();
         else if (result.isConfirmed) this.exportarPdf();
       });
-    } else this.mensajeAdvertencia('Debe cargar al menos un registro en la tabla.');
+    } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un registro en la tabla.');
   }
 
   /** Prime NG */
@@ -894,20 +894,5 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-   }
-
-  /** Mostrar mensaje de error  */
-  mensajeError(titulo : string, mensaje : string) {
-  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : string) {
-  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
   }
 }

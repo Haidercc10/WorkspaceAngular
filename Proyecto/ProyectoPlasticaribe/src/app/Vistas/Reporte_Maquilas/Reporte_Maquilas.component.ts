@@ -13,6 +13,7 @@ import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maqu
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { stepsMovMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Reporte_Maquilas',
@@ -33,12 +34,12 @@ export class Reporte_MaquilasComponent implements OnInit {
   estados : any [] = []; //Variable que almacenará los estados que pueden tener las ordenes de compra de materia prima
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
   datosPdf : any [] = []; //variable que va a almacenar la informacion del documento consultado
-  arrayTerceros : any = [];
+  arrayTerceros : any = []; /** Array que carga la información de los terceros. */
   arrayConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
   totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
   totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
-  pesoTotal : number = 0;
+  pesoTotal : number = 0; /** Peso total de la orden de maquila */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private frmBuilder : FormBuilder,
@@ -49,7 +50,8 @@ export class Reporte_MaquilasComponent implements OnInit {
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private servicioTerceros : TercerosService,
                             private messageService: MessageService,
-                              private shepherdService: ShepherdService) {
+                              private shepherdService: ShepherdService,
+                                private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
@@ -147,10 +149,13 @@ export class Reporte_MaquilasComponent implements OnInit {
         for (let i = 0; i < datos.length; i++) {
           this.llenarTabla(datos[i]);
         }
-      } else this.mostrarAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`)
+      } else {
+        this.msj.mensajeAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`);
+        this.cargando = false;
+      }
 
       setTimeout(() => { this.cargando = false; }, datos.length * 5);
-    }, error => { this.mostrarError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); this.cargando = false; });
 
     if (this.ValidarRol == 1) {
       if (estado != null && codigo != null && tercero != null) ruta2 = `?doc=${codigo}&estado=${estado}&tercero=${tercero}`;
@@ -165,7 +170,7 @@ export class Reporte_MaquilasComponent implements OnInit {
           this.llenartTablaConsolidado(datos[i]);
         }
         setTimeout(() => { this.cargando = false; }, datos.length * 5);
-      }, error => { this.mostrarError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); this.cargando = false; });
     }
   }
 
@@ -478,7 +483,7 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.crearPDF_Orden(id); }, 2500);
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); this.cargando = false; });
   }
 
   // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
@@ -663,7 +668,7 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); this.cargando = false; });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -706,23 +711,6 @@ export class Reporte_MaquilasComponent implements OnInit {
     let tercero : any = this.FormConsultarFiltros.value.tercero;
     let nuevo : any[] = this.arrayTerceros.filter((item) => item.tercero_Id == tercero);
     setTimeout(() => { this.FormConsultarFiltros.patchValue({tercero: nuevo[0].tercero_Nombre, id_tercero: nuevo[0].tercero_Id });}, 30);
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-   this.cargando = false;
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
-   this.cargando = false;
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

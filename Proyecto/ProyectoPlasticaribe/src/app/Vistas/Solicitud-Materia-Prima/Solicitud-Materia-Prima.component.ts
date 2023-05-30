@@ -9,6 +9,7 @@ import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaP
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
@@ -57,7 +58,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
                             private tintaService : TintasService,
                               private boppService : EntradaBOPPService,
                                 private solicitudService : SolicitudMateriaPrimaService,
-                                  private dtSolicitudService : DetalleSolicitudMateriaPrimaService,) {
+                                  private dtSolicitudService : DetalleSolicitudMateriaPrimaService,
+                                    private msj : MensajesAplicacionService ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formSolicitud = this.frmBuilder.group({
@@ -103,18 +105,6 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
-  }
-
-  // Funcion que va a mostrar un mensaje satisfactorio
-  mensajeSatisfactorio = (titulo : string, mensaje : string) => this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life : 2000});
-
-  // Funcion que va a ejecutar un mensaje de advertencia
-  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life : 2000});
-
-  // Funcion que va a ejecutar un mensaje de error
-  mensajeError(titulo : string, mensaje : string){
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life : 2000});
-    this.cargando = false;
   }
 
   // Función para quitar mensaje de elección
@@ -168,7 +158,10 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           Categoria : datos_materiaPrima[i].categoria,
         });
       }
-    }, error => { this.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, error => {
+      this.msj.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`);
+      this.cargando = false;
+  });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -192,9 +185,9 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           this.materiasPrimasSeleccionada_ID.push(this.formMateriaPrima.value.Id);
           this.materiasPrimasSeleccionadas.push(info);
           this.formMateriaPrima.reset();
-        } else this.mensajeAdvertencia(`¡La cantidad de la materia prima seleccionada debe ser mayor a 0!`);
-      } else this.mensajeAdvertencia(`¡La materia prima '${this.formMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor a 0!`);
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.formMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Función que va a mandar un mensaje de confirmación para quitar materias primas seleccionadas previamente
@@ -217,7 +210,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.cerrarMensaje('quitar');
     this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == this.mpSeleccionada.Id), 1);
     this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == this.mpSeleccionada.Id), 1);
-    this.mensajeSatisfactorio(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
+    this.msj.mensajeConfirmacion(`Confirmación`, `Se ha quitado la materia prima seleccionada de la tabla!`);
   }
 
   // Funcion que enviará un mensaje de confirmación para validar que si se desea eliminar la materia prima escogida
@@ -241,7 +234,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.dtSolicitudService.GetMateriaPrimaSolicitud(this.formSolicitud.value.Id_Solicitud, this.mpSeleccionada.Id).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.dtSolicitudService.Delete(data[i].dtSolicitud_Id).subscribe(datos => {
-          this.mensajeSatisfactorio(`¡Materia Prima Eliminada!`, `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
+          this.msj.mensajeConfirmacion(`¡Materia Prima Eliminada!`, `¡Se ha eliminado la materia prima con el ID ${this.mpSeleccionada.Id} de la solicitud!`);
         });
       }
     });
@@ -251,7 +244,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   // Función que va a validar si la información para crear la solicitud es correcta
   validarDatosSolicitud(){
     if (this.materiasPrimasSeleccionadas.length > 0) !this.edicionSolicitud ? this.crearSolicitud() : this.editarSolicitud();
-    else this.mensajeAdvertencia(`¡Debe seleccionar al menos una materia prima!`);
+    else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar al menos una materia prima!`);
   }
 
   // Función que va a crear una solicitud de materia prima
@@ -265,7 +258,10 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       Estado_Id: 11,
     }
     this.solicitudService.Post(info).subscribe(data => this.crearDetallesSolicitud(data.solicitud_Id),
-    error => this.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la solicitud de materia prima!`));
+    error => {
+      this.msj.mensajeError(`¡No fue posible crear la solicitud!`, `¡Ocurrió un error al intentar crear la solicitud de materia prima!`);
+      this.cargando = false;
+    })
   }
 
   // Función que va a crear los detalles de solicitud de materia prima
@@ -281,14 +277,17 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
         Estado_Id: 11
       }
-      this.dtSolicitudService.Post(info).subscribe(data => this.mensajeSatisfactorio(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`),
+      this.dtSolicitudService.Post(info).subscribe(data => this.msj.mensajeConfirmacion(`¡Se ha creado la solicitud de materia prima!`, `¡Se creó correctamente la solicitud de materia prima!`),
       error => err = true);
     }
     setTimeout(() => {
       if (!err) {
         this.buscarInfoSolicitud_PDF(solicitud_Id);
         this.limpiarTodo();
-      } else this.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentear guardar las materias primas de la solicitud!`);
+      } else {
+        this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentear guardar las materias primas de la solicitud!`);
+        this.cargando = false;
+      }
     }, 1500);
   }
 
@@ -328,8 +327,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           this.materiasPrimasSeleccionada_ID.push(info.Id);
           this.materiasPrimasSeleccionadas.push(info);
         }
-      }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
-    } else this.mensajeAdvertencia(`¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
+      }, error => { this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`); this.cargando = false });
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a editar la información de la solicitud
@@ -344,7 +343,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       Estado_Id: 11,
     }
     this.solicitudService.Put(this.formSolicitud.value.Id_Solicitud, info).subscribe(data => this.editarDtSolicitud(info.Solicitud_Id),
-    error => this.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`));
+    error => { this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentar editar la solicitud de materia prima!`); this.cargando = false; });
   }
 
   // Funcion que agregará las materias primas a la solicitud que está siendo editada
@@ -362,7 +361,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
           Estado_Id: 11
         }
-        this.dtSolicitudService.Post(info).subscribe(datos => this.mensajeSatisfactorio(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`),
+        this.dtSolicitudService.Post(info).subscribe(datos => this.msj.mensajeConfirmacion(`¡Se ha editado la solicitud de materia prima!`, `¡Se editó correctamente la solicitud de materia prima!`),
         error => err = true);
       });
     }
@@ -370,7 +369,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
       if (!err) {
         this.buscarInfoSolicitud_PDF(solicitud_Id);
         this.limpiarTodo();
-      } else this.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentear guardar las materias primas de la solicitud!`);
+      } else this.msj.mensajeError(`¡No fue posible editar la solicitud!`, `¡Ocurrió un error al intentear guardar las materias primas de la solicitud!`);
     }, 1500);
   }
 
@@ -407,8 +406,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
         setTimeout(() => this.crearPDF(solicitud_Id), 1000);
-      }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
-    } else this.mensajeAdvertencia(`¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
+      }, error => { this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`); this.cargando = false;});
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear un pdf de la solicitud creada o editada
@@ -527,7 +526,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => this.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
+    }, error => { this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`); this.cargando = false; });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

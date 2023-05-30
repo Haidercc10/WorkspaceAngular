@@ -8,10 +8,10 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
 import { Movimientos_MantenimientoComponent } from '../Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
-import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
 import { stepsReporteActivos as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,8 +44,8 @@ export class Reporte_MantenimientoComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private activosService : ActivosService,
                     private tipoActivoService : Tipo_ActivoService,
-                      private messageService: MessageService,
-                        private shepherdService: ShepherdService) {
+                        private shepherdService: ShepherdService,
+                          private msj : MensajesAplicacionService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormActivos = this.frmBuilderMateriaPrima.group({
@@ -72,7 +72,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.InformacionActivos.length == 0) this.mostrarAdvertencia(`Advertencia`, `¡Debe haber activos en la tabla para poder exportar la información a Excel!`);
+    if (this.InformacionActivos.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe haber activos en la tabla para poder exportar la información a Excel!`);
     else {
       this.cargando = true;
       setTimeout(() => {
@@ -135,7 +135,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
           });
           this.cargando = false;
         }, 500);
-        this.mostrarConfirmacion(`Confirmación`,`Archivo de excel generado con éxito!`);
+        this.msj.mensajeConfirmacion(`Confirmación`,`Archivo de excel generado con éxito!`);
       }, 2000);
     }
   }
@@ -153,9 +153,9 @@ export class Reporte_MantenimientoComponent implements OnInit {
         this.activosService.GetInfoActivos(datos_activos[i].actv_Id).subscribe(datos_infoActivos => {
           if (datos_infoActivos == null) this.llenarTablaSinMantenimientos(datos_activos[i]);
           else this.llenarTabla(datos_infoActivos);
-        }, error => { this.mostrarError(`Error`, `¡No se ha podido buscar la información del activo ${datos_activos[i].actv_Nombre}!`); });
+        }, error => { this.msj.mensajeError(`Error`, `¡No se ha podido buscar la información del activo ${datos_activos[i].actv_Nombre}!`); });
       }
-    }, error => { this.mostrarError(`Error`, `¡No se han podido consultar los activos!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se han podido consultar los activos!`); });
   }
 
   // Funcion que va a llenar la tabla con la información proveniente de la consulta
@@ -217,28 +217,13 @@ export class Reporte_MantenimientoComponent implements OnInit {
           });
           this.movimientosActivos.consultar();
         }
-      }, error => { this.mostrarError(`Error`, `¡No fue posible buscar el activo ${data.Nombre}!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No fue posible buscar el activo ${data.Nombre}!`); });
     }, 50);
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
-  }
-
-    /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

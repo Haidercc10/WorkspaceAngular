@@ -14,6 +14,7 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
 import { OcompraComponent } from '../ocompra/ocompra.component';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,14 +41,14 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   cantFinalizadas : number = 0; /** Variable que mostrará el número de solicitudes finalizadas */
   cantCanceladas : number = 0; /** Variable que mostrará el número de solicitudes canceladas */
   @ViewChild(OcompraComponent) OrdenCompra : OcompraComponent;
-  informacionPDF: any;
+  informacionPDF: any; /** Variable que contendrá la información del PDF */
   arrayMatPrimas : any = []; /** Array que cargará las materias primas de la solicitud seleccionada */
   solicitudSeleccionada : number = 0; /** Nro de la solicitud seleccionada */
-  usuarioSolicitante : string = ''
-  modalOc : boolean = false;
+  usuarioSolicitante : string = '' /** Variable que contendrá el nombre del usuario que solicitó la materia prima. */
+  modalOc : boolean = false; /** Variable que validará que se cargue o no, el componente del modal de ordenes de compras. */
   cantParciales : number = 0; /** Variable que mostrará el número de solicitudes parciales */
   estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
-  clave : string = '';
+  clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -55,7 +56,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
                       private AppComponent : AppComponent,
                         private servicioEstados : EstadosService,
                           private servicioSolicitudesMP : SolicitudMateriaPrimaService,
-                            private servicioDtSolicitudesMP : DetalleSolicitudMateriaPrimaService) {
+                            private servicioDtSolicitudesMP : DetalleSolicitudMateriaPrimaService,
+                              private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       documento : [null],
@@ -141,7 +143,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -150,7 +152,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null && fechaFinal != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -159,7 +161,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && fechaFinal != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaFinal, estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -168,7 +170,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && fechaInicial != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -177,13 +179,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null && estado != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
           this.llenarTabla(data[index]);
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && fechaFinal != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaFinal).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -192,7 +194,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null && estado != null) {
       this.servicioSolicitudesMP.getFechasEstado(fechaInicial, fechaInicial, estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -201,7 +203,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(solicitud != null) {
       this.servicioDtSolicitudesMP.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -210,7 +212,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(estado != null) {
       this.servicioSolicitudesMP.getEstados(estado).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -219,7 +221,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else if(fechaInicial != null) {
       this.servicioSolicitudesMP.getFechas(fechaInicial, fechaInicial).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -228,7 +230,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     } else {
       this.servicioSolicitudesMP.getFechas(this.today, this.today).subscribe(data => {
         for (let index = 0; index < data.length; index++) {
@@ -237,7 +239,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
             arrayId.push(data[index].consecutivo);
           }
         }
-      }, error => { this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
+      }, error => { this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados con los filtros de búsqueda seleccionados`); });
     }
     setTimeout(() => { this.cargando = false; }, 1500);
   }
@@ -257,15 +259,6 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
 
   /** Función para filtrar los registros de la tabla */
   aplicarFiltro = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-
-   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion = (titulo : any, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 3000});
-
-  /** Mostrar mensaje de error  */
-  mostrarError = (titulo : any, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail:  mensaje, life : 5000});
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia = (titulo : any, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 4000});
 
   // Funcion que va a consultar los detalles del pdf
   llenarInfoPdf(solicitud_Id : number = 0){
@@ -299,7 +292,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.generarPDF(solicitud_Id); }, 1000);
-    }, error => this.mostrarError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
+    }, error => this.msj.mensajeError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
   }
 
   // Funcion que va a crear un pdf de las solicitudes de materia prima
@@ -447,7 +440,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => this.mostrarError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
+    }, error => this.msj.mensajeError(`Error`, `No se encontró información sobre la solicitud N° ${solicitud_Id}!`));
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -546,7 +539,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     solicitud_Id = this.solicitudSeleccionada;
     this.clave = palabraClave;
     setTimeout(() => {
-      if (this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.mostrarAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
+      if (this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') this.msj.mensajeAdvertencia(`Advertencia`, `No es posible ${this.clave} solicitudes con estado ${this.estadoSolicitud}!`);
       else this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea ${this.clave} la solicitud N° ${solicitud_Id}?`, sticky: true});
     }, 1000);
   }
@@ -570,7 +563,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
         Estado_Id: this.clave == 'finalizar' ? 5 : 4
       }
       this.servicioSolicitudesMP.Put(solicitud_Id, modelo).subscribe(updateData => this.cancelarFinalizarDtlSolicitud(),
-      error => this.mostrarError(`¡Error!`, `No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
+      error => this.msj.mensajeError(`¡Error!`, `No fue posible actualizar el encabezado de la solicitud N° ${solicitud_Id}`));
    });
   }
 
@@ -591,13 +584,13 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
       if(this.arrayMatPrimas[i].Estado == 'Parcial') {
         modelo.Estado_Id = 5
         this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData =>  error = false, err => {
-          this.mostrarError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
+          this.msj.mensajeError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
           error = true;
         });
       } else if(this.arrayMatPrimas[i].Estado == 'Pendiente') {
         modelo.Estado_Id = 4
         this.servicioDtSolicitudesMP.Put(this.arrayMatPrimas[i].Codigo, modelo).subscribe(updateData => error = false, err => {
-          this.mostrarError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
+          this.msj.mensajeError(`¡Error!`, `No fue posible actualizar el detalle de la solicitud N° ${this.arrayMatPrimas.Solicitud}`);
           error = true;
         });
       }
@@ -605,7 +598,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     setTimeout(() => {
       if(!error) {
         this.cargando = false;
-        this.mostrarConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
+        this.msj.mensajeConfirmacion(`Confirmación`, `Estado de la solicitud actualizado exitosamente!`);
         this.getEstadoSolitudes();
         this.consultarFiltros();
       }
@@ -615,7 +608,7 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
   /** Función que cargará el modal de ordenes de compra y allí consultará la solicitud seleccionada. */
   cargarModalCrearOrden(){
     if(this.estadoSolicitud == 'Finalizado' || this.estadoSolicitud == 'Cancelado') {
-      this.mostrarAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
+      this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear ordenes de compras con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalOc = true;
       this.OrdenCompra.solicitud = true;

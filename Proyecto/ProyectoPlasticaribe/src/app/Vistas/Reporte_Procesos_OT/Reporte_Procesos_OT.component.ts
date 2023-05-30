@@ -18,6 +18,7 @@ import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +80,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             private usuarioService : UsuarioService,
                               private clientesService : ClientesService,
                                 private messageService: MessageService,
-                                  private shepherdService: ShepherdService) {
+                                  private shepherdService: ShepherdService,
+                                    private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -141,7 +143,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayDocumento.length == 0) this.mensajeAdvertencia('¡Advertencia!',"¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
+    if (this.ArrayDocumento.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',"¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
@@ -406,7 +408,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             fs.saveAs(blob, `Reporte de OT por Procesos - ${this.today}.xlsx`);
-            this.mensajeConfirmacion('¡Archivo Creado!', '¡Se ha exportado la información a un archivo de tipo Excel!');
+            this.msj.mensajeConfirmacion('¡Archivo Creado!', '¡Se ha exportado la información a un archivo de tipo Excel!');
           });
           this.load = true;
         }, 1000);
@@ -522,7 +524,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     else if (numOT != null && fechaincial != null && fechaFinal != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -531,11 +533,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
       masDeUnFiltros = false;
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { this.mensajeAdvertencia(`Advertencia`, 'Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-      else if (fechaFinal < fechaincial) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!','La fecha final debe ser mayor que la fecha inicial');}, 4800);
+      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { this.msj.mensajeAdvertencia(`Advertencia`, 'Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
+      else if (fechaFinal < fechaincial) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','La fecha final debe ser mayor que la fecha inicial');}, 4800);
       else {
         this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-          if(datos_ot.length == 0) {setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!','No existen OTs creadas en las fechas consultadas.')}, 4800);
+          if(datos_ot.length == 0) {setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','No existen OTs creadas en las fechas consultadas.')}, 4800);
           } else {
             for (let i = 0; i < datos_ot.length; i++) {
               this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
@@ -550,7 +552,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (fechaincial != null && fechaFinal != null && fallas != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFechasFallas(fechaincial, fechaFinal, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -560,7 +562,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (fechaincial != null && fechaFinal != null && estado != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -588,7 +590,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     else if (numOT != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!','No se encontró la OT consultada.');}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','No se encontró la OT consultada.');}, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -598,7 +600,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (fallas != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!','No se encontraron OTs con la falla consultada.'); }, 3000);
+        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!','No se encontraron OTs con la falla consultada.'); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -608,7 +610,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (vendedor != null) {
       masDeUnFiltros = false;
       this.srvEstadosOTVendedores.consultarPorFechasVendedor(this.today, this.today, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`); }, 4800);
+        if(datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`); }, 4800);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
@@ -622,7 +624,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (estado != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOtEstado(estado).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`);}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -632,7 +634,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (cliente != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorCliente(cliente).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Cliente consultado.`);}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Cliente consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -642,7 +644,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     } else if (producto != null) {
       masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorProductos(producto).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el producto consultado.`);}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el producto consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i]);
@@ -657,7 +659,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       if(fechaincial == null) fechaincial = this.today;
       if(fechaFinal == null) fechaFinal = fechaincial;
         this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal, ruta).subscribe(datos_ot => {
-          if (datos_ot.length == 0) setTimeout(() => { this.mensajeAdvertencia('¡Advertencia!',`¡No se encontraron Ordenes de Trabajo con los parametros consultados!`); }, 3000);
+          if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`¡No se encontraron Ordenes de Trabajo con los parametros consultados!`); }, 3000);
           else {
             for (let i = 0; i < datos_ot.length; i++) {
               this.llenarArray(datos_ot[i]);
@@ -743,7 +745,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     if (proceso == 'EXTRUSION' && form.ext > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -789,7 +791,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     } else if (proceso == 'IMPRESION' && form.imp > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusImpresion(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -832,7 +834,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'ROTOGRABADO' && form.rot > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusRotograbado(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -875,7 +877,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'DOBLADO' && form.dbl > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusDoblado(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -918,7 +920,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'LAMINADO' && form.lam > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusLaminado(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -961,7 +963,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'CORTE' && form.cor > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusCorte(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -1004,7 +1006,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'EMPAQUE' && form.emp > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusEmpaque(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -1047,7 +1049,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'SELLADO' && form.sel > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusSellado(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -1089,7 +1091,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (proceso == 'Wiketiado' && form.wik > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusWiketiado(this.otSeleccionada).subscribe(registros_OT => {
-        if (registros_OT.length == 0) this.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+        if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
           setTimeout(() => {
@@ -1144,7 +1146,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     let falla : number = this.formularioOT.value.fallasOT;
     let observacion : string = this.formularioOT.value.ObservacionOT;
 
-    if(this.otSeleccionada == 0) this.mensajeAdvertencia('¡Advertencia!','Debe seleccionar una OT');
+    if(this.otSeleccionada == 0) this.msj.mensajeAdvertencia('¡Advertencia!','Debe seleccionar una OT');
 
     this.estadosProcesos_OTService.srvObtenerListaPorOT(this.otSeleccionada).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
@@ -1172,10 +1174,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
         }
         /**/
-        if (falla == null) this.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.")
+        if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.")
         else {
           this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(datos_ot => {
-            this.mensajeConfirmacion('¡Falla Agregada!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
+            this.msj.mensajeConfirmacion('¡Falla Agregada!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
             this.limpiarCampos();
           });
         }
@@ -1305,7 +1307,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             estado : estadoFinal,
           }
           this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(datos_clientesOT => {
-            this.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
+            this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
           });
         }
       });

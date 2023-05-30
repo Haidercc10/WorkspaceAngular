@@ -7,10 +7,10 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { OcompraComponent } from '../ocompra/ocompra.component';
-import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
 import { stepsMovOrdenCompra as defaultSteps, defaultStepOptions } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -40,8 +40,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                 private AppComponent : AppComponent,
                   private estadosService : EstadosService,
                     private dtOrdenCompraService : DetallesOrdenesCompraService,
-                      private messageService: MessageService,
-                        private shepherdService: ShepherdService) {
+                        private shepherdService: ShepherdService,
+                          private msj : MensajesAplicacionService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
@@ -109,7 +109,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (oc != null && fechaFinal != null && fechaInicial) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -117,7 +117,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (oc != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -125,7 +125,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (datos_orden[i].estado_Id == estado && datos_orden[i].fecha == fechaInicial) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (fechaFinal != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -133,14 +133,14 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (oc != null && fechaInicial != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
           if (datos_orden[i].fecha == fechaInicial) this.llenarTabla(datos_orden)[i];
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (oc != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -148,7 +148,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (datos_orden[i].estado_Id == estado) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -156,7 +156,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (fechaInicial != null && fechaFinal != null) {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -164,7 +164,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (oc != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -172,7 +172,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (fechaInicial != null) {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaInicial).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -180,7 +180,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else if (estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_Estado(estado).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -188,7 +188,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     } else {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(this.today, this.today).subscribe(datos_orden => {
         size_query = datos_orden.length;
@@ -196,7 +196,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
           ocConsultadas.push(datos_orden[i].consecutivo);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
     }
     setTimeout(() => { this.cargando = false; }, 2000);
   }
@@ -249,7 +249,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.generarPDF(oc); }, 2500);
-    }, error => { this.mostrarError(`¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -480,7 +480,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
+    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -564,23 +564,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
           this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
         }
-      }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`); });
+      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`); });
     }
-  }
-
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-  }
-
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
-  }
-
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
   }
 
    /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

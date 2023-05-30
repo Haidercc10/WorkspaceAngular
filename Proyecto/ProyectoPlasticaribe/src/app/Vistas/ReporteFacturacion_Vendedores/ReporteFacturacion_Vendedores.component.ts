@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardVentasVendedor as defaultSteps } from 'src/app/data';
@@ -40,8 +40,8 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private usuarioService : UsuarioService,
-                    private messageService: MessageService,
-                      private shepherdService: ShepherdService) {
+                      private shepherdService: ShepherdService,
+                        private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -128,7 +128,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
         this.consultarConsolidado();
       }, 1500);
     } else {
-      this.mensajeAdvertencia(`¡Ya se ha graficado la información del vendedor con el código ${vendedor} en el año ${this.anioSeleccionado}!`);
+      this.msj.mensajeAdvertencia(`Advertencia`, `¡Ya se ha graficado la información del vendedor con el código ${vendedor} en el año ${this.anioSeleccionado}!`);
       this.cargando = false;
     }
   }
@@ -142,7 +142,7 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     else if (vendedor.length == 1) vendedor = `00${vendedor}`;
 
     this.zeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, `?vendedor=${vendedor}`).subscribe(datos_consolidado => {
-      if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+      if(datos_consolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
       else {
         for (let i = 0; i < datos_consolidado.length; i++) {
           this.llenarConsolidado(datos_consolidado[i]);
@@ -243,7 +243,4 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     }
     return total;
   }
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
 }

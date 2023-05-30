@@ -17,6 +17,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
 import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -85,10 +86,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   private categoriMpService : CategoriaMateriaPrimaService,
                     private AppComponent : AppComponent,
                       private boppService : EntradaBOPPService,
-                        private messageService: MessageService,
                           private shepherdService: ShepherdService,
                             private frmBuilder : FormBuilder,
-                              private undMedidaService : UnidadMedidaService,) {
+                              private undMedidaService : UnidadMedidaService,
+                                private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormEdicionMateriaPrima = this.frmBuilder.group({
       Id : [null, Validators.required],
@@ -464,19 +465,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           fs.saveAs(blob, `Inventario Materia Prima - ${this.today}.xlsx`);
         });
         this.load = true;
-        this.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del inventario de materia prima!`);
+        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del inventario de materia prima!`);
       }, 1000);
     }, 1500);
   }
-
-  /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity: 'success', summary: titulo,  detail: mensaje, life: 2000});
-
-  /** Mostrar mensaje de error  */
-  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-
-  /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
@@ -539,10 +531,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }
       this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
         this.consultarInventario();
-        this.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
+        this.msj.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
         this.modalEditarMateriasPrimas = false;
       }, () => {
-        this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la materia prima!`);
+        this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la materia prima!`);
         this.modalEditarMateriasPrimas = false;
       });
     } else if (this.categoriasTintas.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
@@ -563,10 +555,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
         this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
           this.consultarInventario();
-          this.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
+          this.msj.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
           this.modalEditarMateriasPrimas = false;
         }, () => {
-          this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la tinta!`);
+          this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la tinta!`);
           this.modalEditarMateriasPrimas = false;
         })
       });
@@ -593,10 +585,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
             this.consultarInventario();
-            this.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
+            this.msj.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
             this.modalEditarMateriasPrimas = false;
           }, () => {
-            this.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar el biorientado!`);
+            this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar el biorientado!`);
             this.modalEditarMateriasPrimas = false;
           })
         }
