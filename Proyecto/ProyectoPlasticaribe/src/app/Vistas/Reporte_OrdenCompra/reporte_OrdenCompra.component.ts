@@ -232,8 +232,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           Nombre : '',
           Cantidad : this.formatonumeros(datos_orden[i].cantidad),
           Medida : datos_orden[i].unidad_Medida,
-          Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-          SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+          Precio : `$${this.formatonumeros((datos_orden[i].precio_Unitario).toFixed(2))}`,
+          SubTotal : `${this.formatonumeros((datos_orden[i].cantidad * datos_orden[i].precio_Unitario).toFixed(2))}`,
         }
         if (info.Id_Mp != 84) {
           info.Id = info.Id_Mp;
@@ -414,7 +414,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_orden[i].peso_Total)}`
+                      text: `${this.formatonumeros((datos_orden[i].peso_Total).toFixed(2))}`
                     },
                     '',
                     {
@@ -423,7 +423,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total)}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total).toFixed(2))}`
                     },
                   ],
                   [
@@ -437,7 +437,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total * 0.19)}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total * 0.19).toFixed(2))}`
                     },
                   ],
                   [
@@ -451,7 +451,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19))}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19)).toFixed(2))}`
                     },
                   ],
                 ]

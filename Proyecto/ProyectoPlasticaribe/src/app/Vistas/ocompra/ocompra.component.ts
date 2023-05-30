@@ -570,8 +570,13 @@ export class OcompraComponent implements OnInit {
     this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {
-          info: { title: `Orden de Compra N° ${datos_orden[i].consecutivo}` },
-          pageSize: { width: 630, height: 760 },
+          info: {
+            title: `Orden de Compra N° ${datos_orden[i].consecutivo}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -586,8 +591,17 @@ export class OcompraComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
-                { text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`, alignment: 'right', style: 'titulo', margin: 30 }
+                {
+                  image : logoParaPdf,
+                  width : 220,
+                  height : 50
+                },
+                {
+                  text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
               ]
             },
             '\n \n',
@@ -671,7 +685,7 @@ export class OcompraComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    `Nombre: ${datos_orden[i].proveedor}`,
+                    {text: `Nombre: ${datos_orden[i].proveedor}`, bold: true},
                     `ID: ${datos_orden[i].proveedor_Id}`,
                     `Tipo de ID: ${datos_orden[i].tipo_Id}`,
                   ],
@@ -688,7 +702,7 @@ export class OcompraComponent implements OnInit {
                 ]
               },
               layout: 'lightHorizontalLines',
-              fontSize: 11,
+              fontSize: 10,
             },
             {
               text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
@@ -712,7 +726,7 @@ export class OcompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_orden[i].peso_Total)}`
+                      text: `${this.formatonumeros((datos_orden[i].peso_Total).toFixed(2))}`
                     },
                     '',
                     {
@@ -721,7 +735,7 @@ export class OcompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total)}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total).toFixed(2))}`
                     },
                   ],
                   [
@@ -735,7 +749,7 @@ export class OcompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total * 0.19)}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total * 0.19).toFixed(2))}`
                     },
                   ],
                   [
@@ -749,7 +763,7 @@ export class OcompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros(datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19))}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19)).toFixed(2))}`
                     },
                   ],
                 ]
@@ -763,8 +777,14 @@ export class OcompraComponent implements OnInit {
             }
           ],
           styles: {
-            header: { fontSize: 10, bold: true },
-            titulo: { fontSize: 20, bold: true }
+            header: {
+              fontSize: 10,
+              bold: true
+            },
+            titulo: {
+              fontSize: 20,
+              bold: true
+            }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
