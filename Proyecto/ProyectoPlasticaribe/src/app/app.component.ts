@@ -140,12 +140,9 @@ export class AppComponent implements OnInit{
   reiniciarTiempo() : any{
     let t : any;
     let estadoConexion : boolean = window.navigator.onLine;
-    if (window.location.pathname != '/' && !estadoConexion) {
-      localStorage.clear();
-      window.location.pathname = '/';
-    }
+    if (window.location.pathname != '/' && !estadoConexion) this.tiempoExcedido();
     clearTimeout(t);
-    t = setTimeout(this.tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
+    t = setTimeout(() => this.tiempoExcedido(), 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
   }
 
   // Funcion que se va a ejecutar cuando se exceda el tiempo de espera
