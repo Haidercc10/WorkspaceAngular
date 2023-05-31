@@ -334,48 +334,38 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   obtenerProcesoId(asigncaion : number){
     if (!this.error) {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-        this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
-          for (let i = 0; i < datos_proceso.length; i++) {
-            if (datos_proceso[i].proceso_Nombre == this.materiasPrimasSeleccionadas[index].Proceso) {
-              let idMateriaPrima = this.materiasPrimasSeleccionadas[index].Id;
-              let cantidadMateriaPrima = this.materiasPrimasSeleccionadas[index].Cantidad;
-              let presentacionMateriaPrima = this.materiasPrimasSeleccionadas[index].Und_Medida;
-              if (this.materiasPrimasSeleccionadas[index].Id_Mp == 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001) {
-                const datosDetallesAsignacionTintas : any = {
-                  AsigMp_Id : asigncaion,
-                  Tinta_Id : idMateriaPrima,
-                  DtAsigTinta_Cantidad : cantidadMateriaPrima,
-                  UndMed_Id : presentacionMateriaPrima,
-                  Proceso_Id : datos_proceso[i].proceso_Id,
-                }
-                this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(() => {}, () => {
-                  this.error = true;
-                  this.load = true;
-                  this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
-                });
-                this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
-              } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
-                const datosDetallesAsignacion : any = {
-                  AsigMp_Id : asigncaion,
-                  MatPri_Id : idMateriaPrima,
-                  DtAsigMp_Cantidad : cantidadMateriaPrima,
-                  UndMed_Id : presentacionMateriaPrima,
-                  Proceso_Id : datos_proceso[i].proceso_Id,
-                }
-                this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(() => {}, () => {
-                  this.error = true;
-                  this.load = true;
-                  this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
-                });
-                this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
-              }
-            }
+        let idMateriaPrima = this.materiasPrimasSeleccionadas[index].Id;
+        let cantidadMateriaPrima = this.materiasPrimasSeleccionadas[index].Cantidad;
+        let presentacionMateriaPrima = this.materiasPrimasSeleccionadas[index].Und_Medida;
+        if (this.materiasPrimasSeleccionadas[index].Id_Mp == 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001) {
+          const datosDetallesAsignacionTintas : any = {
+            AsigMp_Id : asigncaion,
+            Tinta_Id : idMateriaPrima,
+            DtAsigTinta_Cantidad : cantidadMateriaPrima,
+            UndMed_Id : presentacionMateriaPrima,
+            Proceso_Id : this.materiasPrimasSeleccionadas[index].Proceso,
           }
-        }, () => {
-          this.error = true;
-          this.load = true;
-          this.mensajeService.mensajeError(`¡Error!`, `¡Error al consultar el proceso!`);
-        });
+          this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(() => {}, () => {
+            this.error = true;
+            this.load = true;
+            this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
+          });
+          this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
+        } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
+          const datosDetallesAsignacion : any = {
+            AsigMp_Id : asigncaion,
+            MatPri_Id : idMateriaPrima,
+            DtAsigMp_Cantidad : cantidadMateriaPrima,
+            UndMed_Id : presentacionMateriaPrima,
+            Proceso_Id : this.materiasPrimasSeleccionadas[index].Proceso,
+          }
+          this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(() => {}, () => {
+            this.error = true;
+            this.load = true;
+            this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
+          });
+          this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
+        }
       }
       setTimeout(() => { if (!this.error) this.asignacionExitosa(); }, 3500);
     }
