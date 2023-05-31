@@ -437,7 +437,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros((datos_orden[i].valor_Total * 0.19).toFixed(2))}`
+                      text: `$${this.formatonumeros(((datos_orden[i].valor_Total * datos_orden[i].iva) / 100).toFixed(2))}`
                     },
                   ],
                   [
@@ -451,7 +451,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `$${this.formatonumeros((datos_orden[i].valor_Total + (datos_orden[i].valor_Total * 0.19)).toFixed(2))}`
+                      text: `$${this.formatonumeros((datos_orden[i].valor_Total + ((datos_orden[i].valor_Total * datos_orden[i].iva) / 100)).toFixed(2))}`
                     },
                   ],
                 ]

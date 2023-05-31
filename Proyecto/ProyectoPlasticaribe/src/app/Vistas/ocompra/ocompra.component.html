@@ -47,7 +47,7 @@
       <div class="row g-4">
 
         <!-- Consecutivo de la orden de compra -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText required/>
@@ -56,16 +56,16 @@
         </div>
 
         <!-- Código de solicitus -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="solicitud">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="solicitud">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Solicitud" id="Solicitud" type="text" (keyup.enter)="consultarSolicitudMP()" pInputText/>
+            <input formControlName="Solicitud" id="Solicitud" type="number" (keyup.enter)="consultarSolicitudMP()" pInputText/>
             <label for="Solicitud">Num. Solicitud</label>
           </span>
         </div>
 
         <!-- Proveedor -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-5 col-xxl-5">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Proveedor" id="Proveedores" autocomplete="off" list="Proveedor" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" required/>
@@ -76,8 +76,16 @@
           </span>
         </div>
 
+        <!-- IVA -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="cantidadMatPrima">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="iva" inputId="iva" mode="decimal" [(ngModel)]="iva" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="iva">IVA(%)</label>
+          </span>
+        </div>
+
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -182,7 +190,7 @@
             <th scope="col">Und. Medida</th>
             <th scope="col">Precio Unitario</th>
             <th scope="col">Subtotal</th>
-            <th scope="col">IVA 19%</th>
+            <th scope="col">IVA {{iva}}%</th>
             <th scope="col">Valor Total</th>
             <th scope="col">Acción</th>
           </tr>
@@ -204,8 +212,8 @@
             <td>{{materiasPrimas.Und_Medida}}</td>
             <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td>
             <td>{{materiasPrimas.SubTotal | currency : 'COP $'}}</td>
-            <td>{{(materiasPrimas.SubTotal * .19) | currency : 'COP $'}}</td>
-            <td>{{materiasPrimas.SubTotal + (materiasPrimas.SubTotal * .19) | currency : 'COP $'}}</td>
+            <td>{{((materiasPrimas.SubTotal * iva) / 100) | currency : 'COP $'}}</td>
+            <td>{{((materiasPrimas.SubTotal * iva) / 100) + (materiasPrimas.SubTotal) | currency : 'COP $'}}</td>
             <td id="quitarMp" class="text-center">
               <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
               <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
