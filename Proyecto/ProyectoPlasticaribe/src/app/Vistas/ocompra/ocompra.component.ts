@@ -449,7 +449,7 @@ export class OcompraComponent implements OnInit {
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
       if (solicitud != null && solicitud != '') this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
-      this.mostrarEleccion(0, 'pdf');
+      this.buscarinfoOrdenCompra();
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al crear la orden de compra!`);
@@ -546,34 +546,36 @@ export class OcompraComponent implements OnInit {
   buscarinfoOrdenCompra(){
     this.onReject();
     this.cargando = true;
-    this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
-      for (let i = 0; i < datos_orden.length; i++) {
-        let info : any = {
-          Id : 0,
-          Id_Mp: datos_orden[i].mP_Id,
-          Id_Tinta: datos_orden[i].tinta_Id,
-          Id_Bopp: datos_orden[i].bopp_Id,
-          Nombre : '',
-          Cantidad : this.formatonumeros(datos_orden[i].cantidad),
-          Medida : datos_orden[i].unidad_Medida,
-          Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-          SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+    setTimeout(() => {
+      this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
+        for (let i = 0; i < datos_orden.length; i++) {
+          let info : any = {
+            Id : 0,
+            Id_Mp: datos_orden[i].mP_Id,
+            Id_Tinta: datos_orden[i].tinta_Id,
+            Id_Bopp: datos_orden[i].bopp_Id,
+            Nombre : '',
+            Cantidad : this.formatonumeros(datos_orden[i].cantidad),
+            Medida : datos_orden[i].unidad_Medida,
+            Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
+            SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+          }
+          if (info.Id_Mp != 84) {
+            info.Id = info.Id_Mp;
+            info.Nombre = datos_orden[i].mp;
+          } else if (info.Id_Tinta != 2001) {
+            info.Id = info.Id_Tinta;
+            info.Nombre = datos_orden[i].tinta;
+          } else if (info.Id_Bopp != 1) {
+            info.Id = info.Id_Bopp;
+            info.Nombre = datos_orden[i].bopp;
+          }
+          this.informacionPDF.push(info);
+          this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
-        if (info.Id_Mp != 84) {
-          info.Id = info.Id_Mp;
-          info.Nombre = datos_orden[i].mp;
-        } else if (info.Id_Tinta != 2001) {
-          info.Id = info.Id_Tinta;
-          info.Nombre = datos_orden[i].tinta;
-        } else if (info.Id_Bopp != 1) {
-          info.Id = info.Id_Bopp;
-          info.Nombre = datos_orden[i].bopp;
-        }
-        this.informacionPDF.push(info);
-        this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-      }
-      setTimeout(() => {this.generarPDF(); }, 2500);
-    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
+        this.generarPDF();
+      }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
+    }, 100);
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -802,7 +804,7 @@ export class OcompraComponent implements OnInit {
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
         this.ordenCreada = 0;
-        this.limpiarTodo();
+        setTimeout(() => this.limpiarTodo(), 1500);
         break;
       }
     }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });

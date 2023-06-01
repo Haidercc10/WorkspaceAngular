@@ -1,16 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte_Consolidado_Facturacion',
@@ -115,8 +114,12 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
   cargarClientes(){
     let cliente : any = this.formFiltros.value.cliente;
-    if(this.formFiltros.value.vendedor == null) {
-      if(cliente != null) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
+    let vendedor = this.storage_Id.toString();
+    if (vendedor.length == 2) vendedor = `0${vendedor}`;
+    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+    if(cliente != null && cliente.length > 2){
+      if(this.formFiltros.value.vendedor == null) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);
+      else this.invetarioZeusService.GetCliente_Vendedor_LikeNombre(vendedor, cliente).subscribe(data => this.arrayClientes = data);
     }
   }
 
@@ -144,12 +147,6 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
       vendedor: nuevo[0].nombvende,
       idvendedor : nuevo[0].idvende,
     });
-    this.cargarClientesxVendedor(nuevo[0].idvende);
-  }
-
-  /** Se cargarán los clientes del vendedor seleccionado. */
-  cargarClientesxVendedor(vendedor : any){
-    this.invetarioZeusService.getClientesxVendedor(vendedor).subscribe(dataClientes2 => { this.arrayClientes = dataClientes2; });
   }
 
   /** Al momento de seleccionar un cliente, se cargaran sus items */
@@ -164,9 +161,6 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
         idcliente : nuevo[0].idcliente,
       });
       this.cargarItemsxClientes(nuevo[0].idcliente);
-    } else {
-      if(this.formFiltros.value.vendedor != null) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
-      else this.arrayClientes = []; this.arrayItems = [];
     }
   }
 

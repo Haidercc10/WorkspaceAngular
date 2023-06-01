@@ -20,12 +20,30 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
   }
 
+  GetCliente_Vendedor_LikeNombre = (vendedor : string, nombre : string) : Observable<any> => this.http.get<any>(`${rutaZeus}/Articulos/GetCliente_Vendedor_LikeNombre/${vendedor}/${nombre}`);
+
   LikeGetVendedores(texto: any){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);
   }
 
   LikeGetItems(texto: any){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulos/${texto}`);
+  }
+
+  getClientesxVendedor(vendedor : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxVendedor/${vendedor}`);
+  }
+
+  getClientesxId(idcliente : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxId/${idcliente}`);
+  }
+
+  getVendedoresxId(id: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxId/${id}`);
+  }
+
+  getArticulosxId(id: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulosxId/${id}`);
   }
 
   /************************************************************ EXISTENCIAS **************************************************************/
@@ -89,22 +107,6 @@ export class InventarioZeusService {
 
   GetPedidos(){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
-  }
-
-  getClientesxVendedor(vendedor : any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxVendedor/${vendedor}`);
-  }
-
-  getClientesxId(idcliente : any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxId/${idcliente}`);
-  }
-
-  getVendedoresxId(id: any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxId/${id}`);
-  }
-
-  getArticulosxId(id: any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulosxId/${id}`);
   }
 
   getArticulosxCliente(id: any){
