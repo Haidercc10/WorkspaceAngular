@@ -92,7 +92,6 @@ export class OcompraComponent implements OnInit {
       Proveedor : ['', Validators.required],
       Id_Proveedor : ['', Validators.required],
       Observacion : [''],
-      iva : [this.iva, Validators.required],
     });
 
     this.FormMateriaPrima = this.frmBuilder.group({
@@ -103,6 +102,7 @@ export class OcompraComponent implements OnInit {
       Precio : [null, Validators.required],
       PrecioOculto : [null, Validators.required],
       Categoria : [null, Validators.required],
+      iva : [this.iva, Validators.required],
     });
   }
 
@@ -136,7 +136,7 @@ export class OcompraComponent implements OnInit {
   limpiarTodo(){
     this.FormMateriaPrima.reset();
     this.FormOrdenCompra.reset();
-    this.FormOrdenCompra.patchValue({ iva : 19 });
+    this.FormMateriaPrima.patchValue({ iva : 19 });
     this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
     this.cargando = false;
@@ -149,7 +149,16 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a limpiar los campos de materia prima
-  limpiarCamposMateriaPrima = () => this.FormMateriaPrima.reset();
+  limpiarCamposMateriaPrima(){
+    let iva = this.iva == null || this.iva == undefined ? 19 : this.iva;
+    this.FormMateriaPrima.reset();
+    this.FormMateriaPrima.patchValue({ iva : iva });
+  }
+
+  ivaOrdenCompra(){
+    let iva = this.iva == null || this.iva == undefined ? 19 : this.iva;
+    this.FormMateriaPrima.patchValue({ iva : iva });
+  }
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarProveedores(){
@@ -230,7 +239,7 @@ export class OcompraComponent implements OnInit {
           this.materiasPrimasSeleccionadas.push(info);
           this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
           this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
-          this.FormMateriaPrima.reset();
+          this.limpiarCamposMateriaPrima();
         } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
       } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
@@ -335,7 +344,6 @@ export class OcompraComponent implements OnInit {
             Proveedor : datos_orden[i].proveedor,
             Id_Proveedor : datos_orden[i].proveedor_Id,
             Observacion : datos_orden[i].observacion,
-            Iva : datos_orden[i].iva,
           });
           let info : any = {
             Id : 0,
@@ -347,6 +355,7 @@ export class OcompraComponent implements OnInit {
             Und_Medida : datos_orden[i].unidad_Medida,
             Precio : datos_orden[i].precio_Unitario,
             SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            iva : datos_orden[i].iva,
           };
           if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -385,7 +394,6 @@ export class OcompraComponent implements OnInit {
           if (data[i].estado_Solicitud_Id != 5){
             if (data[i].estado_Solicitud_Id != 4) {
               this.FormOrdenCompra.patchValue({ Observacion : data[i].observacion, });
-
               let info : any = {
                 Id : 0,
                 Id_Mp: data[i].mP_Id,
@@ -749,7 +757,7 @@ export class OcompraComponent implements OnInit {
                     '',
                     {
                       border: [true, false, true, true],
-                      text: `IVA 19%`
+                      text: `IVA ${datos_orden[i].iva}%`
                     },
                     {
                       border: [false, false, true, true],

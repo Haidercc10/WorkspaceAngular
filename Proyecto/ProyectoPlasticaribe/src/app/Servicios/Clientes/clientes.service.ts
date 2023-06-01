@@ -31,6 +31,8 @@ export class ClientesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/nombreCliente/${nombre}`);
   }
 
+  GetClientesVendedores = (vendedor : number, nombre : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Clientes/getClientesVendedores_LikeNombre/${vendedor}/${nombre}`);
+
   //Metodo agregar Productos
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)

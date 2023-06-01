@@ -48,7 +48,8 @@ export class PedidoExternoComponent implements OnInit {
   ModalCrearProductos: boolean = false; //Funcion que va a mostrar o no el modal de productos
   ModalCrearCliente: boolean = false; //Funcion que va a mostrar o no el modal de clientes
   ModalSedesClientes: boolean = false; //Funcion que va a mostrar o no el modal de sedes clientes
-  cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
+  clientesSeleccionar : any [] = []; //Variable que almacenará la información de los clientes que pueden ser buscados por el vendedor
+  cliente = []; //Variable que almacenará los clientes que estan siendo buscado por el vendedor
   sedeCliente:any=[]; //Varieble que almacenará las direcciones de las sedes de los cliente
   ciudad :any=[]; //Variable que almacenará las ciudades de los clientes
   usuarioVendedor=[]; //Variable que almacenara los nombres de los usuarios vendedores
@@ -71,6 +72,7 @@ export class PedidoExternoComponent implements OnInit {
   pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
   fechaUltFacuracion : any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  arrBirds = [];
 
   constructor(private pedidoproductoService : OpedidoproductoService,
                 private productosServices : ProductoService,
@@ -119,8 +121,8 @@ export class PedidoExternoComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.clientesComboBox();
     this.checkboxIva();
+    this.buscarClientes();
   }
 
   tutorial(){
@@ -203,35 +205,33 @@ export class PedidoExternoComponent implements OnInit {
     this.FormPedidoExternoProductos.reset();
   }
 
-  /* EMPIEZA A HACE LAS RESPECTIVAS VALIDACIONES PARA MOSTRAR DATOS EN LOS COMBOBOX DESDE QUE ARRANCA LA PAGINA */
-  clientesComboBox() {
-    this.cliente = [];
-    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-      this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
-        for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) {
-            if (datos_clientes[index].usua_Id == this.storage_Id) this.cliente.push(datos_clientes[index]);
-          } else this.cliente.push(datos_clientes[index]);
-          this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-        }
-      });
-    });
+  // Funcion que va a buscar los posibles clientes a los que se les puede hacer el pedido de productos
+  buscarClientes(){
+    let nombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    if (nombre != null && nombre != '' && nombre != undefined && nombre.length > 3 && this.ValidarRol == 2){
+      this.clientesService.GetClientesVendedores(this.storage_Id, nombre).subscribe(datos => this.cliente = datos);
+    } else this.cliente = [];
+    this.ValidarRol == 1 ? this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos => this.cliente = datos) : null;
+    setTimeout(() => this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre)), 500);
   }
 
   // Funcion que va a buscar el cliente seleccionado
   clienteSeleccionado(){
-    this.clientesService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteNombre).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        this.FormPedidoExternoClientes.patchValue({
-          PedClienteNombre: datos[i].cli_Nombre,
-          PedClienteId : datos[i].cli_Id,
-        });
-        setTimeout(() => {
-          this.ciudadClienteComboBox();
-          this.productoCliente();
-        }, 100);
-      }
-    });
+    let nombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    if (nombre != null && nombre != '' && nombre != undefined){
+      this.clientesService.srvObtenerListaPorNombreCliente(nombre).subscribe(datos => {
+        for (let i = 0; i < datos.length; i++) {
+          this.FormPedidoExternoClientes.patchValue({
+            PedClienteNombre: datos[i].cli_Nombre,
+            PedClienteId : datos[i].cli_Id,
+          });
+          setTimeout(() => {
+            this.ciudadClienteComboBox();
+            this.productoCliente();
+          }, 100);
+        }
+      });
+    }
   }
 
   //Funcion para llenar las ciudades del cliente en donde tiene sedes

@@ -433,7 +433,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                     '',
                     {
                       border: [true, false, true, true],
-                      text: `IVA 19%`
+                      text: `IVA ${datos_orden[i].iva}%`
                     },
                     {
                       border: [false, false, true, true],
