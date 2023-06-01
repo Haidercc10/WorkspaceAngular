@@ -80,28 +80,10 @@ export class ClientesComponent implements OnInit {
   }
 
   // Funcion que limipiará los campos deñ formulario de clientes
-  LimpiarCampos() {
-    this.FormCrearClientes.setValue({
-      CliId: null,
-      TipoIdCliente: null,
-      CliNombre: null,
-      CliTelefono: '',
-      CliEmail: '',
-      TipoClienteId: null,
-      UsuIdNombre: null,
-      vendedorId: null,
-    });
-  }
+  LimpiarCampos = () => this.FormCrearClientes.reset();
 
   // Funcion que limpiará los campos del formulario de sedes de clientes
-  LimpiarCamposSede(){
-    this.FormCrearSedeClientes.setValue({
-      SedeCli_Ciudad: null,
-      CliId2: null,
-      SedeCli_Postal: 0,
-      SedeCli_Direccion: null
-    });
-  }
+  LimpiarCamposSede = () => this.FormCrearSedeClientes.reset();
 
   // Funcion que consultará y almacenará los tipos de identificaciones
   tipoIdntificacion = () => this.tipoIdentificacionService.srvObtenerLista().subscribe(datos => this.tipoIdentificacion = datos);

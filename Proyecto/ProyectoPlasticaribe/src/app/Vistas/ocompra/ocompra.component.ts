@@ -449,8 +449,8 @@ export class OcompraComponent implements OnInit {
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
       if (solicitud != null && solicitud != '') this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
-      this.buscarinfoOrdenCompra();
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
+      setTimeout(() => this.buscarinfoOrdenCompra(), 500);
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al crear la orden de compra!`);
       this.cargando = false;

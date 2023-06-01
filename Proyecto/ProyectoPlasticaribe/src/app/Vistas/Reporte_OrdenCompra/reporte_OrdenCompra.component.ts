@@ -522,6 +522,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.EditarOrdenCompra.edicionOrdenCompra = true;
       this.EditarOrdenCompra.FormOrdenCompra.reset();
       this.EditarOrdenCompra.FormMateriaPrima.reset();
+      this.EditarOrdenCompra.FormMateriaPrima.patchValue({ iva : 19 });
       this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
       this.EditarOrdenCompra.catidadTotalPeso = 0;
       this.EditarOrdenCompra.cantidadTotalPrecio = 0;

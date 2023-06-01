@@ -242,9 +242,9 @@ export class PedidoExternoComponent implements OnInit {
     this.usuarioVende=[];
     let clienteBD: any = this.FormPedidoExternoClientes.value.PedClienteId;
     this.sedesClientesService.srvObtenerListaPorCliente(clienteBD).subscribe(datos_sedesClientes => {
+      this.sedeCliente = datos_sedesClientes;
       for (let i = 0; i < datos_sedesClientes.length; i++) {
         this.ciudad.push(datos_sedesClientes[i].sedeCliente_Ciudad);
-        this.sedeCliente.push(datos_sedesClientes[i]);
       }
 
       if (this.sedeCliente.length <= 1 ) {
