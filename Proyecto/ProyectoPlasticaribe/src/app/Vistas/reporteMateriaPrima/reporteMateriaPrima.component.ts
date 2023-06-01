@@ -397,14 +397,29 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.load = false;
     let datos : any [] = [];
     let infoDocumento : any [] = [];
-    if (num == 1) datos = this.ArrayMateriaPrima; //Todas las materias primas
-    else if (num == 2) this.dt.filteredValue != null ? datos = this.dt.filteredValue : datos = this.ArrayMateriaPrima; //Materias primas filtradas y no filtradas
-    else if (num == 3) this.dt_Polientileno.filteredValue != null ? datos = this.dt_Polientileno.filteredValue : datos = this.polietilenos; //Polietilenos filtrados y no filtrados
-    else if (num == 4) this.dt_Tintas.filteredValue != null ? datos = this.dt_Tintas.filteredValue : datos = this.tintas; //Tintas Filtradas y no Filtradas
-    else if (num == 5) this.dt_Biorientados.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
+    let title : string = ``;
+    if (num == 1) {
+      datos = this.ArrayMateriaPrima; //Todas las materias primas
+      title = `Inventario Materia Prima - ${this.today}`;
+    }
+    else if (num == 2) {
+      this.dt.filteredValue != null ? datos = this.dt.filteredValue : datos = this.ArrayMateriaPrima; //Materias primas filtradas y no filtradas
+      title = `Inventario Materia Prima - ${this.today}`;
+    }
+    else if (num == 3) {
+      this.dt_Polientileno.filteredValue != null ? datos = this.dt_Polientileno.filteredValue : datos = this.polietilenos; //Polietilenos filtrados y no filtrados
+      title = `Inventario Polietilenos - ${this.today}`;
+    }
+    else if (num == 4) {
+      this.dt_Tintas.filteredValue != null ? datos = this.dt_Tintas.filteredValue : datos = this.tintas; //Tintas Filtradas y no Filtradas
+      title = `Inventario Tintas - ${this.today}`;
+    }
+    else if (num == 5) {
+      this.dt_Biorientados.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
+      title = `Inventario Biorientados - ${this.today}`;
+    }
 
     setTimeout(() => {
-      const title = `Inventario Materia_Prima - ${this.today}`;
       const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
       for (const item of datos) {
         const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
@@ -412,7 +427,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }
       let workbook = new Workbook();
       const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(`Inventario Materia Prima - ${this.today}`);
+      let worksheet = workbook.addWorksheet(title);
       worksheet.addImage(imageId1, 'A1:B3');
       let titleRow = worksheet.addRow([title]);
       titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
@@ -462,10 +477,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       setTimeout(() => {
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, `Inventario Materia Prima - ${this.today}.xlsx`);
+          fs.saveAs(blob, title + `.xlsx`);
         });
         this.load = true;
-        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del inventario de materia prima!`);
+        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
       }, 1000);
     }, 1500);
   }
