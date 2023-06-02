@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { Console } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -68,7 +69,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.obtenerClientes();
+    //this.obtenerClientes();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -175,13 +176,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que va a buscar informacion de un cliente
   buscarCliente(){
-    let datosNumeros : any = /^[0-9]*(\.?)[ 0-9]+$/;
-    let cliente = this.FormConsultarProductos.value.Cliente;
-    if (cliente.match(datosNumeros) != null){
-      this.clienteService.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
-        this.FormConsultarProductos.patchValue({ Cliente : datos_cliente.cli_Nombre, Cliente_Id : cliente, });
-      });
-    }
+    let cliente : any = this.FormConsultarProductos.value.Cliente;
+    if (cliente != null && cliente.length > 2) this.clienteService.LikeGetCliente(cliente).subscribe(datos_cliente => { this.arrayClientes = datos_cliente; });
+  }
+
+  /** Función que va a cargar el id del cliente en un campo oculto y le nombre en el campo Cliente */
+  cargarCliente(){
+    let cliente : any = this.FormConsultarProductos.value.Cliente;
+    let nuevoArray : any[] = this.arrayClientes.filter((item) => item.cli_Id == cliente );
+    this.FormConsultarProductos.patchValue({ Cliente : nuevoArray[0].cli_Nombre, Cliente_Id : nuevoArray[0].cli_Id });
   }
 
   // Funcion que va a validar cuando se seleccionen todos los rollos
