@@ -3062,37 +3062,20 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1 y 2
   habilitarCapa2(){
     setTimeout(() => {
-      this.formCrearMezclas.disable({ onlySelf: true });
-      this.formCrearMezclas.get('mezclaId').enable();
-      this.formCrearMezclas.get('Nombre_Mezclas').enable();
-      this.formCrearMezclas.get('Material_MatPrima').enable();
-      this.formCrearMezclas.get('Proc_Capa1').enable();
-      this.formCrearMezclas.get('Chechbox_Capa1').enable();
-      this.formCrearMezclas.get('materialP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1').enable();
-      this.formCrearMezclas.get('materialP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1').enable();
-      this.formCrearMezclas.get('materialP3_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1').enable();
-      this.formCrearMezclas.get('materialP4_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('Proc_Capa2').enable();
-      this.formCrearMezclas.get('materialP1_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa2').enable();
-      this.formCrearMezclas.get('materialP2_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa2').enable();
-      this.formCrearMezclas.get('materialP3_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa2').enable();
-      this.formCrearMezclas.get('materialP4_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa2').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa2').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa2').enable();
+      this.formCrearMezclas.enable();
+      this.formCrearMezclas.get('Proc_Capa3').disable();
+      this.formCrearMezclas.get('materialP1_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3').disable();
+      this.formCrearMezclas.get('materialP2_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3').disable();
+      this.formCrearMezclas.get('materialP3_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3').disable();
+      this.formCrearMezclas.get('materialP4_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3').disable();
+      this.formCrearMezclas.get('MezclaPigmento1_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3').disable();
+      this.formCrearMezclas.get('MezclaPigmento2_Capa3').disable();
+      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').disable();
       this.cambiarNroCapas2();
     }, 300);
   }
@@ -3100,50 +3083,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1, 2 y 3
   habilitarCapa3(){
     setTimeout(() => {
-      this.formCrearMezclas.disable();
-      this.formCrearMezclas.get('mezclaId').enable();
-      this.formCrearMezclas.get('Nombre_Mezclas').enable();
-      this.formCrearMezclas.get('Material_MatPrima').enable();
-      this.formCrearMezclas.get('Proc_Capa1').enable();
-      this.formCrearMezclas.get('Chechbox_Capa1').enable();
-      this.formCrearMezclas.get('materialP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa1').enable();
-      this.formCrearMezclas.get('materialP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa1').enable();
-      this.formCrearMezclas.get('materialP3_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa1').enable();
-      this.formCrearMezclas.get('materialP4_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
-      this.formCrearMezclas.get('Proc_Capa2').enable();
-      this.formCrearMezclas.get('materialP1_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa2').enable();
-      this.formCrearMezclas.get('materialP2_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa2').enable();
-      this.formCrearMezclas.get('materialP3_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa2').enable();
-      this.formCrearMezclas.get('materialP4_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa2').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP1_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa2').enable();
-      this.formCrearMezclas.get('MezclaPigmentoP2_Capa2').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa2').enable();
-      this.formCrearMezclas.get('Proc_Capa3').enable();
-      this.formCrearMezclas.get('materialP1_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP1_Capa3').enable();
-      this.formCrearMezclas.get('materialP2_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP2_Capa3').enable();
-      this.formCrearMezclas.get('materialP3_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP3_Capa3').enable();
-      this.formCrearMezclas.get('materialP4_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMaterialP4_Capa3').enable();
-      this.formCrearMezclas.get('MezclaPigmento1_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa3').enable();
-      this.formCrearMezclas.get('MezclaPigmento2_Capa3').enable();
-      this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').enable();
+      this.formCrearMezclas.enable();
       this.cambiarNroCapas3();
     }, 300);
   }
