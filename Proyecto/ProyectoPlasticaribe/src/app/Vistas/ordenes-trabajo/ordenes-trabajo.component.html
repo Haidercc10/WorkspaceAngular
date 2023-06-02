@@ -2,7 +2,6 @@
   <app-menuLateral></app-menuLateral>
   <br>
 </ng-container>
-<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
@@ -45,7 +44,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OT_Id" type="text" id="orden" pInputText (keyup.enter)="ConsultarOrdenTrabajo()" required/>
+            <input formControlName="OT_Id" type="text" id="orden" pInputText (keyup.enter)="ConsultarOrdenTrabajo()"/>
             <label for="orden">Nro. OT</label>
           </span>
         </div>
@@ -170,7 +169,7 @@
     dataKey="Nombre"
     selectionMode="single"
     (onRowSelect)="consultarInfoProducto($event.data)"
-    (onRowUnselect)="onRowUnselect()">
+    (onRowUnselect)="productoDeseleccionado()">
     <ng-template pTemplate="header">
       <tr class="font-size-13">
         <th scope="col">Id</th>
@@ -205,7 +204,7 @@
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="7" class="text-right">Totales</td>
-        <td>{{cantidadCostoProductos | currency : 'COP $'}}</td>
+        <td>{{calcularCostoPedido() | currency : 'COP $'}}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -250,6 +249,7 @@
             </div>
           </div>
 
+          <!-- Laminado -->
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
             <div class="field-checkbox">
               <p-checkbox [(ngModel)]="laminado" [binary]="true" inputId="OT_Laminado" id="lam"></p-checkbox>
@@ -347,7 +347,7 @@
                 <!-- Material -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Material_Extrusion" inputId="Material" optionValue="material_Id" [autoDisplayFirst]="false" [options]="arrayMateriales" optionLabel="material_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Material_Extrusion" inputId="Material" optionValue="material_Id" [autoDisplayFirst]="false" [options]="arrayMateriales" optionLabel="material_Nombre" [required]="true"></p-dropdown>
                     <label for="Material">Material</label>
                   </span>
                 </div>
@@ -355,7 +355,7 @@
                 <!-- Formato -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Extrusion" inputId="Formato" optionValue="formato_Id" [autoDisplayFirst]="false" [options]="formatos" optionLabel="formato_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Extrusion" inputId="Formato" optionValue="formato_Id" [autoDisplayFirst]="false" [options]="formatos" optionLabel="formato_Nombre" [required]="true"></p-dropdown>
                     <label for="Formato">Formato</label>
                   </span>
                 </div>
@@ -363,7 +363,7 @@
                 <!-- Pigmento -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Pigmento">Pigmento</label>
                   </span>
                 </div>
@@ -371,7 +371,7 @@
                 <!-- Tratado -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tratado_Extrusion" inputId="Tratado" [options]="tratado" optionLabel="tratado_Nombre" optionValue="tratado_Id" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Tratado_Extrusion" inputId="Tratado" [options]="tratado" optionLabel="tratado_Nombre" optionValue="tratado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Tratado">Tratado</label>
                   </span>
                 </div>
@@ -411,7 +411,7 @@
                 <!-- Unidad Medida -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
+                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true"></p-dropdown>
                     <label for="UndMedida">Und. Medida</label>
                   </span>
                 </div>
@@ -441,7 +441,7 @@
                 <!-- Tipo de Impresión -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tipo_Impresion" inputId="TipoImpresion" [autoDisplayFirst]="false" [options]="tiposImpresion" optionValue="tpImpresion_Id" optionLabel="tpImpresion_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tipo_Impresion" inputId="TipoImpresion" [autoDisplayFirst]="false" [options]="tiposImpresion" optionValue="tpImpresion_Id" optionLabel="tpImpresion_Nombre" [required]="true"></p-dropdown>
                     <label for="TipoImpresion">Tipo Impresión</label>
                   </span>
                 </div>
@@ -478,7 +478,7 @@
                 <!-- Tinta 1 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion1" inputId="Tinta1" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion1" inputId="Tinta1" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta1">Tinta 1 (Opcional)</label>
                   </span>
                 </div>
@@ -486,7 +486,7 @@
                 <!-- Tinta 2 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion2" inputId="Tinta2" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion2" inputId="Tinta2" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta2">Tinta 2 (Opcional)</label>
                   </span>
                 </div>
@@ -494,7 +494,7 @@
                 <!-- Tinta 3 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion3" inputId="Tinta13" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion3" inputId="Tinta13" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta3">Tinta 3 (Opcional)</label>
                   </span>
                 </div>
@@ -502,7 +502,7 @@
                   <!-- Tinta 4 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion4" inputId="Tinta4" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion4" inputId="Tinta4" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta4">Tinta 4 (Opcional)</label>
                   </span>
                 </div>
@@ -510,7 +510,7 @@
                 <!-- Tinta 5-->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion5" inputId="Tinta5" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion5" inputId="Tinta5" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta5">Tinta 5 (Opcional)</label>
                   </span>
                 </div>
@@ -518,7 +518,7 @@
                 <!-- Tinta 6 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion6" inputId="Tinta6" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion6" inputId="Tinta6" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta6">Tinta 6 (Opcional)</label>
                   </span>
                 </div>
@@ -526,7 +526,7 @@
                 <!-- Tinta 7 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion7" inputId="Tinta7" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion7" inputId="Tinta7" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta7">Tinta 7 (Opcional)</label>
                   </span>
                 </div>
@@ -534,7 +534,7 @@
                   <!-- Tinta 8 -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Tinta_Impresion8" inputId="Tinta8" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre"></p-dropdown>
+                    <p-dropdown formControlName="Tinta_Impresion8" inputId="Tinta8" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [required]="true"></p-dropdown>
                     <label for="Tinta8">Tinta 8 (Opcional)</label>
                   </span>
                 </div>
@@ -557,7 +557,7 @@
                 <!--Capa 1-->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Capa_Laminado1" inputId="Capa1" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Capa_Laminado1" inputId="Capa1" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Capa1">Capa 1</label>
                   </span>
                 </div>
@@ -581,7 +581,7 @@
                 <!--Capa 2-->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Capa_Laminado2" inputId="Capa2" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Capa_Laminado2" inputId="Capa2" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Capa2">Capa 2</label>
                   </span>
                 </div>
@@ -605,7 +605,7 @@
                 <!--Capa 3-->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Capa_Laminado3" inputId="Capa3" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Capa_Laminado3" inputId="Capa3" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Capa3">Capa 3</label>
                   </span>
                 </div>
@@ -643,7 +643,7 @@
                 <!-- Formato -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Formato">Formato</label>
                   </span>
                 </div>
@@ -700,7 +700,7 @@
                 <!-- Formato -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="Formato">Formato</label>
                   </span>
                 </div>
@@ -751,7 +751,7 @@
                 <!-- Tipo Sellado -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="TipoSellado" inputId="TipoSellado" [options]="tipoSellado" optionLabel="tpSellados_Nombre" optionValue="tpSellados_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <p-dropdown formControlName="TipoSellado" inputId="TipoSellado" [options]="tipoSellado" optionLabel="tpSellados_Nombre" optionValue="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="TipoSellado">Tipo Sellado</label>
                   </span>
                 </div>
@@ -909,8 +909,6 @@
 
             <!-- Inicio formulario de crear mezclas -->
             <form [formGroup]="formCrearMezclas">
-              <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
-
               <!-- División 1 -->
               <div class="container-fluid mb-4" >
                 <p-divider align="left" id="form-mezcla">
@@ -1433,7 +1431,6 @@
           <!--Mezclas OT-->
           <div class="container">
             <form [formGroup]="FormOrdenTrabajoMezclas">
-              <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
               <!-- División 1 -->
               <div class="container-fluid mb-4">
@@ -1471,19 +1468,19 @@
 
                   <!-- Check 1 / Capa 1 -->
                   <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="1" readonly onmousedown="return false;"></p-radioButton>
+                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="1" readonly onmousedown="return false;" [required]="true"></p-radioButton>
                     <label style="margin-left: 5px;" for="city1"> 1</label>
                   </div>
 
                   <!-- Check 2 / Capa 2 -->
                   <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="2" readonly onmousedown="return false;"></p-radioButton>
+                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="2" readonly onmousedown="return false;" [required]="true"></p-radioButton>
                     <label style="margin-left: 5px;" for="city2"> 2</label>
                   </div>
 
                   <!-- Check 3 / Capa 3 -->
                   <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="3" readonly onmousedown="return false;"></p-radioButton>
+                    <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="3" readonly onmousedown="return false;" [required]="true"></p-radioButton>
                     <label style="margin-left: 5px;" for="city3"> 3</label>
                   </div>
                 </div>
@@ -1549,7 +1546,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP1_Capa1" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP1_Capa1" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 1</label>
                           </span>
                         </div>
@@ -1570,7 +1567,7 @@
                         <!--Material 2 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP2_Capa1" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP2_Capa1" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material2">Material 2</label>
                           </span>
                         </div>
@@ -1591,7 +1588,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP3_Capa1" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP3_Capa1" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material3">Material 3</label>
                           </span>
                         </div>
@@ -1612,7 +1609,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP4_Capa1" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP4_Capa1" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 4</label>
                           </span>
                         </div>
@@ -1633,7 +1630,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmentoP1_Capa1" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmentoP1_Capa1" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento1">Pigmento 1</label>
                           </span>
                         </div>
@@ -1654,7 +1651,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmentoP2_Capa1" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmentoP2_Capa1" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento2">Pigmento 2</label>
                           </span>
                         </div>
@@ -1682,7 +1679,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP1_Capa2" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP1_Capa2" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 1</label>
                           </span>
                         </div>
@@ -1703,7 +1700,7 @@
                         <!--Material 2 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP2_Capa2" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP2_Capa2" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material2">Material 2</label>
                           </span>
                         </div>
@@ -1724,7 +1721,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP3_Capa2" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP3_Capa2" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material3">Material 3</label>
                           </span>
                         </div>
@@ -1745,7 +1742,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP4_Capa2" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP4_Capa2" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 4</label>
                           </span>
                         </div>
@@ -1766,7 +1763,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmentoP1_Capa2" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmentoP1_Capa2" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento1">Pigmento 1</label>
                           </span>
                         </div>
@@ -1787,7 +1784,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmentoP2_Capa2" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmentoP2_Capa2" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento2">Pigmento 2</label>
                           </span>
                         </div>
@@ -1815,7 +1812,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP1_Capa3" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP1_Capa3" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 1</label>
                           </span>
                         </div>
@@ -1836,7 +1833,7 @@
                         <!--Material 2 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP2_Capa3" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP2_Capa3" inputId="Material2" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material2">Material 2</label>
                           </span>
                         </div>
@@ -1857,7 +1854,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP3_Capa3" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP3_Capa3" inputId="Material3" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material3">Material 3</label>
                           </span>
                         </div>
@@ -1878,7 +1875,7 @@
                         <!--Material 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="materialP_Capa3" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="materialP_Capa3" inputId="Material1" [options]="mezclasMateriales" optionLabel="mezMaterial_Nombre" optionValue="mezMaterial_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Material1">Material 4</label>
                           </span>
                         </div>
@@ -1899,7 +1896,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmento1_Capa3" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmento1_Capa3" inputId="Pigmento1" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento1">Pigmento 1</label>
                           </span>
                         </div>
@@ -1920,7 +1917,7 @@
                         <!--Pigmento 1 Capa 1 -->
                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
                           <span class="p-float-label">
-                            <p-dropdown formControlName="MezclaPigmento2_Capa3" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false"></p-dropdown>
+                            <p-dropdown formControlName="MezclaPigmento2_Capa3" inputId="Pigmento2" [options]="mezclasPigmentos" optionLabel="mezPigmto_Nombre" optionValue="mezPigmto_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                             <label for="Pigmento2">Pigmento 2</label>
                           </span>
                         </div>
@@ -1935,7 +1932,6 @@
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
             </form>
@@ -1955,3 +1951,23 @@
     </div>
   </div>
 </p-card>
+
+<p-toast position="center" key="editarOrden" (onClose)="cerrarMensaje()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="editarOrdenTrabajo()" icon="pi pi-check" label="Editar OT" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="cerrarMensaje()" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

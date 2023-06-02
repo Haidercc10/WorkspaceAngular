@@ -38,6 +38,5 @@ export class PaginaPrincipalComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
-    this.tutorial = this.AppComponent.tutorial;
   }
 }

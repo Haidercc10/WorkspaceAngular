@@ -73,7 +73,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   pedidosSinOT : any = []; //Variable que almacenará la informacion de los pedidos que no tienen orden de trabajo aun
-  cantidadCostoProductos : number = 0; //Variable que se utilizará para mostrar el costo total de los productos provenientes del pedido
   ultimaOrdenTrabajo : number; // Variable que almacenará el numero de la OT que se está creando
   ArrayProducto : any [] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
   estados : any = []; //Variable que almacenará los estados que puede tener una orden de trabajo
@@ -158,24 +157,16 @@ export class OrdenesTrabajoComponent implements OnInit {
       OT_Id: [null],
       Pedido_Id: [null, Validators.required],
       Nombre_Vendedor: [null, Validators.required],
-      OT_FechaCreacion: this.today,
+      OT_FechaCreacion: [this.today, Validators.required],
       OT_FechaEntrega: [null, Validators.required],
       Id_Sede_Cliente : [null, Validators.required],
       ID_Cliente: [null, Validators.required],
       Nombre_Cliente: [null, Validators.required],
       Ciudad_SedeCliente: [null, Validators.required],
       Direccion_SedeCliente : [null, Validators.required],
-      OT_Estado : [null, Validators.required],
+      OT_Estado : [null],
       OT_Observacion : [null],
       Margen : [0, Validators.required],
-      OT_Cyrel : [false],
-      OT_Extrusion : [false],
-      OT_Impresion : [false],
-      OT_Rotograbado : [false],
-      OT_Laminado : [false],
-      OT_Corte : [false],
-      OT_Doblado : [false],
-      OT_Sellado : [false],
     });
 
     this.FormOrdenTrabajoExtrusion = this.frmBuilderPedExterno.group({
@@ -376,6 +367,33 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
+  verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
+
+   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de mezclas*/
+  verTutorial2() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps2);
+    this.shepherdService.start();
+  }
+
+  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de crear mezclas*/
+  verTutorial3() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps3);
+    this.shepherdService.start();
+  }
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
@@ -469,7 +487,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que va a limpiar los campos del formulario de mezclas
   limpiarFormMezclas(){
-    this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : 109, });
+    this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : 'ALTA 1 X 1 NEGRO', });
     this.cargarCombinacionMezclas();
   }
 
@@ -488,7 +506,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.edicionOrdenTrabajo = false;
     this.checkedCyrel = false;
     this.checkedCorte = false;
-    this.cantidadCostoProductos = 0;
     this.ArrayProducto = [];
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
@@ -498,7 +515,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.idMezclaSeleccionada = 0;
     this.nroCapas = 0;
     this.nroCapasOT = 0;
-    this.cantidadCostoProductos = 0;
     this.extrusion = false;
     this.impresion = false;
     this.rotograbado = false;
@@ -586,9 +602,22 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que cargará el nombre de las mezclas
   cargarMezclas = () => this.mezclasService.srvObtenerLista().subscribe(datos => this.mezclas = datos);
 
+  // Funcion que va cargará la informacion de los tipos de productos
+  cargarTiposProductos = () => this.tiposProductosService.srvObtenerLista().subscribe(datos => this.tipoProductos = datos);
+
+  // Funcion que va a cargar la informacion de los tipos de sellado
+  cargarTiposSellado = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos => this.tipoSellado = datos);
+
+  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
+  ultimaOT = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => this.ultimaOrdenTrabajo = datos_ot.item + 1);
+
+  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
+  pedidos = () => this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => this.pedidosSinOT = datos);
+
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
-    this.mezclasService.srvObtenerListaPorId(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
+    let data : any = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    this.mezclasService.getMezclaNombre(data).subscribe(datos_mezcla => {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
         this.FormOrdenTrabajoMezclas.disable();
@@ -640,76 +669,9 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
           PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
         });
-      }, 1000);
-    }, () => {
-      this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas.replace('%', '%25')).subscribe(datos_mezcla => {
-        this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
-        setTimeout(() => {
-          this.FormOrdenTrabajoMezclas.disable();
-          this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-          this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-          this.FormOrdenTrabajoMezclas.patchValue({
-            Id_Mezcla : datos_mezcla.mezcla_Id,
-            Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
-            Chechbox_Capa1 : this.nroCapasOT,
-            Chechbox_Capa2 : '',
-            Chechbox_Capa3 : '',
-            Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
-            Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
-            Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
-            materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
-            PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
-            materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
-            PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
-            materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
-            PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
-            materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
-            PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
-            materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
-            PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
-            materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
-            PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
-            materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
-            PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
-            materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
-            PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
-            materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
-            PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
-            materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
-            PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
-            materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
-            PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
-            materialP_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
-            PorcentajeMaterialP_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
-            MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-            PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
-            MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
-            PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
-            MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
-            PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
-            MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-            PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
-            MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
-            PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
-            MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
-            PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
-          });
-        }, 300);
-      });
+      }, 300);
     });
   }
-
-  // Funcion que va cargará la informacion de los tipos de productos
-  cargarTiposProductos = () => this.tiposProductosService.srvObtenerLista().subscribe(datos => this.tipoProductos = datos);
-
-  // Funcion que va a cargar la informacion de los tipos de sellado
-  cargarTiposSellado = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos => this.tipoSellado = datos);
-
-  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
-  ultimaOT = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => this.ultimaOrdenTrabajo = datos_ot.item + 1);
-
-  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
-  pedidos = () => this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => this.pedidosSinOT = datos);
 
   // Funcion que va a obtener los pedidos provenientes de zeus
   pedidosZues(){
@@ -736,20 +698,20 @@ export class OrdenesTrabajoComponent implements OnInit {
   // funcion que consultará la informacion de un pedido de Zeus
   informacionPedidoZeus(){
     let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
-    this.cantidadCostoProductos = 0;
-    this.ArrayProducto = [];
     this.limpiarCampos();
     let presentacion : string;
     this.pedidosZeusService.GetInfoPedido_Consecutivo(pedido).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
+        if (datos[i].presentacion == "UND") presentacion = 'Und';
+        else if (datos[i].presentacion == 'KLS') presentacion = 'Kg';
+        else if (datos[i].presentacion == 'PAQ') presentacion = 'Paquete';
         this.sedeClienteService.GetSedeCliente(datos[i].id_Cliente, datos[i].ciudad, datos[i].direccion_Cliente).subscribe(datosSede => {
           for (let j = 0; j < datosSede.length; j++) {
+            this.FormOrdenTrabajo.reset();
             this.FormOrdenTrabajo.patchValue({
-              OT_Id: null,
               Pedido_Id: pedido,
               Nombre_Vendedor: datos[i].vendedor,
               OT_FechaCreacion: this.today,
-              OT_FechaEntrega: null,
               Id_Sede_Cliente : datosSede[j].sedeCli_Id,
               ID_Cliente: datosSede[j].cli_Id,
               Nombre_Cliente: datos[i].cliente,
@@ -757,22 +719,10 @@ export class OrdenesTrabajoComponent implements OnInit {
               Direccion_SedeCliente : datos[i].direccion_Cliente,
               OT_Estado : datos[i].estado == 'Parcialmente Satisfecho' ? datos[i].estado = 12 : datos[i].estado = 11,
               OT_Observacion : datos[i].observacion,
-              Margen : 0,
-              OT_Cyrel : this.checkedCyrel,
-              OT_Extrusion : this.extrusion,
-              OT_Impresion : this.impresion,
-              OT_Rotograbado : this.rotograbado,
-              OT_Laminado : this.laminado,
-              OT_Corte : this.checkedCorte,
-              OT_Doblado : this.doblado,
-              OT_Sellado : this.sellado,
             });
             break;
           }
         });
-        if (datos[i].presentacion == "UND") presentacion = 'Und';
-        else if (datos[i].presentacion == 'KLS') presentacion = 'Kg';
-        else if (datos[i].presentacion == 'PAQ') presentacion = 'Paquete';
         this.productoService.GetInfoProducto_Prod_Presentacion(datos[i].id_Producto, presentacion).subscribe(datos_producto => {
           for (let j = 0; j < datos_producto.length; j++) {
             let productoExt : any = {
@@ -791,15 +741,13 @@ export class OrdenesTrabajoComponent implements OnInit {
               CantPaquete : datos_producto[j].produ.prod_CantBolsasPaquete,
               CantBulto : datos_producto[j].produ.prod_CantBolsasBulto,
               Cant : parseFloat(datos[i].cant_Pendiente),
-              Cant_Pedida : parseFloat(datos[i].cant_Pendiente),
+              Cant_Inicial : parseFloat(datos[i].cant_Pendiente),
               UndCant : presentacion,
-              TipoSellado : datos_producto[j].tipo_Sellado,
               PrecioUnd : datos[i].precioUnidad,
               SubTotal : datos[i].costo_Cant_Pendiente,
               FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
             }
             this.ArrayProducto.push(productoExt);
-            this.cantidadCostoProductos += datos[i].costo_Cant_Pendiente;
           }
         });
       }
@@ -809,17 +757,15 @@ export class OrdenesTrabajoComponent implements OnInit {
   // funcion que consultará la informacion del pedido apra crear la orden de trabajo
   informacionPedido(){
     let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
-    this.cantidadCostoProductos = 0;
     this.ArrayProducto = [];
     this.limpiarCampos();
     this.pedidoExternoService.GetInfoPedido(pedido).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
+        this.FormOrdenTrabajo.reset();
         this.FormOrdenTrabajo.patchValue({
-          OT_Id: null,
           Pedido_Id: pedido,
           Nombre_Vendedor: datos[i].vendedor,
           OT_FechaCreacion: this.today,
-          OT_FechaEntrega: null,
           Id_Sede_Cliente : datos[i].id_Sede_Cliente,
           ID_Cliente: datos[i].id_Cliente,
           Nombre_Cliente: datos[i].cliente,
@@ -827,15 +773,6 @@ export class OrdenesTrabajoComponent implements OnInit {
           Direccion_SedeCliente : datos[i].direccion,
           OT_Estado : datos[i].estado,
           OT_Observacion : datos[i].observacion,
-          Margen : 0,
-          OT_Cyrel : this.checkedCyrel,
-          OT_Extrusion : this.extrusion,
-          OT_Impresion : this.impresion,
-          OT_Rotograbado : this.rotograbado,
-          OT_Laminado : this.laminado,
-          OT_Corte : this.checkedCorte,
-          OT_Doblado : this.doblado,
-          OT_Sellado : this.sellado,
         });
 
         let productoExt : any = {
@@ -862,9 +799,17 @@ export class OrdenesTrabajoComponent implements OnInit {
           FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.ArrayProducto.push(productoExt);
-        this.cantidadCostoProductos += datos[i].subTotal_Producto;
       }
     });
+  }
+
+  // Funcion que va a calcular el costo total de los productos que tiene el pedido
+  calcularCostoPedido() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.ArrayProducto.length; i++) {
+      total += this.ArrayProducto[i].SubTotal;
+    }
+    return total;
   }
 
   // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
@@ -942,21 +887,13 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.laminado = datos_Ot.laminado;
       this.checkedCorte = datos_Ot.corte;
       this.sellado = datos_Ot.sellado;
-      setTimeout(() => { this.calcularDatosOt(data) }, 500);
-
+      setTimeout(() => this.calcularDatosOt(data), 500);
       this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : datos_Ot.mezcla_Id, });
       this.cargarCombinacionMezclas();
-      setTimeout(() => {
-        this.FormOrdenTrabajoMezclas.disable();
-        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-      }, 1000);
     }, () => {
-      let presentacion : string = data.UndCant;
+      let presentacion : string = data.UndCant, impresion : any, laminadoCapa1 : any, laminadoCapa2 : any, laminadoCapa3 : any;
       if (presentacion == 'Kg') presentacion = 'Kilo';
       else if (presentacion == 'Und') presentacion = 'Unidad';
-      let impresion : any;
-      let laminadoCapa1 : any, laminadoCapa2 : any, laminadoCapa3 : any;
       this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(data.Id, presentacion).subscribe(datos_Ot => {
         for (const itemOt of datos_Ot) {
           this.FormOrdenTrabajo.patchValue({
@@ -1070,13 +1007,8 @@ export class OrdenesTrabajoComponent implements OnInit {
           setTimeout(() => { this.calcularDatosOt(data); }, 1000);
           this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
           this.cargarCombinacionMezclas();
-          setTimeout(() => {
-            this.FormOrdenTrabajoMezclas.disable();
-            this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-            this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-          }, 1000);
         }
-      }, () => { this.mostrarAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
+      }, () => this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`));
     });
   }
 
@@ -1163,7 +1095,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Funcion que se se ejecurá cuando hayan deseleccionado un producto
-  onRowUnselect(){
+  productoDeseleccionado(){
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
     this.limpiarFormLaminado();
@@ -1180,10 +1112,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.checkedCapa2 = false;
     this.checkedCapa3 = false;
     this.presentacionProducto = '';
-    this.producto = 0;
-    this.idMezclaSeleccionada = 0;
-    this.nroCapas = 0;
-    this.nroCapasOT = 0;
     this.extrusion = false;
     this.impresion = false;
     this.rotograbado = false;
@@ -1201,7 +1129,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.informacionSeleccionada = 0;
   }
 
-  // Funcion que va a validar que la información este correcta
+  // Función que va a validar que la información este correcta
   validarDatos(){
     if (this.FormOrdenTrabajo.valid) {
       if (!this.extrusion) this.limpiarFormExtrusion();
@@ -1218,14 +1146,14 @@ export class OrdenesTrabajoComponent implements OnInit {
               if (this.FormOrdenTrabajoCorte.valid) {
                 if (this.FormOrdenTrabajoSellado.valid) {
                   if (this.FormOrdenTrabajoMezclas.valid) this.guardarOt();
-                  else this.mostrarAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.mostrarAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
-              } else this.mostrarAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
-            } else this.mostrarAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.mostrarAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
-        } else this.mostrarAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+                  else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
+              } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
+            } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
+        } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
       }, 700);
-    } else this.mostrarAdvertencia(`¡Hay campos del formulario vacios!`);
+    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
   }
 
   //Funcion que va a guardar la información de la orden de trabajo
@@ -1266,19 +1194,19 @@ export class OrdenesTrabajoComponent implements OnInit {
       errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
       errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
       this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
-      setTimeout(() => { this.pdfOrdenTrabajo(datos_ot.ot_Id); }, 1500);
+      setTimeout(() => this.pdfOrdenTrabajo(datos_ot.ot_Id), 1500);
       setTimeout(() => {
-        if (!errorExt && !errorImp && !errorLam && !errorSelCor) this.mostrarConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
+        if (!errorExt && !errorImp && !errorLam && !errorSelCor) this.mensajeService.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
         this.limpiarCampos();
       }, 2000);
     }, error => {
-      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
+      this.mensajeService.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
       this.cargando = false;
     });
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
-  guardarOt_Extrusion(ordenTrabajo : number){
+  guardarOt_Extrusion(ordenTrabajo : number) : boolean{
     let infoOTExt : any = {
       Ot_Id : ordenTrabajo,
       Material_Id : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -1292,12 +1220,15 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => true, error => this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message));
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { return true }, error => {
+      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message);
+      return false;
+    });
     return false;
   }
 
   //Funcion que va a guardar la informacion de impresion de la orden de trabajo
-  guardarOt_Impresion(ordenTrabajo : number){
+  guardarOt_Impresion(ordenTrabajo : number) : boolean {
     let rodilloImpresion : any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
     let pistaImpresion : any = this.FormOrdenTrabajoImpresion.value.Pista_Impresion;
     let tinta1Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1;
@@ -1324,14 +1255,17 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => true, error => this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message));
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { return true }, error => {
+          this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message);
+          return false;
+        });
       }
     });
     return false;
   }
 
   //Funcion que va a guardar la informacion de laminado de la orden de trabajo
-  guardarOt_Laminado(ordenTrabajo : number){
+  guardarOt_Laminado(ordenTrabajo : number) : boolean {
     let infoOTLam : any = {
       OT_Id : ordenTrabajo,
       Capa_Id1 : this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
@@ -1344,13 +1278,16 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message); });
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { return true; }, error => {
+      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message);
+      return false;
+    });
     return false;
   }
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
-  guardarOt_Sellado_Corte(ordenTrabajo : number){
-    let tipoSellado : string = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : string = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+  guardarOt_Sellado_Corte(ordenTrabajo : number) : boolean {
+    let tipoSellado : number = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : number = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
       let info : any = {
         Ot_Id : ordenTrabajo,
@@ -1369,8 +1306,11 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
       }
-      this.otSelladoCorteService.post(info).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message); });
-    }, error => { this.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message); });
+      this.otSelladoCorteService.post(info).subscribe(() => { return true; }, error => {
+        this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
+        return false;
+      });
+    }, error => this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message));
     return false;
   }
 
@@ -1405,10 +1345,10 @@ export class OrdenesTrabajoComponent implements OnInit {
           Prod_Peso_Bulto : 0,
         }
         this.productoService.PutEstadoProducto(producto, info).subscribe(() => { }, error => {
-          this.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error);
+          this.mensajeService.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error);
         });
       }
-    }, error => this.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
+    }, error => this.mensajeService.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
 
   // Funcion que va a cambiar el estado de un cliente a "Activo"
@@ -1426,8 +1366,8 @@ export class OrdenesTrabajoComponent implements OnInit {
         Cli_Fecha : datos_cliente.cli_Fecha,
         Cli_Hora : datos_cliente.cli_Hora,
       }
-      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
-    }, error => this.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.error));
+      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
+    }, error => this.mensajeService.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.error));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -1435,1241 +1375,628 @@ export class OrdenesTrabajoComponent implements OnInit {
     let usuario : string = this.AppComponent.storage_Nombre;
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        if (datos_ot[i].cyrel) {
-          const pdfDefinicion : any = {
-            info: { title: `${datos_ot[i].numero_Orden}` },
-            pageSize: { width: 630, height: 760 },
-            footer: function(currentPage : any, pageCount : any) {
-              return [
-                '\n',
+        const pdfDefinicion : any = {
+          info: { title: `${datos_ot[i].numero_Orden}` },
+          pageSize: { width: 630, height: 760 },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              '\n',
+              {
+                columns: [
+                  { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          content : [
+            {
+              columns: [
+                { image : logoParaPdf, width : 220, height : 50, margin: [ 0, -15, 0, 0 ] },
                 {
-                  columns: [
-                    { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                    { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                  ]
-                }
+                  width: 390,
+                  text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
+                  style: 'titulo',
+                  alignment: 'center',
+                },
               ]
             },
-            content : [
-              {
-                columns: [
-                  { image : logoParaPdf, width : 220, height : 50 },
-                  {
-                    width: 390,
-                    text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
-                    style: 'titulo',
-                    alignment: 'center',
-                  },
-                  { width: 90, text: `OT ${datos_ot[i].numero_Orden}`, style: 'ot', alignment: 'right', }
+            '\n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [60, '*', 60, '*'],
+                style: 'header',
+                body: [
+                  [
+                    { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
+                    { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
+                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
+                  ],
+                  [
+                    { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
+                    { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
+                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
+                  ],
                 ]
               },
-              '\n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [60, '*', 60, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                      { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                      { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
-                      { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                      { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
-                    ],
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
                   ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n \n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Materia Prima`, alignment: 'center', style: 'titulo', } ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-            // Mezclas
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, true], text: `Material`, alignment: 'center', style: 'titulo', },
-                      { border: [false, false, false, true], text: `Cod Producto`, alignment: 'center', style: 'titulo', },
-                      { border: [false, false, false, true], text: `Kilos (Kg)`, alignment: 'center', style: 'titulo', }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA UNICA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa1}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C1_nombre}`,  alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m4C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C1_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C1_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA INTERNA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa2}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m4C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C2_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C2_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA EXTERNA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa3}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [],  text : `${datos_ot[i].m4C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C3_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C3_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [],  text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border: [false, false, false, false], text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', } ]
-                  ]
-                }
-              },
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false],  fillColor: '#eeeeee', text: `Pigmento`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Formato`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Ancho`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Und Medida`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Calibre`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Peso MT \n(Min/Max)`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Tratado`, alignment: 'center', style : 'subtitulo', }
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].pigmento_Extrusion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].formato_Extrusin}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].und_Extrusion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].tratado}`, alignment: 'center', }
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : [539],
-                  style : '',
-                  body : [
-                    [ { border : [true, true, true, false], text : `Observación: ` } ],
-                    [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 10.5,
-              },
-              '\n',
-              '\n',
-              '\n',
-              // Hoja 2
-              {
-                columns: [
-                  { image : logoParaPdf, width : 220, height : 50 },
-                  {
-                    width: 390,
-                    text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
-                    style: 'titulo',
-                    alignment: 'center',
-                  },
-                  { width: 90, text: `OT ${ot}`, style: 'ot', alignment: 'right', }
                 ]
               },
-              '\n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [60, '*', 60, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                      { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                      { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
-                      { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                      { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              table : {
+                widths : ['*'],
+                style : '',
+                body : [
+                  [ { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Materia Prima`, alignment: 'center', style: 'titulo', } ]
+                ]
               },
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              // Procesos
-              {
-                table : {
-                  widths : ['*', 20, '*'],
-                  style : '',
-                  body : [
-                    [
-                      // Extrusion
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                              { }
-                            ],
-                            [
-                              { border : [], text : `Pigmento: `, },
-                              { border : [], text : `${datos_ot[i].pigmento_Extrusion}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Formato: `, },
-                              { border : [], text : `${datos_ot[i].formato_Extrusin}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Calibre: `, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Unidad Medida: `, },
-                              { border : [], text : `${datos_ot[i].und_Extrusion}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `ANCHO`, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   `, },
-                              { border : [], text : `       ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, }
-                            ],
-                            [
-                              { border : [], text : `Peso MT (Min/Max): `, },
-                              { border : [false, false, false, false], text : `${datos_ot[i].peso_Extrusion}`, },
-                              { border : [false, false, false, false], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Tratado Caras: `, },
-                              { border : [], text : `${datos_ot[i].tratado}`, },
-                              { border : [], text : ``, }
-                            ],
-                          ]
-                        }
-                      },
-                      { },
-                      // Laminado
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `LAMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `CAPA`, bold : true, },
-                              { border : [], text : `CALIBRE`, bold : true, },
-                              { border : [], text : `CANTIDAD`, bold : true, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa1}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa1}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa1}`, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa2}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa2}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa2}`, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa3}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa3}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa3}`, }
-                            ]
-                          ]
-                        }
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+          // Mezclas
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    { border: [false, false, false, true], text: `Material`, alignment: 'center', style: 'titulo', },
+                    { border: [false, false, false, true], text: `Cod Producto`, alignment: 'center', style: 'titulo', },
+                    { border: [false, false, false, true], text: `Kilos (Kg)`, alignment: 'center', style: 'titulo', }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `CAPA UNICA:`, }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa1}`, }, ],
+                          [ { border : [], text : ``, }, ]
+                        ]
                       }
-                    ],
-                    [
-                      { },
-                      { },
-                      { }
-                    ],
-                    [
-                      { },
-                      { },
-                      { }
-                    ],
-                    [
-                      // Impresion
-                      {
-                        table : {
-                          widths : ['*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 2, text : `IMPRESIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                            ],
-                            [
-                              { border : [], text : `Tipo Impresión: `, },
-                              { border : [], text : `${datos_ot[i].tipo_Impresion}`, }
-                            ],
-                            [
-                              { border : [], text : `Rodillo N°: `, },
-                              { border : [], text : `${datos_ot[i].rodillo}`, }
-                            ],
-                            [
-                              { border : [], text : `N° de Pista: `, },
-                              { border : [], text : `${datos_ot[i].pista}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 1: `, },
-                              { border : [], text : `${datos_ot[i].tinta1}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 2: `, },
-                              { border : [], text : `${datos_ot[i].tinta2}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 3: `, },
-                              { border : [], text : `${datos_ot[i].tinta3}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 4: `, },
-                              { border : [], text : `${datos_ot[i].tinta4}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 5: `, },
-                              { border : [], text : `${datos_ot[i].tinta5}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 6: `, },
-                              { border : [], text : `${datos_ot[i].tinta6}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 7: `, },
-                              { border : [], text : `${datos_ot[i].tinta7}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 8: `, },
-                              { border : [], text : `${datos_ot[i].tinta8}`, }
-                            ],
-                          ]
-                        }
-                      },
-                      { },
-                      // Producto Terimnado
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `PRODUCTO TERMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                              { },
-                            ],
-                            [
-                              { border : [], text : `Formato Bolsa: `, alignment: 'center', },
-                              { border : [], text : `${datos_ot[i].formato_Producto}`, alignment: 'center', },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Ancho`, alignment: 'right', bold : true, },
-                              { border : [], text : `Largo`, alignment: 'center', bold : true, },
-                              { border : [], text : `Fuelle`, alignment: 'left', bold : true, },
-                            ],
-                            [
-                              { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Ancho)}`, alignment: 'right', },
-                              { border : [], colspan : 3, text : `x          ${this.formatonumeros(datos_ot[i].selladoCorte_Largo)}          x`, alignment: 'center', },
-                              { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Fuelle)}               ${datos_ot[i].und_Extrusion}`, },
-                            ],
-                            [
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Sellado: `, },
-                              { border : [], text : `${datos_ot[i].tpSellados_Nombre}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Margen: `, },
-                              { border : [], text : `${datos_ot[i].margen}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Peso Millar: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_PesoMillar}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Cant. x Paquete: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasPaquete}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Cant. x Bulto: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasBulto}`, },
-                              { border : [], text : ``, },
-                            ]
-                          ]
-                        }
-                      },
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].m1C1_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m2C1_nombre}`,  alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m3C1_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m4C1_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p1C1_Nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p2C1_Nombre}`, alignment: 'justify', }, ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`, alignment: 'center', }, ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `CAPA INTERNA:`, }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa2}`, }, ],
+                          [ { border : [], text : ``, }, ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].m1C2_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m2C2_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m3C2_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m4C2_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p1C2_Nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p2C2_Nombre}`, alignment: 'justify', }, ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`, alignment: 'center', }, ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `CAPA EXTERNA:`, }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa3}`, }, ],
+                          [ { border : [], text : ``, }, ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].m1C3_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m2C3_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].m3C3_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [],  text : `${datos_ot[i].m4C3_nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p1C3_Nombre}`, alignment: 'justify', }, ],
+                          [ { border : [], text : `${datos_ot[i].p2C3_Nombre}`, alignment: 'justify', }, ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`, alignment: 'center', }, ],
+                          [ { border : [],  text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`, alignment: 'center', }, ],
+                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`, alignment: 'center', }, ]
+                        ]
+                      }
+                    }
+                  ],
+                ]
               },
-              '\n',
-              {
-                table : {
-                  widths : [20, '*', 20],
-                  style : '',
-                  body : [
-                    [
-                      { border : [], text : ``, },
-                      { border : [], text : `Hacer Cyrel`, alignment : 'center', bold : true},
-                      { border : [], text : ``, }
-                    ]
-                  ]
-                }
-              },
-              '\n\n',
-              {
-                table : {
-                  widths : [539],
-                  style : '',
-                  body : [
-                    [ { border : [true, true, true, false], text : `Observación: ` } ],
-                    [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
-                  ]
-                },
-                layout: { defaultBorder: false,  },
-                fontSize: 10.5,
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*'],
+                style : '',
+                body : [
+                  [ { border: [false, false, false, false], text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', } ]
+                ]
               }
-            ],
-            styles: {
-              header: { fontSize: 7, bold: true },
-              titulo: { fontSize: 11, bold: true },
-              ot: { fontSize: 13, bold: true },
-              subtitulo : { fontSize : 10, bold : true }
-            }
-          }
-          const pdf = pdfMake.createPdf(pdfDefinicion);
-          pdf.open();
-        } else if (!datos_ot[i].cyrel) {
-          const pdfDefinicion : any = {
-            info: { title: `${datos_ot[i].numero_Orden}` },
-            pageSize: { width: 630, height: 760 },
-            footer: function(currentPage : any, pageCount : any) {
-              return [
-                '\n',
-                {
-                  columns: [
-                    { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                    { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+            },
+            {
+              table : {
+                widths : ['*', '*', '*', '*', '*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    { border: [false, false, false, false],  fillColor: '#eeeeee', text: `Pigmento`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Formato`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Ancho`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Und Medida`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Calibre`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Peso MT \n(Min/Max)`, alignment: 'center', style : 'subtitulo', },
+                    { border: [false, false, false, false], fillColor: '#eeeeee', text: `Tratado`, alignment: 'center', style : 'subtitulo', }
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `${datos_ot[i].pigmento_Extrusion}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].formato_Extrusin}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].und_Extrusion}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Extrusion)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].tratado}`, alignment: 'center', }
                   ]
-                }
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : [539],
+                style : '',
+                body : [
+                  [ { border : [true, true, true, false], text : `Observación: ` } ],
+                  [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            '\n',
+            '\n',
+            // Hoja 2
+            {
+              columns: [
+                { image : logoParaPdf, width : 220, height : 50, margin: [ 0, -15, 0, 0 ] },
+                {
+                  width: 390,
+                  text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
+                  style: 'titulo',
+                  alignment: 'center',
+                },
               ]
             },
-            content : [
-              {
-                columns: [
-                  { image : logoParaPdf, width : 220, height : 50 },
-                  {
-                    width: 390,
-                    text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
-                    style: 'titulo',
-                    alignment: 'center',
-                  },
-                  { width: 90, text: `OT ${datos_ot[i].numero_Orden}`, style: 'ot', alignment: 'right', }
+            '\n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [60, '*', 60, '*'],
+                style: 'header',
+                body: [
+                  [
+                    { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
+                    { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
+                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
+                  ],
+                  [
+                    { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
+                    { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
+                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
+                  ],
                 ]
               },
-              '\n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [60, '*', 60, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                      { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                      { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
-                      { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                      { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
-                    ],
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
+                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
+                    { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
                   ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n \n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Materia Prima`, alignment: 'center', style: 'titulo', } ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-            // Mezclas
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, true], text: `Material`, alignment: 'center', style: 'titulo', },
-                      { border: [false, false, false, true], text: `Cod Producto`, alignment: 'center', style: 'titulo', },
-                      { border: [false, false, false, true], text: `Kilos (Kg)`, alignment: 'center', style: 'titulo', }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA UNICA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa1}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C1_nombre}`,  alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m4C1_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C1_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C1_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA INTERNA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa2}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m4C2_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C2_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C2_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                    [
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `CAPA EXTERNA:`, }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa3}`, }, ],
-                            [ { border : [], text : ``, }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].m1C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m2C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].m3C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [],  text : `${datos_ot[i].m4C3_nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p1C3_Nombre}`, alignment: 'justify', }, ],
-                            [ { border : [], text : `${datos_ot[i].p2C3_Nombre}`, alignment: 'justify', }, ]
-                          ]
-                        }
-                      },
-                      {
-                        border : [false, false, false, true],
-                        table : {
-                          widths : ['*'],
-                          style : '',
-                          body : [
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [],  text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`, alignment: 'center', }, ],
-                            [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`, alignment: 'center', }, ]
-                          ]
-                        }
-                      }
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border: [false, false, false, false], text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', } ]
-                  ]
-                }
-              },
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false],  fillColor: '#eeeeee', text: `Pigmento`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Formato`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Ancho`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Und Medida`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Calibre`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Peso MT \n(Min/Max)`, alignment: 'center', style : 'subtitulo', },
-                      { border: [false, false, false, false], fillColor: '#eeeeee', text: `Tratado`, alignment: 'center', style : 'subtitulo', }
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].pigmento_Extrusion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].formato_Extrusin}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].und_Extrusion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Extrusion)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].tratado}`, alignment: 'center', }
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border : [true, true, true, false], text : `Observación: ` } ],
-                    [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 10.5,
-              },
-              '\n',
-              '\n',
-              '\n',
-              // Hoja 2
-              {
-                columns: [
-                  { image : logoParaPdf, width : 220, height : 50 },
-                  {
-                    width: 390,
-                    text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
-                    style: 'titulo',
-                    alignment: 'center',
-                  },
-                  { width: 90, text: `OT ${ot}`, style: 'ot', alignment: 'right', }
                 ]
               },
-              '\n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [60, '*', 60, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                      { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                      { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
-                      { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                      { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
-                      { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              {
-                table : {
-                  widths : ['*', '*', '*', '*', '*'],
-                  style : '',
-                  body : [
-                    [
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                      { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
-                    ],
-                    [
-                      { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                      { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                    ]
-                  ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
-              },
-              '\n',
-              // Procesos
-              {
-                table : {
-                  widths : ['*', 20, '*'],
-                  style : '',
-                  body : [
-                    [
-                      // Extrusion
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                              { }
-                            ],
-                            [
-                              { border : [], text : `Pigmento: `, },
-                              { border : [], text : `${datos_ot[i].pigmento_Extrusion}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Formato: `, },
-                              { border : [], text : `${datos_ot[i].formato_Extrusin}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Calibre: `, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Unidad Medida: `, },
-                              { border : [], text : `${datos_ot[i].und_Extrusion}`, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `ANCHO`, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   `, },
-                              { border : [], text : `       ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, }
-                            ],
-                            [
-                              { border : [], text : `Peso MT (Min/Max): `, },
-                              { border : [false, false, false, false], text : `${datos_ot[i].peso_Extrusion}`, },
-                              { border : [false, false, false, false], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `Tratado Caras: `, },
-                              { border : [], text : `${datos_ot[i].tratado}`, },
-                              { border : [], text : ``, }
-                            ],
-                          ]
-                        }
-                      },
-                      { },
-                      // Laminado
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `LAMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, }
-                            ],
-                            [
-                              { border : [], text : `CAPA`, bold : true, },
-                              { border : [], text : `CALIBRE`, bold : true, },
-                              { border : [], text : `CANTIDAD`, bold : true, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa1}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa1}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa1}`, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa2}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa2}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa2}`, }
-                            ],
-                            [
-                              { border : [], text : `${datos_ot[i].laminado_Capa3}`, },
-                              { border : [], text : `${datos_ot[i].calibre_Laminado_Capa3}`, },
-                              { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa3}`, }
-                            ]
-                          ]
-                        }
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            // Procesos
+            {
+              table : {
+                widths : ['*', 20, '*'],
+                style : '',
+                body : [
+                  [
+                    // Extrusion
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            { colSpan : 3, text : `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                            { }
+                          ],
+                          [
+                            { border : [], text : `Pigmento: `, },
+                            { border : [], text : `${datos_ot[i].pigmento_Extrusion}`, },
+                            { border : [], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `Formato: `, },
+                            { border : [], text : `${datos_ot[i].formato_Extrusin}`, },
+                            { border : [], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `Calibre: `, },
+                            { border : [], text : `${this.formatonumeros(datos_ot[i].calibre_Extrusion)}`, },
+                            { border : [], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `Unidad Medida: `, },
+                            { border : [], text : `${datos_ot[i].und_Extrusion}`, },
+                            { border : [], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `ANCHO`, },
+                            { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   `, },
+                            { border : [], text : `       ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, }
+                          ],
+                          [
+                            { border : [], text : `Peso MT (Min/Max): `, },
+                            { border : [false, false, false, false], text : `${datos_ot[i].peso_Extrusion}`, },
+                            { border : [false, false, false, false], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `Tratado Caras: `, },
+                            { border : [], text : `${datos_ot[i].tratado}`, },
+                            { border : [], text : ``, }
+                          ],
+                        ]
                       }
-                    ],
-                    [
-                      { },
-                      { },
-                      { }
-                    ],
-                    [
-                      { },
-                      { },
-                      { }
-                    ],
-                    [
-                      // Impresion
-                      {
-                        table : {
-                          widths : ['*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 2, text : `IMPRESIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                            ],
-                            [
-                              { border : [], text : `Tipo Impresión: `, },
-                              { border : [], text : `${datos_ot[i].tipo_Impresion}`, }
-                            ],
-                            [
-                              { border : [], text : `Rodillo N°: `, },
-                              { border : [], text : `${datos_ot[i].rodillo}`, }
-                            ],
-                            [
-                              { border : [], text : `N° de Pista: `, },
-                              { border : [], text : `${datos_ot[i].pista}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 1: `, },
-                              { border : [], text : `${datos_ot[i].tinta1}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 2: `, },
-                              { border : [], text : `${datos_ot[i].tinta2}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 3: `, },
-                              { border : [], text : `${datos_ot[i].tinta3}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 4: `, },
-                              { border : [], text : `${datos_ot[i].tinta4}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 5: `, },
-                              { border : [], text : `${datos_ot[i].tinta5}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 6: `, },
-                              { border : [], text : `${datos_ot[i].tinta6}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 7: `, },
-                              { border : [], text : `${datos_ot[i].tinta7}`, }
-                            ],
-                            [
-                              { border : [], text : `Tinta 8: `, },
-                              { border : [], text : `${datos_ot[i].tinta8}`, }
-                            ],
+                    },
+                    { },
+                    // Laminado
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            { colSpan : 3, text : `LAMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { border : [], text : ``, },
+                            { border : [], text : ``, }
+                          ],
+                          [
+                            { border : [], text : `CAPA`, bold : true, },
+                            { border : [], text : `CALIBRE`, bold : true, },
+                            { border : [], text : `CANTIDAD`, bold : true, }
+                          ],
+                          [
+                            { border : [], text : `${datos_ot[i].laminado_Capa1}`, },
+                            { border : [], text : `${datos_ot[i].calibre_Laminado_Capa1}`, },
+                            { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa1}`, }
+                          ],
+                          [
+                            { border : [], text : `${datos_ot[i].laminado_Capa2}`, },
+                            { border : [], text : `${datos_ot[i].calibre_Laminado_Capa2}`, },
+                            { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa2}`, }
+                          ],
+                          [
+                            { border : [], text : `${datos_ot[i].laminado_Capa3}`, },
+                            { border : [], text : `${datos_ot[i].calibre_Laminado_Capa3}`, },
+                            { border : [], text : `${datos_ot[i].cantidad_Laminado_Capa3}`, }
                           ]
-                        }
-                      },
-                      { },
-                      // Producto Terimnado
-                      {
-                        table : {
-                          widths : ['*', '*', '*'],
-                          style : '',
-                          body : [
-                            [
-                              { colSpan : 3, text : `PRODUCTO TERMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                              { },
-                              { },
-                            ],
-                            [
-                              { border : [], text : `Formato Bolsa: `, alignment: 'center', },
-                              { border : [], text : `${datos_ot[i].formato_Producto}`, alignment: 'center', },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Ancho`, alignment: 'right', bold : true, },
-                              { border : [], text : `Largo`, alignment: 'center', bold : true, },
-                              { border : [], text : `Fuelle`, alignment: 'left', bold : true, },
-                            ],
-                            [
-                              { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Ancho)}`, alignment: 'right', },
-                              { border : [], colspan : 3, text : `x          ${this.formatonumeros(datos_ot[i].selladoCorte_Largo)}          x`, alignment: 'center', },
-                              { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Fuelle)}               ${datos_ot[i].und_Extrusion}`, },
-                            ],
-                            [
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Sellado: `, },
-                              { border : [], text : `${datos_ot[i].tpSellados_Nombre}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Margen: `, },
-                              { border : [], text : `${datos_ot[i].margen}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Peso Millar: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_PesoMillar}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Cant. x Paquete: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasPaquete}`, },
-                              { border : [], text : ``, },
-                            ],
-                            [
-                              { border : [], text : `Cant. x Bulto: `, },
-                              { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasBulto}`, },
-                              { border : [], text : ``, },
-                            ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    { },
+                    { },
+                    { }
+                  ],
+                  [
+                    { },
+                    { },
+                    { }
+                  ],
+                  [
+                    // Impresion
+                    {
+                      table : {
+                        widths : ['*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            { colSpan : 2, text : `IMPRESIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                          ],
+                          [
+                            { border : [], text : `Tipo Impresión: `, },
+                            { border : [], text : `${datos_ot[i].tipo_Impresion}`, }
+                          ],
+                          [
+                            { border : [], text : `Rodillo N°: `, },
+                            { border : [], text : `${datos_ot[i].rodillo}`, }
+                          ],
+                          [
+                            { border : [], text : `N° de Pista: `, },
+                            { border : [], text : `${datos_ot[i].pista}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 1: `, },
+                            { border : [], text : `${datos_ot[i].tinta1}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 2: `, },
+                            { border : [], text : `${datos_ot[i].tinta2}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 3: `, },
+                            { border : [], text : `${datos_ot[i].tinta3}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 4: `, },
+                            { border : [], text : `${datos_ot[i].tinta4}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 5: `, },
+                            { border : [], text : `${datos_ot[i].tinta5}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 6: `, },
+                            { border : [], text : `${datos_ot[i].tinta6}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 7: `, },
+                            { border : [], text : `${datos_ot[i].tinta7}`, }
+                          ],
+                          [
+                            { border : [], text : `Tinta 8: `, },
+                            { border : [], text : `${datos_ot[i].tinta8}`, }
+                          ],
+                        ]
+                      }
+                    },
+                    { },
+                    // Producto Terimnado
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            { colSpan : 3, text : `PRODUCTO TERMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                            { },
+                          ],
+                          [
+                            { border : [], text : `Formato Bolsa: `, alignment: 'center', },
+                            { border : [], text : `${datos_ot[i].formato_Producto}`, alignment: 'center', },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Ancho`, alignment: 'right', bold : true, },
+                            { border : [], text : `Largo`, alignment: 'center', bold : true, },
+                            { border : [], text : `Fuelle`, alignment: 'left', bold : true, },
+                          ],
+                          [
+                            { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Ancho)}`, alignment: 'right', },
+                            { border : [], colspan : 3, text : `x          ${this.formatonumeros(datos_ot[i].selladoCorte_Largo)}          x`, alignment: 'center', },
+                            { border : [], colspan : 3, text : `${this.formatonumeros(datos_ot[i].selladoCorte_Fuelle)}               ${datos_ot[i].und_Extrusion}`, },
+                          ],
+                          [
+                            { border : [], text : ``, },
+                            { border : [], text : ``, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : ``, },
+                            { border : [], text : ``, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Sellado: `, },
+                            { border : [], text : `${datos_ot[i].tpSellados_Nombre}`, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Margen: `, },
+                            { border : [], text : `${datos_ot[i].margen}`, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Peso Millar: `, },
+                            { border : [], text : `${datos_ot[i].selladoCorte_PesoMillar}`, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Cant. x Paquete: `, },
+                            { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasPaquete}`, },
+                            { border : [], text : ``, },
+                          ],
+                          [
+                            { border : [], text : `Cant. x Bulto: `, },
+                            { border : [], text : `${datos_ot[i].selladoCorte_CantBolsasBulto}`, },
+                            { border : [], text : ``, },
                           ]
-                        }
-                      },
-                    ]
+                        ]
+                      }
+                    },
                   ]
-                },
-                layout: { defaultBorder: false, },
-                fontSize: 9,
+                ]
               },
-              '\n\n\n',
-              {
-                table : {
-                  widths : ['*'],
-                  style : '',
-                  body : [
-                    [ { border : [true, true, true, false], text : `Observación: ` } ],
-                    [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            datos_ot[i].cyrel ? {
+              table : {
+                widths : [20, '*', 20],
+                style : '',
+                body : [
+                  [
+                    { border : [], text : ``, },
+                    { border : [], text : `Hacer Cyrel`, alignment : 'center', bold : true},
+                    { border : [], text : ``, }
                   ]
-                },
-                layout: { defaultBorder: false,  },
-                fontSize: 10.5,
+                ]
               }
-            ],
-            styles: {
-              header: { fontSize: 7, bold: true },
-              titulo: { fontSize: 11, bold: true },
-              ot: { fontSize: 13, bold: true },
-              subtitulo : { fontSize : 10, bold : true }
+            } : {},
+            '\n\n',
+            {
+              table : {
+                widths : [539],
+                body : [
+                  [ { border : [true, true, true, false], text : `Observación: ` } ],
+                  [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]
+                ]
+              },
+              layout: { defaultBorder: false,  },
+              fontSize: 9,
+              margin: [0, -20]
             }
+          ],
+          styles: {
+            header: { fontSize: 7, bold: true },
+            titulo: { fontSize: 11, bold: true },
+            ot: { fontSize: 13, bold: true },
+            subtitulo : { fontSize : 10, bold : true }
           }
-          const pdf = pdfMake.createPdf(pdfDefinicion);
-          pdf.open();
         }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
       }
     });
   }
@@ -2705,14 +2032,6 @@ export class OrdenesTrabajoComponent implements OnInit {
           OT_Estado : datos_orden[i].estado_Orden,
           OT_Observacion : datos_orden[i].observacion,
           Margen : datos_orden[i].ot_MargenAdicional,
-          OT_Cyrel : this.checkedCyrel,
-          OT_Extrusion : this.extrusion,
-          OT_Impresion : this.impresion,
-          OT_Rotograbado : this.rotograbado,
-          OT_Laminado : this.laminado,
-          OT_Corte : this.checkedCorte,
-          OT_Doblado : this.doblado,
-          OT_Sellado : this.sellado,
         });
 
         let productoExt : any = {
@@ -2740,7 +2059,6 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
         this.ArrayProducto.push(productoExt);
-        this.cantidadCostoProductos = productoExt.SubTotal;
 
         this.FormOrdenTrabajoExtrusion.patchValue({
           Material_Extrusion : datos_orden[i].id_Material,
@@ -2803,7 +2121,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.cargarCombinacionMezclas();
         this.calcularDatosOt(productoExt);
       }
-    }, error => { this.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message); });
+    }, error => this.mensajeService.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message));
   }
 
   // Funcion que va a validar que si se desee actualizar la orden de trabajo
@@ -2824,36 +2142,27 @@ export class OrdenesTrabajoComponent implements OnInit {
               if (this.FormOrdenTrabajoCorte.valid) {
                 if (this.FormOrdenTrabajoSellado.valid) {
                   if (this.FormOrdenTrabajoMezclas.valid) {
-                    Swal.fire({
-                      icon: 'info',
-                      title: 'Confirmación de Edición de OT',
-                      html:`<spam>¿Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</spam>
-                      <br> <b>¡Al hacer esto no se recuperarán los datos iniciales!</b>`,
-                      showDenyButton: true,
-                      confirmButtonText: `Editar Orden de Trabajo`,
-                      denyButtonText: `Seguir Editando`,
-                    }).then((result) => {
-                      if (result.isConfirmed) this.editarOrdenTrabajo();
-                      else if (result.isDenied) {
-                        const Toast = Swal.mixin({
-                          toast: true, position: 'center', showConfirmButton: false, timer: 3000, timerProgressBar: true,
-                          didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer);
-                            toast.addEventListener('mouseleave', Swal.resumeTimer);
-                          }
-                        });
-                        Toast.fire({ icon: 'info', title: 'Puede seguir editando la Orden de Trabajo' });
-                      }
+                    this.messageService.add({
+                      severity:'warn',
+                      key: 'editarOrden',
+                      summary:'Confirmación de Edición de OT',
+                      detail:
+                      `<h6><b>Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</b></h6><br>` +
+                      `<spam><b>¡Al hacer esto no se recuperarán los datos iniciales!</b><br></spam>`,
+                      sticky: true
                     });
-                  } else this.mostrarAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
-                } else this.mostrarAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
-              } else this.mostrarAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
-            } else this.mostrarAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
-          } else this.mostrarAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
-        } else this.mostrarAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+                  } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
+              } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
+            } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
+        } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
       }, 700);
-    } else this.mostrarAdvertencia(`¡Hay campos del formulario vacios!`);
+    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
   }
+
+  // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
+  cerrarMensaje = () => this.messageService.clear('editarOrden');
 
   // Funcion que va actualizar con nueva información la orden de trabajo
   editarOrdenTrabajo(){
@@ -2895,12 +2204,12 @@ export class OrdenesTrabajoComponent implements OnInit {
           errorSelCor = this.actualizarOT_Sellado_Corte(ot);
           setTimeout(() => {
             if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-              Swal.fire({icon : 'success', title: '¡Actualizado Correctamente!', text: `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`});
+              this.mensajeService.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
               this.limpiarCampos();
             }
           }, 1500);
-        }, () => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`, ''); });
-      }, () => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`, ''); });
+        }, () => this.mensajeService.mensajeError(`¡Error!`, `¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`));
+      }, () => this.mensajeService.mensajeError(`¡Error!`, `No se pudo obtener información de la Orden de Trabajo N° ${ot}`));
     }
   }
 
@@ -2923,7 +2232,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
         }
         this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(() => { }, error => {
-          this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.message);
+          this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.error);
           return true;
         });
       }
@@ -2966,17 +2275,17 @@ export class OrdenesTrabajoComponent implements OnInit {
               Tinta8_Id : datos_impresion[j].tinta_Id8,
             }
             this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(() => { }, error => {
-              this.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message);
+              this.mensajeService.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
               return true;
             });
           }
         }, () => {
-          this.mensajeError(`¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`, '');
+          this.mensajeService.mensajeError(`¡Error!`, `¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`);
           return true;
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
+      this.mensajeService.mensajeError(`¡Error!`, `¡No se encontró información de la OT N° ${ot}!`);
       return true;
     });
     return false;
@@ -3000,12 +2309,12 @@ export class OrdenesTrabajoComponent implements OnInit {
           LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
         this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => { }, error => {
-          this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.message);
+          this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.message);
           return true;
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
+      this.mensajeService.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -3015,7 +2324,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   actualizarOT_Sellado_Corte(ot : number){
     this.otSelladoCorteService.GetOT_SelladoCorte(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        let tipoSellado : string = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : string = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+        let tipoSellado : number = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : number = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
         this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
           let info : any = {
             SelladoCorte_Id : datos_ot[i].selladoCorte_Id,
@@ -3036,16 +2345,16 @@ export class OrdenesTrabajoComponent implements OnInit {
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => { }, error => {
-            this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
+            this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
             return true;
           });
         }, error => {
-          this.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message);
+          this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message);
           return true;
         });
       }
     }, () => {
-      this.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`, '');
+      this.mensajeService.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -4013,32 +3322,5 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa3').enable();
       this.cambiarNroCapas3();
     }, 300);
-  }
-
-  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
-  verTutorial() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
-  }
-
-   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de mezclas*/
-  verTutorial2() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps2);
-    this.shepherdService.start();
-  }
-
-  /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación en el apartado de crear mezclas*/
-  verTutorial3() {
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
-    this.shepherdService.modal = true;
-    this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps3);
-    this.shepherdService.start();
   }
 }

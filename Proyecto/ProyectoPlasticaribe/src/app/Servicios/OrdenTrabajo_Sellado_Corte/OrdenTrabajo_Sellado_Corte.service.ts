@@ -22,7 +22,7 @@ export class OrdenTrabajo_Sellado_CorteService {
     return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/${dato}`);
   }
 
-  getTipoSellado_Formato(tipoSellado : string, formato : string){
+  getTipoSellado_Formato(tipoSellado : number, formato : number){
     return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
   }
 

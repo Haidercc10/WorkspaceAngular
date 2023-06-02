@@ -2,13 +2,11 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import { OpedidoproductoComponent } from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
-import Swal from 'sweetalert2';
-import { CrearProductoComponent } from '../crear-producto/crear-producto.component';
 import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
@@ -20,6 +18,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './crear-clientes.component.html',
   styleUrls: ['./crear-clientes.component.css']
 })
+
 export class ClientesComponent implements OnInit {
 
   public FormCrearClientes !: FormGroup; //Formulario de creacion de clientes
@@ -40,10 +39,9 @@ export class ClientesComponent implements OnInit {
                   private tiposClientesService : TipoClienteService,
                     private tipoIdentificacionService : TipoIdentificacionService,
                       private usuarioService : UsuarioService,
-                        private pedidoCliente : OpedidoproductoComponent,
-                          private crearProducto : CrearProductoComponent,
-                            private clientesService :ClientesService,
-                              private sedesClientesService: SedeClienteService,) {
+                        private clientesService :ClientesService,
+                          private sedesClientesService: SedeClienteService,
+                            private mensajeService : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
@@ -53,7 +51,6 @@ export class ClientesComponent implements OnInit {
       CliTelefono: [''],
       CliEmail: [''],
       TipoClienteId: [null, Validators.required],
-      UsuIdNombre: [null, Validators.required],
       vendedorId: [null, Validators.required],
     });
 
@@ -93,148 +90,56 @@ export class ClientesComponent implements OnInit {
 
   // Funcion que consultará y almacneará los vendedores
   usuarioComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-      if (datos_usuarios.rolUsu_Id == 2) this.usuario.push(datos_usuarios);
-      else {
-        this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-          for (let index = 0; index < datos_usuarios.length; index++) {
-            if (datos_usuarios[index].rolUsu_Id == 2) this.usuario.push(datos_usuarios[index]);
-          }
-        });
-      }
-    });
-  }
-
-  // Funcion que se encará de buscar la información de vendedor
-  vendedoreSeleccionado(){
-    let vendedor : any = this.FormCrearClientes.value.UsuIdNombre;
-    this.usuarioService.srvObtenerListaPorId(vendedor).subscribe(datos_usuario => {
-      this.FormCrearClientes = this.formBuilderCrearClientes.group({
-        CliId: this.FormCrearClientes.value.CliId,
-        TipoIdCliente: this.FormCrearClientes.value.TipoIdCliente,
-        CliNombre: this.FormCrearClientes.value.CliNombre,
-        CliTelefono: this.FormCrearClientes.value.CliTelefono,
-        CliEmail: this.FormCrearClientes.value.CliEmail,
-        TipoClienteId: this.FormCrearClientes.value.TipoClienteId,
-        UsuIdNombre: datos_usuario.usua_Nombre,
-        vendedorId: datos_usuario.usua_Id,
-      });
-    });
-  }
-
-  // Funcion que consulta´ra y almacenará los clientes
-  clientesComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-      this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
-        for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);
-          else this.cliente.push(datos_clientes[index]);
-          this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-        }
-      });
-    });
+    if (this.ValidarRol == 2) this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos => this.usuario = datos);
+    else if (this.ValidarRol == 1) this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuario = datos.filter((item) => item.rolUsu_Id == 2));
   }
 
   // Funcion que validará los campos del formulario de clientes
-  validarCamposVaciosClientes() : any{
-    if (this.FormCrearClientes.valid){
-      this.crearCliente();
-      this.LimpiarCampos();
-      this.clientesComboBox();
-    } else this.mensajeAdvertencia("Hay campos vacios");
-  }
+  validarCamposVaciosClientes = () => this.FormCrearClientes.valid ? this.crearCliente() : this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios");
 
   // Funcionq eu validará los campos dl formulario de sedes de clientes
-  validarCamposVaciosSedes(){
-    if (this.FormCrearSedeClientes.valid){
-      this.crearSede();
-    } else this.mensajeAdvertencia("Hay campos vacios");
-  }
+  validarCamposVaciosSedes = () => this.FormCrearSedeClientes.valid ? this.crearSede() : this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios");
 
   // Funcion que se encargará de crear clientes
   crearCliente(){
-    if (this.ValidarRol == 2) {
-      const datosClientes : any = {
-        Cli_Id: this.FormCrearClientes.value.CliId,
-        TipoIdentificacion_Id : this.FormCrearClientes.value.TipoIdCliente,
-        Cli_Nombre: this.FormCrearClientes.value.CliNombre,
-        Cli_Telefono: this.FormCrearClientes.value.CliTelefono,
-        Cli_Email: this.FormCrearClientes.value.CliEmail,
-        TPCli_Id: this.FormCrearClientes.value.TipoClienteId,
-        Usua_Id: this.FormCrearClientes.value.vendedorId,
-        Estado_Id : 8,
-        Cli_Fecha : moment().format('YYYY-MM-DD'),
-        Cli_Hora : moment().format('H:mm:ss'),
-      }
-      this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
-        Swal.fire({icon : 'success', title: 'Guardado Exitoso', text: 'Cliente guardado con éxito!'});
-      }, error => { this.mensajeError('¡No fue posible crear el cliente!', error.message); });
-    }else if (this.ValidarRol == 1){
-      const datosClientes : any = {
-        Cli_Id: this.FormCrearClientes.value.CliId,
-        TipoIdentificacion_Id : this.FormCrearClientes.value.TipoIdCliente,
-        Cli_Nombre: this.FormCrearClientes.value.CliNombre,
-        Cli_Telefono: this.FormCrearClientes.value.CliTelefono,
-        Cli_Email: this.FormCrearClientes.value.CliEmail,
-        TPCli_Id: this.FormCrearClientes.value.TipoClienteId,
-        Usua_Id: this.FormCrearClientes.value.vendedorId,
-        Estado_Id : 1,
-        Cli_Fecha : moment().format('YYYY-MM-DD'),
-        Cli_Hora : moment().format('H:mm:ss'),
-      }
-      this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
-        Swal.fire({icon : 'success', title: 'Guardado Exitoso', text: 'Cliente guardado con éxito!'});
-      }, error => { this.mensajeError('¡No fue posible crear el cliente!', error.message); });
+    const datosClientes : any = {
+      Cli_Id: this.FormCrearClientes.value.CliId,
+      TipoIdentificacion_Id : this.FormCrearClientes.value.TipoIdCliente,
+      Cli_Nombre: this.FormCrearClientes.value.CliNombre,
+      Cli_Telefono: this.FormCrearClientes.value.CliTelefono,
+      Cli_Email: this.FormCrearClientes.value.CliEmail,
+      TPCli_Id: this.FormCrearClientes.value.TipoClienteId,
+      Usua_Id: this.FormCrearClientes.value.vendedorId,
+      Estado_Id : 0,
+      Cli_Fecha : moment().format('YYYY-MM-DD'),
+      Cli_Hora : moment().format('H:mm:ss'),
     }
-    this.crearProducto.ngOnInit();
-    this.pedidoCliente.ngOnInit();
+    if (this.ValidarRol == 2) datosClientes.Estado_Id = 8;
+    else if (this.ValidarRol == 1) datosClientes.Estado_Id = 1;
+    this.clientesService.srvGuardar(datosClientes).subscribe(() => {
+      this.mensajeService.mensajeConfirmacion(`¡Cliente Creado!`, `¡Se creado el cliente con el nombre ${datosClientes.Cli_Nombre}!`);
+      this.LimpiarCampos();
+    }, error => this.mensajeService.mensajeError('¡No fue posible crear el cliente!', error.message));
   }
 
   // Funcion que se encargará de crear sedes de clientes
   crearSede(){
     this.sedesClientesService.GetSedesCliente(this.FormCrearSedeClientes.value.CliId2).subscribe(datos_sedePorID => {
-      if (datos_sedePorID > 0) {
-        const datosSedes : any = {
-          sedeCli_Id: datos_sedePorID + 1,
-          SedeCliente_Ciudad: this.FormCrearSedeClientes.value.SedeCli_Ciudad,
-          SedeCliente_Direccion: this.FormCrearSedeClientes.value.SedeCli_Direccion,
-          SedeCli_CodPostal: this.FormCrearSedeClientes.value.SedeCli_Postal,
-          Cli_Id : this.FormCrearSedeClientes.value.CliId2,
-          SedeCli_Fecha : moment().format('YYYY-MM-DD'),
-          SedeCli_Hora : moment().format('H:mm:ss'),
-        }
-        this.sedesClientesService.srvGuardar(datosSedes).subscribe(datos_sede => {
-          Swal.fire({icon : 'success', title: 'Guardado Exitoso', text: 'Sede de Cliente guardada con éxito!'});
-          this.LimpiarCamposSede();
-          this.pedidoCliente.ngOnInit();
-        }, error => { this.mensajeError('¡No fue posible crear la sede del cliente!', error.message); });
-      } else if (datos_sedePorID == 0) {
-        const datosSedess : any = {
-          sedeCli_Id: this.FormCrearSedeClientes.value.CliId2 +""+ 1,
-          SedeCliente_Ciudad: this.FormCrearSedeClientes.value.SedeCli_Ciudad,
-          SedeCliente_Direccion: this.FormCrearSedeClientes.value.SedeCli_Direccion,
-          SedeCli_CodPostal: this.FormCrearSedeClientes.value.SedeCli_Postal,
-          Cli_Id : this.FormCrearSedeClientes.value.CliId2,
-          SedeCli_Fecha : moment().format('YYYY-MM-DD'),
-          SedeCli_Hora : moment().format('H:mm:ss'),
-        }
-        this.sedesClientesService.srvGuardar(datosSedess).subscribe(datos_sede => {
-          Swal.fire({icon : 'success', title: 'Guardado Exitoso', text: 'Sede de Cliente guardada con éxito!'});
-          this.LimpiarCamposSede();
-          this.pedidoCliente.ngOnInit();
-         }, error => { this.mensajeError('¡No fue posible crear la sede del cliente!', error.message); });
+      const datosSedes : any = {
+        sedeCli_Id: '',
+        SedeCliente_Ciudad: this.FormCrearSedeClientes.value.SedeCli_Ciudad,
+        SedeCliente_Direccion: this.FormCrearSedeClientes.value.SedeCli_Direccion,
+        SedeCli_CodPostal: this.FormCrearSedeClientes.value.SedeCli_Postal,
+        Cli_Id : this.FormCrearSedeClientes.value.CliId2,
+        SedeCli_Fecha : moment().format('YYYY-MM-DD'),
+        SedeCli_Hora : moment().format('H:mm:ss'),
       }
-    }, error => { this.mensajeError('¡Ocurrió un error al momento de consultar si el cliente tiene sedes previamente creadas!', error.message); });
+      if (datos_sedePorID > 0) datosSedes.sedeCli_Id = datos_sedePorID + 1;
+      else if (datos_sedePorID == 0) datosSedes.sedeCli_Id = this.FormCrearSedeClientes.value.CliId2 +""+ 1;
+      this.sedesClientesService.srvGuardar(datosSedes).subscribe(() => {
+        this.mensajeService.mensajeConfirmacion('Guardado Exitoso', 'Sede de Cliente guardada con éxito!');
+        this.LimpiarCamposSede();
+      }, error => this.mensajeService.mensajeError('¡No fue posible crear la sede del cliente!', error.message));
+    }, error => this.mensajeService.mensajeError('¡Ocurrió un error al momento de consultar si el cliente tiene sedes previamente creadas!', error.message));
   }
-
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-  }
-
 }

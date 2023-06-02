@@ -30,16 +30,13 @@ export class AppComponent implements OnInit{
   user_ContaZeus?: user_Conta_Zeus | null;
   user_BagPro?: User_BagPro | null;
   title = 'ProyectoPlasticaribe';
-  validar : number = 0;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rutaCarpetaArchivos : string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
-  public data:any=[];
   tamanoLetra : number = 1;
   temaSeleccionado : boolean = false;
-  tutorial : boolean;
 
   constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private authenticationService: AuthenticationService,
@@ -121,40 +118,12 @@ export class AppComponent implements OnInit{
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
     this.cookieService.set('tamanoLetraCambiado', 'true', { expires: 365, sameSite: 'Lax' });
-    this.tutorial = this.cookieService.get('Tutorial') != '' ? true : false;
-    this.tutorial ? this.cookieService.set('Tutorial', 'true') : undefined;
   }
 
-  //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
+  //Funcion para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
   inactividad(){
-    document.onkeypress = this.reiniciarTiempo();
-    document.onload = this.reiniciarTiempo();
-    document.onmousemove = this.reiniciarTiempo();
-    document.onmousedown = this.reiniciarTiempo(); // aplica para una pantalla touch
-    document.ontouchstart = this.reiniciarTiempo();
-    document.onclick = this.reiniciarTiempo(); // aplica para un clic del touchpad
-    document.onscroll = this.reiniciarTiempo(); // navegando con flechas del teclado
-  }
-
-  // Funcion uqe va a reiniciar el tiempo de espera de la aplicacion
-  reiniciarTiempo() : any{
-    let t : any;
-    let estadoConexion : boolean = window.navigator.onLine;
-    if (window.location.pathname != '/' && !estadoConexion) this.tiempoExcedido();
-    clearTimeout(t);
-    t = setTimeout(() => this.tiempoExcedido(), 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
-  }
-
-  // Funcion que se va a ejecutar cuando se exceda el tiempo de espera
-  tiempoExcedido(){
-    localStorage.clear();
-    window.location.pathname = '/';
-  }
-
-  inactividad2(){
     let t : any;
     window.onload = reiniciarTiempo;
-    // Eventos del DOM
     document.onmousemove = reiniciarTiempo;
     document.onkeypress = reiniciarTiempo;
     document.onload = reiniciarTiempo;
@@ -165,20 +134,14 @@ export class AppComponent implements OnInit{
     document.onscroll = reiniciarTiempo;    // navegando con flechas del teclado
     document.onkeypress = reiniciarTiempo;
     function tiempoExcedido() {
-      window.location.href = "./";
+      localStorage.clear();
+      window.location.pathname = '/';
     }
     function reiniciarTiempo() {
       let estadoConexion : boolean = window.navigator.onLine;
-      if (window.location.pathname != '/' && !estadoConexion) window.location.href = "./";
+      if (window.location.pathname != '/' && !estadoConexion) tiempoExcedido;
       clearTimeout(t);
-      t = setTimeout(tiempoExcedido, 1800000);
-      // 1 minuto son 60000 millisegundos
-      // 30 minutos son 1800000 milisegundos
+      t = setTimeout(tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
     }
-  }
-
-  saveInLocal(key, val): void {
-    this.storage.set(key, val);
-    this.data[key]= this.storage.get(key);
   }
 }

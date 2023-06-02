@@ -14,7 +14,6 @@ import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -157,81 +156,45 @@ export class CrearProductoComponent implements OnInit {
 
   // Funcion que va a crear un producto y lo va a asociar a un cliente
   llenarTabla(){
-    if (this.ValidarRol == 2) {
-      const datosProductos : any = {
-        Prod_Id: this.FormCrearProducto.value.ProduId,
-        Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
-        Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
-        TpProd_Id: this.FormCrearProducto.value.ProduTipo,
-        Prod_Peso: 0,
-        Prod_Peso_Millar: 0,
-        UndMedPeso: 'Kg',
-        Prod_Fuelle: this.FormCrearProducto.value.ProduFuelle,
-        Prod_Ancho: this.FormCrearProducto.value.ProduAncho,
-        Prod_Calibre: this.FormCrearProducto.value.ProduCalibre,
-        UndMedACF: this.FormCrearProducto.value.ProduUnidadMedidaACF,
-        Estado_Id: 9,
-        Prod_Largo: this.FormCrearProducto.value.ProduLargo,
-        Pigmt_Id: this.FormCrearProducto.value.ProduPigmento,
-        Material_Id: this.FormCrearProducto.value.ProduMaterial,
-        Prod_Fecha : this.today,
-        Prod_Hora : moment().format('H:mm:ss'),
-        TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
-        Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
-        Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
-        Prod_PrecioDia_Sellado : 0,
-        Prod_PrecioNoche_Sellado : 0,
-        Prod_Peso_Paquete : 0,
-        Prod_Peso_Bulto : 0,
-      };
-      const clienteproducto : any = {
-        Cli_Id: this.FormCrearProducto.value.ClienteNombre,
-        Prod_Id: this.FormCrearProducto.value.ProduId
-      }
-      this.productoService.srvGuardar(datosProductos).subscribe(datos => {
-        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-          this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
-          this.LimpiarCampos();
-        }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
-      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
-    } else if (this.ValidarRol == 1){
-      const datosProductos : any = {
-        Prod_Id: this.FormCrearProducto.value.ProduId,
-        Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
-        Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
-        TpProd_Id: this.FormCrearProducto.value.ProduTipo,
-        Prod_Peso: 0,
-        Prod_Peso_Millar: 0,
-        UndMedPeso: 'Kg',
-        Prod_Fuelle: this.FormCrearProducto.value.ProduFuelle,
-        Prod_Ancho: this.FormCrearProducto.value.ProduAncho,
-        Prod_Calibre: this.FormCrearProducto.value.ProduCalibre,
-        UndMedACF: this.FormCrearProducto.value.ProduUnidadMedidaACF,
-        Estado_Id: 10,
-        Prod_Largo: this.FormCrearProducto.value.ProduLargo,
-        Pigmt_Id: this.FormCrearProducto.value.ProduPigmento,
-        Material_Id: this.FormCrearProducto.value.ProduMaterial,
-        Prod_Fecha : this.today,
-        Prod_Hora : moment().format('H:mm:ss'),
-        TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
-        Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
-        Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
-        Prod_PrecioDia_Sellado : 0,
-        Prod_PrecioNoche_Sellado : 0,
-        Prod_Peso_Paquete : 0,
-        Prod_Peso_Bulto : 0,
-      };
-      const clienteproducto : any = {
-        Cli_Id: this.FormCrearProducto.value.ClienteNombre,
-        Prod_Id: this.FormCrearProducto.value.ProduId
-      }
-      this.productoService.srvGuardar(datosProductos).subscribe(datos => {
-        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-          this.mensajeService.mensajeConfirmacion(`¡Producto Creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
-          this.LimpiarCampos();
-        }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
-      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
+    const datosProductos : any = {
+      Prod_Id: this.FormCrearProducto.value.ProduId,
+      Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
+      Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
+      TpProd_Id: this.FormCrearProducto.value.ProduTipo,
+      Prod_Peso: 0,
+      Prod_Peso_Millar: 0,
+      UndMedPeso: 'Kg',
+      Prod_Fuelle: this.FormCrearProducto.value.ProduFuelle,
+      Prod_Ancho: this.FormCrearProducto.value.ProduAncho,
+      Prod_Calibre: this.FormCrearProducto.value.ProduCalibre,
+      UndMedACF: this.FormCrearProducto.value.ProduUnidadMedidaACF,
+      Estado_Id: 0,
+      Prod_Largo: this.FormCrearProducto.value.ProduLargo,
+      Pigmt_Id: this.FormCrearProducto.value.ProduPigmento,
+      Material_Id: this.FormCrearProducto.value.ProduMaterial,
+      Prod_Fecha : this.today,
+      Prod_Hora : moment().format('H:mm:ss'),
+      TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
+      Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
+      Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
+      Prod_PrecioDia_Sellado : 0,
+      Prod_PrecioNoche_Sellado : 0,
+      Prod_Peso_Paquete : 0,
+      Prod_Peso_Bulto : 0,
+    };
+    const clienteproducto : any = {
+      Cli_Id: this.FormCrearProducto.value.ClienteNombre,
+      Prod_Id: this.FormCrearProducto.value.ProduId
     }
+    if (this.ValidarRol == 2) datosProductos.Estado_Id = 9;
+    else if (this.ValidarRol == 1) datosProductos.Estado_Id = 10;
+
+    this.productoService.srvGuardar(datosProductos).subscribe(() => {
+      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(() =>{
+        this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
+        this.LimpiarCampos();
+      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
+    }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
   }
 
   //Funcion que va a crear una existencia para un producto
@@ -250,7 +213,7 @@ export class CrearProductoComponent implements OnInit {
       ExProd_Fecha : moment().format('YYYY-MM-DD'),
       ExProd_Hora : moment().format('H:mm:ss'),
     };
-    this.existenciasService.srvGuardar(datosExistencias).subscribe(datos_existencias => {
+    this.existenciasService.srvGuardar(datosExistencias).subscribe(() => {
       this.mensajeService.mensajeConfirmacion(`Existencia Creada`, `La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
       this.LimpiarCamposPresentacion();
     }, error => this.mensajeService.mensajeError('¡Ocurrió un error, no fue posible guardar la presentación!', error.message));
