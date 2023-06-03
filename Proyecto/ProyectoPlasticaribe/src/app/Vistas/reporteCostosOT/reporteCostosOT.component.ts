@@ -477,6 +477,7 @@ export class ReporteCostosOTComponent implements OnInit {
                   }
                 ]
               },
+              watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
               content : [
                 {
                   columns: [
@@ -666,6 +667,7 @@ export class ReporteCostosOTComponent implements OnInit {
               info: {
                 title: `${this.ordenTrabajo}`
               },
+              watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
               content : [
                 {
                   columns: [
@@ -856,6 +858,7 @@ export class ReporteCostosOTComponent implements OnInit {
               info: {
                 title: `${this.ordenTrabajo}`
               },
+              watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
               content : [
                 {
                   columns: [

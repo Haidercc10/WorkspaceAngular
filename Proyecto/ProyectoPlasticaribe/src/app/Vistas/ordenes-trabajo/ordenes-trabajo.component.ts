@@ -49,13 +49,13 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 export class OrdenesTrabajoComponent implements OnInit {
 
-  public FormOrdenTrabajo !: FormGroup;
-  public FormOrdenTrabajoExtrusion !: FormGroup;
-  public FormOrdenTrabajoImpresion !: FormGroup;
-  public FormOrdenTrabajoLaminado !: FormGroup;
-  public FormOrdenTrabajoCorte !: FormGroup;
-  public FormOrdenTrabajoSellado !: FormGroup;
-  public FormOrdenTrabajoMezclas !: FormGroup;
+  FormOrdenTrabajo !: FormGroup;
+  FormOrdenTrabajoExtrusion !: FormGroup;
+  FormOrdenTrabajoImpresion !: FormGroup;
+  FormOrdenTrabajoLaminado !: FormGroup;
+  FormOrdenTrabajoCorte !: FormGroup;
+  FormOrdenTrabajoSellado !: FormGroup;
+  FormOrdenTrabajoMezclas !: FormGroup;
 
   arrayTintas = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
   arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
@@ -1222,7 +1222,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { return true }, error => {
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { }, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
       return false;
     });
@@ -1257,7 +1257,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { return true }, error => {
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { }, error => {
           this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
           return false;
         });
@@ -1280,7 +1280,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { return true; }, error => {
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { }, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
       return false;
     });
@@ -1308,7 +1308,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
       }
-      this.otSelladoCorteService.post(info).subscribe(() => { return true; }, error => {
+      this.otSelladoCorteService.post(info).subscribe(() => { }, error => {
         this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
         return false;
       });
@@ -2649,52 +2649,42 @@ export class OrdenesTrabajoComponent implements OnInit {
     material4C3 == 1 ? porcMaterial4C3 = 0 : porcMaterial4C3;
 
     if(mezcla != null) {
-      if(this.checkedCapa1 == true) {
-        let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-        if (porcentajeTotalCapas == 100) {
-          if(material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1){
-            let porcentajeTotalCapa1 : number = (parseFloat(porcMaterial1C1) + parseFloat(porcMaterial2C1) + parseFloat(porcMaterial3C1) + parseFloat(porcMaterial4C1));
-            if (porcentajeTotalCapa1 == 100) {
-              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                if(dataMezcla.length == 0) this.infoMezclaCrear();
-                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`);
-              });
-            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La suma del porcentaje de mezcla de materiales de la capa 1 es ${porcentajeTotalCapa1} y debe ser 100, por favor verifique!`);
-          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para el/los material(es) seleccionado(s)');
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El porcentaje total de la capa 1 es ${porcentajeTotalCapas} y debe ser 100 ` ) ;
-      } else if(this.checkedCapa2 == true) {
-        let porcentajeTotalCapas : any = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0) {
-          if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
-            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
-            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) {
-              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                if(dataMezcla.length == 0) this.infoMezclaCrear();
-                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`);
-              });
-            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
-          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar estos porcentajes de mezcla para los materiales seleccionados');
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
-      } else if (this.checkedCapa3 == true) {
-        let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0 && porc_Capa3 != 0) {
-          if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
-            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
-            && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
-            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-            let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
-            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) {
-              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                if(dataMezcla.length == 0) this.infoMezclaCrear();
-                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`)
-              });
-            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
-          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para los materiales seleccionados');
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas debe ser 100');
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir el número de capas de la mezcla.');
+      this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+        if(dataMezcla.length == 0){
+          let porcentajeTotalCapas : any = (porc_Capa1 + porc_Capa2 + porc_Capa3);
+          if(this.checkedCapa1 == true) {
+            if (porcentajeTotalCapas == 100) {
+              if(material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1){
+                let porcentajeTotalCapa1 : number = (parseFloat(porcMaterial1C1) + parseFloat(porcMaterial2C1) + parseFloat(porcMaterial3C1) + parseFloat(porcMaterial4C1));
+                if (porcentajeTotalCapa1 == 100) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La suma del porcentaje de mezcla de materiales de la capa 1 es ${porcentajeTotalCapa1} y debe ser 100, por favor verifique!`);
+              } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para el/los material(es) seleccionado(s)');
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El porcentaje total de la capa 1 es ${porcentajeTotalCapas} y debe ser 100 ` ) ;
+          } else if(this.checkedCapa2 == true) {
+            if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0) {
+              if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
+                && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
+                let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+                let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+                if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+              } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar estos porcentajes de mezcla para los materiales seleccionados');
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
+          } else if (this.checkedCapa3 == true) {
+            if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0 && porc_Capa3 != 0) {
+              if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
+                && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
+                && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
+                let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+                let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+                let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
+                if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+              } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para los materiales seleccionados');
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas debe ser 100');
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir el número de capas de la mezcla.');
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`)
+      });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Nombre de Mezcla"`);
   }
 

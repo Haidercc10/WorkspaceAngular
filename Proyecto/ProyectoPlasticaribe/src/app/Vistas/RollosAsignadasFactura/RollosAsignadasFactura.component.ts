@@ -356,6 +356,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               width: 630,
               height: 760
             },
+            watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
             content : [
               {
                 columns: [
