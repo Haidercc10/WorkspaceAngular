@@ -27,3 +27,11 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
   display: flex;
   width: 100%;
 }
+
+.colorRojo {
+  color: var(--rojo);
+}
+
+.colorNegro {
+  color: #000;
+}

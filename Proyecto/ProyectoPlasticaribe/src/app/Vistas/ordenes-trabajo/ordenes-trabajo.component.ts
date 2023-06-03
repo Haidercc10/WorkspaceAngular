@@ -1,13 +1,12 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
+import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -15,6 +14,7 @@ import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Laminado_CapaService } from 'src/app/Servicios/LaminadoCapa/Laminado_Capa.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { MezclasService } from 'src/app/Servicios/Mezclas/Mezclas.service';
 import { Mezclas_MaterialesService } from 'src/app/Servicios/MezclasMateriales/Mezclas_Materiales.service';
 import { Mezclas_PigmentosService } from 'src/app/Servicios/MezclasPigmentos/Mezclas_Pigmentos.service';
@@ -33,10 +33,9 @@ import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-product
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
-import { stepsOrdenTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsCrearMezclasOT as defaultSteps3, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsOrdenTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2, stepsCrearMezclasOT as defaultSteps3 } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -364,9 +363,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.cargarTiposSellado();
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
@@ -400,6 +396,69 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
+  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas);
+
+  /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
+  cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
+
+  //Funcion que cargará los estados que puede tener una orden de trabajo
+  cargarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(datos => this.estados = datos);
+
+  /** Función que cargará los materiales en el combobox al momento de crear la OT. */
+  cargarMaterialEnProcesoExtrusion = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales = materiasProd);
+
+   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
+  cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
+
+  /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
+  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => item.undMed_Id == 'Cms' || item.undMed_Id == 'Plgs'));
+
+  //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
+  cargarTratadoEnProcesoExtrusion = () => this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => this.tratado = datos_tratado);
+
+  //Funcion que cargará los formatos para el proceso de extrusion
+  cargarFormatosEnProcesoExtrusion = () => this.formatoService.srvObtenerLista().subscribe(datos_formatos => this.formatos = datos_formatos);
+
+  //Funcion que cargará los diferentes tipos de impresion que maneja la empresa
+  cargarTiposImpresion = () => this.tiposImpresionService.srvObtenerLista().subscribe(datos => this.tiposImpresion = datos);
+
+  //Funcion que cargará los diferentes laminados
+  cargarLaminados = () => this.laminadoCapasService.srvObtenerLista().subscribe(datos => this.laminado_capas = datos);
+
+  // Funcion que cargará las mezclas de materiales
+  cargarMezclaMateria = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales = datos);
+
+  // Funcion que cargará las mezclas de materiales
+  cargarMezclaMateria2 = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales2 = datos);
+
+  // Funcion que cargará las mezclas de pigmentos
+  cargarMezclaPigmento = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos = datos);
+
+    // Funcion que cargará las mezclas de pigmentos
+  cargarMezclaPigmento2 = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos2 = datos);
+
+  // Funcion que cargará el nombre de las mezclas
+  cargarMezclas = () => this.mezclasService.srvObtenerLista().subscribe(datos => this.mezclas = datos);
+
+  // Funcion que va cargará la informacion de los tipos de productos
+  cargarTiposProductos = () => this.tiposProductosService.srvObtenerLista().subscribe(datos => this.tipoProductos = datos);
+
+  // Funcion que va a cargar la informacion de los tipos de sellado
+  cargarTiposSellado = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos => this.tipoSellado = datos);
+
+  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
+  ultimaOT = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => this.ultimaOrdenTrabajo = datos_ot.item + 1);
+
+  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
+  pedidos = () => this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => this.pedidosSinOT = datos);
+
+  // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
+  cerrarMensaje = () => this.messageService.clear('editarOrden');
 
   // Funcion que colocará los campos del formulario principal con datos predeterminados
   limpiarFormOrdenTrabajo(){
@@ -557,63 +616,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.pesoBulto = 0;
   }
 
-  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas);
-
-  /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
-  cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
-
-  //Funcion que cargará los estados que puede tener una orden de trabajo
-  cargarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(datos => this.estados = datos);
-
-  /** Función que cargará los materiales en el combobox al momento de crear la OT. */
-  cargarMaterialEnProcesoExtrusion = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales = materiasProd);
-
-   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
-  cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
-
-  /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
-  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => item.undMed_Id == 'Cms' || item.undMed_Id == 'Plgs'));
-
-  //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
-  cargarTratadoEnProcesoExtrusion = () => this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => this.tratado = datos_tratado);
-
-  //Funcion que cargará los formatos para el proceso de extrusion
-  cargarFormatosEnProcesoExtrusion = () => this.formatoService.srvObtenerLista().subscribe(datos_formatos => this.formatos = datos_formatos);
-
-  //Funcion que cargará los diferentes tipos de impresion que maneja la empresa
-  cargarTiposImpresion = () => this.tiposImpresionService.srvObtenerLista().subscribe(datos => this.tiposImpresion = datos);
-
-  //Funcion que cargará los diferentes laminados
-  cargarLaminados = () => this.laminadoCapasService.srvObtenerLista().subscribe(datos => this.laminado_capas = datos);
-
-  // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales = datos);
-
-  // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria2 = () => this.mezclaMaterialService.srvObtenerLista().subscribe(datos => this.mezclasMateriales2 = datos);
-
-  // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos = datos);
-
-    // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento2 = () => this.mezclaPigmentosService.srvObtenerLista().subscribe(datos => this.mezclasPigmentos2 = datos);
-
-  // Funcion que cargará el nombre de las mezclas
-  cargarMezclas = () => this.mezclasService.srvObtenerLista().subscribe(datos => this.mezclas = datos);
-
-  // Funcion que va cargará la informacion de los tipos de productos
-  cargarTiposProductos = () => this.tiposProductosService.srvObtenerLista().subscribe(datos => this.tipoProductos = datos);
-
-  // Funcion que va a cargar la informacion de los tipos de sellado
-  cargarTiposSellado = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos => this.tipoSellado = datos);
-
-  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
-  ultimaOT = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => this.ultimaOrdenTrabajo = datos_ot.item + 1);
-
-  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
-  pedidos = () => this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => this.pedidosSinOT = datos);
-
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
     let data : any = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
@@ -691,7 +693,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que va a validar si el pedido viene de zeus
   validarPedido(){
-    let nuevo = this.pedidosSinOT.filter((item) => item.id_Pedido == this.FormOrdenTrabajo.value.Pedido_Id);
+    let nuevo = this.pedidosSinOT.filter(item => item.id_Pedido == this.FormOrdenTrabajo.value.Pedido_Id);
     !nuevo[0].zeus ? this.informacionPedido() : this.informacionPedidoZeus();
   }
 
@@ -1091,7 +1093,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           }
         }
       }
-    } else this.mostrarAdvertencia(`¡Debe elegir una unidad de medida para extrusión!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
   }
 
   // Funcion que se se ejecurá cuando hayan deseleccionado un producto
@@ -1221,7 +1223,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
     this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { return true }, error => {
-      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message);
+      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
       return false;
     });
     return false;
@@ -1256,7 +1258,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
         this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { return true }, error => {
-          this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message);
+          this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
           return false;
         });
       }
@@ -1279,7 +1281,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
     this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { return true; }, error => {
-      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message);
+      this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
       return false;
     });
     return false;
@@ -1307,10 +1309,10 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
       }
       this.otSelladoCorteService.post(info).subscribe(() => { return true; }, error => {
-        this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
+        this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
         return false;
       });
-    }, error => this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message));
+    }, error => this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error));
     return false;
   }
 
@@ -2121,7 +2123,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.cargarCombinacionMezclas();
         this.calcularDatosOt(productoExt);
       }
-    }, error => this.mensajeService.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message));
+    }, error => this.mensajeService.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.error));
   }
 
   // Funcion que va a validar que si se desee actualizar la orden de trabajo
@@ -2160,9 +2162,6 @@ export class OrdenesTrabajoComponent implements OnInit {
       }, 700);
     } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos del formulario vacios!`);
   }
-
-  // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
-  cerrarMensaje = () => this.messageService.clear('editarOrden');
 
   // Funcion que va actualizar con nueva información la orden de trabajo
   editarOrdenTrabajo(){
@@ -2237,7 +2236,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         });
       }
     }, () => {
-      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
+      this.mensajeService.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
       return true;
     });
     return false;
@@ -2309,7 +2308,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
         this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => { }, error => {
-          this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.message);
+          this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.error);
           return true;
         });
       }
@@ -2345,11 +2344,11 @@ export class OrdenesTrabajoComponent implements OnInit {
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => { }, error => {
-            this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
+            this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
             return true;
           });
         }, error => {
-          this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message);
+          this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error);
           return true;
         });
       }
@@ -2360,7 +2359,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     return false;
   }
 
-  //
+  // Función que va a abrir el modal de creación de las mezclas
   cargarModalMezclas() {
     this.modalMezclas = true;
     this.cargarMezclaMateria2();
@@ -2368,6 +2367,12 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.cargarMateriales_MatPrima();
     setTimeout(() => { this.initFormCrearMezclas(); }, 1000);
   }
+
+  // Función que va a abrir el modal de la creación de materiales
+  cargarModalMateriales = () => this.modalMateriales = true;
+
+  // Función que va a abrir el modal de la creación de pigmentos
+  cargarModalPigmentos = () => this.modalPigmentos = true;
 
   //
   initFormCrearMezclas(){
@@ -2429,81 +2434,27 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   //
   cargarCombinacionMezclas2(){
-    let nombreMezcla : any =  this.formCrearMezclas.value.Nombre_Mezclas;
-    if (nombreMezcla != null) {
-      this.mezclasService.srvObtenerListaPorNombre(nombreMezcla.replace('%', '%25')).subscribe(datos_mezcla => {
+    if (this.formCrearMezclas.value.Nombre_Mezclas != null) {
+      this.mezclasService.srvObtenerListaPorNombre(this.formCrearMezclas.value.Nombre_Mezclas.replace('%', '%25')).subscribe(datos_mezcla => {
         for (let i = 0; i < datos_mezcla.length; i++) {
           this.idMezclaSeleccionada = datos_mezcla[i].mezcla_Id;
           this.nroCapas = datos_mezcla[i].mezcla_NroCapas;
 
-            /** Selecciona el nro de capas que tiene la mezcla seleccionada */
-            if(this.nroCapas == 1) this.habilitarCapa1();
-            if(this.nroCapas == 2) this.habilitarCapa2();
-            if(this.nroCapas == 3) this.habilitarCapa3();
+          /** Selecciona el nro de capas que tiene la mezcla seleccionada */
+          if(this.nroCapas == 1) this.habilitarCapa1();
+          if(this.nroCapas == 2) this.habilitarCapa2();
+          if(this.nroCapas == 3) this.habilitarCapa3();
 
-            /** carga un objeto con los datos de la mezcla seleccionada */
-            this.cargarDatosMezclaSeleccionada(datos_mezcla[i]);
-
-            /** carga los campos con los datos de la mezcla seleccionada */
-            this.cargarCamposMezclaSeleccionada(datos_mezcla[i]);
+          this.cargarCamposMezclaSeleccionada(datos_mezcla[i]); /** carga los campos con los datos de la mezcla seleccionada */
         }
       });
-    } else this.mostrarAdvertencia('Debe llenar el campo nombre de mezclas');
-  }
-
-  /** Carga los datos de la mezcla seleccionada en un objeto. */
-  cargarDatosMezclaSeleccionada(datos_mezcla : any){
-    this.objetoDatos = {
-      Material_MatPrima : datos_mezcla.material_Id,
-      mezclaNroCapas : this.nroCapas,
-      Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
-      Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
-      Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
-      materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
-      PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
-      materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
-      PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
-      materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
-      PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
-      materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
-      PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
-      materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
-      PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
-      materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
-      PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
-      materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
-      PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
-      materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
-      PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
-      materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
-      PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
-      materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
-      PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
-      materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
-      PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
-      materialP4_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
-      PorcentajeMaterialP4_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
-      MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-      PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
-      MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
-      PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
-      MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
-      PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
-      MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id2xCapa1,
-      PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
-      MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
-      PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
-      MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
-      PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
-    }
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar el campo nombre de mezclas');
   }
 
   cargarCamposMezclaSeleccionada(datos_mezcla : any) {
-    let nombreMezcla : any =  this.formCrearMezclas.value.Nombre_Mezclas;
-
     this.formCrearMezclas.patchValue({
       mezclaId : this.idMezclaSeleccionada,
-      Nombre_Mezclas : nombreMezcla.replace('%25', '%'),
+      Nombre_Mezclas : this.formCrearMezclas.value.Nombre_Mezclas.replace('%25', '%'),
       Material_MatPrima : datos_mezcla.material_Id,
       Chechbox_Capa1 : this.nroCapas,
       Chechbox_Capa2 : '',
@@ -2550,13 +2501,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que devolverá un mensaje de error con la informacion que se le envie
-  mensajeError(titulo : string, texto : string){
-    this.cargando = false;
-    this.messageService.add({severity:'success', summary: titulo, detail: texto });
-  }
-
-  //
+  // Funcion que va a habilitar los campos de la capa 1 en el modal de creación de materia prima
   cambiarNroCapas1() {
     this.checkedCapa1 = true;
     this.checkedCapa2 = false;
@@ -2565,44 +2510,30 @@ export class OrdenesTrabajoComponent implements OnInit {
 
     this.formCrearMezclas.patchValue({
       mezclaId : 0,
-      Nombre_Mezclas : this.formCrearMezclas.value.Nombre_Mezclas,
-      Material_MatPrima : this.formCrearMezclas.value.Material_MatPrima,
       Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 100,
       Proc_Capa2 : 0,
       Proc_Capa3 : 0,
-      materialP1_Capa1 : this.formCrearMezclas.value.materialP1_Capa1,
-      PorcentajeMaterialP1_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1,
       materialP1_Capa2 : 1,
       PorcentajeMaterialP1_Capa2 : 0,
       materialP1_Capa3 : 1,
       PorcentajeMaterialP1_Capa3 : 0,
-      materialP2_Capa1 : this.formCrearMezclas.value.materialP2_Capa1,
-      PorcentajeMaterialP2_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1,
       materialP2_Capa2 : 1,
       PorcentajeMaterialP2_Capa2 : 0,
       materialP2_Capa3 : 1,
       PorcentajeMaterialP2_Capa3 : 0,
-      materialP3_Capa1 : this.formCrearMezclas.value.materialP3_Capa1,
-      PorcentajeMaterialP3_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1,
       materialP3_Capa2 : 1,
       PorcentajeMaterialP3_Capa2 : 0,
       materialP3_Capa3 : 1,
       PorcentajeMaterialP3_Capa3 : 0,
-      materialP4_Capa1 : this.formCrearMezclas.value.materialP4_Capa1,
-      PorcentajeMaterialP4_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1,
       materialP4_Capa2 : 1,
       PorcentajeMaterialP4_Capa2 : 0,
       materialP4_Capa3 : 1,
       PorcentajeMaterialP4_Capa3 : 0,
-      MezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa1,
-      PorcentajeMezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1,
       MezclaPigmentoP1_Capa2 : 1,
       PorcentajeMezclaPigmentoP1_Capa2 : 0,
       MezclaPigmento1_Capa3 : 1,
       PorcentajeMezclaPigmentoP1_Capa3 :0,
-      MezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa1,
-      PorcentajeMezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1,
       MezclaPigmentoP2_Capa2 : 1,
       PorcentajeMezclaPigmentoP2_Capa2 : 0,
       MezclaPigmento2_Capa3 : 1,
@@ -2610,7 +2541,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     });
   }
 
-  //
+  // Funcion que va a habilitar los campos de la capa 2 en el modal de creación de materia prima
   cambiarNroCapas2() {
     this.checkedCapa1 = false;
     this.checkedCapa2 = true;
@@ -2619,52 +2550,26 @@ export class OrdenesTrabajoComponent implements OnInit {
 
     this.formCrearMezclas.patchValue ({
       mezclaId : 0,
-      Nombre_Mezclas : this.formCrearMezclas.value.Nombre_Mezclas,
-      Material_MatPrima : this.formCrearMezclas.value.Material_MatPrima,
       Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 50,
       Proc_Capa2 : 50,
       Proc_Capa3 : 0,
-      materialP1_Capa1 : this.formCrearMezclas.value.materialP1_Capa1,
-      PorcentajeMaterialP1_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1,
-      materialP1_Capa2 : this.formCrearMezclas.value.materialP1_Capa2,
-      PorcentajeMaterialP1_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2,
       materialP1_Capa3 : 1,
       PorcentajeMaterialP1_Capa3 : 0,
-      materialP2_Capa1 : this.formCrearMezclas.value.materialP2_Capa1,
-      PorcentajeMaterialP2_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1,
-      materialP2_Capa2 : this.formCrearMezclas.value.materialP2_Capa2,
-      PorcentajeMaterialP2_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2,
       materialP2_Capa3 : 1,
       PorcentajeMaterialP2_Capa3 : 0,
-      materialP3_Capa1 : this.formCrearMezclas.value.materialP3_Capa1,
-      PorcentajeMaterialP3_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1,
-      materialP3_Capa2 : this.formCrearMezclas.value.materialP3_Capa2,
-      PorcentajeMaterialP3_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2,
       materialP3_Capa3 : 1,
       PorcentajeMaterialP3_Capa3 : 0,
-      materialP4_Capa1 : this.formCrearMezclas.value.materialP4_Capa1,
-      PorcentajeMaterialP4_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1,
-      materialP4_Capa2 : this.formCrearMezclas.value.materialP4_Capa2,
-      PorcentajeMaterialP4_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2,
       materialP4_Capa3 : 1,
       PorcentajeMaterialP4_Capa3 : 0,
-      MezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa1,
-      PorcentajeMezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1,
-      MezclaPigmentoP1_Capa2 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa2,
-      PorcentajeMezclaPigmentoP1_Capa2 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa2,
       MezclaPigmento1_Capa3 : 1,
       PorcentajeMezclaPigmentoP1_Capa3 : 0,
-      MezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa1,
-      PorcentajeMezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1,
-      MezclaPigmentoP2_Capa2 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa2,
-      PorcentajeMezclaPigmentoP2_Capa2 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2,
       MezclaPigmento2_Capa3 : 1,
       PorcentajeMezclaPigmentoP2_Capa3 : 0,
     });
   }
 
-  //
+  // Funcion que va a habilitar los campos de la capa 3 en el modal de creación de materia prima
   cambiarNroCapas3() {
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
@@ -2673,195 +2578,130 @@ export class OrdenesTrabajoComponent implements OnInit {
 
     this.formCrearMezclas.patchValue ({
       mezclaId : 0,
-      Nombre_Mezclas : this.formCrearMezclas.value.Nombre_Mezclas,
-      Material_MatPrima : this.formCrearMezclas.value.Material_MatPrima,
       Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 30,
       Proc_Capa2 : 40,
       Proc_Capa3 : 30,
-      materialP1_Capa1 : this.formCrearMezclas.value.materialP1_Capa1,
-      PorcentajeMaterialP1_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1,
-      materialP1_Capa2 : this.formCrearMezclas.value.materialP1_Capa2,
-      PorcentajeMaterialP1_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2,
-      materialP1_Capa3 : this.formCrearMezclas.value.materialP1_Capa3,
-      PorcentajeMaterialP1_Capa3 : this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3,
-      materialP2_Capa1 : this.formCrearMezclas.value.materialP2_Capa1,
-      PorcentajeMaterialP2_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1,
-      materialP2_Capa2 : this.formCrearMezclas.value.materialP2_Capa2,
-      PorcentajeMaterialP2_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2,
-      materialP2_Capa3 : this.formCrearMezclas.value.materialP2_Capa3,
-      PorcentajeMaterialP2_Capa3 : this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3,
-      materialP3_Capa1 : this.formCrearMezclas.value.materialP3_Capa1,
-      PorcentajeMaterialP3_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1,
-      materialP3_Capa2 : this.formCrearMezclas.value.materialP3_Capa2,
-      PorcentajeMaterialP3_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2,
-      materialP3_Capa3 : this.formCrearMezclas.value.materialP3_Capa3,
-      PorcentajeMaterialP3_Capa3 : this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3,
-      materialP4_Capa1 : this.formCrearMezclas.value.materialP4_Capa1,
-      PorcentajeMaterialP4_Capa1 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1,
-      materialP4_Capa2 : this.formCrearMezclas.value.materialP4_Capa2,
-      PorcentajeMaterialP4_Capa2 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2,
-      materialP4_Capa3 : this.formCrearMezclas.value.materialP4_Capa3,
-      PorcentajeMaterialP4_Capa3 : this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3,
-      MezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa1,
-      PorcentajeMezclaPigmentoP1_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1,
-      MezclaPigmentoP1_Capa2 : this.formCrearMezclas.value.MezclaPigmentoP1_Capa2,
-      PorcentajeMezclaPigmentoP1_Capa2 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa2,
-      MezclaPigmento1_Capa3 : this.formCrearMezclas.value.MezclaPigmento1_Capa3,
-      PorcentajeMezclaPigmentoP1_Capa3 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa3,
-      MezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa1,
-      PorcentajeMezclaPigmentoP2_Capa1 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1,
-      MezclaPigmentoP2_Capa2 : this.formCrearMezclas.value.MezclaPigmentoP2_Capa2,
-      PorcentajeMezclaPigmentoP2_Capa2 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2,
-      MezclaPigmento2_Capa3 : this.formCrearMezclas.value.MezclaPigmento2_Capa3,
-      PorcentajeMezclaPigmentoP2_Capa3 : this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa3,
     });
   }
 
   /** Función que creará la mezcla predefinida  */
   crearMezclaPredefinida() {
-      let mezcla : any = this.formCrearMezclas.value.Nombre_Mezclas;
-      /** Porcentajes de capa */
-      let porc_Capa1 : any = this.formCrearMezclas.value.Proc_Capa1 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa1;
-      let porc_Capa2 : any = this.formCrearMezclas.value.Proc_Capa2 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa2;
-      let porc_Capa3 : any =  this.formCrearMezclas.value.Proc_Capa3 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa3;
-      /** Capa 1 */
-      let material1C1 : any = this.formCrearMezclas.value.materialP1_Capa1;
-      let porcMaterial1C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1;
-      let material2C1 : any = this.formCrearMezclas.value.materialP2_Capa1;
-      let porcMaterial2C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1;
-      let material3C1 : any = this.formCrearMezclas.value.materialP3_Capa1;
-      let porcMaterial3C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1;
-      let material4C1 : any = this.formCrearMezclas.value.materialP4_Capa1;
-      let porcMaterial4C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1;
-      /** Capa 2 */
-      let material1C2 : any = this.formCrearMezclas.value.materialP1_Capa2;
-      let porcMaterial1C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2;
-      let material2C2 : any = this.formCrearMezclas.value.materialP2_Capa2;
-      let porcMaterial2C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2;
-      let material3C2 : any = this.formCrearMezclas.value.materialP3_Capa2;
-      let porcMaterial3C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2;
-      let material4C2 : any = this.formCrearMezclas.value.materialP4_Capa2;
-      let porcMaterial4C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2;
-      /** Capa 3 */
-      let material1C3 : any = this.formCrearMezclas.value.materialP1_Capa3;
-      let porcMaterial1C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3;
-      let material2C3 : any = this.formCrearMezclas.value.materialP2_Capa3;
-      let porcMaterial2C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3;
-      let material3C3 : any = this.formCrearMezclas.value.materialP3_Capa3;
-      let porcMaterial3C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3;
-      let material4C3 : any = this.formCrearMezclas.value.materialP4_Capa3;
-      let porcMaterial4C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3;
+    let mezcla : any = this.formCrearMezclas.value.Nombre_Mezclas;
+    /** Porcentajes de capa */
+    let porc_Capa1 : any = this.formCrearMezclas.value.Proc_Capa1 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa1;
+    let porc_Capa2 : any = this.formCrearMezclas.value.Proc_Capa2 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa2;
+    let porc_Capa3 : any =  this.formCrearMezclas.value.Proc_Capa3 == undefined ? 0 : this.formCrearMezclas.value.Proc_Capa3;
+    /** Capa 1 */
+    let material1C1 : any = this.formCrearMezclas.value.materialP1_Capa1;
+    let porcMaterial1C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1;
+    let material2C1 : any = this.formCrearMezclas.value.materialP2_Capa1;
+    let porcMaterial2C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1;
+    let material3C1 : any = this.formCrearMezclas.value.materialP3_Capa1;
+    let porcMaterial3C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1;
+    let material4C1 : any = this.formCrearMezclas.value.materialP4_Capa1;
+    let porcMaterial4C1 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1;
+    /** Capa 2 */
+    let material1C2 : any = this.formCrearMezclas.value.materialP1_Capa2;
+    let porcMaterial1C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2;
+    let material2C2 : any = this.formCrearMezclas.value.materialP2_Capa2;
+    let porcMaterial2C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2;
+    let material3C2 : any = this.formCrearMezclas.value.materialP3_Capa2;
+    let porcMaterial3C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2;
+    let material4C2 : any = this.formCrearMezclas.value.materialP4_Capa2;
+    let porcMaterial4C2 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2;
+    /** Capa 3 */
+    let material1C3 : any = this.formCrearMezclas.value.materialP1_Capa3;
+    let porcMaterial1C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3;
+    let material2C3 : any = this.formCrearMezclas.value.materialP2_Capa3;
+    let porcMaterial2C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3;
+    let material3C3 : any = this.formCrearMezclas.value.materialP3_Capa3;
+    let porcMaterial3C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3;
+    let material4C3 : any = this.formCrearMezclas.value.materialP4_Capa3;
+    let porcMaterial4C3 : any = this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3;
 
-      /** Si % del material es 'null' entonces coloca 0 al porcentaje */
-      if (porcMaterial1C1 == null) { porcMaterial1C1 = 0 } else { porcMaterial1C1; }
-      if (porcMaterial2C1 == null) { porcMaterial2C1 = 0 } else { porcMaterial2C1; }
-      if (porcMaterial3C1 == null) { porcMaterial3C1 = 0 } else { porcMaterial3C1; }
-      if (porcMaterial4C1 == null) { porcMaterial4C1 = 0 } else { porcMaterial4C1; }
-      if (porcMaterial1C2 == null) { porcMaterial1C2 = 0 } else { porcMaterial1C2; }
-      if (porcMaterial2C2 == null) { porcMaterial2C2 = 0 } else { porcMaterial2C2; }
-      if (porcMaterial3C2 == null) { porcMaterial3C2 = 0 } else { porcMaterial3C2; }
-      if (porcMaterial4C2 == null) { porcMaterial4C2 = 0 } else { porcMaterial4C2; }
-      if (porcMaterial1C3 == null) { porcMaterial1C3 = 0 } else { porcMaterial1C3; }
-      if (porcMaterial2C3 == null) { porcMaterial2C3 = 0 } else { porcMaterial2C3; }
-      if (porcMaterial3C3 == null) { porcMaterial3C3 = 0 } else { porcMaterial3C3; }
-      if (porcMaterial4C3 == null) { porcMaterial4C3 = 0 } else { porcMaterial4C3; }
+    /** Si % del material es 'null' entonces coloca 0 al porcentaje */
+    porcMaterial1C1 == null ? porcMaterial1C1 = 0 : porcMaterial1C1;
+    porcMaterial2C1 == null ? porcMaterial2C1 = 0 : porcMaterial2C1;
+    porcMaterial3C1 == null ? porcMaterial3C1 = 0 : porcMaterial3C1;
+    porcMaterial4C1 == null ? porcMaterial4C1 = 0 : porcMaterial4C1;
+    porcMaterial1C2 == null ? porcMaterial1C2 = 0 : porcMaterial1C2;
+    porcMaterial2C2 == null ? porcMaterial2C2 = 0 : porcMaterial2C2;
+    porcMaterial3C2 == null ? porcMaterial3C2 = 0 : porcMaterial3C2;
+    porcMaterial4C2 == null ? porcMaterial4C2 = 0 : porcMaterial4C2;
+    porcMaterial1C3 == null ? porcMaterial1C3 = 0 : porcMaterial1C3;
+    porcMaterial2C3 == null ? porcMaterial2C3 = 0 : porcMaterial2C3;
+    porcMaterial3C3 == null ? porcMaterial3C3 = 0 : porcMaterial3C3;
+    porcMaterial4C3 == null ? porcMaterial4C3 = 0 : porcMaterial4C3;
 
-      /** Si material es 'no aplica' entonces coloca 0 al porcentaje */
-      if (material1C1 == 1) { porcMaterial1C1 = 0 } else { porcMaterial1C1; }
-      if (material2C1 == 1) { porcMaterial2C1 = 0 } else { porcMaterial2C1; }
-      if (material3C1 == 1) { porcMaterial3C1 = 0 } else { porcMaterial3C1; }
-      if (material4C1 == 1) { porcMaterial4C1 = 0 } else { porcMaterial4C1; }
-      if (material1C2 == 1) { porcMaterial1C2 = 0 } else { porcMaterial1C2; }
-      if (material2C2 == 1) { porcMaterial2C2 = 0 } else { porcMaterial2C2; }
-      if (material3C2 == 1) { porcMaterial3C2 = 0 } else { porcMaterial3C2; }
-      if (material4C2 == 1) { porcMaterial4C2 = 0 } else { porcMaterial4C2; }
-      if (material1C3 == 1) { porcMaterial1C3 = 0 } else { porcMaterial1C3; }
-      if (material2C3 == 1) { porcMaterial2C3 = 0 } else { porcMaterial2C3; }
-      if (material3C3 == 1) { porcMaterial3C3 = 0 } else { porcMaterial3C3; }
-      if (material4C3 == 1) { porcMaterial4C3 = 0 } else { porcMaterial4C3; }
+    /** Si material es 'no aplica' entonces coloca 0 al porcentaje */
+    material1C1 == 1 ? porcMaterial1C1 = 0 : porcMaterial1C1;
+    material2C1 == 1 ? porcMaterial2C1 = 0 : porcMaterial2C1;
+    material3C1 == 1 ? porcMaterial3C1 = 0 : porcMaterial3C1;
+    material4C1 == 1 ? porcMaterial4C1 = 0 : porcMaterial4C1;
+    material1C2 == 1 ? porcMaterial1C2 = 0 : porcMaterial1C2;
+    material2C2 == 1 ? porcMaterial2C2 = 0 : porcMaterial2C2;
+    material3C2 == 1 ? porcMaterial3C2 = 0 : porcMaterial3C2;
+    material4C2 == 1 ? porcMaterial4C2 = 0 : porcMaterial4C2;
+    material1C3 == 1 ? porcMaterial1C3 = 0 : porcMaterial1C3;
+    material2C3 == 1 ? porcMaterial2C3 = 0 : porcMaterial2C3;
+    material3C3 == 1 ? porcMaterial3C3 = 0 : porcMaterial3C3;
+    material4C3 == 1 ? porcMaterial4C3 = 0 : porcMaterial4C3;
 
-      if(mezcla != null) {
-        if(this.checkedCapa1 == true) {
-          let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-          console.log(porcentajeTotalCapas);
-          console.log(`${porc_Capa1} - ${porc_Capa2} - ${porc_Capa3}`)
-
-          /** Inicio condición 1 */
-          if (porcentajeTotalCapas == 100) {
-            if(material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1){
-              let porcentajeTotalCapa1 : number = (parseInt(porcMaterial1C1) + parseInt(porcMaterial2C1) + parseInt(porcMaterial3C1) + parseInt(porcMaterial4C1));
-              if (porcentajeTotalCapa1 == 100) {
-                this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                  if(dataMezcla.length == 0) {
-                    if(!this.compararRegistroEntrante()) {
-
-                      /** Si todas las condiciones se cumplen, crea la mezcla. */
-                      this.infoMezclaCrear();
-
-                    } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-                  } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`);
-                });
-              } else this.mostrarAdvertencia(`La suma del porcentaje de mezcla de materiales de la capa 1 es ${porcentajeTotalCapa1} y debe ser 100, por favor verifique!`);
-            } else this.mostrarAdvertencia('No puede usar este porcentaje para el/los material(es) seleccionado(s)');
-          } else this.mostrarAdvertencia(`El porcentaje total de la capa 1 es ${porcentajeTotalCapas} y debe ser 100 ` ) ;
-
-          /** Inicio condición 2 */
-        } else if(this.checkedCapa2 == true) {
-          let porcentajeTotalCapas : any = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-          if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0) {
-            if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
-              && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
-
-              let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-              let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-              if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) {
-                this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                  if(dataMezcla.length == 0) {
-                    if(!this.compararRegistroEntrante()) {
-
-                      /** Si todas las condiciones se cumplen, crea la mezcla. */
-                      this.infoMezclaCrear();
-
-                    } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-                  } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`);
-                });
-              } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
-            } else this.mostrarAdvertencia('No puede usar estos porcentajes de mezcla para los materiales seleccionados');
-          } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
-          /** Fin Condición 2 */
-
-        } else if (this.checkedCapa3 == true) {
-          let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-          if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0 && porc_Capa3 != 0) {
-            if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
-              && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
-              && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
-              let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-              let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-              let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
-              if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) {
-                this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                  if(dataMezcla.length == 0) {
-                    if(!this.compararRegistroEntrante()) {
-
-                      /** Si todas las condiciones se cumplen, crea la mezcla. */
-                      this.infoMezclaCrear();
-
-                    } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-                  } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`)
-                });
-              } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
-            } else this.mostrarAdvertencia('No puede usar este porcentaje para los materiales seleccionados');
-          } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas debe ser 100');
-          /** Fin condición 3 */
-        } else this.mostrarAdvertencia('Debe elegir el número de capas de la mezcla.');
-      } else this.mostrarAdvertencia(`Debe diligenciar el campo "Nombre de Mezcla"`);
+    if(mezcla != null) {
+      if(this.checkedCapa1 == true) {
+        let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
+        if (porcentajeTotalCapas == 100) {
+          if(material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1){
+            let porcentajeTotalCapa1 : number = (parseFloat(porcMaterial1C1) + parseFloat(porcMaterial2C1) + parseFloat(porcMaterial3C1) + parseFloat(porcMaterial4C1));
+            if (porcentajeTotalCapa1 == 100) {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+                if(dataMezcla.length == 0) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`);
+              });
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La suma del porcentaje de mezcla de materiales de la capa 1 es ${porcentajeTotalCapa1} y debe ser 100, por favor verifique!`);
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para el/los material(es) seleccionado(s)');
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El porcentaje total de la capa 1 es ${porcentajeTotalCapas} y debe ser 100 ` ) ;
+      } else if(this.checkedCapa2 == true) {
+        let porcentajeTotalCapas : any = (porc_Capa1 + porc_Capa2 + porc_Capa3);
+        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0) {
+          if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
+            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
+            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+                if(dataMezcla.length == 0) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`);
+              });
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar estos porcentajes de mezcla para los materiales seleccionados');
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
+      } else if (this.checkedCapa3 == true) {
+        let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
+        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0 && porc_Capa3 != 0) {
+          if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
+            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
+            && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
+            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+            let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
+            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+                if(dataMezcla.length == 0) this.infoMezclaCrear();
+                else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`)
+              });
+            } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para los materiales seleccionados');
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas debe ser 100');
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir el número de capas de la mezcla.');
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Nombre de Mezcla"`);
   }
 
+  // Función que va a crear la mezcla en la base de datos
   infoMezclaCrear(){
     let mezcla : any = this.formCrearMezclas.value.Nombre_Mezclas;
-      let modelo : modelMezclas = {
+    let modelo : modelMezclas = {
       mezclaId : 0,
       Mezcla_Nombre: mezcla.replace('%25', '%'),
       Mezcla_NroCapas: this.nroCapas,
@@ -2913,87 +2753,33 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
 
     this.mezclasService.srvGuardar(modelo).subscribe(() => {
-      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
+      this.mensajeService.mensajeConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`, '');
       setTimeout(() => {
         this.initFormCrearMezclas();
         this.cargarMezclas();
       }, 1000);
-    });
-    console.log(modelo)
-  }
-
-  /** Función que validará si las caracteristicas de la mezcla ya existen. Si no existen crea la mezcla.  */
-  compararRegistroEntrante() {
-    if(this.objetoDatos.Material_MatPrima == this.formCrearMezclas.value.Material_MatPrima &&
-      this.objetoDatos.mezclaNroCapas == this.nroCapas &&
-      this.objetoDatos.Proc_Capa1 == this.formCrearMezclas.value.Proc_Capa1 &&
-      this.objetoDatos.Proc_Capa2 == this.formCrearMezclas.value.Proc_Capa2 &&
-      this.objetoDatos.Proc_Capa3 == this.formCrearMezclas.value.Proc_Capa3 &&
-      this.objetoDatos.materialP1_Capa1 == this.formCrearMezclas.value.materialP1_Capa1 &&
-      this.objetoDatos.PorcentajeMaterialP1_Capa1 == this.formCrearMezclas.value.PorcentajeMaterialP1_Capa1 &&
-      this.objetoDatos.materialP1_Capa2 == this.formCrearMezclas.value.materialP1_Capa2 &&
-      this.objetoDatos.PorcentajeMaterialP1_Capa2 == this.formCrearMezclas.value.PorcentajeMaterialP1_Capa2 &&
-      this.objetoDatos.materialP1_Capa3 == this.formCrearMezclas.value.materialP1_Capa3 &&
-      this.objetoDatos.PorcentajeMaterialP1_Capa3 == this.formCrearMezclas.value.PorcentajeMaterialP1_Capa3 &&
-      this.objetoDatos.materialP2_Capa1 == this.formCrearMezclas.value.materialP2_Capa1 &&
-      this.objetoDatos.PorcentajeMaterialP2_Capa1 == this.formCrearMezclas.value.PorcentajeMaterialP2_Capa1 &&
-      this.objetoDatos.materialP2_Capa2 == this.formCrearMezclas.value.materialP2_Capa2 &&
-      this.objetoDatos.PorcentajeMaterialP2_Capa2 == this.formCrearMezclas.value.PorcentajeMaterialP2_Capa2 &&
-      this.objetoDatos.materialP2_Capa3 == this.formCrearMezclas.value.materialP2_Capa3 &&
-      this.objetoDatos.PorcentajeMaterialP2_Capa3 == this.formCrearMezclas.value.PorcentajeMaterialP2_Capa3 &&
-      this.objetoDatos.materialP3_Capa1 == this.formCrearMezclas.value.materialP3_Capa1 &&
-      this.objetoDatos.PorcentajeMaterialP3_Capa1 == this.formCrearMezclas.value.PorcentajeMaterialP3_Capa1 &&
-      this.objetoDatos.materialP3_Capa2 == this.formCrearMezclas.value.materialP3_Capa2 &&
-      this.objetoDatos.PorcentajeMaterialP3_Capa2 == this.formCrearMezclas.value.PorcentajeMaterialP3_Capa2 &&
-      this.objetoDatos.materialP3_Capa3 == this.formCrearMezclas.value.materialP3_Capa3 &&
-      this.objetoDatos.PorcentajeMaterialP3_Capa3 == this.formCrearMezclas.value.PorcentajeMaterialP3_Capa3 &&
-      this.objetoDatos.materialP4_Capa1 == this.formCrearMezclas.value.materialP4_Capa1 &&
-      this.objetoDatos.PorcentajeMaterialP4_Capa1 == this.formCrearMezclas.value.PorcentajeMaterialP4_Capa1 &&
-      this.objetoDatos.materialP4_Capa2 == this.formCrearMezclas.value.materialP4_Capa2 &&
-      this.objetoDatos.PorcentajeMaterialP4_Capa2 == this.formCrearMezclas.value.PorcentajeMaterialP4_Capa2 &&
-      this.objetoDatos.materialP4_Capa3 == this.formCrearMezclas.value.materialP4_Capa3 &&
-      this.objetoDatos.PorcentajeMaterialP4_Capa3 == this.formCrearMezclas.value.PorcentajeMaterialP4_Capa3 &&
-      this.objetoDatos.MezclaPigmentoP1_Capa1 == this.formCrearMezclas.value.MezclaPigmentoP1_Capa1 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP1_Capa1 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa1 &&
-      this.objetoDatos.MezclaPigmentoP1_Capa2 == this.formCrearMezclas.value.MezclaPigmentoP1_Capa2 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP1_Capa2 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa2 &&
-      this.objetoDatos.MezclaPigmento1_Capa3 == this.formCrearMezclas.value.MezclaPigmento1_Capa3 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP1_Capa3 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP1_Capa3 &&
-      this.objetoDatos.MezclaPigmentoP2_Capa1 == this.formCrearMezclas.value.MezclaPigmentoP2_Capa1 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP2_Capa1 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa1 &&
-      this.objetoDatos.MezclaPigmentoP2_Capa2 == this.formCrearMezclas.value.MezclaPigmentoP2_Capa2 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP2_Capa2 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2 &&
-      this.objetoDatos.MezclaPigmento2_Capa3 == this.formCrearMezclas.value.MezclaPigmento2_Capa3 &&
-      this.objetoDatos.PorcentajeMezclaPigmentoP2_Capa3 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa3) {
-      return true;
-    } else return false;
-  }
-
-  //
-  cargarModalMateriales(){
-    this.modalMateriales = true;
+    }, error => this.mensajeService.mensajeError(`¡Error!`, `¡${error.error}!`));
   }
 
   /** Función para crear mater desde el modal de crear mezclas */
   crearMaterial(){
     let nombreMaterial : string = this.formCrearMateriales.value.matNombre;
     let descripcionMaterial : string = this.formCrearMateriales.value.matDescripcion;
-    if(descripcionMaterial == null) descripcionMaterial = `Mezcla de Material ${nombreMaterial.toUpperCase()}`;
     this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
       if(dataMzMaterial.length == 0) {
         const material : modelMezMaterial = {
           MezMaterial_Nombre: nombreMaterial.toUpperCase(),
-          MezMaterial_Descripcion: descripcionMaterial,
+          MezMaterial_Descripcion: descripcionMaterial == null ? `Mezcla de Material ${nombreMaterial.toUpperCase()}` : descripcionMaterial,
         }
         this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
-          this.mostrarConfirmacion('Registro creado con éxito!', '');
+          this.mensajeService.mensajeConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
             this.formCrearMateriales.reset();
             this.cargarMezclaMateria();
             this.cargarMezclaMateria2();
           }, 300);
         });
-      } else this.mostrarAdvertencia(`Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
     });
   }
 
@@ -3001,37 +2787,23 @@ export class OrdenesTrabajoComponent implements OnInit {
   crearPigmento(){
     let nombrePigmento : string = this.formCrearPigmentos.value.pigNombre;
     let descripcionPigmento : string = this.formCrearPigmentos.value.pigDescripcion;
-
-    if(descripcionPigmento == null) descripcionPigmento = `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}`;
-
     this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
       if(dataMzPigmento.length == 0) {
         const pigmento : modelMezPigmento = {
           MezPigmto_Nombre: nombrePigmento.toUpperCase(),
-          MezPigmto_Descripcion: descripcionPigmento,
+          MezPigmto_Descripcion: descripcionPigmento == null ? `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}` : descripcionPigmento,
         }
         this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
-          this.mostrarConfirmacion('Registro creado con éxito!', '');
+          this.mensajeService.mensajeConfirmacion('Registro creado con éxito!', '');
           setTimeout(() => {
           this.formCrearPigmentos.reset();
           this.mezclasPigmentos();
           this.mezclasPigmentos2();
           }, 300);
         });
-      } else this.mostrarAdvertencia(`Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
     });
   }
-
-  //
-  cargarModalPigmentos(){
-    this.modalPigmentos = true;
-  }
-
-  /** Mostrar mensaje de error */
-  mostrarAdvertencia = (dato : any) => this.messageService.add({severity:'warn', detail: dato});
-
-  /** Mostrar mensaje de confirmación */
-  mostrarConfirmacion = (titulo: string, texto : string) => this.messageService.add({severity:'success', summary: titulo, detail: texto });
 
   // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1
   habilitarCapa1(){
@@ -3054,7 +2826,6 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.get('PorcentajeMezclaPigmentoP1_Capa1').enable();
       this.formCrearMezclas.get('MezclaPigmentoP2_Capa1').enable();
       this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
-      console.log(this.formCrearMezclas.getRawValue().PorcentajeMezclaPigmentoP2_Capa2);
       this.cambiarNroCapas1();
     }, 500);
   }

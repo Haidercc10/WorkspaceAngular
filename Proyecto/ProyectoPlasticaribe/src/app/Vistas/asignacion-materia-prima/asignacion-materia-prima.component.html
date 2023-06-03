@@ -91,7 +91,7 @@
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
             <td>{{ot.kg | number}}</td>
-            <td><b>{{ot.kgRestante | number}}</b></td>
+            <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0, 'colorNegro' : ot.kgRestante > 0}"><b>{{ot.kgRestante | number}}</b></td>
           </tr>
         </ng-template>
       </p-table>
@@ -214,6 +214,13 @@
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
             <td>{{materiasPrimasSeleccionadas.Proceso}}</td>
             <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas)"></i></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="2">Total</td>
+            <td>{{calcularMateriaPrimaAsignada()}}</td>
+            <td colspan="3"></td>
           </tr>
         </ng-template>
       </p-table>

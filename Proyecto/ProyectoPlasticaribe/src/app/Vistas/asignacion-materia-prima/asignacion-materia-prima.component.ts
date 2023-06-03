@@ -255,6 +255,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario de materia prima!`);
   }
 
+  // Funcion que va a calcular la cantidad de materia prima asignada
+  calcularMateriaPrimaAsignada() : number {
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].Cantidad;
+    }
+    return total;
+  }
+
   // Funcion que va a quitar la materia prima
   quitarMateriaPrima(data : any){
     this.onReject('eleccion');
@@ -276,13 +285,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
   asignacionMateriaPrima(){
-    this.infoOT();
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (!this.error) {
       if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
         setTimeout(() => {
           this.load = false;
-          if (this.cantidadAsignada <= this.cantRestante) this.crearAsignacion();
+          if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
           else {
             if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){
               this.soloTintas = true;
@@ -294,7 +302,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             }
           }
         }, 2000);
-      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo},porque ya se encuentra cerrada!`);
+      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
     }
   }
 
