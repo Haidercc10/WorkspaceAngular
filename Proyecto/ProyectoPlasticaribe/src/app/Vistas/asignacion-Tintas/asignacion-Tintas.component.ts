@@ -108,9 +108,7 @@ export class AsignacionTintasComponent implements OnInit {
   limpiarCamposMateriaPrima = () => this.FormMateriaPrima.reset();
 
   // Funcion que buscará las tintas que se utilizan en la empresa
-  obtenerTintas(){
-    this.tintasService.srvObtenerListaXColores().subscribe(data => this.tintas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.tinta_Id)));
-  }
+  obtenerTintas = () => this.tintasService.srvObtenerListaXColores().subscribe(data => this.tintas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.tinta_Id)));
 
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
   buscarTintaSeleccionada(){
@@ -123,9 +121,7 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   // Función que buscará las materias primas que se utilizan para crear tintas
-  obtenerMateriaPrima(){
-    this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data => this.materiasPrimas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.matPrima)));
-  }
+  obtenerMateriaPrima = () => this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data => this.materiasPrimas = data.filter((item) => ![84, 2001, 88, 89, 2072].includes(item.matPrima)));
 
   //Funcion para  obtener las unidades de medidas
   obtenerUnidadesMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos);
@@ -135,8 +131,7 @@ export class AsignacionTintasComponent implements OnInit {
     let materiaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
     this.asignacionMPxTintas.srvObtenerListaMatPrimasPorId(materiaPrima).subscribe(datos_materiasPrimas => {
       for (let index = 0; index < datos_materiasPrimas.length; index++) {
-        let mp : number [] = [84, 2001, 88, 89, 2072];
-        if (!mp.includes(datos_materiasPrimas[index].matPrima)) {
+        if (![84, 2001, 88, 89, 2072].includes(datos_materiasPrimas[index].matPrima)) {
           this.FormMateriaPrima.setValue({
             idMateriaPrima : datos_materiasPrimas[index].matPrima,
             nombreMateriaPrima : datos_materiasPrimas[index].nombreMP,
@@ -161,10 +156,7 @@ export class AsignacionTintasComponent implements OnInit {
     let stock : number = this.FormMateriaPrima.value.stockMateriaPrima;
     let IdMatPrimaReal : number = 84;
     let IdTintaReal : number = 2001;
-
-    if (idMateriaPrima > 2000) IdTintaReal = idMateriaPrima;
-    else IdMatPrimaReal = idMateriaPrima;
-
+    idMateriaPrima > 2000 ? IdTintaReal = idMateriaPrima : IdMatPrimaReal = idMateriaPrima;
     if (cantidad <= stock) {
       let productoExt : any = {
         Id : idMateriaPrima,
@@ -230,7 +222,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.moverInventarioMP();
       this.moverInventarioTintas();
-      setTimeout(() => { this.sumarInventarioTintas(); }, 1000);
+      setTimeout(() => this.sumarInventarioTintas(), 1000);
       this.load = false;
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de asignación!`);

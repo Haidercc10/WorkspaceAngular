@@ -1,5 +1,5 @@
 export interface modelMezclas {
-  mezclaId : number;
+  mezclaId? : number;
   Mezcla_Nombre : string;
   Mezcla_NroCapas : number;
   Material_Id : number;

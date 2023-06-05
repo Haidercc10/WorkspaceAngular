@@ -2683,7 +2683,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'No puede usar este porcentaje para los materiales seleccionados');
             } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'La suma del porcentaje de mezcla de las capas debe ser 100');
           } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe elegir el número de capas de la mezcla.');
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`)
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una mezcla llamada ${mezcla}`);
       });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Nombre de Mezcla"`);
   }
@@ -2692,7 +2692,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   infoMezclaCrear(){
     let mezcla : any = this.formCrearMezclas.value.Nombre_Mezclas;
     let modelo : modelMezclas = {
-      mezclaId : 0,
       Mezcla_Nombre: mezcla.replace('%25', '%'),
       Mezcla_NroCapas: this.nroCapas,
       Material_Id:  this.formCrearMezclas.value.Material_MatPrima,
