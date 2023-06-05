@@ -39,7 +39,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   error : boolean = false; //Variabla que nos ayudarápara saber si hubo un error
   kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
-  cantidadAsignada : number = 0; //Variable que va a almacenar la cantidad materia prima asignada de una orden de trabajo
   cantRestante : number = 0; //Variable que va a almacenar la cantidad que resta por asignar de una orden de trabajo
   estadoOT : any; //Variable que va a almacenar el estado de la orden de trabajo
   infoOrdenTrabajo : any [] = []; //Variable en la que se almacenará la información de la orden de trabajo consultada
@@ -117,8 +116,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.reset();
+    this.FormMateriaPrimaRetiro.reset();
     this.FormMateriaPrimaRetiro.patchValue({ FechaRetiro : this.today, });
-    this.cantidadAsignada = 0;
     this.cantRestante = 0;
     this.kgOT = 0;
     this.load = true;
@@ -156,41 +155,28 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
   infoOT(){
     this.error = false;
-    this.load = false;
-    this.infoOrdenTrabajo = [];
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    this.cantRestante = 0;
-    this.kgOT = 0;
-
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
       if (datos_procesos.length != 0) {
         for (let index = 0; index < datos_procesos.length; index++) {
-          let adicional : number = datos_procesos[index].datosotKg * 0.02;
+          let adicional : number = datos_procesos[index].datosotKg * 0.05;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
             this.cantRestante = this.kgOT - datos_asignacion;
-            let info : any = {
+            this.infoOrdenTrabajo = [{
               ot : ot,
               cliente : datos_procesos[index].clienteNom,
               item : datos_procesos[index].clienteItemsNom,
               kg : this.kgOT,
               kgRestante : this.cantRestante,
-            }
-            this.infoOrdenTrabajo.push(info);
-            this.load = true;
+            }];
           });
           break;
         }
-      } else {
-        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no se encuentra registrada en BagPro`);
-        this.load = true;
-      }
-    }, () => {
-      this.mensajeService.mensajeError(`¡Error!`, `¡Error al consultar la OT ${ot}!`);
-      this.error = true;
-    });
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no se encuentra registrada en BagPro`);
+    }, () => this.mensajeService.mensajeError(`¡Error!`, `¡Error al consultar la OT ${ot}!`));
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -198,9 +184,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let id : number = dato == 1 ? this.FormMateriaPrimaRetirada.value.MpIdRetirada : this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        if (datos_materiaPrima[i].categoria != 6) {
-          let mp : number [] = [84, 2001, 88, 89, 2072];
-          if (!mp.includes(datos_materiaPrima[i].id)) {
+        if (this.categoriasMP.includes(datos_materiaPrima[i].categoria) || this.categoriasTintas.includes(datos_materiaPrima[i].categoria)) {
+          if (![84, 2001, 88, 89, 2072].includes(datos_materiaPrima[i].id)) {
             this.FormMateriaPrimaRetirada.patchValue({
               MpIdRetirada : datos_materiaPrima[i].id,
               MpNombreRetirada: datos_materiaPrima[i].nombre,
@@ -282,10 +267,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
   asignacionMateriaPrima(){
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    this.load = false;
     if (!this.error) {
       if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
         setTimeout(() => {
-          this.load = false;
           if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
           else {
             if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){
@@ -298,8 +283,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             }
           }
         }, 2000);
-      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
-    }
+      } else if (this.estadoOT == 4 || this.estadoOT == 1) {
+        this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
+        this.load = true;
+      }
+    } else this.load = true;
   }
 
   // Crear Asignacion
@@ -316,22 +304,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Estado_OrdenTrabajo : 14,
       AsigMp_Hora : moment().format('H:mm:ss'),
     }
-    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(() => { this.obtenerUltimoIdAsignacaion(); }, () => {
+    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
       this.error = true;
       this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
       this.load = true;
     });
-  }
-
-  //Funcion que va a buscar y obtener el id de la ultima asignacion
-  obtenerUltimoIdAsignacaion(){
-    if (!this.error) {
-      this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => this.obtenerProcesoId(datos_asignaciones.asigMp_Id), () => {
-        this.error = true;
-        this.mensajeService.mensajeError(`¡Error!`, `¡No se pudo extraer el último Id de asignación!`);
-        this.load = true;
-      });
-    }
   }
 
   // Funcion que se encargará de consultar el Id del proceso y hacer el ingreso de las materia primas asignadas
@@ -371,28 +348,26 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
         }
       }
-      setTimeout(() => { if (!this.error) this.asignacionExitosa(); }, 3500);
+      setTimeout(() => !this.error ? this.asignacionExitosa() : null, 2500);
     }
   }
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
   asignacionExitosa() {
     if (!this.error && !this.soloTintas) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
-    else if (this.soloTintas && this.cantidadAsignada > this.cantRestante) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
+    else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
     this.LimpiarCampos();
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
   moverInventarioMpPedida(idMateriaPrima : number, cantidadMateriaPrima : number){
     if (!this.error) {
-      let stockMateriaPrimaFinal : number;
       this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-        stockMateriaPrimaFinal = datos_materiaPrima.matPri_Stock - cantidadMateriaPrima;
         const datosMP : any = {
           MatPri_Id : idMateriaPrima,
           MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
           MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-          MatPri_Stock : stockMateriaPrimaFinal,
+          MatPri_Stock : datos_materiaPrima.matPri_Stock - cantidadMateriaPrima,
           UndMed_Id : datos_materiaPrima.undMed_Id,
           CatMP_Id : datos_materiaPrima.catMP_Id,
           MatPri_Precio : datos_materiaPrima.matPri_Precio,

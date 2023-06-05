@@ -183,7 +183,7 @@ export class MovimientoMPComponent implements OnInit {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
         for (let i = 0; i < datos_procesos.length; i++) {
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(codigo)).subscribe(datos_asignacion => {
-            this.cantRestante = (datos_procesos[i].datosotKg + (datos_procesos[i].datosotKg * 0.02)) - datos_asignacion;
+            this.cantRestante = (datos_procesos[i].datosotKg + (datos_procesos[i].datosotKg * 0.05)) - datos_asignacion;
             this.cantAsignada = datos_asignacion;
           });
           break;

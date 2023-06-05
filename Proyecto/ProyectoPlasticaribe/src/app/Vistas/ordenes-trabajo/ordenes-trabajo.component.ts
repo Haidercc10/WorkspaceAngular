@@ -107,6 +107,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   margenKg : number = 0; //Variable que almcanerá la cantidad adicional de kg que se harán para manejar un margen de error
   pesoPaquete : number = 0; //Variable que almacenará cuantos kg pesa un paquete
   pesoBulto : number = 0; //Variable que almacenará cuantos kg pesa un bulto
+  pesoProducto : number = 0; //Variable que almacenará el peso del producto
   informacionSeleccionada : any; //Variable que almacenará la información del producto seleccionado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
@@ -460,6 +461,22 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a cerrar el mensaje de confirmación de edicion de una orden de trabajo
   cerrarMensaje = () => this.messageService.clear('editarOrden');
 
+  // Funcion que va a obtener los pedidos provenientes de zeus
+  pedidosZues(){
+    this.pedidosZeusService.GetPedidosAgrupados().subscribe(datos_Pedidos => {
+      for (let i = 0; i < datos_Pedidos.length; i++) {
+        let data : any =  {
+          "id_Pedido": parseInt(datos_Pedidos[i].consecutivo),
+          "id_Cliente": datos_Pedidos[i],
+          "nombre_Cliente": datos_Pedidos[i].cliente,
+          "cantidad_Productos": 1,
+          "zeus" : true,
+        }
+        this.pedidosSinOT.push(data);
+      }
+    });
+  }
+
   // Funcion que colocará los campos del formulario principal con datos predeterminados
   limpiarFormOrdenTrabajo(){
     this.FormOrdenTrabajo.reset();
@@ -675,22 +692,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     });
   }
 
-  // Funcion que va a obtener los pedidos provenientes de zeus
-  pedidosZues(){
-    this.pedidosZeusService.GetPedidosAgrupados().subscribe(datos_Pedidos => {
-      for (let i = 0; i < datos_Pedidos.length; i++) {
-        let data : any =  {
-          "id_Pedido": parseInt(datos_Pedidos[i].consecutivo),
-          "id_Cliente": datos_Pedidos[i],
-          "nombre_Cliente": datos_Pedidos[i].cliente,
-          "cantidad_Productos": 1,
-          "zeus" : true,
-        }
-        this.pedidosSinOT.push(data);
-      }
-    });
-  }
-
   // Funcion que va a validar si el pedido viene de zeus
   validarPedido(){
     let nuevo = this.pedidosSinOT.filter(item => item.id_Pedido == this.FormOrdenTrabajo.value.Pedido_Id);
@@ -744,6 +745,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               CantBulto : datos_producto[j].produ.prod_CantBolsasBulto,
               Cant : parseFloat(datos[i].cant_Pendiente),
               Cant_Inicial : parseFloat(datos[i].cant_Pendiente),
+              TipoSellado : datos_producto[i].tipo_Sellado,
               UndCant : presentacion,
               PrecioUnd : datos[i].precioUnidad,
               SubTotal : datos[i].costo_Cant_Pendiente,
@@ -1053,6 +1055,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             else fact = 0.0302;
             this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
           }
+          this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
           //Peso Millar
           this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].Peso_Producto * 1000;
           if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar / 2;
@@ -1195,11 +1198,14 @@ export class OrdenesTrabajoComponent implements OnInit {
       errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
       errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
       errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
-      this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
-      setTimeout(() => this.pdfOrdenTrabajo(datos_ot.ot_Id), 1500);
       setTimeout(() => {
-        if (!errorExt && !errorImp && !errorLam && !errorSelCor) this.mensajeService.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
-        this.limpiarCampos();
+        if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
+          this.mensajeService.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
+          this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
+          this.cambiarEstadoProducto(this.producto);
+          this.pdfOrdenTrabajo(datos_ot.ot_Id);
+          this.limpiarCampos();
+        }
       }, 2000);
     }, error => {
       this.mensajeService.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
@@ -1224,7 +1230,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
     this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { }, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
-      return false;
+      return true;
     });
     return false;
   }
@@ -1259,7 +1265,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         }
         this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { }, error => {
           this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
-          return false;
+          return true;
         });
       }
     });
@@ -1282,7 +1288,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
     this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { }, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
-      return false;
+      return true;
     });
     return false;
   }
@@ -1307,10 +1313,11 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
         SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+        SelladoCorte_PesoProducto : this.pesoProducto,
       }
       this.otSelladoCorteService.post(info).subscribe(() => { }, error => {
         this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
-        return false;
+        return true;
       });
     }, error => this.mensajeService.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error));
     return false;
