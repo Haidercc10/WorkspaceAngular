@@ -335,7 +335,7 @@ input:checked + .colorMode svg.moon {
 }
 
 /* Estilos para el sidebar de los usuarios */
-.cardDatosUsuario, .cerrarSesion, .eventosUSua {
+.cardDatosUsuario, .cerrarSesion {
   border: .5px solid #da4a51;
   border-radius: 10px;
   width: 100%;
@@ -343,7 +343,7 @@ input:checked + .colorMode svg.moon {
   transition: all 300ms;
 }
 
-.cardDatosUsuario:hover, .cerrarSesion:hover, .eventosUSua:hover {
+.cardDatosUsuario:hover, .cerrarSesion:hover {
   border: 1.5px solid #da4a51;
   background-color: #da4a510f;
 }
