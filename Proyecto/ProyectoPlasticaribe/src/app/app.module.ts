@@ -12,6 +12,7 @@ import { StorageServiceModule } from 'ngx-webstorage-service';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
@@ -315,6 +316,7 @@ import { AppComponent } from './app.component';
     GalleriaModule,
     OverlayPanelModule,
     SpeedDialModule,
+    AvatarModule,
   ],
 
   providers: [

@@ -1,10 +1,12 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -18,8 +20,11 @@ export class MenuLateralComponent implements OnInit {
   items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
   @ViewChild(AppComponent) appComponent : AppComponent;
+  public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
   menuConfiguracion : boolean = false;
+  menuUsuario : boolean = false;
+  modalUsuario : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -48,15 +53,22 @@ export class MenuLateralComponent implements OnInit {
   modoSeleccionado : boolean;
 
   constructor(private AppComponent : AppComponent,
-                private rolService : RolesService,
-                  private confirmationService: ConfirmationService,
-                    private messageService: MessageService,
-                      private authenticationService: AuthenticationService,
-                        private cookieService: CookieService,
-                          @Inject(DOCUMENT) private document : Document) {
+                private formBuilder : FormBuilder,
+                  private rolService : RolesService,
+                    private confirmationService: ConfirmationService,
+                      private messageService: MessageService,
+                        private authenticationService: AuthenticationService,
+                          private cookieService: CookieService,
+                            @Inject(DOCUMENT) private document : Document,
+                              private usuarioService : UsuarioService,
+                                private mensajeService : MensajesAplicacionService,) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.FormUsuarios = this.formBuilder.group({
+      usuNombre: [null, Validators.required],
+      usuPassword: [null, Validators.required],
+    });
   }
 
   ngOnInit() {
@@ -66,15 +78,8 @@ export class MenuLateralComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
-    let rol = this.AppComponent.storage_Rol;
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == parseInt(this.AppComponent.storage_Rol)) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.AppComponent.storage_Rol;
+    this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
   }
 
   aumentarLetra() {
@@ -92,33 +97,62 @@ export class MenuLateralComponent implements OnInit {
   }
 
   cambiarColorIcono(){
-    let fontSize : number;
-    fontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     const icono1 = this.document.getElementById('iconoTanamoLetra1');
     const icono2 = this.document.getElementById('iconoTanamoLetra2');
     const icono3 = this.document.getElementById('iconoTanamoLetra3');
     const icono4 = this.document.getElementById('iconoTanamoLetra4');
     const icono5 = this.document.getElementById('iconoTanamoLetra5');
 
-    if (fontSize > 0.66 && fontSize < 0.68) icono1.className = 'pi pi-circle-fill font-size-25';
-    else icono1.className = 'pi pi-circle font-size-16';
-
-    if (fontSize > 0.68 && fontSize < 0.89) icono2.className = 'pi pi-circle-fill font-size-25';
-    else icono2.className = 'pi pi-circle font-size-16';
-
-    if (fontSize > 0.89 && fontSize < 1.03) icono3.className = 'pi pi-circle-fill font-size-25';
-    else icono3.className = 'pi pi-circle font-size-16';
-
-    if (fontSize > 1.03 && fontSize < 1.19) icono4.className = 'pi pi-circle-fill font-size-25';
-    else icono4.className = 'pi pi-circle font-size-16';
-
-    if (fontSize > 1.19 && fontSize < 1.3) icono5.className = 'pi pi-circle-fill font-size-25';
-    else icono5.className = 'pi pi-circle font-size-16';
+    fontSize > 0.66 && fontSize < 0.68 ? icono1.className = 'pi pi-circle-fill font-size-25' : icono1.className = 'pi pi-circle font-size-16';
+    fontSize > 0.68 && fontSize < 0.89 ? icono2.className = 'pi pi-circle-fill font-size-25' : icono2.className = 'pi pi-circle font-size-16';
+    fontSize > 0.89 && fontSize < 1.03 ? icono3.className = 'pi pi-circle-fill font-size-25' : icono3.className = 'pi pi-circle font-size-16';
+    fontSize > 1.03 && fontSize < 1.19 ? icono4.className = 'pi pi-circle-fill font-size-25' : icono4.className = 'pi pi-circle font-size-16';
+    fontSize > 1.19 && fontSize < 1.30 ? icono5.className = 'pi pi-circle-fill font-size-25' : icono5.className = 'pi pi-circle font-size-16';
   }
 
   configuracion(){
     this.menuConfiguracion = true;
     setTimeout(() => this.cambiarColorIcono(), 100);
+  }
+
+  mostrarMenuUsuario = () => this.menuUsuario = true;
+
+  abrirModalUsuario(){
+    this.modalUsuario = true;
+    this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
+      this.FormUsuarios.patchValue({ usuNombre: dataUsuarios[0].usua_Nombre, usuPassword: dataUsuarios[0].usua_Contrasena, });
+    });
+  }
+
+  // Funcion que actualizará los usuarios
+  actualizarUsuario() {
+    this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
+      for (let i = 0; i < dataUsuarios.length; i++) {
+        const infoUsuarios : any = {
+          Usua_Id : dataUsuarios[i].usua_Id,
+          Usua_Nombre : this.FormUsuarios.value.usuNombre,
+          TpUsu_Id : dataUsuarios[i].tpUsu_Id,
+          Area_Id : dataUsuarios[i].area_Id,
+          RolUsu_Id : dataUsuarios[i].rolUsu_Id,
+          Estado_Id : dataUsuarios[i].estado_Id,
+          Usua_Telefono : dataUsuarios[i].usua_Telefono,
+          Usua_Contrasena : this.FormUsuarios.value.usuPassword,
+          Usua_Email : dataUsuarios[i].usua_Email,
+          TipoIdentificacion_Id : 'C.C',
+          Empresa_Id : 800188732,
+          cajComp_Id : dataUsuarios[i].cajComp_Id,
+          eps_Id : dataUsuarios[i].eps_Id,
+          fPen_Id : dataUsuarios[i].fPen_Id,
+          Usua_Fecha : dataUsuarios[i].usua_Fecha,
+          Usua_Hora : dataUsuarios[i].usua_Hora,
+        }
+        this.usuarioService.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
+          this.modalUsuario = false;
+          this.mensajeService.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
+        }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`));
+      }
+    });
   }
 
   showConfirm() {
@@ -140,104 +174,46 @@ export class MenuLateralComponent implements OnInit {
     this.messageService.add({key: 'c', sticky: true, severity:'warn', summary:'¿Seguro que desea salir?'});
   }
 
-  onConfirm() {
-    this.authenticationService.logout();
-  }
+  onConfirm = () => this.authenticationService.logout();
 
-  onReject() {
-    this.messageService.clear('c');
-  }
+  onReject = () => this.messageService.clear('c');
 
   // Funcion que hacer que aparezca un icono u otro
-  clickIcon1(){
-    if (this.subir1) this.subir1 = false;
-    else this.subir1 = true;
-  }
+  clickIcon1 = () => this.subir1 ? this.subir1 = false : this.subir1 = true;
 
-  clickIcon2(){
-    if (this.subir2) this.subir2 = false;
-    else this.subir2 = true;
-  }
+  clickIcon2 = () => this.subir2 ? this.subir2 = false : this.subir2 = true;
 
-  clickIcon3(){
-    if (this.subir3) this.subir3 = false;
-    else this.subir3 = true;
-  }
+  clickIcon3 = () => this.subir ? this.subir3 = false : this.subir3 = true;
 
-  clickIcon4(){
-    if (this.subir4) this.subir4 = false;
-    else this.subir4 = true;
-  }
+  clickIcon4 = () => this.subir4 ? this.subir4 = false : this.subir4 = true;
 
-  clickIcon5(){
-    if (this.subir5) this.subir5 = false;
-    else this.subir5 = true;
-  }
+  clickIcon5 = () => this.subir5 ? this.subir5 = false : this.subir5 = true;
 
-  clickIcon6(){
-    if (this.subir6) this.subir6 = false;
-    else this.subir6 = true;
-  }
+  clickIcon6 = () => this.subir6 ? this.subir6 = false : this.subir6 = true;
 
-  clickIcon7(){
-    if (this.subir7) this.subir7 = false;
-    else this.subir7 = true;
-  }
+  clickIcon7 = () => this.subir7 ? this.subir7 = false : this.subir7 = true;
 
-  clickIcon7_1(){
-    if (this.subir7_1) this.subir7_1 = false;
-    else this.subir7_1 = true;
-  }
+  clickIcon7_1 = () => this.subir7_1 ? this.subir7_1 = false : this.subir7_1 = true;
 
-  clickIcon8(){
-    if (this.subir8) this.subir8 = false;
-    else this.subir8 = true;
-  }
+  clickIcon8 = () => this.subir8 ? this.subir8 = false : this.subir8 = true;
 
-  clickIcon8_1(){
-    if (this.subir8_1) this.subir8_1 = false;
-    else this.subir8_1 = true;
-  }
+  clickIcon8_1 = () => this.subir8_1 ? this.subir8_1 = false : this.subir8_1 = true;
 
-  clickIcon9(){
-    if (this.subir9) this.subir9 = false;
-    else this.subir9 = true;
-  }
+  clickIcon9 = () => this.subir9 ? this.subir9 = false : this.subir9 = true;
 
-  clickIcon10(){
-    if (this.subir10) this.subir10 = false;
-    else this.subir10 = true;
-  }
+  clickIcon10 = () => this.subir10 ? this.subir10 = false : this.subir10 = true;
 
-  clickIcon11(){
-    if (this.subir11) this.subir11 = false;
-    else this.subir11 = true;
-  }
+  clickIcon11 = () => this.subir11 ? this.subir11 = false : this.subir11 = true;
 
-  clickIcon12(){
-    if (this.subir12) this.subir12 = false;
-    else this.subir12 = true;
-  }
+  clickIcon12 = () => this.subir12 ? this.subir12 = false : this.subir12 = true;
 
-  clickIcon13(){
-    if (this.subir13) this.subir13 = false;
-    else this.subir13 = true;
-  }
+  clickIcon13 = () => this.subir13 ? this.subir13 = false : this.subir13 = true;
 
-  clickIcon14(){
-    if (this.subir14) this.subir14 = false;
-    else this.subir14 = true;
-  }
+  clickIcon14 = () => this.subir14 ? this.subir14 = false : this.subir14 = true;
 
-  clickIcon15(){
-    if (this.subir15) this.subir15 = false;
-    else this.subir15 = true;
-  }
+  clickIcon15 = () => this.subir15 ? this.subir15 = false : this.subir15 = true;
 
-  clickIcon16(){
-    if (this.subir16) this.subir16 = false;
-    else this.subir16 = true;
-  }
+  clickIcon16 = () => this.subir16 ? this.subir16 = false : this.subir16 = true;
 
   mostrar() {
     let modo = window.localStorage.getItem("theme");

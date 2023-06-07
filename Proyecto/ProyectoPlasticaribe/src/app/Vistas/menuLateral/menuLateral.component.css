@@ -61,10 +61,6 @@
   border-bottom: 1px dashed #ddd;
   margin: 40px 0;
 }
-/*
-ul li a {
-  color: #FFF;
-} */
 
 ul li a:hover{
   color: #db4149;
@@ -72,7 +68,6 @@ ul li a:hover{
 
 ul li a:active > a, a[aria-expanded="true"]{
   color: #db4149;
-
 }
 
 span{
@@ -134,10 +129,6 @@ p {
   border: none;
   border-radius: 0;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-  /* width: 100%;
-  position: fixed;
-  z-index: 100;
-  margin-top: -25px; */
 }
 
 .navbarDark {
@@ -341,4 +332,43 @@ input:checked + .colorMode svg.moon {
 
 .modo h4 {
   margin-bottom: 5%;
+}
+
+/* Estilos para el sidebar de los usuarios */
+.cardDatosUsuario, .cerrarSesion {
+  border: .5px solid #da4a51;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+.cardDatosUsuario:hover, .cerrarSesion:hover {
+  border: 1.5px solid #da4a51;
+  background-color: #da4a510f;
+}
+
+p-dialog input {
+	width: 100%;
+	height: 100%;
+	visibility: visible;
+}
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-password ::ng-deep .p-password, p-password ::ng-deep .p-inputtext {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep .p-inputtext {
+  display: flex;
+  width: 100%;
+}
+
+p-dialog ::ng-deep div .p-dialog-title {
+  color: var(--rojo);
+  align-items: center;
 }

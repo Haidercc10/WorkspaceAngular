@@ -935,6 +935,7 @@ export class OcompraComponent implements OnInit {
             Oc_PesoTotal : this.calcularCantMateriaPrima(),
             TpDoc_Id : 'OCMP',
             Oc_Observacion : (observacion).toUpperCase(),
+            IVA : this.iva,
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => { this.editarDtOrdenCompa(); }, () => {

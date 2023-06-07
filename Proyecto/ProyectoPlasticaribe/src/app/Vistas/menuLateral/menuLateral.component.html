@@ -1,3 +1,49 @@
+<!-- Navegador Principal -->
+<nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
+  <div class="container-fluid">
+    <p>
+      <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="display = true">
+        <i class="pi pi-list"></i>
+        <b>
+          <span [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">&nbsp;&nbsp;Plasti<span>caribe S.A.S</span></span>
+        </b>
+      </button>
+    </p>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
+      <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
+    </div>
+  </div>
+</nav>
+
+<!-- Boton de Configuración -->
+<div class="botonFlotante">
+  <button type="button" (click)="configuracion()">
+    <i class="pi pi-cog"></i>
+  </button>
+</div>
+
+<!-- Mensaje de Cierre de Sesión -->
+<p-toast position="center" key="c" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="onConfirm()" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
 <!-- Menú Principal -->
 <p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
   <div class="imagen">
@@ -864,14 +910,11 @@
       </li>
     </ng-container>
   </ul>
-  <div class="text-center">
-    <p-button type="button" styleClass="p-button-raised p-button-outlined p-button-danger" label="Cerrar Sesión" icon="pi pi-fw pi-power-off" (click)="confirm1()"></p-button>
-  </div>
 
   <!-- BOTON DE CONFIGURACION -->
 </p-sidebar>
 
-<!-- Mesnú de Configuraciones -->
+<!-- Menú de Configuraciones -->
 <p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
   <div class="escalabilidad">
     <div class="mb-2">
@@ -922,48 +965,61 @@
   </div>
 </p-sidebar>
 
-<!-- Navegador Principal -->
-<nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
-  <div class="container-fluid">
-    <p>
-      <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="display = true">
-        <i class="pi pi-list"></i>
-        <b>
-          <span [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">&nbsp;&nbsp;Plasti<span>caribe S.A.S</span></span>
-        </b>
-      </button>
-    </p>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <span [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
-      <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
+<!-- Menú de Usuario -->
+<p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+  <div>
+    <h5 class="mb-2">Bienvenido</h5>
+    <h6 class="font-size-24"><p>{{storage_Nombre}}</p></h6>
+  </div>
+
+  <div class="cardDatosUsuario my-3 p-2" (click)="abrirModalUsuario()">
+    <div class="row">
+      <div class="col-3 m-auto text-center">
+        <i class="pi pi-user font-size-20"></i>
+      </div>
+
+      <div class="col-9 font-size-12">
+        <h5><p>Editar Perfil</p></h5>
+      </div>
     </div>
   </div>
-</nav>
 
-<!-- Mensaje de Cierre de Sesión -->
-<p-toast position="center" key="c" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
+  <div class="cerrarSesion my-3 p-2" (click)="confirm1()">
+    <div class="row">
+      <div class="col-3 m-auto text-center">
+        <i class="pi pi-fw pi-power-off font-size-20"></i>
       </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="onConfirm()" label="Si" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject()" label="No" class="p-button-secondary"></button>
-        </div>
+
+      <div class="col-9 font-size-12">
+        <h5><p>Cerrar Sesión</p></h5>
       </div>
     </div>
-  </ng-template>
-</p-toast>
+  </div>
+</p-sidebar>
 
-<!-- Boton de Configuración -->
-<div class="botonFlotante">
-  <button type="button" (click)="configuracion()">
-    <i class="pi pi-cog"></i>
-  </button>
-</div>
+<!-- Modal Usuario -->
+<p-dialog [(visible)]="modalUsuario" [style]="{width: '470px'}" header="Editar Usuarios" [modal]="true">
+  <ng-template pTemplate="content">
+    <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
+      <div class="row my-3 g-4">
+        <div class="col-12">
+          <span class="p-float-label">
+            <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
+            <label for="usuarioNombre">Nombre Usuario</label>
+          </span>
+        </div>
+
+        <div class="col 12">
+          <span class="p-float-label">
+            <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
+            <label for="pass">Contraseña</label>
+          </span>
+        </div>
+      </div>
+
+      <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
+      </div>
+    </form>
+  </ng-template>
+</p-dialog>

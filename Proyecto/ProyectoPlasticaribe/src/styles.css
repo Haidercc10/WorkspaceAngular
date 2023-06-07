@@ -107,22 +107,6 @@ a {
 .modal-title {
   color: var(--rojo) ;
 }
-/*
-.tutorial{
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: hsla(240, 100%, 1%, 0.6);
-  cursor: default;
-}
-
-.objetoSobresaliente {
-  position: relative;
-  z-index: 2100;
-} */
 
 .overlay{
   z-index: 200;
@@ -257,4 +241,3 @@ html, body {
 #texto-centrado {
   text-align: center;
 }
-
