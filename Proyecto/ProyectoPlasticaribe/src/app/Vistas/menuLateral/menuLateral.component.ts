@@ -2,8 +2,10 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -25,11 +27,13 @@ export class MenuLateralComponent implements OnInit {
   menuConfiguracion : boolean = false;
   menuUsuario : boolean = false;
   modalUsuario : boolean = false;
+  modalCalendario : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
+  cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   position: string = '';
   subir : boolean = true;
   subir1 : boolean = true;
@@ -61,7 +65,8 @@ export class MenuLateralComponent implements OnInit {
                           private cookieService: CookieService,
                             @Inject(DOCUMENT) private document : Document,
                               private usuarioService : UsuarioService,
-                                private mensajeService : MensajesAplicacionService,) {
+                                private mensajeService : MensajesAplicacionService,
+                                  private eventosCalService : EventosCalendarioService,) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -73,6 +78,7 @@ export class MenuLateralComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.cantidadEventosMes();
   }
 
   lecturaStorage(){
@@ -154,6 +160,15 @@ export class MenuLateralComponent implements OnInit {
       }
     });
   }
+
+  // Funcion que consultará la cantidad de eventos que hay en el mes
+  cantidadEventosMes(){
+    let inicio : any = moment().format('YYYY-MM-DD');
+    let fin : any = moment().endOf('month').format('YYYY-MM-DD');
+    this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe(data => this.cantidadEventos = data);
+  }
+
+  mostrarModalCalendario = () => this.modalCalendario = true;
 
   showConfirm() {
     this.confirmationService.confirm({
