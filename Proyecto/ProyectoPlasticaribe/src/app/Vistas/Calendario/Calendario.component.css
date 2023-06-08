@@ -1,0 +1,51 @@
+full-calendar {
+  max-width: 1100px;
+  margin: 40px auto;
+  cursor: pointer;
+}
+
+::ng-deep .fc-day:hover, .fc-day-mon:hover, .fc-day-past:hover, .fc-daygrid-day:hover {
+  background-color: #93C5FD29;
+  color: black;
+}
+
+p-dialog ::ng-deep div .p-dialog-title {
+  color: var(--rojo);
+  align-items: center;
+}
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+  display: flex;
+  width: 100%;
+}
+
+p-calendar ::ng-deep span button {
+  background-color: var(--rojo);
+  border: 0;
+  transition: all 1s;
+}
+
+p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+  background: var(--rojoHover);
+}
+
+p-calendar ::ng-deep .p-datepicker-header button {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep .p-datepicker-header button:hover {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep span button span {
+  display: block;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+  display: flex;
+  width: 100%;
+}

@@ -14,12 +14,11 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
-  selector: 'app-prueba-imagen-cat-insumo',
-  templateUrl: './prueba-imagen-cat-insumo.component.html',
-  styleUrls: ['./prueba-imagen-cat-insumo.component.css']
+  selector: 'app-Calendario',
+  templateUrl: './Calendario.component.html',
+  styleUrls: ['./Calendario.component.css']
 })
-
-export class PruebaImagenCatInsumoComponent implements OnInit  {
+export class CalendarioComponent implements OnInit {
 
   FormEvento !: FormGroup; //Formulario que tendrá la informacion del evento a crear o el evento a editar
   cargando : boolean = false;
@@ -53,9 +52,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerRoles();
     this.opcionesCalendario();
-    this.obtenerEventos('');
+    this.tiempoExcedido();
+    this.obtenerRoles();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -64,6 +63,15 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
+
+  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
+  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
+
+  //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
+  tiempoExcedido() {
+    this.obtenerEventos('');
+    this.recargar();
   }
 
   // Funcion que va a limpiar los datos del modal
@@ -298,3 +306,4 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   // Funcion que va a cerrar un mensaje
   cerrarMensaje = (key : string) => this.messageService.clear(key);
 }
+
