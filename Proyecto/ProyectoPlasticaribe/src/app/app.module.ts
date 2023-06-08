@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { NgChartsModule } from 'ng2-charts';
 import { CookieService } from 'ngx-cookie-service';
@@ -12,7 +13,6 @@ import { StorageServiceModule } from 'ngx-webstorage-service';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
-import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
@@ -61,6 +61,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
@@ -316,7 +317,8 @@ import { AppComponent } from './app.component';
     GalleriaModule,
     OverlayPanelModule,
     SpeedDialModule,
-    AvatarModule,
+    FullCalendarModule,
+    TreeSelectModule,
   ],
 
   providers: [
