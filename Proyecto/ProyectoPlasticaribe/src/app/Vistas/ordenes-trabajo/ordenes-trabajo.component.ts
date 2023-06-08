@@ -402,7 +402,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas);
+  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas.filter((item) => item.catMP_Id == 7));
 
   /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
   cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
@@ -636,7 +636,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
     let data : any = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
-    this.mezclasService.getMezclaNombre(data).subscribe(datos_mezcla => {
+    this.mezclasService.getMezclaNombre(data.replace('%', '%25')).subscribe(datos_mezcla => {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
         this.FormOrdenTrabajoMezclas.disable();
@@ -916,7 +916,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
           this.FormOrdenTrabajoExtrusion.patchValue({
             Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
-            Formato_Extrusion : parseInt(itemOt.ptFormatopt.trim()),
+            Formato_Extrusion : parseInt(itemOt.extFormato.trim()),
             Pigmento_Extrusion : parseInt(itemOt.extPigmento.trim()),
             Ancho_Extrusion1 : itemOt.extAcho1,
             Ancho_Extrusion2 : itemOt.extAcho2,
@@ -955,16 +955,17 @@ export class OrdenesTrabajoComponent implements OnInit {
                 Tipo_Impresion : impresion,
                 Rodillo_Impresion : itemOt.impRodillo,
                 Pista_Impresion : itemOt.impPista,
-                Tinta_Impresion1 : datos_impresion[j].tinta_Id1,
-                Tinta_Impresion2 : datos_impresion[j].tinta_Id2,
-                Tinta_Impresion3 : datos_impresion[j].tinta_Id3,
-                Tinta_Impresion4 : datos_impresion[j].tinta_Id4,
-                Tinta_Impresion5 : datos_impresion[j].tinta_Id5,
-                Tinta_Impresion6 : datos_impresion[j].tinta_Id6,
-                Tinta_Impresion7 : datos_impresion[j].tinta_Id7,
-                Tinta_Impresion8 : datos_impresion[j].tinta_Id8,
+                Tinta_Impresion1 : datos_impresion[j].tinta_Nombre1,
+                Tinta_Impresion2 : datos_impresion[j].tinta_Nombre2,
+                Tinta_Impresion3 : datos_impresion[j].tinta_Nombre3,
+                Tinta_Impresion4 : datos_impresion[j].tinta_Nombre4,
+                Tinta_Impresion5 : datos_impresion[j].tinta_Nombre5,
+                Tinta_Impresion6 : datos_impresion[j].tinta_Nombre6,
+                Tinta_Impresion7 : datos_impresion[j].tinta_Nombre7,
+                Tinta_Impresion8 : datos_impresion[j].tinta_Nombre8,
               });
             }
+            console.log(datos_impresion)
           });
 
           laminadoCapa1 = itemOt.lamCapa1.trim();
@@ -2853,5 +2854,19 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.enable();
       this.cambiarNroCapas3();
     }, 300);
+  }
+
+  /** Función que validará que no se elija ninguna tinta igual a otra en el formulario de impresión */
+  validarTinta(posicion : string){
+    let tinta : any = this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.value;
+    let tintasSeleccionadas : any[] = Object.values(this.FormOrdenTrabajoImpresion.value);
+    tintasSeleccionadas = tintasSeleccionadas.filter((item) => typeof(item) == 'string');
+    let indice : number = tintasSeleccionadas.indexOf(tinta);
+    if(indice != -1) tintasSeleccionadas.splice(indice, 1);
+    if(tinta != 'NO APLICA')
+    if(tintasSeleccionadas.includes(tinta)) {
+      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
+      this.FormOrdenTrabajoImpresion.get('Tinta_Impresion'+ posicion)?.setValue('');
+    }
   }
 }
