@@ -1,0 +1,86 @@
+<full-calendar [events]="events" [options]="options" *ngIf="!cargando"></full-calendar>
+
+<p-dialog [(visible)]="modalEvento" [style]="{width: '500px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '360px' }" header="{{accion}} Evento" [modal]="true">
+  <ng-template pTemplate="content">
+    <form [formGroup]="FormEvento">
+      <div class="row g-4 my-2">
+
+        <!-- Nombre Evento -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-pencil"></i>
+            <input formControlName="Nombre" type="text" id="Nombre" pInputText/>
+            <label htmlFor="Nombre">Nombre Evento</label>
+          </span>
+        </div>
+
+        <!-- Visibilidad Evento -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-treeSelect formControlName="Visibilidad"
+                          class="w-full md:w-20rem"
+                          containerStyleClass="w-full"
+                          [(ngModel)]="visibilidadSeleccionada"
+                          [options]="visibilidadSeleccionable"
+                          [metaKeySelection]="false"
+                          selectionMode="multiple"
+                          placeholder="Seleccionar Roles"
+                          id="Visibilidad"></p-treeSelect>
+            <label htmlFor="Visibilidad">Visibilidad</label>
+          </span>
+        </div>
+
+        <!-- Descripción del Evento -->
+        <div class="col-12">
+          <span class="p-float-label">
+            <textarea formControlName="Descripcion" [rows]="13" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Descripción Evento</label>
+          </span>
+        </div>
+
+        <!-- Fecha Inicio -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaInicio" [showTime]="true" [showSeconds]="true" dateFormat="yy-mm-dd"></p-calendar>
+            <label for="FechaInicio">Fecha Inicio</label>
+          </span>
+        </div>
+
+        <!-- Fecha Fin -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaFin" [showTime]="true" [showSeconds]="true" dateFormat="yy-mm-dd"></p-calendar>
+            <label for="FechaFin">Fecha Fin</label>
+          </span>
+        </div>
+      </div>
+
+      <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-success" id="crear" type="button" label="{{accion}} Evento" icon="pi pi-send" (click)="validarFormularioEvento()"></button>
+        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarModal()"></button>
+        <button pButton class="p-button-danger" id="eliminar" type="button" label="Eliminar Evento" icon="pi pi-trash" (click)="confirmarEliminacion()"></button>
+      </div>
+    </form>
+  </ng-template>
+</p-dialog>
+
+<!-- Mensaje  para validar que si se desea eliminar un evento -->
+<p-toast position="center" key="eliminar" (onClose)="cerrarMensaje('eliminar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton (click)="eliminarEvento()" icon="pi pi-check" label="ELiminar" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="cerrarMensaje('eliminar')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
