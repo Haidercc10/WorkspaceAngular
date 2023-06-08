@@ -18,7 +18,6 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './Calendario.component.html',
   styleUrls: ['./Calendario.component.css']
 })
-
 export class CalendarioComponent implements OnInit {
 
   FormEvento !: FormGroup; //Formulario que tendrá la informacion del evento a crear o el evento a editar
@@ -53,9 +52,9 @@ export class CalendarioComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerRoles();
     this.opcionesCalendario();
-    this.obtenerEventos('');
+    this.tiempoExcedido();
+    this.obtenerRoles();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -64,6 +63,15 @@ export class CalendarioComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
+
+  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
+  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
+
+  //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
+  tiempoExcedido() {
+    this.obtenerEventos('');
+    this.recargar();
   }
 
   // Funcion que va a limpiar los datos del modal
@@ -77,27 +85,23 @@ export class CalendarioComponent implements OnInit {
 
   // Funcion que va a cargar los roles que se podrán elegir en la visibilidad del evento
   obtenerRoles() {
-    this.visibilidadSeleccionable.push(
-      { key: `B`, label: `Todos`, data: `Todos`, icon: 'pi pi-fw pi-users', children: [] },
-      { key: `C`, label: `Solo...`, data: `Solo...`, icon: 'pi pi-fw pi-user', children: [] }
-    );
-    this.rolesService.srvObtenerLista().subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        this.visibilidadSeleccionable[2].children.push({
-          key: data[i].rolUsu_Id,
-          label: data[i].rolUsu_Nombre,
-          data: data[i].rolUsu_Nombre,
-          icon: 'pi pi-fw pi-user',
-          children: []
-        });
-      }
-    });
-    setTimeout(() => {
-      if (this.ValidarRol != 1) {
-        this.visibilidadSeleccionable[2].children = this.visibilidadSeleccionable[2].children.filter(item => item.key == this.ValidarRol);
-        this.visibilidadSeleccionable.splice(1, 1);
-      }
-    }, 500);
+    if (this.ValidarRol == 1) {
+      this.visibilidadSeleccionable.push(
+        { key: `B`, label: `Todos`, data: `Todos`, icon: 'pi pi-fw pi-users', children: [] },
+        { key: `C`, label: `Solo...`, data: `Solo...`, icon: 'pi pi-fw pi-user', children: [] }
+      );
+      this.rolesService.srvObtenerLista().subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          this.visibilidadSeleccionable[2].children.push({
+            key: data[i].rolUsu_Id,
+            label: data[i].rolUsu_Nombre,
+            data: data[i].rolUsu_Nombre,
+            icon: 'pi pi-fw pi-user',
+            children: []
+          });
+        }
+      });
+    }
   }
 
   // Funcion que llenará la información de la configuración del calendario
@@ -155,12 +159,14 @@ export class CalendarioComponent implements OnInit {
     this.accion = 'Editar';
     this.eventoSeleccionado = data.event._def.extendedProps.Id;
     this.visibilidadSeleccionada = [];
-    let visibilidad : any [] = data.event._def.extendedProps.Visibilidad.trim().split('|').filter((item: string) => item != '');
+    let visibilidad : any [] = data.event._def.extendedProps.Visibilidad.trim().split('|');
+    visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
+    visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
     let c : number = this.visibilidadSeleccionable.findIndex(item => item.key == 'C');
-    if (visibilidad[0] == 'Solo Yo') {
-      visibilidad[0] = 'A';
+    if (visibilidad.length == 1) {
+      visibilidad[0] == this.ValidarRol.toString() ? visibilidad[0] = 'A' : parseInt(visibilidad[0]);
       this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
-    } else {
+    } else if(c > 0) {
       if (visibilidad.length == this.visibilidadSeleccionable[c].children.length) {
         visibilidad = ['B'];
         this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
@@ -171,7 +177,7 @@ export class CalendarioComponent implements OnInit {
           }
         }
       }
-    }
+    } else this.visibilidadSeleccionada = this.visibilidadSeleccionable;
 
     this.FormEvento.patchValue({
       Nombre : data.event.title,
@@ -202,7 +208,7 @@ export class CalendarioComponent implements OnInit {
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|Solo Yo`;
+          visibilidad = `|1`;
           break;
         }
         if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
@@ -243,7 +249,7 @@ export class CalendarioComponent implements OnInit {
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|Solo Yo`;
+          visibilidad = `|1`;
           break;
         }
         if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
@@ -300,3 +306,4 @@ export class CalendarioComponent implements OnInit {
   // Funcion que va a cerrar un mensaje
   cerrarMensaje = (key : string) => this.messageService.clear(key);
 }
+
