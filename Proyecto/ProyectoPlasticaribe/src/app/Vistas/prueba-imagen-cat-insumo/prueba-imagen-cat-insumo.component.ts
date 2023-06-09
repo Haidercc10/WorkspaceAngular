@@ -155,8 +155,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
     visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
     let c : number = this.visibilidadSeleccionable.findIndex(item => item.key == 'C');
-    if (visibilidad.length == 1) {
+    if (visibilidad.length == 1 || visibilidad[0] == 'Solo Yo') {
+      console.log(visibilidad)
       visibilidad[0] == this.ValidarRol.toString() ? visibilidad[0] = 'A' : parseInt(visibilidad[0]);
+      visibilidad[0] == 'Solo Yo' ? visibilidad[0] = 'A' : parseInt(visibilidad[0]);
       this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
     } else if(c > 0) {
       if (visibilidad.length == this.visibilidadSeleccionable[c].children.length) {
@@ -200,7 +202,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|1`;
+          visibilidad = `|Solo Yo`;
           break;
         }
         if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
@@ -241,7 +243,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {
-          visibilidad = `|1`;
+          visibilidad = `|Solo Yo`;
           break;
         }
         if (this.visibilidadSeleccionada.some(item => item.key == 'B')) {
