@@ -2861,7 +2861,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }, 300);
   }
 
-  /** Función que validará que no se elija ninguna tinta igual a otra en el formulario de impresión */
+  /** Función que validará que no se elija ninguna tinta igual a otra en el formulario de impresión y organizará las tintas */
   validarTinta(posicion : string){
     let tinta : any = this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.value;
     let tintasSeleccionadas : any[] = Object.values(this.FormOrdenTrabajoImpresion.value);
@@ -2873,13 +2873,12 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
         this.FormOrdenTrabajoImpresion.get('Tinta_Impresion'+ posicion)?.setValue('NO APLICA');
       }
-      console.log(posicion)
     }
-    for (let index = 0; index < parseInt(posicion); index++) {
-      if(tintasSeleccionadas[index].includes('NO APLICA')) {
+    for (let index = 1; index < parseInt(posicion); index++) {
+      if(tintasSeleccionadas[index - 1].includes('NO APLICA')) {
         this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + index)?.setValue(tinta);
         this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.setValue('NO APLICA');
-        //break;
+        break;
       }
     }
   }
