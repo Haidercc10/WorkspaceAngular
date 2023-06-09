@@ -1,6 +1,7 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { Console } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -635,8 +636,13 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
-    let data : any = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
-    this.mezclasService.getMezclaNombre(data.replace('%', '%25')).subscribe(datos_mezcla => {
+    let simboloPorcentaje : boolean = false;
+    let data : string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    simboloPorcentaje = data.toString().includes("%") ? true : false;
+    if(simboloPorcentaje) data = data.replace('%', '%25')
+    else data = data;
+
+    this.mezclasService.getMezclaNombre(data).subscribe(datos_mezcla => {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
         this.FormOrdenTrabajoMezclas.disable();
@@ -965,7 +971,6 @@ export class OrdenesTrabajoComponent implements OnInit {
                 Tinta_Impresion8 : datos_impresion[j].tinta_Nombre8,
               });
             }
-            console.log(datos_impresion)
           });
 
           laminadoCapa1 = itemOt.lamCapa1.trim();
@@ -2863,10 +2868,19 @@ export class OrdenesTrabajoComponent implements OnInit {
     tintasSeleccionadas = tintasSeleccionadas.filter((item) => typeof(item) == 'string');
     let indice : number = tintasSeleccionadas.indexOf(tinta);
     if(indice != -1) tintasSeleccionadas.splice(indice, 1);
-    if(tinta != 'NO APLICA')
-    if(tintasSeleccionadas.includes(tinta)) {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
-      this.FormOrdenTrabajoImpresion.get('Tinta_Impresion'+ posicion)?.setValue('');
+    if(tinta != 'NO APLICA') {
+      if(tintasSeleccionadas.includes(tinta)) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion'+ posicion)?.setValue('NO APLICA');
+      }
+      console.log(posicion)
+    }
+    for (let index = 0; index < parseInt(posicion); index++) {
+      if(tintasSeleccionadas[index].includes('NO APLICA')) {
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + index)?.setValue(tinta);
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.setValue('NO APLICA');
+        //break;
+      }
     }
   }
 }
