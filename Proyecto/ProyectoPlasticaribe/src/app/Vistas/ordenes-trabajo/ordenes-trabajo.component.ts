@@ -1428,13 +1428,13 @@ export class OrdenesTrabajoComponent implements OnInit {
                   [
                     { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
                     { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [true, true, false, false], text: `Item`, style: 'titulo', },
                     { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
                   ],
                   [
                     { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
                   ],
                 ]
@@ -1704,13 +1704,13 @@ export class OrdenesTrabajoComponent implements OnInit {
                   [
                     { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
                     { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [true, true, false, false], text: `Item`, style: 'titulo', },
                     { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
                   ],
                   [
                     { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
                   ],
                 ]
