@@ -1,0 +1,334 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<!--Espacio para el titulo-->
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"> Nómina</h2>
+    </div>
+    <!--Linea-->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<!-- Card con el contenido del módulo -->
+<p-card class="font-size-14">
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
+  <div class="mb-4">
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
+  </div>
+
+  <p-toolbar styleClass="mb-5 gap-3">
+    <div class="row" style="width: 100%;">
+      <!-- Rango de Fechas -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3 p-2">
+        <span class="p-float-label" id="rango-fechas">
+          <p-calendar inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas que deseas consultar"></p-calendar>
+          <label for="FechaInicial">Rango de Fechas</label>
+        </span>
+      </div>
+
+      <div class="col">
+        <button pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultarNominas()"></button>
+      </div>
+
+      <div class="col justify-content-end text-right">
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
+      </div>
+    </div>
+  </p-toolbar>
+
+  <!--Tabs para nóminas sectorizadas-->
+  <p-tabView [scrollable]="true" id="materias-primas">
+
+    <!-- Nomina Sellado -->
+    <p-tabPanel
+      header="Sellado"
+      leftIcon="pi pi-tags"
+      tooltip="Información de la Nómina de Sellado">
+      <div class="mb-3" *ngIf="load">
+        <div class="row g-3 font-size-14" id="table1">
+          <p-table
+            #dt
+            [value]="arraySellado"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="arraySellado.length"
+            [rowsPerPageOptions]="[10,25,50,100,arraySellado.length]"
+            [rowHover]="true"
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <!--Filtros-->
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Valor', 'contains')"></th>
+                <th></th>
+              </tr>
+              <!--Encabezado-->
+              <tr>
+                <th>#</th>
+                <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                <th id="entrada" pSortableColumn="Valor" pReorderableColumn scope="col">Valor <p-sortIcon field="Valor"></p-sortIcon></th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <!--Cuerpo-->
+            <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+              <tr>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td>{{nomina.Cedula}}</td>
+                <td>{{nomina.Nombre}}</td>
+                <td>{{nomina.Cargo}}</td>
+                <td>{{nomina.Valor | number}}</td>
+                <td class="text-align : center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
+              </tr>
+            </ng-template>
+            <!--Pie-->
+            <ng-template pTemplate="footer">
+              <tr id="totales">
+                <td colspan="4" class="text-right" *ngIf="ValidarRol == 1">Valor Total Nómina</td>
+                <td colspan="2" class="text-left">{{0 | number}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Nomina Corte -->
+    <p-tabPanel
+     header="Corte"
+     leftIcon="pi pi-th-large"
+     tooltip="Información de la Nómina de Corte">
+     <div class="mb-3" *ngIf="load">
+       <div class="row g-3 font-size-14" id="table2">
+        <p-table
+            #dt
+            [value]="arraySellado"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="arraySellado.length"
+            [rowsPerPageOptions]="[10,25,50,100,arraySellado.length]"
+            [rowHover]="true"
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <!--Filtros-->
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Valor', 'contains')"></th>
+                <th></th>
+              </tr>
+              <!--Encabezado-->
+              <tr>
+                <th>#</th>
+                <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                <th id="entrada" pSortableColumn="Valor" pReorderableColumn scope="col">Valor <p-sortIcon field="Valor"></p-sortIcon></th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <!--Cuerpo-->
+            <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+              <tr>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td>{{nomina.Cedula}}</td>
+                <td>{{nomina.Nombre}}</td>
+                <td>{{nomina.Cargo}}</td>
+                <td>{{nomina.Valor | number}}</td>
+                <td class="text-align : center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
+              </tr>
+            </ng-template>
+            <!--Pie-->
+            <ng-template pTemplate="footer">
+              <tr id="totales">
+                <td colspan="4" class="text-right" *ngIf="ValidarRol == 1">Valor Total Nómina</td>
+                <td colspan="2" class="text-left">{{0 | number}}</td>
+              </tr>
+            </ng-template>
+        </p-table>
+       </div>
+     </div>
+    </p-tabPanel>
+
+    <!-- Nomina Producción -->
+    <p-tabPanel
+    header="Producción"
+    leftIcon="pi pi-sliders-h"
+    tooltip="Información de la Nómina de Producción">
+    <div class="mb-3" *ngIf="load">
+      <div class="row g-3 font-size-14" id="table3">
+        <p-table
+            #dt
+            [value]="arrayProduccion"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="arrayProduccion.length"
+            [rowsPerPageOptions]="[10,25,50,100,arrayProduccion.length]"
+            [rowHover]="true"
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <!--Filtros-->
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Valor', 'contains')"></th>
+                <th></th>
+              </tr>
+              <!--Encabezado-->
+              <tr>
+                <th>#</th>
+                <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                <th id="entrada" pSortableColumn="Valor" pReorderableColumn scope="col">Valor <p-sortIcon field="Valor"></p-sortIcon></th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <!--Cuerpo-->
+            <ng-template pTemplate="body" let-nomina3 let-rowIndex="rowIndex">
+              <tr>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td>{{nomina3.Cedula}}</td>
+                <td>{{nomina3.Nombre}}</td>
+                <td>{{nomina3.Cargo}}</td>
+                <td>{{nomina3.Valor | number}}</td>
+                <td class="text-align : center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
+              </tr>
+            </ng-template>
+            <!--Pie-->
+            <ng-template pTemplate="footer">
+              <tr id="totales">
+                <td colspan="4" class="text-right" *ngIf="ValidarRol == 1">Valor Total Nómina</td>
+                <td colspan="2" class="text-left">{{0 | number}}</td>
+              </tr>
+            </ng-template>
+        </p-table>
+      </div>
+    </div>
+    </p-tabPanel>
+
+    <!-- Nomina Administrativos -->
+    <p-tabPanel
+    header="Administrativos"
+    leftIcon="pi pi-briefcase"
+    tooltip="Información de la Nómina de Administrativos">
+    <div class="mb-3" *ngIf="load">
+      <div class="row g-3 font-size-14" id="table4">
+        <p-table
+            #dtNomAdminstrativo
+            [value]="arrayAdministrativo"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="arrayAdministrativo.length"
+            [rowsPerPageOptions]="[10,25,50,100,arrayAdministrativo.length]"
+            [rowHover]="true"
+            dataKey="Id"
+            [scrollable]="true"
+            scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <!--Filtros-->
+              <tr class="font-size-16" id="filtros">
+                <th></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Valor', 'contains')"></th>
+                <th></th>
+              </tr>
+              <!--Encabezado-->
+              <tr>
+                <th>#</th>
+                <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                <th id="entrada" pSortableColumn="Valor" pReorderableColumn scope="col">Valor <p-sortIcon field="Valor"></p-sortIcon></th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <!--Cuerpo-->
+            <ng-template pTemplate="body" let-nomina4 let-rowIndex="rowIndex">
+              <tr>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td>{{nomina4.Cedula}}</td>
+                <td>{{nomina4.Nombre}}</td>
+                <td>{{nomina4.Cargo}}</td>
+                <td>{{nomina4.Valor | number}}</td>
+                <td class="text-align : center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
+              </tr>
+            </ng-template>
+            <!--Pie-->
+            <ng-template pTemplate="footer">
+              <tr id="totales">
+                <td colspan="4" class="text-right" *ngIf="ValidarRol == 1">Valor Total Nómina</td>
+                <td colspan="2" class="text-left">{{0 | number}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+      </div>
+    </div>
+    </p-tabPanel>
+  </p-tabView>
+
+  <!--  -->
+  <p-dialog [(visible)]="modalSellado" [style]="{width: '70vw'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="modalCorte" [style]="{width: '70vw'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="modalProduccion" [style]="{width: '70vw'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+    </ng-template>
+  </p-dialog>
+
+</p-card>

@@ -156,6 +156,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 
 @NgModule({
   declarations: [
@@ -239,6 +240,7 @@ import { AppComponent } from './app.component';
     Reporte_SolicitudesMPComponent,
     SolicitudMateriaPrimaComponent,
     CalendarioComponent,
+    NominaComponent
   ],
 
   imports: [

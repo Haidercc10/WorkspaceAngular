@@ -427,7 +427,7 @@ export class OcompraComponent implements OnInit {
           } else this.mensajeService.mensajeError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
         }
       }, error => this.mensajeService.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
-    } else this.mensajeService.mensajeError(`¡Advertencia!`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
+    } else this.mensajeService.mensajeError(`¡Advertencia!`, `¡La información que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear la orden de compra

@@ -5,6 +5,7 @@ import { Console } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
+import { Dropdown } from 'primeng/dropdown';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -2880,6 +2881,38 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.setValue('NO APLICA');
         break;
       }
+    }
+  }
+
+  /** Función para validar que no se elijan laminados de capa iguales en el formulario y que se organicen dependiendo la posición */
+  validarLaminado(posicion : number){
+    let campoLaminado : any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
+    let laminados : any[] = Object.values(this.FormOrdenTrabajoLaminado.value);
+    let lam1 : any = laminados.splice(0, 1); let lam2 : any = laminados.splice(2, 1); let lam3 : any = laminados.splice(4, 1);
+    let laminadosCapas : any[] = [...lam1, ...lam2, ...lam3];
+    let indice : number = laminadosCapas.indexOf(campoLaminado);
+    if(indice != -1) laminadosCapas.splice(indice, 1);
+    if(campoLaminado != 'NO APLICA') {
+      if(laminadosCapas.includes(campoLaminado)) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `El laminado ${this.laminado_capas[campoLaminado - 1].lamCapa_Nombre} ya se encuentra selecionado, por favor elija otro!`);
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.setValue(1);
+      }
+    }
+    for (let index = 1; index < posicion; index++) {
+      if(laminadosCapas[index - 1].toString().includes('1')) {
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + index)?.setValue(campoLaminado);
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion)?.setValue(1);
+        break;
+      }
+    }
+    this.validarLaminadoCapa(posicion);
+  }
+
+  validarLaminadoCapa(posicion : number) {
+    let campoLaminado : any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
+    if(campoLaminado == 1) {
+      this.FormOrdenTrabajoLaminado.get('Calibre_Laminado' + posicion)?.setValue(0);
+      this.FormOrdenTrabajoLaminado.get('cantidad_Laminado' + posicion)?.setValue(0);
     }
   }
 }
