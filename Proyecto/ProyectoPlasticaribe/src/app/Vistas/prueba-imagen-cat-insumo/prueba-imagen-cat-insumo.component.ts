@@ -22,29 +22,16 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   ngOnInit() {
     let informacion : any [] = [];
-    this.bagproService.GetNominaSelladoAgrupada('2023-06-01', '2023-06-10').subscribe(data => {
+    this.bagproService.GetNominaSelladoAcumuladaItem('2023-06-01', '2023-06-10').subscribe(data => {
       for (let i = 0; i < data.length; i++) {
-        let operario : number = informacion.findIndex(item => (item.Cedula == data.cedula ||
-                                                              item.Cedula == data.cedula2 ||
-                                                              item.Cedula == data.cedula3 ||
-                                                              item.Cedula == data.cedula4) && item.Referencia == data.referencia);
-        if (operario != -1) {
-        }
-        let info : any = {
-          Cedula : 0,
-          Operario : 0,
-          Referencia : 0,
-          Dia : 0,
-          Noche : 0,
-          Registros_Dia : 0,
-          Registros_Noche : 0,
-          Registros_Total : 0,
-          Pago_Dia : 0,
-          Pago_Noche : 0,
-          Pago_Total : 0,
-        }
+        let info = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
+        info.Cantidad = parseFloat(info.Cantidad),
+        info.CantidadTotal = parseFloat(info.CantidadTotal);
+        info.PagoTotal = parseFloat(info.PagoTotal)
+        info.PrecioDia = parseFloat(info.PrecioDia)
+        info.PrecioNoche = parseFloat(info.PrecioNoche)
+        console.log(info);
       }
-      console.log(data);
     })
   }
 }

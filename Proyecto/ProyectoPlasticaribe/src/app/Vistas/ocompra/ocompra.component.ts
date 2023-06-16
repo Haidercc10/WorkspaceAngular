@@ -448,7 +448,7 @@ export class OcompraComponent implements OnInit {
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
-      if (solicitud != null && solicitud != '') this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
+      if (solicitud.length > 0) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
       setTimeout(() => this.buscarinfoOrdenCompra(), 500);
     }, () => {

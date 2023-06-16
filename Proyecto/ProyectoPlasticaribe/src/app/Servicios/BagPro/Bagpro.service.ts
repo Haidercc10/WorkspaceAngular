@@ -76,7 +76,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
   }
 
-  GetNominaSelladoAgrupada = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getNominaSelladoAgrupada/${fechaInicio}/${fechaFin}`);
+  GetNominaSelladoAcumuladaItem = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getNominaSelladoAcumuladaItem/${fechaInicio}/${fechaFin}`);
   /***************************************************** PROCEXTRUSION ***************************************************************/
 
   srvObtenerListaProcExt():Observable<any[]> {
