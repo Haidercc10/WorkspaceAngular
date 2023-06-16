@@ -45,6 +45,7 @@ export class NominaComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.consultarNominas()
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -79,10 +80,10 @@ export class NominaComponent implements OnInit {
     this.arrayCorte = [];
     this.arrayProduccion = [];
     this.arrayAdministrativo = [];
-    let fecha : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
-    let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fecha;
+    let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
+    let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    this.servicioBagPro.getNominaSellado(fecha, fechaFinal).subscribe(data => {
+    this.servicioBagPro.getNominaSelladoAcumuladaItem('2023-06-01', '2023-06-10').subscribe(data => {
       for(let index = 0; index < data.length; index++) {
         this.cargarTabla(data[index]);
       }
@@ -91,14 +92,13 @@ export class NominaComponent implements OnInit {
 
   /** Función para cargar las tablas de Nóminas */
   cargarTabla(datos : any){
-    this.totalNominaSellado += datos.Valor;
-    let info : any = {
-      Cedula:  datos.Cedula,
-      Nombre: datos.Operario,
-      Cargo: 'Operario Sellado',
-      Valor: datos.Valor,
-    }
+    let info : any = JSON.parse(`{${datos.replaceAll("'", '"')}}`);
+    info.Cedula = info.Cedula,
+    info.Operario = info.Operario,
+    info.Cargo = 'Operario Sellado',
+    info.PagoTotal = parseFloat(info.PagoTotal),
     this.arraySellado.push(info);
+    this.arraySellado.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
   }
 
   /** Funcion para filtrar busquedas y mostrar datos segun el filtro consultado. */

@@ -67,7 +67,7 @@
             [value]="arraySellado"
             [resizableColumns]="true"
             columnResizeMode="expand"
-            styleClass="p-datatable-gridlines p-datatable-sm"
+            styleClass="p-datatable-sm"
             responsiveLayout="scroll"
             [paginator]="true"
             [rows]="arraySellado.length"
@@ -80,40 +80,41 @@
               <!--Filtros-->
               <tr class="font-size-16" id="filtros">
                 <th></th>
+                <th></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Operario', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Valor', 'contains')"></th>
+                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PagoTotal', 'contains')"></th>
                 <th></th>
               </tr>
               <!--Encabezado-->
               <tr>
+                <th></th>
                 <th>#</th>
                 <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
-                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th pSortableColumn="Operario" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="Operario"></p-sortIcon></th>
                 <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
-                <th id="entrada" pSortableColumn="Valor" pReorderableColumn scope="col">Valor <p-sortIcon field="Valor"></p-sortIcon></th>
-                <th>Ver</th>
+                <th id="entrada" pSortableColumn="PagoTotal" pReorderableColumn scope="col">Valor a devengar<p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                <th >Ver</th>
               </tr>
             </ng-template>
             <!--Cuerpo-->
-            <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-nomina let-expanded="expanded" let-rowIndex="rowIndex">
               <tr>
+                <td>
+                  <button type="button" pButton pRipple [pRowToggler]="nomina" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
                 <td><b>{{rowIndex + 1}}</b></td>
                 <td>{{nomina.Cedula}}</td>
-                <td>{{nomina.Nombre}}</td>
+                <td>{{nomina.Operario}}</td>
                 <td>{{nomina.Cargo}}</td>
-                <td>{{nomina.Valor | number}}</td>
-                <td class="text-align : center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
+                <td>{{nomina.PagoTotal | number}}</td>
+                <td class="text-center"><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detalles del empleado" icon="pi pi-eye"></button></td>
               </tr>
             </ng-template>
-            <!--Pie-->
-            <ng-template pTemplate="footer">
-              <tr id="totales">
-                <td colspan="4" class="text-right" *ngIf="ValidarRol == 1">Valor Total Nómina</td>
-                <td colspan="2" class="text-left">{{0 | number}}</td>
-              </tr>
-            </ng-template>
+            <!--Tabla 2-->
+
+
           </p-table>
         </div>
       </div>

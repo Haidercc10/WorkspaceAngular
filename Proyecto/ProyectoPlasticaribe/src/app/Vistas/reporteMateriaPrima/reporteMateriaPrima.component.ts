@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table/table';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
