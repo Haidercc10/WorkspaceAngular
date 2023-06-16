@@ -155,11 +155,8 @@ export class CalendarioComponent implements OnInit {
     this.accion = 'Editar';
     this.eventoSeleccionado = data.event._def.extendedProps.Id;
     this.visibilidadSeleccionada = [];
-    let visibilidad : any [] = data.event._def.extendedProps.Visibilidad.trim().split('|');
-    visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
-    visibilidad.splice(visibilidad.findIndex(item => item == ''), 1);
+    let visibilidad : any [] = data.event._def.extendedProps.Visibilidad.trim().split('|').filter((item: string) => item != '');
     let c : number = this.visibilidadSeleccionable.findIndex(item => item.key == 'C');
-
     if (visibilidad[0] == 'Solo Yo') {
       visibilidad[0] = 'A';
       this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);

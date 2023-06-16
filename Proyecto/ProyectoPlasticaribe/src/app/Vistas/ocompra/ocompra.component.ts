@@ -388,7 +388,7 @@ export class OcompraComponent implements OnInit {
     let solicitud = this.FormOrdenCompra.value.Solicitud;
     let exp = /^([0-9])*$/;
 
-    if (solicitud.match(exp)) {
+    if (solicitud) {
       this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].estado_Solicitud_Id != 5){

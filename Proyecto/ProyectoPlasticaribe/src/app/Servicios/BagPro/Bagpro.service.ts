@@ -12,7 +12,7 @@ export class BagproService {
 
   constructor(private http : HttpClient) { }
 
-  /* PROCSELLADO */
+  /********************************************************* PROCSELLADO **************************************************************/
   srvObtenerListaProcSellado():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcSellado');
   }
@@ -54,7 +54,30 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
   }
 
-  /**************************************** PROCEXTRUSION *************************************************/
+  /** Consultas por NomStatus en ProcSellado*/
+  srvObtenerListaPorStatusSellado(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxSellado/${ot}`);
+  }
+
+  srvObtenerListaPorStatusWiketiado(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
+  }
+
+  srvObtenerDataConsolidada_StatusSellado(OT : any, Proceso: any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
+  }
+
+  DeleteRollosSellado_Wiketiado(id : any) {
+    return this.http.delete(this.rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
+  }
+
+  /** Nvo */
+  srvObtenerListaFilasEmpaqueEnProcExtrusion(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
+  }
+
+  GetNominaSelladoAgrupada = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getNominaSelladoAgrupada/${fechaInicio}/${fechaFin}`);
+  /***************************************************** PROCEXTRUSION ***************************************************************/
 
   srvObtenerListaProcExt():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
@@ -74,11 +97,6 @@ export class BagproService {
 
   srvObtenerListaProcextrusionProducido(ot : any) {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OtConEmpaque/${ot}`);
-  }
-
-  /** Nvo */
-  srvObtenerListaFilasEmpaqueEnProcExtrusion(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
   }
 
   srvObtenerListaProcExtrusionRollosOT(ot : any):Observable<any[]> {
@@ -113,16 +131,66 @@ export class BagproService {
     return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollosExtrusion_Empaque/${id}`);
   }
 
-  DeleteRollosSellado_Wiketiado(id : any) {
-    return this.http.delete(this.rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
-  }
-
   GetRollosExtrusion_Empaque_Sellado(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/getRollosExtrusion_Empaque_Sellado/${fechaInicial}/${fechaFinal}/${proceso}${ruta}`);
   }
 
+  /**  Obtener datos por NomStatus  */
+  getDatosxNomStatus(status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxNomStatus/${status}`);
+  }
 
-  /*************************************************************** CLIENTESOT *******************************************************************/
+  getDatosxFechasxNomStatus(fecha1 : any, fecha2 : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxFechasxNomStatus/${fecha1}/${fecha2}/${status}`);
+  }
+
+  getDatosxRolloxNomStatus(rollo : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxRolloxNomStatus/${rollo}/${status}`);
+  }
+
+  getDatosxOTxNomStatus(OT : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxOTxNomStatus/${OT}/${status}`);
+  }
+
+  srvObtenerListaProcExtrusionOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Orden_Trabajo/${ot}`);
+  }
+
+  /** Consultas por NomStatus en ProcExtrusion */
+  srvObtenerListaPorStatusExtrusion(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxExtrusion/${OT}`);
+  }
+
+  srvObtenerListaPorStatusImpresion(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxImpresion/${OT}`);
+  }
+
+  srvObtenerListaPorStatusRotograbado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxRotograbado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusDoblado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxDoblado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusLaminado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxLaminado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusCorte(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxCorte/${OT}`);
+  }
+
+  srvObtenerListaPorStatusEmpaque(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxEmpaque/${OT}`);
+  }
+
+/** Servcios de datos consolidados para Estados Procesos OT */
+  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
+  }
+
+  /********************************************************** CLIENTESOT ****************************************************************/
 
   srvActualizar(id:number|String, data:any, estado : any) {
     return this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
@@ -178,7 +246,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCantOrdenesMateriales/${fecha1}/${fecha2}`);
   }
 
-  /* CLIENTESOTITEM */
+  /**************************************************************** CLIENTESOTITEM *******************************************************/
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaClienteOTItems():Observable<any[]> {
@@ -193,7 +261,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/BuscarOTxVendedores/${OT}`);
   }
 
-  /* DESPERDICIO */
+  /*********************************************************** DESPERDICIO **************************************************************/
 
   // CONSULTAS A LA TABLA PROC_DESPERDICIOS DE BAGPRO
   srvObtenerListaDespercicios():Observable<any[]> {
@@ -204,62 +272,12 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/OT/${ot}`);
   }
 
-  /** Consultas por NomStatus en ProcExtrusion */
-
-  srvObtenerListaPorStatusExtrusion(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxExtrusion/${OT}`);
-  }
-
-  srvObtenerListaPorStatusImpresion(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxImpresion/${OT}`);
-  }
-
-  srvObtenerListaPorStatusRotograbado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxRotograbado/${OT}`);
-  }
-
-  srvObtenerListaPorStatusDoblado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxDoblado/${OT}`);
-  }
-
-  srvObtenerListaPorStatusLaminado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxLaminado/${OT}`);
-  }
-
-  srvObtenerListaPorStatusCorte(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxCorte/${OT}`);
-  }
-
-  srvObtenerListaPorStatusEmpaque(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxEmpaque/${OT}`);
-  }
-
-  /** Consultas por NomStatus en ProcSellado*/
-
-  srvObtenerListaPorStatusSellado(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxSellado/${ot}`);
-  }
-
-  srvObtenerListaPorStatusWiketiado(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
-  }
-
-/** Servcios de datos consolidados para Estados Procesos OT */
-
-  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
-  }
-
-  srvObtenerDataConsolidada_StatusSellado(OT : any, Proceso: any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
-  }
-
   /* Rutas para consultas a la tabla de ProcImpresion_RolloBOPP*/
   consultarOTImpresion(ot : any) {
     return this.http.get<any>(this.rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
   }
 
-  /** Operarios */
+  /***************************************************************** Operarios **********************************************************/
   srvObtenerListaOperariosExtrusion() {
     return this.http.get<any>(this.rutaBagPro + '/OperariosProcesos/NombreOperarios');
   }
@@ -268,7 +286,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/OperariosProcesos/NombreOperarios2/${nombre}`);
   }
 
-  /** Clientes */
+  /************************************************************** Clientes **************************************************************/
 
   srvObtenerListaUltimosClientes(fecha : any) {
     return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes/${fecha}`);
@@ -276,26 +294,5 @@ export class BagproService {
 
   srvObtenerListaUltimosClientes2(fecha : any, cliente : any) {
     return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
-  }
-
-  /**  Obtener datos por NomStatus  */
-  getDatosxNomStatus(status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxNomStatus/${status}`);
-  }
-
-  getDatosxFechasxNomStatus(fecha1 : any, fecha2 : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxFechasxNomStatus/${fecha1}/${fecha2}/${status}`);
-  }
-
-  getDatosxRolloxNomStatus(rollo : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxRolloxNomStatus/${rollo}/${status}`);
-  }
-
-  getDatosxOTxNomStatus(OT : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxOTxNomStatus/${OT}/${status}`);
-  }
-
-  srvObtenerListaProcExtrusionOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Orden_Trabajo/${ot}`);
   }
 }

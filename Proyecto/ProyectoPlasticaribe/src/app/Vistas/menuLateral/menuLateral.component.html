@@ -996,6 +996,21 @@
       </div>
     </div>
   </div>
+
+  <div class="mt-2">
+    <span class="Titulo tituloRojo">Eventos Para Hoy {{today}}</span>
+  </div>
+
+  <!-- Eventos del Día -->
+  <div class="eventosUSua my-3 p-2" *ngFor="let item of eventosHoy">
+    <div class="row font-size-25 mb-2">
+      <p>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</p>
+    </div>
+
+    <div class="row font-size-20">
+      <p>{{item.Nombre}}</p>
+    </div>
+  </div>
 </p-sidebar>
 
 <!-- Modal Usuario -->

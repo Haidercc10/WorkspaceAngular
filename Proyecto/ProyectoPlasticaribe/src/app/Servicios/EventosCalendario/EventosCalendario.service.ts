@@ -19,6 +19,8 @@ constructor(private http : HttpClient) { }
 
   GetCantidadEventos = (id : number, rol : number, inicio : any, fin : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/EventosCalendarios/getCantidadEventos/${id}/${rol}/${inicio}/${fin}`);
 
+  GetEventosDia = (id : number, rol : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/EventosCalendarios/getEventosDia/${id}/${rol}`);
+
   Post = (data : modelEventosCalendario) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/EventosCalendarios`, data);
 
   Put = (id : number, data : modelEventosCalendario) => this.http.put(`${rutaPlasticaribeAPI}/EventosCalendarios/${id}`, data);

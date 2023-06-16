@@ -296,7 +296,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     let solicitud_Id = this.formSolicitud.value.Id_Solicitud;
     let exp = /^([0-9])*$/;
 
-    if (solicitud_Id.match(exp)) {
+    if (solicitud_Id) {
       this.limpiarTodo();
       this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -377,8 +377,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
   buscarInfoSolicitud_PDF(solicitud_Id : any = 0){
     this.informacionPDF = [];
     if (solicitud_Id == 0) solicitud_Id = this.formSolicitud.value.Id_Solicitud;
-    let exp = /^([0-9])*$/;
-    if (solicitud_Id.match(exp)) {
+    if (solicitud_Id) {
       this.cargando = true;
       this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {

@@ -24,6 +24,7 @@ export class MenuLateralComponent implements OnInit {
   @ViewChild(AppComponent) appComponent : AppComponent;
   public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
+  today : any = moment().format('YYYY-MM-DD');
   menuConfiguracion : boolean = false;
   menuUsuario : boolean = false;
   modalUsuario : boolean = false;
@@ -34,6 +35,7 @@ export class MenuLateralComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
+  eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
   position: string = '';
   subir : boolean = true;
   subir1 : boolean = true;
@@ -79,6 +81,7 @@ export class MenuLateralComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cantidadEventosMes();
+    this.consultarEventosHoy();
   }
 
   lecturaStorage(){
@@ -166,6 +169,20 @@ export class MenuLateralComponent implements OnInit {
     let inicio : any = moment().format('YYYY-MM-DD');
     let fin : any = moment().endOf('month').format('YYYY-MM-DD');
     this.eventosCalService.GetCantidadEventos(this.storage_Id, this.ValidarRol, inicio, fin).subscribe(data => this.cantidadEventos = data);
+  }
+
+  // Funcion que consultará los eventos de hoy
+  consultarEventosHoy(){
+    this.eventosHoy = [];
+    this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        this.eventosHoy.push({
+          Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
+          Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
+          Nombre : data[i].eventoCal_Nombre
+        });
+      }
+    });
   }
 
   mostrarModalCalendario = () => this.modalCalendario = true;

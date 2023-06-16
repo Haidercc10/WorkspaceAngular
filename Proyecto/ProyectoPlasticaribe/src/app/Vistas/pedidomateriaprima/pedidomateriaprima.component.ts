@@ -462,6 +462,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             Oc_PesoTotal : datos_orden.oc_PesoTotal,
             TpDoc_Id : datos_orden.tpDoc_Id,
             Oc_Observacion : datos_orden.oc_Observacion,
+            IVA : datos_orden.iva,
           }
           this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(() => { }, () => {
             this.mensajeService.mensajeError(`Error`,`¡Error al cambiar el estado de la orden de compra!`);
