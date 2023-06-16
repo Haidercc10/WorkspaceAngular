@@ -302,5 +302,5 @@ export class BagproService {
   }
 
   /** ProcSellado */
-  getNominaSellado = (fecha1 : any, fecha2 : any):Observable<any[]> =>( this.http.get<any>(this.rutaBagPro + `/ProcSellado/getNominaSellado/${fecha1}/${fecha2}`));
+  getNominaSelladoAcumuladaItem = (fecha1 : any, fecha2 : any):Observable<any[]> =>( this.http.get<any>(this.rutaBagPro + `/ProcSellado/getNominaSelladoAcumuladaItem/${fecha1}/${fecha2}`));
 }
