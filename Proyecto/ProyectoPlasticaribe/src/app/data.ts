@@ -10379,3 +10379,36 @@ export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
     </p>`
   },
 ]
+
+export const stepsNomina : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#nomina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'nomina',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Nómina</h5>',
+    text: `<p></p>`
+  },
+  {
+    attachTo: {
+      element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rango',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Seleccionar Rango</h5>',
+    text: `<p></p>`
+  },
+]
