@@ -56,6 +56,7 @@ export class MenuLateralComponent implements OnInit {
   subir14 : boolean = true;
   subir15 : boolean = true;
   subir16 : boolean = true;
+  subir17 : boolean = true;
   modoSeleccionado : boolean;
 
   constructor(private AppComponent : AppComponent,
@@ -246,6 +247,8 @@ export class MenuLateralComponent implements OnInit {
   clickIcon15 = () => this.subir15 ? this.subir15 = false : this.subir15 = true;
 
   clickIcon16 = () => this.subir16 ? this.subir16 = false : this.subir16 = true;
+
+  clickIcon17 = () => this.subir17 ? this.subir17 = false : this.subir17 = true;
 
   mostrar() {
     let modo = window.localStorage.getItem("theme");
