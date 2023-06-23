@@ -3,6 +3,7 @@ import { ShepherdService } from 'angular-shepherd';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
 
@@ -13,6 +14,7 @@ import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 's
 })
 export class DashBoard_FacturacionComponent implements OnInit {
 
+  cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -43,6 +45,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
   totalFacturado10 : number = 0; //Variable que almcenará lo facturado en el mes de octubre
   totalFacturado11 : number = 0; //Variable que almcenará lo facturado en el mes de noviembre
   totalFacturado12 : number = 0; //Variable que almcenará lo facturado en el mes de diciembre
+  totalFacturadoanio : number = 0; //Variable que almacenará lo facturado en todo el año
+  facturadoAnios : any[] = []; //variable que almacenará la información de lo facturado por los años
 
   mostrarGrafica : boolean = false; //Variable que mostrará o no la información graficada
   nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
@@ -53,7 +57,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
-                  private shepherdService: ShepherdService) {
+                  private shepherdService: ShepherdService,
+                    private mensajeAplicacion : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -61,6 +66,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.lecturaStorage();
     this.llenarArrayAnos();
     this.tiempoExcedido();
+    this.graficarDatos();
+    this.facturacionAnio();
   }
 
   tutorial(){
@@ -79,7 +86,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => { this.tiempoExcedido(); }, 60000);
+  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
@@ -98,10 +105,24 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion(){
+    this.totalFacturadoanio = 0;
+    this.facturadoAnios = [];
     if (this.ValidarRol == 1 || this.ValidarRol == 60) {
-      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => { this.totalFacturadoDia = datos_facturacion; });
-      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
-      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
+      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
+      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalFacuturadoMes = datos_facturacion);
+      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalIvaVentaMes = datos_facturacion);
+      for (let i = 0; i < 12; i++) {
+        let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
+        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => this.totalFacturadoanio += datos_facturacion);
+      }
+    }
+  }
+
+  // Funcion que va a consultar la facturación por año
+  facturacionAnio(){
+    let index : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
+    if (index == -1) {
+      this.cargando = true;
       for (let i = 0; i < 12; i++) {
         let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
         this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
@@ -117,43 +138,22 @@ export class DashBoard_FacturacionComponent implements OnInit {
           if (i == 9) this.totalFacturado10 = datos_facturacion;
           if (i == 10) this.totalFacturado11 = datos_facturacion;
           if (i == 11) this.totalFacturado12 = datos_facturacion;
+          let info : any = { anio: this.anoSeleccionado, costo : datos_facturacion };
+          let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
+          if (index2 != -1) this.facturadoAnios[index2].costo += datos_facturacion;
+          else this.facturadoAnios.push(info);
         });
-        setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
       }
-    }
+      setTimeout(() => this.llenarGraficaFacturacion(), 1500);
+    } else this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
-   // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
-  llenarGraficaFacturacion(){
+  // funcion que llenará el array con las opciones de la grafica
+  graficarDatos(){
+    this.facturadoAnios = [];
     this.facturasData = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: [
-        {
-          label: 'Facturación',
-          data: [
-            this.totalFacturado1,
-            this.totalFacturado2,
-            this.totalFacturado3,
-            this.totalFacturado4,
-            this.totalFacturado5,
-            this.totalFacturado6,
-            this.totalFacturado7,
-            this.totalFacturado8,
-            this.totalFacturado9,
-            this.totalFacturado10,
-            this.totalFacturado11,
-            this.totalFacturado12,
-          ],
-          yAxisID: 'y',
-          borderColor: '#FF7878',
-          backgroundColor: 'rgba(255,167,38,0.2)',
-          pointStyle: 'rectRot',
-          pointRadius: 10,
-          pointHoverRadius: 15,
-          fill: true,
-          tension: 0.3
-        }
-      ]
+      datasets: []
     };
 
     this.facturasOptions = {
@@ -179,10 +179,30 @@ export class DashBoard_FacturacionComponent implements OnInit {
           display: true,
           position: 'left',
           ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' }
+          grid: { color: '#ebedef' },
+          min : 0
         },
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
+  }
+
+  // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
+  llenarGraficaFacturacion(){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anoSeleccionado}`,
+      data: [this.totalFacturado1, this.totalFacturado2, this.totalFacturado3, this.totalFacturado4, this.totalFacturado5, this.totalFacturado6, this.totalFacturado7, this.totalFacturado8, this.totalFacturado9, this.totalFacturado10, this.totalFacturado11, this.totalFacturado12],
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    };
+    this.facturasData.datasets.push(info);
+    this.cargando = false;
   }
 }

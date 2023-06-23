@@ -250,7 +250,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.onReject('eleccion');
     data = this.mpSeleccionada;
     this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
-    this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item.Id == data.Id), 1);
+    this.materiasPrimasSeleccionada_ID.splice(this.materiasPrimasSeleccionada_ID.findIndex((item) => item == data.Id), 1);
   }
 
   // Funcion que hará validaciones antes de realizar la asignación

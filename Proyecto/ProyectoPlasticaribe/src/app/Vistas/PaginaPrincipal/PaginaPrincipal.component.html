@@ -7,14 +7,14 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid" id="card">
-    <p-tabView [scrollable]="true" *ngIf="(ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 60 || ValidarRol == 61)">
+    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="(ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 60 || ValidarRol == 61)">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Ordenes de Trabajo"
         leftIcon="pi pi-sliders-h"
         tooltip="Información de las Ordenes de Trabajo"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <app-Dashboard-OT></app-Dashboard-OT>
+        <app-Dashboard-OT *ngIf="ordenTrabajo"></app-Dashboard-OT>
       </p-tabPanel>
 
       <!--FACTURACIÓN-->
@@ -23,7 +23,7 @@
         leftIcon="pi pi-sliders-h"
         tooltip="Información de la Facturación Mensual"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <app-DashBoard_Facturacion></app-DashBoard_Facturacion>
+        <app-DashBoard_Facturacion *ngIf="facturacion"></app-DashBoard_Facturacion>
       </p-tabPanel>
 
       <!-- MATERIA PRIMA -->
@@ -32,7 +32,7 @@
         leftIcon="pi pi-box"
         tooltip="Información de las Materias Primas"
         *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 3">
-        <app-Dashboard_MatPrima></app-Dashboard_MatPrima>
+        <app-Dashboard_MatPrima *ngIf="materiaPrima"></app-Dashboard_MatPrima>
       </p-tabPanel>
 
       <!-- PEDIDOS -->
@@ -41,7 +41,7 @@
         leftIcon="pi pi-shopping-bag"
         tooltip="Información de los Pedidos creados en Zeus"
         *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
-        <app-DashBoard_Pedidos></app-DashBoard_Pedidos>
+        <app-DashBoard_Pedidos *ngIf="pedidos"></app-DashBoard_Pedidos>
       </p-tabPanel>
 
       <!-- FACTURACION DE VENDEDORES -->
@@ -50,8 +50,18 @@
         leftIcon="pi pi-chart-line"
         tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <app-ReporteFacturacion_Vendedores></app-ReporteFacturacion_Vendedores>
+        <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
       </p-tabPanel>
+
+      <!-- REACUDOS -->
+      <p-tabPanel
+        header="Recaudos"
+        leftIcon="pi pi-shopping-cart"
+        tooltip="Información sobre los reacudos de la empresa"
+        *ngIf="ValidarRol == 1">
+        <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

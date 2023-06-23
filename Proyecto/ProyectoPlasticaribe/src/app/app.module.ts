@@ -157,6 +157,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
+import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 
 @NgModule({
   declarations: [
@@ -240,7 +241,8 @@ import { NominaComponent } from './Vistas/Nomina/Nomina.component';
     Reporte_SolicitudesMPComponent,
     SolicitudMateriaPrimaComponent,
     CalendarioComponent,
-    NominaComponent
+    NominaComponent,
+    DashBoardRecaudosComponent,
   ],
 
   imports: [

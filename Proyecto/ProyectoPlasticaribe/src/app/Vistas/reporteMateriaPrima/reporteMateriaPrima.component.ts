@@ -154,6 +154,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Id : data.id,
         Nombre : data.nombre,
         Ancho : data.ancho,
+        Micras : data.micras,
         Inicial : data.inicial,
         Entrada : data.entrada,
         Salida : data.salida,
