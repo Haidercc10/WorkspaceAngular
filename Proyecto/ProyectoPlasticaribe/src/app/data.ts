@@ -10393,8 +10393,8 @@ export const stepsNomina : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
     id: 'nomina',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Nómina</h5>',
-    text: `<p></p>`
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Nómina</h5>',
+    text: `<p>En este módulo encontrarás la información de la nómina de los operarios de sellado, tanto acumulada, como detallada por item y operario.</p>`
   },
   {
     attachTo: {
