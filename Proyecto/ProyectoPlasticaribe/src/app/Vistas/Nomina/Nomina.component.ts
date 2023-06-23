@@ -77,7 +77,7 @@ export class NominaComponent implements OnInit {
 
     if(numero == 2) {
       title = `Nómina de Sellado de ${fechaInicial} a ${fechaFinal}`;
-      header = ["Cedula", "Nombre", "Fecha", "Bulto", "Item", "Referencia", "Cant. Total", "Cant. Sellada Operario", "Presentación",  "Maquina", "Peso", "Turno", "Proceso", "Precio", "Subtotal", "Pesado entre"];
+      header = ["Cedula", "Nombre", "Fecha", "Bulto", "Item", "Referencia", "Cant. Total", "Cant. Sellada Operario", "Medida",  "Maquina", "Peso", "Turno", "Proceso", "Precio", "Subtotal", "Pesado entre"];
       this.cargarNominaDetallada(fechaInicial, fechaFinal);
       datos = this.detalladoxBultos;
     }
@@ -98,7 +98,7 @@ export class NominaComponent implements OnInit {
       let workbook = new Workbook();
       const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
       let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:A2');
+      numero == 1 ? worksheet.addImage(imageId1, 'A1:A2') : worksheet.addImage(imageId1, 'A1:B3') ;
       let titleRow = worksheet.addRow([title]);
       titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
       worksheet.addRow([]);
@@ -112,7 +112,7 @@ export class NominaComponent implements OnInit {
         }
         cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
       });
-      numero == 1 ? worksheet.mergeCells('A1:D3') : worksheet.mergeCells('A1:Q3');
+      numero == 1 ? worksheet.mergeCells('A1:D3') : worksheet.mergeCells('A1:P3');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
       if(numero == 1) {
@@ -136,17 +136,17 @@ export class NominaComponent implements OnInit {
           row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
         worksheet.getColumn(1).width = 15;
-        worksheet.getColumn(2).width = 40;
-        worksheet.getColumn(3).width = 25;
+        worksheet.getColumn(2).width = 35;
+        worksheet.getColumn(3).width = 20;
         worksheet.getColumn(4).width = 12;
         worksheet.getColumn(5).width = 12;
         worksheet.getColumn(6).width = 40;
-        worksheet.getColumn(7).width = 15;
+        worksheet.getColumn(7).width = 10;
         worksheet.getColumn(8).width = 20;
-        worksheet.getColumn(9).width = 15;
-        worksheet.getColumn(10).width = 12;
+        worksheet.getColumn(9).width = 10;
+        worksheet.getColumn(10).width = 10;
         worksheet.getColumn(11).width = 10;
-        worksheet.getColumn(12).width = 12;
+        worksheet.getColumn(12).width = 10;
         worksheet.getColumn(13).width = 12;
         worksheet.getColumn(14).width = 12;
         worksheet.getColumn(15).width = 10;
@@ -160,8 +160,8 @@ export class NominaComponent implements OnInit {
         });
         this.load = true;
         this.msj.mensajeConfirmacion(`Confirmación`, title + `exportada éxitosamente!`);
-      }, 1000);
-    }, 1500);
+      }, 1500);
+    }, 2000);
   }
 
   /** Función para consultar las nomina de sellado */
@@ -280,34 +280,34 @@ export class NominaComponent implements OnInit {
    /** Muestra mensaje preguntando en qué tipo de formatos */
   mostrarEleccion(){
     setTimeout(() => {
-     if(this.dt.filteredValue != null) {
-        this.exportarExcel(1);
-     } else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true})
+      if(this.arraySellado.length > 0) {
+        if(this.dt.filteredValue != null) {
+          this.exportarExcel(1);
+        } else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true});
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla, verifique!`);
     }, 500);
   }
 
   /** función que contendrá la consulta de cuando se desee exportar a excel la nomina de forma detallada */
   cargarNominaDetallada(fecha1 : any, fecha2 : any){
     this.detalladoxBultos = [];
+      this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
+        for(let index = 0; index < data.length; index++) {
+          let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
+          info.Cedula = parseInt(info.Cedula),
+          info.Referencia = parseInt(info.Referencia),
+          info.Bulto = parseInt(info.Bulto),
+          info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', ''),
+          info.Cantidad = parseFloat(info.Cantidad),
+          info.Cantidad_Total = parseFloat(info.Cantidad_Total),
+          info.Peso = parseFloat(info.Peso),
+          info.Precio = parseFloat(info.Precio),
+          info.Valor_Total = parseFloat(info.Valor_Total)
 
-    this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
-      for(let index = 0; index < data.length; index++) {
-        let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
-        info.Cedula = parseInt(info.Cedula),
-        info.Referencia = parseInt(info.Referencia),
-        info.Bulto = parseInt(info.Bulto),
-        info.Fecha = info.Fecha.toString().replace('12:00:00 a. m.', ''),
-        info.Cantidad = parseFloat(info.Cantidad),
-        info.Cantidad_Total = parseFloat(info.Cantidad_Total),
-        info.Peso = parseFloat(info.Peso),
-        info.Precio = parseFloat(info.Precio),
-        info.Valor_Total = parseFloat(info.Valor_Total)
-
-        this.detalladoxBultos.push(info);
-        this.detalladoxBultos.sort((a, b) => Number(a.Cedula) - Number(b.Cedula));
-        this.detalladoxBultos.sort((a, b) => Number(a.Bulto) - Number(b.Bulto));
-        //console.log(this.detalladoxBultos)
-      }
-    });
+          this.detalladoxBultos.push(info);
+          this.detalladoxBultos.sort((a,b) => Number(a.Bulto) - Number(b.Bulto));
+          this.detalladoxBultos.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
+        }
+      });
   }
 }
