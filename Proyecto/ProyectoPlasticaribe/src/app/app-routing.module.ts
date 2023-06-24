@@ -64,6 +64,7 @@ import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostos
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
+import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 
 export const routes: Routes = [
 
@@ -174,6 +175,9 @@ export const routes: Routes = [
 
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'nomina', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,61]}, component: NominaComponent},
+
+  /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
+  {path: 'solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: SolicitudMP_ExtrusionComponent},
 ]
 
 @NgModule({

@@ -158,6 +158,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
+import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 
 @NgModule({
   declarations: [
@@ -243,6 +244,7 @@ import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoar
     CalendarioComponent,
     NominaComponent,
     DashBoardRecaudosComponent,
+    SolicitudMP_ExtrusionComponent,
   ],
 
   imports: [
