@@ -210,7 +210,19 @@
               </p-cellEditor>
             </td>
             <td>{{materiasPrimas.Und_Medida}}</td>
-            <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td>
+
+            <td [pEditableColumn]="materiasPrimas.Precio" pEditableColumnField="price" class="cursor">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="number" [(ngModel)]="materiasPrimas.Precio"/>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ materiasPrimas.Precio | currency : 'COP $' }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+
+            <!-- <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td> -->
             <td>{{materiasPrimas.SubTotal | currency : 'COP $'}}</td>
             <td>{{((materiasPrimas.SubTotal * iva) / 100) | currency : 'COP $'}}</td>
             <td>{{((materiasPrimas.SubTotal * iva) / 100) + (materiasPrimas.SubTotal) | currency : 'COP $'}}</td>

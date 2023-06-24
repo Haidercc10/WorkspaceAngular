@@ -304,7 +304,7 @@ export class PedidoExternoComponent implements OnInit {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
         if (datos_sedeCliente.lengrh == 0) !this.cargando;
         for (let j = 0; j < datos_sedeCliente.length; j++) {
-          this.zeusCobtabilidadService.getVistasFavUsuario(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
+          this.zeusCobtabilidadService.GetCarteraClientes(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
             if (datos.length == 0) this.cargando = false;
             for (let i = 0; i < datos.length; i++) {
               let fechaRadicado : any = datos[i].fecha_Radicado;

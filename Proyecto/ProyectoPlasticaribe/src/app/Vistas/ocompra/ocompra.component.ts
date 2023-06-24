@@ -388,7 +388,7 @@ export class OcompraComponent implements OnInit {
     let solicitud = this.FormOrdenCompra.value.Solicitud;
     let exp = /^([0-9])*$/;
 
-    if (solicitud.match(exp)) {
+    if (solicitud) {
       this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].estado_Solicitud_Id != 5){
@@ -427,7 +427,7 @@ export class OcompraComponent implements OnInit {
           } else this.mensajeService.mensajeError(`¡Solicitud no valida!`, `¡No se puede crear una orden de compra para esta solicitud dado que esta ha finalizado!`);
         }
       }, error => this.mensajeService.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
-    } else this.mensajeService.mensajeError(`¡Advertencia!`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
+    } else this.mensajeService.mensajeError(`¡Advertencia!`, `¡La información que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear la orden de compra
@@ -448,7 +448,7 @@ export class OcompraComponent implements OnInit {
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
-      if (solicitud != null && solicitud != '') this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
+      if (solicitud.length > 0) this.crearRelacionOc_Solicitud(datos_ordenCompra.oc_Id, solicitud);
       this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
       setTimeout(() => this.buscarinfoOrdenCompra(), 500);
     }, () => {
@@ -935,6 +935,7 @@ export class OcompraComponent implements OnInit {
             Oc_PesoTotal : this.calcularCantMateriaPrima(),
             TpDoc_Id : 'OCMP',
             Oc_Observacion : (observacion).toUpperCase(),
+            IVA : this.iva,
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => { this.editarDtOrdenCompa(); }, () => {

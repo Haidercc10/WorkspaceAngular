@@ -63,6 +63,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
+import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 
 export const routes: Routes = [
 
@@ -170,6 +171,9 @@ export const routes: Routes = [
 
   /** */
   {path: 'Reporte-Facturacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_Consolidado_FacturacionComponent},
+
+  /*************************************************************** DASBOARD **************************************************************************/
+  {path: 'nomina', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,61]}, component: NominaComponent},
 ]
 
 @NgModule({

@@ -210,7 +210,16 @@
           <tr>
             <td>{{materiasPrimasSeleccionadas.Id}}</td>
             <td>{{materiasPrimasSeleccionadas.Nombre}}</td>
-            <td>{{materiasPrimasSeleccionadas.Cantidad | number}}</td>
+            <td [pEditableColumn]="materiasPrimasSeleccionadas.Cantidad" pEditableColumnField="price" class="cursor">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="number" [(ngModel)]="materiasPrimasSeleccionadas.Cantidad"/>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ materiasPrimasSeleccionadas.Cantidad | number : '1.2-2' }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
             <td>{{materiasPrimasSeleccionadas.Proceso}}</td>
             <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas)"></i></td>

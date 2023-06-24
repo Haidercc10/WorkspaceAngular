@@ -89,6 +89,7 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains')"></th>
+                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Micras', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Inicial', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Entrada', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Salida', 'contains')"></th>
@@ -108,7 +109,11 @@
                 <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
                   <p-sortIcon field="Nombre"></p-sortIcon>
                 </th>
-                <th scope="col">Ancho
+                <th id="Ancho" pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho
+                  <p-sortIcon field="Ancho"></p-sortIcon>
+                </th>
+                <th id="Micras" pSortableColumn="Micras" pReorderableColumn scope="col">Micras
+                  <p-sortIcon field="Micras"></p-sortIcon>
                 </th>
                 <th id="inicial" pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
                   <p-sortIcon field="Inicial"></p-sortIcon>
@@ -145,6 +150,7 @@
                 <td>{{materiaPrima.Id}}</td>
                 <td>{{materiaPrima.Nombre}}</td>
                 <td>{{materiaPrima.Ancho}}</td>
+                <td>{{materiaPrima.Micras | number}}</td>
                 <td>{{materiaPrima.Inicial | number}}</td>
                 <td>{{materiaPrima.Entrada | number}}</td>
                 <td>{{materiaPrima.Salida | number}}</td>
@@ -205,7 +211,6 @@
                 <th></th>
                 <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Nombre', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Ancho', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Inicial', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Entrada', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Salida', 'contains')"></th>
@@ -224,8 +229,6 @@
                 </th>
                 <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
                   <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th scope="col">Ancho
                 </th>
                 <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
                   <p-sortIcon field="Inicial"></p-sortIcon>
@@ -261,7 +264,6 @@
                 <td>{{rowIndex + 1}}</td>
                 <td>{{materiaPrima.Id}}</td>
                 <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Ancho}}</td>
                 <td>{{materiaPrima.Inicial | number}}</td>
                 <td>{{materiaPrima.Entrada | number}}</td>
                 <td>{{materiaPrima.Salida | number}}</td>
@@ -322,7 +324,6 @@
                 <th></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Nombre', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Ancho', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Inicial', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Entrada', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Salida', 'contains')"></th>
@@ -341,8 +342,6 @@
                 </th>
                 <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
                   <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th scope="col">Ancho
                 </th>
                 <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
                   <p-sortIcon field="Inicial"></p-sortIcon>
@@ -378,7 +377,6 @@
                 <td>{{rowIndex + 1}}</td>
                 <td>{{materiaPrima.Id}}</td>
                 <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Ancho}}</td>
                 <td>{{materiaPrima.Inicial | number}}</td>
                 <td>{{materiaPrima.Entrada | number}}</td>
                 <td>{{materiaPrima.Salida | number}}</td>
@@ -439,6 +437,7 @@
                 <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Id', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Nombre', 'contains')"></th>
                 <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Ancho', 'contains')"></th>
+                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Micras', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Inicial', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Entrada', 'contains')"></th>
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Salida', 'contains')"></th>
@@ -458,7 +457,11 @@
                 <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
                   <p-sortIcon field="Nombre"></p-sortIcon>
                 </th>
-                <th scope="col">Ancho
+                <th id="Ancho" pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho
+                  <p-sortIcon field="Ancho"></p-sortIcon>
+                </th>
+                <th id="Micras" pSortableColumn="Micras" pReorderableColumn scope="col">Micras
+                  <p-sortIcon field="Micras"></p-sortIcon>
                 </th>
                 <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
                   <p-sortIcon field="Inicial"></p-sortIcon>
@@ -494,7 +497,8 @@
                 <td>{{rowIndex + 1}}</td>
                 <td>{{materiaPrima.Id}}</td>
                 <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Ancho}}</td>
+                <td>{{materiaPrima.Ancho | number}}</td>
+                <td>{{materiaPrima.Micras | number}}</td>
                 <td>{{materiaPrima.Inicial | number}}</td>
                 <td>{{materiaPrima.Entrada | number}}</td>
                 <td>{{materiaPrima.Salida | number}}</td>

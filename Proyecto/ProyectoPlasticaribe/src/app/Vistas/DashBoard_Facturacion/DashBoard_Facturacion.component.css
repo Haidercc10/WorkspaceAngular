@@ -93,3 +93,19 @@ p-chart ::ng-deep div ::ng-deep canvas {
     padding: 0.5rem !important;
   }
 }
+
+p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
+  width: 100%;
+}
+
+p-dropdown {
+  margin: 0;
+}
+
+p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
+  width: 100%;
+}
+
+button {
+  width: 30px;
+}

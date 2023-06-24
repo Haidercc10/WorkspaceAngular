@@ -12,7 +12,15 @@ export class ZeusContabilidadService {
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getVistasFavUsuario(id : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturasBU/getCarteraClientes/${id}`);
-  }
+  GetCarteraClientes = (id : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturasBU/getCarteraClientes/${id}`);
+
+  GetCarteraAgrupadaClientes = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraAgrupadaClientes`);
+
+  GetCarteraAgrupadaVendedores = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraAgrupadaVendedores`);
+
+  GetCartera = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCartera`);
+
+  GetCarteraTotal = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraTotal`);
+
+  GetCarteraVendedor = (id : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraVendedor/${id}`);
 }

@@ -1,9 +1,11 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { Console } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
+import { Dropdown } from 'primeng/dropdown';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -402,7 +404,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas);
+  cargarTintasEnProcesoImpresion = () => this.servicioTintas.srvObtenerLista().subscribe(tintas => this.arrayTintas = tintas.filter((item) => item.catMP_Id == 7));
 
   /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
   cargarPigmentosEnProcesoExtrusion = () => this.servicioPigmentos.srvObtenerLista().subscribe(pigmentos => this.arrayPigmentos = pigmentos);
@@ -635,7 +637,12 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
-    let data : any = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    let simboloPorcentaje : boolean = false;
+    let data : string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    simboloPorcentaje = data.toString().includes("%") ? true : false;
+    if(simboloPorcentaje) data = data.replace('%', '%25')
+    else data = data;
+
     this.mezclasService.getMezclaNombre(data).subscribe(datos_mezcla => {
       this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
       setTimeout(() => {
@@ -916,7 +923,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
           this.FormOrdenTrabajoExtrusion.patchValue({
             Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
-            Formato_Extrusion : parseInt(itemOt.ptFormatopt.trim()),
+            Formato_Extrusion : parseInt(itemOt.extFormato.trim()),
             Pigmento_Extrusion : parseInt(itemOt.extPigmento.trim()),
             Ancho_Extrusion1 : itemOt.extAcho1,
             Ancho_Extrusion2 : itemOt.extAcho2,
@@ -955,14 +962,14 @@ export class OrdenesTrabajoComponent implements OnInit {
                 Tipo_Impresion : impresion,
                 Rodillo_Impresion : itemOt.impRodillo,
                 Pista_Impresion : itemOt.impPista,
-                Tinta_Impresion1 : datos_impresion[j].tinta_Id1,
-                Tinta_Impresion2 : datos_impresion[j].tinta_Id2,
-                Tinta_Impresion3 : datos_impresion[j].tinta_Id3,
-                Tinta_Impresion4 : datos_impresion[j].tinta_Id4,
-                Tinta_Impresion5 : datos_impresion[j].tinta_Id5,
-                Tinta_Impresion6 : datos_impresion[j].tinta_Id6,
-                Tinta_Impresion7 : datos_impresion[j].tinta_Id7,
-                Tinta_Impresion8 : datos_impresion[j].tinta_Id8,
+                Tinta_Impresion1 : datos_impresion[j].tinta_Nombre1,
+                Tinta_Impresion2 : datos_impresion[j].tinta_Nombre2,
+                Tinta_Impresion3 : datos_impresion[j].tinta_Nombre3,
+                Tinta_Impresion4 : datos_impresion[j].tinta_Nombre4,
+                Tinta_Impresion5 : datos_impresion[j].tinta_Nombre5,
+                Tinta_Impresion6 : datos_impresion[j].tinta_Nombre6,
+                Tinta_Impresion7 : datos_impresion[j].tinta_Nombre7,
+                Tinta_Impresion8 : datos_impresion[j].tinta_Nombre8,
               });
             }
           });
@@ -1422,13 +1429,13 @@ export class OrdenesTrabajoComponent implements OnInit {
                   [
                     { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
                     { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [true, true, false, false], text: `Item`, style: 'titulo', },
                     { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
                   ],
                   [
                     { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
                   ],
                 ]
@@ -1698,13 +1705,13 @@ export class OrdenesTrabajoComponent implements OnInit {
                   [
                     { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
                     { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                    { border: [true, true, false, false], text: `Id Producto`, style: 'titulo', },
+                    { border: [true, true, false, false], text: `Item`, style: 'titulo', },
                     { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
                   ],
                   [
                     { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                    { border: [false, false, false, true], text: `Producto`, style: 'titulo', },
+                    { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
                     { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
                   ],
                 ]
@@ -2853,5 +2860,59 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.enable();
       this.cambiarNroCapas3();
     }, 300);
+  }
+
+  /** Función que validará que no se elija ninguna tinta igual a otra en el formulario de impresión y organizará las tintas */
+  validarTinta(posicion : string){
+    let tinta : any = this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.value;
+    let tintasSeleccionadas : any[] = Object.values(this.FormOrdenTrabajoImpresion.value);
+    tintasSeleccionadas = tintasSeleccionadas.filter((item) => typeof(item) == 'string');
+    let indice : number = tintasSeleccionadas.indexOf(tinta);
+    if(indice != -1) tintasSeleccionadas.splice(indice, 1);
+    if(tinta != 'NO APLICA') {
+      if(tintasSeleccionadas.includes(tinta)) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion'+ posicion)?.setValue('NO APLICA');
+      }
+    }
+    for (let index = 1; index < parseInt(posicion); index++) {
+      if(tintasSeleccionadas[index - 1].includes('NO APLICA')) {
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + index)?.setValue(tinta);
+        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.setValue('NO APLICA');
+        break;
+      }
+    }
+  }
+
+  /** Función para validar que no se elijan laminados de capa iguales en el formulario y que se organicen dependiendo la posición */
+  validarLaminado(posicion : number){
+    let campoLaminado : any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
+    let laminados : any[] = Object.values(this.FormOrdenTrabajoLaminado.value);
+    let lam1 : any = laminados.splice(0, 1); let lam2 : any = laminados.splice(2, 1); let lam3 : any = laminados.splice(4, 1);
+    let laminadosCapas : any[] = [...lam1, ...lam2, ...lam3];
+    let indice : number = laminadosCapas.indexOf(campoLaminado);
+    if(indice != -1) laminadosCapas.splice(indice, 1);
+    if(campoLaminado != 'NO APLICA') {
+      if(laminadosCapas.includes(campoLaminado)) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `El laminado ${this.laminado_capas[campoLaminado - 1].lamCapa_Nombre} ya se encuentra selecionado, por favor elija otro!`);
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.setValue(1);
+      }
+    }
+    for (let index = 1; index < posicion; index++) {
+      if(laminadosCapas[index - 1].toString().includes('1')) {
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + index)?.setValue(campoLaminado);
+        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion)?.setValue(1);
+        break;
+      }
+    }
+    this.validarLaminadoCapa(posicion);
+  }
+
+  validarLaminadoCapa(posicion : number) {
+    let campoLaminado : any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
+    if(campoLaminado == 1) {
+      this.FormOrdenTrabajoLaminado.get('Calibre_Laminado' + posicion)?.setValue(0);
+      this.FormOrdenTrabajoLaminado.get('cantidad_Laminado' + posicion)?.setValue(0);
+    }
   }
 }

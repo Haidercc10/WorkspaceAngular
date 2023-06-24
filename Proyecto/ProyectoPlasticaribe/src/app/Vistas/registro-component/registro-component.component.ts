@@ -1,23 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
-import moment from 'moment';
-import { modelUsuario } from 'src/app/Modelo/modelUsuario';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { SrvTipos_UsuariosService } from 'src/app/Servicios/TiposUsuarios/srvTipos_Usuarios.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import * as fs from 'file-saver';
-import { Table } from 'primeng/table'
-import { AreaService } from 'src/app/Servicios/Areas/area.service';
-import { MessageService } from 'primeng/api';
+import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelAreas } from 'src/app/Modelo/modelAreas';
 import { modelRol } from 'src/app/Modelo/modelRol';
 import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
-import { AppComponent } from 'src/app/app.component';
-import { stepsUsuarios as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
+import { modelUsuario } from 'src/app/Modelo/modelUsuario';
+import { AreaService } from 'src/app/Servicios/Areas/area.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { SrvTipos_UsuariosService } from 'src/app/Servicios/TiposUsuarios/srvTipos_Usuarios.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsUsuarios as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-registro-component',
@@ -86,34 +85,16 @@ export class RegistroComponentComponent implements OnInit {
   }
 
   // Funcion que crgará las areas
-  cargarAreas() {
-    this.arrayAreas = [];
-    this.servicioAreas.srvObtenerLista().subscribe(dataAreas => { this.arrayAreas = dataAreas; });
-  }
+  cargarAreas = () => this.servicioAreas.srvObtenerLista().subscribe(dataAreas => this.arrayAreas = dataAreas);
 
   // Funcion que cargará los roles
-  cargarRoles() {
-    this.arrayRoles = [];
-    this.servicioRoles.srvObtenerLista().subscribe(dataRoles => { this.arrayRoles = dataRoles; });
-  }
+  cargarRoles = () => this.servicioRoles.srvObtenerLista().subscribe(dataRoles => this.arrayRoles = dataRoles);
 
   // Funcion que cargará los estados que pueden tener los usuarios
-  cargarEstados() {
-    this.arrayEstados = [];
-    this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
-      for (let index = 0; index < dataEstados.length; index++) {
-        if(dataEstados[index].estado_Nombre == 'Activo' ||
-        dataEstados[index].estado_Nombre == 'Inactivo')
-        this.arrayEstados.push(dataEstados[index]);
-      }
-    });
-  }
+  cargarEstados = () => this.servicioEstados.srvObtenerListaEstados().subscribe(data => this.arrayEstados = data.filter(item => item.estado_Nombre == 'Activo' || item.estado_Nombre == 'Inactivo'));
 
   // Funcion que cargará los tipos de usuarios
-  cargarTiposUsuarios() {
-    this.arrayTiposUsuarios = [];
-    this.servicioTpUsuarios.srvObtenerLista().subscribe(dataTipoUsu => { this.arrayTiposUsuarios = dataTipoUsu; });
-  }
+  cargarTiposUsuarios = () => this.servicioTpUsuarios.srvObtenerLista().subscribe(data => this.arrayTiposUsuarios = data);
 
   // Funcion que cargará los usuarios
   cargarUsuarios() {
@@ -382,9 +363,7 @@ export class RegistroComponentComponent implements OnInit {
   }
 
   // Funcion que permitirá filtrar la información de la tabla
-  aplicarfiltroGlobal($event, valorCampo : string){
-    this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
-  }
+  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
   /** Cargar modal de crear roles y tipos de usuarios */
   modalRoles_TiposUsuarios(){
@@ -464,10 +443,7 @@ export class RegistroComponentComponent implements OnInit {
   }
 
   /** Agregar roles o areas dependiendo la acción del dialogo. */
-  agregar() {
-    if(this.accionDialogoNuevo == 'Rol') this.crearRoles();
-    else this.crearAreas();
-  }
+  agregar = () => this.accionDialogoNuevo == 'Rol' ? this.crearRoles() : this.crearAreas();
 
   /** Cargar roles al datalist al momento de escribir en el campo nombre del modal*/
   cargarRoles_Like(){
