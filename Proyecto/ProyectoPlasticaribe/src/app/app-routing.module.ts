@@ -65,6 +65,7 @@ import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/repor
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
+import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 
 export const routes: Routes = [
 
@@ -122,7 +123,7 @@ export const routes: Routes = [
   {path: 'reporte-pedidos-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,60]}, component : Reporte_PedidosVendedoresComponent}, // Pedidos Vendedores
 
   /************************************** Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos **********************************************/
-  {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
+  {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : Ingreso_Rollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
   {path: 'AsignacionRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   {path: 'ReporteRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
   {path: 'Inventario-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component: Inventario_ExtrusionComponent},

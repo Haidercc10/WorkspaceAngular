@@ -159,6 +159,7 @@ import { AppComponent } from './app.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
+import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 
 @NgModule({
   declarations: [
@@ -245,6 +246,7 @@ import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/S
     NominaComponent,
     DashBoardRecaudosComponent,
     SolicitudMP_ExtrusionComponent,
+    Ingreso_Rollos_ExtrusionComponent,
   ],
 
   imports: [
