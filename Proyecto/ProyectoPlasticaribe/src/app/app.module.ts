@@ -160,6 +160,8 @@ import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
+import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
+import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
 
 @NgModule({
   declarations: [
@@ -247,6 +249,8 @@ import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extru
     DashBoardRecaudosComponent,
     SolicitudMP_ExtrusionComponent,
     Ingreso_Rollos_ExtrusionComponent,
+    Solicitud_Rollos_BodegasComponent,
+    Movimientos_SolicitudRollosComponent,
   ],
 
   imports: [

@@ -3,8 +3,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
+import { modelDtBodegasRollos } from 'src/app/Modelo/modelDtBodegasRollos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Bodegas_RollosService } from 'src/app/Servicios/Bodegas_Rollos/Bodegas_Rollos.service';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsIngresoRollosExtrusion as defaultSteps } from 'src/app/data';
@@ -35,7 +37,8 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
                   private mensajeService : MensajesAplicacionService,
                     private frmBuilder : FormBuilder,
                       private bagProService : BagproService,
-                        private bgRollosService : Bodegas_RollosService) {
+                        private bgRollosService : Bodegas_RollosService,
+                          private dtBgRollosService : Detalle_BodegaRollosService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
@@ -100,38 +103,36 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     else if (ot != null) ruta = `?ot=${ot}`;
     else if (rollo != null) ruta = `?rollo=${rollo}`;
 
-    if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
-      this.cargando = true;
-      this.rollosConsultados = [];
-      this.rollosIngresar = [];
-      this.consolidadoProductos = [];
+    this.cargando = true;
+    this.rollosConsultados = [];
+    this.rollosIngresar = [];
+    this.consolidadoProductos = [];
 
-      this.bagProService.GetRollosExtrusion_Empaque_Sellado(fechaInicial, fechaFinal, 'EXTRUSION', ruta).subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          rollosBagPro.push(data[i].rollo);
-        }
-        setTimeout(() => {
-          this.bgRollosService.GetRollos(rollosBagPro).subscribe(datos => {
-            for (let i = 0; i < datos.length; i++) {
-              rollosExistentes.push(datos[i].bgRollo_Rollo);
-            }
-            setTimeout(() => {
-              for (let i = 0; i < data.length; i++) {
-                if (datos.length > 0 && !rollosExistentes.includes(parseInt(data[i].rollo))) this.llenarRollosIngresar(data[i], false);
-                else if (datos.length > 0 && rollosExistentes.includes(parseInt(data[i].rollo))) {
-                  let nuevo : any [] = datos.filter((item) => item.bgRollo_Rollo == data[i].rollo);
-                  for (let j = 0; j < nuevo.length; j++) {
-                    if (nuevo[j].bgRollo_BodegaActual != 'EXT') this.llenarRollosIngresar(data[i], false);
-                    else this.llenarRollosIngresar(data[i], true);
-                  }
+    this.bagProService.GetRollosExtrusion_Empaque_Sellado(fechaInicial, fechaFinal, 'EXTRUSION', ruta).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        rollosBagPro.push(data[i].rollo);
+      }
+      setTimeout(() => {
+        this.dtBgRollosService.GetRollos(rollosBagPro).subscribe(datos => {
+          for (let i = 0; i < datos.length; i++) {
+            rollosExistentes.push(datos[i].dtBgRollo_Rollo);
+          }
+          setTimeout(() => {
+            for (let i = 0; i < data.length; i++) {
+              if (datos.length > 0 && !rollosExistentes.includes(parseInt(data[i].rollo))) this.llenarRollosIngresar(data[i], false);
+              else if (datos.length > 0 && rollosExistentes.includes(parseInt(data[i].rollo))) {
+                let nuevo : any [] = datos.filter((item) => item.dtBgRollo_Rollo == data[i].rollo);
+                for (let j = 0; j < nuevo.length; j++) {
+                  if (nuevo[j].bgRollo_BodegaActual != 'EXT') this.llenarRollosIngresar(data[i], false);
+                  else this.llenarRollosIngresar(data[i], true);
                 }
-                if (datos.length == 0) this.llenarRollosIngresar(data[i], false);
               }
-            }, 500);
-          });
-        }, 2500);
-      });
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`La fecha seleccionada no es valida!`);
+              if (datos.length == 0) this.llenarRollosIngresar(data[i], false);
+            }
+          }, 500);
+        });
+      }, 2500);
+    });
   }
 
   // Funcion que va a llenar los rollos que estan disponibles para ser ingresados
@@ -247,28 +248,43 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   // Funcion que va a crear los rollos en la base de datos
   ingresarRollos(){
     if (this.rollosIngresar.length > 0){
-      let numRollos : number = 0;
+      this.cargando = true;
+      const info : modelBodegasRollos = {
+        BgRollo_FechaEntrada: moment().format('YYYY-MM-DD'),
+        BgRollo_HoraEntrada: moment().format('H:mm:ss'),
+        BgRollo_FechaModifica: moment().format('YYYY-MM-DD'),
+        BgRollo_HoraModifica: moment().format('H:mm:ss'),
+        BgRollo_Observacion: this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion,
+      }
+      this.bgRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id), err => {
+        this.mensajeService.mensajeError(`¡Ha ocurrido un error al ingresar los rollos!`, `¡${err.error}!`);
+        this.cargando = false;
+      });
+    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar minimo un rollo para realizar el ingreso!`);
+  }
+
+  //
+  ingresarDetallesRollos(id : number){
+    let numRollos : number = 0;
       this.cargando = true;
       for (let i = 0; i < this.rollosIngresar.length; i++) {
-        const info : modelBodegasRollos = {
-          BgRollo_FechaEntrada: moment().format('YYYY-MM-DD'),
-          BgRollo_HoraEntrada: moment().format('H:mm:ss'),
-          BgRollo_FechaModifica: moment().format('YYYY-MM-DD'),
-          BgRollo_HoraModifica: moment().format('H:mm:ss'),
-          BgRollo_Rollo: this.rollosIngresar[i].Rollo,
-          BgRollo_Cantidad: this.rollosIngresar[i].Cantidad,
+        const info : modelDtBodegasRollos = {
+          BgRollo_OrdenTrabajo: this.rollosIngresar[i].Ot,
+          Prod_Id: parseInt(this.rollosIngresar[i].Id_Producto),
+          DtBgRollo_Rollo: this.rollosIngresar[i].Rollo,
+          DtBgRollo_Cantidad: this.rollosIngresar[i].Cantidad,
           UndMed_Id: this.rollosIngresar[i].Presentacion,
           BgRollo_BodegaActual: 'EXT',
-          BgRollo_Extrusion: true,
-          BgRollo_ProdIntermedio: false,
-          BgRollo_Impresion: false,
-          BgRollo_Rotograbado: false,
-          BgRollo_Sellado: false,
-          BgRollo_Corte: false,
-          BgRollo_Despacho: false,
-          BgRollo_Observacion: this.FormConsultarRollos.value.Observacion,
+          DtBgRollo_Extrusion: true,
+          DtBgRollo_ProdIntermedio: false,
+          DtBgRollo_Impresion: false,
+          DtBgRollo_Rotograbado: false,
+          DtBgRollo_Sellado: false,
+          DtBgRollo_Corte: false,
+          DtBgRollo_Despacho: false,
+          BgRollo_Id: id
         }
-        this.bgRollosService.Post(info).subscribe(() => {
+        this.dtBgRollosService.Post(info).subscribe(() => {
           numRollos += 1
           if (numRollos == this.rollosIngresar.length) this.finalizacionIngresoRollos();
         }, err => {
@@ -276,7 +292,6 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
           this.cargando = false;
         });
       }
-    } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar minimo un rollo para realizar el ingreso!`);
   }
 
   // Funcion que se va a ejecutar cuando se hayan ingresado todos los rollos

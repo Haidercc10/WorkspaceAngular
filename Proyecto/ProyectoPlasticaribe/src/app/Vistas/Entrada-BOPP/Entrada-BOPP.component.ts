@@ -110,7 +110,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   // Funcion que servirá para cargar las categorias
-  obtenerCategorias = () => this.categoriaService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15].includes(item.catMP_Id)));
+  obtenerCategorias = () => this.categoriaService.srvObtenerLista().subscribe(datos => this.categorias = datos.filter((item) => [6,14,15,17].includes(item.catMP_Id)));
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
