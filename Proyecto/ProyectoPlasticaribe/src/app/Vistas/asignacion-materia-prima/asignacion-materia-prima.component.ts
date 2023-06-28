@@ -51,6 +51,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   soloTintas : boolean = false;
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  solicitud : boolean = false;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -307,6 +308,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Usua_Id : this.storage_Id,
       Estado_OrdenTrabajo : 14,
       AsigMp_Hora : moment().format('H:mm:ss'),
+      SolMpExt_Id : this.FormMateriaPrimaRetiro.value.Solicitud == null ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud,
     }
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
       this.error = true;
@@ -436,8 +438,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial(){
-    let solicitud : any = this.FormMateriaPrimaRetiro.value.Solicitud;
-    if(solicitud.length > 0 && parseInt(solicitud) > 1 && typeof(parseInt(solicitud)) == 'number') {
+    let solicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
+    console.log(solicitud)
+    if(solicitud != null) {
       this.load = false;
       this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
         if(data.length > 0) {

@@ -23,4 +23,8 @@ export class DetSolicitudMP_ExtrusionService {
   Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/${id}`);
 
   GetSolicitudMp_Extrusion = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getSolicitudMp_Extrusion/${id}`);
+
+  GetQuerySolicitudesMp_Extrusion = (fecha1 : number, fecha2 : any, ruta? : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getQuerySolicitudesMp_Extrusion/${fecha1}/${fecha2}${ruta}`);
+
+  GetRelacionSolicitudesAsignaciones = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getRelacionSolicitudesAsignaciones/${id}/`);
 }

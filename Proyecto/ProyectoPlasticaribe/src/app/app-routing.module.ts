@@ -67,6 +67,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
+import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_SolicitudMpExtrusion/Reporte_SolicitudMpExtrusion.component';
 
 export const routes: Routes = [
 
@@ -182,6 +183,7 @@ export const routes: Routes = [
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
   {path: 'solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: SolicitudMP_ExtrusionComponent},
+  {path: 'reporte-solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_SolicitudMpExtrusionComponent},
 ]
 
 @NgModule({
