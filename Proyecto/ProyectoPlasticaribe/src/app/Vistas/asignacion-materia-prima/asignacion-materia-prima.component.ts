@@ -5,6 +5,7 @@ import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetSolicitudMP_ExtrusionService } from 'src/app/Servicios/DetSolicitudMP_Extrusion/DetSolicitudMP_Extrusion.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/DetallesAsgTintas/detallesAsignacionTintas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -63,12 +64,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                 private detallesAsignacionTintas : DetallesAsignacionTintasService,
                                   private messageService: MessageService,
                                     private shepherdService: ShepherdService,
-                                      private mensajeService : MensajesAplicacionService,) {
+                                      private mensajeService : MensajesAplicacionService,
+                                          private servicioDetlSolitudMaterial : DetSolicitudMP_ExtrusionService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
       OTImp : [''],
+      Solicitud : [null],
       FechaRetiro : [this.today, Validators.required],
       Maquina : [null, Validators.required],
       kgOt : [null, Validators.required],
@@ -222,6 +225,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 Und_Medida : this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada,
                 Proceso : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
                 Categoria : this.FormMateriaPrimaRetirada.value.Categoria,
+                Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
               }
               if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
               else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
@@ -429,4 +433,58 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   confirmarAsignacion = (OT : any) => this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar de todas formas?`, sticky: true});
+
+  //Buscar informacion de las solicitudes de materia prima creadas
+  consultarSolicitudMaterial(){
+    let solicitud : any = this.FormMateriaPrimaRetiro.value.Solicitud;
+    if(solicitud.length > 0 && parseInt(solicitud) > 1 && typeof(parseInt(solicitud)) == 'number') {
+      this.load = false;
+      this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
+        if(data.length > 0) {
+          this.FormMateriaPrimaRetiro.patchValue({ OTRetiro : data[0].ot, Maquina : data[0].maquina, ObservacionRetiro : data[0].observacion, })
+          setTimeout(() => { this.infoOT(); }, 1000);
+          for (let i = 0; i < data.length; i++) {
+            this.llenarTablaMpConSolitudMP(data[i])
+          }
+        }
+      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener solicitud de material consultada!`));
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El valor ingresado en el campo solicitud no es válido`);
+    setTimeout(() => { this.load = true; }, 1500);
+  }
+
+  /** Llenar la tabla de materias primas seleccionadas con la info de la solicitud. */
+  llenarTablaMpConSolitudMP(datos_solicitud : any) {
+    let info : any = {
+      Id : 0,
+      Id_Mp: datos_solicitud.matPrima_Id,
+      Id_Tinta: datos_solicitud.tinta_Id,
+      Nombre : '',
+      Stock : 0,
+      Cantidad : datos_solicitud.cantidad,
+      Und_Medida : datos_solicitud.medida,
+      Proceso : 'EXT',
+    }
+    if (info.Id_Mp != 84) {
+      info.Id = info.Id_Mp;
+      info.Nombre = datos_solicitud.matPrima;
+      info.Stock = datos_solicitud.stock_Mp;
+    } else if (info.Id_Tinta != 2001) {
+      info.Id = info.Id_Tinta;
+      info.Nombre = datos_solicitud.tinta;
+      info.Stock = datos_solicitud.stock_Tinta;
+    }
+    this.materiasPrimasSeleccionada_ID.push(info.Id);
+    this.materiasPrimasSeleccionadas.push(info);
+  }
+
+  /** Validar que los materiales de la asignación tengan un stock mayor a la cantidad solicitada */
+  validarStockMateriales() {
+    let stockMenor : boolean = false;
+    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
+      if(this.materiasPrimasSeleccionadas[index].Cantidad > this.materiasPrimasSeleccionadas[index].Stock) stockMenor = true;
+      else stockMenor = false;
+      break;
+    }
+    stockMenor ? this.mensajeService.mensajeAdvertencia(`Advertencia`, `Existen materiales con cantidades solicitadas mayores a su stock, por favor, verfique!`) : this.validarCamposVaciosRetirada();
+  }
 }
