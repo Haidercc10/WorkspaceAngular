@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
+import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 @Injectable({
@@ -16,9 +16,9 @@ constructor(private http : HttpClient) { }
 
   GetTodo = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion`);
 
-  Post = (data : modelDtSolcitudMP) => this.http.post(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion`, data);
+  Post = (data : modelSolicitudMP_Extrusion) => this.http.post(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion`, data);
 
-  Put = (id : number, data : modelDtSolcitudMP) => this.http.put(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion/${id}`, data);
+  Put = (id : number, data : modelSolicitudMP_Extrusion) => this.http.put(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion/${id}`, data);
 
   Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/SolicitudMatPrima_Extrusion/${id}`);
 
