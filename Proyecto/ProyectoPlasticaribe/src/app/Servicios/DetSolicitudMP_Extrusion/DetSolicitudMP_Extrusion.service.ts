@@ -12,13 +12,15 @@ export class DetSolicitudMP_ExtrusionService {
 
   constructor(private http : HttpClient) { }
 
-  GetId = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitudMatPrima_Extrusion/${id}`);
+  GetId = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/${id}`);
 
-  GetTodo = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitudMatPrima_Extrusion`);
+  GetTodo = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion`);
 
-  Post = (data : modelDetSolicitudMP_Extrusion) => this.http.post(`${rutaPlasticaribeAPI}/DetSolicitudMatPrima_Extrusion`, data);
+  Post = (data : modelDetSolicitudMP_Extrusion) => this.http.post(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion`, data);
 
-  Put = (id : number, data : modelDetSolicitudMP_Extrusion) => this.http.put(`${rutaPlasticaribeAPI}/DetSolicitudMatPrima_Extrusion/${id}`, data);
+  Put = (id : number, data : modelDetSolicitudMP_Extrusion) => this.http.put(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/${id}`, data);
 
-  Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/DetSolicitudMatPrima_Extrusion/${id}`);
+  Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/${id}`);
+
+  GetSolicitudMp_Extrusion = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/getSolicitudMp_Extrusion/${id}`);
 }
