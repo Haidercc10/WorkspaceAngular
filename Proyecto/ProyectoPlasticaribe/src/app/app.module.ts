@@ -162,6 +162,7 @@ import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/S
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
 import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
+import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
 
 @NgModule({
   declarations: [
@@ -251,6 +252,7 @@ import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_Solic
     Ingreso_Rollos_ExtrusionComponent,
     Solicitud_Rollos_BodegasComponent,
     Movimientos_SolicitudRollosComponent,
+    Dashboard_CuentasPagarComponent,
   ],
 
   imports: [

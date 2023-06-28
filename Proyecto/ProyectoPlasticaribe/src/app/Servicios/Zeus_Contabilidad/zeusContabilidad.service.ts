@@ -12,6 +12,7 @@ export class ZeusContabilidadService {
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  /**************************************************************** FACTURAS BU *****************************************************************************/
   GetCarteraClientes = (id : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturasBU/getCarteraClientes/${id}`);
 
   GetCarteraAgrupadaClientes = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraAgrupadaClientes`);
@@ -23,4 +24,12 @@ export class ZeusContabilidadService {
   GetCarteraTotal = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraTotal`);
 
   GetCarteraVendedor = (id : any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasBU/getCarteraVendedor/${id}`);
+
+  /*********************************************************************** SaldoProvLibroPrincipal **********************************************************/
+  GetCostosProveedores = (cuenta : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/SaldoProv_LibroPrincipal/getCostosProveedores/${cuenta}`);
+
+  GetCostosTotalProveedores = (cuenta : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/SaldoProv_LibroPrincipal/getCostosTotalProveedores/${cuenta}`);
+
+  /************************************************************************ FacturasLibroPrincipal *************************************************************/
+  GetFacturasProveedores = (cuenta : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/FacturasLibroPrincipal/getFacturasProveedores/${cuenta}`);
 }

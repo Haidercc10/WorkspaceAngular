@@ -344,6 +344,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           info: { title: `${data[i].solicitud}` },
           pageSize: { width: 630, height: 760 },
           watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 150, 25, 35],
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -355,16 +356,17 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
               }
             ]
           },
-          content : [
+          header: [
             {
+              margin: [20, 8, 20, 0],
               columns: [
                 { image : logoParaPdf, width : 220, height : 50, margin: 10 },
                 { text: `Solicitud de Rollos ${data[i].solicitud}`, alignment: 'right', tyle: 'titulo', fontSize: 15, margin: 30 }
               ]
             },
-            '\n \n',
+            '\n',
             {
-              style: 'tablaEmpresa',
+              margin: [30, 0],
               table: {
                 widths: [90, 167, 90, 166],
                 style: 'header',
@@ -425,12 +427,12 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                   ]
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 9,
             },
-            '\n',
+            '\n \n',
+          ],
+          content : [
             {
               text: `\n \nObservación sobre la Orden: \n ${data[i].observacion}\n`,
               style: 'header',
@@ -441,7 +443,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
               alignment: 'center',
               style: 'header'
             },
-
             this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
           ],
           styles: {
@@ -477,7 +478,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [50, 50, 50, 240, 50, 50],
+        widths: [50, 50, 50, '*', 50, 50],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 7,

@@ -62,6 +62,15 @@
         <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
       </p-tabPanel>
 
+      <!-- CUENTAS POR PAGAR -->
+      <p-tabPanel
+        header="Cuentas Por Pagar"
+        leftIcon="pi pi-wallet"
+        tooltip="Información sobre las cuentas por pagar de la empresa"
+        *ngIf="ValidarRol == 1">
+        <app-Dashboard_CuentasPagar *ngIf="cuentasPagar"></app-Dashboard_CuentasPagar>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

@@ -7,12 +7,11 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
 
 @Component({
-  selector: 'app-prueba-imagen-cat-insumo',
-  templateUrl: './prueba-imagen-cat-insumo.component.html',
-  styleUrls: ['./prueba-imagen-cat-insumo.component.css']
+  selector: 'app-Dashboard_CuentasPagar',
+  templateUrl: './Dashboard_CuentasPagar.component.html',
+  styleUrls: ['./Dashboard_CuentasPagar.component.css']
 })
-
-export class PruebaImagenCatInsumoComponent implements OnInit  {
+export class Dashboard_CuentasPagarComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
