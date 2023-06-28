@@ -1,4 +1,4 @@
-export interface modelSolicitudMP_Extrusion {
+export interface modelDetSolicitudMP_Extrusion {
   SolMPExt_Id : number;
   MatPri_Id : number;
   Tinta_Id : number;
