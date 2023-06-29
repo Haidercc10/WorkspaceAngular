@@ -254,7 +254,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         BgRollo_HoraEntrada: moment().format('H:mm:ss'),
         BgRollo_FechaModifica: moment().format('YYYY-MM-DD'),
         BgRollo_HoraModifica: moment().format('H:mm:ss'),
-        BgRollo_Observacion: this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion,
+        BgRollo_Observacion: this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
       }
       this.bgRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.bgRollo_Id), err => {
         this.mensajeService.mensajeError(`¡Ha ocurrido un error al ingresar los rollos!`, `¡${err.error}!`);

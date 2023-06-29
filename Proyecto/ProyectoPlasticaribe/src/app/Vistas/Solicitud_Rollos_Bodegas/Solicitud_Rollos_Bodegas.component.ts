@@ -343,107 +343,85 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         const pdfDefinicion : any = {
           info: { title: `${data[i].solicitud}` },
           pageSize: { width: 630, height: 760 },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
           pageMargins : [25, 150, 25, 35],
-          footer: function(currentPage : any, pageCount : any) {
+          header: function(currentPage : any, pageCount : any) {
             return [
               {
+                margin: [20, 8, 20, 0],
                 columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          header: [
-            {
-              margin: [20, 8, 20, 0],
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50, margin: 10 },
-                { text: `Solicitud de Rollos ${data[i].solicitud}`, alignment: 'right', tyle: 'titulo', fontSize: 15, margin: 30 }
-              ]
-            },
-            '\n',
-            {
-              margin: [30, 0],
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Solicitud de Rollos ${data[i].solicitud}`, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
                     },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa}`
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
                     },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].fecha_Solicitud.replace('T00:00:00', ``)} ${data[i].hora_Solicitud}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Ciudad}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Direccion}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Usuario`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].usuario}`
-                    },
-                  ]
+                    layout: 'noBorders',
+                  }
                 ]
               },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n \n',
-          ],
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },,
+              {
+                margin: [20, 10, 20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: [55, 50, 50, 270, 50, 60],
+                  body: [
+                    [
+                      { text: 'Orden', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Rollo', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Item', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Referencia', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Presentación', fillColor: '#bbb', fontSize: 9 },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              }
+            ];
+          },
           content : [
+            this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
             {
               text: `\n \nObservación sobre la Orden: \n ${data[i].observacion}\n`,
               style: 'header',
             },
-            '\n \n',
-            {
-              text: `Rollos Solicitados\n\n`,
-              alignment: 'center',
-              style: 'header'
-            },
-            this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
           ],
           styles: {
             header: { fontSize: 10, bold: true },
@@ -461,7 +439,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
   buildTableBody(data : any, columns : any) {
     var body = [];
-    body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
@@ -482,11 +459,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         body: this.buildTableBody(data, columns),
       },
       fontSize: 7,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
     };
   }
 }
