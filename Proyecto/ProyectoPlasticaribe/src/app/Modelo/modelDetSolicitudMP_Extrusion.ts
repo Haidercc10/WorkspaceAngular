@@ -1,4 +1,5 @@
 export interface modelDetSolicitudMP_Extrusion {
+  Codigo : number;
   SolMpExt_Id : number;
   MatPri_Id : number;
   Tinta_Id : number;

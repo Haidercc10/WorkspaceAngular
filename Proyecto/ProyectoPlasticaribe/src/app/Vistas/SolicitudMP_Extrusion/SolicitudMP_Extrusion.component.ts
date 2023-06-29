@@ -58,6 +58,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   informacionPDF : any = []; //Array que contendrá la información del PDF
   nroSolicitud : number = 0; /** Variable que guardará el ID de la solicitud para crear el pdf. */
+  esSolicitud : boolean = false; /** Variable que se encargará de limpiar campos */
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -108,11 +109,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // Funcion que va a hacer que se inicie el tutorial in-app
   tutorial(){
-    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    /*this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();
+    this.shepherdService.start();*/
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -141,6 +142,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.soloTintas = false;
     this.categoriasSeleccionadas = [];
     this.infoOrdenTrabajo = [];
+    this.esSolicitud = false;
+    this.nroSolicitud = 0;
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -333,6 +336,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         let presentacionMateriaPrima = this.materiasPrimasSeleccionadas[index].Und_Medida;
         //if (this.materiasPrimasSeleccionadas[index].Id_Mp == 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001) {}
           const detallesSolicitud : modelDetSolicitudMP_Extrusion = {
+            Codigo : 0,
             SolMpExt_Id : solicitud,
             MatPri_Id : this.materiasPrimasSeleccionadas[index].Id_Mp,
             Tinta_Id : this.materiasPrimasSeleccionadas[index].Id_Tinta,
@@ -351,9 +355,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó satisfactoriamente.
   solicitudExitosa() {
-    if (!this.error) this.mensajeService.mensajeConfirmacion(`Confirmación`, `Solicitud creada satisfactoriamente!`);
-    //else if (this.soloTintas && this.calcularMateriaPrimaSolicitada() > this.cantRestante) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
-    //this.LimpiarCampos();
+    if (!this.error && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`Confirmación`, `Solicitud creada satisfactoriamente!`)
+    else if(!this.error && this.esSolicitud) this.mensajeService.mensajeConfirmacion(`Confirmación`, `Solicitud actualizada satisfactoriamente!`)
     this.buscarinfoOrdenCompra();
   }
 
@@ -603,21 +606,29 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial(){
+   let solicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
    this.materiasPrimasSeleccionada_ID = [];
    this.materiasPrimasSeleccionadas = [];
-   let solicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
+
    if(solicitud != null) {
-     this.load = false;
+
      this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
        if(data.length > 0) {
-         this.FormMateriaPrimaRetiro.patchValue({ OTRetiro : data[0].ot, Maquina : data[0].maquina, ObservacionRetiro : data[0].observacion, })
-         setTimeout(() => { this.infoOT(); }, 1000);
-         for (let i = 0; i < data.length; i++) {
-           this.llenarTablaMpConSolitudMP(data[i])
-         }
+        if(data[0].estado != 5 && data[0].estado != 4) {
+          this.esSolicitud = true;
+          this.load = false;
+          this.FormMateriaPrimaRetiro.patchValue({ OTRetiro : data[0].ot, Maquina : data[0].maquina, ObservacionRetiro : data[0].observacion, })
+          setTimeout(() => { this.infoOT(); }, 1000);
+          for (let i = 0; i < data.length; i++) {
+            this.llenarTablaMpConSolitudMP(data[i])
+          }
+        } else {
+          this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se pueden editar solicitudes con estado finalizado o cancelado!`);
+          this.esSolicitud = false;
+        }
        }
      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
-   } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El valor ingresado en el campo solicitud no es válido`);
+   } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El N° de la solicitud no es válido`);
    setTimeout(() => { this.load = true; }, 1500);
  }
 
@@ -646,26 +657,28 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
    this.materiasPrimasSeleccionadas.push(info);
  }
 
+ /** Editar Solicitudes de material de producción por Id */
  editarSolicitud() {
+  this.load = false;
   let solicitudId : any = this.FormMateriaPrimaRetiro.value.Solicitud;
   let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
   let ot : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
   let observacion : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
   this.servicioSolicitudMpExt.GetId(solicitudId).subscribe(data => {
     const solicitud : modelSolicitudMP_Extrusion = {
-      SolMpExt_Id: data.solMpExt_Id,
+      SolMpExt_Id: solicitudId,
       SolMpExt_OT: ot != null ? ot : data.solMpExt_OT,
       SolMpExt_Maquina: maquina != null ? maquina : data.solMpExt_Maquina,
       SolMpExt_Fecha: data.solMpExt_Fecha,
-      SolMpExt_Hora: data.SolMpExt_Hora,
-      SolMpExt_Observacion : observacion != null ? observacion.toString() : data.solMpExt_Observacion,
+      SolMpExt_Hora: data.solMpExt_Hora,
+      SolMpExt_Observacion : observacion != null ? observacion.toString() : '',
       Estado_Id: data.estado_Id,
       Proceso_Id: this.FormMateriaPrimaRetiro.value.ProcesoRetiro,
       Usua_Id: this.storage_Id
     }
-    this.servicioSolicitudMpExt.Put(solicitudId, solicitud).subscribe((datos) => {
-      this.editarDetallesSolicitud(datos.solMpExt_Id);
-      this.nroSolicitud = datos.solMpExt_Id;
+    this.servicioSolicitudMpExt.Put(parseInt(solicitudId), solicitud).subscribe((datos) => {
+      this.editarDetallesSolicitud(solicitudId);
+      this.nroSolicitud = data.solMpExt_Id;
     }, () => {
       this.error = true;
       this.mensajeService.mensajeError(`Error`, `Error al crear la solicitud de material!`);
@@ -674,37 +687,40 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   });
  }
 
+ /** Editar detalles de solicitudes de material de producción por Id */
  editarDetallesSolicitud(solicitudId : number) {
   let errorId : boolean = false;
   for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
     this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(solicitudId, this.materiasPrimasSeleccionadas[index].Id).subscribe(data1 => {
       if(data1.length == 0) {
         let detSolicitud : modelDetSolicitudMP_Extrusion = {
+          Codigo : 0,
           SolMpExt_Id: solicitudId,
           MatPri_Id: this.materiasPrimasSeleccionadas[index].Id_Mp,
           Tinta_Id: this.materiasPrimasSeleccionadas[index].Id_Tinta,
           DtSolMpExt_Cantidad: this.materiasPrimasSeleccionadas[index].Cantidad,
           UndMed_Id: this.materiasPrimasSeleccionadas[index].Und_Medida
         }
-        this.servicioDetSolicitudMpExt.Post(detSolicitud).subscribe(data2 => {}, error => {
+        this.servicioDetSolicitudMpExt.Post(detSolicitud).subscribe(data2 => { errorId = false; }, error => {
           errorId = true;
           this.mensajeService.mensajeError(`Error`, `No fue posible insertar la solicitud y las materias primas, por favor verifique!`)
         });
       } else {
         let detSolicitud : modelDetSolicitudMP_Extrusion = {
+          Codigo : data1[0],
           SolMpExt_Id: solicitudId,
           MatPri_Id: this.materiasPrimasSeleccionadas[index].Id_Mp,
           Tinta_Id: this.materiasPrimasSeleccionadas[index].Id_Tinta,
           DtSolMpExt_Cantidad: this.materiasPrimasSeleccionadas[index].Cantidad,
           UndMed_Id: this.materiasPrimasSeleccionadas[index].Und_Medida
         }
-        this.servicioDetSolicitudMpExt.Put(solicitudId, detSolicitud).subscribe(data3 => {}, error => {
+        this.servicioDetSolicitudMpExt.Put(data1[0], detSolicitud).subscribe(data3 => { errorId = false; }, error => {
           errorId = true;
           this.mensajeService.mensajeError(`Error`, `No fue posible actualizar la solicitud y las materias primas, por favor verifique!`)
         });
       }
     });
   }
-  !errorId ? this.solicitudExitosa() : this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF');
+  !errorId ? setTimeout(() => {  this.load = true; this.solicitudExitosa(); }, 1000)  : this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF, por favor, verifique!');
  }
 }

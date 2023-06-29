@@ -84,7 +84,7 @@
   </form>
 
   <!-- Tabla de OT -->
-  <div class="row g-3" id="tabla1">
+  <div class="row g-3" id="tabla1" *ngIf="load">
     <div class="table-responsive">
       <p-table
       #dt
@@ -146,7 +146,7 @@
           <span class="p-float-label">
             <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
             <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}} - Stock: {{item.stock}}</option>
             </datalist>
             <label for="MP">Materia Prima</label>
           </span>
@@ -191,7 +191,7 @@
   </div>
 
   <!-- TABLA DE RETIRO -->
-  <div class="row g-3" id="tabla2">
+  <div class="row g-3" id="tabla2" *ngIf="load">
     <div class="table-responsive">
       <p-table
       #dt
@@ -246,7 +246,8 @@
       <div class="row g-3">
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosRetirada()"></button>
+            <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="!esSolicitud" (click)="validarCamposVaciosRetirada()"></button>
+            <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" (click)="editarSolicitud()"></button>
             <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
           </div>
         </div>
