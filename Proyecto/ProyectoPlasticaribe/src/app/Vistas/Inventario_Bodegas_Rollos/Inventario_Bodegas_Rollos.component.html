@@ -1,0 +1,99 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Rollos Por Bodega</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card class="font-size-14">
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
+  <p-toolbar styleClass="mb-5 gap-3">
+    <div class="row" style="width: 100%;">
+      <!-- Exportar excel -->
+      <div class="col p-2">
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1"></button>
+      </div>
+    </div>
+  </p-toolbar>
+
+  <p-tabView [scrollable]="true">
+    <!-- INVENTARIO TOTAL -->
+    <p-tabPanel
+      header="Inventario Total"
+      leftIcon="pi pi-th-large"
+      tooltip="Información del Inventario de Todas las Bodega">
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- EXTRUSIÓN -->
+    <p-tabPanel
+      header="Extrusión"
+      leftIcon="pi pi-bolt"
+      tooltip="Información del Inventario de la Bodega de Extrusión">
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- PRODUCTO INTERMEDIO -->
+    <p-tabPanel
+      header="Producto Intermedio"
+      leftIcon="pi pi-th-large"
+      tooltip="Información del Inventario de la Bodega de Producto Intermedio">
+    </p-tabPanel>
+
+    <!-- IMPRESIÓN -->
+    <p-tabPanel
+      header="Impresión"
+      leftIcon="pi pi-print"
+      tooltip="Información del Inventario de la Bodega de Impresión">
+    </p-tabPanel>
+
+    <!-- ROTOGRABADO -->
+    <p-tabPanel
+      header="Rotograbado"
+      leftIcon="pi pi-print"
+      tooltip="Información del Inventario de la Bodega de Rotograbado">
+    </p-tabPanel>
+
+    <!-- SELLADO -->
+    <p-tabPanel
+      header="Sellado"
+      leftIcon="pi pi-tags"
+      tooltip="Información del Inventario de la Bodega de Sellado">
+    </p-tabPanel>
+
+    <!-- DESPACHO -->
+    <p-tabPanel
+      header="Despacho"
+      leftIcon="pi pi-truck"
+      tooltip="Información del Inventario de la Bodega de Despacho">
+    </p-tabPanel>
+  </p-tabView>
+
+</p-card>
