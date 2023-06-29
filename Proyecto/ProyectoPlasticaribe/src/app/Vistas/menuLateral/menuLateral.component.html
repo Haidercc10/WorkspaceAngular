@@ -140,7 +140,7 @@
     </ng-container>
 
     <!-- BOPP / BOPA / POLIESTER -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+    <ng-container *ngIf="[1,3,4].includes(ValidarRol)">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
           <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
@@ -153,7 +153,7 @@
           <b>BOPP / BOPA / POLIESTER</b>
         </a>
         <div class="collapse" id="collapseExample1">
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <ng-container *ngIf="[1,3].includes(ValidarRol)">
               <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
@@ -161,7 +161,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1">
+          <ng-container *ngIf="[1].includes(ValidarRol)">
               <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
@@ -169,7 +169,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+          <ng-container *ngIf="[1,3,4].includes(ValidarRol)">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -177,7 +177,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <ng-container *ngIf="[1,3].includes(ValidarRol)">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
@@ -185,7 +185,7 @@
               </a>
             </div>
           </ng-container>
-            <div class="mb-2 sangria">
+          <div class="mb-2 sangria">
             <hr>
           </div>
         </div>

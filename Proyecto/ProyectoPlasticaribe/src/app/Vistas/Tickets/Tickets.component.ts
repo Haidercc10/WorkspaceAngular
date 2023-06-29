@@ -137,7 +137,7 @@ export class TicketsComponent implements OnInit {
           //     { text: `${datos[i].fecha.replace('T00:00:00', '')} - ${datos[i].hora}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
           //   ]
           // },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
           content : [
             // { text : `${datos[i].direccion_Empresa}`, alignment: 'center', fontSize: 7, margin: [0, 10, 0, 0], },
             // { text : `Ticket #${datos[i].codigo}`, alignment: 'justify', fontSize: 15, margin: [0, 80, 0, 0], bold : true },

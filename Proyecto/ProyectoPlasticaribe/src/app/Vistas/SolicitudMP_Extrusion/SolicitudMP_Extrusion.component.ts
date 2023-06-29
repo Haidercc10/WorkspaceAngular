@@ -421,7 +421,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
               }
             ]
           },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
           content : [
             {
               columns: [
