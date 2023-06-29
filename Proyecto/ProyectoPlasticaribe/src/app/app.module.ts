@@ -164,6 +164,7 @@ import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bod
 import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
 import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
 import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_SolicitudMpExtrusion/Reporte_SolicitudMpExtrusion.component';
+import { Inventario_Bodegas_RollosComponent } from './Vistas/Inventario_Bodegas_Rollos/Inventario_Bodegas_Rollos.component';
 
 @NgModule({
   declarations: [
@@ -255,6 +256,7 @@ import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_Solicitu
     Movimientos_SolicitudRollosComponent,
     Dashboard_CuentasPagarComponent,
     Reporte_SolicitudMpExtrusionComponent,
+    Inventario_Bodegas_RollosComponent,
   ],
 
   imports: [

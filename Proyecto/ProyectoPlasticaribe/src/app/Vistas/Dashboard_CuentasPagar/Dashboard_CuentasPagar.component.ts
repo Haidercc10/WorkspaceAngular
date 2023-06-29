@@ -24,8 +24,9 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  carteraAgrupadaProveedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por los clientes
-  cartera : any [] = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
+  carteraAgrupadaProveedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por los proveedores
+  carteraInvergoal : any [] = []; //Variable que almacenará la información de la cartera de INVERGOAL
+  carteraInversuez : any [] = []; //Variable que almacenará la información de la cartera de INVERSUEZ
   totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
   @ViewChild('dt_carteraAgrupada') dt_carteraAgrupada: Table | undefined;
 
@@ -59,19 +60,17 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
-
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     this.consultarCartera();
-    this.recargar();
   }
 
   // Función que ejecutará las peticiones de la cartera
   consultarCartera(){
     this.cargando = true;
     this.carteraAgrupadaProveedores = [];
+    this.carteraInvergoal = [];
+    this.carteraInversuez = [];
     this.zeusService.GetCostosProveedores('220505').subscribe(data => {
       let numDatos : number = 0;
       for (let i = 0; i < data.length; i++) {
@@ -83,14 +82,26 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           Periodo : data[i].anomescta,
           Detalles : [],
         }
-        this.carteraAgrupadaProveedores.push(info);
+        if (!['900458314','900362200'].includes(data[i].idprove)) this.carteraAgrupadaProveedores.push(info);
+        else if (data[i].idprove == '900362200') this.carteraInvergoal.push(info);
+        else if (data[i].idprove == '900458314') this.carteraInversuez.push(info);
         numDatos += 1;
         if (numDatos == data.length) {
           this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
-              let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-              this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
-              this.cargando = false;
+              if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
+                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900362200') {
+                let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInvergoal[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900458314') {
+                let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInversuez[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              }
             }
           });
         };
@@ -100,9 +111,9 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   // Funcion que va a tomar a calcular los dias de retraso de la factura
-  calcularDiasRetraso(factura : any, proveedor : any){
-    let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == proveedor);
-    let info : any [] = this.carteraAgrupadaProveedores[index].Detalles.filter(item => item.factura == factura);
+  calcularDiasRetraso(factura : any, proveedor : any, data : any = this.carteraAgrupadaProveedores){
+    let index = data.findIndex(item => item.Id_Proveedor == proveedor);
+    let info : any [] = data[index].Detalles.filter(item => item.factura == factura);
     let dias : number = 0;
     for (let i = 0; i < info.length; i++) {
       dias = moment().diff(moment(info[i].fecha_Vencimiento), 'days');
@@ -113,9 +124,10 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_carteraAgrupada!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a crear un pdf
-  crearPdf(){
+  crearPdf(data : any = this.carteraAgrupadaProveedores){
     let nombre : string = this.storage_Nombre;
     const titulo : string = `Estado Proveedores`;
+    let total : number = 0;
     const pdfDefinicion : any = {
       info: { title: titulo },
       pageSize: { width: 630, height: 760 },
@@ -195,7 +207,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       },
       content : []
     };
-    for (let item of this.carteraAgrupadaProveedores) {
+    for (let item of data) {
+      total += item.Cartera;
       let proveedor = {
         margin: [0, 5, 0, 5],
         table: {
@@ -214,7 +227,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           {text: `${itemDetalles.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${this.formatonumeros(itemDetalles.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor))}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${itemDetalles.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
         ];
         proveedor.table.body.push(info);
@@ -232,7 +245,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       );
       pdfDefinicion.content.push(proveedor);
     }
-    let total = {
+    let totalData = {
       margin: [0, 10],
       table: {
         widths: [100, 70, 70, 160, 30, 40, 40],
@@ -241,7 +254,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
             { text: `Total General:`, border: [false, false, false, false], bold: true, colSpan: 1},
             '',
             '',
-            { text: `${this.formatonumeros(this.totalCartera)}`, border: [false, false, false, false], bold: true, colSpan: 1},
+            { text: `${this.formatonumeros(total)}`, border: [false, false, false, false], bold: true, colSpan: 1},
             { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
             '',
             '',
@@ -251,7 +264,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       layout: { defaultBorder: false, },
       fontSize: 9,
     }
-    pdfDefinicion.content.push(total);
+    pdfDefinicion.content.push(totalData);
     pdfMake.createPdf(pdfDefinicion).open();
   }
 }
