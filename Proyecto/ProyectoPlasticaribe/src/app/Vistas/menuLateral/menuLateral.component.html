@@ -344,7 +344,7 @@
     </ng-container>
 
     <!-- MATERIAS PRIMAS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 13">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 13">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir3; then thenTemplate; else elseTemplate"></ng-container>
@@ -445,6 +445,12 @@
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/solicitud-materia-prima" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
               Solicitud de Materia Prima
+            </a>
+          </div>
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 7">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/solicitud-mp-extrusion" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
+              Solicitud Material Producción
             </a>
           </div>
             <div class="mb-2 sangria">
@@ -608,6 +614,16 @@
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
               Movimientos Solicitud Mat. Prima
+            </a>
+          </div>
+        </ng-container>
+
+        <!-- Mov. SOLICITUDES DE MATERIALES DE PRODUCCIÓN -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7">
+          <div class="mb-2 sangria">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitud-mp-extrusion" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+              Mov. Solicitud Material Producción
             </a>
           </div>
         </ng-container>

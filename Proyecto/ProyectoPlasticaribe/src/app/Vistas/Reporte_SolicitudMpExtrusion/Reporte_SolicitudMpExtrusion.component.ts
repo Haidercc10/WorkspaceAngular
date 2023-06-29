@@ -99,7 +99,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.cantFinalizadas = 0;
     this.cantCanceladas = 0;
 
-    this.servicioSolicitudesMPExt.GetTodo().subscribe(data => {
+    this.servicioSolicitudesMPExt.GetUltimas100Solicitudes().subscribe(data => {
       for (let index = 0; index < data.length; index++) {
         if(data[index].estado_Id == 11) this.cantPendientes += 1;
         if(data[index].estado_Id == 5) this.cantFinalizadas += 1;
@@ -127,7 +127,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     if(fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
 
     if(solicitud != null) ruta = `id=${solicitud}`;
-    if(estado != null) ruta.length > 0 ? ruta =+ `&estado=${solicitud}` : ruta =+ `estado=${solicitud}` ;
+    if(estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}` ;
     ruta.length > 0 ? ruta = `?${ruta}` : ruta = ``;
 
     this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta).subscribe(data => {
@@ -150,13 +150,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       ot : datos.ot,
       fecha : datos.fecha.replace('T00:00:00', ''),
       estadoId : datos.estado,
-      estado : '',
+      estado : datos.nombre_Estado,
     }
-    if(info.estadoId == 5) info.estado = 'Finalizado';
-    if(info.estadoId == 11) info.estado = 'Pendiente';
-    if(info.estadoId == 4) info.estado = 'Cancelado';
-    if(info.estadoId == 12) info.estado = 'Parcial';
-
     this.arrayRegistros.push(info);
   }
 
@@ -516,8 +511,19 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   /** Consultar solicitudes por estado. */
   consultarPorEstado(estado : number){
+    this.arrayRegistros = [];
     this.formFiltros.patchValue({estadoDoc : estado});
-    setTimeout(() => { this.consultarFiltros(); }, 500);
+    this.cargando = true;
+    setTimeout(() => {
+      this.servicioSolicitudesMPExt.GetUltimas100Solicitudes().subscribe(data => {
+        if(data.length > 0) {
+          for (let index = 0; index < data.length; index++) {
+            if(data[index].estado_Id == estado && data[index].solMpExt_Id != 1) this.llenarTablaConEstados(data[index]);
+          }
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron solicitudes con el estado seleccionado!`);
+      });
+    }, 500);
+    setTimeout(() => { this.cargando = false; }, 1000);
   }
 
   limpiarTodo(){
@@ -528,6 +534,22 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.usuarioSolicitante = '';
     this.estadoSolicitud = '';
     this.clave = '';
+  }
+
+  llenarTablaConEstados(datos : any){
+    let info : any = {
+      id : datos.solMpExt_Id,
+      ot : datos.solMpExt_OT,
+      fecha : datos.solMpExt_Fecha.replace('T00:00:00', ''),
+      estadoId : datos.estado_Id,
+      estado : '',
+    }
+    if(info.estadoId == 5) info.estado = 'Finalizado';
+    if(info.estadoId == 11) info.estado = 'Pendiente';
+    if(info.estadoId == 4) info.estado = 'Cancelado';
+    if(info.estadoId == 12) info.estado = 'Parcial';
+
+    this.arrayRegistros.push(info);
   }
 
 }

@@ -182,8 +182,8 @@ export const routes: Routes = [
   {path: 'nomina', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,61]}, component: NominaComponent},
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
-  {path: 'solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: SolicitudMP_ExtrusionComponent},
-  {path: 'reporte-solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_SolicitudMpExtrusionComponent},
+  {path: 'solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,7]}, component: SolicitudMP_ExtrusionComponent},
+  {path: 'reporte-solicitud-mp-extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3,7]}, component: Reporte_SolicitudMpExtrusionComponent},
 ]
 
 @NgModule({

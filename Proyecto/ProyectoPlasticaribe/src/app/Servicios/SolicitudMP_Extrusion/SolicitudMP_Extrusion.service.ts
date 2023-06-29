@@ -22,4 +22,7 @@ constructor(private http : HttpClient) { }
 
   Delete = (id : number) => this.http.delete(`${rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
 
+  GetUltimas100Solicitudes = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getUltimas100Solicitudes`);
+
+  GetUltimaSolicitud = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/getUltimaSolicitud`);
 }
