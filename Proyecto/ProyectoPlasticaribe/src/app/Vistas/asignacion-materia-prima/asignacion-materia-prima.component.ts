@@ -438,8 +438,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial(){
+    this.materiasPrimasSeleccionada_ID = [];
+    this.materiasPrimasSeleccionadas = [];
     let solicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
-    console.log(solicitud)
     if(solicitud != null) {
       this.load = false;
       this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
@@ -450,7 +451,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             this.llenarTablaMpConSolitudMP(data[i])
           }
         }
-      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener solicitud de material consultada!`));
+      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El valor ingresado en el campo solicitud no es válido`);
     setTimeout(() => { this.load = true; }, 1500);
   }
@@ -465,16 +466,18 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Stock : 0,
       Cantidad : datos_solicitud.cantidad,
       Und_Medida : datos_solicitud.medida,
-      Proceso : 'EXT',
+      Proceso : '',
     }
     if (info.Id_Mp != 84) {
       info.Id = info.Id_Mp;
       info.Nombre = datos_solicitud.matPrima;
       info.Stock = datos_solicitud.stock_Mp;
+      info.Proceso = 'EXT';
     } else if (info.Id_Tinta != 2001) {
       info.Id = info.Id_Tinta;
       info.Nombre = datos_solicitud.tinta;
       info.Stock = datos_solicitud.stock_Tinta;
+      info.Proceso = 'IMP';
     }
     this.materiasPrimasSeleccionada_ID.push(info.Id);
     this.materiasPrimasSeleccionadas.push(info);

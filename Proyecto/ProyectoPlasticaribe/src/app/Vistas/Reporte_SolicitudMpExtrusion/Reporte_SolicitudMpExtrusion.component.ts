@@ -13,6 +13,7 @@ import { AppComponent } from 'src/app/app.component';
 import { AsignacionMateriaPrimaComponent } from '../asignacion-materia-prima/asignacion-materia-prima.component';
 import { Table } from 'primeng/table';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 
 
 @Component({
@@ -54,7 +55,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
                           private servicioSolicitudesMPExt : SolicitudMP_ExtrusionService,
                             private servicioDtSolicitudesMPExt : DetSolicitudMP_ExtrusionService,
                               private msj : MensajesAplicacionService,
-                                ) {
+                                private ServicioDetAsignacionesMp : DetallesAsignacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       documento : [null],
@@ -442,16 +443,20 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.usuarioSolicitante = info.Usuario;
     arrayIds.push(info.Id)
 
-    /*this.servicioDtSolicitudesMPExt.GetRelacionSolicitudesAsignaciones(this.solicitudSeleccionada).subscribe(data2 => {
+    this.ServicioDetAsignacionesMp.GetAsignacionesConSolicitudes(this.solicitudSeleccionada).subscribe(data2 => {
       for (let i = 0; i < data2.length; i++) {
-        let infoSolicitud : any = { Ident : 0, Id_Mp: data2[i].matPrima_Id, Id_Tinta: data2[i].tinta_Id, CantSolicitud : data2[i].cantidad }
-
+        let infoSolicitud : any = {
+          Ident : 0,
+          Id_Mp: data2[i].matPri_Id,
+          Id_Tinta: data2[i].tinta_Id,
+          CantSolicitud : data2[i].cantMP
+        }
         if (infoSolicitud.Id_Mp != 84) infoSolicitud.Ident = infoSolicitud.Id_Mp;
         else if (infoSolicitud.Id_Tinta != 2001) infoSolicitud.Ident = infoSolicitud.Id_Tinta;
 
         if(arrayIds.includes(infoSolicitud.Ident)) info.CantAprobada = infoSolicitud.CantSolicitud;
       }
-    });*/
+    });
 
     this.arrayMatPrimas.push(info);
   }
