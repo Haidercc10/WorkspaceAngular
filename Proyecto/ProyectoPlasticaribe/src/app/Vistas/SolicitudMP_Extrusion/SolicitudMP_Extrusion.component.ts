@@ -18,7 +18,7 @@ import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extr
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsAsignacionMateriaPrima as defaultSteps } from 'src/app/data';
+//import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -59,6 +59,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   informacionPDF : any = []; //Array que contendrá la información del PDF
   nroSolicitud : number = 0; /** Variable que guardará el ID de la solicitud para crear el pdf. */
   esSolicitud : boolean = false; /** Variable que se encargará de limpiar campos */
+  ultimoNroSolicitud : number = 0;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -103,17 +104,18 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.obtenerProcesos();
     this.obtenerMateriaPrima();
     this.consultarCategorias();
-    this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT' });
+    this.ultimoConsecutivoSolicitud();
+    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, }); }, 2000);
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
   tutorial(){
-    /*this.shepherdService.defaultStepOptions = defaultStepOptions;
+    //this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
-    this.shepherdService.addSteps(defaultSteps);
-    this.shepherdService.start();*/
+    //this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -130,8 +132,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.reset();
     this.FormMateriaPrimaRetiro.reset();
-    this.FormMateriaPrimaRetiro.patchValue({ FechaRetiro : this.today, });
-    this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT' });
+    this.ultimoConsecutivoSolicitud();
+    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, FechaRetiro : this.today, }); }, 2000);
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
@@ -284,19 +286,23 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   //Funcion que creará la solicitud de materia prima a una OT Y lo guardará en la base de datos
   solicitudMateriaPrima(){
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    let idSolicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
     this.load = false;
     if (!this.error) {
       if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
         setTimeout(() => {
-          if (this.calcularMateriaPrimaSolicitada() <= this.cantRestante) this.crearSolicitudMatPrima();
+          if (this.calcularMateriaPrimaSolicitada() <= this.cantRestante && !this.esSolicitud) this.crearSolicitudMatPrima();
+          else if (this.calcularMateriaPrimaSolicitada() <= this.cantRestante && this.esSolicitud) this.editarSolicitud();
           else {
             this.load = true;
-            if (this.ValidarRol != 1) this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
-            else if (this.ValidarRol == 1) this.confirmarSolicitud(idOrdenTrabajo);
+            if (this.ValidarRol != 1 && !this.esSolicitud) this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
+            else if (this.ValidarRol != 1 && this.esSolicitud) this.mensajeService.mensajeAdvertencia(`Advertencia`, `La cantidad a solicitar supera el limite de kilos permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos al administrador.`);
+            else if (this.ValidarRol == 1 && !this.esSolicitud) this.confirmarSolicitud(idOrdenTrabajo);
+            else if (this.ValidarRol == 1 && this.esSolicitud) this.confirmarEditarSolicitud(idSolicitud);
           }
         }, 2000);
       } else if (this.estadoOT == 4 || this.estadoOT == 1) {
-        this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear solicitudes a la OT ${idOrdenTrabajo}, porque está cerrada!`);
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible crear/editar solicitudes a la OT ${idOrdenTrabajo}, porque está cerrada!`);
         this.load = true;
       }
     } else this.load = true;
@@ -370,6 +376,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   }
 
   confirmarSolicitud = (OT : any) => this.messageService.add({severity:'warn', key:'solicitud', summary:'Confirmar Elección', detail: `La cantidad a solicitar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea solicitar de todas formas?`, sticky: true});
+
+  confirmarEditarSolicitud = (Id : any) => this.messageService.add({severity:'warn', key:'solicitud', summary:'Confirmar Elección', detail: `La cantidad a solicitar supera el limite de Kg permitidos para la OT ${Id}, ¿Desea solicitar de todas formas?`, sticky: true});
 
   //Buscar informacion de la solicitud creada
   buscarinfoOrdenCompra(){
@@ -611,7 +619,6 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
    this.materiasPrimasSeleccionadas = [];
 
    if(solicitud != null) {
-
      this.servicioDetSolicitudMpExt.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
        if(data.length > 0) {
         if(data[0].estado != 5 && data[0].estado != 4) {
@@ -626,14 +633,14 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se pueden editar solicitudes con estado finalizado o cancelado!`);
           this.esSolicitud = false;
         }
-       }
+       } this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`)
      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El N° de la solicitud no es válido`);
    setTimeout(() => { this.load = true; }, 1500);
- }
+  }
 
- /** Llenar la tabla de materias primas seleccionadas con la info de la solicitud. */
- llenarTablaMpConSolitudMP(datos_solicitud : any) {
+  /** Llenar la tabla de materias primas seleccionadas con la info de la solicitud. */
+  llenarTablaMpConSolitudMP(datos_solicitud : any) {
    let info : any = {
      Id : 0,
      Id_Mp: datos_solicitud.matPrima_Id,
@@ -655,10 +662,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
    }
    this.materiasPrimasSeleccionada_ID.push(info.Id);
    this.materiasPrimasSeleccionadas.push(info);
- }
+  }
 
- /** Editar Solicitudes de material de producción por Id */
- editarSolicitud() {
+  /** Editar Solicitudes de material de producción por Id */
+  editarSolicitud() {
   this.load = false;
   let solicitudId : any = this.FormMateriaPrimaRetiro.value.Solicitud;
   let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
@@ -685,10 +692,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
       this.load = true;
     });
   });
- }
+  }
 
- /** Editar detalles de solicitudes de material de producción por Id */
- editarDetallesSolicitud(solicitudId : number) {
+  /** Editar detalles de solicitudes de material de producción por Id */
+  editarDetallesSolicitud(solicitudId : number) {
   let errorId : boolean = false;
   for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
     this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(solicitudId, this.materiasPrimasSeleccionadas[index].Id).subscribe(data1 => {
@@ -722,5 +729,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     });
   }
   !errorId ? setTimeout(() => {  this.load = true; this.solicitudExitosa(); }, 1000)  : this.mensajeService.mensajeError(`Error`, 'No se mostrará la informacion del PDF, por favor, verifique!');
- }
+  }
+
+  /** Función que obtendrá el ultimo Id de la solicitud */
+  ultimoConsecutivoSolicitud = () =>  this.servicioSolicitudMpExt.GetUltimaSolicitud().subscribe(data => { this.ultimoNroSolicitud = (data + 1); });
 }

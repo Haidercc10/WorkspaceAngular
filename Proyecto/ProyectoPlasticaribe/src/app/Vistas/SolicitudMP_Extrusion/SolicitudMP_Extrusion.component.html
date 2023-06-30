@@ -12,7 +12,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Solicitud de Material de Producción</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Material de Producción</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -172,7 +172,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-4">
+    <div class="mb-4" id="botones1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton pRipple id="agregarMp" label="Agregar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosMPRetirada()"></button>
         <button pButton pRipple id="limpiarMp" label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
@@ -206,9 +206,9 @@
           <tr>
             <th scope="col">ID</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Cantidad</th>
+            <th scope="col" id="cantidad2">Cantidad</th>
             <th scope="col">Und. Medida</th>
-            <th scope="col"></th>
+            <th scope="col" id="quitarMP"></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimasSeleccionadas>
@@ -245,9 +245,9 @@
     <div class="mb-3">
       <div class="row g-3">
         <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2">
             <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="!esSolicitud" (click)="validarCamposVaciosRetirada()"></button>
-            <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" (click)="editarSolicitud()"></button>
+            <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" (click)="solicitudMateriaPrima()"></button>
             <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
           </div>
         </div>
