@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsInvenatarioBodegas as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -34,8 +36,9 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   inventario : boolean = false; //Variablq que validará si se ve el modal de los rollos o no
 
   constructor(private AppComponent : AppComponent,
-                private msj : MensajesAplicacionService,
-                  private bgRollosService : Detalle_BodegaRollosService,) {
+                private shepherdService: ShepherdService,
+                  private msj : MensajesAplicacionService,
+                    private bgRollosService : Detalle_BodegaRollosService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -49,6 +52,15 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  // Funcion que va a hacer que se inicie el tutorial in-app
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -113,6 +125,23 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   // Funcion que va a aplicar un filtro de busqueda a las tablas
   aplicarfiltro = ($event : any, campo : any, valorCampo : string, tabla : any) => tabla!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  // Funcion que va a calcular la cantidad total de kg que hay
+  calcularTotalKg(data : any) : number{
+    let total : number = 0;
+    for (const item of data) {
+      total += item.Cantidad;
+    }
+    return total;
+  }
+
+  calcularTotalRollos(data : any) : number{
+    let total : number = 0;
+    for (const item of data) {
+      total += item.Rollos;
+    }
+    return total;
+  }
 
   // Funcion que va a crear un archivo de excel
   crearExcel(num : number){

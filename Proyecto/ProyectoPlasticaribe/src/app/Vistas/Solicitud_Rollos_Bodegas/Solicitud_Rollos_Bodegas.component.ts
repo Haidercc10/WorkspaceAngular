@@ -11,7 +11,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsIngresoRollosExtrusion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsSolicitudRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -52,8 +52,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.FormConsultarRollos = this.frmBuilder.group({
       OrdenTrabajo: [null, Validators.required],
       Rollo : [null],
-      FechaInicial : [null],
-      FechaFinal : [null],
       Observacion : [''],
       BodegaSolicitada : [null, Validators.required],
       BodegaSolicitante : [null, Validators.required],
@@ -142,20 +140,16 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   consultarRollos(){
     if (this.FormConsultarRollos.valid) {
       let ot : number = this.FormConsultarRollos.value.OrdenTrabajo;
-      let fechaInicial : any = moment(this.FormConsultarRollos.value.FechaInicial).format('YYYY-MM-DD');
-      let fechaFinal : any = moment(this.FormConsultarRollos.value.FechaFinal).format('YYYY-MM-DD');
       let rollo : number = this.FormConsultarRollos.value.Rollo;
       let bodega : string = this.FormConsultarRollos.value.BodegaSolicitada;
       let ruta : string = rollo != null ? `?rollo=${rollo}` : '';
-      fechaInicial == 'Invalid date' ? fechaInicial = this.today : fechaInicial;
-      fechaFinal == 'Invalid date' ? fechaFinal = fechaInicial : fechaFinal;
 
       this.cargando = true;
       this.rollosConsultados = [];
       this.rollosIngresar = [];
       this.consolidadoProductos = [];
 
-      this.dtBgRollosService.GetRollosDisponibles(bodega, fechaInicial, fechaFinal, ot, ruta).subscribe(data => {
+      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           this.llenarRollosIngresar(data[i]);
         }

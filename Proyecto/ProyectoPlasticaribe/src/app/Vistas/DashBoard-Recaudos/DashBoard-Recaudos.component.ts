@@ -4,7 +4,7 @@ import moment from 'moment';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
