@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetSolicitudMP_ExtrusionService } from 'src/app/Servicios/DetSolicitudMP_Extrusion/DetSolicitudMP_Extrusion.service';
@@ -11,6 +12,7 @@ import { DetallesAsignacionTintasService } from 'src/app/Servicios/DetallesAsgTi
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extrusion/SolicitudMP_Extrusion.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
@@ -51,7 +53,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   soloTintas : boolean = false;
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  solicitud : boolean = false;
+  esSolicitud : boolean = false;
+  arrayMatPrimas : any =  [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -66,7 +69,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                   private messageService: MessageService,
                                     private shepherdService: ShepherdService,
                                       private mensajeService : MensajesAplicacionService,
-                                          private servicioDetlSolitudMaterial : DetSolicitudMP_ExtrusionService) {
+                                      private servicioSolitudMaterial : SolicitudMP_ExtrusionService,
+                                        private servicioDetlSolitudMaterial : DetSolicitudMP_ExtrusionService,
+                                          private servicioDetAsigMatPrima : DetallesAsignacionService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
@@ -131,6 +136,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.soloTintas = false;
     this.categoriasSeleccionadas = [];
     this.infoOrdenTrabajo = [];
+    this.esSolicitud = false;
+    this.arrayMatPrimas = [];
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -223,6 +230,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 Id_Tinta: 2001,
                 Nombre : this.FormMateriaPrimaRetirada.value.MpNombreRetirada,
                 Cantidad : this.FormMateriaPrimaRetirada.value.MpCantidadRetirada,
+                CantAprobada : 0,
+                CanOculta : 0,
                 Und_Medida : this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada,
                 Proceso : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
                 Categoria : this.FormMateriaPrimaRetirada.value.Categoria,
@@ -360,8 +369,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
   asignacionExitosa() {
-    if (!this.error && !this.soloTintas) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
-    else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
+    if (!this.error && !this.soloTintas && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
+    else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
+    else if(this.esSolicitud) this.validarEstadoSolicitud();
     this.LimpiarCampos();
   }
 
@@ -440,17 +450,24 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   consultarSolicitudMaterial(){
     this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
+    this.arrayMatPrimas = [];
     let solicitud : number = this.FormMateriaPrimaRetiro.value.Solicitud;
+    this.esSolicitud = false;
     if(solicitud != null) {
-      this.load = false;
       this.servicioDetlSolitudMaterial.GetSolicitudMp_Extrusion(solicitud).subscribe(data => {
         if(data.length > 0) {
-          this.FormMateriaPrimaRetiro.patchValue({ OTRetiro : data[0].ot, Maquina : data[0].maquina, ObservacionRetiro : data[0].observacion, })
-          setTimeout(() => { this.infoOT(); }, 1000);
-          for (let i = 0; i < data.length; i++) {
-            this.llenarTablaMpConSolitudMP(data[i])
-          }
-        }
+          if(data[0].estado != 4 && data[0].estado != 5) {
+            this.load = false;
+            this.FormMateriaPrimaRetiro.patchValue({ OTRetiro : data[0].ot, Maquina : data[0].maquina, ObservacionRetiro : data[0].observacion, })
+            setTimeout(() => {
+              this.infoOT();
+              this.esSolicitud = true;
+            }, 1000);
+            for (let i = 0; i < data.length; i++) {
+              this.llenarTablaMpConSolitudMP(data[i])
+            }
+          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No es posible cargar solicitudes finalizadas o canceladas!`);
+        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`);
       }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El valor ingresado en el campo solicitud no es válido`);
     setTimeout(() => { this.load = true; }, 1500);
@@ -458,13 +475,18 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   /** Llenar la tabla de materias primas seleccionadas con la info de la solicitud. */
   llenarTablaMpConSolitudMP(datos_solicitud : any) {
+    let arrayIds : any = [];
+
     let info : any = {
+      IdSolicitud : datos_solicitud.id,
       Id : 0,
       Id_Mp: datos_solicitud.matPrima_Id,
       Id_Tinta: datos_solicitud.tinta_Id,
       Nombre : '',
       Stock : 0,
       Cantidad : datos_solicitud.cantidad,
+      CantAprobada : 0,
+      CantOculta : datos_solicitud.cantidad,
       Und_Medida : datos_solicitud.medida,
       Proceso : '',
     }
@@ -479,6 +501,25 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       info.Stock = datos_solicitud.stock_Tinta;
       info.Proceso = 'IMP';
     }
+    arrayIds.push(info.Id);
+
+    this.servicioDetAsigMatPrima.GetAsignacionesConSolicitudes(info.IdSolicitud).subscribe(data2 => {
+      for (let i = 0; i < data2.length; i++) {
+        let infoAsignaciones : any = {
+          Ident : 0,
+          Id_Mp: data2[i].matPri_Id,
+          Id_Tinta: data2[i].tinta_Id,
+          CantAsignaciones : data2[i].cantMP
+        }
+        if (infoAsignaciones.Id_Mp != 84) infoAsignaciones.Ident = infoAsignaciones.Id_Mp;
+        else if (infoAsignaciones.Id_Tinta != 2001) infoAsignaciones.Ident = infoAsignaciones.Id_Tinta;
+
+        if(arrayIds.includes(infoAsignaciones.Ident)) {
+          info.CantAprobada = infoAsignaciones.CantAsignaciones;
+        }
+      }
+    });
+    this.arrayMatPrimas.push(info.Id);
     this.materiasPrimasSeleccionada_ID.push(info.Id);
     this.materiasPrimasSeleccionadas.push(info);
   }
@@ -491,6 +532,54 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       else stockMenor = false;
       break;
     }
-    stockMenor ? this.mensajeService.mensajeAdvertencia(`Advertencia`, `Existen materiales con cantidades solicitadas mayores a su stock, por favor, verfique!`) : this.validarCamposVaciosRetirada();
+    stockMenor ? this.mensajeService.mensajeAdvertencia(`Advertencia`, `Existen materiales con cantidades solicitadas mayores a su stock, por favor, verifique!`) : this.validarCamposVaciosRetirada();
+  }
+
+  /** Función que validará el nuevo estado de la solicitud */
+  validarEstadoSolicitud(){
+    let cantItemsFinalizados : number = 0;
+    let cantItemsParciales : number = 0;
+    let cantItems : number = this.arrayMatPrimas.length;
+    let estadoSolicitud : number = 0;
+
+    if(this.esSolicitud) {
+      for (let index = 0; index < this.arrayMatPrimas.length; index++) {
+        if(this.arrayMatPrimas.includes(this.materiasPrimasSeleccionada_ID[index])) {
+          if((this.materiasPrimasSeleccionadas[index].Cantidad + this.materiasPrimasSeleccionadas[index].CantAprobada) >= this.materiasPrimasSeleccionadas[index].CantOculta) {
+            cantItemsFinalizados += 1;
+          } else if((this.materiasPrimasSeleccionadas[index].Cantidad + this.materiasPrimasSeleccionadas[index].CantAprobada) < this.materiasPrimasSeleccionadas[index].CantOculta) {
+            cantItemsParciales += 1;
+          }
+        }
+      }
+      if(cantItemsFinalizados == cantItems) estadoSolicitud = 5;
+      else if(cantItemsFinalizados < cantItems && cantItemsParciales >= 0) estadoSolicitud = 12;
+      else estadoSolicitud = 11;
+      this.actualizarEstadoSolicitud(estadoSolicitud);
+    } else {
+
+    }
+  }
+
+  /** Actualizar estado de las solicitudes de material de producción. */
+  actualizarEstadoSolicitud(estado : number){
+    let solicitud_Id : number = this.FormMateriaPrimaRetiro.value.Solicitud;
+
+    this.servicioSolitudMaterial.GetId(solicitud_Id).subscribe(data => {
+      let modelo : modelSolicitudMP_Extrusion = {
+        SolMpExt_Id: solicitud_Id,
+        SolMpExt_OT: data.solMpExt_OT,
+        SolMpExt_Maquina: data.solMpExt_Maquina,
+        SolMpExt_Fecha: data.solMpExt_Fecha,
+        SolMpExt_Hora: data.solMpExt_Hora,
+        SolMpExt_Observacion: data.solMpExt_Observacion,
+        Estado_Id: estado,
+        Proceso_Id: data.proceso_Id,
+        Usua_Id: data.usua_Id
+      }
+      this.servicioSolitudMaterial.Put(modelo.SolMpExt_Id, modelo).subscribe(updateData => {
+        this.mensajeService.mensajeConfirmacion(`Confirmación`, `Asignación creada exitosamente!`);
+      }, error => { this.mensajeService.mensajeError(`Error`, `No fue posible crear la asignación de materia prima!`); });
+    })
   }
 }

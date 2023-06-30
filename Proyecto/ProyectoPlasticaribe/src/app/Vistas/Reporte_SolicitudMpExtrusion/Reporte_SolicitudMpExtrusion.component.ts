@@ -503,7 +503,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       this.msj.mensajeAdvertencia(`Advertencia`, `No es posible crear asignaciones con base a solicitudes de materia prima con estado ${this.estadoSolicitud}!`);
     } else {
       this.modalAsignacion = true;
-      this.AsignacionMatPrima.solicitud = true;
+      this.AsignacionMatPrima.esSolicitud = true;
       this.AsignacionMatPrima.FormMateriaPrimaRetiro.patchValue({Solicitud : this.solicitudSeleccionada});
       this.AsignacionMatPrima.consultarSolicitudMaterial();
     }
@@ -536,6 +536,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.clave = '';
   }
 
+  /** Llenar la tabla dependiendo el estado seleccionado */
   llenarTablaConEstados(datos : any){
     let info : any = {
       id : datos.solMpExt_Id,

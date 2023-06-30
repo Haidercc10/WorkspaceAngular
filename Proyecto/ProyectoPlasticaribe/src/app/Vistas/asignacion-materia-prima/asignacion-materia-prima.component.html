@@ -1,7 +1,7 @@
 <!-- Inicio Contenedor total -->
-<app-menuLateral *ngIf="!solicitud"></app-menuLateral>
+<app-menuLateral *ngIf="!esSolicitud"></app-menuLateral>
 <br>
-<app-VistasFavoritas *ngIf="!solicitud"></app-VistasFavoritas>
+<app-VistasFavoritas *ngIf="!esSolicitud"></app-VistasFavoritas>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
@@ -211,6 +211,7 @@
             <th scope="col">ID</th>
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
+            <th *ngIf="esSolicitud" scope="col">Cantidad Aprobada</th>
             <th scope="col">Stock</th>
             <th scope="col">Und. Medida</th>
             <th scope="col">Proceso</th>
@@ -231,6 +232,7 @@
                 </ng-template>
               </p-cellEditor>
             </td>
+            <td *ngIf="esSolicitud">{{materiasPrimasSeleccionadas.CantAprobada | number : '1.2-2'}}</td>
             <td [ngClass]="{ 'colorRojo' : materiasPrimasSeleccionadas.Cantidad > materiasPrimasSeleccionadas.Stock }"><b>{{materiasPrimasSeleccionadas.Stock}}</b></td>
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
             <td><b>{{materiasPrimasSeleccionadas.Proceso}}</b></td>
@@ -254,7 +256,7 @@
       <div class="row g-3">
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple id="asignar" label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarStockMateriales()"></button>
+            <button pButton pRipple id="asignar" label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarStockMateriales()"></button> <!--(click)="validarStockMateriales()"-->
             <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
           </div>
         </div>
@@ -276,7 +278,7 @@
           <button type="button" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-database" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
         </div>
       </div>
     </div>
