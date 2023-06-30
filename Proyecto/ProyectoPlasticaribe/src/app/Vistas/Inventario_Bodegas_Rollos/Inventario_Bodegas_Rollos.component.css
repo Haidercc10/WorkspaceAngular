@@ -15,7 +15,6 @@ p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p
   width: 100%;
 }
 
-
 p-calendar ::ng-deep span button {
   background-color: var(--rojo);
   border: 0;
@@ -61,4 +60,50 @@ p-dialog ::ng-deep .p-dialog-header span {
   border-radius: 10px;
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
+}
+
+#botonDetalles ::ng-deep .p-button {
+  width: 30px;
+  height: 30px;
+  text-decoration: none;
+}
+
+.bg-Extrusion {
+  color: white;
+  background-color: palevioletred;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-ProductoIntermedio {
+  color: white;
+  background-color: LightSalmon;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Impresion {
+  color: white;
+  background-color: DarkCyan;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Rotograbado {
+  color: white;
+  background-color: DarkSeaGreen;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Sellado {
+  color: white;
+  background-color: CornflowerBlue;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-Despacho {
+  color: white;
+  background-color: MediumSlateBlue;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.negrita{
+  font-weight: bold;
 }

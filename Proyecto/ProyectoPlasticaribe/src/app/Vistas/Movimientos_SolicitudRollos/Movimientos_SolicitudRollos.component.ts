@@ -4,10 +4,8 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
 import { modelDtBodegasRollos } from 'src/app/Modelo/modelDtBodegasRollos';
 import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
-import { Bodegas_RollosService } from 'src/app/Servicios/Bodegas_Rollos/Bodegas_Rollos.service';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -15,7 +13,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
-import { stepsMovSolicitudesMP as defaultSteps, defaultStepOptions } from 'src/app/data';
+import { defaultStepOptions, stepsMovSolicitudesMP as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -229,29 +227,31 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   finalizarSolicitud(estado : number){
     let estadoNombre: string = estado == 5 ? 'aceptado' : 'cancelado';
     this.solicitudService.Get_Id(this.solicitudSeleccionada).subscribe(data => {
-      let info : modelSolicitudRollos = {
-        SolRollo_Id: this.solicitudSeleccionada,
-        SolRollo_FechaRespuesta: moment().format('YYYY-MM-DD'),
-        SolRollo_HoraRespuesta: moment().format('H:mm:ss'),
-        Usua_Respuesta : this.storage_Id,
-        Usua_Id: data.usua_Id,
-        SolRollo_FechaSolicitud: data.solRollo_FechaSolicitud,
-        SolRollo_HoraSolicitud: data.solRollo_HoraSolicitud,
-        Estado_Id: estado,
-        TpSol_Id: data.tpSol_Id,
-        SolRollo_Observacion: data.solRollo_Observacion,
-      }
-      this.solicitudService.Put(this.solicitudSeleccionada, info).subscribe(() => {
-        if (estado == 5) this.cambiarBodegaActualRollo();
-        else {
-          this.limpiarCampos();
-          this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+      if (data.estado_Id == 11){
+        let info : modelSolicitudRollos = {
+          SolRollo_Id: this.solicitudSeleccionada,
+          SolRollo_FechaRespuesta: moment().format('YYYY-MM-DD'),
+          SolRollo_HoraRespuesta: moment().format('H:mm:ss'),
+          Usua_Respuesta : this.storage_Id,
+          Usua_Id: data.usua_Id,
+          SolRollo_FechaSolicitud: data.solRollo_FechaSolicitud,
+          SolRollo_HoraSolicitud: data.solRollo_HoraSolicitud,
+          Estado_Id: estado,
+          TpSol_Id: data.tpSol_Id,
+          SolRollo_Observacion: data.solRollo_Observacion,
         }
-      }, err => {
-        this.msj.mensajeError(`No se ha podido cambiado a ${estadoNombre} solicitud!`, `¡${err.error}!`);
-        this.cargando = false;
-      })
-    });
+        this.solicitudService.Put(this.solicitudSeleccionada, info).subscribe(() => {
+          if (estado == 5) this.cambiarBodegaActualRollo();
+          else {
+            this.limpiarCampos();
+            this.msj.mensajeConfirmacion(`¡Se ha cambiado el estado de la solicitud satisfactoriamente!`, ``);
+          }
+        }, err => {
+          this.msj.mensajeError(`No se ha podido cambiado a ${estadoNombre} solicitud!`, `¡${err.error}!`);
+          this.cargando = false;
+        });
+      } else this.msj.mensajeAdvertencia(`¡No puede cambiar el estado!`, `¡No se puede cambiar el estado de solicitudes que ya han sido 'Aceptadas' o 'Finalizadas'!`);
+    }, err => this.msj.mensajeAdvertencia(`¡No se encontró información sobre el rollo!`, `¡Es posible que el rollo ya no esté en la bodega solicitada!`));
   }
 
   // Funcion que va a cambiar la bodega actual del rollo y a actualizar el proceso por el que ha pasado
@@ -269,13 +269,13 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
             DtBgRollo_Cantidad : data[j].dtBgRollo_Cantidad,
             UndMed_Id : data[j].undMed_Id,
             BgRollo_BodegaActual : this.detallesSolicitud[i].BodegaSiguiente,
-            DtBgRollo_Extrusion : (this.detallesSolicitud[i].BodegaSiguiente == 'EXT' || data[j].dtBgRollo_Extrusion) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_ProdIntermedio : (this.detallesSolicitud[i].BodegaSiguiente == 'BGPI' || data[j].dtBgRollo_ProdIntermedio) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_Impresion : (this.detallesSolicitud[i].BodegaSiguiente == 'IMP' || data[j].dtBgRollo_Impresion) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_Rotograbado : (this.detallesSolicitud[i].BodegaSiguiente == 'ROT' || data[j].dtBgRollo_Rotograbado) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_Sellado : (this.detallesSolicitud[i].BodegaSiguiente == 'SELLA' || data[j].dtBgRollo_Sellado) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_Corte : (this.detallesSolicitud[i].BodegaSiguiente == 'CORTE' || data[j].dtBgRollo_Corte) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
-            DtBgRollo_Despacho : (this.detallesSolicitud[i].BodegaSiguiente == 'DESP' || data[j].dtBgRollo_Despacho) && this.detallesSolicitud[i].TipoSolicitud == 1 ? true : false,
+            DtBgRollo_Extrusion : this.detallesSolicitud[i].BodegaSiguiente == 'EXT' || (data[j].dtBgRollo_Extrusion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_ProdIntermedio : this.detallesSolicitud[i].BodegaSiguiente == 'BGPI' || (data[j].dtBgRollo_ProdIntermedio && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Impresion : this.detallesSolicitud[i].BodegaSiguiente == 'IMP' || (data[j].dtBgRollo_Impresion && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Rotograbado : this.detallesSolicitud[i].BodegaSiguiente == 'ROT' || (data[j].dtBgRollo_Rotograbado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Sellado : this.detallesSolicitud[i].BodegaSiguiente == 'SELLA' || (data[j].dtBgRollo_Sellado && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Corte : this.detallesSolicitud[i].BodegaSiguiente == 'CORTE' || (data[j].dtBgRollo_Corte && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
+            DtBgRollo_Despacho : this.detallesSolicitud[i].BodegaSiguiente == 'DESP' || (data[j].dtBgRollo_Despacho && this.detallesSolicitud[i].TipoSolicitud == 1) ? true : false,
           }
           this.dtBgRollosService.Put(data[j].codigo, info).subscribe(() => {
             numDatos += 1;
@@ -290,9 +290,10 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   }
 
   // Funcion que va a consultar la información con la que se llenará el pdf
-  buscarInformacioPDF(){
+  async buscarInformacioPDF(){
     this.informacionPdf = [];
     this.dtSolicitudService.GetInformacionSolicitud(this.solicitudSeleccionada).subscribe(data => {
+      this.cargando = true;
       for (let i = 0; i < data.length; i++) {
         let info : any = {
           "Orden Trabajo" : data[i].orden_Trabajo,
@@ -317,7 +318,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
           info: { title: `${data[i].solicitud}` },
           pageSize: { width: 630, height: 760 },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 130, 25, 35],
+          pageMargins : [25, 150, 25, 35],
           header: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -368,7 +369,21 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
                   ]
                 },
                 layout: { defaultBorder: false, }
-              },,
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*', '*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Bodega Solicitada:  ${data[i].bodega_Solicitada}`, bold: true, fontSize: 10, alignment: 'center' },
+                      { border: [false, false, false, false], text: `Bodega Solicitante:  ${data[i].bodega_Solicitante}`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
               {
                 margin: [20, 10, 20, 0],
                 table: {
