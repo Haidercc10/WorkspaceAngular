@@ -115,14 +115,17 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'DESP' });
         }
       } else {
-        this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
-        this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
+        this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
+        this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
       }
     });
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm = () => this.FormConsultarRollos.reset();
+  limpiarForm() {
+    this.FormConsultarRollos.reset();
+    this.devolucionRollos = false;
+  }
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
@@ -132,6 +135,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     this.consolidadoProductos = [];
     this.informacionPdf = [];
     this.cargando = false;
+    this.devolucionRollos = false;
   }
 
   // Funcion que va a consultar los rollos mediante los parametros pasados por el usuario
@@ -275,7 +279,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         Usua_Respuesta : this.storage_Id,
         Estado_Id: 11,
         TpSol_Id: this.devolucionRollos ? 2 : 1,
-        SolRollo_Observacion: this.FormConsultarRollos.value.Observacion,
+        SolRollo_Observacion: this.FormConsultarRollos.value.Observacion == null ? '' : this.FormConsultarRollos.value.Observacion.toUpperCase(),
       }
       this.solicitudRollosService.Post(info).subscribe(data => this.ingresarDetallesRollos(data.solRollo_Id), err => {
         this.mensajeService.mensajeError(`¡Ha ocurrido un error al solicitar los rollos!`, `¡${err.error}!`);
@@ -395,7 +399,21 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                   ]
                 },
                 layout: { defaultBorder: false, }
-              },,
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*', '*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Bodega Solicitada:  ${data[i].bodega_Solicitada}`, bold: true, fontSize: 10, alignment: 'center' },
+                      { border: [false, false, false, false], text: `Bodega Solicitante:  ${data[i].bodega_Solicitante}`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
               {
                 margin: [20, 10, 20, 0],
                 table: {

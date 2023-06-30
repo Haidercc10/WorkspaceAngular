@@ -92,6 +92,14 @@
             </div>
           </ng-container>
           <ng-container *ngIf="[1,7].includes(ValidarRol)">
+              <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Inventario-Bodegas-Rollos" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-th-large font-size-15" style="margin-right: 2%;"></i>
+                Inventario de Bodegas
+              </a>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="[1,7].includes(ValidarRol)">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Solicitud-Rollos-Bodegas" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-file-edit font-size-15" style="margin-right: 2%;"></i>

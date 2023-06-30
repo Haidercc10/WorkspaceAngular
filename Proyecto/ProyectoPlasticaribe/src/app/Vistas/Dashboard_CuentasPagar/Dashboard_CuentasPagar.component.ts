@@ -87,6 +87,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
         else if (data[i].idprove == '900458314') this.carteraInversuez.push(info);
         numDatos += 1;
         if (numDatos == data.length) {
+          this.costoPorPagar(1);
           this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
               if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
@@ -119,6 +120,19 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       dias = moment().diff(moment(info[i].fecha_Vencimiento), 'days');
     }
     return dias < 0 ? dias - 1 : dias;
+  }
+
+  // Funcion que va a sumar el costo total a pagar
+  costoPorPagar(data : any){
+    let info : any;
+    if (data == 1) info = this.carteraAgrupadaProveedores;
+    else if (data == 2) info = this.carteraInvergoal;
+    else if (data == 3) info = this.carteraInversuez;
+    let total : number = 0;
+    for (const item of info) {
+      total += item.Cartera;
+    }
+    this.totalCartera = total;
   }
 
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_carteraAgrupada!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
