@@ -21,9 +21,8 @@
 </div>
 
 <p-card class="font-size-14">
-
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
   <p-toolbar styleClass="mb-5 gap-3">
@@ -34,12 +33,13 @@
     </div>
   </p-toolbar>
 
-  <p-tabView [scrollable]="true">
+  <p-tabView [scrollable]="true" id="seleccionInventarios">
     <!-- INVENTARIO TOTAL -->
     <p-tabPanel
       header="Inventario Total"
       leftIcon="pi pi-th-large"
-      tooltip="Información del Inventario de Todas las Bodega">
+      tooltip="Información del Inventario de Todas las Bodega"
+      id="tablasInventario">
       <div class="mb-3" *ngIf="!cargando">
         <div class="row g-3 font-size-14" id="table">
           <p-table
@@ -56,19 +56,19 @@
             dataKey="Orden"
             [scrollable]="true"
             scrollHeight="50rem">
-            <ng-template pTemplate="header" >
-              <tr class="font-size-16">
-                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(1)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtTotal)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'BodegaActual', 'contains', dtTotal)"></th>
+            <ng-template pTemplate="header">
+              <tr class="font-size-16" id="filtros">
+                <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar2" (click)="crearExcel(1)"></button></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtTotal)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'BodegaActual', 'contains', dtTotal)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
-              <tr class="font-size-16">
+              <tr class="font-size-16" id="titulos">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
                 <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
                 <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
@@ -80,7 +80,7 @@
                 <th pFrozenColumn alignFrozen="right" [frozen]="true">Ver</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" id="cuerpo">
               <tr>
                 <td pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
                 <td class="negrita">{{data.Orden}}</td>
@@ -96,6 +96,14 @@
                                       'bg-Sellado': data.BodegaActual == 'Sellado',
                                       'bg-Despacho': data.BodegaActual == 'Despacho'}">{{data.BodegaActual | uppercase}}</span></td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" id="totales">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioTotal) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="3">{{calcularTotalRollos(inventarioTotal) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -127,12 +135,12 @@
           <ng-template pTemplate="header" >
             <tr class="font-size-16">
               <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(2)"></button></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtExtrusion)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtExtrusion)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtExtrusion)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtExtrusion)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtExtrusion)"></th>
-              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtExtrusion)"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtExtrusion)"></th>
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
             <tr class="font-size-16">
@@ -156,6 +164,14 @@
               <td>{{data.Presentacion}}</td>
               <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
               <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="4">Totales: </td>
+              <td>{{calcularTotalKg(inventarioExtrusion) | number : '1.2-2'}}</td>
+              <td>Kg</td>
+              <td colspan="2">{{calcularTotalRollos(inventarioExtrusion) | number : '1.2-2'}}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -187,12 +203,12 @@
             <ng-template pTemplate="header" >
               <tr class="font-size-16">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(3)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtProductoIntemedio)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtProductoIntemedio)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtProductoIntemedio)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr class="font-size-16">
@@ -216,6 +232,14 @@
                 <td>{{data.Presentacion}}</td>
                 <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioProductoIntermedio) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="2">{{calcularTotalRollos(inventarioProductoIntermedio) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -247,12 +271,12 @@
             <ng-template pTemplate="header" >
               <tr class="font-size-16">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(4)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtImpresion)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtImpresion)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtImpresion)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr class="font-size-16">
@@ -276,6 +300,14 @@
                 <td>{{data.Presentacion}}</td>
                 <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioImpresion) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="2">{{calcularTotalRollos(inventarioImpresion) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -307,12 +339,12 @@
             <ng-template pTemplate="header" >
               <tr class="font-size-16">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(5)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtRotograbajo)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtRotograbajo)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtRotograbajo)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtRotograbajo)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtRotograbajo)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtRotograbajo)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtRotograbajo)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr class="font-size-16">
@@ -336,6 +368,14 @@
                 <td>{{data.Presentacion}}</td>
                 <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioRotograbado) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="2">{{calcularTotalRollos(inventarioRotograbado) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -367,12 +407,12 @@
             <ng-template pTemplate="header" >
               <tr class="font-size-16">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(6)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtSellado)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtSellado)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtSellado)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtSellado)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtSellado)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtSellado)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtSellado)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr class="font-size-16">
@@ -396,6 +436,14 @@
                 <td>{{data.Presentacion}}</td>
                 <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioSellado) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="2">{{calcularTotalRollos(inventarioSellado) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -427,12 +475,12 @@
             <ng-template pTemplate="header" >
               <tr class="font-size-16">
                 <th pFrozenColumn alignFrozen="left" [frozen]="true"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="crearExcel(7)"></button></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtDespacho)"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Orden', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains', dtDespacho)"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Rollos', 'contains', dtDespacho)"></th>
                 <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr class="font-size-16">
@@ -456,6 +504,14 @@
                 <td>{{data.Presentacion}}</td>
                 <td class="negrita">{{data.Rollos | number : '1.2-2'}}</td>
                 <td style="text-align: center;" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button id="botonDetalles" icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="consultarDetallesInventario(data.Orden, data.Bodega)"></p-button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4">Totales: </td>
+                <td>{{calcularTotalKg(inventarioDespacho) | number : '1.2-2'}}</td>
+                <td>Kg</td>
+                <td colspan="2">{{calcularTotalRollos(inventarioDespacho) | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
           </p-table>

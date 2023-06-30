@@ -68,31 +68,15 @@
           </span>
         </div>
 
-        <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
-          <span class="p-float-label">
-            <p-calendar formControlName="FechaInicial" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
-          </span>
-        </div>
-
-        <!-- Fecha Final -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl">
-          <span class="p-float-label">
-            <p-calendar formControlName="FechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
-          </span>
-        </div>
-
         <!-- Devolución -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="iva">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="devolucion">
           <div class="field-checkbox" style="padding: 5%;">
             <p-checkbox formControlName="Devolucion" [(ngModel)]="devolucionRollos" label="Devolución" [binary]="true" [required]="true"></p-checkbox>
           </div>
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-6 col-xxl-12" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>

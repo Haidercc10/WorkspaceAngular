@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { i } from '@fullcalendar/core/internal-common';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({

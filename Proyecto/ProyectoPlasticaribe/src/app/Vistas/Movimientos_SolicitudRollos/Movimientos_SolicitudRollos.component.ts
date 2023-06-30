@@ -13,7 +13,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsMovSolicitudesMP as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsMovimientosSolicitudesRollos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -290,7 +290,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   }
 
   // Funcion que va a consultar la información con la que se llenará el pdf
-  async buscarInformacioPDF(){
+  buscarInformacioPDF(){
     this.informacionPdf = [];
     this.dtSolicitudService.GetInformacionSolicitud(this.solicitudSeleccionada).subscribe(data => {
       this.cargando = true;

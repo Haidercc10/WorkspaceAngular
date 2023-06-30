@@ -9,7 +9,7 @@ import { Bodegas_RollosService } from 'src/app/Servicios/Bodegas_Rollos/Bodegas_
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsIngresoRollosExtrusion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Ingreso_Rollos_Extrusion',
