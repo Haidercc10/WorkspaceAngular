@@ -105,7 +105,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     this.ultimoConsecutivoSolicitud();
-    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, }); }, 2000);
+    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, }); }, 3000);
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
   }
 
@@ -133,7 +133,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.FormMateriaPrimaRetirada.reset();
     this.FormMateriaPrimaRetiro.reset();
     this.ultimoConsecutivoSolicitud();
-    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, FechaRetiro : this.today, }); }, 2000);
+    setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, FechaRetiro : this.today, }); }, 3000);
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
     this.cantRestante = 0;
     this.kgOT = 0;
@@ -370,9 +370,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   onReject = (dato : any) => this.messageService.clear(dato);
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
-  mostrarEleccion(item : any){
+  mostrarEleccion(item : any, accion : string){
     this.mpSeleccionada = item;
-    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true});
+    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea ${accion} la materia prima de la solicitud?`, sticky: true});
   }
 
   confirmarSolicitud = (OT : any) => this.messageService.add({severity:'warn', key:'solicitud', summary:'Confirmar Elección', detail: `La cantidad a solicitar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea solicitar de todas formas?`, sticky: true});
@@ -633,7 +633,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se pueden editar solicitudes con estado finalizado o cancelado!`);
           this.esSolicitud = false;
         }
-       } this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`)
+       } else {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `La solicitud N° ${solicitud} no existe!`);
+        this.infoOrdenTrabajo = [];
+       }
      }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la solicitud de material consultada!`));
    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El N° de la solicitud no es válido`);
    setTimeout(() => { this.load = true; }, 1500);
@@ -670,7 +673,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   let solicitudId : any = this.FormMateriaPrimaRetiro.value.Solicitud;
   let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
   let ot : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
-  let observacion : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
+  let observacion : any = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
   this.servicioSolicitudMpExt.GetId(solicitudId).subscribe(data => {
     const solicitud : modelSolicitudMP_Extrusion = {
       SolMpExt_Id: solicitudId,
@@ -733,4 +736,20 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   /** Función que obtendrá el ultimo Id de la solicitud */
   ultimoConsecutivoSolicitud = () =>  this.servicioSolicitudMpExt.GetUltimaSolicitud().subscribe(data => { this.ultimoNroSolicitud = (data + 1); });
+
+  /** Función para eliminar la materia prima de la solicitud de material de la base de datos. */
+  eliminarMatPrimaSolicitud(mp : any) {
+    mp = this.mpSeleccionada;
+    this.servicioDetSolicitudMpExt.GetSolicitudesConMatPrimas(this.FormMateriaPrimaRetiro.value.Solicitud, mp.Id).subscribe(data => {
+      if (data.length > 0) {
+          this.onReject('eleccion');
+          for (let i = 0; i < data.length; i++) {
+            this.servicioDetSolicitudMpExt.Delete(data[i]).subscribe(() => {
+              this.quitarMateriaPrima(mp);
+              this.mensajeService.mensajeAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima de la solicitud!`);
+            }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo eliminar la materia prima de la solicitud!`); });
+          }
+      } else this.quitarMateriaPrima(mp);
+    });
+  }
 }

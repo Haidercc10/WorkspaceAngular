@@ -146,7 +146,7 @@
           <span class="p-float-label">
             <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
             <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}} - Stock: {{item.stock}}</option>
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option> <!--- Stock: {{item.stock | number: '1.2-2'}}-->
             </datalist>
             <label for="MP">Materia Prima</label>
           </span>
@@ -226,7 +226,8 @@
               </p-cellEditor>
             </td>
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
-            <td id="quitarMp"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas)"></i></td>
+            <td id="quitarMp" *ngIf="!esSolicitud"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'quitar')"></i></td>
+            <td id="eliminarMp" *ngIf="esSolicitud"><i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'eliminar')"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -266,10 +267,11 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="!esSolicitud" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="esSolicitud" pButton (click)="eliminarMatPrimaSolicitud(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-database" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
         </div>
       </div>
     </div>

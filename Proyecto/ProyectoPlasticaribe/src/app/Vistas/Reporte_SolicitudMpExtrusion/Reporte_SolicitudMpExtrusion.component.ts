@@ -521,7 +521,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
           for (let index = 0; index < data.length; index++) {
             if(data[index].estado_Id == estado && data[index].solMpExt_Id != 1) this.llenarTablaConEstados(data[index]);
           }
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron solicitudes con el estado seleccionado!`);
+        }
       });
     }, 500);
     setTimeout(() => { this.cargando = false; }, 1000);

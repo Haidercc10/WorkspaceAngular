@@ -35,22 +35,22 @@
     <div class="row g-3" id="fila">
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}" pTooltip="Hay {{cantCanceladas}} solicitudes canceladas de las últimas 100 creadas"></p-chip>
+          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}" pTooltip="Hay {{cantCanceladas}} solicitud(es) cancelada(s) de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}" pTooltip="Hay {{cantPendientes}} solicitudes pendientes de las últimas 100 creadas"></p-chip>
+          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}" pTooltip="Hay {{cantPendientes}} solicitud(es) pendiente(s) de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h" label="Parciales {{cantParciales}}" pTooltip="Hay {{cantParciales}} solicitudes parciales de las últimas 100 creadas"></p-chip>
+          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h" label="Parciales {{cantParciales}}" pTooltip="Hay {{cantParciales}} solicitud(es) parcial(es) de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}" pTooltip="Hay {{cantFinalizadas}} solicitudes finalizadas de las últimas 100 creadas"></p-chip>
+          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}" pTooltip="Hay {{cantFinalizadas}} solicitud(es) finalizada(s) de las últimas 100 creadas"></p-chip>
         </div>
       </div>
     </div>
@@ -109,7 +109,7 @@
   <!-- Botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
-      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
+      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" pTooltip="Si no llenas los filtros se consultará por la fecha de hoy." (click)="consultarFiltros()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>
