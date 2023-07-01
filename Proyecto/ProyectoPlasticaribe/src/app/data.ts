@@ -9878,3 +9878,504 @@ export const stepsDashboardCuentasPagar : Step.StepOptions[] = [
     text: `<p>¡En esa tabla aparecerán las facturas del proveedor!</p>`
   },
 ];
+
+export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#titulo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'titulo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Solicitudes de material</h5>',
+    text: `<p>En este módulo podrás realizar <b>las solicitudes de material de producción</b> al encargado del inventario de materias primas. <br><br>
+    Haz clic en siguiente y <b>mira el paso a paso que creamos para ti!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#solicitud',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'solicitud',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Solicitud</h5>',
+    text: `<p>En este campo inicialmente visualizarás el <b>último consecutivo de la solicitud.</b><br><br>
+    Además podrás visualizar la solicitud que desees, <b>digitando el N° de la solicitud y presionando la tecla enter</b><br><br>
+    Si la solicitud existe, <b>se cargarán las materias prima asociadas</b> en la tabla que se encuentra en la parte inferior, donde podrás <b>agregar,
+    editar y eliminar las materias primas</b>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'ordenTrabajo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Orden de trabajo</h5>',
+    text: `<p>En este campo <b>debes digitar la orden de trabajo para la cual deseas solicitar el material</b> y luego presionar la tecla enter.<br><br>
+    Si la OT existe se cargará los siguientes datos:<br>
+    <b>- Cliente</b><br>
+    <b>- Referencia</b><br>
+    <b>- Tope de kilos de material a entregar.</b><br>
+    <b>- Cantidad restante por entregar</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#maquina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'maquina',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Maquina</h5>',
+    text: `<p>En este campo <b>debes digitar el n° de la maquina</b> en la cual se utilizará el material solicitado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#proceso',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'proceso',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Proceso</h5>',
+    text: `<p>En este campo <b>debes seleccionar el nombre del proceso</b> en el cual será utilizado el material solicitado.<br><br>
+    Recuerda que inicialmente se carga el proceso de <b>Extrusion</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'observacion',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Observación</h5>',
+    text: `<p>En este campo <b>puedes realizar un comentario u observación general de tu solicitud</b>.<br><br>
+    Dicha observación <b>podrá ser visualizada por el operario encargado de la entrega de materia prima</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Detalles de la OT</h5>',
+    text: `<p>Si existe la OT que consultaste inicialmente se cargarán los siguientes datos:<br>
+    <b>- Cliente</b><br>
+    <b>- Referencia</b><br>
+    <b>- Tope de kilos de material a entregar.</b><br>
+    <b>- Cantidad restante por entregar</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#materiaPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'materiaPrima',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Selección de material</h5>',
+    text: `<p>Aquí puedes seleccionar los materiales que deseas solicitar.
+    Existen 2 formas de seleccionar el material:<br><br>
+    1. Si conoces el Id del material, <b>digitalo en el campo Id y presiona enter</b>. Esta acción cargará el nombre.<br>
+    2. También <b>puedes escribir el nombre en el campo Materia Prima,</b> allí se cargará una lista desplegable con materiales, <b>selecciona el que deseas solicitar.</b><br><br>
+    Luego de cargar el nombre del material <b>digita la cantidad que deseas solicitar</b> y selecciona la unidad de medida,
+    que inicialmente es <b>Kg (Kilogramos)</b>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Agregar Material</h5>',
+    text: `<p><b>Haciendo clic sobre el botón "agregar materia prima" </b>se cargará en la tabla el material que seleccionaste inicialmente y
+    que deseas solicitar.<br><br>
+    Si tienes algún error de digitación al momento de seleccionar un material, solo haz clic el <b>botón en limpiar campos mp</b>
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Material a solicitar</h5>',
+    text: `<p>En esta tabla encontrarás las materias primas que seleccionaste inicialmente y que deseas solicitar<br><br>
+    Si tienes algún error de digitación en los materiales cargados en la tabla, <b>tienes la opción de quitarlo haciendo clic el botón</b> <i class="pi pi-trash"></i>
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'cantidad2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Editar cantidad</h5>',
+    text: `<p><b>Este campo es editable</b>, si te equivocas, solo haz clic sobre este campo de la tabla
+    y <b>digita la cantidad que en realidad deseas solicitar y listo!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarMP',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'quitarMP',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Quitar material</h5>',
+    text: `<p>Si definitivamente te equivocaste en uno de los materiales seleccionados, <b>quitalo de la tabla haciendo clic sobre el icono <i class="pi pi-trash"></i></b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botones2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Crear Solicitud</h5>',
+    text: `<p>Luego de seleccionar los materiales que deseas solicitar, <b>haz clic sobre el botón "crear solicitud" para guardar el registro</b><br><br>
+    Luego de esto, <b>se generará un formato PDF con las especificaciones de la solicitud</b>.<br><br>
+    Si te arrepientes de realizar la solicitud y ya tenías información cargada en la tabla y en el formulario de la parte superior, <b>haz clic sobre el botón limpiar todo!</b>
+    </p>`
+  },
+]
+
+export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#movimientos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'movimientos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
+    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de material de producción</b>, podrás apreciar la cantidad de
+    solicitudes <b>aceptadas, pendientes, parciales y finalizadas.</b> <br><br>
+    Tendrás filtros de búsqueda por:<br>
+    <b>- Id de solicitud</b><br>
+    <b>- Fechas de la solicitud</b><br>
+    <b>- Estado de la solicitud</b><br><br>
+    Además podrás apreciar en que estado se encuentra las solicitudes y los materiales de la mismas.<br><br>
+    También podrás <b>cargar los datos de la solicitud en un modal de asignaciones, y cancelar o finalizar la solicitud</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#rojo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rojo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
+    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de material que se encuentran canceladas actualmente de las ultimas 100 creadas.</b><br><br>
+    <b>Nota:</b> A las solicitudes con estado cancelado no se les puede crear una asignación.<br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#naranja',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'naranja',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
+    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de material que se encuentran pendientes actualmente de las ultimas 100 creadas.</b><br><br>
+    Las solicitudes con estado pendiente son a las que <b>no se les ha creado ó asociado una asignación.</b><br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#amarillo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'amarillo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
+    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de material que se encuentran parciales actualmente de las ultimas 100 creadas.</b><br><br>
+    Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por el encargado de materia prima, ya tienen asignaciones asociadas, pero no se entregó toda la materia prima de la solicitud.</b><br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#verde',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'verde',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
+    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente de las ultimas 100 creadas</b><br><br>
+    Las solicitudes con estado finalizado son las que <b> ya tienen asignaciones creadas, en las cuales se les entregó toda la materia prima solicitada.</b><br><br>
+    Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'formulario1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-filter"></i> Filtros</h5>',
+    text: `<p>Aquí encontraremos <b>los filtros de búsqueda donde podrás realizar tus consultas.</b><br><br>
+    Además podrás crear las combinaciones que desees llenando los campos: <br>
+    <b>- Id de solicitud</b><br>
+    <b>- Fecha Inicial de la solicitud</b><br>
+    <b>- Fecha Final de la solicitud</b><br>
+    <b>- Estado de la solicitud</b><br><br>
+    Y luego solo <b>pulsa el botón consultar para ver la información solicitada!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
+    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de material en la tabla</b> de registros consultados.
+    <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
+    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de material que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
+    <b>- Id</b><br>
+    <b>- OT</b><br>
+    <b>- Fecha Creación</b><br>
+    <b>- Estado General</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#detalle',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'detalle',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-eye"></i> Ver detalles de la solicitud</h5>',
+    text: `<p>Si existen registros en la tabla, <b>pulsa sobre el botón <i class="pi pi-eye"></i></b> para ver detalles de la solicitud del registro que seleccionaste. <br><br>
+    podrás apreciar <b>número de solicitud, operario solicitante, materias primas, cantidad pedida, cantidad asignada unidad de medida y el estado de las mismas</b> en la tabla detalles de la solicitud.</p>`
+  },
+  {
+    attachTo: {
+      element: '#matprimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'matprimas',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
+    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de material que selecciones de la tabla registros consultados.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#usuario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'usuario',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user"></i> Usuario solicitante</h5>',
+    text: `<p>Luego de hacer click en <b>el botón <i class="pi pi-eye"></i> ver detalles</b> en la tabla registros consultados, <b>aquí visualizarás el nombre del usuario que realizó el pedido de materia prima.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Materias Primas</h5>',
+    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, unidad de medida y el estado de las mismas</b><br><br></p>`
+  },
+  {
+    attachTo: {
+      element: '#aprobada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'aprobada',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Cantidad aprobada</h5>',
+    text: `<p>Este campo se refiere a <b>la cantidad de cada item de materia prima que se ha asignado en base a la solicitud</b> que esté visualizando en el momento.<br><br></p>`
+  },
+  {
+    attachTo: {
+      element: '#crear-oc',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'crear-oc',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
+    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de asignaciones de materia prima</b> y se cargará el <b>campo N°. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
+    Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
+    <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
+    <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
+  },
+  {
+    attachTo: {
+      element: '#finalizar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'finalizar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
+    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#cancelar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'cancelar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
+    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b><br><br>
+    </p>`
+  },
+]

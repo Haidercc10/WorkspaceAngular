@@ -14,7 +14,7 @@ import { AsignacionMateriaPrimaComponent } from '../asignacion-materia-prima/asi
 import { Table } from 'primeng/table';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-//import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsMovSolicitudesMPExtrusion as defaultSteps } from 'src/app/data';
 
 
 @Component({
@@ -556,10 +556,10 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
    // Funcion que va a hacer que se inicie el tutorial in-app
    tutorial(){
-   // this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
-   // this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
   }
 }

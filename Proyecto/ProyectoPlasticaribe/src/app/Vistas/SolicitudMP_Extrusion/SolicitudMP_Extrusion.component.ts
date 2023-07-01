@@ -18,7 +18,7 @@ import { SolicitudMP_ExtrusionService } from 'src/app/Servicios/SolicitudMP_Extr
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
-//import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsSolicitudMaterialProduccion as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -111,10 +111,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // Funcion que va a hacer que se inicie el tutorial in-app
   tutorial(){
-    //this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
-    //this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
   }
 

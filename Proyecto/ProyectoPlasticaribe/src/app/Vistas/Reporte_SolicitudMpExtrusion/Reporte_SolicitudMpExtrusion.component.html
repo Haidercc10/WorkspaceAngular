@@ -23,7 +23,7 @@
 <p-card>
   <!--Ver tutorial-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+    <p-button icon="pi pi-info" (onClick)="tutorial()" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
   </div>
 
   <!--Solicitudes-->
@@ -35,22 +35,22 @@
     <div class="row g-3" id="fila">
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}"></p-chip>
+          <p-chip id="rojo" class="cursor" (click)="consultarPorEstado(4)" icon="pi pi-ban" label="Canceladas {{cantCanceladas}}" pTooltip="Hay {{cantCanceladas}} solicitudes canceladas de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}"></p-chip>
+          <p-chip id="naranja" class="cursor" (click)="consultarPorEstado(11)" icon="pi pi-hourglass" label="Pendientes {{cantPendientes}}" pTooltip="Hay {{cantPendientes}} solicitudes pendientes de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h" label="Parciales {{cantParciales}}"></p-chip>
+          <p-chip id="amarillo" class="cursor" (click)="consultarPorEstado(12)" icon="pi pi-sliders-h" label="Parciales {{cantParciales}}" pTooltip="Hay {{cantParciales}} solicitudes parciales de las últimas 100 creadas"></p-chip>
         </div>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3 justify-content-center">
         <div class="mb-3">
-          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}"></p-chip>
+          <p-chip id="verde" class="cursor" (click)="consultarPorEstado(5)" icon="pi pi-check-square" label="Finalizadas {{cantFinalizadas}}" pTooltip="Hay {{cantFinalizadas}} solicitudes finalizadas de las últimas 100 creadas"></p-chip>
         </div>
       </div>
     </div>
