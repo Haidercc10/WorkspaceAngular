@@ -492,111 +492,75 @@ export class Reporte_MaquilasComponent implements OnInit {
     let nombre : string = this.storage_Nombre;
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
+        let titulo : string = `Orden de Maquila N° ${datos_orden[i].orden}`;
         const pdfDefinicion : any = {
-          info: { title: `Orden de Maquila N° ${id}` },
+          info: { title: titulo},
           pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 130, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
             return [
               {
+                margin: [20, 8, 20, 0],
                 columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].fecha.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].usuario, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  }
                 ]
-              }
-            ]
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+            ];
           },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
           content : [
             {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
-                {
-                  text: `Orden de Maquila N° ${datos_orden[i].orden}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 30
-                }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].empresa}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].fecha.replace('T00:00:00', ``)} ${datos_orden[i].hora}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].empresa_Ciudad}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].empresa_Direccion}`
-                    },
-                    {},
-                    {}
-                  ]
-                ]
-              },
-              layout: {
-                defaultBorder: false,
-              },
-              fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `Usuario: ${datos_orden[i].usuario}\n`,
-              alignment: 'left',
-              style: 'header',
-            },
-            '\n \n',
-            {
-              text: `\n Información detallada del Tercero \n \n`,
+              text: `Información detallada del Tercero \n \n`,
               alignment: 'center',
               style: 'header'
             },
             {
               style: 'tablaCliente',
               table: {
-                widths: [171,171, 171],
+                widths: [210,171, 171],
                 style: 'header',
                 body: [
                   [
@@ -612,7 +576,7 @@ export class Reporte_MaquilasComponent implements OnInit {
                 ]
               },
               layout: 'lightHorizontalLines',
-              fontSize: 11,
+              fontSize: 9,
             },
             {
               text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
@@ -625,7 +589,7 @@ export class Reporte_MaquilasComponent implements OnInit {
             {
               style: 'tablaTotales',
               table: {
-                widths: [197, '*', 50, '*', '*', 98],
+                widths: [217, '*', 50, '*', 60, 98],
                 style: 'header',
                 body: [
                   [
@@ -670,7 +634,10 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); this.cargando = false; });
+    }, () => {
+      this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`);
+      this.cargando = false;
+    });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -692,7 +659,7 @@ export class Reporte_MaquilasComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [50, 197, 50, 50, 50, 98],
+        widths: [50, 217, 50, 50, 60, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,

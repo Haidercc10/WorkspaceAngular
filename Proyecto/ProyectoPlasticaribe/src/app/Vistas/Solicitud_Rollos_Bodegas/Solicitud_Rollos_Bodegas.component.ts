@@ -86,33 +86,33 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   // Funcion que va a consultar las bodegas de los que se van a solicitar rollos
   obternerBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
-      if (this.ValidarRol != 1){
-        if (this.ValidarRol == 64) { //PRODUCTO INTERMEDIO
+      switch (this.ValidarRol){
+        case 64: //PRODUCTO INTERMEDIO
           this.bodegasSolicitadas = data.filter(item => ['EXT'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['BGPI'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'BGPI' });
-        }
-        if (this.ValidarRol == 62) { //IMPRESION
+          break;
+        case 62: //IMPRESION
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'ROT'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['IMP'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'IMP' });
-        }
-        if (this.ValidarRol == 63) { //ROTOGRABADO
+          break;
+        case 63: //ROTOGRABADO
           this.bodegasSolicitadas = data.filter(item => ['BGPI'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['ROT'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'ROT' });
-        }
-        if (this.ValidarRol == 8) { //SELLADO
+          break;
+        case 8: //SELLADO
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'IMP'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['SELLA'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'SELLA' });
-        }
-        if (this.ValidarRol == 10) { //DESPACHO
+          break;
+        case 10: //DESPACHO
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['DESP'].includes(item.proceso_Id));
           this.FormConsultarRollos.patchValue({ BodegaSolicitante : 'DESP' });
-        }
-      } else {
+        break;
+      default:
         this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
         this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT', 'DESP'].includes(item.proceso_Id));
       }
@@ -216,7 +216,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       if (!producto.includes(this.rollosIngresar[i].Id_Producto)) {
         let cantidad : number = 0, cantRollo : number = 0;
         for (let j = 0; j < this.rollosIngresar.length; j++) {
-          if (this.rollosIngresar[i].Id_Producto == this.rollosIngresar[j].Id_Producto && !this.rollosIngresar[j].exits && !this.rollosIngresar[j].exits) {
+          if (this.rollosIngresar[i].Id_Producto == this.rollosIngresar[j].Id_Producto) {
             cantidad += this.rollosIngresar[j].Cantidad;
             cantRollo += 1;
           }
@@ -227,21 +227,19 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
             Ot: this.rollosIngresar[i].Ot,
             Id : this.rollosIngresar[i].Id_Producto,
             Nombre : this.rollosIngresar[i].Producto,
-            Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-            Cantidad2 : cantidad,
-            Rollos: this.formatonumeros(cantRollo),
-            Rollos2: cantRollo,
+            Cantidad : cantidad,
+            Rollos: this.rollosIngresar.filter(x => x.Id_Producto == this.rollosIngresar[i].Id_Producto).length,
             Presentacion : this.rollosIngresar[i].Presentacion,
           }
           this.consolidadoProductos.push(info);
         }
       }
     }
-    setTimeout(() => this.cargando = false, 50);
     setTimeout(() => {
       this.rollosIngresar.sort((a,b) => Number(a.Rollo) - Number(b.Rollo) );
       this.consolidadoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-    }, 500);
+      this.cargando = false;
+    }, 50);
   }
 
   // Funcion que calculará el total de rollos que se están signanado
@@ -338,8 +336,9 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     let nombre : string = this.storage_Nombre;
     this.dtSolicitudRollosService.GetInformacionSolicitud(solicitud).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
+      let titulo : string = `Solicitud de Rollos ${data[i].solicitud}`;
         const pdfDefinicion : any = {
-          info: { title: `${data[i].solicitud}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
           pageMargins : [25, 150, 25, 35],
@@ -356,7 +355,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                       body: [
                         [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
                         [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
-                        [{text: `Solicitud de Rollos ${data[i].solicitud}`, bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
                       ]
                     },
                     layout: 'noBorders',

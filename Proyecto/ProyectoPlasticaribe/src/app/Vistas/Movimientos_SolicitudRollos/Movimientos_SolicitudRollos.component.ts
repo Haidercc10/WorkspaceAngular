@@ -96,35 +96,36 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   // Funcion que va a consultar las bodegas de los que se van a solicitar rollos
   obternerBodegas(){
     this.procesosService.srvObtenerLista().subscribe(data => {
-      if (this.ValidarRol != 1){
-        if (this.ValidarRol == 64) { //PRODUCTO INTERMEDIO
+      switch (this.ValidarRol) {
+        case 64: //PRODUCTO INTERMEDIO
           this.bodegasSolicitadas = data.filter(item => ['EXT'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['BGPI'].includes(item.proceso_Id));
           this.FormFiltros.patchValue({ BodegaSolicitante : 'BGPI' });
-        }
-        if (this.ValidarRol == 62) { //IMPRESION
+        break;
+        case 62: //IMPRESION
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'ROT'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['IMP'].includes(item.proceso_Id));
           this.FormFiltros.patchValue({ BodegaSolicitante : 'IMP' });
-        }
-        if (this.ValidarRol == 63) { //ROTOGRABADO
+        break;
+        case 63: //ROTOGRABADO
           this.bodegasSolicitadas = data.filter(item => ['BGPI'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['ROT'].includes(item.proceso_Id));
           this.FormFiltros.patchValue({ BodegaSolicitante : 'ROT' });
-        }
-        if (this.ValidarRol == 8) { //SELLADO
+        break;
+        case 8: //SELLADO
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'IMP'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['SELLA'].includes(item.proceso_Id));
           this.FormFiltros.patchValue({ BodegaSolicitante : 'SELLA' });
-        }
-        if (this.ValidarRol == 10) { //DESPACHO
+        break;
+        case 10: //DESPACHO
           this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP'].includes(item.proceso_Id));
           this.bodegasSolicitantes = data.filter(item => ['DESP'].includes(item.proceso_Id));
           this.FormFiltros.patchValue({ BodegaSolicitante : 'DESP' });
-        }
-      } else {
-        this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
-        this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
+        break;
+        default:
+          this.bodegasSolicitadas = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
+          this.bodegasSolicitantes = data.filter(item => ['BGPI', 'EXT', 'SELLA', 'IMP', 'ROT'].includes(item.proceso_Id));
+        break;
       }
     });
   }
@@ -158,7 +159,6 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
     let estado : string = this.FormFiltros.value.Estado;
     let tipoSolicitud : number = this.FormFiltros.value.TipoSolicitud;
     let ruta : string = '';
-    let numDatos : number = 0;
     this.solicitudes = [];
     this.detallesSolicitud = [];
     this.usuarioSolicitante = '';
@@ -169,27 +169,31 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
     if (bodegaSolicitada != null) ruta.length > 0 ? ruta += `&bgSolicitada=${bodegaSolicitada}` : ruta += `bgSolicitada=${bodegaSolicitada}`;
     if (bodegaSolicitante != null) ruta.length > 0 ? ruta += `&bgSolicitante=${bodegaSolicitante}` : ruta += `bgSolicitante=${bodegaSolicitante}`;
     if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
-    if (ruta.length > 0) ruta = `?${ruta}`
+    if (ruta.length > 0) ruta = `?${ruta}`;
 
-    this.dtSolicitudService.GetSolicitudesRealizadas(tipoSolicitud, fechaInicio, fechaFin, ruta).subscribe(data =>{
-      for (let i = 0; i < data.length; i++) {
-        let info : any = {
-          Solicitud: data[i].solicitud,
-          Fecha: `${data[i].fecha_Solicitud.replace('T00:00:00', '')} ${data[i].hora_Solicitud}`,
-          Estado: data[i].estado,
-          BgSolicitada: data[i].bodega_Solicitada,
-          BgSolicitante: data[i].bodega_Solicitante,
-          Tipo: data[i].tipo_Solicitud,
-        }
-        this.solicitudes.push(info);
-        this.solicitudes.sort((a, b) => Number(a.Solicitud) - Number(b.Solicitud));
-        numDatos += 1;
-        numDatos == data.length ? this.cargando = false : this.cargando = true;
-      }
-    }, err => {
+    this.dtSolicitudService.GetSolicitudesRealizadas(tipoSolicitud, fechaInicio, fechaFin, ruta).subscribe(data => this.processData(data), err => {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡${err.error}!`);
       this.cargando = false;
     });
+  }
+
+  // Funcion que va a procesar los datos que se reciben de la consulta de solicitudes
+  private processData(data: any[]): void {
+    let numDatos : number = 0;
+    for (let i = 0; i < data.length; i++) {
+      let info : any = {
+        Solicitud: data[i].solicitud,
+        Fecha: `${data[i].fecha_Solicitud.replace('T00:00:00', '')} ${data[i].hora_Solicitud}`,
+        Estado: data[i].estado,
+        BgSolicitada: data[i].bodega_Solicitada,
+        BgSolicitante: data[i].bodega_Solicitante,
+        Tipo: data[i].tipo_Solicitud,
+      }
+      this.solicitudes.push(info);
+      this.solicitudes.sort((a, b) => Number(a.Solicitud) - Number(b.Solicitud));
+      numDatos += 1;
+      numDatos == data.length ? this.cargando = false : this.cargando = true;
+    }
   }
 
   // Funcion que va a llenar la tabla de los detalles de los rollos de una solicitud
@@ -309,8 +313,8 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
     setTimeout(() => this.crearPDF(this.solicitudSeleccionada), 2500);
   }
 
-  // funcion que va a crear un PDF
-  crearPDF(solicitud : number){
+  /* funcion que va a crear un PDF. @param solicitud : number : numero de la solicitud. @return : void : no retorna nada*/
+  crearPDF(solicitud : number) : void{
     let nombre : string = this.storage_Nombre;
     this.dtSolicitudService.GetInformacionSolicitud(solicitud).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
