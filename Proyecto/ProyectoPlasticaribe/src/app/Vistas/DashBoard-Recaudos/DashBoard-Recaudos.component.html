@@ -78,9 +78,9 @@
               <th pSortableColumn="num_Factura"><p-sortIcon field="num_Factura"></p-sortIcon> N° Factura</th>
               <th pSortableColumn="nombre_CLiente"><p-sortIcon field="nombre_CLiente"></p-sortIcon> Cliente</th>
               <th pSortableColumn="id_Fecha"><p-sortIcon field="id_Fecha"></p-sortIcon> Fecha</th>
-              <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vencimiento</th>
-              <th pSortableColumn="nombre_Vendedor"><p-sortIcon field="nombre_Vendedor"></p-sortIcon> Vendedor</th>
+              <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vence</th>
               <th pSortableColumn="saldo_Cartera"><p-sortIcon field="saldo_Cartera"></p-sortIcon> Cartera</th>
+              <th pSortableColumn="nombre_Vendedor"><p-sortIcon field="nombre_Vendedor"></p-sortIcon> Vendedor</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
@@ -90,8 +90,8 @@
               <td>{{item.nombre_CLiente}}</td>
               <td>{{item.id_Fecha}}</td>
               <td>{{item.fecha_Vencimiento}}</td>
-              <td>{{item.nombre_Vendedor}}</td>
               <td>{{item.saldo_Cartera | number : '1.2-2'}}</td>
+              <td>{{item.nombre_Vendedor}}</td>
             </tr>
           </ng-template>
         </p-table>
