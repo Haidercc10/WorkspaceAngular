@@ -25,6 +25,7 @@ export class PaginaPrincipalComponent implements OnInit {
   pedidos: boolean = false;
   facturacionVendedores : boolean = false;
   recaudos : boolean = false;
+  cuentasPagar : boolean = false;
 
   constructor(private AppComponent : AppComponent,) { }
 
@@ -54,5 +55,6 @@ export class PaginaPrincipalComponent implements OnInit {
     if (index == 3) this.pedidos = true;
     if (index == 4) this.facturacionVendedores = true;
     if (index == 5) this.recaudos = true;
+    if (index == 6) this.cuentasPagar = true;
   }
 }

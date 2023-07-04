@@ -1,0 +1,299 @@
+<!-- Inicio Contenedor total -->
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" id="titulo">Solicitud de Material de Producción</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <div class="mb-3">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Consultar OT</h4>
+  </div>
+
+  <br>
+
+  <!-- Formulario Orden de Trabajo -->
+  <form [formGroup]="FormMateriaPrimaRetiro" id="formulario">
+    <div class="mb-3">
+      <div class="row g-4">
+
+         <!-- Solicitud -->
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Solicitud" id="solicitud" type="text" pInputText (keyup.enter)="consultarSolicitudMaterial()" required/>
+            <label for="solicitud">N° Solicitud</label>
+          </span>
+        </div>
+
+        <!-- Orden de Trabajo -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OTRetiro" id="ordenTrabajo" type="text" pInputText (keyup.enter)="infoOT()" required/>
+            <label for="ordenTrabajo">OT</label>
+          </span>
+        </div>
+
+        <!-- Maquina -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-wrench"></i>
+            <input formControlName="Maquina" id="maquina" type="number" pInputText required/>
+            <label for="maquina">Maquina</label>
+          </span>
+        </div>
+
+        <!-- Proceso -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2" id="proceso">
+          <span class="p-float-label">
+            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
+            <label for="Proceso">Proceso</label>
+          </span>
+        </div>
+
+        <!-- Observacion -->
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-4 col-xxl-4">
+          <span class="p-float-label">
+            <textarea formControlName="ObservacionRetiro" id="observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </form>
+
+  <!-- Tabla de OT -->
+  <div class="row g-3" id="tabla1" *ngIf="load">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [rows]="20"
+      [rowHover]="true"
+      [value]="infoOrdenTrabajo">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">N°</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Item</th>
+            <th scope="col">Kg Total</th>
+            <th scope="col">Kg Restante</th>
+        </ng-template>
+        <ng-template pTemplate="body" let-ot>
+          <tr>
+            <td>{{ot.ot}}</td>
+            <td>{{ot.cliente}}</td>
+            <td>{{ot.item}}</td>
+            <td>{{ot.kg | number}}</td>
+            <td [ngClass]="{'colorRojo' : ot.kgRestante <= 0 }">{{ot.kgRestante | number}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  <br>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!--Inicio titulo -->
+  <div class="mb-3">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Seleccionar Materia Prima</h4>
+  </div>
+  <br>
+
+  <!-- Formulario de seleccion de materia prima  -->
+  <form [formGroup]="FormMateriaPrimaRetirada">
+    <div class="mb-3" id="materiaPrima">
+      <div class="row g-4">
+
+        <!-- Id Materia Prima -->
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2" id="idMp">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="MpIdRetirada" id="IdMP" type="number" pInputText min="0" (keyup.enter)="cambiarNombreMateriaPrima(1)" required/>
+            <label for="IdMP">Id</label>
+          </span>
+        </div>
+
+        <!-- Nombre Materia Prima -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6" id="nombreMp">
+          <span class="p-float-label">
+            <input formControlName="MpNombreRetirada" id="MP" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
+            <datalist id="materiaprima">
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option> <!--- Stock: {{item.stock | number: '1.2-2'}}-->
+            </datalist>
+            <label for="MP">Materia Prima</label>
+          </span>
+        </div>
+
+        <!-- Cantidad pedida -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="cantidad">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal"  [showClear]="true" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Cantidad">Cantidad</label>
+          </span>
+        </div>
+
+        <!-- Unidad de Medida -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2" id="und">
+          <span class="p-float-label">
+            <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
+            <label for="Und">Und</label>
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-4" id="botones1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton pRipple id="agregarMp" label="Agregar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosMPRetirada()"></button>
+        <button pButton pRipple id="limpiarMp" label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
+      </div>
+    </div>
+  </form>
+
+  <!--Linea -->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+  <!--Fin Linea -->
+
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Tabla de materias primas solicitadas</h4>
+  </div>
+
+  <!-- TABLA DE RETIRO -->
+  <div class="row g-3" id="tabla2" *ngIf="load">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [rows]="20"
+      [rowHover]="true"
+      [value]="materiasPrimasSeleccionadas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col" id="cantidad2">Cantidad</th>
+            <th scope="col">Und. Medida</th>
+            <th scope="col" id="quitarMP"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiasPrimasSeleccionadas>
+          <tr>
+            <td>{{materiasPrimasSeleccionadas.Id}}</td>
+            <td>{{materiasPrimasSeleccionadas.Nombre}}</td>
+            <td [pEditableColumn]="materiasPrimasSeleccionadas.Cantidad" pEditableColumnField="price" class="cursor">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="number" [(ngModel)]="materiasPrimasSeleccionadas.Cantidad"/>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ materiasPrimasSeleccionadas.Cantidad | number : '1.2-2' }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
+            <td id="quitarMp" *ngIf="!esSolicitud"><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'quitar')"></i></td>
+            <td id="eliminarMp" *ngIf="esSolicitud"><i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimasSeleccionadas, 'eliminar')"></i></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="2">Total</td>
+            <td>{{calcularMateriaPrimaSolicitada()}}</td>
+            <td colspan="3"></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <br>
+  <div *ngIf="load">
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones2">
+            <button pButton pRipple id="asignar" label="Crear Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="!esSolicitud" (click)="validarCamposVaciosRetirada()"></button>
+            <button pButton pRipple id="editar" label="Editar Solicitud" type="button" icon="pi pi-check" class="p-button-danger" *ngIf="esSolicitud" (click)="solicitudMateriaPrima()"></button>
+            <button pButton pRipple id="limpiarTodo" label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-card>
+
+<p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-mp>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" *ngIf="!esSolicitud" pButton (click)="quitarMateriaPrima(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="esSolicitud" pButton (click)="eliminarMatPrimaSolicitud(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<p-toast position="center" key="solicitud" (onClose)="onReject('solicitud')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="crearSolicitudMatPrima()" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

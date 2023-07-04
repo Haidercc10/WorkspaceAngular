@@ -1,5 +1,5 @@
 .fondo {
-  background-color: antiquewhite;
+  background-image: linear-gradient(62deg, #e3e7fe 0%, #fceade 100%);
 }
 
 p-card, p-card ::ng-deep .p-card {

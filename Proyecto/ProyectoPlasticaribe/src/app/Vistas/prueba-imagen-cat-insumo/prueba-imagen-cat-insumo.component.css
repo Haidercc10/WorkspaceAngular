@@ -1,51 +1,48 @@
-full-calendar {
-  max-width: 1100px;
-  margin: 40px auto;
-  cursor: pointer;
+.fondo {
+  background-color: #ffe1cf;
+  background-image: linear-gradient(62deg, #ffe1cf 0%, #fdf2e4 100%);
+  height: 100%;
 }
 
-::ng-deep .fc-day:hover, .fc-day-mon:hover, .fc-day-past:hover, .fc-daygrid-day:hover {
-  background-color: #93C5FD29;
-  color: black;
+.fondo2 {
+  background-color: #040d19;
+  height: 100%;
 }
 
-p-dialog ::ng-deep div .p-dialog-title {
+.header h3, .header .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
   color: var(--rojo);
-  align-items: center;
 }
 
-.p-input-icon-left {
+.header2 h3, .header2 .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojoClaro);
+}
+
+.header h3:hover, .header .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.header2 h3:hover, .header2 .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.fila-1, .fila-2, .fila-3, .fila-4 {
+  padding: 0 2%;
+}
+
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
   width: 100%;
 }
 
-p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
-  display: flex;
+p-chart ::ng-deep div ::ng-deep canvas {
+  display: inline-block;
   width: 100%;
-}
-
-p-calendar ::ng-deep span button {
-  background-color: var(--rojo);
-  border: 0;
-  transition: all 1s;
-}
-
-p-calendar ::ng-deep span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
-}
-
-p-calendar ::ng-deep .p-datepicker-header button {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep .p-datepicker-header button:hover {
-  background: #fff0;
-}
-
-p-calendar ::ng-deep span button span {
-  display: block;
-}
-
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
-  display: flex;
-  width: 100%;
+  height: 100%;
 }

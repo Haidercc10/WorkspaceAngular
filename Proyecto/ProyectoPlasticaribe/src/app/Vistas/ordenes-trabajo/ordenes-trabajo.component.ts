@@ -1,11 +1,9 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
-import { Console } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { Dropdown } from 'primeng/dropdown';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
@@ -1391,36 +1389,27 @@ export class OrdenesTrabajoComponent implements OnInit {
     let usuario : string = this.AppComponent.storage_Nombre;
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
+        let titulo : string = `${datos_ot[i].numero_Orden}`;
         const pdfDefinicion : any = {
-          info: { title: `${datos_ot[i].numero_Orden}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
-            return [
-              '\n',
-              {
-                columns: [
-                  { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content : [
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 190, 25, 35],
+          header:[
             {
+              margin: [25, 5],
               columns: [
-                { image : logoParaPdf, width : 220, height : 50, margin: [ 0, -15, 0, 0 ] },
+                { image : logoParaPdf, width : 220, height : 50, margin: [10,5] },
                 {
-                  width: 390,
                   text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
                   style: 'titulo',
                   alignment: 'center',
+                  margin: [0, 20, 0, 0],
                 },
               ]
             },
-            '\n',
             {
+              margin: [25, 5],
               style: 'tablaEmpresa',
               table: {
                 widths: [60, '*', 60, '*'],
@@ -1445,6 +1434,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             },
             '\n',
             {
+              margin: [25, 5],
               table : {
                 widths : ['*', '*', '*', '*', '*'],
                 style : '',
@@ -1468,7 +1458,20 @@ export class OrdenesTrabajoComponent implements OnInit {
               layout: { defaultBorder: false, },
               fontSize: 9,
             },
-            '\n \n',
+          ],
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              '\n',
+              {
+                columns: [
+                  { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          content : [
             {
               table : {
                 widths : ['*'],
@@ -1670,7 +1673,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             '\n',
             {
               table : {
-                widths : [539],
+                widths : ['*'],
                 style : '',
                 body : [
                   [ { border : [true, true, true, false], text : `Observación: ` } ],
@@ -1679,72 +1682,9 @@ export class OrdenesTrabajoComponent implements OnInit {
               },
               layout: { defaultBorder: false, },
               fontSize: 9,
+              pageBreak : 'after'
             },
-            '\n',
-            '\n',
-            '\n',
             // Hoja 2
-            {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50, margin: [ 0, -15, 0, 0 ] },
-                {
-                  width: 390,
-                  text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
-                  style: 'titulo',
-                  alignment: 'center',
-                },
-              ]
-            },
-            '\n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [60, '*', 60, '*'],
-                style: 'header',
-                body: [
-                  [
-                    { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                    { border: [false, true, false, false], text: `${datos_ot[i].id_Cliente}` },
-                    { border: [true, true, false, false], text: `Item`, style: 'titulo', },
-                    { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                  ],
-                  [
-                    { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                    { border: [false, false, true, true], text: `${datos_ot[i].cliente}` },
-                    { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
-                    { border: [false, false, true, true], text: `${datos_ot[i].producto}` },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n',
-            {
-              table : {
-                widths : ['*', '*', '*', '*', '*'],
-                style : '',
-                body : [
-                  [
-                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`,  style: 'titulo', alignment: 'center', },
-                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo',  alignment: 'center', },
-                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                    { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center',  },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].cantidad_Pedida)}`, alignment: 'center', },
-                    { border: [false, false, false, false], text: `${this.formatonumeros(datos_ot[i].peso_Neto)}`, alignment: 'center', },
-                    { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                    { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                  ]
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n',
             // Procesos
             {
               table : {
@@ -1993,7 +1933,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             '\n\n',
             {
               table : {
-                widths : [539],
+                widths : ['*'],
                 body : [
                   [ { border : [true, true, true, false], text : `Observación: ` } ],
                   [ { border : [true, false, true, true], text : `${datos_ot[i].observacion}` } ]

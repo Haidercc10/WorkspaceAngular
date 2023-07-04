@@ -122,5 +122,6 @@ export class DetallesAsignacionService {
   srvGuardar(data : modelDetallesAsignacion): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data);
   }
-
+  /** Obtener asignacion basadas en solicitudes*/
+  GetAsignacionesConSolicitudes = (idSolicitud : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/getAsignacionesConSolicitudes/${idSolicitud}`);
 }

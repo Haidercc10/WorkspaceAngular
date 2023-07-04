@@ -1,0 +1,277 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingresar Rollos</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
+  </div>
+  <br>
+
+  <form [formGroup]="FormConsultarRollos">
+    <!-- Primera Fila -->
+    <div class="mb-3" id="formulario">
+      <div class="row g-4">
+
+        <!-- Consultar Orden de Trabajo -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OrdenTrabajo" id="ordenTrabajo" type="text" pInputText required/>
+            <label for="ordenTrabajo">OT</label>
+          </span>
+        </div>
+
+        <!-- Numero de Rollo -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Rollo" id="Rollo" type="text" pInputText required/>
+            <label for="Rollo">N° Rollo</label>
+          </span>
+        </div>
+
+        <!-- Fecha Inicial -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaInicial" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+            <label for="FechaFinal">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- Observacion -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-4 col-xxl-4">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!--Botones-->
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
+          <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <!-- Inicio titulo tabla producto -->
+  <div class="mb-4">
+    <div class="row g-3">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 col-xxl-8">
+        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+      </div>
+      <!-- <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <p-chip label="Rollos Ingresados: {{rollosIngresados}}" id="rollosIngresados" icon="pi pi-check"></p-chip>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <p-chip label="Rollos No Ingresados: {{rollosSinIngresar}}" id="rollosNoIngresados" icon="pi pi-ban"></p-chip>
+      </div> -->
+    </div>
+  </div>
+
+  <!--Inicio tabla Rollos creados en OT -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3 font-size-14" id="tabla1">
+      <p-table
+          #dt
+          [value]="rollosConsultados"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [rowHover]="true"
+          dataKey="Rollo"
+          [(selection)]="rollosIngresar"
+          [scrollable]="true"
+          scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">OT</th>
+            <th scope="col">Rollo</th>
+            <th scope="col">Item</th>
+            <th scope="col">Refencia</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentacion</th>
+            <th scope="col">Proceso</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox id="elegirRollos" (click)="seleccionarTodosRollos()"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rollo>
+          <tr>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Ot}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Rollo}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Id_Producto}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Producto}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Cantidad | number}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Presentacion}}</td>
+            <td [ngClass]="{'existente':rollo.exits}">{{rollo.Estatus}}</td>
+            <td [ngClass]="{'deshabilitado':rollo.exits}">
+              <p-tableCheckbox [value]="rollo" id="elegirRollo" (click)="llenarRollosAIngresar(rollo)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4" *ngIf="!cargando">
+    <hr class="Linea">
+  </div>
+
+  <!-- Inicio titulo tabla producto -->
+  <div class="mb-4" *ngIf="!cargando">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
+  </div>
+
+  <!--Inicio tabla Rollos a Insertar -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3" id="tabla2">
+      <p-table
+        #dt2
+        [value]="rollosIngresar"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        dataKey="Rollo"
+        [(selection)]="rollosConsultados"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">OT</th>
+            <th scope="col">Rollo</th>
+            <th scope="col">Item</th>
+            <th scope="col">Refencia</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentación</th>
+            <th scope="col">Proceso</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox id="elegirRollos2" (click)="quitarTodosRollos()"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rollo>
+          <tr *ngIf="!rollo.exits">
+            <td>{{rollo.Ot}}</td>
+            <td>{{rollo.Rollo}}</td>
+            <td>{{rollo.Id_Producto}}</td>
+            <td>{{rollo.Producto}}</td>
+            <td>{{rollo.Cantidad | number}}</td>
+            <td>{{rollo.Presentacion}}</td>
+            <td>{{rollo.Estatus}}</td>
+            <td>
+              <p-tableCheckbox [value]="rollo" id="elegirRollo2" (click)="quitarRollosAIngresar(rollo)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4" *ngIf="!cargando">
+    <hr class="Linea">
+  </div>
+
+  <!-- Inicio titulo tabla producto -->
+  <div class="mb-4" *ngIf="!cargando">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
+  </div>
+
+  <!--Inicio tabla Rollos a Insertar -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3" id="tabla3">
+      <div class="table-responsive">
+        <p-table
+        #dt
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="20"
+        [rowHover]="true"
+        [value]="consolidadoProductos"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">OT</th>
+            <th scope="col">Item</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">N° Rollos</th>
+            <th scope="col">Presentación</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-grupoProductos>
+          <tr>
+            <td>{{grupoProductos.Ot}}</td>
+            <td>{{grupoProductos.Id}}</td>
+            <td>{{grupoProductos.Nombre}}</td>
+            <td>{{grupoProductos.Cantidad}}</td>
+            <td>{{grupoProductos.Rollos}}</td>
+            <td>{{grupoProductos.Presentacion}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="3" class="text-right">Totales</td>
+            <td>{{calcularTotalCantidad() | number}}</td>
+            <td>{{calcularTotalRollos() | number}}</td>
+            <td>Kg</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="bajarPagina" *ngIf="!cargando">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" id="ingresarRollo" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="ingresarRollos()"></button>
+      <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+    </div>
+  </div>
+</p-card>

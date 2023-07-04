@@ -1,0 +1,316 @@
+<div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <!-- Cards de Costos -->
+  <div class="row g-3 text-center fila-1">
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3"></div>
+
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3" id="totalCartera">
+      <p-card >
+        <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
+          <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Estado de Proveedores</h3>
+        </div>
+        <div class="mb-3">
+          <h4><b>{{totalCartera | currency : ' COP $'}}</b></h4>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3"></div>
+  </div>
+
+  <div class="row g-3 text-center fila-2">
+    <div class="py-3 px-2 col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Proveedores</h2>
+
+        <!-- Plasticaribe -->
+        <p-tabView [scrollable]="true" (onChange)="costoPorPagar($event.index + 1)" id="datosProveedores">
+          <p-tabPanel
+            header="PLASTICARIBE SAS"
+            leftIcon="pi pi-th-large"
+            (click)="costoPorPagar(1)">
+            <div class="mb-3" *ngIf="!cargando">
+              <div class="row g-3 font-size-14">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_carteraAgrupada
+                  [value]="carteraAgrupadaProveedores"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [paginator]="true"
+                  [rows]="carteraAgrupadaProveedores.length"
+                  [rowsPerPageOptions]="[10,25,50,100]"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr class="font-size-16" id="filtros">
+                      <th colspan="2"><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" id="crearPdf" (click)="crearPdf()"></button></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cartera', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cuenta', 'contains')"></th>
+                    </tr>
+                    <tr>
+                      <th></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Cartera"><p-sortIcon field="Cartera"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td>
+                        <button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                      </td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Cartera | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7" id="facturasDetalladas">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraAgrupada
+                            [value]="item.Detalles"
+                            dataKey="factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="factura"><p-sortIcon field="factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="fecha_Factura"><p-sortIcon field="fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="saldo_Actual"><p-sortIcon field="saldo_Actual"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="mora"><p-sortIcon field="mora"></p-sortIcon> Mora</th>
+                                <th>Días</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.factura}}</td>
+                                <td>{{detalles.fecha_Factura}}</td>
+                                <td>{{detalles.fecha_Vencimiento}}</td>
+                                <td>{{detalles.saldo_Actual | number : '1.2-2'}}</td>
+                                <td>{{detalles.mora}}</td>
+                                <td>{{calcularDiasRetraso(detalles.factura, item.Id_Proveedor)}}</td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Invergoal -->
+          <p-tabPanel
+            header="INVERGOAL SAS"
+            leftIcon="pi pi-bolt"
+            (click)="costoPorPagar(2)">
+            <div class="mb-3" *ngIf="!cargando">
+              <div class="row g-3 font-size-14" id="table">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_carteraInvergoal
+                  [value]="carteraInvergoal"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [paginator]="true"
+                  [rows]="carteraInvergoal.length"
+                  [rowsPerPageOptions]="[10,25,50,100]"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInvergoal)"></button></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Cartera"><p-sortIcon field="Cartera"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td>
+                        <button type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                      </td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Cartera | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraInvergoal
+                            [value]="item.Detalles"
+                            dataKey="factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="factura"><p-sortIcon field="factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="fecha_Factura"><p-sortIcon field="fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="saldo_Actual"><p-sortIcon field="saldo_Actual"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="mora"><p-sortIcon field="mora"></p-sortIcon> Mora</th>
+                                <th>Días</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.factura}}</td>
+                                <td>{{detalles.fecha_Factura}}</td>
+                                <td>{{detalles.fecha_Vencimiento}}</td>
+                                <td>{{detalles.saldo_Actual | number : '1.2-2'}}</td>
+                                <td>{{detalles.mora}}</td>
+                                <td>{{calcularDiasRetraso(detalles.factura, item.Id_Proveedor, carteraInvergoal)}}</td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Inversuez -->
+          <p-tabPanel
+            header="INVERSUEZ SAS"
+            leftIcon="pi pi-th-large"
+            (click)="costoPorPagar(3)">
+            <div class="mb-3" *ngIf="!cargando">
+              <div class="row g-3 font-size-14" id="table">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_carteraInvesuez
+                  [value]="carteraInversuez"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [paginator]="true"
+                  [rows]="carteraInversuez.length"
+                  [rowsPerPageOptions]="[10,25,50,100]"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInversuez)"></button></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Cartera"><p-sortIcon field="Cartera"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td>
+                        <button type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                      </td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Cartera | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraInvesuez
+                            [value]="item.Detalles"
+                            dataKey="factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="factura"><p-sortIcon field="factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="fecha_Factura"><p-sortIcon field="fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="saldo_Actual"><p-sortIcon field="saldo_Actual"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="mora"><p-sortIcon field="mora"></p-sortIcon> Mora</th>
+                                <th>Días</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.factura}}</td>
+                                <td>{{detalles.fecha_Factura}}</td>
+                                <td>{{detalles.fecha_Vencimiento}}</td>
+                                <td>{{detalles.saldo_Actual | number : '1.2-2'}}</td>
+                                <td>{{detalles.mora}}</td>
+                                <td>{{calcularDiasRetraso(detalles.factura, item.Id_Proveedor, carteraInversuez)}}</td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </p-card>
+    </div>
+  </div>
+</div>

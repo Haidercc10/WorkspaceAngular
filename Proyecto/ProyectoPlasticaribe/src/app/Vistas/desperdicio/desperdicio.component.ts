@@ -297,57 +297,89 @@ export class DesperdicioComponent implements OnInit {
     let nombre : string = this.AppComponent.storage_Nombre;
     this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
       for (let i = 0; i < datos_desperdicios.length; i++) {
+        let titulo : string = `Reporte Merma de Material - ${this.today}`;
         const pdfDefinicion : any = {
-          info: { title: `Reporte Merma de Material - ${this.today}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 150, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
             return [
               {
+                margin: [20, 8, 20, 0],
                 columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content : [
-            {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
-                { text: `Reporte Merma de Material`, alignment: 'right',  style: 'titulo', margin: 30 }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    { border: [false, false, false, false], text: `Nombre Empresa` },
-                    { border: [false, false, false, true], text: `Plasticaribe S.A.S` },
-                    { border: [false, false, false, false], text: `Dirección` },
-                    { border: [false, false, false, true], text: `${datos_desperdicios[i].empresa_Direccion}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Ciudad` },
-                    { border: [false, false, false, true], text: `${datos_desperdicios[i].empresa_Ciudad}` },
-                    { border: [false, false, false, false], text: `Fecha registro` },
-                    { border: [false, false, false, true], text: `${datos_desperdicios[i].desp_FechaRegistro.replace('T00:00:00', '')}` },
-                  ],
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_desperdicios[i].desp_FechaRegistro.replace('T00:00:00', ''), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_desperdicios[i].nombreCreador, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  }
                 ]
               },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n \n',
-            { text: `Ingresados Por:\n`, alignment: 'left', style: 'header', },
-            { text: `${datos_desperdicios[i].nombreCreador}\n`, alignment: 'left', style: 'texto', },
-            { text: `\n\n Información detallada de los Desperdicios \n `, alignment: 'center', style: 'header' },
-
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              {
+                margin: [20, 10, 20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: [30, 40, 30, 40, 60, 70, 40, 35, 40, 42, 60],
+                  body: [
+                    [
+                      { text: 'OT', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Maquina', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Item', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Material', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Operario', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'No_Conformidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Impreso', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Area', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Fecha', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Observacion', fillColor: '#bbb', fontSize: 9 },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              }
+            ];
+          },
+          content : [
             this.table(this.datosPdf, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Impreso', 'Area', 'Fecha', 'Observacion']),
           ],
           styles: {
@@ -391,7 +423,6 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que se encagará de llenar la tabla del pdf
   buildTableBody(data, columns) {
     var body = [];
-    body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
@@ -408,15 +439,10 @@ export class DesperdicioComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [30, 32, 30, 30, 60, 62, 40, 30, 35, 42, 60],
+        widths: [30, 40, 30, 40, 60, 70, 37, 32, 40, 42, 58],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
     };
   }
 
