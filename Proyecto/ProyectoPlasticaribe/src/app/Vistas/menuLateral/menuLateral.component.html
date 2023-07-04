@@ -62,7 +62,7 @@
     </li>
 
     <!-- Bodega de Extrusión -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+    <ng-container *ngIf="[1,7,8,10,62,63,64].includes(ValidarRol)">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" (click)="clickIcon9()" aria-controls="collapseExample">
           <ng-container *ngIf="subir9; then thenTemplate9; else elseTemplate9"></ng-container>
@@ -72,18 +72,18 @@
           <ng-template #elseTemplate9>
             <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
           </ng-template>
-          <b>Bodega de Extrusión</b>
+          <b>Bodegas</b>
         </a>
         <div class="collapse" id="collapseExample9">
-          <ng-container *ngIf="ValidarRol == 1">
+          <!-- <ng-container *ngIf="ValidarRol == 1">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Eliminar-rollos" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-delete-left font-size-15" style="margin-right: 2%;"></i>
                 Eliminar Rollos
               </a>
             </div>
-          </ng-container>
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+          </ng-container> -->
+          <ng-container *ngIf="[1,7].includes(ValidarRol)">
               <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/IngresoRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
@@ -91,8 +91,32 @@
               </a>
             </div>
           </ng-container>
+          <ng-container *ngIf="[1,7].includes(ValidarRol)">
+              <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Inventario-Bodegas-Rollos" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-th-large font-size-15" style="margin-right: 2%;"></i>
+                Inventario de Bodegas
+              </a>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="[1,7].includes(ValidarRol)">
+            <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Solicitud-Rollos-Bodegas" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-file-edit font-size-15" style="margin-right: 2%;"></i>
+                Solicitud de Rollos
+              </a>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="[1,7].includes(ValidarRol)">
+            <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Movimientos-Solicitud-Rollos" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
+                Movimientos Solicitudes
+              </a>
+            </div>
+          </ng-container>
           <!-- Inventario Boddega Extrusion -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+          <!-- <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -115,7 +139,7 @@
                 Salida de Rollos
               </a>
             </div>
-          </ng-container>
+          </ng-container> -->
             <div class="mb-2 sangria">
             <hr>
           </div>
@@ -124,7 +148,7 @@
     </ng-container>
 
     <!-- BOPP / BOPA / POLIESTER -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+    <ng-container *ngIf="[1,3,4].includes(ValidarRol)">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
           <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
@@ -137,7 +161,7 @@
           <b>BOPP / BOPA / POLIESTER</b>
         </a>
         <div class="collapse" id="collapseExample1">
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <ng-container *ngIf="[1,3].includes(ValidarRol)">
               <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-download font-size-15" style="margin-right: 2%;"></i>
@@ -145,7 +169,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1">
+          <ng-container *ngIf="[1].includes(ValidarRol)">
               <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-cloud-upload font-size-15" style="margin-right: 2%;"></i>
@@ -153,7 +177,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+          <ng-container *ngIf="[1,3,4].includes(ValidarRol)">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -161,7 +185,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <ng-container *ngIf="[1,3].includes(ValidarRol)">
             <div class="mb-2 sangria">
               <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
@@ -169,7 +193,7 @@
               </a>
             </div>
           </ng-container>
-            <div class="mb-2 sangria">
+          <div class="mb-2 sangria">
             <hr>
           </div>
         </div>
@@ -328,7 +352,7 @@
     </ng-container>
 
     <!-- MATERIAS PRIMAS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 13">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 13">
       <li>
         <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir3; then thenTemplate; else elseTemplate"></ng-container>
@@ -429,6 +453,12 @@
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/solicitud-materia-prima" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
               Solicitud de Materia Prima
+            </a>
+          </div>
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 7">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/solicitud-mp-extrusion" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
+              Solicitud Material Producción
             </a>
           </div>
             <div class="mb-2 sangria">
@@ -592,6 +622,16 @@
             <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
               <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
               Movimientos Solicitud Mat. Prima
+            </a>
+          </div>
+        </ng-container>
+
+        <!-- Mov. SOLICITUDES DE MATERIALES DE PRODUCCIÓN -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7">
+          <div class="mb-2 sangria">
+            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitud-mp-extrusion" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+              Mov. Solicitud Material Producción
             </a>
           </div>
         </ng-container>
