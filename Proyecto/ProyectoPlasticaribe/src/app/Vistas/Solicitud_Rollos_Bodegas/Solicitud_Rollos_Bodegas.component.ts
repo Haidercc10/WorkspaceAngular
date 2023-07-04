@@ -322,8 +322,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
           "Rollo" : data[i].rollo,
           "Item" : data[i].item,
           "Referencia" : data[i].referencia,
-          "Cantidad" : this.formatonumeros(data[i].cantidad),
-          "Cantidad2" : data[i].cantidad,
+          "Cantidad" : data[i].cantidad,
           "Presentación" : data[i].presentacion,
         }
         this.informacionPdf.push(info);
@@ -334,39 +333,29 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   // funcion que va a crear un PDF
   crearPDF(solicitud : number){
-    let codigo : string = ``, version : string = ``, vigencia : string = ``, nombre : string = this.storage_Nombre;
+    let nombre : string = this.storage_Nombre;
     this.dtSolicitudRollosService.GetInformacionSolicitud(solicitud).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
-        if (data[i].bodega_Solicitada == 'Producto Intermedio') {
-          codigo = 'FR-PR-MT-02';
-          version = '01';
-          vigencia = ``;
-        } else if (data[i].bodega_Solicitada != 'Producto Intermedio' && data[i].bodega_Solicitada != 'Extrusion') {
-          codigo = 'FR-PR-01';
-          version = '01';
-          vigencia = ``;
-        }        
+      let titulo : string = `Solicitud de Rollos ${data[i].solicitud}`;
         const pdfDefinicion : any = {
-          info: { title: `Solicitud de Rollos N°${data[i].solicitud}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 170, 25, 35],
+          pageMargins : [25, 150, 25, 35],
           header: function(currentPage : any, pageCount : any) {
             return [
               {
                 margin: [20, 8, 20, 0],
                 columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 30] },
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
                   {
                     width: 300,
                     alignment: 'center',
                     table: {
                       body: [
                         [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                        [{text: `Fecha: ${moment().format('DD/MM/YYYY')}`, alignment: 'center', fontSize: 8}],
-                        [{text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
-                        [{text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8}],
-                        [{text: `Solicitud de Rollos N°${data[i].solicitud}`, bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
                       ]
                     },
                     layout: 'noBorders',
@@ -378,10 +367,10 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                     margin: [20, 20, 20, 0],
                     table: {
                       body: [
-                        [{text: `Código: `, alignment: 'left', fontSize: 8, bold: true}, { text: codigo, alignment: 'left', fontSize: 8 }],
-                        [{text: `Versión: `, alignment: 'left', fontSize: 8, bold: true}, { text: version, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true}, { text: vigencia, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                         [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                       ]
                     },
                     layout: 'noBorders',
@@ -408,13 +397,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                 margin: [20, 0],
                 table: {
                   headerRows: 1,
-                  widths: ['*', '*', '*', '*'],
+                  widths: ['*', '*'],
                   body: [
                     [
-                      { border: [false, false, false, false], text: `Bod. Solicitada:  ${data[i].bodega_Solicitada}`, bold: true, fontSize: 8, alignment: 'center' },
-                      { border: [false, false, false, false], text: `Bod. Solicitante:  ${data[i].bodega_Solicitante}`, bold: true, fontSize: 8, alignment: 'center' },
-                      { border: [false, false, false, false], text: `Estado:  ${data[i].estado}`, bold: true, fontSize: 8, alignment: 'center' },
-                      { border: [false, false, false, false], text: `Tipo Sol.:  ${data[i].tipo_Solicitud}`, bold: true, fontSize: 8, alignment: 'center' },
+                      { border: [false, false, false, false], text: `Bodega Solicitada:  ${data[i].bodega_Solicitada}`, bold: true, fontSize: 10, alignment: 'center' },
+                      { border: [false, false, false, false], text: `Bodega Solicitante:  ${data[i].bodega_Solicitante}`, bold: true, fontSize: 10, alignment: 'center' },
                     ],
                   ]
                 },
@@ -427,7 +414,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                   widths: [55, 50, 50, 270, 50, 60],
                   body: [
                     [
-                      { text: 'Orden Trabajo', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Orden', fillColor: '#bbb', fontSize: 9 },
                       { text: 'Rollo', fillColor: '#bbb', fontSize: 9 },
                       { text: 'Item', fillColor: '#bbb', fontSize: 9 },
                       { text: 'Referencia', fillColor: '#bbb', fontSize: 9 },
@@ -441,25 +428,11 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
             ];
           },
           content : [
-            this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),            
-            {
-              margin: [20, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*', '*'],
-                body: [
-                  [
-                    { border: [false, false, false, false], text: `Total Rollos:  ${this.formatonumeros(this.informacionPdf.length.toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center' },
-                    { border: [false, false, false, false], text: `Total Kg:  ${this.formatonumeros(this.sumarTotalKg(this.informacionPdf).toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center' },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
+            this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
             {
               text: `\n \nObservación sobre la Orden: \n ${data[i].observacion}\n`,
               style: 'header',
-            }
+            },
           ],
           styles: {
             header: { fontSize: 10, bold: true },
@@ -472,14 +445,6 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         break;
       }
     });
-  }
-
-  sumarTotalKg(data : any){
-    let totalKg = 0;
-    data.forEach(element => {
-      totalKg += element.Cantidad2;
-    });
-    return totalKg;
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf

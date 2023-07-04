@@ -1,23 +1,48 @@
-p-panelmenu ::ng-deep div, p-panelmenu ::ng-deep .p-panelmenu-panel, p-panelmenu ::ng-deep .p-panelmenu-header, p-panelmenu ::ng-deep div a {
-    background-color: #fff0 !important;
-    border: none !important;
+.fondo {
+  background-color: #ffe1cf;
+  background-image: linear-gradient(62deg, #ffe1cf 0%, #fdf2e4 100%);
+  height: 100%;
 }
 
-p-panelmenu ::ng-deep div a:hover,
-p-panelmenu ::ng-deep div a:focus,
-p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expanded="true"] {
-    background-color: rgba(255, 0, 0, 0.446) !important;
-    border: .1px solid white !important;
+.fondo2 {
+  background-color: #040d19;
+  height: 100%;
 }
 
-.imagen{
-  display: flex;
-  margin-left: 5%;
-  margin-top: 10%;
-  margin-bottom: 10%;
-  color: #000;
+.header h3, .header .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojo);
 }
 
-.imagen img{
-  width: 90%;
+.header2 h3, .header2 .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojoClaro);
+}
+
+.header h3:hover, .header .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.header2 h3:hover, .header2 .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.fila-1, .fila-2, .fila-3, .fila-4 {
+  padding: 0 2%;
+}
+
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
+  width: 100%;
+}
+
+p-chart ::ng-deep div ::ng-deep canvas {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
 }
