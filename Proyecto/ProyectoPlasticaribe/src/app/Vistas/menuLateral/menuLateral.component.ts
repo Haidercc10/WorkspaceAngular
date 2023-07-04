@@ -17,6 +17,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './menuLateral.component.html',
   styleUrls: ['./menuLateral.component.css']
 })
+
 export class MenuLateralComponent implements OnInit {
   display : boolean = false;
   items: MenuItem[];
