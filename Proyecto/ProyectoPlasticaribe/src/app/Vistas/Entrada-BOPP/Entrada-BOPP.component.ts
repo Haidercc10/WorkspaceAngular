@@ -128,7 +128,6 @@ export class EntradaBOPPComponent implements OnInit {
     this.campoRemi_Faccompra = null;
     this.valorTotal = 0;
     this.FormOpcional.reset();
-    this.boppsGenericos = [];
   }
 
   // funcion que va a limpiar los campos

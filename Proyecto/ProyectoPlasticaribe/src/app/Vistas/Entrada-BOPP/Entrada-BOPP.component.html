@@ -100,7 +100,6 @@
             <p-table
             #dt
             [resizableColumns]="true"
-            selectionMode = "multiple"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
@@ -128,7 +127,7 @@
               <ng-template pTemplate="body" let-arrayBopps>
                 <ng-container *ngIf="arrayBopps.completado && arrayBopps.cantidad == arrayBopps.cantFacturada; then completado else noCompletado"></ng-container>
                 <ng-template #noCompletado>
-                  <tr [ngClass]="{'row-accessories': arrayBopps.id < 10000}"> <!--[pSelectableRow]="arrayBopps"-->
+                  <tr [ngClass]="{'row-accessories': arrayBopps.id < 10000}" > <!--[pSelectableRow]="arrayBopps"-->
                     <td style="text-align: center" id="id">{{arrayBopps.id}}</td>
                     <td id="nombre">{{arrayBopps.nombre}}</td>
                     <td style="text-align: center" id="micras">{{arrayBopps.micras | number : '1.2-2'}}</td>
