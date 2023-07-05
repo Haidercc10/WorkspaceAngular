@@ -815,7 +815,6 @@ export class PedidoExternoComponent implements OnInit {
         break;
       }
     });
-
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

@@ -12,6 +12,9 @@ import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.s
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 import { DOCUMENT } from '@angular/common';
+import { EmpresaService } from './Servicios/Empresa/empresa.service';
+import { logoParaPdf } from './logoPlasticaribe_Base64';
+import moment from 'moment';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +49,8 @@ export class AppComponent implements OnInit{
                         private cookieService: CookieService,
                           private config: PrimeNGConfig,
                             private encriptacion : EncriptacionService,
-                              @Inject(DOCUMENT) private document : Document) {
+                              @Inject(DOCUMENT) private document : Document,
+                                private empresaService : EmpresaService) {
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
