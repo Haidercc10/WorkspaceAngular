@@ -15,4 +15,5 @@ export interface modelBOPP{
   BOPP_CantidadInicialKg : number;
   Usua_Id : number;
   BOPP_Hora : string;
+  //BoppGen_Id : number;
 }
