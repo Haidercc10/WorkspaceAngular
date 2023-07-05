@@ -4,6 +4,7 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
@@ -48,6 +49,7 @@ export class EntradaBOPPComponent implements OnInit {
   tipoDoc : any = null;
   boppSeleccionado : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  boppsGenericos : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -63,7 +65,8 @@ export class EntradaBOPPComponent implements OnInit {
                                     private servicioDetRemisiones : RemisionesMPService,
                                       private messageService: MessageService,
                                         private shepherdService: ShepherdService,
-                                          private mensajeService : MensajesAplicacionService) {
+                                          private mensajeService : MensajesAplicacionService,
+                                            private servicioBoppGenerico : BoppGenericoService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -76,7 +79,9 @@ export class EntradaBOPPComponent implements OnInit {
       undMed : [''],
       Fecha : [this.today],
       Observacion : [''],
-      Categoria : [''],
+      Categoria : [6],
+      IdBoppGenerico : [null],
+      boppGenerico : [null],
     });
 
     this.FormOpcional = this.frmBuilder.group({
@@ -100,6 +105,8 @@ export class EntradaBOPPComponent implements OnInit {
     this.getPreciosBOPP();
     this.getSerialesBOPP();
     this.obtenerProveeedor();
+    this.cargarBoppsGenericos();
+    this.FormEntradaBOPP.patchValue({Categoria : 6});
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -115,7 +122,7 @@ export class EntradaBOPPComponent implements OnInit {
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
     this.FormEntradaBOPP.reset();
-    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today, Categoria : 6 });
     this.ArrayBOPP = [];
     this.arrayBopps = [];
     this.campoRemi_Faccompra = null;
@@ -126,7 +133,7 @@ export class EntradaBOPPComponent implements OnInit {
   // funcion que va a limpiar los campos
   limpiarCampos(){
     this.FormEntradaBOPP.reset();
-    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today, Categoria : 6 });
   }
 
   //Funcion que va a cargar en la tabla el rollo que se va a crear
@@ -142,6 +149,8 @@ export class EntradaBOPPComponent implements OnInit {
       let ancho : number = this.FormEntradaBOPP.value.ancho;
       let categoria : any = this.FormEntradaBOPP.value.Categoria;
       let id : number = this.FormEntradaBOPP.value.Id;
+      let IdGenerico : number = this.FormEntradaBOPP.value.IdBoppGenerico;
+      let nombreGenerico : number = this.FormEntradaBOPP.value.boppGenerico;
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {
@@ -163,12 +172,14 @@ export class EntradaBOPPComponent implements OnInit {
               Subtotal : 0,
               Cat_Id : categoria,
               Cat : datos_categorias.catMP_Nombre,
+              IdBoppGenerico : IdGenerico,
+              NombreBoppGenerico : nombreGenerico
             }
             productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
             this.ArrayBOPP.push(productoExt);
             this.obtenerValorTotal();
-
-            this.FormEntradaBOPP.reset();
+            console.log(this.ArrayBOPP)
+            this.limpiarCampos();
             this.load = true;
           });
         }
@@ -205,10 +216,11 @@ export class EntradaBOPPComponent implements OnInit {
           BOPP_Hora : moment().format('H:mm:ss'),
           BOPP_TipoDoc: this.tipoDoc,
           BOPP_CodigoDoc : this.campoRemi_Faccompra,
+          BoppGen_Id : this.ArrayBOPP[i].IdBoppGenerico,
         }
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
           this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
-          this.load = true;
+        this.load = true;
         }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
       }
     }
@@ -305,7 +317,7 @@ export class EntradaBOPPComponent implements OnInit {
       ancho: datos.boppGen_Ancho,
       precio: datos.doc_PrecioUnitario,
       proveedor : datos.prov_Id,
-      completado : false
+      completado : false,
     }
 
     if (infoOc.matPri_Id != 84 && infoOc.idTinta == 2001 && infoOc.idBopp == 1) {
@@ -352,8 +364,11 @@ export class EntradaBOPPComponent implements OnInit {
       precio: item.precio,
       ancho: item.ancho,
       Observacion: item.nombre,
-      Categoria: item.categoria,
+      Categoria: 6,
+      IdBoppGenerico : item.id,
+      boppGenerico : item.nombre,
     });
+    console.log(item.id)
   }
 
   /** Factura */
@@ -489,17 +504,17 @@ export class EntradaBOPPComponent implements OnInit {
 
     if((oc == null && factura == null && remision == null)) {
       this.crearEntrada();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 800);
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 1000);
     } else if (oc != null && factura != null && remision == null) {
       this.campoRemi_Faccompra = factura;
       this.tipoDoc = 'FCO'
       this.registrarFacturaBopp();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 3000);
     } else if (oc != null && remision != null && factura == null) {
       this.campoRemi_Faccompra = remision;
       this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 3000);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
@@ -521,5 +536,23 @@ export class EntradaBOPPComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+  }
+
+  /** Función para cargar los nombres de bopps genericos en el campo */
+  cargarBoppsGenericos(){
+    this.boppsGenericos = [];
+    this.servicioBoppGenerico.srvObtenerLista().subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.boppsGenericos.push(data[index])
+      }
+    });
+  }
+
+  /** Función para seleccionar el nombre del bopp en el campo, pero su valor será el Id. */
+  seleccionarBoppsGenericos(){
+    let bopp : any = this.FormEntradaBOPP.value.boppGenerico;
+    let nuevo : any = [];
+    nuevo = this.boppsGenericos.filter((item) => item.boppGen_Id == bopp);
+    this.FormEntradaBOPP.patchValue({ boppGenerico : nuevo[0].boppGen_Nombre, IdBoppGenerico : nuevo[0].boppGen_Id });
   }
 }

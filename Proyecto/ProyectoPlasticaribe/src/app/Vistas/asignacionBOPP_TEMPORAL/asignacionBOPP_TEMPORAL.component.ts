@@ -289,6 +289,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             UndMed_Kg : datos_bopp[j].undMed_Kg,
             bopP_CantidadInicialKg : datos_bopp[j].bopP_CantidadInicialKg,
             usua_Id : datos_bopp[j].usua_Id,
+            boppGen_Id : datos_bopp[j].boppGen_Id
           }
 
           this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(() => {

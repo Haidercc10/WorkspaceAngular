@@ -596,7 +596,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             UndMed_Kg: this.FormEdicionMateriaPrima.value.UndMed,
             BOPP_CantidadInicialKg: data[i].bopP_CantidadInicialKg,
             Usua_Id: data[i].usua_Id,
-            BOPP_Hora: data[i].bopP_Hora
+            BOPP_Hora: data[i].bopP_Hora,
+            BoppGen_Id : data[i].boppGen_Id
           }
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
             this.consultarInventario();

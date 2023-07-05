@@ -498,6 +498,7 @@ export class Orden_MaquilaComponent implements OnInit {
           undMed_Kg: datos.undMed_Kg,
           bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
           usua_Id: datos.usua_Id,
+          boppGen_Id : datos.boppGen_Id,
         }
         this.boppService.srvActualizar(id, info).subscribe(() => {  });
       });
@@ -569,6 +570,7 @@ export class Orden_MaquilaComponent implements OnInit {
           undMed_Kg: datos.undMed_Kg,
           bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
           usua_Id: datos.usua_Id,
+          boppGen_Id : datos.boppGen_Id,
         }
         this.boppService.srvActualizar(id, info).subscribe(() => {  });
       });
