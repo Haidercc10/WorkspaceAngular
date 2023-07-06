@@ -25,6 +25,8 @@ export class Detalle_BodegaRollosService {
 
   GetInventarioRollos_OrdenTrabajo = (orden : number, bodega : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInventarioRollos_OrdenTrabajo/${orden}/${bodega}`);
 
+  GetInformacionIngreso = (id : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos/getInformacionIngreso/${id}`);
+
   Post = (data : modelDtBodegasRollos) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos`, data);
 
   Put = (id : any, data : modelDtBodegasRollos) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos/${id}`, data);

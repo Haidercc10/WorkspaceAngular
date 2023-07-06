@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
 import { modelDtBodegasRollos } from 'src/app/Modelo/modelDtBodegasRollos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -10,6 +11,7 @@ import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRol
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Ingreso_Rollos_Extrusion',
@@ -286,7 +288,7 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
         }
         this.dtBgRollosService.Post(info).subscribe(() => {
           numRollos += 1
-          if (numRollos == this.rollosIngresar.length) this.finalizacionIngresoRollos();
+          if (numRollos == this.rollosIngresar.length) this.buscarInformacion(id);
         }, err => {
           this.mensajeService.mensajeError(`¡Ha ocurrido un error al ingresar los rollos!`, `¡${err.error}!`);
           this.cargando = false;
@@ -298,5 +300,180 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
   finalizacionIngresoRollos(){
     this.mensajeService.mensajeConfirmacion(`¡Rollos Ingresados!`, `¡Se han ingresado los rollos a la bodega de extrusión!`);
     this.limpiarCampos();
+  }
+
+  // Funcion que va a buscar la informacion con la que se llenará el pdf
+  buscarInformacion(id : number){
+    this.cargando = true;
+    this.informacionPdf = [];
+    this.dtBgRollosService.GetInformacionIngreso(id).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        const element = data[i];
+        this.informacionPdf.push({
+          "Orden Trabajo" : element.orden_Trabajo,
+          "Rollo" : element.rollo,
+          "Item" : element.item,
+          "Referencia" : element.referencia,
+          "Cantidad" : this.formatonumeros(element.cantidad),
+          "Cantidad2" : element.cantidad,
+          "Presentación" : element.presentacion,
+        });
+        if (this.informacionPdf.length == data.length) this.crearPdf(id);
+      }      
+    }, err => {
+      this.mensajeService.mensajeError(`¡Ha ocurrido un error al buscar la información!`, `¡${err.error}!`);
+      this.cargando = false;
+    });
+  }
+
+  // Funcion que va a crear el pdf 
+  crearPdf(id : number){
+    let nombre : string = this.storage_Nombre;
+    this.dtBgRollosService.GetInformacionIngreso(id).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        let titulo = `Ingreso de Rollos N°${data[i].ingreso}`;
+        const pdfDefinicion : any = {
+          info: { title: titulo },
+          pageSize: { width: 630, height: 760 },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 160, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                margin: [20, 8, 20, 0],
+                columns: [
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 30] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha: ${moment().format('DD/MM/YYYY')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Código: `, alignment: 'left', fontSize: 8, bold: true}, { text: `FR-PR-MT-01`, alignment: 'left', fontSize: 8 }],
+                        [{text: `Versión: `, alignment: 'left', fontSize: 8, bold: true}, { text: `02`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${moment().format('DD/MM/YYYY')}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  }
+                ]
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              {
+                margin: [20, 10, 20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: [55, 50, 50, 270, 50, 60],
+                  body: [
+                    [
+                      { text: 'Orden Trabajo', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Rollo', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Item', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Referencia', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Presentación', fillColor: '#bbb', fontSize: 9 },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              }
+            ];
+          },
+          content : [
+            this.table(this.informacionPdf, ['Orden Trabajo', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación']),
+            {
+              margin: [20, 0],
+              table: {
+                headerRows: 1,
+                widths: ['*', '*'],
+                body: [
+                  [
+                    { border: [false, false, false, false], text: `Total Rollos:  ${this.formatonumeros(this.informacionPdf.length.toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center' },
+                    { border: [false, false, false, false], text: `Total Kg:  ${this.formatonumeros(this.sumarTotalKg(this.informacionPdf).toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center' },
+                  ],
+                ]
+              },
+              layout: { defaultBorder: false, }
+            },
+            {
+              text: `\n \nObservación sobre la Orden: \n ${data[i].observacion}\n`,
+              style: 'header',
+            },
+          ],
+          styles: {
+            header: { fontSize: 10, bold: true },
+            titulo: { fontSize: 20, bold: true }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        this.finalizacionIngresoRollos();
+        break;
+      }
+    });
+  }
+
+  sumarTotalKg(data : any){
+    let totalKg = 0;
+    data.forEach(element => {
+      totalKg += element.Cantidad2;
+    });
+    return totalKg;
+  }
+
+  // funcion que se encagará de llenar la tabla de los rollos en el pdf
+  buildTableBody(data : any, columns : any) {
+    var body = [];
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los rollos
+  table(data : any, columns : any) {
+    return {
+      table: {
+        widths: [50, 50, 50, '*', 50, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+    };
   }
 }

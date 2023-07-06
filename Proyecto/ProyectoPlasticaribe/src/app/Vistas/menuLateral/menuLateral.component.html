@@ -614,17 +614,27 @@
               Movimientos de Maquilas
             </a>
           </div>
-        </ng-container>
+          </ng-container>
 
-        <!-- Mov. SOLICITUDES DE MAT. PRIMA -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
-          <div class="mb-2 sangria">
-            <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
-              <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
-              Movimientos Solicitud Mat. Prima
-            </a>
-          </div>
-        </ng-container>
+          <!-- Mov. SOLICITUDES DE MAT. PRIMA -->
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
+            <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitudes-mp" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+                Movimientos Solicitud Mat. Prima
+              </a>
+            </div>
+          </ng-container>
+
+          <!-- Mov. SOLICITUDES DE MATERIALES DE PRODUCCIÓN -->
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7">
+            <div class="mb-2 sangria">
+              <a [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}" data-bs-toggle="" href="/reporte-solicitud-mp-extrusion" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-file font-size-15" style="margin-right: 2%;"></i>
+                Mov. Solicitud Material Producción
+              </a>
+            </div>
+          </ng-container>
 
         <!-- Mov. SOLICITUDES DE MATERIALES DE PRODUCCIÓN -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 7">

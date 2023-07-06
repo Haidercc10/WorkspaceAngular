@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { AppComponent } from 'src/app/app.component';
 import { vistasDisponibles } from './VistasDisponibles';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-VistasFavoritas',
   templateUrl: './VistasFavoritas.component.html',
   styleUrls: ['./VistasFavoritas.component.css']
 })
+
 export class VistasFavoritasComponent implements OnInit {
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
