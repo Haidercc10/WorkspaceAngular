@@ -9,6 +9,7 @@ import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/Ev
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -60,6 +61,8 @@ export class MenuLateralComponent implements OnInit {
   subir17 : boolean = true;
   modoSeleccionado : boolean;
 
+  roles : any [] = [];
+
   constructor(private AppComponent : AppComponent,
                 private formBuilder : FormBuilder,
                   private rolService : RolesService,
@@ -70,7 +73,8 @@ export class MenuLateralComponent implements OnInit {
                             @Inject(DOCUMENT) private document : Document,
                               private usuarioService : UsuarioService,
                                 private mensajeService : MensajesAplicacionService,
-                                  private eventosCalService : EventosCalendarioService,) {
+                                  private eventosCalService : EventosCalendarioService,
+                                    private vistasPermisosService : Vistas_PermisosService,) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -125,6 +129,14 @@ export class MenuLateralComponent implements OnInit {
   configuracion(){
     this.menuConfiguracion = true;
     setTimeout(() => this.cambiarColorIcono(), 100);
+  }
+
+  validarPermisosVistas(vista : string) : boolean{
+    let validacion : boolean;
+    // this.vistasPermisosService.GetPermisos(this.ValidarRol, vista).subscribe(() => validacion = true, () => validacion = false);
+    // return validacion;
+    console.log(1)
+    return true;
   }
 
   mostrarMenuUsuario = () => this.menuUsuario = true;
