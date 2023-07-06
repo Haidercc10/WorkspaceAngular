@@ -47,6 +47,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   estadoSolicitud : string = ''; /** Variable que servirá para no permitir cancelar solicitudes en estado cancelado o finalizado. */
   clave : string = ''; /** Variable que contendrá una palabra clave ya sea para finalizar o cancelar una solicitud.*/
   nroSolicitud : number = 0;
+  arrayId : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                   private messageService: MessageService,
@@ -119,7 +120,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     let fechaInicial : any = moment(this.formFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.formFiltros.value.estadoDoc;
-    let arrayId : any = [];
+    this.arrayId = [];
     let ruta : any = ``;
 
     if (fechaInicial == 'Invalid date') fechaInicial = null;
@@ -134,14 +135,15 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.servicioDtSolicitudesMPExt.GetQuerySolicitudesMp_Extrusion(fechaInicial, fechaFinal, ruta).subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
-          if(!arrayId.includes(data[index].id)) {
+          if(!this.arrayId.includes(data[index].id)) {
             this.llenarTabla(data[index]);
-            arrayId.push(data[index].id);
+            this.arrayId.push(data[index].id);
           }
         }
       } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
     }, error => { this.msj.mensajeError(`Error`, `Error al consultar registros de solicitudes de material`)} );
     setTimeout(() => { this.cargando = false; }, 1500);
+    console.log(this.arrayId);
   }
 
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
@@ -203,126 +205,142 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(datos_solicitud : any){
+    let index = this.arrayId.indexOf(this.solicitudSeleccionada);
+    console.log(index)
+    let [id, ot, fecha, estado] = [this.arrayRegistros[index].id, this.arrayRegistros[index].ot, this.arrayRegistros[index].fecha, this.arrayRegistros[index].estado];
     let nombre : string = this.AppComponent.storage_Nombre;
     //this.servicioDetlSolMP_Extrusion.getSolicitudMp_Extrusion(this.nroSolicitud).subscribe(datos_solicitud => {
       for (let i = 0; i < datos_solicitud.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Solicitud de material N° ${datos_solicitud[i].id}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
-          footer: function(currentPage : any, pageCount : any) {
+          info: { title: `Solicitud de material N° ${datos_solicitud[i].id}` },
+          pageSize: { width: 630, height: 760 },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 215, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
             return [
+              /** Encabezado del pdf */
               {
+                margin: [20, 8, 20, 0],
                 columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha de Análisis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Solicitud de material N° ${datos_solicitud[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  },
                 ]
-              }
+              },
+              /** Línea */
+              {
+                margin: [30, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: '',
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /** Titulo tabla OT */
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Detalles de la solicitud`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /** Encabezado y body tabla OT */
+              {
+                margin: [20, 0, 20, 28],
+                style : 'header2',
+                table: {
+                  headerRows: 1,
+                  widths: [140, 135, 135, 140],
+                  body: [
+                    [
+                      { text: 'N° Solicitud', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'OT', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'Fecha Creación', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'Estado Solicitud', fillColor: '#bbb', fontSize: 9, bold : true },
+                    ],
+                    [id, ot, fecha, estado],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              },
+              /** Titulo de tabla materia prima */
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Materiales de producción solicitados`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /**Encabezado tabla materia prima */
+              {
+                margin: [20, 0, 20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: [60, 372, 60, 60],
+                  body: [
+                    [
+                      { text: 'Id', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Materia Prima', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Medida', fillColor: '#bbb', fontSize: 9 },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              },
             ]
           },
-          watermark: { text: 'Plasticaribe SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content : [
-            {
-              columns: [
-                {
-                  image : logoParaPdf,
-                  width : 220,
-                  height : 50
-                },
-                {
-                  text: `Solicitud de material N° ${datos_solicitud[i].id}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 12
-                }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 75, 181],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_solicitud[i].empresa_Nombre}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_solicitud[i].fecha.replace('T00:00:00', ``)} ${datos_solicitud[i].hora}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_solicitud[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_solicitud[i].empresa_Direccion}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_solicitud[i].empresa_Direccion}`
-                    },
-                    {},
-                    {}
-                  ]
-                ]
-              },
-              layout: {
-                defaultBorder: false,
-              },
-              fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `Usuario: ${datos_solicitud[i].nombre_Usuario}\n`,
-              alignment: 'left',
-              style: 'header',
-            },
-            '\n \n',
-            {
-              text: `\n Materiales de producción solicitados \n `,
-              alignment: 'center',
-              style: 'header'
-            },
-
+           content : [
             this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Und_Medida', ]),
-
             {
               style: 'tablaTotales',
               table: {
-                widths: ['*', 250, '*', '*'],
+                widths: [365, 60, 60, 60],
                 style: 'header',
                 body: [
                   [
@@ -334,7 +352,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `${this.formatonumeros((0).toFixed(2))}`
+                      text: `${this.formatonumeros((this.calcularCantSolicitada()).toFixed(2))}`
                     },
                     '',
                   ],
@@ -349,14 +367,9 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
             }
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: {fontSize: 10, bold: true },
+            titulo: { fontSize: 20, bold: true},
+            header2: { fontSize: 9, bold: false},
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
@@ -371,7 +384,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   // funcion que se encargará de llenar la tabla en el pdf
   buildTableBody(data : any, columns : any) {
     var body = [];
-    body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
@@ -387,15 +399,10 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: ['*', 250, '*', '*'],
+        widths: [60, 365, 60, 60],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
     };
   }
 
@@ -513,6 +520,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   /** Consultar solicitudes por estado. */
   consultarPorEstado(estado : number){
     this.arrayRegistros = [];
+    this.arrayId = [];
     this.formFiltros.patchValue({estadoDoc : estado});
     this.cargando = true;
     setTimeout(() => {
@@ -552,6 +560,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     if(info.estadoId == 12) info.estado = 'Parcial';
 
     this.arrayRegistros.push(info);
+    this.arrayId.push(info.id)
   }
 
    // Funcion que va a hacer que se inicie el tutorial in-app
@@ -561,5 +570,21 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+  }
+
+  calcularCantSolicitada() {
+    let valor : number = 0;
+    for (const solicitud of this.arrayMatPrimas) {
+      valor += solicitud.Cantidad
+    }
+    return valor;
+  }
+
+  calcularCantAprobada() {
+    let valor : number = 0;
+    for (const solicitud of this.arrayMatPrimas) {
+      valor += solicitud.CantAprobada
+    }
+    return valor;
   }
 }

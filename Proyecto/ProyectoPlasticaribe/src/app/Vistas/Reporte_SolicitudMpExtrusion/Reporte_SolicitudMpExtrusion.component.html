@@ -223,6 +223,14 @@
                 <td>{{matPrimas.Und_Medida}}</td>
               </tr>
             </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="2">Total</td>
+                <td>{{calcularCantSolicitada() | number: '1.2-2'}}</td>
+                <td>{{calcularCantAprobada() | number: '1.2-2' }}</td>
+                <td>{{'Kg'}}</td>
+              </tr>
+            </ng-template>
           </p-table>
         </div>
 

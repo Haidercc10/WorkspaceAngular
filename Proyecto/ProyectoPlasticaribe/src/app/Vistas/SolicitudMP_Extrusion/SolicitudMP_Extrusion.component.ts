@@ -414,7 +414,6 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     let [ot, cliente, item, kg] = [this.infoOrdenTrabajo[0].ot, this.infoOrdenTrabajo[0].cliente, this.infoOrdenTrabajo[0].item, this.formatonumeros(this.infoOrdenTrabajo[0].kg)];
     let nombre : string = this.AppComponent.storage_Nombre;
        for (let i = 0; i < data.length; i++) {
-        console.log(this.infoOrdenTrabajo);
          const pdfDefinicion : any = {
           info: { title: `Solicitud de material N° ${data[i].id}` },
           pageSize: { width: 630, height: 760 },
@@ -601,19 +600,9 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     });
     return body;
   }
+
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [60, 365, 60, 60],
-        body: this.buildTableBody(data, columns),
-      },
-      fontSize: 8,
-    };
-  }
-
-  table2(data, columns) {
     return {
       table: {
         headerRows: 1,
