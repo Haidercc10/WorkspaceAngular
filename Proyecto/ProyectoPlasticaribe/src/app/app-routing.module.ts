@@ -123,7 +123,6 @@ export const routes: Routes = [
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
   {path: 'ordenes-trabajo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OrdenesTrabajoComponent},
   {path: 'reportes-procesos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,12]}, component: Reporte_Procesos_OTComponent},
-  {path: 'reporte-pedidos-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,60]}, component : Reporte_PedidosVendedoresComponent}, // Pedidos Vendedores
 
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,7,8,9,10]}, component : Ingreso_Rollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
@@ -143,17 +142,14 @@ export const routes: Routes = [
   {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,10,60,61]}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
-  {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
+  // {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
   {path: 'pedido-externo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: PedidoExternoComponent},
-  {path: 'crearproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:CrearProductoComponent},
-  {path: 'crear-clientes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:ClientesComponent},
 
- /***************************************************************** USUARIOS **********************************************************************************/
-  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
+  /***************************************************************** USUARIOS **********************************************************************************/
   {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RegistroComponentComponent},
 
  /*************************************************************************************************************************************************************/
-  {path: 'prueba-cat-insumo', data: {expectedRole : [1]}, component: PruebaImagenCatInsumoComponent},
+  {path: 'prueba-cat-insumo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PruebaImagenCatInsumoComponent},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
   {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
