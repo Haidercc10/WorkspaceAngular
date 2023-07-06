@@ -581,7 +581,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           const info : modelBOPP = {
-            BOPP_Id : data[i].bopP_Id,
+            BOPP_Id: data[i].bopP_Id,
             BOPP_Nombre: `${this.FormEdicionMateriaPrima.value.Nombre}`,
             BOPP_Descripcion: this.FormEdicionMateriaPrima.value.Nombre,
             BOPP_Serial: data[i].bopP_Serial,
@@ -597,7 +597,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             BOPP_CantidadInicialKg: data[i].bopP_CantidadInicialKg,
             Usua_Id: data[i].usua_Id,
             BOPP_Hora: data[i].bopP_Hora,
-            BoppGen_Id : data[i].boppGen_Id
+            BoppGen_Id: data[i].boppGen_Id,
+            BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
+            BOPP_TipoDoc: data[i].bopP_TipoDoc,
           }
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
             this.consultarInventario();

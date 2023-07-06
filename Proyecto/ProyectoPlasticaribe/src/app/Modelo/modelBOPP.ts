@@ -16,4 +16,6 @@ export interface modelBOPP{
   Usua_Id : number;
   BOPP_Hora : string;
   BoppGen_Id : number;
+  BOPP_CodigoDoc : any,
+  BOPP_TipoDoc : any,
 }

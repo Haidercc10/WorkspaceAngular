@@ -285,6 +285,9 @@ export class DevolucionesMPComponent implements OnInit {
               bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
               Usua_Id : item.usua_Id,
               boppGen_Id : item.boppGen_Id,
+              bopP_Hora : item.bopP_Hora,
+              bopP_CodigoDoc: item.bopP_CodigoDoc,
+              bopP_TipoDoc: item.bopP_TipoDoc,
             }
             this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(() => {
               this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);

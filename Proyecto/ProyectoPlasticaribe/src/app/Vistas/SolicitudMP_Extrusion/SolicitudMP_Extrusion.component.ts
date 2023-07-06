@@ -418,11 +418,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
           info: { title: `Solicitud de material N° ${data[i].id}` },
           pageSize: { width: 630, height: 760 },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 215, 25, 35],
+          pageMargins : [25, 235, 25, 35],
           header: function(currentPage : any, pageCount : any) {
             return [
               {
-                margin: [20, 8, 20, 0],
+                margin: [20, 1, 20, 0],
                 columns: [
                   { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
                   {
@@ -432,6 +432,8 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
                       body: [
                         [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
                         [{text: `Fecha de Análisis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, }],
+                        [{text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8, }],
                         [{text: `Solicitud de material N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
                       ]
                     },
@@ -444,10 +446,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
                     margin: [20, 20, 20, 0],
                     table: {
                       body: [
-                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Código: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Versión: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Página: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                       ]
                     },
                     layout: 'noBorders',
