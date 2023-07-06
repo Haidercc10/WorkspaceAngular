@@ -7,6 +7,18 @@
   user-select: none;
 }
 
+p-panelmenu ::ng-deep div, p-panelmenu ::ng-deep .p-panelmenu-panel, p-panelmenu ::ng-deep .p-panelmenu-header, p-panelmenu ::ng-deep div a {
+  background-color: #fff0 !important;
+  border: none !important;
+}
+
+p-panelmenu ::ng-deep div a:hover,
+p-panelmenu ::ng-deep div a:focus,
+p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expanded="true"] {
+  background-color: #F007 !important;
+  border: .1px solid white !important;
+}
+
 .imagen{
   display: flex;
   margin-left: 5%;
@@ -25,51 +37,6 @@
   color: #000;
 }
 
-.datosUsuario{
-  display: flex;
-  margin-left: 10%;
-}
-
-.datosUsuario i{
-  width: 30px;
-}
-
-.datosUsuario p{
-  color: #000;
-  margin-left: 5%;
-  font-size: calc(var(--font-size) * 18px);
-}
-
-.datosRol{
-  display: flex;
-  margin-left: 10%;
-}
-
-.datosRol i{
-  width: 30px;
-  margin-top: 3%;
-}
-
-.datosRol p{
-  color: #000;
-  font-size: calc(var(--font-size) * 18px);
-}
-
-.line {
-  width: 100%;
-  height: 1px;
-  border-bottom: 1px dashed #ddd;
-  margin: 40px 0;
-}
-
-ul li a:hover{
-  color: #db4149;
-}
-
-ul li a:active > a, a[aria-expanded="true"]{
-  color: #db4149;
-}
-
 span{
   color: #db4149;
 }
@@ -80,38 +47,6 @@ span{
 
 .botonMenu .user:hover{
   color: #db4149;
-}
-
-.boton:hover {
-  color: #db4149;
-}
-
-p {
-  font-family: 'Poppins', sans-serif;
-  font-size: calc(var(--font-size) * 1.1em);
-  font-weight: 300;
-  line-height: 1.7em;
-  color: #999;
-}
-
-.boton{
-  margin-left: 80px;
-}
-
-#sidebar ul li a {
-  padding-bottom: 10px;
-  font-size: calc(var(--font-size) * 1.1em);
-  display: block;
-}
-
-.sangria{
-  margin-left: 8%;
-  font-size: calc(var(--font-size) * 14px);
-}
-
-.subSangria{
-  margin-left: 11%;
-  font-size: calc(var(--font-size) * 14px);
 }
 
 .pi:hover{
