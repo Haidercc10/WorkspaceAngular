@@ -132,7 +132,7 @@ export const routes: Routes = [
   {path: 'registro-usuario', canActivate: [VistasPermisosGuard], data: {nombre: 'Usuarios'}, component: RegistroComponentComponent},
 
  /*************************************************************************************************************************************************************/
-  {path: 'prueba-cat-insumo', canActivate: [VistasPermisosGuard], data: {nombre: 'Pruebas'}, component: PruebaImagenCatInsumoComponent},
+  {path: 'pruebas', canActivate: [VistasPermisosGuard], data: {nombre: 'Pruebas'}, component: PruebaImagenCatInsumoComponent},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
   {path: 'pedido-mantenimiento', canActivate: [VistasPermisosGuard], data: {nombre: 'Pedido de Mantenimiento de Activos'}, component: PedidoMantenimientoComponent},
