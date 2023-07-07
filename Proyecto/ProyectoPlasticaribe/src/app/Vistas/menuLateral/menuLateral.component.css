@@ -15,8 +15,9 @@ p-panelmenu ::ng-deep div, p-panelmenu ::ng-deep .p-panelmenu-panel, p-panelmenu
 p-panelmenu ::ng-deep div a:hover,
 p-panelmenu ::ng-deep div a:focus,
 p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expanded="true"] {
-  background-color: #F007 !important;
-  border: .1px solid white !important;
+  background-color: #CCC8 !important;
+  box-shadow: 2px 2px 10px 5px #bbb !important;
+  border: .1px solid #bbbb !important;
 }
 
 .imagen{

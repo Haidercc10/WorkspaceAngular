@@ -1,23 +1,21 @@
-p-panelmenu ::ng-deep div, p-panelmenu ::ng-deep .p-panelmenu-panel, p-panelmenu ::ng-deep .p-panelmenu-header, p-panelmenu ::ng-deep div a {
-    background-color: #fff0 !important;
-    border: none !important;
-}
 
-p-panelmenu ::ng-deep div a:hover,
-p-panelmenu ::ng-deep div a:focus,
-p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expanded="true"] {
-    background-color: rgba(255, 0, 0, 0.446) !important;
-    border: .1px solid white !important;
-}
-
-.imagen{
+p-pickList span{
   display: flex;
-  margin-left: 5%;
-  margin-top: 10%;
-  margin-bottom: 10%;
-  color: #000;
 }
 
-.imagen img{
-  width: 90%;
+@media screen and (max-width: 576px) {
+
+  .product-item {
+    flex-wrap: wrap;
+  }
+
+  p-pickList img {
+    margin: 0 0 1rem 0;
+    width: 50px;
+  }
+}
+
+::ng-deep .p-picklist-item:not(.cdk-drag-disabled) {
+  cursor: move;
+  z-index: 3130 !important;
 }

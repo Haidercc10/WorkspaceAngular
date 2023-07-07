@@ -3,8 +3,8 @@ import moment from 'moment';
 import { MenuItem } from 'primeng/api';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
+import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AppComponent } from 'src/app/app.component';
-import { vistasDisponibles } from './VistasDisponibles';
 
 @Component({
   selector: 'app-VistasFavoritas',
@@ -14,6 +14,7 @@ import { vistasDisponibles } from './VistasDisponibles';
 
 export class VistasFavoritasComponent implements OnInit {
 
+  
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -30,14 +31,15 @@ export class VistasFavoritasComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
-                  private msj : MensajesAplicacionService,) {
+                  private msj : MensajesAplicacionService,
+                    private vistasPermisos : Vistas_PermisosService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
     if (this.storage_Id.toString() != '') {
-      this.llenarDatosSeleccionables();
+      this.llenarVistasDisponibles();
       this.buscarFavoritos();
       setTimeout(() => this.mostrarVistasFav(), 2500);
     }
@@ -51,7 +53,7 @@ export class VistasFavoritasComponent implements OnInit {
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
-  llenarDatosSeleccionables = () => this.disponibles = vistasDisponibles;
+  llenarVistasDisponibles = () => this.vistasPermisos.Get_By_Rol(this.ValidarRol).subscribe(data => this.disponibles = data);
 
   // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
   mostrarVistasFav(){
@@ -100,7 +102,6 @@ export class VistasFavoritasComponent implements OnInit {
         },
         icon: "assets/Iconos_Menu/crear.png",
         command: () => {
-          this.displayTerminal = true;
           this.llenarDatosRol();
         }
       }
@@ -117,18 +118,10 @@ export class VistasFavoritasComponent implements OnInit {
     this.targetProducts = [];
     this.disponiblesMostrar = [];
     for (let i = 0; i < this.disponibles.length; i++) {
-      if (this.disponibles[i].roles.includes(this.ValidarRol) && !this.seleccionados.includes(this.disponibles[i].id)) {
-        let info : any = {
-          id : this.disponibles[i].id,
-          nombre : this.disponibles[i].nombre,
-          icono : this.disponibles[i].icono,
-          categoria : this.disponibles[i].categoria,
-          ruta : this.disponibles[i].categoria,
-        }
-        this.disponiblesMostrar.push(info);
-      } else if (this.seleccionados.includes(this.disponibles[i].id)) this.targetProducts.push(this.disponibles[i]);
+      if (!this.seleccionados.includes(this.disponibles[i].id)) this.disponiblesMostrar.push(this.disponibles[i]);
+      else this.targetProducts.push(this.disponibles[i]);
     }
-    setTimeout(() => { this.displayTerminal = true; }, 500);
+    setTimeout(() => this.displayTerminal = true, 500);
   }
 
   // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
