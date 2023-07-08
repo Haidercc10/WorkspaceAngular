@@ -170,6 +170,10 @@ a {
   font-size: calc(var(--font-size) * 16px);
 }
 
+.font-size-18 {
+  font-size: calc(var(--font-size) * 18px);
+}
+
 .font-size-20 {
   font-size: calc(var(--font-size) * 20px);
 }
@@ -178,16 +182,16 @@ a {
   font-size: calc(var(--font-size) * 25px);
 }
 
+.font-size-24 {
+  font-size: calc(var(--font-size) * 24px);
+}
+
 .font-size-32 {
   font-size: calc(var(--font-size) * 32px);
 }
 
 .font-size-48 {
   font-size: calc(var(--font-size) * 48px);
-}
-
-.font-size-24 {
-  font-size: calc(var(--font-size) * 24px);
 }
 
 .d-grid {

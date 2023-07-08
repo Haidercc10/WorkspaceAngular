@@ -1,18 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import moment from 'moment';
-import { MenuItem, MessageService } from 'primeng/api';
-import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
-import { AppComponent } from 'src/app/app.component';
-import { vistasDisponibles } from './VistasDisponibles';
+import { MenuItem } from 'primeng/api';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
+import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-VistasFavoritas',
   templateUrl: './VistasFavoritas.component.html',
   styleUrls: ['./VistasFavoritas.component.css']
 })
+
 export class VistasFavoritasComponent implements OnInit {
 
+  
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -29,17 +32,16 @@ export class VistasFavoritasComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private vistasFavService : VistasFavoritasService,
-                  private msj : MensajesAplicacionService,) {
+                  private msj : MensajesAplicacionService,
+                    private vistasPermisos : Vistas_PermisosService,
+                      private router : Router) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    if (this.storage_Id.toString() != '') {
-      this.llenarDatosSeleccionables();
-      this.buscarFavoritos();
-      setTimeout(() => this.mostrarVistasFav(), 2500);
-    }
+    this.llenarVistasDisponibles();
+    this.buscarFavoritos();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -50,7 +52,7 @@ export class VistasFavoritasComponent implements OnInit {
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
-  llenarDatosSeleccionables = () => this.disponibles = vistasDisponibles;
+  llenarVistasDisponibles = () => this.vistasPermisos.Get_By_Rol(this.ValidarRol).subscribe(data => this.disponibles = data);
 
   // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
   mostrarVistasFav(){
@@ -65,7 +67,7 @@ export class VistasFavoritasComponent implements OnInit {
           positionLeft: 15
         },
         icon: "assets/Iconos_Menu/home.png",
-        command: () => { window.location.href = './home'; }
+        command: () => this.router.navigateByUrl('/home')
       }
     );
     for (let i = 0; i < this.disponibles.length; i++) {
@@ -81,7 +83,7 @@ export class VistasFavoritasComponent implements OnInit {
               positionLeft: 15
             },
             icon: icono,
-            command: () => { window.location.href = ruta; }
+            command: () => this.router.navigateByUrl(ruta)
           };
           this.dockItems.push(info);
           this.seleccionados.push(this.disponibles[i].id);
@@ -98,10 +100,7 @@ export class VistasFavoritasComponent implements OnInit {
           positionLeft: 15
         },
         icon: "assets/Iconos_Menu/crear.png",
-        command: () => {
-          this.displayTerminal = true;
-          this.llenarDatosRol();
-        }
+        command: () => this.llenarDatosRol()
       }
     );
     this.responsiveOptions = [
@@ -116,18 +115,10 @@ export class VistasFavoritasComponent implements OnInit {
     this.targetProducts = [];
     this.disponiblesMostrar = [];
     for (let i = 0; i < this.disponibles.length; i++) {
-      if (this.disponibles[i].roles.includes(this.ValidarRol) && !this.seleccionados.includes(this.disponibles[i].id)) {
-        let info : any = {
-          id : this.disponibles[i].id,
-          nombre : this.disponibles[i].nombre,
-          icono : this.disponibles[i].icono,
-          categoria : this.disponibles[i].categoria,
-          ruta : this.disponibles[i].categoria,
-        }
-        this.disponiblesMostrar.push(info);
-      } else if (this.seleccionados.includes(this.disponibles[i].id)) this.targetProducts.push(this.disponibles[i]);
+      if (!this.seleccionados.includes(this.disponibles[i].id)) this.disponiblesMostrar.push(this.disponibles[i]);
+      else this.targetProducts.push(this.disponibles[i]);
     }
-    setTimeout(() => { this.displayTerminal = true; }, 500);
+    setTimeout(() => this.displayTerminal = true, 500);
   }
 
   // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
@@ -146,20 +137,12 @@ export class VistasFavoritasComponent implements OnInit {
 
   // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
   buscarFavoritos(){
-    this.vistasFavoritas = [];
-    if (this.storage_Id != undefined) {
-      this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
-        for (let i = 0; i < datos_vistasFav.length; i++) {
-          this.vistasFavoritas = [
-            datos_vistasFav[i].vistaFav_Num1,
-            datos_vistasFav[i].vistaFav_Num2,
-            datos_vistasFav[i].vistaFav_Num3,
-            datos_vistasFav[i].vistaFav_Num4,
-            datos_vistasFav[i].vistaFav_Num5,
-          ];
-        }
-      }, error => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
-    }
+    this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(data => {
+      data.forEach(element => {
+        this.vistasFavoritas = [ element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5, ]
+        this.mostrarVistasFav();
+      });
+    }, () => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
   }
 
   // Funcion que añadirá o actualizará la base de datos con las vistas favoritas que ha elegido un usuario
@@ -176,11 +159,7 @@ export class VistasFavoritasComponent implements OnInit {
           VistaFav_Fecha : moment().format('YYYY-MM-DD'),
           VistaFav_Hora : moment().format('H:mm:ss'),
         }
-        this.vistasFavService.insertVistasFavoritas(info).subscribe(() => {
-          this.buscarFavoritos();
-          setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-        }, error => { this.msj.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'); });
-        break;
+        this.vistasFavService.insertVistasFavoritas(info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'));
       }
     } else {
       this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
@@ -197,10 +176,7 @@ export class VistasFavoritasComponent implements OnInit {
               VistaFav_Fecha : moment().format('YYYY-MM-DD'),
               VistaFav_Hora : moment().format('H:mm:ss'),
             }
-            this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
-              this.buscarFavoritos();
-              setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-            }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
+            this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
           } else {
             for (let j = 0; j < this.targetProducts.length; j++) {
               let info : any = {
@@ -214,10 +190,7 @@ export class VistasFavoritasComponent implements OnInit {
                 VistaFav_Fecha : moment().format('YYYY-MM-DD'),
                 VistaFav_Hora : moment().format('H:mm:ss'),
               }
-              this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
-                this.buscarFavoritos();
-                setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-              }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
+              this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => this.buscarFavoritos(), () => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
               break;
             }
           }
