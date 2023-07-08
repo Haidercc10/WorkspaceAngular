@@ -137,4 +137,7 @@ export class EntradaBOPPService {
     return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
   }
 
+  GetInventarioBoppsGenericos = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getInventarioBoppsGenericos');
+
+  GetInventarioBopps = (fecha1 : any, fecha2 : any, id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getInventarioBopps/${fecha1}/${fecha2}/${id}`);
 }

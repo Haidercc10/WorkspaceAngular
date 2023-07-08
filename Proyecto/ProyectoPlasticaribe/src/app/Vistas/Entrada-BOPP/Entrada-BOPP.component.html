@@ -27,6 +27,11 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
   </div>
 
+  <!-- Botones que llamaran modal bopp's genéricos -->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Bopp genérico" icon="pi pi-database" (click)="llamarModalCrearBopp()" pTooltip="Crea bopp's genéricos y asocialos a los rollos que deseas ingresar, dependiendo micras y ancho!" tooltipPosition="left"></button>
+  </div>
+
   <div class="mb-3">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Opcional</h4>
   </div>
@@ -370,3 +375,10 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!--Modal para crear bopp's genéricos -->
+<p-dialog [(visible)]="modalCrearBopp" [style]="{width: '60vw'}" [resizable]="true" header="Rollo(s) asociado(s)" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-crear-bopp></app-crear-bopp>
+  </ng-template>
+</p-dialog>

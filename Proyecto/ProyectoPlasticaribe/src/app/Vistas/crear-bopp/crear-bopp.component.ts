@@ -4,6 +4,7 @@ import moment from 'moment';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { EntradaBOPPComponent } from '../Entrada-BOPP/Entrada-BOPP.component';
 
 @Component({
   selector: 'app-crear-bopp',
@@ -18,10 +19,12 @@ export class CrearBoppComponent implements OnInit {
   tintaCreada = false;
   informacion : string = '';
 
+
   constructor(private frmBuilder : FormBuilder,
                 private boppGenericoService : BoppGenericoService,
                   private mensajeService : MensajesAplicacionService,
-                    private categoriasService : CategoriaMateriaPrimaService) {
+                    private categoriasService : CategoriaMateriaPrimaService,
+                      private EntradaBOPP : EntradaBOPPComponent) {
 
     this.FormBopp = this.frmBuilder.group({
       Nombre : [null, Validators.required],
@@ -32,6 +35,7 @@ export class CrearBoppComponent implements OnInit {
 
   ngOnInit() {
     this.obtenerCategorias();
+    setTimeout(() => { this.EntradaBOPP.cargarBoppsGenericos(); },  500);
   }
 
   //Funcion que va a limpoar todos los campos
@@ -51,7 +55,8 @@ export class CrearBoppComponent implements OnInit {
         BoppGen_Hora : moment().format('H:mm:ss'),
       }
       this.boppGenericoService.srvGuardar(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`¡Creación Exitosa!`, '¡El rollo ha sido creado con éxito!')
+        this.mensajeService.mensajeConfirmacion(`¡Creación Exitosa!`, '¡El rollo ha sido creado con éxito!');
+        setTimeout(() => { this.EntradaBOPP.cargarBoppsGenericos(); }, 500);
         setTimeout(() => { this.limpiarCampos(); }, 500);
       }, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear el rollo, verifique!`));
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe llenar los campos vacios!')
