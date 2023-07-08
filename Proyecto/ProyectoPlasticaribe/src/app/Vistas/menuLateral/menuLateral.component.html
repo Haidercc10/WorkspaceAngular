@@ -188,3 +188,21 @@
     <app-Calendario></app-Calendario>
   </ng-template>
 </p-dialog>
+
+<!-- Eventos del Día -->
+<p-dialog [(visible)]="eventosDia" [style]="{width: '800px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '400px' }" header="Eventos del Día">
+  <ng-template pTemplate="content">
+    <div class="card flex justify-content-center mb-3" *ngFor="let item of eventosHoy">
+      <p-fieldset legend="{{item.Nombre}}">
+        <p class="p-2 font-size-20">{{item.Descripcion}}</p>
+        <span>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</span>
+      </p-fieldset>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-success" type="button" label="No Volver a Mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
+      <button pButton class="p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
+    </div>
+  </ng-template>  
+</p-dialog>

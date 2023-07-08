@@ -40,6 +40,7 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
+  eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   position: string = '';
   modoSeleccionado : boolean;
 
@@ -197,13 +198,21 @@ export class MenuLateralComponent implements OnInit {
         this.eventosHoy.push({
           Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
           Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre : data[i].eventoCal_Nombre
+          Nombre : data[i].eventoCal_Nombre,
+          Descripcion : data[i].eventoCal_Descripcion,
         });
-      }
+        if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
+        else this.eventosDia = true;
+      }      
     });
   }
 
   mostrarModalCalendario = () => this.modalCalendario = true;
+
+  noMostrarMasDialogoEventosDia(mostrar : string){
+    this.cookieService.set('MostrarEventosDia', mostrar, { expires: 365, sameSite: 'Lax' });
+    this.eventosDia = false;
+  }
 
   showConfirm() {
     this.confirmationService.confirm({
