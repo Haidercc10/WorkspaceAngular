@@ -17,6 +17,7 @@ import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
 import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { ThisReceiver } from '@angular/compiler';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -31,6 +32,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   @ViewChild('dt_Polientileno') dt_Polientileno: Table | undefined;
   @ViewChild('dt_Tintas') dt_Tintas: Table | undefined;
   @ViewChild('dt_Biorientados') dt_Biorientados: Table | undefined;
+  @ViewChild('dt_BoppGenerico') dt_BoppGenerico: Table | undefined;
+  @ViewChild('dt_Biorientados2') dt_Biorientados2: Table | undefined;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -74,11 +77,23 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   cantExistenciasBiorientado : number = 0; //Variable que guardará la cantidad total en existencias de los biorientados
   cantDiferenciaBiorientado : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los biorientados
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-
   modalCreacionMateriaPrima : boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
   ModalCrearMateriaPrima: boolean= false; //Variable para validar que se abra el modal de creacion de polietileno
   ModalCrearTintas: boolean= false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenetes
   modalEditarMateriasPrimas : boolean = false;
+  modalVerBopps : boolean = false; /** Modal que cargará la información de los bopp asociados a los bopp genericos */
+  arrayBopps : any = []; /** Array que cargará la información de los bopp genéricos con stock. */
+  stockTotalBopps : number = 0; /** Variable que cargará el peso total del bopp generico agrupado */
+  genericoSeleccionado : string = '';
+  arrayModalBopp : any = []; /** Array que cargará en el modal los bopp asociados a los agrupados */
+  valorTotalBopp : number = 0; /** Variable que cargará el valor total del bopp */
+  cantInicialBopp : number = 0; /** Variable que cargará la cantidad total inicial del bopp */
+  cantEntranteBopp : number = 0; /** Variable que cargará la cantidad total entrante del bopp */
+  cantSalienteBopp : number = 0; /** Variable que cargará la cantidad total saliente del bopp */
+  cantExistenciasBopp : number = 0; /** Variable que cargará la cantidad total de existencias del bopp */
+  cantDiferenciaBopp : number = 0; /** Variable que cargará la cantidad total de la diferencia del bopp */
+  boppsAgrupados : boolean = false; /** variable que mostrará el tab del bopp agrupado */
+
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
@@ -419,70 +434,73 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       title = `Inventario Biorientados - ${this.today}`;
     }
 
-    setTimeout(() => {
-      const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
-      for (const item of datos) {
-        const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
-        infoDocumento.push(datos1);
-      }
-      let workbook = new Workbook();
-      const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-      let worksheet = workbook.addWorksheet(title);
-      worksheet.addImage(imageId1, 'A1:B3');
-      let titleRow = worksheet.addRow([title]);
-      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-      worksheet.addRow([]);
-      worksheet.addRow([]);
-      let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'eeeeee' }
-        }
-        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      });
-      worksheet.mergeCells('A1:L3');
-      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      infoDocumento.forEach(d => {
-        let row = worksheet.addRow(d);
-        row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-        row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-        let qty= row.getCell(7);
-        let color = 'ADD8E6';
-        qty.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: color }
-        }
-      });
-      worksheet.getColumn(1).width = 10;
-      worksheet.getColumn(2).width = 60;
-      worksheet.getColumn(3).width = 12;
-      worksheet.getColumn(4).width = 22;
-      worksheet.getColumn(5).width = 12;
-      worksheet.getColumn(6).width = 12;
-      worksheet.getColumn(7).width = 22;
-      worksheet.getColumn(8).width = 12;
-      worksheet.getColumn(9).width = 12;
-      worksheet.getColumn(10).width = 12;
-      worksheet.getColumn(11).width = 20;
-      worksheet.getColumn(12).width = 20;
+    if(this.boppsAgrupados) this.exportarExcel2();
+    else {
       setTimeout(() => {
-        workbook.xlsx.writeBuffer().then((data) => {
-          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, title + `.xlsx`);
+        const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
+        for (const item of datos) {
+          const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
+          infoDocumento.push(datos1);
+        }
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        let worksheet = workbook.addWorksheet(title);
+        worksheet.addImage(imageId1, 'A1:B3');
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        this.load = true;
-        this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
-      }, 1000);
-    }, 1500);
+        worksheet.mergeCells('A1:L3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        infoDocumento.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          let qty= row.getCell(7);
+          let color = 'ADD8E6';
+          qty.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: color }
+          }
+        });
+        worksheet.getColumn(1).width = 10;
+        worksheet.getColumn(2).width = 60;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 22;
+        worksheet.getColumn(5).width = 12;
+        worksheet.getColumn(6).width = 12;
+        worksheet.getColumn(7).width = 22;
+        worksheet.getColumn(8).width = 12;
+        worksheet.getColumn(9).width = 12;
+        worksheet.getColumn(10).width = 12;
+        worksheet.getColumn(11).width = 20;
+        worksheet.getColumn(12).width = 20;
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, title + `.xlsx`);
+          });
+          this.load = true;
+          this.msj.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del !` + title);
+        }, 1000);
+      }, 1500);
+    }
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -613,4 +631,215 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       });
     }
   }
+
+  /** Función que consultará la información del BOPP agrupado por genérico. */
+  boppsAgrupados_Genericos(){
+    this.arrayBopps = [];
+    this.stockTotalBopps = 0;
+    let cantDatos : number = 0;
+    this.load = false;
+
+    this.boppService.GetInventarioBoppsGenericos().subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.cargarTablaBopps(data[index]);
+        cantDatos += 1;
+        cantDatos == data.length ? this.load = true : this.load = false;
+      }
+    });
+  }
+
+  /**  Función que cargará en la tabla la información del BOPP agrupado por genérico. */
+  cargarTablaBopps(datos : any) {
+    let info : any = {
+      Id : datos.id,
+      Nombre : datos.nombre,
+      Micras : datos.micras,
+      Ancho : datos.ancho,
+      IdCateg : datos.idCategoria,
+      NombreCateg : datos.nombreCategoria,
+      Rollos : datos.rollos,
+      Stock : datos.stock,
+      Medida : datos.medida,
+    }
+    this.arrayBopps.push(info);
+    this.stockTotalBopps += info.Stock;
+  }
+
+  /** Función que cargará el bopp agrupado por el génerico */
+  aplicarfiltroGenerico($event, campo : any, valorCampo : string){
+    this.dt_BoppGenerico!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if(this.dt_BoppGenerico.filteredValue != null) {
+        this.stockTotalBopps = 0;
+        for (let index = 0; index < this.dt_BoppGenerico.filteredValue.length; index++) {
+          this.stockTotalBopps += this.dt_BoppGenerico.filteredValue[index].Stock;
+        }
+      } else {
+        this.stockTotalBopps = 0;
+        for (let index = 0; index < this.dt_BoppGenerico._value.length; index++) {
+          this.stockTotalBopps += this.dt_BoppGenerico._value[index].Stock;
+        }
+      }
+    }, 500)
+  }
+
+  /** Función que llamará el modal y consultará la información de el(los) bopp(s) asociado(s) al bopp genérico que se seleccionó */
+  llamarModalBopp(data : any){
+    this.genericoSeleccionado = data.Nombre
+    this.modalVerBopps = true;
+    this.arrayModalBopp = [];
+    this.valorTotalBopp = 0;
+    this.cantInicialBopp = 0;
+    this.cantEntranteBopp = 0;
+    this.cantSalienteBopp = 0;
+    this.cantExistenciasBopp = 0;
+    this.cantDiferenciaBopp = 0;
+    let fecha : any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[0]).format('YYYY-MM-DD') : this.today;
+    let fechaFinal : any = this.rongoFechas.length > 0 ? moment(this.rongoFechas[1]).format('YYYY-MM-DD') : fecha;
+
+    this.boppService.GetInventarioBopps(fecha, fechaFinal, data.Id).subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.cargarTablaModal(data[index]);
+      }
+    });
+  }
+
+  /** Función quellenará la información de el(los) bopp(s) asociado(s) al bopp genérico que se seleccionó */
+  cargarTablaModal(datos : any) {
+    let info : any = {
+      Id : datos.id,
+      Nombre : datos.nombre,
+      Ancho : datos.ancho,
+      Micras : datos.micras,
+      Inicial : datos.inicial,
+      Entrada : datos.entrada,
+      Salida : datos.salida,
+      Cant : datos.stock,
+      Diferencia : datos.diferencia,
+      UndCant : datos.medida,
+      PrecioUnd : datos.precio,
+      SubTotal : datos.subtotal,
+      Categoria : datos.categoria,
+      Categoria_Id : datos.categoriaId,
+    }
+    this.arrayModalBopp.push(info);
+    this.valorTotalBopp += info.SubTotal,
+    this.cantInicialBopp += info.Inicial,
+    this.cantEntranteBopp += info.Entrada,
+    this.cantSalienteBopp += info.Salida,
+    this.cantExistenciasBopp += info.Cant,
+    this.cantDiferenciaBopp += info.Diferencia
+  }
+
+  /** Función que cargará el inventario de bopp's agrupados si se encuentra en el tab 4 */
+  cargarTabs(indexTab : any) {
+    if(indexTab == 4) { this.boppsAgrupados = true; this.boppsAgrupados_Genericos(); }
+    else this.boppsAgrupados = false;
+  }
+
+  // Funcion que va a filtrar la información en la tabla de inventario
+  aplicarFiltrosBiorientados2($event, campo : any, valorCampo : string){
+    this.dt_Biorientados2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if(this.dt_Biorientados2.filteredValue != null) {
+        console.log()
+        this.valorTotalBopp = 0;
+        this.cantInicialBopp = 0;
+        this.cantEntranteBopp = 0;
+        this.cantSalienteBopp = 0;
+        this.cantExistenciasBopp = 0;
+        this.cantDiferenciaBopp = 0;
+        for (let i = 0; i < this.dt_Biorientados2.filteredValue.length; i++) {
+          this.valorTotalBopp += this.dt_Biorientados2.filteredValue[i].PrecioUnd * this.dt_Biorientados2.filteredValue[i].Cant;
+          this.cantInicialBopp += this.dt_Biorientados2.filteredValue[i].Inicial;
+          this.cantEntranteBopp += this.dt_Biorientados2.filteredValue[i].Entrada;
+          this.cantSalienteBopp += this.dt_Biorientados2.filteredValue[i].Salida;
+          this.cantExistenciasBopp += this.dt_Biorientados2.filteredValue[i].Cant;
+          this.cantDiferenciaBopp += this.dt_Biorientados2.filteredValue[i].Diferencia;
+        }
+      } else {
+        this.valorTotalBopp = 0;
+        this.cantInicialBopp = 0;
+        this.cantEntranteBopp = 0;
+        this.cantSalienteBopp = 0;
+        this.cantExistenciasBopp = 0;
+        this.cantDiferenciaBopp = 0;
+        for (let i = 0; i < this.dt_Biorientados2._value.length; i++) {
+          this.valorTotalBopp += this.dt_Biorientados2._value[i].PrecioUnd * this.dt_Biorientados2._value[i].Cant;
+          this.cantInicialBopp += this.dt_Biorientados2._value[i].Inicial;
+          this.cantEntranteBopp += this.dt_Biorientados2._value[i].Entrada;
+          this.cantSalienteBopp += this.dt_Biorientados2._value[i].Salida;
+          this.cantExistenciasBopp += this.dt_Biorientados2._value[i].Cant;
+          this.cantDiferenciaBopp += this.dt_Biorientados2._value[i].Diferencia;
+        }
+      }
+    }, 500);
+  }
+
+  /** Exportar el formato de bopp's agrupados a excel */
+  exportarExcel2(){
+    this.load = false;
+    let datos : any [] = [];
+    let infoDocumento : any [] = [];
+    let title : string = `Inventario Bopp agrupado - ${this.today}`;
+
+    this.dt_BoppGenerico.filteredValue != null ? datos = this.dt_BoppGenerico.filteredValue : datos = this.arrayBopps;
+
+    setTimeout(() => {
+      const header = ["Id", "Nombre", "Micras", "Ancho", "Categoria", "Rollos", "Stock", "Medida"]
+      for (const item of datos) {
+        const datos1  : any = [item.Id, item.Nombre, item.Micras, item.Ancho, item.NombreCateg, item.Rollos, item.Stock, item.Medida];
+        infoDocumento.push(datos1);
+      }
+      let workbook = new Workbook();
+      const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+      let worksheet = workbook.addWorksheet(title);
+      worksheet.addImage(imageId1, 'A1:A2');
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'eeeeee' }
+        }
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:H3');
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      infoDocumento.forEach(d => {
+        let row = worksheet.addRow(d);
+        row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let qty= row.getCell(7);
+        let color = 'ADD8E6';
+        qty.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: color }
+        }
+      });
+      worksheet.getColumn(1).width = 20;
+      worksheet.getColumn(2).width = 35;
+      worksheet.getColumn(3).width = 12;
+      worksheet.getColumn(4).width = 12;
+      worksheet.getColumn(5).width = 12;
+      worksheet.getColumn(6).width = 12;
+      worksheet.getColumn(7).width = 12;
+      worksheet.getColumn(8).width = 12;
+      setTimeout(() => {
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, title + `.xlsx`);
+        });
+        this.load = true;
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha generado el formato Excel del ${title}!`);
+      }, 1000);
+    }, 1500);
+  }
+
 }

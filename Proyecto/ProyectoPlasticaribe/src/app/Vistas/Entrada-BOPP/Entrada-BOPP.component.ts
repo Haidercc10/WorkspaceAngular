@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -17,6 +17,7 @@ import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service'
 import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/data';
+import { CrearBoppComponent } from '../crear-bopp/crear-bopp.component';
 
 @Component({
   selector: 'app-Entrada-BOPP',
@@ -25,6 +26,7 @@ import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/dat
 })
 export class EntradaBOPPComponent implements OnInit {
 
+  @ViewChild(CrearBoppComponent) CrearBopp : CrearBoppComponent;
   load: boolean = true;
   public FormEntradaBOPP !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -49,7 +51,8 @@ export class EntradaBOPPComponent implements OnInit {
   tipoDoc : any = null;
   boppSeleccionado : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  boppsGenericos : any = [];
+  boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
+  modalCrearBopp : boolean = false; /** Variable para abrir el modal que creará nuevos bopp's genericos para sociarlos al que se desea ingresar */
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -555,4 +558,7 @@ export class EntradaBOPPComponent implements OnInit {
     nuevo = this.boppsGenericos.filter((item) => item.boppGen_Id == bopp);
     this.FormEntradaBOPP.patchValue({ boppGenerico : nuevo[0].boppGen_Nombre, IdBoppGenerico : nuevo[0].boppGen_Id });
   }
+
+  /** Función para llamar el modal que contendrá los campos para crear bopp's */
+  llamarModalCrearBopp = () => this.modalCrearBopp = true;
 }
