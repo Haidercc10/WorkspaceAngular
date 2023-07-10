@@ -18,6 +18,7 @@ import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ThisReceiver } from '@angular/compiler';
+import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -93,6 +94,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   cantExistenciasBopp : number = 0; /** Variable que cargará la cantidad total de existencias del bopp */
   cantDiferenciaBopp : number = 0; /** Variable que cargará la cantidad total de la diferencia del bopp */
   boppsAgrupados : boolean = false; /** variable que mostrará el tab del bopp agrupado */
+  boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
+  esBopp : boolean = false; /** Variable que definirá si la materia prima que se está editando es bopp */
+  idBoppGenerico : number = 1;
 
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -103,7 +107,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                           private shepherdService: ShepherdService,
                             private frmBuilder : FormBuilder,
                               private undMedidaService : UnidadMedidaService,
-                                private msj : MensajesAplicacionService) {
+                                private msj : MensajesAplicacionService,
+                                  private servicioBoppGen : BoppGenericoService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormEdicionMateriaPrima = this.frmBuilder.group({
       Id : [null, Validators.required],
@@ -114,6 +119,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       UndMed : [null, Validators.required],
       Precio : [null, Validators.required],
       Micras : [null, Validators.required],
+      BoppGenerico : [null],
+      IdBoppGenerico : [null]
     });
   }
 
@@ -529,6 +536,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data : any){
+    this.cargarBoppsGenericos();
     this.modalEditarMateriasPrimas = true;
     this.FormEdicionMateriaPrima.patchValue({
       Id : data.Id,
@@ -541,11 +549,17 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Micras : 0
     });
     if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)){
+      this.esBopp = true;
       this.boppService.srvObtenerListaPorSerial(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          this.FormEdicionMateriaPrima.patchValue({ Micras: data[i].bopP_CantidadMicras});
+          this.FormEdicionMateriaPrima.patchValue({ Micras: data[i].bopP_CantidadMicras, IdBoppGenerico : data[i].boppGen_Id, BoppGenerico : data[i].boppGen_Id, });
+          this.idBoppGenerico = data[i].boppGen_Id;
         }
+        setTimeout(() => { this.seleccionarBoppsGenericos(); }, 3000);
       });
+    } else  {
+      this.FormEdicionMateriaPrima.patchValue({ Micras: 0, Ancho : 0, IdBoppGenerico : null, BoppGenerico : null, });
+      this.esBopp = false;
     }
   }
 
@@ -566,9 +580,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.consultarInventario();
         this.msj.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
         this.modalEditarMateriasPrimas = false;
+        this.esBopp = false;
+        this.idBoppGenerico = 1;
       }, () => {
         this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la materia prima!`);
         this.modalEditarMateriasPrimas = false;
+        this.esBopp = false;
+        this.idBoppGenerico = 1;
       });
     } else if (this.categoriasTintas.includes(this.FormEdicionMateriaPrima.value.Categoria)) {
       this.tintasService.srvObtenerListaPorId(this.FormEdicionMateriaPrima.value.Id).subscribe(data => {
@@ -590,9 +608,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           this.consultarInventario();
           this.msj.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
           this.modalEditarMateriasPrimas = false;
+          this.esBopp = false;
+          this.idBoppGenerico = 1;
         }, () => {
           this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar la tinta!`);
           this.modalEditarMateriasPrimas = false;
+          this.esBopp = false;
+          this.idBoppGenerico = 1;
         })
       });
     } else if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)){
@@ -615,7 +637,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             BOPP_CantidadInicialKg: data[i].bopP_CantidadInicialKg,
             Usua_Id: data[i].usua_Id,
             BOPP_Hora: data[i].bopP_Hora,
-            BoppGen_Id: data[i].boppGen_Id,
+            BoppGen_Id: this.FormEdicionMateriaPrima.value.IdBoppGenerico == null ? this.idBoppGenerico : this.FormEdicionMateriaPrima.value.IdBoppGenerico,
             BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
             BOPP_TipoDoc: data[i].bopP_TipoDoc,
           }
@@ -623,9 +645,13 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             this.consultarInventario();
             this.msj.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
             this.modalEditarMateriasPrimas = false;
+            this.esBopp = false;
+            this.idBoppGenerico = 1;
           }, () => {
             this.msj.mensajeError(`¡Error!`, `¡Ha ocurrido un error al intentar actualizar el biorientado!`);
             this.modalEditarMateriasPrimas = false;
+            this.esBopp = false;
+            this.idBoppGenerico = 1;
           })
         }
       });
@@ -840,6 +866,24 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha generado el formato Excel del ${title}!`);
       }, 1000);
     }, 1500);
+  }
+
+  /** Función para cargar los nombres de bopps genericos en el campo */
+  cargarBoppsGenericos(){
+    this.boppsGenericos = [];
+    this.servicioBoppGen.srvObtenerLista().subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.boppsGenericos.push(data[index])
+      }
+    });
+  }
+
+  /** Función para seleccionar el nombre del bopp en el campo, pero su valor será el Id. */
+  seleccionarBoppsGenericos(){
+    let bopp : any = this.FormEdicionMateriaPrima.value.BoppGenerico;
+    let nuevo : any = [];
+    nuevo = this.boppsGenericos.filter((item) => item.boppGen_Id == bopp);
+    this.FormEdicionMateriaPrima.patchValue({ BoppGenerico : nuevo[0].boppGen_Nombre, IdBoppGenerico : nuevo[0].boppGen_Id });
   }
 
 }
