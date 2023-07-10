@@ -57,7 +57,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   informacionPDF : any = []; //Array que contendrá la información del PDF
-  nroSolicitud : number = 0; /** Variable que guardará el ID de la solicitud para crear el pdf. */
+  nroSolicitud : number = 9; /** Variable que guardará el ID de la solicitud para crear el pdf. */
   esSolicitud : boolean = false; /** Variable que se encargará de limpiar campos */
   ultimoNroSolicitud : number = 0;
 
@@ -411,165 +411,175 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(data : any){
+    let [ot, cliente, item, kg] = [this.infoOrdenTrabajo[0].ot, this.infoOrdenTrabajo[0].cliente, this.infoOrdenTrabajo[0].item, this.formatonumeros(this.infoOrdenTrabajo[0].kg)];
     let nombre : string = this.AppComponent.storage_Nombre;
-    //this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        const pdfDefinicion : any = {
-          info: {
-            title: `Solicitud de material N° ${data[i].id}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
-          footer: function(currentPage : any, pageCount : any) {
+       for (let i = 0; i < data.length; i++) {
+         const pdfDefinicion : any = {
+          info: { title: `Solicitud de material N° ${data[i].id}` },
+          pageSize: { width: 630, height: 760 },
+          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 235, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
             return [
               {
+                margin: [20, 1, 20, 0],
                 columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha de Análisis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                        [{text: `Hora: ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, }],
+                        [{text: `Usuario: ${nombre}`, alignment: 'center', fontSize: 8, }],
+                        [{text: `Solicitud de material N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Código: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Versión: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Vigencia: `, alignment: 'left', fontSize: 8, bold: true}, {text: '', alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Página: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+              },
+              {
+                margin: [30, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: '',
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /** Titulo tabla OT */
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Detalles de la Orden de Trabajo`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /** Encabezado y body tabla OT */
+              {
+                margin: [20, 0, 20, 28],
+                style : 'header2',
+                table: {
+                  headerRows: 1,
+                  widths: [60, 215, 215, 60],
+                  body: [
+                    [
+                      { text: 'OT', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'Cliente', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'Referencia', fillColor: '#bbb', fontSize: 9, bold : true },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9, bold : true },
+                    ],
+                    [ot, cliente, item, kg],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              },
+              /** Titulo de tabla materia prima */
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      { border: [false, false, false, false], text: `Materiales de producción solicitados`, bold: true, fontSize: 10, alignment: 'center' },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+              /**Encabezado tabla materia prima */
+              {
+                margin: [20, 0, 20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: [60, 372, 60, 60],
+                  body: [
+                    [
+                      { text: 'Id', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Materia Prima', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
+                      { text: 'Medida', fillColor: '#bbb', fontSize: 9 },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, },
+              },
             ]
           },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+
           content : [
-            {
-              columns: [
-                {
-                  image : logoParaPdf,
-                  width : 220,
-                  height : 50
-                },
-                {
-                  text: `Solicitud de material N° ${data[i].id}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 12
-                }
+          this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida']),
+          {
+            style: 'tablaTotales',
+            table: {
+              widths: [365, 60, 60, 60],
+              style: 'header',
+              body: [
+                [
+                  '',
+                  {
+                    border: [true, false, true, true],
+                    text: `Peso Total`,
+                    alignment: 'right',
+                    bold: true
+                  },
+                  {
+                    border: [false, false, true, true],
+                    text: `${this.formatonumeros((this.calcularMateriaPrimaSolicitada()).toFixed(2))}`
+                  },
+                  {
+                    border: [false, false, true, true],
+                    text: `Kg`,
+                    bold: true
+                  },
+                ],
               ]
             },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 65, 191],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Nombre}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Ciudad}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Direccion}`
-                    },
-                    {},
-                    {}
-                  ]
-                ]
-              },
-              layout: {
-                defaultBorder: false,
-              },
-              fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `Usuario: ${data[i].nombre_Usuario}\n`,
-              alignment: 'left',
-              style: 'header',
-            },
-            '\n \n',
-            {
-              text: `\n Materiales de producción solicitados \n `,
-              alignment: 'center',
-              style: 'header'
-            },
+            layout: { defaultBorder: false, },
+            fontSize: 8,
+          },
+          {
+            text: `\n \nObservación sobre la solicitud: \n ${data[i].observacion}\n`,
+            style: 'header',
+          }
+        ],
 
-            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida']),
-
-            {
-              style: 'tablaTotales',
-              table: {
-                widths: [333, 60, 60, 60],
-                style: 'header',
-                body: [
-                  [
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `Peso Total`,
-                      alignment: 'right',
-                      bold: true
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros((this.calcularMateriaPrimaSolicitada()).toFixed(2))}`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `Kg`,
-                      bold: true
-                    },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 8,
-            },
-            {
-              text: `\n \nObservación sobre la solicitud: \n ${data[i].observacion}\n`,
-              style: 'header',
-            }
-          ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            header2: { fontSize: 9, bold: false},
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
@@ -578,13 +588,11 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
         setTimeout(() => this.LimpiarCampos(), 1500);
         break;
       }
-    //}, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
     var body = [];
-    body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
@@ -600,15 +608,10 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [60, '*', 60, 60],
+        widths: [60, 365, 60, 60],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
     };
   }
 

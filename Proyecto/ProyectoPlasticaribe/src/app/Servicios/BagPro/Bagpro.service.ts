@@ -300,4 +300,7 @@ export class BagproService {
   srvObtenerListaUltimosClientes2(fecha : any, cliente : any) {
     return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
   }
+
+  /** ProcSellado */
+  getNominaSelladoAcumuladaItem = (fecha1 : any, fecha2 : any):Observable<any[]> =>( this.http.get<any>(this.rutaBagPro + `/ProcSellado/getNominaSelladoAcumuladaItem/${fecha1}/${fecha2}`));
 }

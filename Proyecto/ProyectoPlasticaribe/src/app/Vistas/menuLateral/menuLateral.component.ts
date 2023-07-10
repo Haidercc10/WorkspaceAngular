@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -26,6 +27,7 @@ export class MenuLateralComponent implements OnInit {
   @ViewChild(AppComponent) appComponent : AppComponent;
   public FormUsuarios !: FormGroup; // Formulario alojado en el modal para editar y eliminar usuarios
 
+  categorias : any[] = [];
   today : any = moment().format('YYYY-MM-DD');
   menuConfiguracion : boolean = false;
   menuUsuario : boolean = false;
@@ -38,27 +40,8 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
+  eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   position: string = '';
-  subir : boolean = true;
-  subir1 : boolean = true;
-  subir2 : boolean = true;
-  subir3 : boolean = true;
-  subir4 : boolean = true;
-  subir5 : boolean = true;
-  subir6 : boolean = true;
-  subir7 : boolean = true;
-  subir7_1 : boolean = true;
-  subir8 : boolean = true;
-  subir8_1 : boolean = true;
-  subir9 : boolean = true;
-  subir10: boolean= true;
-  subir11: boolean = true;
-  subir12 : boolean = true;
-  subir13 : boolean = true;
-  subir14 : boolean = true;
-  subir15 : boolean = true;
-  subir16 : boolean = true;
-  subir17 : boolean = true;
   modoSeleccionado : boolean;
 
   roles : any [] = [];
@@ -74,7 +57,8 @@ export class MenuLateralComponent implements OnInit {
                               private usuarioService : UsuarioService,
                                 private mensajeService : MensajesAplicacionService,
                                   private eventosCalService : EventosCalendarioService,
-                                    private vistasPermisosService : Vistas_PermisosService,) {
+                                    private vistasPermisosService : Vistas_PermisosService,
+                                      private router : Router) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -88,6 +72,7 @@ export class MenuLateralComponent implements OnInit {
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
+    this.CargarCategorias();
   }
 
   lecturaStorage(){
@@ -131,12 +116,32 @@ export class MenuLateralComponent implements OnInit {
     setTimeout(() => this.cambiarColorIcono(), 100);
   }
 
-  validarPermisosVistas(vista : string) : boolean{
-    let validacion : boolean;
-    // this.vistasPermisosService.GetPermisos(this.ValidarRol, vista).subscribe(() => validacion = true, () => validacion = false);
-    // return validacion;
-    console.log(1)
-    return true;
+  CargarCategorias(){
+    this.vistasPermisosService.GetCategoriasMenu(this.ValidarRol).subscribe(data => {
+      this.categorias = [];
+      for (let i = 0; i < data.length; i++){
+        data[i].split('|').forEach(element => {
+          if (this.categorias.length > 0 && element != '' && !['Inicio', 'Pruebas'].includes(element)) {
+            if (this.categorias.findIndex(item => item.label == element) == -1) this.categorias.push({label: element, icon: '', items: []});
+          } else if (element != '' && !['Inicio', 'Pruebas'].includes(element)) this.categorias.push({label: element, icon: '', items: []});
+        });
+      }
+      this.categorias.sort((a, b) => a.label.localeCompare(b.label));
+      this.categorias.unshift({label: `Inicio`, icon: 'pi pi-home', command: () => this.router.navigate(['/home'])});
+      if (this.storage_Id == 123456789) this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
+      this.cargarOpcionesMenu();
+    });
+  }
+
+  cargarOpcionesMenu(){
+    this.categorias.forEach(element => {
+      this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
+        for (let i = 0; i < data.length; i++){
+          element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
+        }
+        element.items.sort((a, b) => a.label.localeCompare(b.label));
+      });
+    });
   }
 
   mostrarMenuUsuario = () => this.menuUsuario = true;
@@ -193,13 +198,21 @@ export class MenuLateralComponent implements OnInit {
         this.eventosHoy.push({
           Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
           Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
-          Nombre : data[i].eventoCal_Nombre
+          Nombre : data[i].eventoCal_Nombre,
+          Descripcion : data[i].eventoCal_Descripcion,
         });
-      }
+        if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
+        else this.eventosDia = true;
+      }      
     });
   }
 
   mostrarModalCalendario = () => this.modalCalendario = true;
+
+  noMostrarMasDialogoEventosDia(mostrar : string){
+    this.cookieService.set('MostrarEventosDia', mostrar, { expires: 365, sameSite: 'Lax' });
+    this.eventosDia = false;
+  }
 
   showConfirm() {
     this.confirmationService.confirm({
@@ -223,52 +236,15 @@ export class MenuLateralComponent implements OnInit {
   onConfirm = () => this.authenticationService.logout();
 
   onReject = () => this.messageService.clear('c');
-
-  // Funcion que hacer que aparezca un icono u otro
-  clickIcon1 = () => this.subir1 ? this.subir1 = false : this.subir1 = true;
-
-  clickIcon2 = () => this.subir2 ? this.subir2 = false : this.subir2 = true;
-
-  clickIcon3 = () => this.subir ? this.subir3 = false : this.subir3 = true;
-
-  clickIcon4 = () => this.subir4 ? this.subir4 = false : this.subir4 = true;
-
-  clickIcon5 = () => this.subir5 ? this.subir5 = false : this.subir5 = true;
-
-  clickIcon6 = () => this.subir6 ? this.subir6 = false : this.subir6 = true;
-
-  clickIcon7 = () => this.subir7 ? this.subir7 = false : this.subir7 = true;
-
-  clickIcon7_1 = () => this.subir7_1 ? this.subir7_1 = false : this.subir7_1 = true;
-
-  clickIcon8 = () => this.subir8 ? this.subir8 = false : this.subir8 = true;
-
-  clickIcon8_1 = () => this.subir8_1 ? this.subir8_1 = false : this.subir8_1 = true;
-
-  clickIcon9 = () => this.subir9 ? this.subir9 = false : this.subir9 = true;
-
-  clickIcon10 = () => this.subir10 ? this.subir10 = false : this.subir10 = true;
-
-  clickIcon11 = () => this.subir11 ? this.subir11 = false : this.subir11 = true;
-
-  clickIcon12 = () => this.subir12 ? this.subir12 = false : this.subir12 = true;
-
-  clickIcon13 = () => this.subir13 ? this.subir13 = false : this.subir13 = true;
-
-  clickIcon14 = () => this.subir14 ? this.subir14 = false : this.subir14 = true;
-
-  clickIcon15 = () => this.subir15 ? this.subir15 = false : this.subir15 = true;
-
-  clickIcon16 = () => this.subir16 ? this.subir16 = false : this.subir16 = true;
-
-  clickIcon17 = () => this.subir17 ? this.subir17 = false : this.subir17 = true;
-
+  
+  // Funcion que cambiará el tema de la aplicación
   mostrar() {
     let modo = window.localStorage.getItem("theme");
     if(modo) this.AppComponent.temaSeleccionado = modo == 'dark' ? true : false;
     this.cambiar(this.AppComponent.temaSeleccionado);
   }
 
+  // Funcion que cambiará el tema de la aplicación
   cambiar(estado : any) {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);

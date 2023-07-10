@@ -37,7 +37,7 @@
               <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
               <p style="padding-left: 5%;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>{{product.nombre}}</b></p>
             </span>
-            <p style="padding-left: 20%;">Módulo {{product.categoria}}</p>
+            <p style="padding-left: 20%;">Módulo(s) {{product.categoria.replaceAll('|', ' - ')}}</p>
           </div>
         </div>
       </ng-template>

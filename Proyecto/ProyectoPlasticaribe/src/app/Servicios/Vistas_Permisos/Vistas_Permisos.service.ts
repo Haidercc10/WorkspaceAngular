@@ -23,6 +23,8 @@ export class Vistas_PermisosService {
 
     Get_Vistas_Rol = (rol : any, categoria : string) : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/get_vistas_rol/${rol}/${categoria}`);
 
+    Get_By_Rol = (rol : any) : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/get_By_Rol/${rol}`);
+
     Post = (data : any) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Vistas_Permisos`, data);
 
     Put = (id : any, data : any) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`, data);
