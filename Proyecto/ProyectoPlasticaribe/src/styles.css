@@ -62,6 +62,10 @@ a {
   color: #5D6D7E;
 }
 
+.colorRojo {
+  color: var(--rojoClaro);
+}
+
 .textoBarraNav{
   font-size: calc(var(--font-size) * 13px);
 }

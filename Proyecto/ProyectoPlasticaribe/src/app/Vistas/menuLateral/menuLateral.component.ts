@@ -69,10 +69,12 @@ export class MenuLateralComponent implements OnInit {
   }
 
   ngOnInit() {
+    moment.locale('es');
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
     this.CargarCategorias();
+    this.abrirModalUsuario();
   }
 
   lecturaStorage(){
@@ -147,7 +149,6 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
   abrirModalUsuario(){
-    this.modalUsuario = true;
     this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
       this.FormUsuarios.patchValue({ usuNombre: dataUsuarios[0].usua_Nombre, usuPassword: dataUsuarios[0].usua_Contrasena, });
     });
@@ -200,6 +201,8 @@ export class MenuLateralComponent implements OnInit {
           Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
           Nombre : data[i].eventoCal_Nombre,
           Descripcion : data[i].eventoCal_Descripcion,
+          Dia: moment().format('DD'),
+          Mes: moment('2023-01-01').format('MMM').toUpperCase(),
         });
         if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
         else this.eventosDia = true;
@@ -228,14 +231,14 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  confirm1() {
-    this.messageService.clear();
-    this.messageService.add({key: 'c', sticky: true, severity:'warn', summary:'¿Seguro que desea salir?'});
+  confirm(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: '¿Seguro que desea salir?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.authenticationService.logout(),
+    });
   }
-
-  onConfirm = () => this.authenticationService.logout();
-
-  onReject = () => this.messageService.clear('c');
   
   // Funcion que cambiará el tema de la aplicación
   mostrar() {

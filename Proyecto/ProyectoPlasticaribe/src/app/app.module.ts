@@ -346,6 +346,7 @@ import { AppComponent } from './app.component';
     BadgeModule,
     PanelMenuModule,
     FieldsetModule,
+    AccordionModule,
   ],
 
   providers: [

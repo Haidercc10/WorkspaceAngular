@@ -6,7 +6,7 @@
         <b>          
           <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
             <i class="pi pi-list font-size-18 px-2 py-3"></i>
-            Plasti<span>caribe S.A.S</span>
+            Plasti<span class="colorRojo">caribe S.A.S</span>
           </span>
         </b>
       </button>
@@ -25,27 +25,6 @@
     <i class="pi pi-cog"></i>
   </button>
 </div>
-
-<!-- Mensaje de Cierre de Sesión -->
-<p-toast position="center" key="c" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="onConfirm()" label="Si" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject()" label="No" class="p-button-secondary"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
 
 <!-- Menú Principal -->
 <p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
@@ -109,78 +88,78 @@
 </p-sidebar>
 
 <!-- Menú de Usuario -->
-<p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
-  <div>
-    <h5 class="mb-2">Bienvenido</h5>
-    <h6 class="font-size-24"><p>{{storage_Nombre}}</p></h6>
-  </div>
-
-  <div class="cardDatosUsuario my-3 p-2" (click)="abrirModalUsuario()">
-    <div class="row">
-      <div class="col-3 m-auto text-center">
-        <i class="pi pi-user font-size-20"></i>
-      </div>
-
-      <div class="col-9 font-size-12">
-        <h5><p>Editar Perfil</p></h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="cerrarSesion my-3 p-2" (click)="confirm1()">
-    <div class="row">
-      <div class="col-3 m-auto text-center">
-        <i class="pi pi-fw pi-power-off font-size-20"></i>
-      </div>
-
-      <div class="col-9 font-size-12">
-        <h5><p>Cerrar Sesión</p></h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="mt-2">
-    <span class="Titulo tituloRojo">Eventos Para Hoy {{today}}</span>
-  </div>
-
-  <!-- Eventos del Día -->
-  <div class="eventosUSua my-3 p-2" *ngFor="let item of eventosHoy">
-    <div class="row font-size-25 mb-2">
-      <p>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</p>
-    </div>
-
-    <div class="row font-size-20">
-      <p>{{item.Nombre}}</p>
-    </div>
-  </div>
+<p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">  
+  <p-accordion class="w-full" [activeIndex]="1">
+    <!-- Editar Usuario -->
+    <p-accordionTab>
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center">
+          <i class="pi pi-user mr-2"></i>
+          <span class="vertical-align-middle">Editar Perfil</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
+          <div class="row g-4">
+            <div class="col-12">
+              <span class="p-float-label">
+                <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
+                <label for="usuarioNombre">Nombre Usuario</label>
+              </span>
+            </div>
+    
+            <div class="col 12">
+              <span class="p-float-label">
+                <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
+                <label for="pass">Contraseña</label>
+              </span>
+            </div>
+          </div>
+    
+          <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
+          </div>
+        </form>
+      </ng-template>
+    </p-accordionTab>
+    <!-- Eventos -->
+    <p-accordionTab>
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center">
+          <i class="pi pi-calendar mr-2"></i>
+          <span class="vertical-align-middle">Eventos</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div class="row eventos mt-2" *ngFor="let item of eventosHoy">
+          <div class="col-6">
+            <div class="row calendarioFecha">
+              <div class="col-12 contenido dia d-grid d-md-flex justify-content-md-center">
+                <span>{{item.Dia}}</span>
+                <span>{{item.Mes}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 m-auto tituloEvento d-grid d-md-flex justify-content-md-start">
+            <span>{{item.Nombre}}</span>
+          </div>
+        </div>
+      </ng-template>
+    </p-accordionTab>
+    <!-- Cerrar Sesión -->
+    <p-accordionTab (click)="confirm($event)">
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center">
+          <i class="pi pi-fw pi-power-off mr-2"></i>
+          <span class="vertical-align-middle">Cerrar Sesión</span>
+        </div>
+      </ng-template>      
+      <ng-template pTemplate="content">
+        <p-confirmPopup></p-confirmPopup>
+      </ng-template>
+    </p-accordionTab>
+  </p-accordion>
 </p-sidebar>
-
-<!-- Modal Usuario -->
-<p-dialog [(visible)]="modalUsuario" [style]="{width: '470px'}" header="Editar Usuarios" [modal]="true">
-  <ng-template pTemplate="content">
-    <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
-      <div class="row my-3 g-4">
-        <div class="col-12">
-          <span class="p-float-label">
-            <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
-            <label for="usuarioNombre">Nombre Usuario</label>
-          </span>
-        </div>
-
-        <div class="col 12">
-          <span class="p-float-label">
-            <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
-            <label for="pass">Contraseña</label>
-          </span>
-        </div>
-      </div>
-
-      <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
-      </div>
-    </form>
-  </ng-template>
-</p-dialog>
 
 <!-- Modal de Calendario -->
 <p-dialog [(visible)]="modalCalendario" [style]="{width: '800px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '400px' }" header="Eventos Calendario" [modal]="true">
