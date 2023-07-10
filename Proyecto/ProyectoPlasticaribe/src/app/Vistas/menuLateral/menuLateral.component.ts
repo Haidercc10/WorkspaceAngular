@@ -70,7 +70,6 @@ export class MenuLateralComponent implements OnInit {
   }
 
   ngOnInit() {
-    moment.locale('es');
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
@@ -195,6 +194,7 @@ export class MenuLateralComponent implements OnInit {
   // Funcion que consultará los eventos de hoy
   consultarEventosHoy(){
     this.eventosHoy = [];
+    this.eventosMes = [];
     this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosHoy.push({

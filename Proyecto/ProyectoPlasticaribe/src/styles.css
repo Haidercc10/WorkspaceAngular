@@ -249,3 +249,19 @@ html, body {
 #texto-centrado {
   text-align: center;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d83543ae;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f43e4d;
+}

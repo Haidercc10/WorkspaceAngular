@@ -144,6 +144,10 @@
             <span>{{item.Nombre}}</span>
           </div>
         </div>
+
+        <div *ngIf="eventosMes.length == 0">
+          <p class="font-size-20 colorRojo">¡No hay eventos por mostrar!</p>
+        </div>
       </ng-template>
     </p-accordionTab>
     <!-- Cerrar Sesión -->
