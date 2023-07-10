@@ -127,7 +127,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerCategorias();
-    //this.consultarInventario();
+    this.consultarInventario();
     this.consultarCategorias();
     this.obtenerUnidadesMedidas();
   }
