@@ -5,7 +5,6 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AppComponent } from 'src/app/app.component';
-import { vistasDisponibles } from '../VistasFavoritas/VistasDisponibles';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
