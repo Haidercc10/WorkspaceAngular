@@ -725,6 +725,17 @@
             </span>
           </div>
 
+          <!-- Nombre BOPP Generico -->
+          <div class="col-md-12" *ngIf="esBopp">
+            <span class="p-float-label">
+              <input formControlName="BoppGenerico" id="BoppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas editar!" [required]="esBopp"/>
+              <datalist id="BoppGen">
+                <option value={{item.boppGen_Id}} *ngFor="let item of boppsGenericos">{{item.boppGen_Nombre}}</option>
+              </datalist>
+              <label for="Nombre">Bopp Genérico</label>
+            </span>
+          </div>
+
           <!--Boton Ingresar al sistema-->
           <div class="mb-3 d-grid gap-2 d-md-flex justify-content-md-center">
             <button pButton pRipple label="Editar" [disabled]="FormEdicionMateriaPrima.invalid" type="submit" class="p-button-success"></button>
