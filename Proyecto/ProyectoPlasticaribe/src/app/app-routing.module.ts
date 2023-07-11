@@ -57,6 +57,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
+import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 
 export const routes: Routes = [
 
@@ -166,6 +167,8 @@ export const routes: Routes = [
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
   {path: 'solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Material Producción'}, component: SolicitudMP_ExtrusionComponent},
   {path: 'reporte-solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Material Producción'}, component: Reporte_SolicitudMpExtrusionComponent},
+
+  {path: 'facturas-invergoal-inversuez', component: Facturas_Invergoal_InversuezComponent}
 ]
 
 @NgModule({
