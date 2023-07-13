@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { MenuItem } from 'primeng/api';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
-import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { Table } from 'primeng/table';
+import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
+import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -14,35 +16,42 @@ import { AppComponent } from 'src/app/app.component';
 
 export class PruebaImagenCatInsumoComponent implements OnInit  {
 
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  displayTerminal: boolean; //Variable que permitirá mostrar o no el apartado donde se pueden escoger las vistas favoritas
-  dockItems: MenuItem[] = []; //Variable que mostrará las vistas favoritas que feuron escogidas por el usuario logeado
-  responsiveOptions: any[]; //Variable que hará que el docker, donde estan las vistas favoritas, sea responsive
-  targetProducts = []; //Variable que tendrá las vistas seleccionadas por el usuario como favoritas
-  disponibles = []; //Variable que tendrá la información de todas las vistas disponibles
-  seleccionados = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
-  vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
-  disponiblesMostrar = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
+  today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
+  primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  carteraAgrupadaProveedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por los proveedores
+  carteraInvergoal : any [] = []; //Variable que almacenará la información de la cartera de INVERGOAL
+  carteraInversuez : any [] = []; //Variable que almacenará la información de la cartera de INVERSUEZ
+  totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
+  @ViewChild('dt_carteraAgrupada') dt_carteraAgrupada: Table | undefined;
+
+  facturasInvergoal : any [] = []; //Variable que almacenará la información de las facturas de INVERGOAL
+  facturasInversuez : any [] = []; //Variable que almacenará la información de las facturas de INVERSUEZ
 
   constructor(private AppComponent : AppComponent,
-                private vistasFavService : VistasFavoritasService,
-                  private msj : MensajesAplicacionService,
-                    private vistasPermisos : Vistas_PermisosService,) {
+                private zeusService : ZeusContabilidadService,
+                  private shepherdService: ShepherdService,
+                    private facturasInverService : Facturas_Invergoal_InversuezService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    if (this.storage_Id.toString() != '') {
-      this.llenarVistasDisponibles();
-      this.buscarFavoritos();
-      setTimeout(() => this.mostrarVistasFav(), 2500);
-    }
+    this.tiempoExcedido();
+    this.consultarFacturas();
   }
+
+  // Funcion que iniciará el tutorial
+  tutorial(){
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -51,171 +60,273 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
-  llenarVistasDisponibles = () => this.vistasPermisos.Get_By_Rol(this.ValidarRol).subscribe(data => this.disponibles = data);
-
-  // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
-  mostrarVistasFav(){
-    this.dockItems = [];
-    this.dockItems.push(
-      {
-        label: 'Inicio',
-        tooltipOptions: {
-          tooltipLabel: "Inicio",
-          tooltipPosition: 'top',
-          positionTop: -15,
-          positionLeft: 15
-        },
-        icon: "assets/Iconos_Menu/home.png",
-        command: () => { window.location.href = './home'; }
-      }
-    );
-    for (let i = 0; i < this.disponibles.length; i++) {
-      for (let j = 0; j < this.vistasFavoritas.length; j++) {
-        if (this.vistasFavoritas[j] == this.disponibles[i].id) {
-          let { nombre, icono, ruta } = this.disponibles[i];
-          let info: any = {
-            label: nombre,
-            tooltipOptions: {
-              tooltipLabel: nombre,
-              tooltipPosition: 'top',
-              positionTop: -15,
-              positionLeft: 15
-            },
-            icon: icono,
-            command: () => { window.location.href = ruta; }
-          };
-          this.dockItems.push(info);
-          this.seleccionados.push(this.disponibles[i].id);
-        }
-      }
-    }
-    this.dockItems.push(
-      {
-        label: 'Añadir',
-        tooltipOptions: {
-          tooltipLabel: "Añadir Favoritos",
-          tooltipPosition: 'top',
-          positionTop: -15,
-          positionLeft: 15
-        },
-        icon: "assets/Iconos_Menu/crear.png",
-        command: () => {
-          this.llenarDatosRol();
-        }
-      }
-    );
-    this.responsiveOptions = [
-      { breakpoint: '1024px', numVisible: 3 },
-      { breakpoint: '768px', numVisible: 2 },
-      { breakpoint: '560px', numVisible: 1 }
-    ];
+  //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
+  tiempoExcedido() {
+    this.consultarCartera();
   }
 
-  // Funcion que llenará los datos segun el rol del usuario logeado, si no encuentra ninguna vista como favorita no pondrá ninguno en la vista
-  llenarDatosRol(){
-    this.targetProducts = [];
-    this.disponiblesMostrar = [];
-    for (let i = 0; i < this.disponibles.length; i++) {
-      if (!this.seleccionados.includes(this.disponibles[i].id)) this.disponiblesMostrar.push(this.disponibles[i]);
-      else this.targetProducts.push(this.disponibles[i]);
-    }
-    setTimeout(() => this.displayTerminal = true, 500);
-  }
-
-  // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
-  elegirFavoritos(){
-    if (this.targetProducts.length > 5) {
-      this.msj.mensajeAdvertencia('Advertencia', 'Solo puede elegir 5 favoritos');
-      for (let i = 0; i < this.targetProducts.length; i++) {
-        this.disponiblesMostrar.push(this.targetProducts[i]);
-        this.targetProducts.splice(i, 1);
-        this.disponiblesMostrar.sort((a,b) => Number(a.id) - Number(b.id));
-        this.añadirVistasFavoritas();
-        break;
-      }
-    } else if (this.targetProducts.length <= 5) this.añadirVistasFavoritas();
-  }
-
-  // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
-  buscarFavoritos(){
-    this.vistasFavoritas = [];
-    if (this.storage_Id != undefined) {
-      this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
-        for (let i = 0; i < datos_vistasFav.length; i++) {
-          this.vistasFavoritas = [
-            datos_vistasFav[i].vistaFav_Num1,
-            datos_vistasFav[i].vistaFav_Num2,
-            datos_vistasFav[i].vistaFav_Num3,
-            datos_vistasFav[i].vistaFav_Num4,
-            datos_vistasFav[i].vistaFav_Num5,
-          ];
-        }
-      }, error => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
-    }
-  }
-
-  // Funcion que añadirá o actualizará la base de datos con las vistas favoritas que ha elegido un usuario
-  añadirVistasFavoritas(){
-    if (this.vistasFavoritas.length == 0) {
-      for (let i = 0; i < this.targetProducts.length; i++) {
+  // Función que ejecutará las peticiones de la cartera
+  consultarCartera(){
+    this.cargando = true;
+    this.carteraAgrupadaProveedores = [];
+    this.carteraInvergoal = [];
+    this.carteraInversuez = [];
+    this.zeusService.GetCostosProveedores('220505').subscribe(data => {
+      let numDatos : number = 0;
+      for (let i = 0; i < data.length; i++) {
         let info : any = {
-          Usua_Id : this.storage_Id,
-          VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
-          VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
-          VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
-          VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
-          VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
-          VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-          VistaFav_Hora : moment().format('H:mm:ss'),
+          Id_Proveedor : data[i].idprove,
+          Proveedor : data[i].razoncial,
+          Cartera : data[i].sdaccta,
+          Cuenta : data[i].codicta,
+          Periodo : data[i].anomescta,
+          Detalles : [],
         }
-        this.vistasFavService.insertVistasFavoritas(info).subscribe(() => {
-          this.buscarFavoritos();
-          setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-        }, error => { this.msj.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'); });
-        break;
-      }
-    } else {
-      this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
-        for (let i = 0; i < datos_vistasFav.length; i++) {
-          if (this.targetProducts.length == 0) {
-            let info : any = {
-              VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
-              Usua_Id : this.storage_Id,
-              VistaFav_Num1 : 0,
-              VistaFav_Num2 : 0,
-              VistaFav_Num3 : 0,
-              VistaFav_Num4 : 0,
-              VistaFav_Num5 : 0,
-              VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-              VistaFav_Hora : moment().format('H:mm:ss'),
-            }
-            this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
-              this.buscarFavoritos();
-              setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-            }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
-          } else {
-            for (let j = 0; j < this.targetProducts.length; j++) {
-              let info : any = {
-                VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
-                Usua_Id : this.storage_Id,
-                VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
-                VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
-                VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
-                VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
-                VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
-                VistaFav_Fecha : moment().format('YYYY-MM-DD'),
-                VistaFav_Hora : moment().format('H:mm:ss'),
+        if (!['900458314','900362200'].includes(data[i].idprove)) this.carteraAgrupadaProveedores.push(info);
+        else if (data[i].idprove == '900362200') this.carteraInvergoal.push(info);
+        else if (data[i].idprove == '900458314') this.carteraInversuez.push(info);
+        numDatos += 1;
+        if (numDatos == data.length) {
+          this.costoPorPagar(1);
+          this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
+            for (let i = 0; i < datos.length; i++) {
+              if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
+                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900362200') {
+                let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInvergoal[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900458314') {
+                let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInversuez[index].Detalles.push(datos[i]);
+                this.cargando = false;
               }
-              this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
-                this.buscarFavoritos();
-                setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-              }, error => this.msj.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
-              break;
             }
+          });
+        };
+      }
+    });
+    this.zeusService.GetCostosTotalProveedores('220505').subscribe(data => this.totalCartera = data);
+  }
+
+  // Funcion que va a tomar a calcular los dias de retraso de la factura
+  calcularDiasRetraso(factura : any, proveedor : any, data : any = this.carteraAgrupadaProveedores){
+    let index = data.findIndex(item => item.Id_Proveedor == proveedor);
+    let info : any [] = data[index].Detalles.filter(item => item.factura == factura);
+    let dias : number = 0;
+    for (let i = 0; i < info.length; i++) {
+      dias = moment().diff(moment(info[i].fecha_Vencimiento), 'days');
+    }
+    return dias < 0 ? dias - 1 : dias;
+  }
+
+  // Funcion que va a sumar el costo total a pagar
+  costoPorPagar(data : any){
+    let info : any;
+    if (data == 1) info = this.carteraAgrupadaProveedores;
+    else if (data == 2) info = this.carteraInvergoal;
+    else if (data == 3) info = this.carteraInversuez;
+    let total : number = 0;
+    for (const item of info) {
+      total += item.Cartera;
+    }
+    this.totalCartera = total;
+  }
+
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_carteraAgrupada!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  // Funcion que va a crear un pdf
+  crearPdf(data : any = this.carteraAgrupadaProveedores){
+    let nombre : string = this.storage_Nombre;
+    const titulo : string = `Estado Proveedores`;
+    let total : number = 0;
+    const pdfDefinicion : any = {
+      info: { title: titulo },
+      pageSize: { width: 630, height: 760 },
+      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+      pageMargins : [25, 140, 25, 15],
+      header: function(currentPage : any, pageCount : any) {
+        return [
+          {
+            margin: [20, 8, 20, 0],
+            columns: [
+              { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+              {
+                width: 300,
+                alignment: 'center',
+                table: {
+                  body: [
+                    [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                    [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
+                    [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                  ]
+                },
+                layout: 'noBorders',
+                margin: [85, 20],
+              },
+              {
+                width: '*',
+                alignment: 'center',
+                margin: [20, 20, 20, 0],
+                table: {
+                  body: [
+                    [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                  ]
+                },
+                layout: 'noBorders',
+              }
+            ]
+          },
+          {
+            margin: [20, 0],
+            table: {
+              headerRows: 1,
+              widths: ['*'],
+              body: [
+                [
+                  {
+                    border: [false, true, false, false],
+                    text: ''
+                  },
+                ],
+              ]
+            },
+            layout: { defaultBorder: false, }
+          },
+          {
+            margin: [20, 10, 20, 0],
+            table: {
+              headerRows: 1,
+              widths: [110, 70, 80, 140, 40, 30, 50],
+              body: [
+                [
+                  { text: 'Factura', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Fecha', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Vence', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Valor', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Mora', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Días', fillColor: '#bbb', fontSize: 10 },
+                  { text: 'Cuenta', fillColor: '#bbb', fontSize: 10 },
+                ],
+              ]
+            },
+            layout: { defaultBorder: false, }
           }
+        ];
+      },
+      content : []
+    };
+    for (let item of data) {
+      total += item.Cartera;
+      let proveedor = {
+        margin: [0, 5, 0, 5],
+        table: {
+          widths: [100, 70, 70, 160, 30, 40, 40],
+          body: [
+            [ { text: `Proveedor:    ${item.Id_Proveedor}    ${item.Proveedor}`, bold: true, border: [false, false, false, false], colSpan: 7},'','','','','','' ],
+          ]
+        },
+        layout: { defaultBorder: false, },
+        fontSize: 9,
+      }
+      for (let itemDetalles of item.Detalles) {
+        let info = [
+          {text: `FA-${itemDetalles.factura}`, border: [true, true, false, true], bold: false, colSpan: 1},
+          {text: `${itemDetalles.fecha_Factura}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${itemDetalles.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${this.formatonumeros(itemDetalles.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${itemDetalles.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
+        ];
+        proveedor.table.body.push(info);
+      }
+      proveedor.table.body.push(
+        [
+          { text: `Total Proveedor:`, border: [false, false, false, false], bold: true, colSpan: 1},
+          '',
+          '',
+          { text: `${this.formatonumeros(item.Cartera)}`, border: [false, false, false, false], bold: true, colSpan: 1},
+          { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
+          '',
+          '',
+        ],
+      );
+      pdfDefinicion.content.push(proveedor);
+    }
+    let totalData = {
+      margin: [0, 10],
+      table: {
+        widths: [100, 70, 70, 160, 30, 40, 40],
+        body: [
+          [
+            { text: `Total General:`, border: [false, false, false, false], bold: true, colSpan: 1},
+            '',
+            '',
+            { text: `${this.formatonumeros(total)}`, border: [false, false, false, false], bold: true, colSpan: 1},
+            { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
+            '',
+            '',
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+    pdfDefinicion.content.push(totalData);
+    pdfMake.createPdf(pdfDefinicion).open();
+  }
+
+  // funcion que va a consultar las facturas de invergoal e inversuez
+  consultarFacturas(){
+    this.facturasInvergoal = [];
+    this.facturasInversuez = [];
+    this.facturasInverService.GetProveedoresFacturas_Pagar().subscribe((data : any) => {
+      this.cargando = true;
+      let numProveedores : number = 0;
+      data.forEach((factura : any) => {
+        const info : any = {
+          Id_Proveedor : factura.nit_Proveedor,
+          Proveedor : factura.prov_Nombre,
+          Cartera : factura.valorTotal,
+          Cuenta : factura.cuenta,
+          Detalles : [],
+          Id_Empresa : factura.nit_Empresa,
+        }
+        if (factura.nit_Empresa == 900362200) this.facturasInvergoal.push(info);
+        else if (factura.nit_Empresa == 900458314) this.facturasInversuez.push(info);
+        numProveedores += 1;
+        if (numProveedores == data.length) {
+          let registros : number = 0;
+          this.facturasInverService.GetFacturas_Pagar().subscribe((datos : any) => {
+            datos.forEach((facturas : any) => {
+              const infoFacturas : any = {
+                factura : facturas.factura,
+                fecha_Factura : facturas.fecha_Factura.replace('T00:00:00', ''),
+                fecha_Vencimiento : facturas.fecha_Vencimiento.replace('T00:00:00', ''),
+                saldo_Actual : facturas.saldo_Actual,
+                mora : facturas.mora,
+              }
+              if (facturas.empresa == 900362200) {
+                this.facturasInvergoal[this.facturasInvergoal.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
+              } else if (facturas.empresa == 900458314) {
+                this.facturasInversuez[this.facturasInversuez.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
+              }
+              registros += 1;
+              if (registros == datos.length) {
+                this.cargando = false;
+                console.log(this.facturasInvergoal);
+                console.log(this.facturasInversuez);
+              }
+            });
+          });
         }
       });
-    }
+    });
   }
 }
