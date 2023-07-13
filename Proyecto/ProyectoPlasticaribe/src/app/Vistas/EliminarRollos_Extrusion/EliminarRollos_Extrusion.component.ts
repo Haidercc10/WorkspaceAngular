@@ -151,8 +151,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     this.bodegaExtrusion = false;
     this.bodegaDespacho = false;
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
 
     if(proceso != null && bodega != null) {
       if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT')

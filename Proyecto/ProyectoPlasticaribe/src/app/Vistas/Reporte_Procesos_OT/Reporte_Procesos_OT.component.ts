@@ -476,8 +476,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTCerrada = 0;
     let ruta : string = '';
     let masDeUnFiltros : boolean = true;
-    if (fechaincial == 'Invalid date') fechaincial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaincial == 'Fecha inválida') fechaincial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
 
     //6
     if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;

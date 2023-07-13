@@ -99,8 +99,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.FormConsultarFiltros.value.estadoDoc;
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
 
     if (oc != null && fechaFinal != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {

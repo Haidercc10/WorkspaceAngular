@@ -141,8 +141,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     let productoConsulta : any = this.formConsultaRollos.value.id_producto;
     if (this.idProducto == 0) productoConsulta = null;
 
-    if (fecha1 == 'Invalid date') fecha1 = null;
-    if (fecha2 == 'Invalid date') fecha2 = null;
+    if (fecha1 == 'Fecha inválida') fecha1 = null;
+    if (fecha2 == 'Fecha inválida') fecha2 = null;
 
     if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {

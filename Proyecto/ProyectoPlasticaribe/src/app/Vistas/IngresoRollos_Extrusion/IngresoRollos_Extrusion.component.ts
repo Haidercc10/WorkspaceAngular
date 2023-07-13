@@ -104,8 +104,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     let rollosBagPro : number [] = [];
     let rollosExistentes : number [] = [];
     let ruta : string = '';
-    fechaInicial == 'Invalid date' ? fechaInicial = this.today : fechaInicial;
-    fechaFinal == 'Invalid date' ? fechaFinal = fechaInicial : fechaFinal;
+    fechaInicial == 'Fecha inválida' ? fechaInicial = this.today : fechaInicial;
+    fechaFinal == 'Fecha inválida' ? fechaFinal = fechaInicial : fechaFinal;
 
     if (ot != null && rollo != null) ruta = `?ot=${ot}&rollo=${rollo}`;
     else if (ot != null) ruta = `?ot=${ot}`;

@@ -167,6 +167,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
+import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 
 @NgModule({
   declarations: [
@@ -260,6 +261,7 @@ import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergo
     Reporte_SolicitudMpExtrusionComponent,
     Inventario_Bodegas_RollosComponent,
     Facturas_Invergoal_InversuezComponent,
+    Gestionar_Facturas_Invergoal_InversuezComponent,
   ],
 
   imports: [

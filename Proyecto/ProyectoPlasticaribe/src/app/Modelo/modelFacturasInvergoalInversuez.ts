@@ -11,5 +11,6 @@ export interface modelFacturasInvergoalInversuez {
     Fecha_Vencimiento : Date;
     Valor_Factura : number;
     Cuenta : string;
+    Estado_Factura : number;
     Observacion : string;
 }

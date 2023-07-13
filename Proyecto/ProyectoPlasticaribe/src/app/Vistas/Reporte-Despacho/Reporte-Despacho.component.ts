@@ -113,8 +113,8 @@ export class ReporteDespachoComponent implements OnInit {
     let fechaIni : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFin : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     if (documento == '') documento = null;
-    if (fechaIni == 'Invalid date') fechaIni = null;
-    if (fechaFin == 'Invalid date') fechaFin = null;
+    if (fechaIni == 'Fecha inválida') fechaIni = null;
+    if (fechaFin == 'Fecha inválida') fechaFin = null;
 
 
     if (fechaIni != null && fechaFin != null) {

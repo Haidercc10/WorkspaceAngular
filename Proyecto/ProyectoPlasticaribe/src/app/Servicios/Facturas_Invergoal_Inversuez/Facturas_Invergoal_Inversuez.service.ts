@@ -13,7 +13,11 @@ constructor(private http : HttpClient) { }
 
     Get_Facturas = () : Observable<any[]> => this.http.get<any[]>(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez`);
 
-    Get_Factura = (id : number) : Observable<any[]> => this.http.get<any[]>(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/${id}`);
+    Get_Factura_Id = (id : number) : Observable<any[]> => this.http.get<any[]>(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/${id}`);
+
+    GetFacturasIngresadas(emp : string, fechaInicial : any, fechaFinal : any, ruta : string) : Observable<any[]> {
+        return this.http.get<any[]>(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/getFacturasIngresadas/${emp}/${fechaInicial}/${fechaFinal}${ruta}`);
+    }
 
     Post = (data : modelFacturasInvergoalInversuez) => this.http.post(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez`, data);
 

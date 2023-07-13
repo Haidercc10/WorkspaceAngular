@@ -128,8 +128,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     let tipoMantenimiento : any = this.FormMovimientosMantenimiento.value.IdTipoMantenimiento;
     let ruta : string = ``;
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     if (fechaInicial == null) fechaInicial = this.today;
     if (fechaFinal == null) fechaFinal = fechaInicial;
 

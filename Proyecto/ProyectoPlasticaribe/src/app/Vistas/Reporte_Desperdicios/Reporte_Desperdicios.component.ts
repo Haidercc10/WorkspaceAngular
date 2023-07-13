@@ -130,8 +130,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayConsulta = [];
     let ruta : string = '';
 
-    if (fecha1 == 'Invalid date') fecha1 = null;
-    if (fecha2 == 'Invalid date') fecha2 = null;
+    if (fecha1 == 'Fecha inválida') fecha1 = null;
+    if (fecha2 == 'Fecha inválida') fecha2 = null;
     if (fecha1 == null) fecha1 = this.today;
     if (fecha2 == null) fecha2 = fecha1;
 

@@ -122,8 +122,8 @@ export class MovimientoMPComponent implements OnInit {
     let materiaPrima : any = this.formMovimientos.value.MateriasPrimas_Id;
     let ruta : string = ``;
 
-    if (fechaInicial == 'Invalid date') fechaInicial = moment().format('YYYY-MM-DD');
-    if (fechaFinal == 'Invalid date') fechaFinal = fechaInicial;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = moment().format('YYYY-MM-DD');
+    if (fechaFinal == 'Fecha inválida') fechaFinal = fechaInicial;
 
     if (codigo != null && tipoMovimiento != null && materiaPrima != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}&materiaPrima=${materiaPrima}`;
     else if (codigo != null && tipoMovimiento != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}`;

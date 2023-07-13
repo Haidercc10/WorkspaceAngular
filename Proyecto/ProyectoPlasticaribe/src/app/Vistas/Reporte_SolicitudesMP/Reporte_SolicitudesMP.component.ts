@@ -131,8 +131,8 @@ export class Reporte_SolicitudesMPComponent implements OnInit {
     let estado : any = this.formFiltros.value.estadoDoc;
     let arrayId : any = [];
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     if(fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
 
     if(solicitud != null && estado != null && fechaInicial != null && fechaFinal != null) {

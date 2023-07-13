@@ -131,7 +131,9 @@ export class MenuLateralComponent implements OnInit {
       this.categorias.sort((a, b) => a.label.localeCompare(b.label));
       this.categorias.unshift({label: `Inicio`, icon: 'pi pi-home', command: () => this.router.navigate(['/home'])});
       if (this.storage_Id == 123456789) this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
-      this.cargarOpcionesMenu();
+      setTimeout(() => {
+        this.cargarOpcionesMenu();
+      }, 50);
     });
   }
 
@@ -139,9 +141,9 @@ export class MenuLateralComponent implements OnInit {
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
-          element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
+          if (element.items) element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
         }
-        element.items.sort((a, b) => a.label.localeCompare(b.label));
+        if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
       });
     });
   }

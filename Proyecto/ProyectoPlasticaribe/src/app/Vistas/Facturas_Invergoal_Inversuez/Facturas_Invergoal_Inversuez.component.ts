@@ -133,6 +133,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
         Fecha_Vencimiento: factura.Vencimiento,
         Valor_Factura: factura.Valor,
         Cuenta: factura.Cuenta,
+        Estado_Factura: 2,
         Observacion: this.FormFacturas.value.Observaciones == null ? '' : this.FormFacturas.value.Observaciones.toUpperCase(),
       };
       this.facturasService.Post(datos).subscribe(() => {
