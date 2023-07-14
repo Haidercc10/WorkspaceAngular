@@ -71,6 +71,15 @@
         <app-Dashboard_CuentasPagar *ngIf="cuentasPagar"></app-Dashboard_CuentasPagar>
       </p-tabPanel>
 
+      <!-- GERENCIA -->
+      <p-tabPanel
+        header="Gerencia"
+        leftIcon="pi pi-chart-line"
+        tooltip="Información general"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-Dashboard_General></app-Dashboard_General>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

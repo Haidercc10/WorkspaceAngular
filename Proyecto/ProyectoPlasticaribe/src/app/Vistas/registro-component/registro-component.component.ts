@@ -9,12 +9,14 @@ import { modelAreas } from 'src/app/Modelo/modelAreas';
 import { modelRol } from 'src/app/Modelo/modelRol';
 import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
 import { modelUsuario } from 'src/app/Modelo/modelUsuario';
+import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SrvTipos_UsuariosService } from 'src/app/Servicios/TiposUsuarios/srvTipos_Usuarios.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsUsuarios as defaultSteps } from 'src/app/data';
 
@@ -23,9 +25,11 @@ import { defaultStepOptions, stepsUsuarios as defaultSteps } from 'src/app/data'
   templateUrl: './registro-component.component.html',
   styleUrls: ['./registro-component.component.css']
 })
+
 export class RegistroComponentComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dt_Roles') dt_Roles: Table | undefined;
 
   public FormUsuarios !: FormGroup; /** Formulario alojado en el modal para editar y eliminar usuarios */
   public arrayAreas : any = []; /** Array para cargar areas al combobox del formulario de usuarios */
@@ -50,6 +54,12 @@ export class RegistroComponentComponent implements OnInit {
   public arrayNombresRoles : any = []; /** Array que cargará los nombres de los roles en el modal para crear roles. */
   public arrayNombresAreas : any = []; /** Array que cargará los nombres de las areas en el modal para crear areas. */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  arrayRoles_Vistas : any [] = []; //Array que cargará los roles con cada una de las vistas que tienen
+  vistasAplicacion : any [] = []; //Array que cargará las vistas de la aplicación
+  vistasSeleccionadas : any [] = []; //Array que cargará las vistas seleccionadas en el modal de roles
+  modalRol : boolean = false; //Variable que servirá para mostrar o no el modal de roles
+  rolEditar : number = 0;
+  editarRol : boolean = false; //
 
   constructor(private formBuilder : FormBuilder,
               private servicioRoles : RolesService,
@@ -59,7 +69,8 @@ export class RegistroComponentComponent implements OnInit {
                       private servicioTpUsuarios : SrvTipos_UsuariosService,
                         private AppComponent : AppComponent,
                           private shepherdService: ShepherdService,
-                            private msj : MensajesAplicacionService) {
+                            private msj : MensajesAplicacionService,
+                              private vistasPermisosService : Vistas_PermisosService,) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
@@ -82,6 +93,8 @@ export class RegistroComponentComponent implements OnInit {
     this.cargarEstados();
     this.cargarTiposUsuarios();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.cargarRoles_Vistas();
+    this.cargarVistas();
   }
 
   // Funcion que crgará las areas
@@ -365,9 +378,12 @@ export class RegistroComponentComponent implements OnInit {
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
+  // Filtros para la tabla de roles
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_Roles!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   /** Cargar modal de crear roles y tipos de usuarios */
   modalRoles_TiposUsuarios(){
-    this.nuevoDialogo = true;
+    this.modalRol = true;
     this.accionDialogoNuevo = 'Rol';
     this.formRoles.reset();
   }
@@ -383,7 +399,8 @@ export class RegistroComponentComponent implements OnInit {
   inicializarFormularioRoles(){
     this.formRoles = this.formBuilder.group({
       rolNombre : [null, Validators.required],
-      rolDescripcion : [null]
+      rolDescripcion : [null, Validators.required],
+      Vistas : [null, Validators.required], 
     })
   }
 
@@ -405,9 +422,10 @@ export class RegistroComponentComponent implements OnInit {
         else {
           const roles : modelRol = { RolUsu_Id : 0, RolUsu_Nombre : nombreRol, RolUsu_Descripcion : descripcionRol, }
           const tipoUsu : modelTipoUsuario = { tpUsu_Id: 0, tpUsu_Nombre: nombreRol, tpUsu_Descripcion: descripcionRol, }
-          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {  this.crearTipo_Usuario(tipoUsu); }, error => {
-            this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`);
-          });
+          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => { 
+            this.crearTipo_Usuario(tipoUsu);
+            this.insertarPermisos(dataRol.rolUsu_Id);
+          }, () => this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`));
         }
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un rol debe diligenciar todos los campos!`);
@@ -478,5 +496,118 @@ export class RegistroComponentComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
+  }
+
+  // Funcion que va a cargar la información de cada uno de los roles con las vistas a las que tiene acceso
+  cargarRoles_Vistas = () => this.servicioRoles.srvObtenerLista().subscribe((data : any) => this.arrayRoles_Vistas = data);
+
+  // Funcion que se va a encargar de cargar las vistas
+  cargarVistas(){
+    this.vistasPermisosService.Get_Todo().subscribe((data : any) => {
+      data.forEach(element => {
+        this.vistasAplicacion.push({
+          key: element.vp_Id,
+          label: element.vp_Nombre,
+          data: element.vp_Nombre,
+          icon: element.vp_Icono_Menu,
+          children: []
+        })
+      });
+    });
+  }
+
+  // Funcion que va a insertar la información de un rol en la tabla permisos
+  insertarPermisos(rol : any){
+    let idVista : number;
+    this.vistasSeleccionadas.forEach(vista => {
+      idVista = vista.key;
+      this.vistasPermisosService.Get_By_Id(vista.key).subscribe(data => {
+        const info : modelVistasPermisos = {
+          Vp_Id: data.vp_Id,
+          Vp_Nombre: data.vp_Nombre,
+          Vp_Icono_Dock: data.vp_Icono_Dock,
+          Vp_Icono_Menu: data.vp_Icono_Menu,
+          Vp_Ruta: data.vp_Ruta,
+          Vp_Categoria: data.vp_Categoria,
+          Vp_Id_Roles: `${data.vp_Id_Roles}${rol}|`,
+        }
+        if (!(data.vp_Id_Roles).split('|').includes(rol)) this.vistasPermisosService.Put(idVista, info).subscribe(() => this.msj.mensajeConfirmacion(`¡El rol se ha creado!`, ``));
+      });
+    });
+  }
+
+  // Funcion que va a cargar la información de un rol en el formulario de roles 
+  cargarRoles_Formulario(rol : any){
+    this.accionDialogoNuevo = 'Rol';
+    this.modalRol = true;
+    this.editarRol = true;
+    this.vistasSeleccionadas = [];
+    this.rolEditar = rol;
+    this.servicioRoles.srvObtenerListaPorId(rol).subscribe(data => {
+      this.formRoles.patchValue({
+        rolNombre: data.rolUsu_Nombre,
+        rolDescripcion: data.rolUsu_Descripcion,
+      });
+      this.vistasPermisosService.Get_By_Rol(rol).subscribe((data : any) => {
+        data.forEach(element => this.vistasAplicacion.filter(item => item.key == element.id).forEach(item => this.vistasSeleccionadas.push(item)));
+      });
+    });  
+  }
+
+  // Funcion que va a editar la información de un rol
+  editarRoles(){
+    this.servicioRoles.srvObtenerListaPorId(this.rolEditar).subscribe(data => {
+      const info = {
+        RolUsu_Id: data.rolUsu_Id,
+        RolUsu_Nombre: data.rolUsu_Nombre,
+        RolUsu_Descripcion: data.rolUsu_Descripcion,
+      }
+      this.servicioRoles.srvActualizar(this.rolEditar, info).subscribe(() => {
+        this.msj.mensajeConfirmacion(`¡El rol se ha editado!`, ``);
+        this.editarVistas();
+      });
+    });
+  }
+
+  // Funcion que va a editar las vistas que tiene a las que tiene acceso un rol
+  editarVistas(){
+    this.vistasPermisosService.Get_By_Rol(this.rolEditar).subscribe(datos =>  {
+      let nombreVistas : any = [];
+      datos.forEach(element => nombreVistas.push(element.nombre));
+      
+      this.vistasSeleccionadas.filter(item => !nombreVistas.includes(item.label)).forEach(vista => {
+        this.vistasPermisosService.Get_By_Id(vista.key).subscribe(data => {
+          const info : modelVistasPermisos = {
+            Vp_Id: data.vp_Id,
+            Vp_Nombre: data.vp_Nombre,
+            Vp_Icono_Dock: data.vp_Icono_Dock,
+            Vp_Icono_Menu: data.vp_Icono_Menu,
+            Vp_Ruta: data.vp_Ruta,
+            Vp_Categoria: data.vp_Categoria,
+            Vp_Id_Roles: `${data.vp_Id_Roles}${this.rolEditar}|`,
+          }
+          if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(vista.key, info).subscribe();
+        });
+      });
+      
+      this.vistasSeleccionadas.forEach(data => {
+        nombreVistas.forEach(element => {
+          if (data.label != element) {
+            this.vistasPermisosService.Get_By_Id(data.key).subscribe(data => {
+            const info : modelVistasPermisos = {
+              Vp_Id: data.vp_Id,
+              Vp_Nombre: data.vp_Nombre,
+              Vp_Icono_Dock: data.vp_Icono_Dock,
+              Vp_Icono_Menu: data.vp_Icono_Menu,
+              Vp_Ruta: data.vp_Ruta,
+              Vp_Categoria: data.vp_Categoria,
+              Vp_Id_Roles: data.vp_Id_Roles.replace(`${this.rolEditar}|`, ''),
+            }
+            if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(data.key, info).subscribe();
+          });
+          }
+        });
+      });
+    }, () => this.insertarPermisos(this.editarRol));
   }
 }

@@ -168,6 +168,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
+import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
 
 @NgModule({
   declarations: [
@@ -262,6 +263,7 @@ import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestio
     Inventario_Bodegas_RollosComponent,
     Facturas_Invergoal_InversuezComponent,
     Gestionar_Facturas_Invergoal_InversuezComponent,
+    Dashboard_GeneralComponent,
   ],
 
   imports: [

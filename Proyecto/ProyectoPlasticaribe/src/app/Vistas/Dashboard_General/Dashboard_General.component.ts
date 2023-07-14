@@ -1,19 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
-import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
-  selector: 'app-prueba-imagen-cat-insumo',
-  templateUrl: './prueba-imagen-cat-insumo.component.html',
-  styleUrls: ['./prueba-imagen-cat-insumo.component.css']
+  selector: 'app-Dashboard_General',
+  templateUrl: './Dashboard_General.component.html',
+  styleUrls: ['./Dashboard_General.component.css']
 })
-
-export class PruebaImagenCatInsumoComponent implements OnInit  {
+export class Dashboard_GeneralComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -43,6 +42,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   cuentas_Pagar_Anios_Invergoal : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   cuentas_Pagar_Anios_Inversuez : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
+  inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
@@ -373,7 +373,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Plasticaribe(data){
-    console.log(data)
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info : any = {
       label: `Año ${this.anioSeleccionado}`,
@@ -392,7 +391,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Invergoal(data){
-    console.log(data)
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info : any = {
       label: `Año ${this.anioSeleccionado}`,
@@ -411,7 +409,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   // Funcion que va a llenar la grafica de cuentas por pagar
   llenarGraficaCuentas_Pagar_Inversuez(data){
-    console.log(data)
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info : any = {
       label: `Año ${this.anioSeleccionado}`,
@@ -474,7 +471,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   // Funcion que va a buscar la informacion de la grafica de inventario de productos
   BuscarDatosGraficaInventario_Producto(){
-    let index : number = this.inventarioMatPrima_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+    let index : number = this.inventarioProductos_Anios.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.inventarioProductos.Get_Cantidad_Productos_Meses().subscribe(data => {

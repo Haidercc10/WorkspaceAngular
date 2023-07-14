@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 @Injectable({
@@ -25,9 +26,9 @@ export class Vistas_PermisosService {
 
     Get_By_Rol = (rol : any) : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/get_By_Rol/${rol}`);
 
-    Post = (data : any) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Vistas_Permisos`, data);
+    Post = (data : modelVistasPermisos) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Vistas_Permisos`, data);
 
-    Put = (id : any, data : any) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`, data);
+    Put = (id : any, data : modelVistasPermisos) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`, data);
 
     Delete = (id : any) : Observable<any> => this.http.delete(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`);
 }  
