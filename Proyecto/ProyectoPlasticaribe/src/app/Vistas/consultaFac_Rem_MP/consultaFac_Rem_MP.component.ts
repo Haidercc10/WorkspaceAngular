@@ -109,8 +109,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
     let proveedores : any = this.FormDocumentos.value.proveedorId;
 
-    if (fecha == 'Invalid date') fecha = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fecha == 'Fecha inválida') fecha = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
 
     if (idDoc != null && fecha != null && fechaFinal != null && TipoDocumento != null && proveedores != null) {
       this.facturaCompraMPService.GetEntradaFacRem_Codigo(idDoc).subscribe(datos_entradas => {

@@ -4,6 +4,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
@@ -103,7 +104,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
                     private servicioInventarioZeus : InventarioZeusService,
-                      private msj : MensajesAplicacionService,) {
+                      private msj : MensajesAplicacionService,
+                        private facturasInverService : Facturas_Invergoal_InversuezService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -117,6 +119,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.comprasMesxMesInvergoal('900362200');
     this.graficarDatosSuez();
     this.comprasMesxMesInversuez('900458314');
+    // this.consultarFacturas();
   }
 
   // Funcion que iniciará el tutorial
@@ -651,5 +654,50 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.graficarDatos();
     this.graficarDatosGoal();
     this.graficarDatosSuez();
+  }
+
+  // funcion que va a consultar las facturas de invergoal e inversuez
+  consultarFacturas(){
+    this.carteraInvergoal = [];
+    this.carteraInversuez = [];
+    this.facturasInverService.GetProveedoresFacturas_Pagar().subscribe((data : any) => {
+      this.cargando = true;
+      let numProveedores : number = 0;
+      data.forEach((factura : any) => {
+        const info : any = {
+          Id_Proveedor : factura.nit_Proveedor,
+          Proveedor : factura.prov_Nombre,
+          Cartera : factura.valorTotal,
+          Cuenta : factura.cuenta,
+          Detalles : [],
+          Id_Empresa : factura.nit_Empresa,
+        }
+        if (factura.nit_Empresa == 900362200) this.carteraInvergoal.push(info);
+        else if (factura.nit_Empresa == 900458314) this.carteraInversuez.push(info);
+        numProveedores += 1;
+        if (numProveedores == data.length) this.facturasProveedores();
+      });
+    });
+  }
+
+  // Funcion que va a llenar cada uno de las facturas de cada proveedor
+  facturasProveedores(){
+    let registros : number = 0;
+    this.facturasInverService.GetFacturas_Pagar().subscribe((datos : any) => {
+      datos.forEach((facturas : any) => {
+        const infoFacturas : any = {
+          factura : facturas.factura,
+          fecha_Factura : facturas.fecha_Factura.replace('T00:00:00', ''),
+          fecha_Vencimiento : facturas.fecha_Vencimiento.replace('T00:00:00', ''),
+          saldo_Actual : facturas.saldo_Actual,
+          mora : facturas.mora,
+          cuenta : facturas.cuenta,
+        }
+        if (facturas.empresa == 900362200) this.carteraInvergoal[this.carteraInvergoal.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
+        else if (facturas.empresa == 900458314) this.carteraInversuez[this.carteraInversuez.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
+        registros += 1;
+        if (registros == datos.length) this.cargando = false;
+      });
+    });
   }
 }

@@ -123,8 +123,8 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.arrayId = [];
     let ruta : any = ``;
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     if(fechaInicial == null) fechaInicial = this.today;
     if(fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
 

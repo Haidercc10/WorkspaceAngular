@@ -135,8 +135,8 @@ export class Reporte_MaquilasComponent implements OnInit {
     let tercero : any = this.FormConsultarFiltros.value.id_tercero
     let ruta : string = '', ruta2 : string = '';
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = fechaInicial;
 

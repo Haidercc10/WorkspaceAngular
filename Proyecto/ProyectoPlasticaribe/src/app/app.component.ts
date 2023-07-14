@@ -14,6 +14,9 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-root',

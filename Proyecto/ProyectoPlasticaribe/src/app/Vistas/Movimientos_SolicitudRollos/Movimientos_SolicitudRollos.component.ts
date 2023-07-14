@@ -152,8 +152,8 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
   // Función que va a consultar las solicitudes de rollos segun los filtros que se le pasen
   consultarSolicitudes(){
     let solicitud : string = this.FormFiltros.value.Solicitud;
-    let fechaInicio : any = moment(this.FormFiltros.value.FechaInicio).format('YYYY-MM-DD') == 'Invalid date' ? this.today : moment(this.FormFiltros.value.FechaInicio).format('YYYY-MM-DD');
-    let fechaFin : any = moment(this.FormFiltros.value.FechaFin).format('YYYY-MM-DD') == 'Invalid date' ? fechaInicio : moment(this.FormFiltros.value.FechaFin).format('YYYY-MM-DD');
+    let fechaInicio : any = moment(this.FormFiltros.value.FechaInicio).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.FormFiltros.value.FechaInicio).format('YYYY-MM-DD');
+    let fechaFin : any = moment(this.FormFiltros.value.FechaFin).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaInicio : moment(this.FormFiltros.value.FechaFin).format('YYYY-MM-DD');
     let bodegaSolicitada : string = this.FormFiltros.value.BodegaSolicitada;
     let bodegaSolicitante : string = this.FormFiltros.value.BodegaSolicitante;
     let estado : string = this.FormFiltros.value.Estado;

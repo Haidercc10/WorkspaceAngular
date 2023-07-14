@@ -116,8 +116,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       rollos.push(this.rollosInsertar[i].Id);
     }
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     setTimeout(() => {
       if (ot != null && fechaInicial != null && fechaFinal != null) {
         this.dtIngRollosService.getRollosDisponiblesOT(ot).subscribe(datos_Rollos => {
