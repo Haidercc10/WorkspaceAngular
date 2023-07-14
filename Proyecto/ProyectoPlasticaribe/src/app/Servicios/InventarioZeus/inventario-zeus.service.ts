@@ -156,4 +156,8 @@ export class InventarioZeusService {
   GetProductosFaturadosMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes`);
 
   GetVendedoresFacturasMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes`);
+
+  GetComprasMes = (anio : any, mes : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes/${anio}/${mes}`);
+
+  GetComprasMesInverGoal_InverSuez = (anio : any, mes : any, id : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMesInverGoal_InverSuez/${anio}/${mes}/${id}`);
 }

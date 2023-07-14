@@ -4,6 +4,7 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
@@ -34,34 +35,28 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
   error : boolean = false; //Variable que ayudará a saber si ocurre un error con la eliminación de algun rollo
-  bodegas : any [] = [{Nombre: 'Bodega Extrusion', Id: 'EXT'}, {Nombre: 'Bodega Despacho', Id: 'DESP'}];
   public arrayProcesos = [];
-  public display : boolean = false;
-  public bodegaExtrusion : boolean = false;
-  public bodegaDespacho : boolean = false;
-  public bdNueva : boolean;
-  public bdBagpro : boolean;
   scrolly : number = 0;
   scrollx : number = 0;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  unMesAtras : any = moment().subtract(30, 'days').format('YYYY-MM-DD'); /** Variable que contendrá la fecha de hace un mes atrás para consultar desde esa fecha hasta hoy. */
+  nroRollo : any = []; /** Variable que contendrá el id de los rollos consultados en el formulario de filtros. */
+  bodegaElegida : string = '';
+  tiempoEspera : number = 0;
+  bagpro : boolean = false;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private AppComponent : AppComponent,
-                  private dtIngRollosService : DtIngRollos_ExtrusionService,
-                    private bagproService : BagproService,
-                      private servicioProcesos : ProcesosService,
-                        private servcioDetEntradaRollos : DetallesEntradaRollosService,
-                          private servicioPreEntregaRollos : DtPreEntregaRollosService,
-                            private messageService: MessageService,
-                              private shepherdService: ShepherdService,
-                                private mensajeService : MensajesAplicacionService) {
+                  private bagproService : BagproService,
+                    private servicioProcesos : ProcesosService,
+                      private messageService: MessageService,
+                        private shepherdService: ShepherdService,
+                          private mensajeService : MensajesAplicacionService,
+                            private servicioDtBodega : Detalle_BodegaRollosService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
       IdRollo : [null],
-      fechaDoc : [null],
-      fechaFinalDoc: [null],
-      Proceso : [null],
       Bodega : [null],
     });
 
@@ -76,6 +71,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
       this.scrolly = window.scrollY;
       this.scrollx = window.scrollX;
     };
+    setTimeout(() => { this.FormConsultarRollos.patchValue({Bodega : 'EXT'}) }, 1000);
   }
 
   tutorial(){
@@ -97,399 +93,105 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   }
 
   // funcion que va a limpiar los campos del formulario
-  limpiarForm(){
-    this.FormConsultarRollos.setValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Proceso : null,
-      Bodega : null,
-    });
-  }
+  limpiarForm = () => this.FormConsultarRollos.patchValue({OT_Id: null, IdRollo: null, Bodega : 'EXT', });
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
-    this.FormConsultarRollos.setValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Proceso : null,
-      Bodega : null,
-    });
+    this.FormConsultarRollos.patchValue({OT_Id: null, IdRollo: null, Bodega : 'EXT', });
     this.rollos = [];
     this.error = false;
     this.rollosInsertar = [];
     this.validarRollo = [];
     this.grupoProductos = [];
-    this,this.totalCantidad = 0;
+    this.totalCantidad = 0;
     this.totalRollos = 0;
     this.cargando = true;
-    this.bodegaExtrusion = false;
-    this.bodegaDespacho = false;
+    this.tiempoEspera = 0;
+    this.bodegaElegida = '';
+    this.bagpro = false;
   }
 
-  // Funcion que va a consultar los rollos
-  consultarRollos(){
-    let ot : number = this.FormConsultarRollos.value.OT_Id;
-    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
+  /** Función que consultará los rollos en bagpro por fechas y proceso. Opcionalmente por OT y por rollo */
+  consultarRollos2(){
+    let ot : string = this.FormConsultarRollos.value.OT_Id;
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
-    let proceso : any = this.FormConsultarRollos.value.Proceso;
     let bodega : any = this.FormConsultarRollos.value.Bodega;
-    let rollos : any = [];
-    let consulta : number;
+    this.bodegaElegida = '';
     this.rollos = [];
-    this.error = false;
     this.rollosInsertar = [];
-    this.validarRollo = [];
     this.grupoProductos = [];
-    this,this.totalCantidad = 0;
+    this.totalCantidad = 0;
     this.totalRollos = 0;
-    this.cargando = true;
-    this.bodegaExtrusion = false;
-    this.bodegaDespacho = false;
+    let ruta : any = ``;
+    this.cargando = false;
+    this.tiempoEspera = 0;
+    this.error = false;
+    this.nroRollo = [];
 
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if(bodega != null) {
+      if(bodega == 'EXT') this.bodegaElegida = 'EXTRUSION';
+      if(bodega == 'IMP') this.bodegaElegida = 'IMPRESION';
+      if(bodega == 'ROT') this.bodegaElegida = 'ROTOGRABADO';
+      if(bodega == 'SELLA') this.bodegaElegida = 'SELLADO';
+      if(bodega == 'CORTE') this.bodegaElegida = 'IMPRESION';
+      if(bodega == 'DESP') this.bodegaElegida = 'DESPACHO';
+      if(bodega == 'BGPI') this.bodegaElegida = 'PRODUCTO INTERMEDIO';
 
-    if(proceso != null && bodega != null) {
-      if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT')
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `La combinación de búsqueda es incorrecta, por favor verifique`);
+      if(ot != null) ruta = `ot=${ot}`;
+      if (rollo != null) ruta.length > 0 ? ruta += `&rollo=${rollo}` : ruta += `rollo=${rollo}`;
+
+      ruta.length > 0 ? ruta = `?${ruta}` : ruta = ``;
+
+      if(['DESP', 'BGPI'].includes(bodega)) this.buscarRollosBagPro(ruta);
       else {
-        this.cargando = false;
-        if(bodega == 'EXT') this.bodegaExtrusion = true;
-        else if (bodega == 'DESP') this.bodegaDespacho = true;
+        this.bagproService.GetRollosExtrusion_Empaque_Sellado('2017-01-01', this.today, this.bodegaElegida, ruta).subscribe(data => {
+          if(data.length > 0) {
+            for (let index = 0; index < data.length; index++) {
+              if(data[index].proceso == this.bodegaElegida && !this.nroRollo.includes(data[index].rollo)) { this.llenarTabla(data[index]); }
 
-        setTimeout(() => {
-          if(proceso == 'Extrusion' || proceso == 'Empaque') {
-            if (ot != null && fechaInicial != null && fechaFinal != null) {
-              this.bagproService.srvObtenerListaProcExtrusionOT(ot).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase() && moment(datos_Rollos[i].fecha.replace('T00:00:00', '')).isBetween(fechaInicial, fechaFinal)) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (fechaInicial != null &&  fechaFinal != null) {
-              this.bagproService.consultarFechas(fechaInicial, fechaFinal).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (ot != null && fechaInicial != null) {
-              this.bagproService.srvObtenerListaProcExtOt(ot).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase() && datos_Rollos[i].fecha.replace('T00:00:00', '') == fechaInicial) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (fechaInicial != null) {
-              this.bagproService.consultarFechas(fechaInicial, fechaInicial).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (ot != null) {
-              this.bagproService.srvObtenerListaProcExtOt(ot).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (rollo != null) {
-              this.bagproService.srvObtenerListaProcExtrusionRollos(rollo).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else {
-              this.bagproService.consultarFechas(this.today, this.today).subscribe(datos_Rollos => {
-                consulta = datos_Rollos.length;
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].clienteItem,
-                      Producto : datos_Rollos[i].clienteItemNombre,
-                      Cantidad : datos_Rollos[i].extnetokg,
-                      Presentacion : 'Kg',
-                      Fecha : datos_Rollos[i].fecha.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
+              this.tiempoEspera += 1;
+              this.tiempoEspera == data.length ? this.cargando = true : this.cargando = false;
             }
-          } else if(proceso == 'Sellado') {
-            if(ot != null && fechaInicial != null && fechaFinal != null) {
-              this.bagproService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (fechaInicial != null && fechaFinal != null) {
-              this.bagproService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaFinal).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (ot != null && fechaInicial != null) {
-              this.bagproService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (fechaInicial) {
-              this.bagproService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaInicial).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (ot != null) {
-              this.bagproService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else if (rollo != null) {
-              this.bagproService.srvObtenerListaProcSelladoRollo(rollo).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            } else {
-              this.bagproService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_Rollos => {
-                for (let i = 0; i < datos_Rollos.length; i++) {
-                  if (!rollos.includes(datos_Rollos[i].item) && datos_Rollos[i].nomStatus == proceso.toUpperCase()) {
-                    let info : any = {
-                      Ot : datos_Rollos[i].ot,
-                      Id : datos_Rollos[i].item,
-                      IdProducto : datos_Rollos[i].referencia,
-                      Producto : datos_Rollos[i].nomReferencia,
-                      Cantidad : datos_Rollos[i].qty,
-                      Presentacion : datos_Rollos[i].unidad,
-                      Fecha : datos_Rollos[i].fechaEntrada.replace('T00:00:00', ''),
-                      Proceso : proceso,
-                    }
-                    if(info.Presentacion == 'KLS') info.Presentacion = 'Kg';
-                    else if (info.Presentacion == 'PAQ') info.Presentacion = 'Paquete';
-                    else if (info.Presentacion == 'UND') info.Presentacion = 'Und';
-
-                    rollos.push(datos_Rollos[i].item);
-                    this.rollos.push(info);
-                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  }
-                }
-              });
-            }
-          }
-          setTimeout(() => {
-            if (consulta <= 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`No se encontraron rollos con la combinación de búsqueda realizada!`)
+          } else {
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda!`);
             this.cargando = true;
-          }, 3000);
-        }, 1500);
-       }
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`Debe diligenciar los campos Proceso y/o Bodega!`);
+          }
+        });
+      }
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una bodega!`);
+  }
+
+  /** Función que consultará los rollos en bagpro. Solo por fechas. Opcionalmente por OT y por rollo */
+  buscarRollosBagPro(ruta : any){
+    this.bagproService.GetProcExtrusion_ProcSellado('2017-01-01', this.today, ruta).subscribe(data => {
+      if(data.length > 0) {
+        for (let index = 0; index < data.length; index++) {
+          if(!this.nroRollo.includes(data[index].rollo)) { this.llenarTabla(data[index]); }
+
+          this.tiempoEspera += 1;
+          this.tiempoEspera == data.length ? this.cargando = true : this.cargando = false;
+        }
+      } else {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda!`);
+        this.cargando = true;
+      }
+    });
+  }
+
+  /** Función que llenará la tabla  */
+  llenarTabla(datos : any){
+    let info : any = {
+      Ot : datos.orden,
+      Id : datos.rollo,
+      IdProducto : datos.id_Producto,
+      Producto : datos.producto,
+      Cantidad : parseInt(datos.cantidad),
+      Presentacion : datos.presentacion,
+      //Fecha : datos.fecha.replace('T00:00:00', ''),
+      Proceso : datos.proceso,
+    }
+    this.rollos.push(info);
+    this.nroRollo.push(info.Id);
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -580,99 +282,89 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     this.totalCantidad = total;
   }
 
-  //Funcion que va a eliminar el rollo de la base de datos nueva y luego de BagPro.
-  eliminarRolloIngresado(){
-    this.display = false;
+  /** Función para eliminar rollos de bagpro y luego de plasticaribeBDD */
+  eliminarRollosBagProBD(){
+    this.onReject();
+    let bodega : any = this.FormConsultarRollos.value.Bodega;
     this.cargando = false;
-    let proceso : any = this.FormConsultarRollos.value.Proceso;
-    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
+    this.error = false;
+    this.bagpro = true;
 
-    if(proceso == 'Extrusion' && this.bodegaExtrusion == true) {
-      for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.dtIngRollosService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe();
+    if(['EXT', 'BGPI', 'IMP', 'ROT', 'CORTE', 'DESP'].includes(bodega)) {
+      for (let index = 0; index < this.rollosInsertar.length; index++) {
+        this.bagproService.Delete(parseInt(this.rollosInsertar[index].Id)).subscribe(data => { this.error = false }, error => {
+          this.error = true;
+          this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, ya que no fueron encontrados!`);
+          this.cargando = true;
+        });
       }
-    }else if ((proceso == 'Sellado' || proceso == 'Empaque' || proceso == 'Extrusion') && this.bodegaDespacho == true) {
+    } else if (bodega == 'SELLA') {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.servcioDetEntradaRollos.deleteRollosDespacho(this.rollosInsertar[i].Id).subscribe();
-        this.eliminarRollosPreEntrega();
+        this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(() => { this.error = false }, () => {
+          this.error = true;
+          this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, ya que no fueron encontrados!`);
+          this.cargando = true;
+        });
       }
     }
-    setTimeout(() => { this.finalizarEliminacion(); }, 2500);
+    setTimeout(() => { if(!this.error) this.eliminarRolloBodegasPBDD(); }, 2000);
   }
 
-  /**Funcion que va a eliminar el rollo de bagpro */
-  eliminarRolloBagpro(){
-    this.display = false;
+  /** Función para eliminar rollos las bodegas de plasticaribeBDD */
+  eliminarRolloBodegasPBDD() {
+    this.onReject();
+    let cantRollosPbdd : number = 0;
     this.cargando = false;
-    let proceso : any = this.FormConsultarRollos.value.Proceso;
-    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
-    if(this.bodegaExtrusion == true) {
-      if(proceso == 'Extrusion') {
-        for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
-            this.error = true;
-            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
-            this.cargando = true;
-          });
-        }
-      }
-    } else if (this.bodegaDespacho == true) {
-      if(proceso == 'Empaque' || proceso == 'Extrusion') {
-        for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
-            this.error = true;
-            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
-            this.cargando = true;
-          });
-        }
-      } else if (proceso == 'Sellado') {
-        for (let i = 0; i < this.rollosInsertar.length; i++) {
-          this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(() => {  }, () => {
-            this.error = true;
-            this.mensajeService.mensajeError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
-            this.cargando = true;
-          });
-        }
-      }
-    }
-    setTimeout(() => {this.eliminarRolloIngresado(); }, 2000);
-  }
+    this.error = false;
 
-  // Eliminación de rollos de la pre entrega
-  eliminarRollosPreEntrega() {
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe();
+    for (let index = 0; index < this.rollosInsertar.length; index++) {
+      let bodega = this.rollosInsertar[index].Proceso;
+      if(bodega == 'EXTRUSION') bodega = 'EXT';
+      if(bodega == 'IMPRESION') bodega = 'IMP';
+      if(bodega == 'ROTOGRABADO') bodega = 'ROTO';
+      if(bodega == 'CORTE') bodega = 'IMP';
+      if(bodega == 'SELLADO') bodega = 'SELLA';
+
+      this.servicioDtBodega.GetInfoRollo(this.rollosInsertar[index].Id, bodega).subscribe(data => {
+        if(data.length > 0) {
+          for (let i = 0; i < data.length; i++) {
+            cantRollosPbdd += 1;
+           this.servicioDtBodega.Delete(data[i].codigo).subscribe(data => { this.error = false; });
+          }
+        }
+      }, error => {
+        this.servicioDtBodega.GetIdRollo(this.rollosInsertar[index].Id).subscribe(data => {
+          if(data.length > 0) {
+            for (let i = 0; i < data.length; i++) {
+              cantRollosPbdd += 1;
+             this.servicioDtBodega.Delete(data[i].codigo).subscribe(data => { this.error = false; });
+            }
+          }
+        });
+      });
     }
+    setTimeout(() => { this.finalizarEliminacion(cantRollosPbdd); }, 1000);
   }
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
-  finalizarEliminacion(){
+  finalizarEliminacion(numero : number){
     setTimeout(() => {
-      this.mensajeService.mensajeConfirmacion(`Confirmación`,`${this.totalRollos} rollo(s) han sido eliminado(s) correctamente!`);
+      if(numero > 0 && this.bagpro) this.mensajeService.mensajeConfirmacion(`Confirmación`, `${this.totalRollos} rollo(s) de "Bagpro" y ${numero} rollo(s) del "Nuevo Programa" han sido eliminado(s) correctamente!`);
+      else if(numero > 0 && !this.bagpro) this.mensajeService.mensajeConfirmacion(`Confirmación`, `${this.totalRollos} rollo(s) han sido eliminado(s) "solo del Nuevo Programa" correctamente!`);
+      else if(numero <= 0 && this.bagpro) this.mensajeService.mensajeConfirmacion(`Confirmación`, `${this.totalRollos} rollo(s) han sido eliminado(s) "solo de Bagpro" correctamente !`);
+      else if(numero <= 0 && !this.bagpro) this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se eliminaron registros del "Nuevo Programa", ya que los rollos elegidos no están en la bodega seleccionada o solo están en "Bagpro"!`);
       this.limpiarCampos();
     }, 2000);
   }
 
   /** Cargar los procesos de donde puede venir el rollo. */
-  obtenerProcesos = () => this.servicioProcesos.srvObtenerLista().subscribe(data =>  this.arrayProcesos = data.filter((item) => ['EXT', 'EMP', 'SELLA'].includes(item.proceso_Id)));
+  obtenerProcesos = () => this.servicioProcesos.srvObtenerLista().subscribe(data =>  this.arrayProcesos = data.filter((item) => ['EXT', 'BGPI', 'IMP', 'ROT', 'CORTE', 'SELLA', 'DESP'].includes(item.proceso_Id)));
 
   /** Mostrar mensaje de Eleccion */
   mostrarEleccion(){
     if (this.rollosInsertar.length > 0) {
       this.messageService.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `De cual base de datos desea eliminar la información?`, sticky: true});
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`,`Debe cargar al menos un rollo en la tabla!`);
-  }
-
-  /** Eliminar rollos de bagpro al confirmar con el primer botón */
-  onConfirm() {
-    this.messageService.clear('eleccion');
-    this.eliminarRolloBagpro();
-  }
-
-  /** Eliminar rollos de Plasticaribe BDD al confirmar con el primer botón */
-  onConfirm2() {
-    this.messageService.clear('eleccion');
-    this.eliminarRolloIngresado();
   }
 
   /** Cerrar Dialogo de eliminación de rollos.*/

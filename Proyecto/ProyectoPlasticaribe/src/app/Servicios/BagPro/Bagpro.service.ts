@@ -128,8 +128,8 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/consultarRollo/${rollo}`);
   }
 
-  EliminarRollExtrusion(id : any) {
-    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollExtrusion/${id}`);
+  Delete(id : any) {
+    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRolloProcExtrusion/${id}`);
   }
 
   DeleteRollosExtrusion_Empaque(id : any) {
@@ -139,6 +139,8 @@ export class BagproService {
   GetRollosExtrusion_Empaque_Sellado(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/getRollosExtrusion_Empaque_Sellado/${fechaInicial}/${fechaFinal}/${proceso}${ruta}`);
   }
+
+  GetProcExtrusion_ProcSellado = (fechaInicio : any, fechaFin : any, ruta : any) => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProcExtrusion_ProcSellado/${fechaInicio}/${fechaFin}${ruta}`);
 
   /**  Obtener datos por NomStatus  */
   getDatosxNomStatus(status : any) {

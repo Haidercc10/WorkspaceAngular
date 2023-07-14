@@ -32,27 +32,29 @@
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
   </div>
 
-  <div class="row g-3 mb-5" style="width: 100%;">
-    <div class="col-md-6 text-left">
-      <span class="p-float-label" id="rango-fechas">
-        <!-- Rango de Fechas -->
-        <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
-        <label for="FechaInicial">Rango de Fechas</label>
-        <!-- Consultar Inventario -->
-        <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger ml-2" id="consultar" (click)="consultarInventario()"></button>
-      </span>
-    </div>
+  <p-toolbar>
+    <div class="row g-3" style="width: 100%;">
+      <div class="col-md-6 text-left">
+        <span class="p-float-label" id="rango-fechas">
+          <!-- Rango de Fechas -->
+          <p-calendar inputId="FechaInicial" [(ngModel)]="rongoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
+          <label for="FechaInicial">Rango de Fechas</label>
+          <!-- Consultar Inventario -->
+          <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger ml-2" id="consultar" (click)="consultarInventario()"></button>
+        </span>
+      </div>
 
-    <div class="col-md-6 text-right">
-      <!-- Con existencias -->
-      <button pButton pRipple pTooltip="Materias primas con existencias" label="Con Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
-      <!-- Nueva materias prima -->
-      <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
-      <!-- Exportar excel -->
-      <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
+      <div class="col-md-6 text-right">
+        <!-- Con existencias -->
+        <button pButton pRipple pTooltip="Materias primas con existencias" label="Con Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
+        <!-- Nueva materias prima -->
+        <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+        <!-- Exportar excel -->
+        <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
+      </div>
     </div>
-  </div>
-  <hr>
+  </p-toolbar>
+
   <p-tabView [scrollable]="true" id="materias-primas" (onChange)="cargarTabs($event.index)">
     <!-- Materias Primas -->
     <p-tabPanel

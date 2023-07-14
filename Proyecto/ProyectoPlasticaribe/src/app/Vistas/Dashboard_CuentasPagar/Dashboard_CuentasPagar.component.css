@@ -30,6 +30,10 @@
   padding: 0 2%;
 }
 
+.fila-5 {
+  padding: 0 3%;
+}
+
 p-card, p-card ::ng-deep .p-card {
   height: 100%;
 }
@@ -45,3 +49,11 @@ p-chart ::ng-deep div ::ng-deep canvas {
   width: 100%;
   height: 100%;
 }
+
+.linea {
+  width: 95%;
+  margin: auto;
+  margin-top: 1%;
+  margin-bottom: 2%;
+}
+

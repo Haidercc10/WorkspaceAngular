@@ -3,10 +3,13 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Dashboard_CuentasPagar',
@@ -29,15 +32,91 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
   @ViewChild('dt_carteraAgrupada') dt_carteraAgrupada: Table | undefined;
 
+  /** Grafica */
+  comprasData: any; //Variable que almacenará la informacion a graficar de la deuda de cada mes
+  comprasOptions: any; //Variable que almacenará los estilos que tendrá la grafica de la deuda de cada mes
+  comprasPlugins = [ DataLabelsPlugin ];
+
+  comprasDataGoal: any; //Variable que almacenará la informacion a graficar de la deuda de cada mes
+  comprasOptionsGoal: any; //Variable que almacenará los estilos que tendrá la grafica de la deuda de cada mes
+  comprasPluginsGoal = [ DataLabelsPlugin ];
+
+  comprasDataSuez: any; //Variable que almacenará la informacion a graficar de la deuda de cada mes
+  comprasOptionsSuez: any; //Variable que almacenará los estilos que tendrá la grafica de la deuda de cada mes
+  comprasPluginsSuez = [ DataLabelsPlugin ];
+
+  /** Valores de deudas por mes */
+  totalDeuda1 : number = 0; //Variable que almacenará la deuda en el mes de enero
+  totalDeuda2 : number = 0; //Variable que almacenará la deuda en el mes de febrero
+  totalDeuda3 : number = 0; //Varibal que almacenará la deuda en el mes de marzo
+  totalDeuda4 : number = 0; //Variable que almcenará la deuda en el mes de abril
+  totalDeuda5 : number = 0; //Variable que almcenará la deuda en el mes de mayo
+  totalDeuda6 : number = 0; //Variable que almcenará la deuda en el mes de junio
+  totalDeuda7 : number = 0; //Variable que almcenará la deuda en el mes de julio
+  totalDeuda8 : number = 0; //Variable que almcenará la deuda en el mes de agosto
+  totalDeuda9 : number = 0; //Variable que almcenará la deuda en el mes de septiembre
+  totalDeuda10 : number = 0; //Variable que almcenará la deuda en el mes de octubre
+  totalDeuda11 : number = 0; //Variable que almcenará la deuda en el mes de noviembre
+  totalDeuda12 : number = 0; //Variable que almcenará la deuda en el mes de diciembre
+  totalDeudaGoal1 : number = 0; //Variable que almacenará la deuda en el mes de enero
+  totalDeudaGoal2 : number = 0; //Variable que almacenará la deuda en el mes de febrero
+  totalDeudaGoal3 : number = 0; //Varibal que almacenará la deuda en el mes de marzo
+  totalDeudaGoal4 : number = 0; //Variable que almcenará la deuda en el mes de abril
+  totalDeudaGoal5 : number = 0; //Variable que almcenará la deuda en el mes de mayo
+  totalDeudaGoal6 : number = 0; //Variable que almcenará la deuda en el mes de junio
+  totalDeudaGoal7 : number = 0; //Variable que almcenará la deuda en el mes de julio
+  totalDeudaGoal8 : number = 0; //Variable que almcenará la deuda en el mes de agosto
+  totalDeudaGoal9 : number = 0; //Variable que almcenará la deuda en el mes de septiembre
+  totalDeudaGoal10 : number = 0; //Variable que almcenará la deuda en el mes de octubre
+  totalDeudaGoal11 : number = 0; //Variable que almcenará la deuda en el mes de noviembre
+  totalDeudaGoal12 : number = 0; //Variable que almcenará la deuda en el mes de diciembre
+  totalDeudaSuez1 : number = 0; //Variable que almacenará la deuda en el mes de enero
+  totalDeudaSuez2 : number = 0; //Variable que almacenará la deuda en el mes de febrero
+  totalDeudaSuez3 : number = 0; //Varibal que almacenará la deuda en el mes de marzo
+  totalDeudaSuez4 : number = 0; //Variable que almcenará la deuda en el mes de abril
+  totalDeudaSuez5 : number = 0; //Variable que almcenará la deuda en el mes de mayo
+  totalDeudaSuez6 : number = 0; //Variable que almcenará la deuda en el mes de junio
+  totalDeudaSuez7 : number = 0; //Variable que almcenará la deuda en el mes de julio
+  totalDeudaSuez8 : number = 0; //Variable que almcenará la deuda en el mes de agosto
+  totalDeudaSuez9 : number = 0; //Variable que almcenará la deuda en el mes de septiembre
+  totalDeudaSuez10 : number = 0; //Variable que almcenará la deuda en el mes de octubre
+  totalDeudaSuez11 : number = 0; //Variable que almcenará la deuda en el mes de noviembre
+  totalDeudaSuez12 : number = 0; //Variable que almcenará la deuda en el mes de diciembre
+
+  totalCompradoAnio : number = 0; /** Variable que mostrará el valor total comprado en todo el anio. */
+  compradoAnio : any[] = [];
+  compradoAnioGoal : any[] = [];
+  compradoAnioSuez : any[] = [];
+
+  anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  anioSeleccionado : any = moment().year(); /** Año seleccionado en el combobox. */
+
+  deudaMayor : number = 0;
+  deudaMayorGoal : number = 0;
+  deudaMayorSuez : number = 0;
+
+  multiAxisData: any;
+  multiAxisOptions: any;
+  multiAxisPlugins = [ DataLabelsPlugin ];
+
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
-                  private shepherdService: ShepherdService) {
+                  private shepherdService: ShepherdService,
+                    private servicioInventarioZeus : InventarioZeusService,
+                      private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.tiempoExcedido();
+    this.llenarArrayAnos();
+    this.graficarDatos();
+    this.comprasMesxMesPlasticaribe();
+    this.graficarDatosGoal();
+    this.comprasMesxMesInvergoal('900362200');
+    this.graficarDatosSuez();
+    this.comprasMesxMesInversuez('900458314');
   }
 
   // Funcion que iniciará el tutorial
@@ -279,5 +358,298 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     }
     pdfDefinicion.content.push(totalData);
     pdfMake.createPdf(pdfDefinicion).open();
+  }
+
+  // Funcion que va a llenar el array de años
+  llenarArrayAnos(){
+    for (let i = 0; i < this.anios.length; i++) {
+      let num_Mayor : number = Math.max(...this.anios);
+      if (num_Mayor == moment().year()) break;
+      this.anios.push(num_Mayor + 1);
+    }
+  }
+
+  /** Función para cargar el valor total de las compras por mes de plasticaribe. */
+  comprasTotalesPlasticaribe() {
+    this.totalCompradoAnio = 0;
+    for (let i = 0; i < 12; i++) {
+      let mes : string = `${i + 1}`;
+      this.servicioInventarioZeus.GetComprasMes(this.anioSeleccionado, mes).subscribe(datos_compras => this.totalCompradoAnio += datos_compras);
+    }
+  }
+
+  /** Compras mes por mes. */
+  comprasMesxMesPlasticaribe(){
+    let index : number = this.compradoAnio.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.cargando = true;
+      for (let i = 0; i < 12; i++) {
+        let mes : string = `${i + 1}`;
+        this.servicioInventarioZeus.GetComprasMes(this.anioSeleccionado, mes).subscribe(datos_compras => {
+          if (i == 0) this.totalDeuda1 = datos_compras;
+          if (i == 1) this.totalDeuda2 = datos_compras;
+          if (i == 2) this.totalDeuda3 = datos_compras;
+          if (i == 3) this.totalDeuda4 = datos_compras;
+          if (i == 4) this.totalDeuda5 = datos_compras;
+          if (i == 5) this.totalDeuda6 = datos_compras;
+          if (i == 6) this.totalDeuda7 = datos_compras;
+          if (i == 7) this.totalDeuda8 = datos_compras;
+          if (i == 8) this.totalDeuda9 = datos_compras;
+          if (i == 9) this.totalDeuda10 = datos_compras;
+          if (i == 10) this.totalDeuda11 = datos_compras;
+          if (i == 11) this.totalDeuda12 = datos_compras;
+          let info : any = { anio: this.anioSeleccionado, costo : datos_compras };
+          let index2 : number = this.compradoAnio.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compradoAnio[index2].costo += datos_compras;
+          else this.compradoAnio.push(info);
+        });
+      }
+      setTimeout(() => this.llenarGraficaCompras(), 2000);
+    } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
+  }
+
+  comprasMesxMesInvergoal(nit : string){
+    console.log(nit)
+    let index : number = this.compradoAnioGoal.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.cargando = true;
+      for (let i = 0; i < 12; i++) {
+        let mes : string = `${i + 1}`;
+        this.servicioInventarioZeus.GetComprasMesInverGoal_InverSuez(this.anioSeleccionado, mes, nit).subscribe(datos_compras => {
+          if (i == 0) this.totalDeudaGoal1 = datos_compras;
+          if (i == 1) this.totalDeudaGoal2 = datos_compras;
+          if (i == 2) this.totalDeudaGoal3 = datos_compras;
+          if (i == 3) this.totalDeudaGoal4 = datos_compras;
+          if (i == 4) this.totalDeudaGoal5 = datos_compras;
+          if (i == 5) this.totalDeudaGoal6 = datos_compras;
+          if (i == 6) this.totalDeudaGoal7 = datos_compras;
+          if (i == 7) this.totalDeudaGoal8 = datos_compras;
+          if (i == 8) this.totalDeudaGoal9 = datos_compras;
+          if (i == 9) this.totalDeudaGoal10 = datos_compras;
+          if (i == 10) this.totalDeudaGoal11 = datos_compras;
+          if (i == 11) this.totalDeudaGoal12 = datos_compras;
+          let info : any = { anio: this.anioSeleccionado, costo : datos_compras };
+          let index2 : number = this.compradoAnioGoal.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compradoAnioGoal[index2].costo += datos_compras;
+          else this.compradoAnioGoal.push(info);
+        });
+      }
+      setTimeout(() => this.llenarGraficaComprasGoal(), 2000);
+    } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
+  }
+
+  comprasMesxMesInversuez(nit : string){
+    console.log(nit)
+    let index : number = this.compradoAnioSuez.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      this.cargando = true;
+      for (let i = 0; i < 12; i++) {
+        let mes : string = `${i + 1}`;
+        this.servicioInventarioZeus.GetComprasMesInverGoal_InverSuez(this.anioSeleccionado, mes, nit).subscribe(datos_compras => {
+          if (i == 0) this.totalDeudaSuez1 = datos_compras;
+          if (i == 1) this.totalDeudaSuez2 = datos_compras;
+          if (i == 2) this.totalDeudaSuez3 = datos_compras;
+          if (i == 3) this.totalDeudaSuez4 = datos_compras;
+          if (i == 4) this.totalDeudaSuez5 = datos_compras;
+          if (i == 5) this.totalDeudaSuez6 = datos_compras;
+          if (i == 6) this.totalDeudaSuez7 = datos_compras;
+          if (i == 7) this.totalDeudaSuez8 = datos_compras;
+          if (i == 8) this.totalDeudaSuez9 = datos_compras;
+          if (i == 9) this.totalDeudaSuez10 = datos_compras;
+          if (i == 10) this.totalDeudaSuez11 = datos_compras;
+          if (i == 11) this.totalDeudaSuez12 = datos_compras;
+          let info : any = { anio: this.anioSeleccionado, costo : datos_compras };
+          let index2 : number = this.compradoAnioSuez.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compradoAnioSuez[index2].costo += datos_compras;
+          else this.compradoAnioSuez.push(info);
+        });
+      }
+      setTimeout(() => this.llenarGraficaComprasSuez(), 2000);
+    } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
+  }
+
+  /** Graficar datos */
+  graficarDatos(){
+    this.compradoAnio = [];
+    this.comprasData = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.comprasOptions = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 13 } },
+          grid: { color: '#ebedef' },
+          min : 0,
+          suggestedMax: this.deudaMayor,
+        },
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    };
+  }
+
+  graficarDatosGoal(){
+    this.compradoAnioGoal = [];
+    this.comprasDataGoal = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.comprasOptionsGoal = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 13 } },
+          grid: { color: '#ebedef' },
+          min : 0,
+        },
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    };
+  }
+
+  graficarDatosSuez(){
+    this.compradoAnioSuez = [];
+    this.comprasDataSuez = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.comprasOptionsSuez = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 13 } },
+          grid: { color: '#ebedef' },
+          min : 0
+        },
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    };
+  }
+
+  /** Llenar gráficas */
+  llenarGraficaCompras(){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: [this.totalDeuda1, this.totalDeuda2, this.totalDeuda3, this.totalDeuda4, this.totalDeuda5, this.totalDeuda6, this.totalDeuda7, this.totalDeuda8, this.totalDeuda9, this.totalDeuda10, this.totalDeuda11, this.totalDeuda12],
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3,
+    };
+    this.comprasData.datasets.push(info);
+    this.deudaMayor = Math.max(...info.data) + 1;
+    this.comprasOptions.scales.y.suggestedMax = this.deudaMayor;
+    //this.cargando = false;
+  }
+
+  llenarGraficaComprasGoal(){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: [this.totalDeudaGoal1, this.totalDeudaGoal2, this.totalDeudaGoal3, this.totalDeudaGoal4, this.totalDeudaGoal5, this.totalDeudaGoal6, this.totalDeudaGoal7, this.totalDeudaGoal8, this.totalDeudaGoal9, this.totalDeudaGoal10, this.totalDeudaGoal11, this.totalDeudaGoal12],
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3,
+    };
+    this.comprasDataGoal.datasets.push(info);
+    //this.cargando = false;
+  }
+
+  llenarGraficaComprasSuez(){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: [this.totalDeudaSuez1, this.totalDeudaSuez2, this.totalDeudaSuez3, this.totalDeudaSuez4, this.totalDeudaSuez5, this.totalDeudaSuez6, this.totalDeudaSuez7, this.totalDeudaSuez8, this.totalDeudaSuez9, this.totalDeudaSuez10, this.totalDeudaSuez11, this.totalDeudaSuez12],
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3,
+    };
+    this.comprasDataSuez.datasets.push(info);
+    this.cargando = false;
+  }
+
+  comprasxAnio() {
+    this.comprasMesxMesPlasticaribe();
+    this.comprasMesxMesInvergoal('900362200');
+    this.comprasMesxMesInversuez('900458314');
+  }
+
+  graficar(){
+    this.graficarDatos();
+    this.graficarDatosGoal();
+    this.graficarDatosSuez();
   }
 }
