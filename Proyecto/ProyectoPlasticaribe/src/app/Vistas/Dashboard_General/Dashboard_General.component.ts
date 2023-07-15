@@ -25,29 +25,29 @@ export class Dashboard_GeneralComponent implements OnInit {
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
 
-  opcionesGrafica : any;
-  opcionesGrafica_Pagar : any;
-  graficaFacturacion : any;
-  graficaCuentas_Cobrar : any;
-  graficaCuentas_Pagar_Plasticaribe : any;
-  graficaCuentas_Pagar_Invergoal : any;
-  graficaCuentas_Pagar_Inversuez : any;
-  graficaCompras_Plasticaribe : any;
-  graficaCompras_Invergoal : any;
-  graficaCompras_Inversuez : any;
-  graficaInventario_MatPrima : any;
-  graficaInventario_Productos : any;
+  opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
+  opcionesGrafica_Pagar : any; //Variable que va a almacenar las opciones de las graficas de las cuentas por pagar
+  graficaFacturacion : any; // Variable que va a almacenar los datos que van a aparecer en la grafica de facturación
+  graficaCuentas_Cobrar : any; // Variable que va a almacenar los datos que van a aparecer en la grafica de cuentas por cobrar
+  graficaCuentas_Pagar_Plasticaribe : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de plasticaribe
+  graficaCuentas_Pagar_Invergoal : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de invergoal
+  graficaCuentas_Pagar_Inversuez : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de inversuez
+  graficaCompras_Plasticaribe : any; //Variable que va a almacenar los datos que van a aparecere en las compras de plasticaribe
+  graficaCompras_Invergoal : any; //Variable que va a almacenar los datos que van a aparecer en las compras de invergoal
+  graficaCompras_Inversuez : any; //Variable que va a almacenar los datos que van a aparecer en las compras de inversuez
+  graficaInventario_MatPrima : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de materia prima
+  graficaInventario_Productos : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de productos
 
-  facturadoAnios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada. almacenará cada uno de los años que se grafiquen
-  cuentas_Cobrar_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  cuentas_Pagar_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  cuentas_Pagar_Anios_Invergoal : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  cuentas_Pagar_Anios_Inversuez : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  compras_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  compras_Anios_Invergoal : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  compras_Anios_Inversuez : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
-  inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
+  facturadoAnios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada.
+  cuentas_Cobrar_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por cobrar
+  cuentas_Pagar_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de plasticaribe
+  cuentas_Pagar_Anios_Invergoal : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de invergoal
+  cuentas_Pagar_Anios_Inversuez : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de inversuez
+  compras_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de plasticaribe
+  compras_Anios_Invergoal : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de invergoal
+  compras_Anios_Inversuez : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de inversuez
+  inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de materia prima
+  inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de productos
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,

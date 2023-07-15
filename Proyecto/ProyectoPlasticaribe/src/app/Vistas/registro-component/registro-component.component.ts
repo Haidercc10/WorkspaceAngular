@@ -574,6 +574,8 @@ export class RegistroComponentComponent implements OnInit {
     this.vistasPermisosService.Get_By_Rol(this.rolEditar).subscribe(datos =>  {
       let nombreVistas : any = [];
       datos.forEach(element => nombreVistas.push(element.nombre));
+      let nombreVistasSeleccionadas : any = [];
+      this.vistasSeleccionadas.forEach(element => nombreVistasSeleccionadas.push(element.label));
       
       this.vistasSeleccionadas.filter(item => !nombreVistas.includes(item.label)).forEach(vista => {
         this.vistasPermisosService.Get_By_Id(vista.key).subscribe(data => {
@@ -589,12 +591,11 @@ export class RegistroComponentComponent implements OnInit {
           if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(vista.key, info).subscribe();
         });
       });
-      
-      this.vistasSeleccionadas.forEach(data => {
-        nombreVistas.forEach(element => {
-          if (data.label != element) {
-            this.vistasPermisosService.Get_By_Id(data.key).subscribe(data => {
-            const info : modelVistasPermisos = {
+
+      nombreVistas.filter(item => !nombreVistasSeleccionadas.includes(item)).forEach(element => {
+        datos.filter(item => item.nombre == element).forEach(info => {
+          this.vistasPermisosService.Get_By_Id(info.id).subscribe(data => {
+            const info_Permisos : modelVistasPermisos = {
               Vp_Id: data.vp_Id,
               Vp_Nombre: data.vp_Nombre,
               Vp_Icono_Dock: data.vp_Icono_Dock,
@@ -603,9 +604,8 @@ export class RegistroComponentComponent implements OnInit {
               Vp_Categoria: data.vp_Categoria,
               Vp_Id_Roles: data.vp_Id_Roles.replace(`${this.rolEditar}|`, ''),
             }
-            if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(data.key, info).subscribe();
+            if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(info.id, info_Permisos).subscribe();
           });
-          }
         });
       });
     }, () => this.insertarPermisos(this.editarRol));
