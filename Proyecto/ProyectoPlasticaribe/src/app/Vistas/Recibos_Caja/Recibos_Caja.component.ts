@@ -49,8 +49,8 @@ export class Recibos_CajaComponent implements OnInit {
   consultarRecibos(){
     this.load = true;
     this.arrayRecibos = [];
-    this.fecha = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
-    this.fechaFinal = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : this.fecha;
+    this.fecha = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format().replace('-05:00', '') : this.today;
+    this.fechaFinal = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format().replace('T00:00:00-05:00', 'T23:59:59') : this.fecha;
     this.totalRecibos = 0;
 
     if (this.fecha == 'Fecha inválida') this.fecha = null;
