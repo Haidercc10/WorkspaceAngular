@@ -59,6 +59,7 @@ import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostos
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
+import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 
 export const routes: Routes = [
 
@@ -171,6 +172,10 @@ export const routes: Routes = [
 
   {path: 'facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Facturas'}, component: Facturas_Invergoal_InversuezComponent},
   {path: 'Gestionar-facturas-invergoal-inversuez', component: Gestionar_Facturas_Invergoal_InversuezComponent},
+
+  /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
+  {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
+
 ]
 
 @NgModule({

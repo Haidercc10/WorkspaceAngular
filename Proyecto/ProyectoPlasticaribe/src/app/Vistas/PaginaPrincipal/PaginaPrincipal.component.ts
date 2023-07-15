@@ -34,6 +34,7 @@ export class PaginaPrincipalComponent implements OnInit {
     if (this.ValidarRol == 1 || this.ValidarRol == 60) this.ordenTrabajo = true;
     if (this.ValidarRol == 3) this.materiaPrima = true;
     if (this.ValidarRol == 61) this.pedidos = true;
+    if (this.ValidarRol == 69) this.recaudos = true;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

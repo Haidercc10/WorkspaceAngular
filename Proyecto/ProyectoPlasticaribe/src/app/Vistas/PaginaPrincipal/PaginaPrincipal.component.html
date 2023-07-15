@@ -7,7 +7,7 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid" id="card">
-    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,3,60,61].includes(ValidarRol)">
+    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,3,60,61,69].includes(ValidarRol)">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Ordenes de Trabajo"
@@ -58,7 +58,7 @@
         header="Recaudos"
         leftIcon="pi pi-shopping-cart"
         tooltip="Información sobre los reacudos de la empresa"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,69].includes(ValidarRol)">
         <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
       </p-tabPanel>
 

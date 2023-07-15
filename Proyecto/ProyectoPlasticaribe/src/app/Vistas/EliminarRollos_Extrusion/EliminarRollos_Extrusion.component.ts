@@ -163,7 +163,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   /** Función que consultará los rollos en bagpro. Solo por fechas. Opcionalmente por OT y por rollo */
   buscarRollosBagPro(ruta : any){
-    this.bagproService.GetProcExtrusion_ProcSellado('2017-01-01', this.today, ruta).subscribe(data => {
+    this.bagproService.GetProcExtrusion_ProcSellado(this.unMesAtras, this.today, ruta).subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
           if(!this.nroRollo.includes(data[index].rollo)) { this.llenarTabla(data[index]); }
