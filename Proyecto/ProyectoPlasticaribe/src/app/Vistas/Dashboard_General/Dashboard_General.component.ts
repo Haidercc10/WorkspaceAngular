@@ -32,7 +32,9 @@ export class Dashboard_GeneralComponent implements OnInit {
   graficaCuentas_Pagar_Plasticaribe : any;
   graficaCuentas_Pagar_Invergoal : any;
   graficaCuentas_Pagar_Inversuez : any;
-  graficaCompras : any;
+  graficaCompras_Plasticaribe : any;
+  graficaCompras_Invergoal : any;
+  graficaCompras_Inversuez : any;
   graficaInventario_MatPrima : any;
   graficaInventario_Productos : any;
 
@@ -41,6 +43,9 @@ export class Dashboard_GeneralComponent implements OnInit {
   cuentas_Pagar_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   cuentas_Pagar_Anios_Invergoal : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   cuentas_Pagar_Anios_Inversuez : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
+  compras_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
+  compras_Anios_Invergoal : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
+  compras_Anios_Inversuez : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
   inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar el año y la cantidad facturada almacenará cada uno de los años que se grafiquen
 
@@ -66,7 +71,6 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-
   // Funcion que va a llenar el array de años
   llenarArrayAnos(){
     for (let i = 0; i < this.anios.length; i++) {
@@ -80,7 +84,15 @@ export class Dashboard_GeneralComponent implements OnInit {
   inicializarGraficas(){
     this.facturadoAnios = [];
     this.cuentas_Cobrar_Anios = [];
+    this.cuentas_Pagar_Anios_Plasticaribe = [];
+    this.cuentas_Pagar_Anios_Invergoal = [];
+    this.cuentas_Pagar_Anios_Inversuez = [];
+    this.compras_Anios_Plasticaribe = [];
+    this.compras_Anios_Invergoal = [];
+    this.compras_Anios_Inversuez = [];
     this.inventarioMatPrima_Anios = [];
+    this.inventarioProductos_Anios = [];
+    
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -165,7 +177,17 @@ export class Dashboard_GeneralComponent implements OnInit {
       datasets: []
     };
     
-    this.graficaCompras = {
+    this.graficaCompras_Plasticaribe = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+    
+    this.graficaCompras_Invergoal = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+    
+    this.graficaCompras_Inversuez = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
@@ -187,9 +209,10 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.BuscarDatosGraficaFacturacion();
     // this.BuscarDatosGraficaCuentas_Cobrar();
     this.BuscarDatosGraficaCuentas_Pagar();
+    this.BuscarDatosGrafica_Compras();
     this.BuscarDatosGraficaInventario_MatPrima();
     this.BuscarDatosGraficaInventario_Producto();
-    setTimeout(() => this.cargando = false, 1500);
+    setTimeout(() => this.cargando = false, 3000);
   }
 
   // Funcion que va a buscar los datos que trandrá la grafica de facturacion
@@ -215,7 +238,7 @@ export class Dashboard_GeneralComponent implements OnInit {
             i == 11 ? datos_facturacion : costoMeses[11],
           ];
           if (i == 11) this.llenarGraficaFacturacion(costoMeses);
-          let info : any = { anio: this.anioSeleccionado, costo : datos_facturacion };
+          let info : any = { anio: this.anioSeleccionado, costo: datos_facturacion };
           let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anioSeleccionado);
           if (index2 != -1) this.facturadoAnios[index2].costo += datos_facturacion;
           else this.facturadoAnios.push(info);
@@ -423,6 +446,135 @@ export class Dashboard_GeneralComponent implements OnInit {
       tension: 0.3
     };
     this.graficaCuentas_Pagar_Inversuez.datasets.push(info);
+  }
+
+  // Funcion que va a buscar los datos de las compras
+  BuscarDatosGrafica_Compras(){
+    let index : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];      
+      let costoMeses_Invergoal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+      let costoMeses_Inversuez : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+      for (let i = 0; i < 12; i++) {
+        this.zeusService.GetComprasMes(this.anioSeleccionado, i + 1).subscribe(data => {
+          costoMeses_Plasticaribe = [
+            i == 0 ? data : costoMeses_Plasticaribe[0],
+            i == 1 ? data : costoMeses_Plasticaribe[1],
+            i == 2 ? data : costoMeses_Plasticaribe[2],
+            i == 3 ? data : costoMeses_Plasticaribe[3],
+            i == 4 ? data : costoMeses_Plasticaribe[4],
+            i == 5 ? data : costoMeses_Plasticaribe[5],
+            i == 6 ? data : costoMeses_Plasticaribe[6],
+            i == 7 ? data : costoMeses_Plasticaribe[7],
+            i == 8 ? data : costoMeses_Plasticaribe[8],
+            i == 9 ? data : costoMeses_Plasticaribe[9],
+            i == 10 ? data : costoMeses_Plasticaribe[10],
+            i == 11 ? data : costoMeses_Plasticaribe[11],
+          ];
+          if (i == 11) this.llenarGrafica_Compras_Plasticaribe(costoMeses_Plasticaribe);
+          let info : any = { anio: this.anioSeleccionado, costo : data };
+          let index2 : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compras_Anios_Plasticaribe[index2].costo += data;
+          else this.compras_Anios_Plasticaribe.push(info); 
+        });
+        this.zeusService.GetComprasMesInverGoal_InverSuez(this.anioSeleccionado, i + 1, '900362200').subscribe(data => {
+          costoMeses_Invergoal = [
+            i == 0 ? data : costoMeses_Invergoal[0],
+            i == 1 ? data : costoMeses_Invergoal[1],
+            i == 2 ? data : costoMeses_Invergoal[2],
+            i == 3 ? data : costoMeses_Invergoal[3],
+            i == 4 ? data : costoMeses_Invergoal[4],
+            i == 5 ? data : costoMeses_Invergoal[5],
+            i == 6 ? data : costoMeses_Invergoal[6],
+            i == 7 ? data : costoMeses_Invergoal[7],
+            i == 8 ? data : costoMeses_Invergoal[8],
+            i == 9 ? data : costoMeses_Invergoal[9],
+            i == 10 ? data : costoMeses_Invergoal[10],
+            i == 11 ? data : costoMeses_Invergoal[11],
+          ];
+          if (i == 11) this.llenarGrafica_Compras_Invergoal(costoMeses_Invergoal);
+          let info : any = { anio: this.anioSeleccionado, costo : data };
+          let index2 : number = this.compras_Anios_Invergoal.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compras_Anios_Invergoal[index2].costo += data;
+          else this.compras_Anios_Invergoal.push(info);      
+        });
+        this.zeusService.GetComprasMesInverGoal_InverSuez(this.anioSeleccionado, i + 1, '900458314').subscribe(data => {
+          costoMeses_Inversuez = [
+            i == 0 ? data : costoMeses_Inversuez[0],
+            i == 1 ? data : costoMeses_Inversuez[1],
+            i == 2 ? data : costoMeses_Inversuez[2],
+            i == 3 ? data : costoMeses_Inversuez[3],
+            i == 4 ? data : costoMeses_Inversuez[4],
+            i == 5 ? data : costoMeses_Inversuez[5],
+            i == 6 ? data : costoMeses_Inversuez[6],
+            i == 7 ? data : costoMeses_Inversuez[7],
+            i == 8 ? data : costoMeses_Inversuez[8],
+            i == 9 ? data : costoMeses_Inversuez[9],
+            i == 10 ? data : costoMeses_Inversuez[10],
+            i == 11 ? data : costoMeses_Inversuez[11],
+          ];
+          if (i == 11) this.llenarGrafica_Compras_Inversuez(costoMeses_Inversuez);
+          let info : any = { anio: this.anioSeleccionado, costo : data };
+          let index2 : number = this.compras_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index2 != -1) this.compras_Anios_Inversuez[index2].costo += data;
+          else this.compras_Anios_Inversuez.push(info);
+        });
+      }
+    }
+  }
+
+  // Funcion que va a llenar la grafica de compras de plasticaribe
+  llenarGrafica_Compras_Plasticaribe(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    };
+    this.graficaCompras_Plasticaribe.datasets.push(info);
+  }
+  
+  // Funcion que va a llenar la grafica de compras de invergoal
+  llenarGrafica_Compras_Invergoal(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    };
+    this.graficaCompras_Invergoal.datasets.push(info);
+  }
+
+  // Funcion que va a llenar la grafica de compras de inversuez
+  llenarGrafica_Compras_Inversuez(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    let info : any = {
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    };
+    this.graficaCompras_Inversuez.datasets.push(info);
   }
 
   // Funcion que va a buscar la informacion de la grafica de inventario de materias primas
