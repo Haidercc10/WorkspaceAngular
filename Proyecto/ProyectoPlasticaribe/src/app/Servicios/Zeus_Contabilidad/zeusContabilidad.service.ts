@@ -24,6 +24,8 @@ export class ZeusContabilidadService {
   GetCarteraTotal = () => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCarteraTotal`);
 
   GetCarteraVendedor = (id : any) => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCarteraVendedor/${id}`);
+  
+  GetCartera_Mes_Anio = (periodo : any) => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCartera_Mes_Anio/${periodo}`);
 
   /*********************************************************************** SaldoProvLibroPrincipal **********************************************************/
   GetCostosProveedores = (cuenta : string) => this.http.get<any>(`${rutaZeusContabilidad}/SaldoProv_LibroPrincipal/getCostosProveedores/${cuenta}`);
