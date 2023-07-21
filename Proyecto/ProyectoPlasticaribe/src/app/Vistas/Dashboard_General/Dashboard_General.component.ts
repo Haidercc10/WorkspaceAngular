@@ -272,26 +272,30 @@ export class Dashboard_GeneralComponent implements OnInit {
       let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.zeusContabilidad.GetCartera_Mes_Anio(`${this.anioSeleccionado}`).subscribe(dato => {
         for (let i = 0; i < dato.length; i++) {
-          if (dato[i] == null) this.llenarGraficaCuentas_Cobrar(costoMeses);
-          costoMeses = [
-            dato[i].mes == '01' && dato[i] != null ? dato[i].valor : costoMeses[0],
-            dato[i].mes == '02' && dato[i] != null ? dato[i].valor : costoMeses[1],
-            dato[i].mes == '03' && dato[i] != null ? dato[i].valor : costoMeses[2],
-            dato[i].mes == '04' && dato[i] != null ? dato[i].valor : costoMeses[3],
-            dato[i].mes == '05' && dato[i] != null ? dato[i].valor : costoMeses[4],
-            dato[i].mes == '06' && dato[i] != null ? dato[i].valor : costoMeses[5],
-            dato[i].mes == '07' && dato[i] != null ? dato[i].valor : costoMeses[6],
-            dato[i].mes == '08' && dato[i] != null ? dato[i].valor : costoMeses[7],
-            dato[i].mes == '09' && dato[i] != null ? dato[i].valor : costoMeses[8],
-            dato[i].mes == '10' && dato[i] != null ? dato[i].valor : costoMeses[9],
-            dato[i].mes == '11' && dato[i] != null ? dato[i].valor : costoMeses[10],
-            dato[i].mes == '12' && dato[i] != null ? dato[i].valor : costoMeses[11],
-          ];
-          if (dato[i].mes == '12') this.llenarGraficaCuentas_Cobrar(costoMeses);
-          let info : any = { anio: this.anioSeleccionado, costo : dato[i].valor };
-          let index2 : number = this.cuentas_Cobrar_Anios.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.cuentas_Cobrar_Anios[index2].costo += dato[i].valor;
-          else this.cuentas_Cobrar_Anios.push(info);
+          if (dato[i] != null){
+            costoMeses = [
+              dato[i].mes == '01' && dato[i] != null ? dato[i].valor : costoMeses[0],
+              dato[i].mes == '02' && dato[i] != null ? dato[i].valor : costoMeses[1],
+              dato[i].mes == '03' && dato[i] != null ? dato[i].valor : costoMeses[2],
+              dato[i].mes == '04' && dato[i] != null ? dato[i].valor : costoMeses[3],
+              dato[i].mes == '05' && dato[i] != null ? dato[i].valor : costoMeses[4],
+              dato[i].mes == '06' && dato[i] != null ? dato[i].valor : costoMeses[5],
+              dato[i].mes == '07' && dato[i] != null ? dato[i].valor : costoMeses[6],
+              dato[i].mes == '08' && dato[i] != null ? dato[i].valor : costoMeses[7],
+              dato[i].mes == '09' && dato[i] != null ? dato[i].valor : costoMeses[8],
+              dato[i].mes == '10' && dato[i] != null ? dato[i].valor : costoMeses[9],
+              dato[i].mes == '11' && dato[i] != null ? dato[i].valor : costoMeses[10],
+              dato[i].mes == '12' && dato[i] != null ? dato[i].valor : costoMeses[11],
+            ];
+            if (dato[i].mes == '12') this.llenarGraficaCuentas_Cobrar(costoMeses);
+            let info : any = { anio: this.anioSeleccionado, costo : dato[i].valor };
+            let index2 : number = this.cuentas_Cobrar_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+            if (index2 != -1) this.cuentas_Cobrar_Anios[index2].costo += dato[i].valor;
+            else this.cuentas_Cobrar_Anios.push(info);
+          } else {
+            this.llenarGraficaCuentas_Cobrar(costoMeses);
+            break;
+          }
         }
       });
     }
@@ -517,7 +521,6 @@ export class Dashboard_GeneralComponent implements OnInit {
             i == 10 ? parseFloat(info.Valor) : costoMeses_Inversuez[10],
             i == 11 ? parseFloat(info.Valor) : costoMeses_Inversuez[11],
           ];
-          console.log(costoMeses_Inversuez)
           if (i == 11) this.llenarGrafica_Compras_Inversuez(costoMeses_Inversuez);
           let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
           let index2 : number = this.compras_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
