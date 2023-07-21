@@ -15,6 +15,7 @@ export class Dashboard_CostosComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  cargando : boolean = false;
 
   constructor(private AppComponent : AppComponent) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;

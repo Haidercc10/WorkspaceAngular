@@ -2,4 +2,68 @@
   <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
+
+  <div class="row g-2">
+    <!-- Cos -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4">
+        <p-card>
+            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Costo indirecto de fabricación</h2>
+            <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="" [options]=""></p-chart>
+            <p-toolbar>
+                <div class="row p-2">
+                  <div class="col-xs-12 col-sm-12 col-md-4 p-2" >
+                    <h5>Año: Total: <b></b></h5>
+                  </div>
+                </div>
+              </p-toolbar>
+        </p-card>
+    </div>
+
+    <!-- Cuentas por Cobrar -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4">
+        <p-card>
+            <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Gastos de administración</h2>
+            <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="" [options]=""></p-chart>
+            <p-toolbar>
+                <div class="row p-2">
+                  <div class="col-xs-12 col-sm-12 col-md-4 p-2">
+                    <h5>Año:  Total: <b></b></h5>
+                  </div>
+                </div>
+              </p-toolbar>
+        </p-card>
+    </div>
+
+
+    <div class="row g-2">
+      <!-- Facturación -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4">
+          <p-card>
+              <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Gastos de ventas</h2>
+              <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="" [options]=""></p-chart>
+              <p-toolbar>
+                  <div class="row p-2">
+                    <div class="col-xs-12 col-sm-12 col-md-4 p-2" >
+                      <h5>Año: Total: <b></b></h5>
+                    </div>
+                  </div>
+                </p-toolbar>
+          </p-card>
+      </div>
+
+      <!-- Cuentas por Cobrar -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4">
+          <p-card>
+              <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Gastos no operacionales</h2>
+              <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="" [options]=""></p-chart>
+              <p-toolbar>
+                  <div class="row p-2">
+                    <div class="col-xs-12 col-sm-12 col-md-4 p-2">
+                      <h5>Año:  Total: <b></b></h5>
+                    </div>
+                  </div>
+                </p-toolbar>
+          </p-card>
+      </div>
+
 </div>
