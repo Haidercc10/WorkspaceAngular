@@ -192,7 +192,134 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
           dato[11].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
         );
         this.manejarDatosCostosNoOperacionesles(costoNoOperacionales)
+        
+        // this.datosCostosFabricacion(costosFabricacion)
+        // this.datosCostosAdministrativo(costosAdministrativos)
+        // this.datosCostosVentas(costosVentas)
+        // this.datosCostosNoOperacionesles(costoNoOperacionales)
       });
+    }
+  }
+
+  // da
+  datosCostosFabricacion(data : any){
+    let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+    let cantDatos : number = 0;
+    
+    let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      for (let i = 0; i < data.length; i++) {
+        costoMeses = [
+          data[i].mes == '01' ? data[i].valor + costoMeses[0] : costoMeses[0],
+          data[i].mes == '02' ? data[i].valor + costoMeses[1] : costoMeses[1],
+          data[i].mes == '03' ? data[i].valor + costoMeses[2] : costoMeses[2],
+          data[i].mes == '04' ? data[i].valor + costoMeses[3] : costoMeses[3],
+          data[i].mes == '05' ? data[i].valor + costoMeses[4] : costoMeses[4],
+          data[i].mes == '06' ? data[i].valor + costoMeses[5] : costoMeses[5],
+          data[i].mes == '07' ? data[i].valor + costoMeses[6] : costoMeses[6],
+          data[i].mes == '08' ? data[i].valor + costoMeses[7] : costoMeses[7],
+          data[i].mes == '09' ? data[i].valor + costoMeses[8] : costoMeses[8],
+          data[i].mes == '10' ? data[i].valor + costoMeses[9] : costoMeses[9],
+          data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
+          data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
+        ]
+        cantDatos++;      
+        if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
+        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
+        let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 != -1) this.costo_Anio_fabricacion[index2].costo += data[i].valor;
+        else this.costo_Anio_fabricacion.push(info);
+      }
+    }
+  }
+
+  datosCostosAdministrativo(data : any){
+    let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+    let cantDatos : number = 0;
+    let index : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      for (let i = 0; i < data.length; i++) {
+        costoMeses = [
+          data[i].mes == '01' ? data[i].valor + costoMeses[0] : costoMeses[0],
+          data[i].mes == '02' ? data[i].valor + costoMeses[1] : costoMeses[1],
+          data[i].mes == '03' ? data[i].valor + costoMeses[2] : costoMeses[2],
+          data[i].mes == '04' ? data[i].valor + costoMeses[3] : costoMeses[3],
+          data[i].mes == '05' ? data[i].valor + costoMeses[4] : costoMeses[4],
+          data[i].mes == '06' ? data[i].valor + costoMeses[5] : costoMeses[5],
+          data[i].mes == '07' ? data[i].valor + costoMeses[6] : costoMeses[6],
+          data[i].mes == '08' ? data[i].valor + costoMeses[7] : costoMeses[7],
+          data[i].mes == '09' ? data[i].valor + costoMeses[8] : costoMeses[8],
+          data[i].mes == '10' ? data[i].valor + costoMeses[9] : costoMeses[9],
+          data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
+          data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
+        ]
+        cantDatos++;      
+        if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
+        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
+        let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 != -1) this.costo_Anio_administrativos[index2].costo += data[i].valor;
+        else this.costo_Anio_administrativos.push(info);
+      }
+    }
+  }
+  
+  datosCostosVentas(data : any){
+    let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+    let cantDatos : number = 0;
+    let index : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      for (let i = 0; i < data.length; i++) {
+        costoMeses = [
+          data[i].mes == '01' ? data[i].valor + costoMeses[0] : costoMeses[0],
+          data[i].mes == '02' ? data[i].valor + costoMeses[1] : costoMeses[1],
+          data[i].mes == '03' ? data[i].valor + costoMeses[2] : costoMeses[2],
+          data[i].mes == '04' ? data[i].valor + costoMeses[3] : costoMeses[3],
+          data[i].mes == '05' ? data[i].valor + costoMeses[4] : costoMeses[4],
+          data[i].mes == '06' ? data[i].valor + costoMeses[5] : costoMeses[5],
+          data[i].mes == '07' ? data[i].valor + costoMeses[6] : costoMeses[6],
+          data[i].mes == '08' ? data[i].valor + costoMeses[7] : costoMeses[7],
+          data[i].mes == '09' ? data[i].valor + costoMeses[8] : costoMeses[8],
+          data[i].mes == '10' ? data[i].valor + costoMeses[9] : costoMeses[9],
+          data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
+          data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
+        ]
+        cantDatos++;      
+        if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
+        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
+        let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 != -1) this.costo_Anio_ventas[index2].costo += data[i].valor;
+        else this.costo_Anio_ventas.push(info);
+      }
+    }
+  }
+  
+  datosCostosNoOperacionesles(data : any){
+    let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+    let cantDatos : number = 0;
+    let index : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
+    if (index == -1) {
+      for (let i = 0; i < data.length; i++) {
+        costoMeses = [
+          data[i].mes == '01' ? data[i].valor + costoMeses[0] : costoMeses[0],
+          data[i].mes == '02' ? data[i].valor + costoMeses[1] : costoMeses[1],
+          data[i].mes == '03' ? data[i].valor + costoMeses[2] : costoMeses[2],
+          data[i].mes == '04' ? data[i].valor + costoMeses[3] : costoMeses[3],
+          data[i].mes == '05' ? data[i].valor + costoMeses[4] : costoMeses[4],
+          data[i].mes == '06' ? data[i].valor + costoMeses[5] : costoMeses[5],
+          data[i].mes == '07' ? data[i].valor + costoMeses[6] : costoMeses[6],
+          data[i].mes == '08' ? data[i].valor + costoMeses[7] : costoMeses[7],
+          data[i].mes == '09' ? data[i].valor + costoMeses[8] : costoMeses[8],
+          data[i].mes == '10' ? data[i].valor + costoMeses[9] : costoMeses[9],
+          data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
+          data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
+        ]
+        cantDatos++;      
+        if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
+        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
+        let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 != -1) this.costo_Anio_noOperacionesles[index2].costo += data[i].valor;
+        else this.costo_Anio_noOperacionesles.push(info);
+      }
     }
   }
 
