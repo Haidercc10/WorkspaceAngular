@@ -20,7 +20,7 @@
       <!--FACTURACIÓN-->
       <p-tabPanel
         header="Facturación"
-        leftIcon="pi pi-sliders-h"
+        leftIcon="pi pi-dollar"
         tooltip="Información de la Facturación Mensual"
         *ngIf="[1,60].includes(ValidarRol)">
         <app-DashBoard_Facturacion *ngIf="facturacion"></app-DashBoard_Facturacion>
@@ -78,6 +78,15 @@
         tooltip="Información general"
         *ngIf="[1].includes(ValidarRol)">
         <app-Dashboard_General></app-Dashboard_General>
+      </p-tabPanel>
+
+      <!-- COSTOS -->
+      <p-tabPanel
+        header="Costos"
+        leftIcon="pi pi-money-bill"
+        tooltip="Información general sobre los costos fijos y variables"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-Dashboard_Costos *ngIf="costos"></app-Dashboard_Costos>
       </p-tabPanel>
 
     </p-tabView>
