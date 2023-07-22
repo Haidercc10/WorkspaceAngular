@@ -34,7 +34,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,){}
-  
+
   ngOnInit(): void {
     this.llenarArrayAnos();
     this.inicializarGraficas();
@@ -98,23 +98,23 @@ export class Dashboard_CostosComponent implements OnInit {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosAdministrativos = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosVentas = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosNoOperacionesles = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
   }
-  
+
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
@@ -137,7 +137,7 @@ export class Dashboard_CostosComponent implements OnInit {
         let costosAdministrativos = costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()));
         let costosVentas = costos.filter(item => cuentasVentas.includes(item.cuenta.trim()));
         let costoNoOperacionales = costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim()));
-        
+
         this.datosCostosFabricacion(costosFabricacion);
         this.datosCostosAdministrativo(costosAdministrativos);
         this.datosCostosVentas(costosVentas);
@@ -150,7 +150,7 @@ export class Dashboard_CostosComponent implements OnInit {
   datosCostosFabricacion(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
-    
+
     let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       for (let i = 0; i < data.length; i++) {
@@ -168,7 +168,7 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
@@ -216,7 +216,7 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
@@ -242,7 +242,7 @@ export class Dashboard_CostosComponent implements OnInit {
       tension: 0.3
     });
   }
-  
+
   // Funcion que va a manejar los datosde los costos de ventas
   datosCostosVentas(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
@@ -264,7 +264,7 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
@@ -312,7 +312,7 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);

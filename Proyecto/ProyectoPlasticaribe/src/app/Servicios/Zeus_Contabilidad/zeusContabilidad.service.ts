@@ -18,13 +18,13 @@ export class ZeusContabilidadService {
   GetCarteraAgrupadaVendedores = () => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCarteraAgrupadaVendedores`);
 
   GetCartera = () => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCartera`);
-  
+
   GetCartera_Anio_Mes = (anio : string, mes : string) => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCartera_Anio_Mes/${anio}/${mes}`);
 
   GetCarteraTotal = () => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCarteraTotal`);
 
   GetCarteraVendedor = (id : any) => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCarteraVendedor/${id}`);
-  
+
   GetCartera_Mes_Anio = (periodo : any) => this.http.get<any>(`${rutaZeusContabilidad}/FacturasBU/getCartera_Mes_Anio/${periodo}`);
 
   /*********************************************************************** SaldoProvLibroPrincipal **********************************************************/
@@ -40,4 +40,5 @@ export class ZeusContabilidadService {
   /************************************************************************ FacturasLibroPrincipal *************************************************************/
   GetCostosCuentas_Mes_Mes = (anio : string) => this.http.get<any>(`${rutaZeusContabilidad}/SaldocontBu/getCostosCuentas_Mes_Mes/${anio}`);
 
+  GetCostosCuentasxMesDetallada = (anio : string, mes : string) => this.http.get<any>(`${rutaZeusContabilidad}/Transac/GetCostosCuentasxMesDetallada/${anio}/${mes}`);
 }

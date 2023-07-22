@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+
 import moment from 'moment';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -10,7 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 
 export class PruebaImagenCatInsumoComponent implements OnInit  {
-  
+
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -33,9 +35,14 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   costo_Anio_ventas : any [] = []; //Variable que va a almacenar los costos de ventas por año
   costo_Anio_noOperacionesles : any [] = []; //Variable que va a almacenar los costos de no operacionesles por año
 
+  arrayCostos : any = [];
+  totalCostoSeleccionado : number = 0;
+  @ViewChild('dt') dt: Table | undefined;
+  load : boolean = false;
+
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,){}
-  
+
   ngOnInit(): void {
     this.llenarArrayAnos();
     this.inicializarGraficas();
@@ -99,23 +106,23 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosAdministrativos = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosVentas = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCostosNoOperacionesles = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
   }
-  
+
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
@@ -133,7 +140,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
-        
+
         let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
         let costosFabricacion = costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()));
         let costosAdministrativos = costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()));
@@ -145,8 +152,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
         this.manejarDatosCostosFabricacion(costosFabricacion);
         this.manejarDatosCostosAdministrativos(costosAdministrativos);
         this.manejarDatosCostosNoOperacionesles(costoNoOperacionales)
-        this.manejarDatosCostosVentas(costosVentas);        
-        
+        this.manejarDatosCostosVentas(costosVentas);
+
         // this.datosCostosFabricacion(costosFabricacion)
         // this.datosCostosAdministrativo(costosAdministrativos)
         // this.datosCostosVentas(costosVentas)
@@ -165,7 +172,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   datosCostosFabricacion(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
-    
+
     let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       for (let i = 0; i < data.length; i++) {
@@ -186,7 +193,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
           data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
           data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
@@ -216,7 +223,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
           data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
           data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
@@ -225,7 +232,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       }
     }
   }
-  
+
   datosCostosVentas(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
@@ -246,7 +253,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
           data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
           data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
@@ -255,7 +262,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       }
     }
   }
-  
+
   datosCostosNoOperacionesles(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
@@ -276,7 +283,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
           data[i].mes == '11' ? data[i].valor + costoMeses[10] : costoMeses[10],
           data[i].mes == '12' ? data[i].valor + costoMeses[11] : costoMeses[11],
         ]
-        cantDatos++;      
+        cantDatos++;
         if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
         let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
         let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
@@ -500,4 +507,53 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
 
   // funcion que va a devolver un array con la informacion de cada uno de los meses de una misma cuenta
   obtenerDatosMes = (data : any, cuenta : string) : any[] => data.filter(item => item.cuenta == cuenta);
+
+
+consultaCostosDetallados(){
+  this.arrayCostos = [];
+  this.totalCostoSeleccionado = 0;
+  let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
+  let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
+  let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
+  let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
+  let array1 : any[] = [];
+  let array2 : any[] = [];
+  let array3 : any[] = [];
+  let array4 : any[] = [];
+
+  this.zeusContabilidad.GetCostosCuentasxMesDetallada('2023', '06').subscribe(data => {
+    for(let index = 0; index < data.length; index++) {
+
+      array1 = cuentas7.filter(item => item.includes(data[index].id_Cuenta.trim())).concat(
+        array2 = cuentas51.filter(item => item.includes(data[index].id_Cuenta.trim().substr(0,4))).concat(
+          array3 = cuentas52.filter(item => item.includes(data[index].id_Cuenta.trim().substr(0,4))).concat(
+            array4 = cuentas53.filter(item => item.includes(data[index].id_Cuenta.trim())))))
+
+            console.log(array1)
+
+      //if(cuentas7.includes(data[index].id_Cuenta.trim())) array1 = data[index];
+      //if(cuentas51.includes(data[index].id_Cuenta.trim().substr(0,4))) array2 = data[index];
+    }
+  });
+}
+
+llenarTabla(datos : any) {
+  datos.fecha_Grabacion = datos.fecha_Grabacion.replace('T', ' ')
+  this.totalCostoSeleccionado += datos.valor;
+  this.arrayCostos.push(datos);
+}
+
+aplicarfiltro($event, campo : any, valorCampo : string){
+  this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  setTimeout(() => {
+    if(this.dt.filteredValue != null) {
+      this.totalCostoSeleccionado = 0;
+      this.dt.filteredValue.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+    } else {
+      this.totalCostoSeleccionado = 0;
+      this.arrayCostos.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+    }
+  }, 500);
+}
+
 }

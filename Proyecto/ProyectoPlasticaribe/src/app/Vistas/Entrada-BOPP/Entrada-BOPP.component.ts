@@ -200,6 +200,7 @@ export class EntradaBOPPComponent implements OnInit {
         if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
         else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
         else if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
+        else if (this.ArrayBOPP[i].Cat_Id == 17) bodega = 8;
 
         let datosBOPP : any = {
           bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
