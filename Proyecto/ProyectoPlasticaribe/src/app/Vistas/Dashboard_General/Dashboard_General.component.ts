@@ -330,63 +330,63 @@ export class Dashboard_GeneralComponent implements OnInit {
           let numMes = mes.periodo.trim().substring(4, 6);
           if (mes.empresa == 'Plasticaribe SAS') {
             costoMeses_Plasticaribe = [
-              numMes == '01' ? mes.costo : costoMeses_Plasticaribe[0],
-              numMes == '02' ? mes.costo : costoMeses_Plasticaribe[1],
-              numMes == '03' ? mes.costo : costoMeses_Plasticaribe[2],
-              numMes == '04' ? mes.costo : costoMeses_Plasticaribe[3],
-              numMes == '05' ? mes.costo : costoMeses_Plasticaribe[4],
-              numMes == '06' ? mes.costo : costoMeses_Plasticaribe[5],
-              numMes == '07' ? mes.costo : costoMeses_Plasticaribe[6],
-              numMes == '08' ? mes.costo : costoMeses_Plasticaribe[7],
-              numMes == '09' ? mes.costo : costoMeses_Plasticaribe[8],
-              numMes == '10' ? mes.costo : costoMeses_Plasticaribe[9],
-              numMes == '11' ? mes.costo : costoMeses_Plasticaribe[10],
-              numMes == '12' ? mes.costo : costoMeses_Plasticaribe[11],
+              numMes == '01' ? 0 - mes.costo : costoMeses_Plasticaribe[0],
+              numMes == '02' ? 0 - mes.costo : costoMeses_Plasticaribe[1],
+              numMes == '03' ? 0 - mes.costo : costoMeses_Plasticaribe[2],
+              numMes == '04' ? 0 - mes.costo : costoMeses_Plasticaribe[3],
+              numMes == '05' ? 0 - mes.costo : costoMeses_Plasticaribe[4],
+              numMes == '06' ? 0 - mes.costo : costoMeses_Plasticaribe[5],
+              numMes == '07' ? 0 - mes.costo : costoMeses_Plasticaribe[6],
+              numMes == '08' ? 0 - mes.costo : costoMeses_Plasticaribe[7],
+              numMes == '09' ? 0 - mes.costo : costoMeses_Plasticaribe[8],
+              numMes == '10' ? 0 - mes.costo : costoMeses_Plasticaribe[9],
+              numMes == '11' ? 0 - mes.costo : costoMeses_Plasticaribe[10],
+              numMes == '12' ? 0 - mes.costo : costoMeses_Plasticaribe[11],
             ];
           
-            let info_Plasticaribe : any = { anio: this.anioSeleccionado, costo : mes.costo };
+            let info_Plasticaribe : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Plasticaribe : number = this.cuentas_Pagar_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
-            if (index_Plasticaribe != -1) this.cuentas_Pagar_Anios_Plasticaribe[index_Plasticaribe].costo += mes.costo;
+            if (index_Plasticaribe != -1) this.cuentas_Pagar_Anios_Plasticaribe[index_Plasticaribe].costo += (0 - mes.costo);
             else this.cuentas_Pagar_Anios_Plasticaribe.push(info_Plasticaribe);
           } else if (mes.empresa == 'Invergoal SAS') {
             costoMeses_Invergoal = [
-              numMes == '01' ? mes.costo : costoMeses_Invergoal[0],
-              numMes == '02' ? mes.costo : costoMeses_Invergoal[1],
-              numMes == '03' ? mes.costo : costoMeses_Invergoal[2],
-              numMes == '04' ? mes.costo : costoMeses_Invergoal[3],
-              numMes == '05' ? mes.costo : costoMeses_Invergoal[4],
-              numMes == '06' ? mes.costo : costoMeses_Invergoal[5],
-              numMes == '07' ? mes.costo : costoMeses_Invergoal[6],
-              numMes == '08' ? mes.costo : costoMeses_Invergoal[7],
-              numMes == '09' ? mes.costo : costoMeses_Invergoal[8],
-              numMes == '10' ? mes.costo : costoMeses_Invergoal[9],
-              numMes == '11' ? mes.costo : costoMeses_Invergoal[10],
-              numMes == '12' ? mes.costo : costoMeses_Invergoal[11],
+              numMes == '01' ? 0 - mes.costo : costoMeses_Invergoal[0],
+              numMes == '02' ? 0 - mes.costo : costoMeses_Invergoal[1],
+              numMes == '03' ? 0 - mes.costo : costoMeses_Invergoal[2],
+              numMes == '04' ? 0 - mes.costo : costoMeses_Invergoal[3],
+              numMes == '05' ? 0 - mes.costo : costoMeses_Invergoal[4],
+              numMes == '06' ? 0 - mes.costo : costoMeses_Invergoal[5],
+              numMes == '07' ? 0 - mes.costo : costoMeses_Invergoal[6],
+              numMes == '08' ? 0 - mes.costo : costoMeses_Invergoal[7],
+              numMes == '09' ? 0 - mes.costo : costoMeses_Invergoal[8],
+              numMes == '10' ? 0 - mes.costo : costoMeses_Invergoal[9],
+              numMes == '11' ? 0 - mes.costo : costoMeses_Invergoal[10],
+              numMes == '12' ? 0 - mes.costo : costoMeses_Invergoal[11],
             ];
           
-            let info_Invergoal : any = { anio: this.anioSeleccionado, costo : mes.costo };
+            let info_Invergoal : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Invergoal : number = this.cuentas_Pagar_Anios_Invergoal.findIndex(item => item.anio == this.anioSeleccionado);
-            if (index_Invergoal != -1) this.cuentas_Pagar_Anios_Invergoal[index_Invergoal].costo += mes.costo;
+            if (index_Invergoal != -1) this.cuentas_Pagar_Anios_Invergoal[index_Invergoal].costo += (0 - mes.costo);
             else this.cuentas_Pagar_Anios_Invergoal.push(info_Invergoal);
           } else if (mes.empresa == 'Inversuez SAS') {
             costoMeses_Inversuez = [
-              numMes == '01' ? mes.costo : costoMeses_Inversuez[0],
-              numMes == '02' ? mes.costo : costoMeses_Inversuez[1],
-              numMes == '03' ? mes.costo : costoMeses_Inversuez[2],
-              numMes == '04' ? mes.costo : costoMeses_Inversuez[3],
-              numMes == '05' ? mes.costo : costoMeses_Inversuez[4],
-              numMes == '06' ? mes.costo : costoMeses_Inversuez[5],
-              numMes == '07' ? mes.costo : costoMeses_Inversuez[6],
-              numMes == '08' ? mes.costo : costoMeses_Inversuez[7],
-              numMes == '09' ? mes.costo : costoMeses_Inversuez[8],
-              numMes == '10' ? mes.costo : costoMeses_Inversuez[9],
-              numMes == '11' ? mes.costo : costoMeses_Inversuez[10],
-              numMes == '12' ? mes.costo : costoMeses_Inversuez[11],
+              numMes == '01' ? 0 - mes.costo : costoMeses_Inversuez[0],
+              numMes == '02' ? 0 - mes.costo : costoMeses_Inversuez[1],
+              numMes == '03' ? 0 - mes.costo : costoMeses_Inversuez[2],
+              numMes == '04' ? 0 - mes.costo : costoMeses_Inversuez[3],
+              numMes == '05' ? 0 - mes.costo : costoMeses_Inversuez[4],
+              numMes == '06' ? 0 - mes.costo : costoMeses_Inversuez[5],
+              numMes == '07' ? 0 - mes.costo : costoMeses_Inversuez[6],
+              numMes == '08' ? 0 - mes.costo : costoMeses_Inversuez[7],
+              numMes == '09' ? 0 - mes.costo : costoMeses_Inversuez[8],
+              numMes == '10' ? 0 - mes.costo : costoMeses_Inversuez[9],
+              numMes == '11' ? 0 - mes.costo : costoMeses_Inversuez[10],
+              numMes == '12' ? 0 - mes.costo : costoMeses_Inversuez[11],
             ];
           
-            let info_Inversuez : any = { anio: this.anioSeleccionado, costo : mes.costo };
+            let info_Inversuez : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Inversuez : number = this.cuentas_Pagar_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
-            if (index_Inversuez != -1) this.cuentas_Pagar_Anios_Inversuez[index_Inversuez].costo += mes.costo;
+            if (index_Inversuez != -1) this.cuentas_Pagar_Anios_Inversuez[index_Inversuez].costo += (0 - mes.costo);
             else this.cuentas_Pagar_Anios_Inversuez.push(info_Inversuez);   
           }
         });
@@ -604,6 +604,9 @@ export class Dashboard_GeneralComponent implements OnInit {
           parseFloat(info.Diciembre)
         ];
         this.llenarGraficaInventario_MatPrima(costoMeses);
+        let info_Anio : any = { anio: this.anioSeleccionado, costo : costoMeses.reduce((a, b) => a + b, 0) };
+        let index2 : number = this.inventarioMatPrima_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 == -1) this.inventarioMatPrima_Anios.push(info_Anio);
       });
     }
   }
@@ -647,6 +650,9 @@ export class Dashboard_GeneralComponent implements OnInit {
           parseFloat(info.Diciembre)
         ];
         this.llenarGraficaInventario_Producto(costoMeses);
+        let info_Anio : any = { anio: this.anioSeleccionado, costo : costoMeses.reduce((a, b) => a + b, 0) };
+        let index2 : number = this.inventarioProductos_Anios.findIndex(item => item.anio == this.anioSeleccionado);
+        if (index2 == -1) this.inventarioProductos_Anios.push(info_Anio);
       });
     }
   }

@@ -133,65 +133,19 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
-        let costosFabricacion = dato[0].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())).concat(
-          dato[1].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[2].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[3].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[4].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[5].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[6].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[7].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[8].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[9].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[10].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-          dato[11].filter(item => cuentasFacbricacion.includes(item.cuenta.trim())),
-        );
+        
+        let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
+        let costosFabricacion = costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()));
+        let costosAdministrativos = costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()));
+        let costosVentas = costos.filter(item => cuentasVentas.includes(item.cuenta.trim()));
+        let costoNoOperacionales = costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim()));
+
+        console.log(this.sumarDatos(costosFabricacion))
+
         this.manejarDatosCostosFabricacion(costosFabricacion);
-
-        let costosAdministrativos = dato[0].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())).concat(
-          dato[1].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[2].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[3].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[4].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[5].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[6].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[7].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[8].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[9].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[10].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-          dato[11].filter(item => cuentasAdministrativos.includes(item.cuenta.trim())),
-        );
         this.manejarDatosCostosAdministrativos(costosAdministrativos);
-
-        let costosVentas = dato[0].filter(item => cuentasVentas.includes(item.cuenta.trim())).concat(
-          dato[1].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[2].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[3].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[4].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[5].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[6].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[7].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[8].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[9].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[10].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-          dato[11].filter(item => cuentasVentas.includes(item.cuenta.trim())),
-        );
-        this.manejarDatosCostosVentas(costosVentas);
-
-        let costoNoOperacionales = dato[0].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())).concat(
-          dato[1].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[2].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[3].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[4].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[5].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[6].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[7].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[8].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[9].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[10].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-          dato[11].filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())),
-        );
         this.manejarDatosCostosNoOperacionesles(costoNoOperacionales)
+        this.manejarDatosCostosVentas(costosVentas);        
         
         // this.datosCostosFabricacion(costosFabricacion)
         // this.datosCostosAdministrativo(costosAdministrativos)
@@ -199,6 +153,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
         // this.datosCostosNoOperacionesles(costoNoOperacionales)
       });
     }
+  }
+
+  // Funcion que va a sumar todos los datos de un array de objetos utilizando reduce
+  sumarDatos(data : any){
+    let suma : number = data.reduce((a, b) => a + b.valor, 0);
+    return suma;
   }
 
   // da
@@ -210,6 +170,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     if (index == -1) {
       for (let i = 0; i < data.length; i++) {
         costoMeses = [
+          data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+
+
           data[i].mes == '01' ? data[i].valor + costoMeses[0] : costoMeses[0],
           data[i].mes == '02' ? data[i].valor + costoMeses[1] : costoMeses[1],
           data[i].mes == '03' ? data[i].valor + costoMeses[2] : costoMeses[2],

@@ -124,7 +124,7 @@ export class Recibos_CajaComponent implements OnInit {
       let title : string = ``;
 
       this.dt.filteredValue != null ? datos = this.dt.filteredValue : datos = this.arrayRecibos;
-      title = `Recibos de Caja de ${fecha} a ${fechaFinal}`;
+      title = `Recibos de Caja de ${fecha.replace('T00:00:00', '')} a ${fechaFinal.replace('T23:59:59', '')}`;
 
       setTimeout(() => {
         const header = ["Periodo", "Consecutivo", "Fecha Transacción", "Cliente", "Descripción", "Valor", "Cuenta", "Vendedor", "Factura", "Vencimiento", "Usuario", "Fecha Registro"];
