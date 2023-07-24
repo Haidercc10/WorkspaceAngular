@@ -135,18 +135,23 @@ export class AppComponent implements OnInit{
     document.onkeypress = reiniciarTiempo;
     document.onload = reiniciarTiempo;
     document.onmousemove = reiniciarTiempo;
-    document.onmousedown = reiniciarTiempo; // aplica para una pantalla touch
+    document.onmousedown = reiniciarTiempo;
     document.ontouchstart = reiniciarTiempo;
-    document.onclick = reiniciarTiempo;     // aplica para un clic del touchpad
-    document.onscroll = reiniciarTiempo;    // navegando con flechas del teclado
+    document.onclick = reiniciarTiempo;
+    document.onscroll = reiniciarTiempo;
     document.onkeypress = reiniciarTiempo;
-    function tiempoExcedido() {
-      localStorage.clear();
-      window.location.pathname = '/';
+
+    const tiempoExcedido = () => {
+      if (this.storage.get('Token')) this.authenticationService.logout();
+      else {
+        this.storage.clear();
+        window.location.pathname = '/';
+      }
     }
+
     function reiniciarTiempo() {
       let estadoConexion : boolean = window.navigator.onLine;
-      if (window.location.pathname != '/' && !estadoConexion) tiempoExcedido;
+      if (window.location.pathname != '/' || !estadoConexion) tiempoExcedido;
       clearTimeout(t);
       t = setTimeout(tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
     }
