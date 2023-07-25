@@ -144,7 +144,7 @@
         </ng-template>
         <!--Registros-->
         <ng-template pTemplate="body" let-gastos let-rowIndex="rowIndex">
-          <tr (click)="consultaCostosDetallados(gastos)" pTooltip="Haz click para ver los detalles de la cuenta {{gastos.cuenta}} - {{gastos.descripcionCuenta}} en el mes de {{gastos.mes}} del año {{gastos.anio}}">
+          <tr (click)="consultaCostosDetallados(gastos)" pTooltip="Haz click para ver los detalles de la cuenta {{gastos.cuenta}}">
             <td><b>{{rowIndex + 1}}</b></td>
             <td>{{gastos.periodo}}</td>
             <td>{{gastos.anio}}</td>

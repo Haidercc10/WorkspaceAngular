@@ -41,6 +41,7 @@ export class Dashboard_CostosComponent implements OnInit {
   abrirModal1 : boolean = false;
   abrirModal2 : boolean = false;
   graficaSeleccionada : string = '';
+  arrayAnios : any[] = [];
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,){}
@@ -354,26 +355,43 @@ export class Dashboard_CostosComponent implements OnInit {
     this.abrirModal1 = true;
     this.totalCostoSeleccionado = 0;
 
-    let index : number = this.arrayCostos.findIndex(item => item.anio == this.anioSeleccionado);
-    if(index == -1) {
+    this.arrayAnios.push()
+    //let indice : number = this.arrayCostos.findIndex(item => item.anio == this.anioSeleccionado);
+
+    //if(indice == -1 ) {
       let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
       let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
       let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
       let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
 
-      this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(data => {
-        let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
-        let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
-        let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
-        let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
-        let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+         this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(data => {
+          let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
 
-        if (numero == 1) { this.llenarTabla(costoIndFabricacion); this.graficaSeleccionada = 'Costos indirectos de fabricación'; }
-        if (numero == 2) { this.llenarTabla(gastosAdmon); this.graficaSeleccionada = 'Gastos de administración'; }
-        if (numero == 3) { this.llenarTabla(gastosVentas); this.graficaSeleccionada = 'Gastos de ventas'; }
-        if (numero == 4) { this.llenarTabla(gastoNoOperacionales); this.graficaSeleccionada = 'Gastos no operacionales'; }
-      });
-    }
+          if (numero == 1) {
+            this.arrayCostos = [];
+            let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
+            this.llenarTabla(costoIndFabricacion);
+            this.graficaSeleccionada = 'Costos indirectos de fabricación';
+          }
+          if (numero == 2) {
+            this.arrayCostos = [];
+            let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
+            this.llenarTabla(gastosAdmon);
+            this.graficaSeleccionada = 'Gastos de administración';
+           }
+          if (numero == 3) {
+            this.arrayCostos = [];
+            let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
+            this.llenarTabla(gastosVentas);
+            this.graficaSeleccionada = 'Gastos de ventas'; };
+          if (numero == 4) {
+            this.arrayCostos = [];
+             let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+            this.llenarTabla(gastoNoOperacionales);
+            this.graficaSeleccionada = 'Gastos no operacionales';
+          }
+        });
+    //}
   }
 
   llenarTabla(datas : any){
