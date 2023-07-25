@@ -76,6 +76,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a inicializar las variables con la información de las graficas
   inicializarGraficas(){
+    this.arrayAnios = [];
     this.costo_Anio_fabricacion = [];
     this.costo_Anio_administrativos = [];
     this.costo_Anio_ventas = [];
@@ -135,6 +136,8 @@ export class Dashboard_CostosComponent implements OnInit {
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
+    this.arrayAnios.push(`${this.anioSeleccionado}`);
+    console.log(this.arrayAnios)
     this.buscarCostosFabricacion();
     setTimeout(() => this.cargando = false, 2000);
   }
@@ -361,51 +364,48 @@ export class Dashboard_CostosComponent implements OnInit {
     this.abrirModal1 = true;
     this.totalCostoSeleccionado = 0;
 
-    this.arrayAnios.push()
-    //let indice : number = this.arrayCostos.findIndex(item => item.anio == this.anioSeleccionado);
+    let cuentas7 : any[] = ['730545', '730590', '730505', '730575', '730585', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
+    let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5140', '5150', '5155', '5195'];
+    let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
+    let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
 
-    //if(indice == -1 ) {
-      let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
-      let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
-      let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
-      let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
+    for (let index = 0; index < this.arrayAnios.length; index++) {
 
-         this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(data => {
-          let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
+      this.zeusContabilidad.GetCostosCuentas_Mes_Mes(this.arrayAnios[index]).subscribe(data => {
+        let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
 
-          if (numero == 1) {
-            this.arrayCostos = [];
-            let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
-            this.llenarTabla(costoIndFabricacion);
-            this.graficaSeleccionada = 'Costos indirectos de fabricación';
-          }
-          if (numero == 2) {
-            this.arrayCostos = [];
-            let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
-            this.llenarTabla(gastosAdmon);
-            this.graficaSeleccionada = 'Gastos de administración';
-           }
-          if (numero == 3) {
-            this.arrayCostos = [];
-            let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
-            this.llenarTabla(gastosVentas);
-            this.graficaSeleccionada = 'Gastos de ventas'; };
-          if (numero == 4) {
-            this.arrayCostos = [];
-             let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
-            this.llenarTabla(gastoNoOperacionales);
-            this.graficaSeleccionada = 'Gastos no operacionales';
-          }
-        });
-    //}
+        if (numero == 1) {
+          let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
+          this.llenarTabla(costoIndFabricacion);
+          this.graficaSeleccionada = 'Costos indirectos de fabricación';
+        }
+        if (numero == 2) {
+          let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
+          this.llenarTabla(gastosAdmon);
+          this.graficaSeleccionada = 'Gastos de administración';
+         }
+        if (numero == 3) {
+          let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
+          this.llenarTabla(gastosVentas);
+          this.graficaSeleccionada = 'Gastos de ventas';
+        }
+        if (numero == 4) {
+          let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+          this.llenarTabla(gastoNoOperacionales);
+          this.graficaSeleccionada = 'Gastos no operacionales';
+        }
+       });
+    }
   }
 
-  llenarTabla(datas : any){
-    for (let index = 0; index < datas.length; index++) {
-      this.cambiarNumeroAMes(datas[index]);
+  limpiarArrayCostos = () => this.arrayCostos = [];
 
-      this.totalCostoSeleccionado += datas[index].valor;
-      this.arrayCostos.push(datas[index]);
+  llenarTabla(datos : any){
+    for (let index = 0; index < datos.length; index++) {
+      this.cambiarNumeroAMes(datos[index]);
+
+      this.totalCostoSeleccionado += datos[index].valor;
+      this.arrayCostos.push(datos[index]);
     }
   }
 
@@ -482,7 +482,7 @@ export class Dashboard_CostosComponent implements OnInit {
     let gastosVentas : any [] = [];
     let gastosNoOperacionales : any [] = [];
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
-    
+
     if (this.costo_Anio_fabricacion.length > 0) {
       this.costo_Anio_fabricacion.forEach(anio => {
         this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
@@ -511,8 +511,8 @@ export class Dashboard_CostosComponent implements OnInit {
             cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
           });
-          worksheet.mergeCells('A1:O3');        
-          worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };        
+          worksheet.mergeCells('A1:O3');
+          worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
           let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
           tituloCostosFab.eachCell(cell => {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
@@ -579,11 +579,11 @@ export class Dashboard_CostosComponent implements OnInit {
             this.cargando = false
             this.msj.mensajeConfirmacion(`¡Información Exportada!`, title);
           }, 1000);
-        });    
+        });
       });
     } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
   }
-  
+
 
   // Funcion que va a devolver un objeto con los totales de cada uno de los meses
   calcularTotalMeses(data : any){
@@ -615,7 +615,7 @@ export class Dashboard_CostosComponent implements OnInit {
         else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
         else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
         else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
-      }     
+      }
     }
 
     datos.push([
