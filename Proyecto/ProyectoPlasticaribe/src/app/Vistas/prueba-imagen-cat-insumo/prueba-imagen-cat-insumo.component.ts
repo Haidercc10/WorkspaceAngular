@@ -36,9 +36,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   costo_Anio_noOperacionesles : any [] = []; //Variable que va a almacenar los costos de no operacionesles por año
 
   arrayCostos : any = [];
+  arrayGastos1 : any = [];
   totalCostoSeleccionado : number = 0;
   @ViewChild('dt') dt: Table | undefined;
   load : boolean = false;
+  abrirModal1 : boolean = false;
+  abrirModal2 : boolean = false;
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,){}
@@ -47,6 +50,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.llenarGraficas();
+    this.datasAgrupados(1);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -139,37 +143,37 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       let cuentasVentas = ['5210', '5215', '5230', '523505', '523510', '523520', '523525', '523530', '523535', '523540', '523550', '5254', '5250', '5255', '5295'];
       let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
-      this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
+      this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(data => {
 
-        let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
+        let costos  = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b));
         let costosFabricacion = costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()));
         let costosAdministrativos = costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()));
         let costosVentas = costos.filter(item => cuentasVentas.includes(item.cuenta.trim()));
         let costoNoOperacionales = costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim()));
 
-        console.log(this.sumarDatos(costosFabricacion))
+        //console.log(this.sumarDatos(costosFabricacion))
 
         this.manejarDatosCostosFabricacion(costosFabricacion);
         this.manejarDatosCostosAdministrativos(costosAdministrativos);
         this.manejarDatosCostosNoOperacionesles(costoNoOperacionales)
         this.manejarDatosCostosVentas(costosVentas);
 
-        // this.datosCostosFabricacion(costosFabricacion)
-        // this.datosCostosAdministrativo(costosAdministrativos)
-        // this.datosCostosVentas(costosVentas)
-        // this.datosCostosNoOperacionesles(costoNoOperacionales)
+        // this.datasCostosFabricacion(costosFabricacion)
+        // this.datasCostosAdministrativo(costosAdministrativos)
+        // this.datasCostosVentas(costosVentas)
+        // this.datasCostosNoOperacionesles(costoNoOperacionales)
       });
     }
   }
 
-  // Funcion que va a sumar todos los datos de un array de objetos utilizando reduce
+  // Funcion que va a sumar todos los datas de un array de objetos utilizando reduce
   sumarDatos(data : any){
     let suma : number = data.reduce((a, b) => a + b.valor, 0);
     return suma;
   }
 
   // da
-  datosCostosFabricacion(data : any){
+  datasCostosFabricacion(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
 
@@ -203,7 +207,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     }
   }
 
-  datosCostosAdministrativo(data : any){
+  datasCostosAdministrativo(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
     let index : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
@@ -233,7 +237,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     }
   }
 
-  datosCostosVentas(data : any){
+  datasCostosVentas(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
     let index : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
@@ -263,7 +267,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     }
   }
 
-  datosCostosNoOperacionesles(data : any){
+  datasCostosNoOperacionesles(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
     let index : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
@@ -293,7 +297,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     }
   }
 
-  // funcion que va a manejar los datos de los costos de fabricacion
+  // funcion que va a manejar los datas de los costos de fabricacion
   manejarDatosCostosFabricacion(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cuentasGraficadas : string [] = [];
@@ -301,28 +305,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     for (let i = 0; i < data.length; i++) {
       if (!cuentasGraficadas.includes(data[i].cuenta.trim())) {
         cuentasGraficadas.push(data[i].cuenta.trim());
-        let datosGraficas = this.obtenerDatosMes(data, data[i].cuenta);
+        let datasGraficas = this.obtenerDatosMes(data, data[i].cuenta);
         let cantDatos : number = 0;
-        datosGraficas.forEach(datos => {
+        datasGraficas.forEach(datas => {
           costoMeses = [
-            datos.mes == '01' && datos != null ? datos.valor : costoMeses[0],
-            datos.mes == '02' && datos != null ? datos.valor : costoMeses[1],
-            datos.mes == '03' && datos != null ? datos.valor : costoMeses[2],
-            datos.mes == '04' && datos != null ? datos.valor : costoMeses[3],
-            datos.mes == '05' && datos != null ? datos.valor : costoMeses[4],
-            datos.mes == '06' && datos != null ? datos.valor : costoMeses[5],
-            datos.mes == '07' && datos != null ? datos.valor : costoMeses[6],
-            datos.mes == '08' && datos != null ? datos.valor : costoMeses[7],
-            datos.mes == '09' && datos != null ? datos.valor : costoMeses[8],
-            datos.mes == '10' && datos != null ? datos.valor : costoMeses[9],
-            datos.mes == '11' && datos != null ? datos.valor : costoMeses[10],
-            datos.mes == '12' && datos != null ? datos.valor : costoMeses[11],
+            datas.mes == '01' && datas != null ? datas.valor : costoMeses[0],
+            datas.mes == '02' && datas != null ? datas.valor : costoMeses[1],
+            datas.mes == '03' && datas != null ? datas.valor : costoMeses[2],
+            datas.mes == '04' && datas != null ? datas.valor : costoMeses[3],
+            datas.mes == '05' && datas != null ? datas.valor : costoMeses[4],
+            datas.mes == '06' && datas != null ? datas.valor : costoMeses[5],
+            datas.mes == '07' && datas != null ? datas.valor : costoMeses[6],
+            datas.mes == '08' && datas != null ? datas.valor : costoMeses[7],
+            datas.mes == '09' && datas != null ? datas.valor : costoMeses[8],
+            datas.mes == '10' && datas != null ? datas.valor : costoMeses[9],
+            datas.mes == '11' && datas != null ? datas.valor : costoMeses[10],
+            datas.mes == '12' && datas != null ? datas.valor : costoMeses[11],
           ];
           cantDatos++;
-          if (datos.mes == '12' || cantDatos == datosGraficas.length) this.llenarGraficaCostos_Fabricacion(costoMeses, data[i].cuenta.trim());
-          let info : any = { anio: this.anioSeleccionado, costo : datos.valor };
+          if (datas.mes == '12' || cantDatos == datasGraficas.length) this.llenarGraficaCostos_Fabricacion(costoMeses, data[i].cuenta.trim());
+          let info : any = { anio: this.anioSeleccionado, costo : datas.valor };
           let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.costo_Anio_fabricacion[index2].costo += datos.valor;
+          if (index2 != -1) this.costo_Anio_fabricacion[index2].costo += datas.valor;
           else this.costo_Anio_fabricacion.push(info);
         });
       }
@@ -346,7 +350,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     });
   }
 
-  // Funcion que va a manejar los datosde los costos administrativos
+  // Funcion que va a manejar los datasde los costos administrativos
   manejarDatosCostosAdministrativos(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cuentasGraficadas : string [] = [];
@@ -354,28 +358,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     for (let i = 0; i < data.length; i++) {
       if (!cuentasGraficadas.includes(data[i].cuenta.trim())) {
         cuentasGraficadas.push(data[i].cuenta.trim());
-        let datosGraficas = this.obtenerDatosMes(data, data[i].cuenta);
+        let datasGraficas = this.obtenerDatosMes(data, data[i].cuenta);
         let cantDatos : number = 0;
-        datosGraficas.forEach(datos => {
+        datasGraficas.forEach(datas => {
           costoMeses = [
-            datos.mes == '01' && datos != null ? datos.valor : costoMeses[0],
-            datos.mes == '02' && datos != null ? datos.valor : costoMeses[1],
-            datos.mes == '03' && datos != null ? datos.valor : costoMeses[2],
-            datos.mes == '04' && datos != null ? datos.valor : costoMeses[3],
-            datos.mes == '05' && datos != null ? datos.valor : costoMeses[4],
-            datos.mes == '06' && datos != null ? datos.valor : costoMeses[5],
-            datos.mes == '07' && datos != null ? datos.valor : costoMeses[6],
-            datos.mes == '08' && datos != null ? datos.valor : costoMeses[7],
-            datos.mes == '09' && datos != null ? datos.valor : costoMeses[8],
-            datos.mes == '10' && datos != null ? datos.valor : costoMeses[9],
-            datos.mes == '11' && datos != null ? datos.valor : costoMeses[10],
-            datos.mes == '12' && datos != null ? datos.valor : costoMeses[11],
+            datas.mes == '01' && datas != null ? datas.valor : costoMeses[0],
+            datas.mes == '02' && datas != null ? datas.valor : costoMeses[1],
+            datas.mes == '03' && datas != null ? datas.valor : costoMeses[2],
+            datas.mes == '04' && datas != null ? datas.valor : costoMeses[3],
+            datas.mes == '05' && datas != null ? datas.valor : costoMeses[4],
+            datas.mes == '06' && datas != null ? datas.valor : costoMeses[5],
+            datas.mes == '07' && datas != null ? datas.valor : costoMeses[6],
+            datas.mes == '08' && datas != null ? datas.valor : costoMeses[7],
+            datas.mes == '09' && datas != null ? datas.valor : costoMeses[8],
+            datas.mes == '10' && datas != null ? datas.valor : costoMeses[9],
+            datas.mes == '11' && datas != null ? datas.valor : costoMeses[10],
+            datas.mes == '12' && datas != null ? datas.valor : costoMeses[11],
           ];
           cantDatos++;
-          if (datos.mes == '12' || cantDatos == datosGraficas.length) this.llenarGraficaCostos_Administrativos(costoMeses, data[i].cuenta.trim());
-          let info : any = { anio: this.anioSeleccionado, costo : datos.valor };
+          if (datas.mes == '12' || cantDatos == datasGraficas.length) this.llenarGraficaCostos_Administrativos(costoMeses, data[i].cuenta.trim());
+          let info : any = { anio: this.anioSeleccionado, costo : datas.valor };
           let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.costo_Anio_administrativos[index2].costo += datos.valor;
+          if (index2 != -1) this.costo_Anio_administrativos[index2].costo += datas.valor;
           else this.costo_Anio_administrativos.push(info);
         });
       }
@@ -399,7 +403,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     });
   }
 
-  // Funcion que va a manejar los datosde los costos de ventas
+  // Funcion que va a manejar los datasde los costos de ventas
   manejarDatosCostosVentas(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cuentasGraficadas : string [] = [];
@@ -407,28 +411,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     for (let i = 0; i < data.length; i++) {
       if (!cuentasGraficadas.includes(data[i].cuenta.trim())) {
         cuentasGraficadas.push(data[i].cuenta.trim());
-        let datosGraficas = this.obtenerDatosMes(data, data[i].cuenta);
+        let datasGraficas = this.obtenerDatosMes(data, data[i].cuenta);
         let cantDatos : number = 0;
-        datosGraficas.forEach(datos => {
+        datasGraficas.forEach(datas => {
           costoMeses = [
-            datos.mes == '01' && datos != null ? datos.valor : costoMeses[0],
-            datos.mes == '02' && datos != null ? datos.valor : costoMeses[1],
-            datos.mes == '03' && datos != null ? datos.valor : costoMeses[2],
-            datos.mes == '04' && datos != null ? datos.valor : costoMeses[3],
-            datos.mes == '05' && datos != null ? datos.valor : costoMeses[4],
-            datos.mes == '06' && datos != null ? datos.valor : costoMeses[5],
-            datos.mes == '07' && datos != null ? datos.valor : costoMeses[6],
-            datos.mes == '08' && datos != null ? datos.valor : costoMeses[7],
-            datos.mes == '09' && datos != null ? datos.valor : costoMeses[8],
-            datos.mes == '10' && datos != null ? datos.valor : costoMeses[9],
-            datos.mes == '11' && datos != null ? datos.valor : costoMeses[10],
-            datos.mes == '12' && datos != null ? datos.valor : costoMeses[11],
+            datas.mes == '01' && datas != null ? datas.valor : costoMeses[0],
+            datas.mes == '02' && datas != null ? datas.valor : costoMeses[1],
+            datas.mes == '03' && datas != null ? datas.valor : costoMeses[2],
+            datas.mes == '04' && datas != null ? datas.valor : costoMeses[3],
+            datas.mes == '05' && datas != null ? datas.valor : costoMeses[4],
+            datas.mes == '06' && datas != null ? datas.valor : costoMeses[5],
+            datas.mes == '07' && datas != null ? datas.valor : costoMeses[6],
+            datas.mes == '08' && datas != null ? datas.valor : costoMeses[7],
+            datas.mes == '09' && datas != null ? datas.valor : costoMeses[8],
+            datas.mes == '10' && datas != null ? datas.valor : costoMeses[9],
+            datas.mes == '11' && datas != null ? datas.valor : costoMeses[10],
+            datas.mes == '12' && datas != null ? datas.valor : costoMeses[11],
           ];
           cantDatos++;
-          if (datos.mes == '12' || cantDatos == datosGraficas.length) this.llenarGraficaCostos_Ventas(costoMeses, data[i].cuenta.trim());
-          let info : any = { anio: this.anioSeleccionado, costo : datos.valor };
+          if (datas.mes == '12' || cantDatos == datasGraficas.length) this.llenarGraficaCostos_Ventas(costoMeses, data[i].cuenta.trim());
+          let info : any = { anio: this.anioSeleccionado, costo : datas.valor };
           let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.costo_Anio_ventas[index2].costo += datos.valor;
+          if (index2 != -1) this.costo_Anio_ventas[index2].costo += datas.valor;
           else this.costo_Anio_ventas.push(info);
         });
       }
@@ -452,7 +456,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     });
   }
 
-  // Funcion que va a manejar los datosde los costos de no operacionesles
+  // Funcion que va a manejar los datasde los costos de no operacionesles
   manejarDatosCostosNoOperacionesles(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cuentasGraficadas : string [] = [];
@@ -460,28 +464,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
     for (let i = 0; i < data.length; i++) {
       if (!cuentasGraficadas.includes(data[i].cuenta.trim())) {
         cuentasGraficadas.push(data[i].cuenta.trim());
-        let datosGraficas = this.obtenerDatosMes(data, data[i].cuenta);
+        let datasGraficas = this.obtenerDatosMes(data, data[i].cuenta);
         let cantDatos : number = 0;
-        datosGraficas.forEach(datos => {
+        datasGraficas.forEach(datas => {
           costoMeses = [
-            datos.mes == '01' && datos != null ? datos.valor : costoMeses[0],
-            datos.mes == '02' && datos != null ? datos.valor : costoMeses[1],
-            datos.mes == '03' && datos != null ? datos.valor : costoMeses[2],
-            datos.mes == '04' && datos != null ? datos.valor : costoMeses[3],
-            datos.mes == '05' && datos != null ? datos.valor : costoMeses[4],
-            datos.mes == '06' && datos != null ? datos.valor : costoMeses[5],
-            datos.mes == '07' && datos != null ? datos.valor : costoMeses[6],
-            datos.mes == '08' && datos != null ? datos.valor : costoMeses[7],
-            datos.mes == '09' && datos != null ? datos.valor : costoMeses[8],
-            datos.mes == '10' && datos != null ? datos.valor : costoMeses[9],
-            datos.mes == '11' && datos != null ? datos.valor : costoMeses[10],
-            datos.mes == '12' && datos != null ? datos.valor : costoMeses[11],
+            datas.mes == '01' && datas != null ? datas.valor : costoMeses[0],
+            datas.mes == '02' && datas != null ? datas.valor : costoMeses[1],
+            datas.mes == '03' && datas != null ? datas.valor : costoMeses[2],
+            datas.mes == '04' && datas != null ? datas.valor : costoMeses[3],
+            datas.mes == '05' && datas != null ? datas.valor : costoMeses[4],
+            datas.mes == '06' && datas != null ? datas.valor : costoMeses[5],
+            datas.mes == '07' && datas != null ? datas.valor : costoMeses[6],
+            datas.mes == '08' && datas != null ? datas.valor : costoMeses[7],
+            datas.mes == '09' && datas != null ? datas.valor : costoMeses[8],
+            datas.mes == '10' && datas != null ? datas.valor : costoMeses[9],
+            datas.mes == '11' && datas != null ? datas.valor : costoMeses[10],
+            datas.mes == '12' && datas != null ? datas.valor : costoMeses[11],
           ];
           cantDatos++;
-          if (datos.mes == '12' || cantDatos == datosGraficas.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, data[i].cuenta.trim());
-          let info : any = { anio: this.anioSeleccionado, costo : datos.valor };
+          if (datas.mes == '12' || cantDatos == datasGraficas.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, data[i].cuenta.trim());
+          let info : any = { anio: this.anioSeleccionado, costo : datas.valor };
           let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.costo_Anio_noOperacionesles[index2].costo += datos.valor;
+          if (index2 != -1) this.costo_Anio_noOperacionesles[index2].costo += datas.valor;
           else this.costo_Anio_noOperacionesles.push(info);
         });
       }
@@ -508,52 +512,82 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   // funcion que va a devolver un array con la informacion de cada uno de los meses de una misma cuenta
   obtenerDatosMes = (data : any, cuenta : string) : any[] => data.filter(item => item.cuenta == cuenta);
 
+  consultaCostosDetallados(datos : any){
+    this.abrirModal2 = true;
+    this.arrayGastos1 = [];
+    this.totalCostoSeleccionado = 0;
 
-consultaCostosDetallados(){
-  this.arrayCostos = [];
-  this.totalCostoSeleccionado = 0;
-  let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
-  let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
-  let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
-  let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
-  let array1 : any[] = [];
-  let array2 : any[] = [];
-  let array3 : any[] = [];
-  let array4 : any[] = [];
+    datos.mes == 'Enero' ? datos.mes = '01' :
+    datos.mes == 'Febrero' ? datos.mes = '02' :
+    datos.mes == 'Marzo' ? datos.mes = '03' :
+    datos.mes == 'Abril' ? datos.mes = '04' :
+    datos.mes == 'Mayo' ? datos.mes = '05' :
+    datos.mes == 'Junio' ? datos.mes = '06' :
+    datos.mes == 'Julio' ? datos.mes = '07' :
+    datos.mes == 'Agosto' ? datos.mes = '08' :
+    datos.mes == 'Septiembre' ? datos.mes = '09' :
+    datos.mes == 'Octubre' ? datos.mes = '10' :
+    datos.mes == 'Noviembre' ? datos.mes = '11' :
+    datos.mes == 'Diciembre' ? datos.mes = '12' : '';
 
-  this.zeusContabilidad.GetCostosCuentasxMesDetallada('2023', '06').subscribe(data => {
-    for(let index = 0; index < data.length; index++) {
+    this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.anio, datos.mes, datos.cuenta).subscribe(data => {
+      for(let index = 0; index < data.length; index++) {
+        this.arrayGastos1.push(data[index]);
+      }
+    });
+  }
 
-      array1 = cuentas7.filter(item => item.includes(data[index].id_Cuenta.trim())).concat(
-        array2 = cuentas51.filter(item => item.includes(data[index].id_Cuenta.trim().substr(0,4))).concat(
-          array3 = cuentas52.filter(item => item.includes(data[index].id_Cuenta.trim().substr(0,4))).concat(
-            array4 = cuentas53.filter(item => item.includes(data[index].id_Cuenta.trim())))))
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if(this.dt.filteredValue != null) {
+        this.totalCostoSeleccionado = 0;
+        this.dt.filteredValue.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+      } else {
+        this.totalCostoSeleccionado = 0;
+        this.arrayCostos.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+      }
+    }, 500);
+  }
 
-            console.log(array1)
+  datasAgrupados(numero : number) {
+    let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
+    let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
+    let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
+    let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
 
-      //if(cuentas7.includes(data[index].id_Cuenta.trim())) array1 = data[index];
-      //if(cuentas51.includes(data[index].id_Cuenta.trim().substr(0,4))) array2 = data[index];
+    this.zeusContabilidad.GetCostosCuentas_Mes_Mes('2023').subscribe(data => {
+      let gastos : any[] = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
+      let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
+      let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
+      let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
+      let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+
+      if (numero == 1) this.llenarTabla(costoIndFabricacion);
+      if (numero == 2) this.llenarTabla(gastosAdmon);
+      if (numero == 3) this.llenarTabla(gastosVentas);
+      if (numero == 4) this.llenarTabla(gastoNoOperacionales);
+    }, error => {console.log(error)});
+  }
+
+  llenarTabla(datas : any){
+    for (let index = 0; index < datas.length; index++) {
+      datas[index].mes == '01' ? datas[index].mes = 'Enero' :
+      datas[index].mes == '02' ? datas[index].mes = 'Febrero' :
+      datas[index].mes == '03' ? datas[index].mes = 'Marzo' :
+      datas[index].mes == '04' ? datas[index].mes = 'Abril' :
+      datas[index].mes == '05' ? datas[index].mes = 'Mayo' :
+      datas[index].mes == '06' ? datas[index].mes = 'Junio' :
+      datas[index].mes == '07' ? datas[index].mes = 'Julio' :
+      datas[index].mes == '08' ? datas[index].mes = 'Agosto' :
+      datas[index].mes == '09' ? datas[index].mes = 'Septiembre' :
+      datas[index].mes == '10' ? datas[index].mes = 'Octubre' :
+      datas[index].mes == '11' ? datas[index].mes = 'Noviembre' :
+      datas[index].mes == '12' ? datas[index].mes = 'Diciembre' : '';
+
+      this.totalCostoSeleccionado += datas[index].valor;
+      this.arrayCostos.push(datas[index]);
     }
-  });
-}
-
-llenarTabla(datos : any) {
-  datos.fecha_Grabacion = datos.fecha_Grabacion.replace('T', ' ')
-  this.totalCostoSeleccionado += datos.valor;
-  this.arrayCostos.push(datos);
-}
-
-aplicarfiltro($event, campo : any, valorCampo : string){
-  this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  setTimeout(() => {
-    if(this.dt.filteredValue != null) {
-      this.totalCostoSeleccionado = 0;
-      this.dt.filteredValue.forEach(element => { this.totalCostoSeleccionado += element.valor; });
-    } else {
-      this.totalCostoSeleccionado = 0;
-      this.arrayCostos.forEach(element => { this.totalCostoSeleccionado += element.valor; });
-    }
-  }, 500);
-}
+  }
 
 }

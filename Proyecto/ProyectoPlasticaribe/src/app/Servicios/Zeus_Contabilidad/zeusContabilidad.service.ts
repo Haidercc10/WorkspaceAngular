@@ -40,5 +40,5 @@ export class ZeusContabilidadService {
   /************************************************************************ FacturasLibroPrincipal *************************************************************/
   GetCostosCuentas_Mes_Mes = (anio : string) => this.http.get<any>(`${rutaZeusContabilidad}/SaldocontBu/getCostosCuentas_Mes_Mes/${anio}`);
 
-  GetCostosCuentasxMesDetallada = (anio : string, mes : string) => this.http.get<any>(`${rutaZeusContabilidad}/Transac/GetCostosCuentasxMesDetallada/${anio}/${mes}`);
+  GetCostosCuentasxMesDetallada = (anio : string, mes : string, cuenta : string) => this.http.get<any>(`${rutaZeusContabilidad}/Transac/GetCostosCuentasxMesDetallada/${anio}/${mes}/${cuenta}`);
 }

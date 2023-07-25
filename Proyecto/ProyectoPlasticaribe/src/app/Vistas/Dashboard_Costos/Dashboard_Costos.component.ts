@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -31,6 +32,15 @@ export class Dashboard_CostosComponent implements OnInit {
   costo_Anio_administrativos : any [] = []; //Variable que va a almacenar los costos de administrativos por año
   costo_Anio_ventas : any [] = []; //Variable que va a almacenar los costos de ventas por año
   costo_Anio_noOperacionesles : any [] = []; //Variable que va a almacenar los costos de no operacionesles por año
+
+  arrayCostos : any = [];
+  arrayGastos1 : any = [];
+  totalCostoSeleccionado : number = 0;
+  @ViewChild('dt') dt: Table | undefined;
+  load : boolean = false;
+  abrirModal1 : boolean = false;
+  abrirModal2 : boolean = false;
+  graficaSeleccionada : string = '';
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,){}
@@ -337,5 +347,100 @@ export class Dashboard_CostosComponent implements OnInit {
       fill : true,
       tension: 0.3
     });
+  }
+
+  datosAgrupados(numero : number) {
+    this.graficaSeleccionada = '';
+    this.abrirModal1 = true;
+    this.totalCostoSeleccionado = 0;
+
+    let index : number = this.arrayCostos.findIndex(item => item.anio == this.anioSeleccionado);
+    if(index == -1) {
+      let cuentas7 : any[] = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
+      let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5150', '5155', '5195'];
+      let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
+      let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
+
+      this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(data => {
+        let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
+        let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
+        let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
+        let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
+        let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+
+        if (numero == 1) { this.llenarTabla(costoIndFabricacion); this.graficaSeleccionada = 'Costos indirectos de fabricación'; }
+        if (numero == 2) { this.llenarTabla(gastosAdmon); this.graficaSeleccionada = 'Gastos de administración'; }
+        if (numero == 3) { this.llenarTabla(gastosVentas); this.graficaSeleccionada = 'Gastos de ventas'; }
+        if (numero == 4) { this.llenarTabla(gastoNoOperacionales); this.graficaSeleccionada = 'Gastos no operacionales'; }
+      });
+    }
+  }
+
+  llenarTabla(datas : any){
+    for (let index = 0; index < datas.length; index++) {
+      this.cambiarNumeroAMes(datas[index]);
+
+      this.totalCostoSeleccionado += datas[index].valor;
+      this.arrayCostos.push(datas[index]);
+    }
+  }
+
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if(this.dt.filteredValue != null) {
+        this.totalCostoSeleccionado = 0;
+        this.dt.filteredValue.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+      } else {
+        this.totalCostoSeleccionado = 0;
+        this.arrayCostos.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+      }
+    }, 500);
+  }
+
+  consultaCostosDetallados(datos : any){
+    this.abrirModal2 = true;
+    this.arrayGastos1 = [];
+    this.totalCostoSeleccionado = 0;
+
+    this.cambiarMesANumero(datos);
+
+    this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.anio, datos.mes, datos.cuenta).subscribe(data => {
+      for(let index = 0; index < data.length; index++) {
+        data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ')
+        this.arrayGastos1.push(data[index]);
+      }
+    });
+    setTimeout(() => { this.cambiarNumeroAMes(datos); }, 500);
+  }
+
+  cambiarNumeroAMes(info : any){
+      info.mes == '01' ? info.mes = 'Enero' :
+      info.mes == '02' ? info.mes = 'Febrero' :
+      info.mes == '03' ? info.mes = 'Marzo' :
+      info.mes == '04' ? info.mes = 'Abril' :
+      info.mes == '05' ? info.mes = 'Mayo' :
+      info.mes == '06' ? info.mes = 'Junio' :
+      info.mes == '07' ? info.mes = 'Julio' :
+      info.mes == '08' ? info.mes = 'Agosto' :
+      info.mes == '09' ? info.mes = 'Septiembre' :
+      info.mes == '10' ? info.mes = 'Octubre' :
+      info.mes == '11' ? info.mes = 'Noviembre' :
+      info.mes == '12' ? info.mes = 'Diciembre' : '';
+  }
+
+  cambiarMesANumero(info : any){
+    info.mes == 'Enero' ? info.mes = '01' :
+    info.mes == 'Febrero' ? info.mes = '02' :
+    info.mes == 'Marzo' ? info.mes = '03' :
+    info.mes == 'Abril' ? info.mes = '04' :
+    info.mes == 'Mayo' ? info.mes = '05' :
+    info.mes == 'Junio' ? info.mes = '06' :
+    info.mes == 'Julio' ? info.mes = '07' :
+    info.mes == 'Agosto' ? info.mes = '08' :
+    info.mes == 'Septiembre' ? info.mes = '09' :
+    info.mes == 'Octubre' ? info.mes = '10' :
+    info.mes == 'Noviembre' ? info.mes = '11' :
+    info.mes == 'Diciembre' ? info.mes = '12' : '';
   }
 }
