@@ -90,6 +90,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
+    this.facturacionAnio();
     this.facturacion();
     this.recargar();
   }
@@ -125,6 +126,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.cargando = true;
       let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.zeusService.GetFacturacion_Mes_Mes(`${this.anoSeleccionado}`).subscribe(dato => {
+        this.totalFacturadoanio = dato.reduce((a, b) => a + b.Valor, 0)
         for (let i = 0; i < dato.length; i++) {
           let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
           costoMeses = [
