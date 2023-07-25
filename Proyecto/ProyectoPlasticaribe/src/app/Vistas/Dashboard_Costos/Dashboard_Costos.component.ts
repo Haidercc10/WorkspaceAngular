@@ -1,8 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Dashboard_Costos',
@@ -21,6 +25,7 @@ export class Dashboard_CostosComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
+  rangoFechas : any; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
 
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaCostosFabricacion : any; //Variable que va a almacenar los costos de fabricación
@@ -44,7 +49,8 @@ export class Dashboard_CostosComponent implements OnInit {
   arrayAnios : any[] = [];
 
   constructor(private AppComponent : AppComponent,
-                private zeusContabilidad : ZeusContabilidadService,){}
+                private zeusContabilidad : ZeusContabilidadService,
+                  private msj : MensajesAplicacionService,){}
 
   ngOnInit(): void {
     this.llenarArrayAnos();
@@ -137,9 +143,9 @@ export class Dashboard_CostosComponent implements OnInit {
   buscarCostosFabricacion(){
     let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
-      let cuentasFacbricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
-      let cuentasAdministrativos = ['5110', '5115', '5125', '5130', '513505', '513510', '513520', '513525', '513530', '513535', '513540', '513550', '5145', '5155', '5195'];
-      let cuentasVentas = ['5210', '5215', '5230', '523505', '523510', '523520', '523525', '523530', '523535', '523540', '523550', '5254', '5250', '5255', '5295'];
+      let cuentasFacbricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
+      let cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
+      let cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
       let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
@@ -460,5 +466,175 @@ export class Dashboard_CostosComponent implements OnInit {
     info.mes == 'Octubre' ? info.mes = '10' :
     info.mes == 'Noviembre' ? info.mes = '11' :
     info.mes == 'Diciembre' ? info.mes = '12' : '';
+  }
+
+  // Funcion que se encargará de exportar a un archivo de excel la información de las cuentas en cada uno de los meses
+  exportarExcel(){
+    this.cargando = true;
+    let infoDocumento : any [] = [];
+    let title : string = `Determinación de Costos`;
+    let cuentasFacbricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
+    let cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
+    let cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
+    let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
+    let costosIndirectosFabricacion : any [] = [];
+    let gastosAdmon : any [] = [];
+    let gastosVentas : any [] = [];
+    let gastosNoOperacionales : any [] = [];
+    const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
+    
+    if (this.costo_Anio_fabricacion.length > 0) {
+      this.costo_Anio_fabricacion.forEach(anio => {
+        this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
+          let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
+          costosIndirectosFabricacion = this.calcularTotalMeses(costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim())));
+          gastosAdmon = this.calcularTotalMeses(costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim())));
+          gastosVentas = this.calcularTotalMeses(costos.filter(item => cuentasVentas.includes(item.cuenta.trim())));
+          gastosNoOperacionales = this.calcularTotalMeses(costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())));
+          infoDocumento = [costosIndirectosFabricacion, gastosAdmon, gastosVentas, gastosNoOperacionales].reduce((a, b) => a.concat(b));
+
+          let workbook = new Workbook();
+          const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+          let worksheet = workbook.addWorksheet(title);
+          worksheet.addImage(imageId1, 'A1:B3');
+          let titleRow = worksheet.addRow([title]);
+          titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+          worksheet.addRow([]);
+          worksheet.addRow([]);
+          let headerRow = worksheet.addRow(header);
+          headerRow.eachCell((cell) => {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'eeeeee' }
+            }
+            cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+          });
+          worksheet.mergeCells('A1:O3');        
+          worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };        
+          let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
+          tituloCostosFab.eachCell(cell => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
+            cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+          });
+          worksheet.mergeCells('A5:O5');
+          infoDocumento.forEach(d => {
+            let row = worksheet.addRow(d);
+            if (d[0] == 'Totales'){
+              if (d[1] != 'Gastos No Operacionales') {
+                let titulo = '';
+                if (d[1] == 'Costos Indirectos de Fabricación') titulo = 'Gastos de Administración y Finanzas';
+                if (d[1] == 'Gastos de Administración y Finanzas') titulo = 'Gastos de Ventas';
+                if (d[1] == 'Gastos de Ventas') titulo = 'Gastos No Operacionales';
+                worksheet.addRow([]);
+                let titulorow = worksheet.addRow([titulo]);
+                titulorow.eachCell(cell => {
+                  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
+                  cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+                  cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+                });
+              }
+              row.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+              row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
+            };
+            row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+            row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          });
+          worksheet.getColumn(1).width = 15;
+          worksheet.getColumn(2).width = 50;
+          worksheet.getColumn(3).width = 22;
+          worksheet.getColumn(4).width = 22;
+          worksheet.getColumn(5).width = 22;
+          worksheet.getColumn(6).width = 22;
+          worksheet.getColumn(7).width = 22;
+          worksheet.getColumn(8).width = 22;
+          worksheet.getColumn(9).width = 22;
+          worksheet.getColumn(10).width = 22;
+          worksheet.getColumn(11).width = 22;
+          worksheet.getColumn(12).width = 22;
+          worksheet.getColumn(13).width = 22;
+          worksheet.getColumn(14).width = 22;
+          worksheet.getColumn(15).width = 22;
+          worksheet.mergeCells('A22:O22');
+          worksheet.mergeCells('A67:O67');
+          worksheet.mergeCells('A106:O106');
+          setTimeout(() => {
+            workbook.xlsx.writeBuffer().then((data) => {
+              let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+              fs.saveAs(blob, title + `.xlsx`);
+            });
+            this.cargando = false
+            this.msj.mensajeConfirmacion(`¡Información Exportada!`, title);
+          }, 1000);
+        });    
+      });
+    } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
+  }
+  
+
+  // Funcion que va a devolver un objeto con los totales de cada uno de los meses
+  calcularTotalMeses(data : any){
+    let datos : any [] = [];
+    let cuentas : any [] = [];
+    let tituloTotal = '';
+
+    for (let i = 0; i < data.length; i++) {
+      if (!cuentas.includes(data[i].cuenta.trim())){
+        cuentas.push(data[i].cuenta.trim());
+        datos.push([
+          data[i].cuenta.trim(),
+          data[i].descripcionCuenta.trim(),
+          data.filter(item => item.mes == '01' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '02' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '03' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '04' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '05' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '06' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '07' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '08' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '09' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '10' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '11' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.mes == '12' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          data.filter(item => item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0)
+        ]);
+        if ((data[i].cuenta).toString().startsWith('7')) tituloTotal = 'Costos Indirectos de Fabricación';
+        else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
+        else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
+        else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
+      }     
+    }
+
+    datos.push([
+      'Totales',
+      tituloTotal,
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;
   }
 }

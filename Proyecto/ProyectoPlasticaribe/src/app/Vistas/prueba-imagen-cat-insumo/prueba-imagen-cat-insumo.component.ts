@@ -4,6 +4,10 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -44,7 +48,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
   abrirModal2 : boolean = false;
 
   constructor(private AppComponent : AppComponent,
-                private zeusContabilidad : ZeusContabilidadService,){}
+                private zeusContabilidad : ZeusContabilidadService,
+                  private msj : MensajesAplicacionService,){}
 
   ngOnInit(): void {
     this.llenarArrayAnos();
@@ -589,5 +594,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
       this.arrayCostos.push(datas[index]);
     }
   }
+
 
 }
