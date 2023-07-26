@@ -47,6 +47,7 @@ export class Dashboard_CostosComponent implements OnInit {
   abrirModal2 : boolean = false;
   graficaSeleccionada : string = '';
   arrayAnios : any[] = [];
+  cuentaSeleccionada : any[] = [];
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,
@@ -359,6 +360,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
+  /** Función que cargará el modal con la información de la grafica seleccionada por meses.  */
   datosAgrupados(numero : number) {
     this.graficaSeleccionada = '';
     this.abrirModal1 = true;
@@ -398,8 +400,10 @@ export class Dashboard_CostosComponent implements OnInit {
     }
   }
 
+  /** Función que limpiará el array de costos al  */
   limpiarArrayCostos = () => this.arrayCostos = [];
 
+  /** Llenar la tabla del primer modal  */
   llenarTabla(datos : any){
     for (let index = 0; index < datos.length; index++) {
       this.cambiarNumeroAMes(datos[index]);
@@ -409,6 +413,7 @@ export class Dashboard_CostosComponent implements OnInit {
     }
   }
 
+  /** Aplicar filtro de busqueda a la tabla del primero modal. */
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
@@ -422,10 +427,12 @@ export class Dashboard_CostosComponent implements OnInit {
     }, 500);
   }
 
+  /** Función que mostrará un segundo modal con los detalles de la cuenta en el periodo seleccionado  */
   consultaCostosDetallados(datos : any){
     this.abrirModal2 = true;
     this.arrayGastos1 = [];
     this.totalCostoSeleccionado = 0;
+    this.cuentaSeleccionada = [];
 
     this.cambiarMesANumero(datos);
 
@@ -435,9 +442,10 @@ export class Dashboard_CostosComponent implements OnInit {
         this.arrayGastos1.push(data[index]);
       }
     });
-    setTimeout(() => { this.cambiarNumeroAMes(datos); }, 500);
+    setTimeout(() => { this.cambiarNumeroAMes(datos); this.cuentaSeleccionada = [datos.anio, datos.mes, datos.cuenta]; }, 500);
   }
 
+  /** Cambiar del numero al nombre del mes */
   cambiarNumeroAMes(info : any){
       info.mes == '01' ? info.mes = 'Enero' :
       info.mes == '02' ? info.mes = 'Febrero' :
@@ -453,6 +461,7 @@ export class Dashboard_CostosComponent implements OnInit {
       info.mes == '12' ? info.mes = 'Diciembre' : '';
   }
 
+  /** Cambiar del nombre del mes al número. */
   cambiarMesANumero(info : any){
     info.mes == 'Enero' ? info.mes = '01' :
     info.mes == 'Febrero' ? info.mes = '02' :
