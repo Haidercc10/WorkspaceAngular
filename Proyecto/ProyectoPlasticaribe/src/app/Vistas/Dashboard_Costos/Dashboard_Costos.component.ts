@@ -138,7 +138,6 @@ export class Dashboard_CostosComponent implements OnInit {
   llenarGraficas(){
     this.cargando = true;
     this.arrayAnios.push(`${this.anioSeleccionado}`);
-    console.log(this.arrayAnios)
     this.buscarCostosFabricacion();
     setTimeout(() => this.cargando = false, 2000);
   }
@@ -366,10 +365,10 @@ export class Dashboard_CostosComponent implements OnInit {
     this.abrirModal1 = true;
     this.totalCostoSeleccionado = 0;
 
-    let cuentas7 : any[] = ['730545', '730590', '730505', '730575', '730585', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551'];
-    let cuentas51 : any[] = ['5110', '5115', '5125', '5130', '5135', '5145', '5140', '5150', '5155', '5195'];
-    let cuentas52 : any[] = ['5210', '5215', '5230', '5235', '5245', '5250', '5255', '5295'];
-    let cuentas53 : any[] = ['530505', '53050505', '530510', '53050510', '530515', '530525', '530535', '530595'];
+    let cuentas7 = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
+    let cuentas51 = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
+    let cuentas52 = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
+    let cuentas53 = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
     for (let index = 0; index < this.arrayAnios.length; index++) {
 
@@ -382,12 +381,12 @@ export class Dashboard_CostosComponent implements OnInit {
           this.graficaSeleccionada = 'Costos indirectos de fabricación';
         }
         if (numero == 2) {
-          let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim().substr(0,4)));
+          let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim()));
           this.llenarTabla(gastosAdmon);
           this.graficaSeleccionada = 'Gastos de administración';
          }
         if (numero == 3) {
-          let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim().substr(0,4)));
+          let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim()));
           this.llenarTabla(gastosVentas);
           this.graficaSeleccionada = 'Gastos de ventas';
         }
@@ -545,8 +544,10 @@ export class Dashboard_CostosComponent implements OnInit {
                   cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
                 });
               }
-              row.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-              row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
+              row.eachCell(cell => {
+                cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
+              });
             };
             row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
             row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
@@ -592,7 +593,6 @@ export class Dashboard_CostosComponent implements OnInit {
       });
     } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
   }
-
 
   // Funcion que va a devolver un objeto con los totales de cada uno de los meses
   calcularTotalMeses(data : any){
