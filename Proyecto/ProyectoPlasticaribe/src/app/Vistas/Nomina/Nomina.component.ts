@@ -9,6 +9,8 @@ import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Nomina',
@@ -39,7 +41,8 @@ export class NominaComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private servicioBagPro : BagproService,
                   private msj : MensajesAplicacionService,
-                    private mensajes : MessageService) {
+                    private mensajes : MessageService,
+                      private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -56,6 +59,11 @@ export class NominaComponent implements OnInit {
 
   /** Función que mostrará un tutorial en la app. */
   verTutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   /** Exportar documento a excel con la nomina de sellado de forma acumulada o detallada por bulto. */

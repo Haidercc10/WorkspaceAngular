@@ -781,8 +781,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Eliminación de rollos!</h4>',
-    text: `<p>¡Llenando estos filtros se pueden consultar los rollos que se quieren eliminar, es obligatorio llenar los campos de <b>'Procesos'</b> y <b>'Bodega'</b>!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Filtros de eliminación</h4>',
+    text: `<p>Llenando estos filtros se pueden consultar los rollos que se desean eliminar, es obligatorio llenar el campo bodega.</p>`
   },
   {
     attachTo: {
@@ -795,8 +795,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'consultarRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Rollos!</h4>',
-    text: `<p>¡Luego de haber llenado los filtros podemos debemos presionar el botón <b>'Consultar'</b> para obtener la información de los rollos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Consultar rollos</h4>',
+    text: `<p>Luego de diligenciar los filtros debemos presionar el botón <b>'Consultar'</b> para obtener la información de los rollos.</p>`
   },
   {
     attachTo: {
@@ -809,8 +809,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarFiltros',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros!</h4>',
-    text: `<p>¡Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar filtros</h4>',
+    text: `<p>Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo</p>`
   },
   {
     attachTo: {
@@ -823,8 +823,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla1',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
-    text: `<p>¡En esta tabla apareceran los rollos que se coincidan con los filtros antes digitados!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Rollos consultados</h4>',
+    text: `<p>En esta tabla apareceran los rollos que se coincidan con los filtros previamente consultados</p>`
   },
   {
     attachTo: {
@@ -837,8 +837,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
-    text: `<p>¡Presionando este checkbox se eligirán todos los rollos que se hayan consultado!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Elegir todos los rollos</h4>',
+    text: `<p>Presionando este checkbox se eligirán todos los rollos que se hayan consultado</p>`
   },
   {
     attachTo: {
@@ -851,8 +851,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
-    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Elegir rollo</h4>',
+    text: `<p>Presionando el checkbox que se encuentra en los registros de la tabla se seleccionará uno de los rollos</p>`
   },
   {
     attachTo: {
@@ -865,8 +865,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
-    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Rollos elegidos</h4>',
+    text: `<p>En esta tabla apareceran los rollos que hayan sido elegidos previamente</p>`
   },
   {
     attachTo: {
@@ -879,8 +879,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
-    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar todos los rollos</h4>',
+    text: `<p>Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos</p>`
   },
   {
     attachTo: {
@@ -893,8 +893,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
-    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar rollo</h4>',
+    text: `<p>Presionando el checkbox que se encuentra en los registros de la tabla se deseleccionará uno de los rollos </p>`
   },
   {
     attachTo: {
@@ -907,8 +907,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla3',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
-    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla consolidada</h4>',
+    text: `<p>Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
           <ol>
             <li>Orden de Trabajo.</li>
             <li>Producto.</li>
@@ -927,8 +927,10 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'eliminarRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Elimiar Rollos Seleccionados!</h4>',
-    text: `<p>¡Luego de haber seleccionado los rollos que queremos eliminar presionamos <b>'Eliminar Rollos'</b> para posteriormente ver un mensaje de confirmación preguntando por la base de datos de la que queremos eliminar los rollos, elegimos y se habrán eliminado los rollos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Eliminar rollos seleccionados</h4>',
+    text: `<p>Luego de haber seleccionado los rollos que queremos eliminar presionamos <b>'Eliminar Rollos'</b>.
+    <br><br> Posteriormente se nos mostrará un mensaje de confirmación preguntando por la base de datos de la que queremos eliminar
+    los rollos, elegimos y se habrán eliminado los rollos</p>`
   },
   {
     attachTo: {
@@ -940,7 +942,7 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarTodo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar todo</h4>',
     text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
   },
 ];
@@ -6955,11 +6957,98 @@ export const stepsNomina : Step.StepOptions[] = [
     classes: '',
     id: 'nomina',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Nómina</h5>',
-    text: `<p>En este módulo encontrarás la información de la nómina de los operarios de sellado, tanto acumulada, como detallada por item y operario.</p>`
+    text: `<p>En este módulo encontrarás la información de la nómina de los operarios de sellado de manera acumulada y detallada por
+    item y empleado, además por cada rollo pesado.</p>`
   },
   {
     attachTo: {
       element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rango',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Seleccionar Rango</h5>',
+    text: `<p>En este campo puedes seleccionar un rango de fechas para generar la nomina de los operarios en ese lapso de tiempo elegido. </p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'consultar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Consultar Rango</h5>',
+    text: `<p>Luego de seleccionar el rango de fechas, presiona este botón para realizar la consulta de la nomina de los operarios de sellado. <br><br>
+    Nota: La consulta realizada agregará un día de más al rango de fechas, debido a que el turno de la noche del último día seleccionado
+    en el rango finaliza el día siguiente a las 7 am. </p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'filtros',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Filtrar columnas</h5>',
+    text: `<p>Luego de consultar el rango de fechas, desde estos campos podrás filtrar la información que se encuentre en la tabla por:
+    <br>- Cedula.
+    <br>- Operario.
+    <br>- Cargo.
+    <br>- Valor a Pagar.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#campos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'campos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Información acumulada</h5>',
+    text: `<p>Luego de realizar la consulta, encontrarás la información de los valores a devengar de manera acumulada por cada operario en el rango de fechas seleccionado.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#desplegable',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'desplegable',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Ver detalles por operario</h5>',
+    text: `<p>En esta columna en cada una de las filas de la tabla haciendo clic sobre el botón <i class="pi pi-angle-right"></i> se desplegará la información
+    de cada operario por item, se mostrará la cantidad de rollos que pesó de cada item. <br><br>
+    Además puedes ver de manera aún más detallada, por item, cada rollo pesado por el operario pulsando sobre el botón <i class="pi pi-eye"></i>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#total',
       on: 'bottom'
     },
     buttons: [
@@ -6968,9 +7057,25 @@ export const stepsNomina : Step.StepOptions[] = [
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
-    id: 'rango',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Seleccionar Rango</h5>',
-    text: `<p></p>`
+    id: 'total',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Total a pagar</h5>',
+    text: `<p>Aquí se verá el valor total a pagar de la nómina de sellado en el rango de fechas seleccionado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se mostrará un mensaje para elegir si deseas exportar la nomina de manera acumulada
+    por operario ó detallada rollo a rollo por cada empleado. </p>`
   },
 ]
 
@@ -9429,6 +9534,144 @@ export const stepsReporteRollosEliminados : Step.StepOptions[] = [
   },
 ];
 
+export const stepsReporteRecibosCaja : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#recibos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'recibos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Recibos de caja</h5>',
+    text: `<p>En este módulo encontrarás la información de los recibos de caja de pagos de facturas de venta que son guardados en Zeus por el área de cartera </p>`
+  },
+  {
+    attachTo: {
+      element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rango',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Seleccionar Rango</h5>',
+    text: `<p>En este campo puedes seleccionar un rango de fechas para generar los recibos de caja guardados en el lapso de tiempo consultado. </p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'consultar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Consultar Rango</h5>',
+    text: `<p>Luego de seleccionar el rango de fechas, presiona este botón para realizar la consulta de los recibos de caja
+    grabados por cartera en ese periodo de tiempo.</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'filtros',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Filtrar columnas</h5>',
+    text: `<p>Luego de consultar el rango de fechas, desde estos campos podrás filtrar la información que se encuentre en la tabla por:
+    <br>- Periodo.
+    <br>- Consecutivo.
+    <br>- Fecha Transacción.
+    <br>- Cliente.
+    <br>- Descripcion.
+    <br>- Valor.
+    <br>- Cuenta.
+    <br>- Vendedor.
+    <br>- Factura.
+    <br>- Fecha vencimiento.
+    <br>- Fecha registro.
+    <br>- Usuario.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#campos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'campos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Información consultada</h5>',
+    text: `<p>Luego de realizar la consulta, encontrarás la información de los recibos de caja que han sido ingresados a zeus por parte de cartera en el rango de fechas seleccionado.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#total',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'total',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i>Valor total cancelado</h5>',
+    text: `<p>Aquí se visualizará el valor total cancelado de cada factura en el rango de fechas seleccionado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se exportará a excel la información de los recibos de caja que se encuentre cargada en la tabla. </p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se exportará a excel la información de los recibos de caja que se encuentre cargada en la tabla. </p>`
+  },
+]
+
 /******************************************************************* TICKETS **************************************************************************/
 export const stepsCreacionTickets : Step.StepOptions[] = [
   {
@@ -10773,3 +11016,4 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     text: `<p>¡Podemos ver las cuentas detalladas presionando este botón, adicionalmente podemos ver los movimientos de cada cuenta en cada mes seleccionando en esta tabla alguna cuenta!</p>`
   },
 ];
+

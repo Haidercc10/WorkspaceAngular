@@ -12,7 +12,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"> Nómina</h2>
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="nomina"> Nómina</h2>
     </div>
     <!--Linea-->
     <div class="mb-4">
@@ -37,17 +37,17 @@
       <!-- Rango de Fechas -->
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3 p-2">
         <span class="p-float-label" id="rango-fechas">
-          <p-calendar inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+          <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
           <label for="FechaInicial">Rango de Fechas</label>
         </span>
       </div>
 
       <div class="col">
-        <button pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultarNominas()"></button>
+        <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultarNominas()"></button>
       </div>
 
       <div class="col justify-content-end text-right">
-        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" pTooltip="" (click)="mostrarEleccion()"></button>
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" pTooltip="" (click)="mostrarEleccion()"></button>
       </div>
     </div>
   </p-toolbar>
@@ -87,8 +87,8 @@
                 <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PagoTotal', 'contains')"></th>
               </tr>
               <!--Encabezado-->
-              <tr>
-                <th></th>
+              <tr id="campos">
+                <th id="desplegable"></th>
                 <th>#</th>
                 <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
                 <th pSortableColumn="Operario" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="Operario"></p-sortIcon></th>
@@ -112,7 +112,7 @@
             <ng-template pTemplate="footer">
               <tr>
                 <td colspan="5" class="text-right">Total Nómina Sellado</td>
-                <td>{{totalNominaSellado | number : '1.2-2'}}</td>
+                <td id="total">{{totalNominaSellado | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
             <!--Tabla 2-->

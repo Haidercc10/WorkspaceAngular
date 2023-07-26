@@ -43,16 +43,16 @@ export class Dashboard_CostosComponent implements OnInit {
   cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
   cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
-  arrayCostos : any = [];
-  arrayGastos1 : any = [];
-  totalCostoSeleccionado : number = 0;
+  arrayCostos : any = []; /** Array que cargará la información de las cuentas empezadas con 71, 51, 52, ó 53 en la tabla del primero modal */
+  arrayGastos1 : any = []; /** Array que cargará la información de una cuenta en un periodo en especifico en la tabla del segundo modal */
+  totalCostoSeleccionado : number = 0; /** Variable que almacenará el valor total de el tipo de costos cargados en el modal */
   @ViewChild('dt') dt: Table | undefined;
   load : boolean = false;
-  abrirModal1 : boolean = false;
-  abrirModal2 : boolean = false;
-  graficaSeleccionada : string = '';
-  arrayAnios : any[] = [];
-  cuentaSeleccionada : any[] = [];
+  abrirModal1 : boolean = false; /** Variable que servirá para abrir el primer modal */
+  abrirModal2 : boolean = false; /** Variable que servirá para abrir el segundo modal */
+  graficaSeleccionada : string = ''; /** Titulo que se mostrará en el modal según la grafica seleccionada */
+  arrayAnios : any[] = []; /** Array que cargará los años seleccionados en la grafica */
+  cuentaSeleccionada : any[] = []; /** Array que mostrará la cuenta, el mes y el año en el titulo del segundo modal */
 
   constructor(private AppComponent : AppComponent,
                 private zeusContabilidad : ZeusContabilidadService,
