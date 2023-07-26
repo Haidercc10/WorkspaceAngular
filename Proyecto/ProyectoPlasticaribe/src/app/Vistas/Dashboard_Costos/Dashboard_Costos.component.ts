@@ -20,8 +20,6 @@ export class Dashboard_CostosComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
-  primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
@@ -37,6 +35,11 @@ export class Dashboard_CostosComponent implements OnInit {
   costo_Anio_administrativos : any [] = []; //Variable que va a almacenar los costos de administrativos por año
   costo_Anio_ventas : any [] = []; //Variable que va a almacenar los costos de ventas por año
   costo_Anio_noOperacionesles : any [] = []; //Variable que va a almacenar los costos de no operacionesles por año
+  
+  cuentasFabricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
+  cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
+  cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
+  cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
   arrayCostos : any = [];
   arrayGastos1 : any = [];
@@ -136,7 +139,6 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
-    this.cargando = true;
     this.arrayAnios.push(`${this.anioSeleccionado}`);
     this.buscarCostosFabricacion();
     setTimeout(() => this.cargando = false, 2000);
@@ -146,24 +148,20 @@ export class Dashboard_CostosComponent implements OnInit {
   buscarCostosFabricacion(){
     let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
-      let cuentasFacbricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
-      let cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
-      let cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
-      let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
-
+      this.cargando = true;
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
         let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-        let costosFabricacion = costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()));
-        let costosAdministrativos = costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()));
-        let costosVentas = costos.filter(item => cuentasVentas.includes(item.cuenta.trim()));
-        let costoNoOperacionales = costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim()));
+        let costosFabricacion = costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()));
+        let costosAdministrativos = costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()));
+        let costosVentas = costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()));
+        let costoNoOperacionales = costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()));
 
         this.datosCostosFabricacion(costosFabricacion);
         this.datosCostosAdministrativo(costosAdministrativos);
         this.datosCostosVentas(costosVentas);
         this.datosCostosNoOperacionesles(costoNoOperacionales);
       });
-    }
+    } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
   // funcion que va a manejar los datos de los costos de fabricacion
@@ -171,30 +169,26 @@ export class Dashboard_CostosComponent implements OnInit {
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
 
-    let index : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      for (let i = 0; i < data.length; i++) {
-        costoMeses = [
-          data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-        ]
-        cantDatos++;
-        if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
-        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
-        let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
-        if (index2 != -1) this.costo_Anio_fabricacion[index2].costo = data.reduce((a, b) => a + b.valor, 0);
-        else this.costo_Anio_fabricacion.push(info);
-      }
+    for (let i = 0; i < data.length; i++) {
+      costoMeses = [
+        data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      ]
+      cantDatos++;
+      if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
+      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
+      let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
+      if (index2 == -1) this.costo_Anio_fabricacion.push(info);
     }
   }
 
@@ -219,30 +213,26 @@ export class Dashboard_CostosComponent implements OnInit {
   datosCostosAdministrativo(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
-    let index : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      for (let i = 0; i < data.length; i++) {
-        costoMeses = [
-          data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-        ]
-        cantDatos++;
-        if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
-        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
-        let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
-        if (index2 != -1) this.costo_Anio_administrativos[index2].costo = data.reduce((a, b) => a + b.valor, 0);
-        else this.costo_Anio_administrativos.push(info);
-      }
+    for (let i = 0; i < data.length; i++) {
+      costoMeses = [
+        data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      ]
+      cantDatos++;
+      if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
+      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
+      let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
+      if (index2 == -1) this.costo_Anio_administrativos.push(info);
     }
   }
 
@@ -267,30 +257,26 @@ export class Dashboard_CostosComponent implements OnInit {
   datosCostosVentas(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
-    let index : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      for (let i = 0; i < data.length; i++) {
-        costoMeses = [
-          data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-        ]
-        cantDatos++;
-        if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
-        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
-        let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
-        if (index2 != -1) this.costo_Anio_ventas[index2].costo = data.reduce((a, b) => a + b.valor, 0);
-        else this.costo_Anio_ventas.push(info);
-      }
+    for (let i = 0; i < data.length; i++) {
+      costoMeses = [
+        data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      ]
+      cantDatos++;
+      if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
+      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
+      let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
+      if (index2 == -1) this.costo_Anio_ventas.push(info);
     }
   }
 
@@ -315,30 +301,26 @@ export class Dashboard_CostosComponent implements OnInit {
   datosCostosNoOperacionesles(data : any){
     let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
     let cantDatos : number = 0;
-    let index : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      for (let i = 0; i < data.length; i++) {
-        costoMeses = [
-          data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
-          data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-        ]
-        cantDatos++;
-        if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
-        let info : any = { anio: this.anioSeleccionado, costo : data[i].valor };
-        let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
-        if (index2 != -1) this.costo_Anio_noOperacionesles[index2].costo = data.reduce((a, b) => a + b.valor, 0);
-        else this.costo_Anio_noOperacionesles.push(info);
-      }
+    for (let i = 0; i < data.length; i++) {
+      costoMeses = [
+        data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+        data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      ]
+      cantDatos++;
+      if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
+      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
+      let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
+      if (index2 == -1) this.costo_Anio_noOperacionesles.push(info);
     }
   }
 
@@ -365,33 +347,28 @@ export class Dashboard_CostosComponent implements OnInit {
     this.abrirModal1 = true;
     this.totalCostoSeleccionado = 0;
 
-    let cuentas7 = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
-    let cuentas51 = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
-    let cuentas52 = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
-    let cuentas53 = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
-
     for (let index = 0; index < this.arrayAnios.length; index++) {
 
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(this.arrayAnios[index]).subscribe(data => {
         let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
 
         if (numero == 1) {
-          let costoIndFabricacion : any = gastos.filter(item => cuentas7.includes(item.cuenta.trim()));
+          let costoIndFabricacion : any = gastos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()));
           this.llenarTabla(costoIndFabricacion);
           this.graficaSeleccionada = 'Costos indirectos de fabricación';
         }
         if (numero == 2) {
-          let gastosAdmon : any = gastos.filter(item => cuentas51.includes(item.cuenta.trim()));
+          let gastosAdmon : any = gastos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()));
           this.llenarTabla(gastosAdmon);
           this.graficaSeleccionada = 'Gastos de administración';
          }
         if (numero == 3) {
-          let gastosVentas : any = gastos.filter(item => cuentas52.includes(item.cuenta.trim()));
+          let gastosVentas : any = gastos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()));
           this.llenarTabla(gastosVentas);
           this.graficaSeleccionada = 'Gastos de ventas';
         }
         if (numero == 4) {
-          let gastoNoOperacionales : any = gastos.filter(item => cuentas53.includes(item.cuenta.trim()));
+          let gastoNoOperacionales : any = gastos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()));
           this.llenarTabla(gastoNoOperacionales);
           this.graficaSeleccionada = 'Gastos no operacionales';
         }
@@ -482,10 +459,6 @@ export class Dashboard_CostosComponent implements OnInit {
     this.cargando = true;
     let infoDocumento : any [] = [];
     let title : string = `Determinación de Costos`;
-    let cuentasFacbricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
-    let cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
-    let cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
-    let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
 
     if (this.costo_Anio_fabricacion.length > 0) {
@@ -493,10 +466,10 @@ export class Dashboard_CostosComponent implements OnInit {
         this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
           let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
           infoDocumento = [
-            this.calcularTotalMeses(costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => cuentasVentas.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())))
+            this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
           ].reduce((a, b) => a.concat(b));
 
           let workbook = new Workbook();

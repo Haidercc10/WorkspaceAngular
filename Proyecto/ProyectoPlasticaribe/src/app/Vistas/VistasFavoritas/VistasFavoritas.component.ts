@@ -14,7 +14,6 @@ import { AppComponent } from 'src/app/app.component';
 })
 
 export class VistasFavoritasComponent implements OnInit {
-
   
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -69,27 +68,25 @@ export class VistasFavoritasComponent implements OnInit {
         icon: "assets/Iconos_Menu/home.png",
         command: () => this.router.navigateByUrl('/home')
       }
-    );
-    for (let i = 0; i < this.disponibles.length; i++) {
-      for (let j = 0; j < this.vistasFavoritas.length; j++) {
-        if (this.vistasFavoritas[j] == this.disponibles[i].id) {
-          let { nombre, icono, ruta } = this.disponibles[i];
-          let info: any = {
-            label: nombre,
-            tooltipOptions: {
-              tooltipLabel: nombre,
-              tooltipPosition: 'top',
-              positionTop: -15,
-              positionLeft: 15
-            },
-            icon: icono,
-            command: () => this.router.navigateByUrl(ruta)
-          };
-          this.dockItems.push(info);
-          this.seleccionados.push(this.disponibles[i].id);
-        }
+    );    
+    this.disponibles.forEach(disponible => {
+      if (this.vistasFavoritas.includes(disponible.id)) {
+        let { nombre, icono, ruta } = disponible;
+        let info: any = {
+          label: nombre,
+          tooltipOptions: {
+            tooltipLabel: nombre,
+            tooltipPosition: 'top',
+            positionTop: -15,
+            positionLeft: 15
+          },
+          icon: icono,
+          command: () => this.router.navigateByUrl(ruta)
+        };
+        this.dockItems.push(info);
+        this.seleccionados.push(disponible.id);
       }
-    }
+    });
     this.dockItems.push(
       {
         label: 'Añadir',
@@ -117,8 +114,8 @@ export class VistasFavoritasComponent implements OnInit {
     for (let i = 0; i < this.disponibles.length; i++) {
       if (!this.seleccionados.includes(this.disponibles[i].id)) this.disponiblesMostrar.push(this.disponibles[i]);
       else this.targetProducts.push(this.disponibles[i]);
+      if ((i + 1) == this.disponibles.length) this.displayTerminal = true;
     }
-    setTimeout(() => this.displayTerminal = true, 500);
   }
 
   // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
