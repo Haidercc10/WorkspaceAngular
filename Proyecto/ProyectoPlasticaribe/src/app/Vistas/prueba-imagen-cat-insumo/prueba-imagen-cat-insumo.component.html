@@ -1,48 +1,209 @@
-<!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
-<div class="dock-window dock-advanced">
-    <!-- Docker -->
-    <div class="fixed-bottom">
-      <p-dock [model]="dockItems" position="bottom">
-        <ng-template pTemplate="item" let-item>
-          <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
-        </ng-template>
-      </p-dock>
-    </div>
-  
-    <p-dialog [(visible)]="displayTerminal" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true">
-      <p-pickList
-        [source]="disponiblesMostrar"
-        [target]="targetProducts"
-        [showTargetControls]="false"
-        [showSourceControls]="false"
-        sourceHeader="Disponible"
-        targetHeader="Seleccionado"
-        [dragdrop]="true"
-        [metaKeySelection]="false"
-        [responsive]="true"
-        [sourceStyle]="{'height':'30rem'}"
-        [targetStyle]="{'height':'30rem'}"
-        filterBy="nombre"
-        sourceFilterPlaceholder="Buscar por nombre"
-        targetFilterPlaceholder="Buscar por nombre"
-        (onMoveToTarget)="elegirFavoritos()"
-        (onMoveAllToTarget)="llenarDatosRol()"
-        (onMoveToSource)="elegirFavoritos()"
-        (onMoveAllToSource)="elegirFavoritos()"
-        [stripedRows]="true">
-        <ng-template let-product pTemplate="item">
-          <div class="product-item">
-            <div class="product-list-detail">
-              <span>
-                <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
-                <p style="padding-left: 5%;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>{{product.nombre}}</b></p>
-              </span>
-              <p style="padding-left: 20%;">Módulo(s) {{product.categoria.replaceAll('|', ' - ')}}</p>
+<!--<div class="fondo">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="toolbar m-auto">
+                <p-toolbar id="cambiarAnio">
+                    <div class="row g-2 justify-content-center align-middle">
+                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
+                        <h5>¡Elige el año que deseas graficar!</h5>
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
+                        <div class="row mb-4 justify-content-center">
+                          <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5">
+                            <p-dropdown class="mr-2"  [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+                          </div>
+
+                          <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
+                            <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficas()"></button>
+                            <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="inicializarGraficas()"></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </p-toolbar>
             </div>
-          </div>
-        </ng-template>
-        <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
-      </p-pickList>
-    </p-dialog>
+        </div>
+    </div>
+
+     <div class="row g-2">
+             <p-card>
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> COSTO INDIRECTO DE FABRICACION</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCostosFabricacion" [options]="opcionesGrafica"></p-chart>
+                <p-toolbar>
+                    <div class="row p-2">
+                      <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of costo_Anio_fabricacion">
+                        <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                      </div>
+                    </div>
+                  </p-toolbar>
+            </p-card>
+        </div>
+
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-4">
+            <p-card>
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> DISCRIMINACION GASTOS DE ADMON</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCostosAdministrativos" [options]="opcionesGrafica"></p-chart>
+                <p-toolbar>
+                    <div class="row p-2">
+                      <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of costo_Anio_administrativos">
+                        <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                      </div>
+                    </div>
+                  </p-toolbar>
+            </p-card>
+        </div>
+
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-4">
+            <p-card>
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> DISCRIMINACION GASTOS DE VENTAS</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCostosVentas" [options]="opcionesGrafica"></p-chart>
+                <p-toolbar>
+                    <div class="row p-2">
+                    <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of costo_Anio_ventas">
+                        <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                    </div>
+                    </div>
+                </p-toolbar>
+            </p-card>
+        </div>
+
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-4">
+            <p-card>
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> GASTOS NO OPERACIONALES</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCostosNoOperacionesles" [options]="opcionesGrafica"></p-chart>
+                <p-toolbar>
+                    <div class="row p-2">
+                    <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of costo_Anio_noOperacionesles">
+                        <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                    </div>
+                    </div>
+                </p-toolbar>
+            </p-card>
+        </div>
+    </div>
+</div>-->
+
+
+<div class="mb-3" *ngIf="!load">
+  <div class="row g-3 font-size-14" id="table">
+    <p-table
+      #dt
+      [value]="arrayCostos"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="arrayCostos.length"
+      [rowsPerPageOptions]="[10,25,50,100,arrayCostos.length]"
+      [rowHover]="true"
+      dataKey="Id"
+      [scrollable]="true"
+      scrollHeight="50rem">
+      <ng-template pTemplate="header" >
+        <!--Filtros tabla-->
+        <tr class="font-size-16" id="filtros">
+          <th></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'periodo', 'contains')"></th>
+          <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'anio', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'mes', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cuenta', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcionCuenta', 'contains')"></th>
+          <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'valor', 'contains')"></th>
+        </tr>
+        <!--Encabezado tabla-->
+        <tr>
+          <th>#</th>
+          <th scope="col" pSortableColumn="periodo">Periodo <p-sortIcon field="periodo"></p-sortIcon></th>
+          <th pSortableColumn="anio" pReorderableColumn scope="col">Año <p-sortIcon field="anio"></p-sortIcon></th>
+          <th pSortableColumn="mes" pReorderableColumn scope="col">Mes <p-sortIcon field="mes"></p-sortIcon></th>
+          <th pSortableColumn="cuenta" pReorderableColumn scope="col">Cuenta <p-sortIcon field="cuenta"></p-sortIcon></th>
+          <th pSortableColumn="descripcionCuenta" pReorderableColumn scope="col">Descripción <p-sortIcon field="descripcionCuenta"></p-sortIcon></th>
+          <th pSortableColumn="valor" pReorderableColumn scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+      <!--Registros-->
+      <ng-template pTemplate="body" let-gastos let-rowIndex="rowIndex">
+        <tr (click)="consultaCostosDetallados(gastos)">
+          <td><b>{{rowIndex + 1}}</b></td>
+          <td>{{gastos.periodo}}</td>
+          <td>{{gastos.anio}}</td>
+          <td>{{gastos.mes}}</td>
+          <td><b>{{gastos.cuenta}}</b></td>
+          <td>{{gastos.descripcionCuenta}}</td>
+          <td><b>{{gastos.valor | number : '1.2-2'}}</b></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr id="totales">
+          <td colspan="6" class="text-right">Totales</td>
+          <td>{{totalCostoSeleccionado | number}} COP</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
-  
+</div>
+
+<p-dialog header="{{0}}" [modal]="true" [draggable]="false" [(visible)]="abrirModal2" [style]="{width: '80%'}">
+  <div class="mb-3" >
+    <div class="row g-3 font-size-14" id="table">
+      <p-table
+        #dt
+        [value]="arrayGastos1"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="arrayGastos1.length"
+        [rowsPerPageOptions]="[10,25,50,100,arrayCostos.length]"
+        [rowHover]="true"
+        dataKey="Id"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header" >
+          <!--Filtros tabla-->
+          <!--Encabezado tabla-->
+          <tr>
+            <th>#</th>
+            <th pSortableColumn="fuente" pReorderableColumn scope="col">Fuente <p-sortIcon field="fuente"></p-sortIcon></th>
+            <th pSortableColumn="fecha_Transaccion" pReorderableColumn scope="col">Fecha Transacción <p-sortIcon field="fecha_Transaccion"></p-sortIcon></th>
+            <th pSortableColumn="id_Cuenta" pReorderableColumn scope="col">Id Cuenta <p-sortIcon field="id_Cuenta"></p-sortIcon></th>
+            <th pSortableColumn="cuenta" pReorderableColumn scope="col">Cuenta <p-sortIcon field="cuenta"></p-sortIcon></th>
+            <th pSortableColumn="descripcion_Transaccion" pReorderableColumn scope="col">Descripción Transacción <p-sortIcon field="descripcion_Transaccion"></p-sortIcon></th>
+            <th pSortableColumn="valor" pReorderableColumn scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
+            <th pSortableColumn="fecha_Grabacion" pReorderableColumn scope="col">Fecha Grabación <p-sortIcon field="fecha_Grabacion"></p-sortIcon></th>
+            <th pSortableColumn="proveedor" pReorderableColumn scope="col">Proveedor <p-sortIcon field="proveedor"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <!--Registros-->
+        <ng-template pTemplate="body" let-gasto let-rowIndex="rowIndex">
+          <tr>
+            <td><b>{{rowIndex + 1}}</b></td>
+            <td><b>{{gasto.fuente}}</b></td>
+            <td>{{gasto.fecha_Transaccion }}</td>
+            <td><b>{{gasto.id_Cuenta }}</b></td>
+            <td>{{gasto.cuenta}}</td>
+            <td>{{gasto.descripcion_Transaccion}}</td>
+            <td><b>{{gasto.valor | number: '1.2-2'}}</b></td>
+            <td>{{gasto.fecha_Grabacion}}</td>
+            <td><b>{{gasto.proveedor}}</b></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr id="totales">
+            <td colspan="6" class="text-right">Totales</td>
+            <td>{{totalCostoSeleccionado | number}}</td>
+            <td colspan="2">COP</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+

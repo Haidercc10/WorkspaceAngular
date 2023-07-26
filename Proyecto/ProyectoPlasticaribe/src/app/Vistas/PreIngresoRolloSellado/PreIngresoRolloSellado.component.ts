@@ -102,8 +102,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     let ot : number = this.FormConsultarRollos.value.OT_Id;
     let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
-    if (fechaInicial == 'Invalid date') fechaInicial = this.today;
-    if (fechaFinal == 'Invalid date') fechaFinal = fechaInicial;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = this.today;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = fechaInicial;
     let ruta : string = ot != null ? `?ot=${ot}` : '';
     let rollosBagPro : number [] = [];
     let rollosExistentes : number [] = [];

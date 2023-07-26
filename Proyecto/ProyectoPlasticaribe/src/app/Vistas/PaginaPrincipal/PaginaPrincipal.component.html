@@ -7,7 +7,7 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid" id="card">
-    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,3,60,61].includes(ValidarRol)">
+    <p-tabView [scrollable]="true" (onChange)="cambioTab($event)" *ngIf="[1,3,60,61,69].includes(ValidarRol)">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Ordenes de Trabajo"
@@ -20,7 +20,7 @@
       <!--FACTURACIÓN-->
       <p-tabPanel
         header="Facturación"
-        leftIcon="pi pi-sliders-h"
+        leftIcon="pi pi-dollar"
         tooltip="Información de la Facturación Mensual"
         *ngIf="[1,60].includes(ValidarRol)">
         <app-DashBoard_Facturacion *ngIf="facturacion"></app-DashBoard_Facturacion>
@@ -58,7 +58,7 @@
         header="Recaudos"
         leftIcon="pi pi-shopping-cart"
         tooltip="Información sobre los reacudos de la empresa"
-        *ngIf="[1].includes(ValidarRol)">
+        *ngIf="[1,69].includes(ValidarRol)">
         <app-DashBoard-Recaudos *ngIf="recaudos"></app-DashBoard-Recaudos>
       </p-tabPanel>
 
@@ -69,6 +69,24 @@
         tooltip="Información sobre las cuentas por pagar de la empresa"
         *ngIf="[1].includes(ValidarRol)">
         <app-Dashboard_CuentasPagar *ngIf="cuentasPagar"></app-Dashboard_CuentasPagar>
+      </p-tabPanel>
+
+      <!-- GERENCIA -->
+      <p-tabPanel
+        header="Gerencia"
+        leftIcon="pi pi-chart-line"
+        tooltip="Información general"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-Dashboard_General *ngIf="gerencia"></app-Dashboard_General>
+      </p-tabPanel>
+
+      <!-- COSTOS -->
+      <p-tabPanel
+        header="Costos"
+        leftIcon="pi pi-money-bill"
+        tooltip="Información general sobre los costos fijos y variables"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-Dashboard_Costos *ngIf="costos"></app-Dashboard_Costos>
       </p-tabPanel>
 
     </p-tabView>

@@ -148,8 +148,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     let ruta : string = ``;
     this.arrayPedido = [];
 
-    if (fechaInicio == 'Invalid date') fechaInicio = null;
-    if (fechaFin == 'Invalid date') fechaFin = null;
+    if (fechaInicio == 'Fecha inválida') fechaInicio = null;
+    if (fechaFin == 'Fecha inválida') fechaFin = null;
 
     if(fechaInicio == null) fechaInicio = fechaInicio = this.today;
     if(fechaFin == null) fechaFin = fechaFin = fechaInicio;

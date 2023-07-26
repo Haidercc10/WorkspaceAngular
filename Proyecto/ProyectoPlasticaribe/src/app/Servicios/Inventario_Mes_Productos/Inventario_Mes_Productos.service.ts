@@ -24,6 +24,8 @@ export class Inventario_Mes_ProductosService {
     return this.http.get<any>(rutaPlasticaribeAPI + `/Inventario_Mensual_Productos/getCantidadMes_Producto/${prod}/${und}`);
   }
 
+  Get_Cantidad_Productos_Meses = () : Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/Inventario_Mensual_Productos/get_Cantidad_Productos_Meses`);
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(rutaPlasticaribeAPI + `/Inventario_Mensual_Productos/${id}`, data);
   }

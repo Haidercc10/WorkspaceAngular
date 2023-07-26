@@ -150,8 +150,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     if (materiaPrima == null) materiaPrima = 0;
     if (operario == null) operario = 0;
     if (turno == null) turno = 'NE';
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
     if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');

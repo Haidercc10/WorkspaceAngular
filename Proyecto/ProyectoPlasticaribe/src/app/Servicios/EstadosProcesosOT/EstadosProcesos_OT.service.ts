@@ -138,6 +138,8 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesTrabajo_Pedido/${pedido}`);
   }
 
+  GetOrdenesMes_Estados = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getOrdenesMes_Estados`);
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`, data);
   }

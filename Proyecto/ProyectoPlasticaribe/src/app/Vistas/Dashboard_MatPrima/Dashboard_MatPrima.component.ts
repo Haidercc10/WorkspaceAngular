@@ -92,10 +92,10 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){
     //this.cargando = true;
-    this.materiasPrimas();
     this.cambiarNombreMes();
+    setTimeout(() => { this.materiasPrimas(); }, 1000);
     this.recargarTab();
-    setTimeout(() => { this.llenarGraficaComparativo(); }, 1000);
+    setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
   }
 
   /** Función paracambiar el nombre del mes a español */

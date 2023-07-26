@@ -14,6 +14,7 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
   templateUrl: './Dashboard-OT.component.html',
   styleUrls: ['./Dashboard-OT.component.css']
 })
+
 export class DashboardOTComponent implements OnInit {
 
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
@@ -115,12 +116,10 @@ export class DashboardOTComponent implements OnInit {
         { Nombre : 'Cerrada', Cantidad : 0, Class : 'bg-verde2', },
       ];
 
-      this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
-        for (let i = 0; i < datos_ot.length; i++) {
-          for (let j = 0; j < this.estadosOrdenes.length; j++) {
-            if (datos_ot[i].estado_Nombre == this.estadosOrdenes[j].Nombre) this.estadosOrdenes[j].Cantidad += 1;
-          }
-        }
+      this.ordenTrabajoService.GetOrdenesMes_Estados().subscribe(datos_ot => {
+        datos_ot.forEach(element => {
+          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;          
+        });
       });
 
       this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {

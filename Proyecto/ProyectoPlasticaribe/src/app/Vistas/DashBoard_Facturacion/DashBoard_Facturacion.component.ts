@@ -90,6 +90,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
+    this.facturacionAnio();
     this.facturacion();
     this.recargar();
   }
@@ -123,28 +124,32 @@ export class DashBoard_FacturacionComponent implements OnInit {
     let index : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
     if (index == -1) {
       this.cargando = true;
-      for (let i = 0; i < 12; i++) {
-        let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
-        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
-          if (i == 0) this.totalFacturado1 = datos_facturacion;
-          if (i == 1) this.totalFacturado2 = datos_facturacion;
-          if (i == 2) this.totalFacturado3 = datos_facturacion;
-          if (i == 3) this.totalFacturado4 = datos_facturacion;
-          if (i == 4) this.totalFacturado5 = datos_facturacion;
-          if (i == 5) this.totalFacturado6 = datos_facturacion;
-          if (i == 6) this.totalFacturado7 = datos_facturacion;
-          if (i == 7) this.totalFacturado8 = datos_facturacion;
-          if (i == 8) this.totalFacturado9 = datos_facturacion;
-          if (i == 9) this.totalFacturado10 = datos_facturacion;
-          if (i == 10) this.totalFacturado11 = datos_facturacion;
-          if (i == 11) this.totalFacturado12 = datos_facturacion;
-          let info : any = { anio: this.anoSeleccionado, costo : datos_facturacion };
+      let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+      this.zeusService.GetFacturacion_Mes_Mes(`${this.anoSeleccionado}`).subscribe(dato => {
+        this.totalFacturadoanio = dato.reduce((a, b) => a + b.Valor, 0)
+        for (let i = 0; i < dato.length; i++) {
+          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
+          costoMeses = [
+            i == 0 ? parseFloat(info.Valor) : costoMeses[0],
+            i == 1 ? parseFloat(info.Valor) : costoMeses[1],
+            i == 2 ? parseFloat(info.Valor) : costoMeses[2],
+            i == 3 ? parseFloat(info.Valor) : costoMeses[3],
+            i == 4 ? parseFloat(info.Valor) : costoMeses[4],
+            i == 5 ? parseFloat(info.Valor) : costoMeses[5],
+            i == 6 ? parseFloat(info.Valor) : costoMeses[6],
+            i == 7 ? parseFloat(info.Valor) : costoMeses[7],
+            i == 8 ? parseFloat(info.Valor) : costoMeses[8],
+            i == 9 ? parseFloat(info.Valor) : costoMeses[9],
+            i == 10 ? parseFloat(info.Valor) : costoMeses[10],
+            i == 11 ? parseFloat(info.Valor) : costoMeses[11],
+          ];
+          if (i == 11) this.llenarGraficaFacturacion(costoMeses);
+          let info_Anio : any = { anio: this.anoSeleccionado, costo: parseFloat(info.Valor) };
           let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
-          if (index2 != -1) this.facturadoAnios[index2].costo += datos_facturacion;
-          else this.facturadoAnios.push(info);
-        });
-      }
-      setTimeout(() => this.llenarGraficaFacturacion(), 1500);
+          if (index2 != -1) this.facturadoAnios[index2].costo += parseFloat(info.Valor);
+          else this.facturadoAnios.push(info_Anio);
+        }
+      });
     } else this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
@@ -188,11 +193,11 @@ export class DashBoard_FacturacionComponent implements OnInit {
   }
 
   // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
-  llenarGraficaFacturacion(){
+  llenarGraficaFacturacion(datos){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     let info : any = {
       label: `Año ${this.anoSeleccionado}`,
-      data: [this.totalFacturado1, this.totalFacturado2, this.totalFacturado3, this.totalFacturado4, this.totalFacturado5, this.totalFacturado6, this.totalFacturado7, this.totalFacturado8, this.totalFacturado9, this.totalFacturado10, this.totalFacturado11, this.totalFacturado12],
+      data: datos,
       yAxisID: 'y',
       borderColor: color.substring(0, 4),
       backgroundColor: color.substring(0, 4) + "2",

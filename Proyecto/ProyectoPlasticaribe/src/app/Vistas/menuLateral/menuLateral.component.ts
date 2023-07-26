@@ -40,6 +40,7 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   cantidadEventos : number = 0; //Variable que almacenará la cantidad de eventos que hay desde el día actual hasta el fin de mes
   eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
+  eventosMes : any [] = []; //Variable que almacenará los eventos que hay para el mes actual
   eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   position: string = '';
   modoSeleccionado : boolean;
@@ -73,6 +74,7 @@ export class MenuLateralComponent implements OnInit {
     this.cantidadEventosMes();
     this.consultarEventosHoy();
     this.CargarCategorias();
+    this.abrirModalUsuario();
   }
 
   lecturaStorage(){
@@ -129,7 +131,9 @@ export class MenuLateralComponent implements OnInit {
       this.categorias.sort((a, b) => a.label.localeCompare(b.label));
       this.categorias.unshift({label: `Inicio`, icon: 'pi pi-home', command: () => this.router.navigate(['/home'])});
       if (this.storage_Id == 123456789) this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
-      this.cargarOpcionesMenu();
+      setTimeout(() => {
+        this.cargarOpcionesMenu();
+      }, 50);
     });
   }
 
@@ -137,9 +141,9 @@ export class MenuLateralComponent implements OnInit {
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
-          element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
+          if (element.items) element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
         }
-        element.items.sort((a, b) => a.label.localeCompare(b.label));
+        if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
       });
     });
   }
@@ -147,7 +151,6 @@ export class MenuLateralComponent implements OnInit {
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
   abrirModalUsuario(){
-    this.modalUsuario = true;
     this.usuarioService.getUsuariosxId(this.storage_Id).subscribe(dataUsuarios => {
       this.FormUsuarios.patchValue({ usuNombre: dataUsuarios[0].usua_Nombre, usuPassword: dataUsuarios[0].usua_Contrasena, });
     });
@@ -193,6 +196,7 @@ export class MenuLateralComponent implements OnInit {
   // Funcion que consultará los eventos de hoy
   consultarEventosHoy(){
     this.eventosHoy = [];
+    this.eventosMes = [];
     this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosHoy.push({
@@ -200,10 +204,24 @@ export class MenuLateralComponent implements OnInit {
           Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
           Nombre : data[i].eventoCal_Nombre,
           Descripcion : data[i].eventoCal_Descripcion,
+          Dia: moment().format('DD'),
+          Mes: moment().format('MMM').toUpperCase(),
         });
         if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
         else this.eventosDia = true;
       }      
+    });
+    this.eventosCalService.GEtEventosMes(this.storage_Id, this.ValidarRol).subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        this.eventosMes.push({
+          Fecha_Hora_Inicio : `${data[i].eventoCal_HoraInicial}`,
+          Fecha_Hora_Fin : `${data[i].eventoCal_FechaFinal.replace('T00:00:00', '')} ${data[i].eventoCal_HoraFinal}`,
+          Nombre : data[i].eventoCal_Nombre,
+          Descripcion : data[i].eventoCal_Descripcion,
+          Dia: moment(data[i].eventoCal_FechaInicial).format('DD'),
+          Mes: moment().format('MMM').toUpperCase(),
+        });
+      }
     });
   }
 
@@ -228,14 +246,14 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  confirm1() {
-    this.messageService.clear();
-    this.messageService.add({key: 'c', sticky: true, severity:'warn', summary:'¿Seguro que desea salir?'});
+  confirm(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: '¿Seguro que desea salir?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.authenticationService.logout(),
+    });
   }
-
-  onConfirm = () => this.authenticationService.logout();
-
-  onReject = () => this.messageService.clear('c');
   
   // Funcion que cambiará el tema de la aplicación
   mostrar() {

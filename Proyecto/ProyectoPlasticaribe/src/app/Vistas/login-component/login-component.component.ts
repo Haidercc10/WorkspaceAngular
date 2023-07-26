@@ -1,19 +1,18 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
-import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
-import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { Router } from '@angular/router';
-import { MovimientosAplicacionService } from 'src/app/Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
 import moment from 'moment';
-import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
-import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
-import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
-import { HttpClient } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
-import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 import { CookieService } from 'ngx-cookie-service';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
+import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { MovimientosAplicacionService } from 'src/app/Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import { AuthenticationService } from 'src/app/_Services/authentication.service';
+import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
+import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
+import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -42,10 +41,9 @@ export class LoginComponentComponent implements OnInit {
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,
                                 private http : HttpClient,
-                                  private messageService: MessageService,
-                                    private encriptacion : EncriptacionService,
-                                      private cookiesServices : CookieService,
-                                        private mensajeService : MensajesAplicacionService,) {
+                                  private encriptacion : EncriptacionService,
+                                    private cookiesServices : CookieService,
+                                      private mensajeService : MensajesAplicacionService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -131,17 +129,5 @@ export class LoginComponentComponent implements OnInit {
       this.mensajeService.mensajeError(`¡Error!`, `¡No fue posible iniciar sesión!`);
       this.cargando = false;
     });
-  }
-
-  // Funcin que va a mostrar o no la contraseña del usuario
-  mostrarPassword(){
-    let password : any = document.getElementById('pass');
-    if(password.type == 'password') {
-      password.type = 'text';
-      this.mostrarPass = true;
-    } else {
-      password.type = 'password';
-      this.mostrarPass = false;
-    }
   }
 }

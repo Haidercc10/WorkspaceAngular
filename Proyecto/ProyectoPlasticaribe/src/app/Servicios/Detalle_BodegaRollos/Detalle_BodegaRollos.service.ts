@@ -33,4 +33,6 @@ export class Detalle_BodegaRollosService {
 
   Delete = (id : any) => this.http.delete(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos/${id}`);
 
+  GetIdRollo = (rollo : any) => this.http.get<any>(`${rutaPlasticaribeAPI}/Detalles_BodegasRollos/getIdRollo/${rollo}`);
+
 }

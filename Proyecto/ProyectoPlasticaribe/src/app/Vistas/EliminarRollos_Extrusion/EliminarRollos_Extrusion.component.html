@@ -26,62 +26,38 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
-  <div class="mb-4">
+  <div class="mb-5">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Consultar Rollos</h4>
   </div>
 
-  <!-- Formulario para consultar una orden de trabajo -->
+  <!-- Formulario para consultar OT o rollo -->
   <form [formGroup]="FormConsultarRollos">
 
     <!-- Primera Fila -->
     <div class="mb-3" id="formulario">
       <div class="row g-3">
 
-        <!-- Consultar Orden de Trabajo -->
-        <div class="col-xs-12 col-xs-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <!-- Bodega -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="OT_Id" id="ordenTrabajo" type="text" pInputText (keyup.enter)="consultarRollos()" required/>
+            <p-dropdown formControlName="Bodega" inputId="Bodega" [autoDisplayFirst]="false" [options]="arrayProcesos" optionLabel="proceso_Nombre" optionValue="proceso_Id"></p-dropdown>
+            <label for="Bodega">Bodega</label>
+          </span>
+        </div>
+
+        <!-- Consultar Orden de Trabajo -->
+        <div class="col-xs-12 col-xs-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+          <span class="p-float-label">
+            <input formControlName="OT_Id" id="ordenTrabajo" type="text" pInputText (keyup.enter)="consultarRollos2()" required/>
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
         <!-- Numero de Rollo -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <input formControlName="IdRollo" id="Rollo" type="text" pInputText (keyup.enter)="consultarRollos()" required />
+            <input formControlName="IdRollo" id="Rollo" type="text" pInputText (keyup.enter)="consultarRollos2()" required />
             <label for="Rollo">N° Rollo</label>
-          </span>
-        </div>
-
-        <!-- Procesos -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
-          <span class="p-float-label">
-            <p-dropdown formControlName="Proceso" optionValue="proceso_Nombre" inputId="Proceso" [autoDisplayFirst]="false" [options]="arrayProcesos" optionLabel="proceso_Nombre"></p-dropdown>
-            <label for="Proceso">Procesos</label>
-          </span>
-        </div>
-
-        <!-- Bodega -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
-          <span class="p-float-label">
-            <p-dropdown formControlName="Bodega" optionValue="Id" inputId="Bodega" [autoDisplayFirst]="false" [options]="bodegas" optionLabel="Nombre"></p-dropdown>
-            <label for="Bodega">Bodega</label>
-          </span>
-        </div>
-
-        <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
-          </span>
-        </div>
-
-        <!-- Fecha Final -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
           </span>
         </div>
 
@@ -90,7 +66,7 @@
 
     <!-- Botones -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
+      <button pButton class="p-button-danger" id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos2()"></button>
       <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
     </div>
 
@@ -100,12 +76,12 @@
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
+  <!-- Inicio titulo tabla consultados -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
   </div>
 
-  <!--Inicio tabla Rollos creados en OT -->
+  <!--Inicio tabla Rollos consultados -->
   <div class="mb-3" *ngIf="cargando">
     <div class="row g-3 font-size-14" id="tabla1">
       <p-table
@@ -130,7 +106,7 @@
             <th scope="col">ID Rollo</th>
             <th scope="col">ID Producto</th>
             <th scope="col">Producto</th>
-            <th scope="col">Fecha Ingreso</th>
+            <!--<th scope="col">Fecha Ingreso</th>-->
             <th scope="col">Cantidad</th>
             <th scope="col">Presentacion</th>
             <th scope="col">Proceso</th>
@@ -147,7 +123,7 @@
               <td style="background-color: rgb(255, 146, 146);">{{rollo.Id}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{rollo.IdProducto}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{rollo.Producto}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Fecha}}</td>
+              <!--<td style="background-color: rgb(255, 146, 146);">{{rollo.Fecha}}</td>-->
               <td style="background-color: rgb(255, 146, 146);">{{rollo.Cantidad | number}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{rollo.Presentacion}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{rollo.Proceso}}</td>
@@ -157,8 +133,8 @@
               <td>{{rollo.Id}}</td>
               <td>{{rollo.IdProducto}}</td>
               <td>{{rollo.Producto}}</td>
-              <td>{{rollo.Fecha}}</td>
-              <td>{{rollo.Cantidad | number}}</td>
+              <!--<td>{{rollo.Fecha}}</td>-->
+              <td>{{rollo.Cantidad | number: '1.2-2'}}</td>
               <td>{{rollo.Presentacion}}</td>
               <td>{{rollo.Proceso}}</td>
               <td>
@@ -175,7 +151,7 @@
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
+  <!-- Inicio titulo tabla a Insertar -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
   </div>
@@ -216,7 +192,7 @@
             <td>{{rollosInsertar.Id}}</td>
             <td>{{rollosInsertar.IdProducto}}</td>
             <td>{{rollosInsertar.Producto}}</td>
-            <td>{{rollosInsertar.Cantidad | number}}</td>
+            <td>{{rollosInsertar.Cantidad | number: '1.2-2'}}</td>
             <td>{{rollosInsertar.Presentacion}}</td>
             <td>{{rollosInsertar.Proceso}}</td>
             <td>
@@ -237,7 +213,7 @@
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Consolidado Productos</h4>
   </div>
 
-  <!--Inicio tabla Rollos a Insertar -->
+  <!--Inicio tabla Rollos producto -->
   <div class="mb-3" *ngIf="cargando">
     <div class="row g-3" id="tabla3">
       <div class="table-responsive">
@@ -276,7 +252,7 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="3" class="text-right">Totales</td>
-            <td>{{totalCantidad | number}}</td>
+            <td>{{totalCantidad | number: '1.2-2'}}</td>
             <td>{{totalRollos | number}}</td>
             <td>Kg</td>
           </tr>
@@ -306,10 +282,10 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="onConfirm()" icon="pi pi-database" label="BD BagPro" class="p-button-warning"></button>
+          <button type="button" pButton (click)="eliminarRollosBagProBD()" icon="pi pi-database" label="BD BagPro" class="p-button-warning" pTooltip="Recuerda que si eliminas rollos de Bagpro también se eliminará del Nuevo Programa"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onConfirm2()" icon="pi pi-database" label="BD Nueva" class="p-button-success"></button>
+          <button type="button" pButton (click)="eliminarRolloBodegasPBDD()" icon="pi pi-database" label="BD Nueva" class="p-button-success" pTooltip="Solo se eliminarán rollos del Nuevo Programa"></button>
         </div>
       </div>
     </div>

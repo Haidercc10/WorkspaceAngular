@@ -72,6 +72,6 @@ export class AuthenticationService {
       this.authenticationContaZeusService.logout();
       this.authenticationBagPro.logout();
       window.location.pathname = '/';
-    }, () => { Swal.fire({ icon: 'error', title: 'Error de Cierre de Sesión', text: '¡No se registró el cierre de sesión del usuario!' }); });
+    });
   }
 }

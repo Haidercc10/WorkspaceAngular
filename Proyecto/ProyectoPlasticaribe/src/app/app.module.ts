@@ -166,6 +166,11 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
+import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
+import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
+import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
+import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_Costos.component';
 
 @NgModule({
   declarations: [
@@ -258,6 +263,11 @@ import { AppComponent } from './app.component';
     Dashboard_CuentasPagarComponent,
     Reporte_SolicitudMpExtrusionComponent,
     Inventario_Bodegas_RollosComponent,
+    Facturas_Invergoal_InversuezComponent,
+    Gestionar_Facturas_Invergoal_InversuezComponent,
+    Dashboard_GeneralComponent,
+    Recibos_CajaComponent,
+    Dashboard_CostosComponent,
   ],
 
   imports: [
@@ -346,6 +356,7 @@ import { AppComponent } from './app.component';
     BadgeModule,
     PanelMenuModule,
     FieldsetModule,
+    AccordionModule,
   ],
 
   providers: [

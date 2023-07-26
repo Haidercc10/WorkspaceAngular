@@ -26,7 +26,7 @@
               <tr>
                 <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
                 <th scope="col" pSortableColumn="nombre" style="min-width: 50%; max-width: 50%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="cantidad" style="min-width: 40%; max-width: 40%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="cantidad" style="min-width: 40%; max-width: 40%" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
@@ -129,8 +129,8 @@
             <ng-template pTemplate="header">
               <tr>
                 <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
-                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
+                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="asignaciones" class="font-size-13" pTooltip="Asignaciones">Asig.<p-sortIcon field="asignaciones"></p-sortIcon></th>
                 <th scope="col" style="min-width: 20%; max-width: 20%" pSortableColumn="cantidad" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
               </tr>
             </ng-template>
@@ -170,7 +170,7 @@
                 <tr>
                   <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
                   <th scope="col" pSortableColumn="tinta_Nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="tinta_Nombre"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">

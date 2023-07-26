@@ -31,6 +31,8 @@ export class RolesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
   }
 
+  GetInformacionRoles = (rol : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Rol_Usuario/getInformacionRoles/${rol}`);
+
   //Metodo agregar roles
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)

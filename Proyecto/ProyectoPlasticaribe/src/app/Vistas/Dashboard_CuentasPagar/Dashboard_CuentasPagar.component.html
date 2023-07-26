@@ -51,7 +51,7 @@
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
                     <tr class="font-size-16" id="filtros">
-                      <th colspan="2"><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" id="crearPdf" (click)="crearPdf()"></button></th>
+                      <th colspan="2"><button pButton class="p-button-danger mr-2" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" id="crearPdf" (click)="crearPdf()"></button></th>
                       <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Proveedor', 'contains')"></th>
                       <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proveedor', 'contains')"></th>
                       <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cartera', 'contains')"></th>
@@ -150,7 +150,7 @@
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
                     <tr>
-                      <th><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInvergoal)"></button></th>
+                      <th><button pButton class="p-button-danger mr-2" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInvergoal)"></button></th>
                       <th>#</th>
                       <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
                       <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
@@ -242,7 +242,7 @@
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
                     <tr>
-                      <th><button pButton class="p-button-danger" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInversuez)"></button></th>
+                      <th><button pButton class="p-button-danger mr-2" type="button" icon="pi pi-file-pdf" label="Ver PDF" pTooltip="Ver en formato PDF" (click)="crearPdf(carteraInversuez)"></button></th>
                       <th>#</th>
                       <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
                       <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
@@ -254,6 +254,7 @@
                     <tr>
                       <td>
                         <button type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+
                       </td>
                       <td>{{rowIndex + 1}}</td>
                       <td>{{item.Id_Proveedor}}</td>
@@ -309,8 +310,111 @@
               </div>
             </div>
           </p-tabPanel>
+
         </p-tabView>
       </p-card>
     </div>
   </div>
+  <hr class="linea">
+  <div class="mb-3">
+    <div class="row g-3 fila-3 text-center">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <div class="row g-3 fila-3">
+          <div class="col-md-6 text-left">
+            <h5>Elige el año que deseas graficar <i class="pi pi-chart-bar"></i> </h5>
+          </div>
+          <div class="col-md-6 text-right">
+            <p-dropdown class="mr-2"  [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+            <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2 botones" (click)="comprasxAnio()"></button>
+            <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2 botones" (click)="graficar()"></button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3"></div>
+    </div>
+  </div>
+
+  <div class="row g-3 p-3" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+
+    <!--Grafica Plasticaribe SAS-->
+    <div class="p-2 col-xxl-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="">
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Compras por mes Plasticaribe SAS</h2><br>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="comprasData" [options]="comprasOptions"></p-chart>
+        <hr>
+        <div class="mb-4">
+          <p-table [value]="compradoAnio" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Año</th>
+                    <th>Valor total comprado</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-compras>
+                <tr>
+                    <td>{{ compras.anio }}</td>
+                    <td>${{ compras.costo | number : '1.2-2' }}</td>
+                </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+
+    <!--Grafica Invergoal SAS-->
+    <div class="p-2 col-xxl-4 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="">
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Compras por mes Invergoal SAS</h2><br>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="comprasDataGoal" [options]="comprasOptionsGoal"></p-chart>
+        <hr>
+        <div class="mb-4">
+          <p-table [value]="compradoAnioGoal" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Año</th>
+                    <th>Valor total comprado</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-compras>
+                <tr>
+                    <td>{{ compras.anio }}</td>
+                    <td>${{ compras.costo | number : '1.2-2' }}</td>
+                </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+
+    <!--Grafica Inversuez SAS-->
+    <div class="p-2 col-xxl-4 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="">
+        <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Compras por mes Inversuez SAS</h2><br>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="comprasDataSuez" [options]="comprasOptionsSuez"></p-chart>
+        <hr>
+        <div class="mb-4">
+          <p-table [value]="compradoAnioSuez" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Año</th>
+                    <th>Valor total comprado</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-compras>
+                <tr>
+                    <td>{{ compras.anio }}</td>
+                    <td>${{ compras.costo | number : '1.2-2' }}</td>
+                </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+
+  </div>
 </div>
+
+
+
+

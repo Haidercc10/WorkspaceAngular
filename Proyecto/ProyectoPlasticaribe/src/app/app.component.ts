@@ -1,7 +1,11 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { PrimeNGConfig } from 'primeng/api';
+import { EmpresaService } from './Servicios/Empresa/empresa.service';
+import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 import { User } from './_Models/user';
 import { User_BagPro } from './_Models/user_BagPro';
 import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
@@ -10,11 +14,9 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
-import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
-import { DOCUMENT } from '@angular/common';
-import { EmpresaService } from './Servicios/Empresa/empresa.service';
-import { logoParaPdf } from './logoPlasticaribe_Base64';
-import moment from 'moment';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-root',
@@ -74,6 +76,7 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    moment.locale('es');
     this.lecturaStorage();
     this.config.setTranslation({
       accept: 'Aceptar',
@@ -132,18 +135,23 @@ export class AppComponent implements OnInit{
     document.onkeypress = reiniciarTiempo;
     document.onload = reiniciarTiempo;
     document.onmousemove = reiniciarTiempo;
-    document.onmousedown = reiniciarTiempo; // aplica para una pantalla touch
+    document.onmousedown = reiniciarTiempo;
     document.ontouchstart = reiniciarTiempo;
-    document.onclick = reiniciarTiempo;     // aplica para un clic del touchpad
-    document.onscroll = reiniciarTiempo;    // navegando con flechas del teclado
+    document.onclick = reiniciarTiempo;
+    document.onscroll = reiniciarTiempo;
     document.onkeypress = reiniciarTiempo;
-    function tiempoExcedido() {
-      localStorage.clear();
-      window.location.pathname = '/';
+
+    const tiempoExcedido = () => {
+      if (this.storage.get('Token')) this.authenticationService.logout();
+      else {
+        this.storage.clear();
+        window.location.pathname = '/';
+      }
     }
+
     function reiniciarTiempo() {
       let estadoConexion : boolean = window.navigator.onLine;
-      if (window.location.pathname != '/' && !estadoConexion) tiempoExcedido;
+      if (window.location.pathname != '/' || !estadoConexion) tiempoExcedido;
       clearTimeout(t);
       t = setTimeout(tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
     }
