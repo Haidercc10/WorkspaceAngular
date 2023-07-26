@@ -406,7 +406,6 @@ export class Dashboard_CostosComponent implements OnInit {
   llenarTabla(datos : any){
     for (let index = 0; index < datos.length; index++) {
       this.cambiarNumeroAMes(datos[index]);
-
       this.totalCostoSeleccionado += datos[index].valor;
       this.arrayCostos.push(datos[index]);
     }
@@ -418,10 +417,10 @@ export class Dashboard_CostosComponent implements OnInit {
     setTimeout(() => {
       if(this.dt.filteredValue != null) {
         this.totalCostoSeleccionado = 0;
-        this.dt.filteredValue.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+        this.dt.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
       } else {
         this.totalCostoSeleccionado = 0;
-        this.arrayCostos.forEach(element => { this.totalCostoSeleccionado += element.valor; });
+        this.arrayCostos.forEach(element => this.totalCostoSeleccionado += element.valor);
       }
     }, 500);
   }
@@ -434,30 +433,32 @@ export class Dashboard_CostosComponent implements OnInit {
     this.cuentaSeleccionada = [];
 
     this.cambiarMesANumero(datos);
-
     this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.anio, datos.mes, datos.cuenta).subscribe(data => {
       for(let index = 0; index < data.length; index++) {
-        data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ')
+        data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
         this.arrayGastos1.push(data[index]);
       }
     });
-    setTimeout(() => { this.cambiarNumeroAMes(datos); this.cuentaSeleccionada = [datos.anio, datos.mes, datos.cuenta]; }, 500);
+    setTimeout(() => {
+      this.cambiarNumeroAMes(datos);
+      this.cuentaSeleccionada = [datos.anio, datos.mes, datos.cuenta];
+    }, 500);
   }
 
   /** Cambiar del numero al nombre del mes */
   cambiarNumeroAMes(info : any){
-      info.mes == '01' ? info.mes = 'Enero' :
-      info.mes == '02' ? info.mes = 'Febrero' :
-      info.mes == '03' ? info.mes = 'Marzo' :
-      info.mes == '04' ? info.mes = 'Abril' :
-      info.mes == '05' ? info.mes = 'Mayo' :
-      info.mes == '06' ? info.mes = 'Junio' :
-      info.mes == '07' ? info.mes = 'Julio' :
-      info.mes == '08' ? info.mes = 'Agosto' :
-      info.mes == '09' ? info.mes = 'Septiembre' :
-      info.mes == '10' ? info.mes = 'Octubre' :
-      info.mes == '11' ? info.mes = 'Noviembre' :
-      info.mes == '12' ? info.mes = 'Diciembre' : '';
+    info.mes == '01' ? info.mes = 'Enero' :
+    info.mes == '02' ? info.mes = 'Febrero' :
+    info.mes == '03' ? info.mes = 'Marzo' :
+    info.mes == '04' ? info.mes = 'Abril' :
+    info.mes == '05' ? info.mes = 'Mayo' :
+    info.mes == '06' ? info.mes = 'Junio' :
+    info.mes == '07' ? info.mes = 'Julio' :
+    info.mes == '08' ? info.mes = 'Agosto' :
+    info.mes == '09' ? info.mes = 'Septiembre' :
+    info.mes == '10' ? info.mes = 'Octubre' :
+    info.mes == '11' ? info.mes = 'Noviembre' :
+    info.mes == '12' ? info.mes = 'Diciembre' : '';
   }
 
   /** Cambiar del nombre del mes al número. */
@@ -485,21 +486,18 @@ export class Dashboard_CostosComponent implements OnInit {
     let cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
     let cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
     let cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
-    let costosIndirectosFabricacion : any [] = [];
-    let gastosAdmon : any [] = [];
-    let gastosVentas : any [] = [];
-    let gastosNoOperacionales : any [] = [];
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
 
     if (this.costo_Anio_fabricacion.length > 0) {
       this.costo_Anio_fabricacion.forEach(anio => {
         this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
           let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-          costosIndirectosFabricacion = this.calcularTotalMeses(costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim())));
-          gastosAdmon = this.calcularTotalMeses(costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim())));
-          gastosVentas = this.calcularTotalMeses(costos.filter(item => cuentasVentas.includes(item.cuenta.trim())));
-          gastosNoOperacionales = this.calcularTotalMeses(costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())));
-          infoDocumento = [costosIndirectosFabricacion, gastosAdmon, gastosVentas, gastosNoOperacionales].reduce((a, b) => a.concat(b));
+          infoDocumento = [
+            this.calcularTotalMeses(costos.filter(item => cuentasFacbricacion.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => cuentasAdministrativos.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => cuentasVentas.includes(item.cuenta.trim()))),
+            this.calcularTotalMeses(costos.filter(item => cuentasNoOperacionesles.includes(item.cuenta.trim())))
+          ].reduce((a, b) => a.concat(b));
 
           let workbook = new Workbook();
           const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
