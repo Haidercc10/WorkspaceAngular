@@ -126,7 +126,6 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.cargando = true;
       let costoMeses : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.zeusService.GetFacturacion_Mes_Mes(`${this.anoSeleccionado}`).subscribe(dato => {
-        this.totalFacturadoanio = dato.reduce((a, b) => a + b.Valor, 0)
         for (let i = 0; i < dato.length; i++) {
           let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
           costoMeses = [
