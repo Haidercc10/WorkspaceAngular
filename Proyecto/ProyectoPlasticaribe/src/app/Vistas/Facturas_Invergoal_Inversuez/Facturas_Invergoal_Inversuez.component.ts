@@ -8,7 +8,7 @@ import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, stepsBodegas as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, stepsInvergoalInversuez as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({

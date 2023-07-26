@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -6,6 +7,7 @@ import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Me
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardGerencia as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Dashboard_General',
@@ -54,7 +56,8 @@ export class Dashboard_GeneralComponent implements OnInit {
                   private msj : MensajesAplicacionService,
                     private zeusContabilidad : ZeusContabilidadService,
                       private inventarioMatPrima : InventInicialDiaService,
-                        private inventarioProductos : Inventario_Mes_ProductosService) {
+                        private inventarioProductos : Inventario_Mes_ProductosService,
+                          private shepherdService: ShepherdService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -62,6 +65,14 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.inicializarGraficas();
     this.llenarArrayAnos();
     this.llenarGraficas();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
