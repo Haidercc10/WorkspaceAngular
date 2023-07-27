@@ -22,6 +22,26 @@
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="botonesGraficado">
                   <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficas()"></button>
                   <button pButton pTooltip="Limpiar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="inicializarGraficas()"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row g-2 justify-content-center align-middle">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
+              <h5>¡Elige un rango de fechas y exporta a Excel!</h5>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
+              <div class="row m-auto justify-content-center">
+                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="seleccionarAnio">
+                  <span class="p-float-label" id="rango-fechas">
+                    <p-calendar inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y exporta a excel"></p-calendar>
+                    <label for="FechaInicial">Rango de Fechas</label>
+                  </span>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="botonesGraficado">
                   <button pButton pTooltip="Exportar Excel" tooltipPosition="bottom" pRipple type="button" icon="pi pi-file-excel" class="p-button-rounded p-button-success mr-2" (click)="exportarExcel()"></button>
                 </div>
               </div>

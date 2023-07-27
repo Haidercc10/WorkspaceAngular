@@ -25,7 +25,7 @@ export class Dashboard_CostosComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
-  rangoFechas : any; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
+  rangoFechas : any [] = []; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
 
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaCostosFabricacion : any; //Variable que va a almacenar los costos de fabricación
@@ -91,6 +91,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a inicializar las variables con la información de las graficas
   inicializarGraficas(){
+    this.rangoFechas = [];
     this.arrayAnios = [];
     this.costo_Anio_fabricacion = [];
     this.costo_Anio_administrativos = [];
@@ -469,114 +470,141 @@ export class Dashboard_CostosComponent implements OnInit {
   exportarExcel(){
     this.cargando = true;
     let infoDocumento : any [] = [];
-    let title : string = `Determinación de Costos`;
-    const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
-
-    if (this.costo_Anio_fabricacion.length > 0) {
-      this.costo_Anio_fabricacion.forEach(anio => {
-        this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
-          let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-          infoDocumento = [
-            this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
-            this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
-          ].reduce((a, b) => a.concat(b));
-
-          let workbook = new Workbook();
-          const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-          let worksheet = workbook.addWorksheet(title);
-          worksheet.addImage(imageId1, 'A1:B3');
-          let titleRow = worksheet.addRow([title]);
-          titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-          worksheet.addRow([]);
-          worksheet.addRow([]);
-          let headerRow = worksheet.addRow(header);
-          headerRow.eachCell((cell) => {
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'eeeeee' }
-            }
-            cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    
+    if (this.rangoFechas.length > 0) this.exportarExcel_RangoFechas();
+    else {
+      if (this.costo_Anio_fabricacion.length > 0) {
+        this.costo_Anio_fabricacion.forEach(anio => {
+          this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
+            let title : string = `Determinación de Costos del ${anio.anio} - ${moment().format('DD-MM-YYYY')}`;
+            let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
+            infoDocumento = [
+              this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
+              this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
+              this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
+              this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
+            ].reduce((a, b) => a.concat(b));
+            this.formatoExcel(title, infoDocumento);
           });
-          worksheet.mergeCells('A1:O3');
-          worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-          let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
-          tituloCostosFab.eachCell(cell => {
+        });
+      } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
+    }
+  }
+
+  // Funcion que va a buscar la información que aparecerá en el excel, esta información se buscará según un rango de fechas
+  exportarExcel_RangoFechas(){
+    this.cargando = true;
+    let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+    let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
+
+    let infoDocumento : any [] = [];
+    let title : string = `Determinación de Costos Desde ${moment(fechaInicial).format('MMMM').toUpperCase()} ${moment(fechaInicial).format('YYYY')} Hasta ${moment(fechaFinal).format('MMMM').toUpperCase()} ${moment(fechaFinal).format('YYYY')} - ${moment().format('DD-MM-YYYY')}`;
+    
+    this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
+      let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
+      infoDocumento = [
+        this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
+        this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
+        this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
+        this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
+      ].reduce((a, b) => a.concat(b));
+      this.formatoExcel(title, infoDocumento);
+    });
+  }
+
+  // Funcion que va a darle el formato y a colocarlos datos en el archivo que se exportará a excel
+  formatoExcel(titulo : string, datos : any){
+    const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
+    let workbook = new Workbook();
+    const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+    let worksheet = workbook.addWorksheet(titulo);
+    worksheet.addImage(imageId1, 'A1:B3');
+    let titleRow = worksheet.addRow([titulo]);
+    titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let headerRow = worksheet.addRow(header);
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'eeeeee' }
+      }
+      cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+    worksheet.mergeCells('A1:O3');
+    worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
+    tituloCostosFab.eachCell(cell => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
+      cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+    worksheet.mergeCells('A5:O5');
+    datos.forEach(d => {
+      let row = worksheet.addRow(d);
+      if (d[0] == 'Totales'){
+        if (d[1] != 'Gastos No Operacionales') {
+          let titulo = '';
+          if (d[1] == 'Costos Indirectos de Fabricación') titulo = 'Gastos de Administración y Finanzas';
+          if (d[1] == 'Gastos de Administración y Finanzas') titulo = 'Gastos de Ventas';
+          if (d[1] == 'Gastos de Ventas') titulo = 'Gastos No Operacionales';
+          worksheet.addRow([]);
+          let titulorow = worksheet.addRow([titulo]);
+          titulorow.eachCell(cell => {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
             cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
           });
-          worksheet.mergeCells('A5:O5');
-          infoDocumento.forEach(d => {
-            let row = worksheet.addRow(d);
-            if (d[0] == 'Totales'){
-              if (d[1] != 'Gastos No Operacionales') {
-                let titulo = '';
-                if (d[1] == 'Costos Indirectos de Fabricación') titulo = 'Gastos de Administración y Finanzas';
-                if (d[1] == 'Gastos de Administración y Finanzas') titulo = 'Gastos de Ventas';
-                if (d[1] == 'Gastos de Ventas') titulo = 'Gastos No Operacionales';
-                worksheet.addRow([]);
-                let titulorow = worksheet.addRow([titulo]);
-                titulorow.eachCell(cell => {
-                  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
-                  cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-                  cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-                });
-              }
-              row.eachCell(cell => {
-                cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
-              });
-            };
-            row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-            row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          });
-          worksheet.getColumn(1).width = 15;
-          worksheet.getColumn(2).width = 50;
-          worksheet.getColumn(3).width = 22;
-          worksheet.getColumn(4).width = 22;
-          worksheet.getColumn(5).width = 22;
-          worksheet.getColumn(6).width = 22;
-          worksheet.getColumn(7).width = 22;
-          worksheet.getColumn(8).width = 22;
-          worksheet.getColumn(9).width = 22;
-          worksheet.getColumn(10).width = 22;
-          worksheet.getColumn(11).width = 22;
-          worksheet.getColumn(12).width = 22;
-          worksheet.getColumn(13).width = 22;
-          worksheet.getColumn(14).width = 22;
-          worksheet.getColumn(15).width = 22;
-          worksheet.mergeCells('A22:O22');
-          worksheet.mergeCells('A67:O67');
-          worksheet.mergeCells('A106:O106');
-          setTimeout(() => {
-            workbook.xlsx.writeBuffer().then((data) => {
-              let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-              fs.saveAs(blob, title + `.xlsx`);
-            });
-            this.cargando = false
-            this.msj.mensajeConfirmacion(`¡Información Exportada!`, title);
-          }, 1000);
+        }
+        row.eachCell(cell => {
+          cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
         });
-      });
-    } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
+      };
+      row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    });
+    worksheet.getColumn(1).width = 15;
+    worksheet.getColumn(2).width = 50;
+    worksheet.getColumn(3).width = 22;
+    worksheet.getColumn(4).width = 22;
+    worksheet.getColumn(5).width = 22;
+    worksheet.getColumn(6).width = 22;
+    worksheet.getColumn(7).width = 22;
+    worksheet.getColumn(8).width = 22;
+    worksheet.getColumn(9).width = 22;
+    worksheet.getColumn(10).width = 22;
+    worksheet.getColumn(11).width = 22;
+    worksheet.getColumn(12).width = 22;
+    worksheet.getColumn(13).width = 22;
+    worksheet.getColumn(14).width = 22;
+    worksheet.getColumn(15).width = 22;
+    worksheet.mergeCells('A22:O22');
+    worksheet.mergeCells('A67:O67');
+    worksheet.mergeCells('A106:O106');
+    worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
+    workbook.xlsx.writeBuffer().then((data) => {
+      let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      fs.saveAs(blob, titulo + `.xlsx`);
+    });
+    this.cargando = false;
+    this.msj.mensajeConfirmacion(`¡Información Exportada!`, titulo);
   }
 
-  // Funcion que va a devolver un objeto con los totales de cada uno de los meses
+  // Funcion que va a devolver un array con los totales de cada uno de los meses para cada una de las cuentas
   calcularTotalMeses(data : any){
     let datos : any [] = [];
     let cuentas : any [] = [];
