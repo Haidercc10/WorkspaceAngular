@@ -153,7 +153,7 @@ export class Dashboard_CostosComponent implements OnInit {
   llenarGraficas(){
     this.arrayAnios.push(`${this.anioSeleccionado}`);
     this.buscarCostosFabricacion();
-    setTimeout(() => this.cargando = false, 2000);
+    setTimeout(() => this.cargando = false, 3000);
   }
 
   // Funcion que va a buscar informacion de los costos de fabricacion
@@ -195,12 +195,11 @@ export class Dashboard_CostosComponent implements OnInit {
         data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
         data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
         data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-      ]
+      ];
       cantDatos++;
       if (cantDatos == data.length) this.llenarGraficaCostos_Fabricacion(costoMeses, 'Año');
-      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
       let index2 : number = this.costo_Anio_fabricacion.findIndex(item => item.anio == this.anioSeleccionado);
-      if (index2 == -1) this.costo_Anio_fabricacion.push(info);
+      if (index2 == -1) this.costo_Anio_fabricacion.push({ anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) });
     }
   }
 
@@ -242,9 +241,8 @@ export class Dashboard_CostosComponent implements OnInit {
       ]
       cantDatos++;
       if (cantDatos == data.length) this.llenarGraficaCostos_Administrativos(costoMeses, 'Año');
-      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
       let index2 : number = this.costo_Anio_administrativos.findIndex(item => item.anio == this.anioSeleccionado);
-      if (index2 == -1) this.costo_Anio_administrativos.push(info);
+      if (index2 == -1) this.costo_Anio_administrativos.push({ anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) });
     }
   }
 
@@ -286,9 +284,8 @@ export class Dashboard_CostosComponent implements OnInit {
       ]
       cantDatos++;
       if (cantDatos == data.length) this.llenarGraficaCostos_Ventas(costoMeses, 'Año');
-      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
       let index2 : number = this.costo_Anio_ventas.findIndex(item => item.anio == this.anioSeleccionado);
-      if (index2 == -1) this.costo_Anio_ventas.push(info);
+      if (index2 == -1) this.costo_Anio_ventas.push({ anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) });
     }
   }
 
@@ -330,9 +327,8 @@ export class Dashboard_CostosComponent implements OnInit {
       ]
       cantDatos++;
       if (cantDatos == data.length) this.llenarGraficaCostos_NoOperacionesles(costoMeses, 'Año');
-      let info : any = { anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) };
       let index2 : number = this.costo_Anio_noOperacionesles.findIndex(item => item.anio == this.anioSeleccionado);
-      if (index2 == -1) this.costo_Anio_noOperacionesles.push(info);
+      if (index2 == -1) this.costo_Anio_noOperacionesles.push({ anio: this.anioSeleccionado, costo : data.reduce((a, b) => a + b.valor, 0) });
     }
   }
 
@@ -517,7 +513,7 @@ export class Dashboard_CostosComponent implements OnInit {
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-    let worksheet = workbook.addWorksheet(titulo);
+    let worksheet = workbook.addWorksheet(`Determinación de Costos`);
     worksheet.addImage(imageId1, 'A1:B3');
     let titleRow = worksheet.addRow([titulo]);
     titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
@@ -525,11 +521,7 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet.addRow([]);
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'eeeeee' }
-      }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
       cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
