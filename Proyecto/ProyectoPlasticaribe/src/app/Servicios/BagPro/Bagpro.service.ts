@@ -8,301 +8,152 @@ import { rutaBagPro } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaBagPro = rutaBagPro;
-
   constructor(private http : HttpClient) { }
 
   /********************************************************* PROCSELLADO **************************************************************/
-  srvObtenerListaProcSellado():Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + '/ProcSellado');
-  }
+  srvObtenerListaProcSellado = () :Observable<any[]> => this.http.get<any>(rutaBagPro + '/ProcSellado');
 
-  srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
-  }
+  srvObtenerListaProcSelladoOT = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/OT/${ot}`);
 
-  srvObtenerListaProcSelladoRollo(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/Rollos/${ot}`);
-  }
+  srvObtenerListaProcSelladoRollo = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/Rollos/${ot}`);
 
-  srvObtenerListaProcSelladoRollosOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/RollosOT/${ot}`);
-  }
+  srvObtenerListaProcSelladoRollosOT = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/RollosOT/${ot}`);
 
-  srvObtenerListaProcSelladoFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/Fechas/${fecha1}/${fecha2}`);
-  }
+  srvObtenerListaProcSelladoFechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/Fechas/${fecha1}/${fecha2}`);
 
-  srvObtenerListaProcSelladoFechasOT(fecha1 : any, fecha2 : any, ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechasOT/${fecha1}/${fecha2}/${ot}`);
-  }
+  srvObtenerListaProcSelladoFechasOT = (fecha1 : any, fecha2 : any, ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/FechasOT/${fecha1}/${fecha2}/${ot}`);
 
-  srvObtenerListaProcSelladoOT_FechaFinal(ot : any):Observable<any> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
-  }
+  srvObtenerListaProcSelladoOT_FechaFinal = (ot : any):Observable<any> => this.http.get<any>(rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
 
-  srvObtenerListaProcSelladoProducido(ot : any){
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSellado/${ot}`);
-  }
+  srvObtenerListaProcSelladoProducido = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/OtConSellado/${ot}`);
 
-  srvObtenerListaProcSelladoProdPesoUnidades(ot : any){
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSelladoPesoUnidad/${ot}`);
-  }
+  srvObtenerListaProcSelladoProdPesoUnidades = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/OtConSelladoPesoUnidad/${ot}`);
 
-   /** Nvo */
-   srvObtenerListaFilasSelladoEnProcSellado(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
-  }
+  srvObtenerListaFilasSelladoEnProcSellado = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
 
-  /** Consultas por NomStatus en ProcSellado*/
-  srvObtenerListaPorStatusSellado(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxSellado/${ot}`);
-  }
+  srvObtenerListaPorStatusSellado = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ObtenerDatosOTxSellado/${ot}`);
 
-  srvObtenerListaPorStatusWiketiado(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
-  }
+  srvObtenerListaPorStatusWiketiado = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
 
-  srvObtenerDataConsolidada_StatusSellado(OT : any, Proceso: any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
-  }
+  srvObtenerDataConsolidada_StatusSellado = (OT : any, Proceso: any) => this.http.get<any>(rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
+  
+  DeleteRollosSellado_Wiketiado = (id : any) => this.http.delete(rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
 
-  DeleteRollosSellado_Wiketiado(id : any) {
-    return this.http.delete(this.rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
-  }
+  srvObtenerListaFilasEmpaqueEnProcExtrusion = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
 
-  /** Nvo */
-  srvObtenerListaFilasEmpaqueEnProcExtrusion(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
-  }
+  GetNominaSelladoAcumuladaItem = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${rutaBagPro}/ProcSellado/getNominaSelladoAcumuladaItem/${fechaInicio}/${fechaFin}`);
 
-  GetNominaSelladoAcumuladaItem = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getNominaSelladoAcumuladaItem/${fechaInicio}/${fechaFin}`);
+  GetNominaSelladoDetalladaItemPersona = (fechaInicio : any, fechaFin : any, item : any, persona : string) => this.http.get<any>(`${rutaBagPro}/ProcSellado/getNominaSelladoDetalladaItemPersona/${fechaInicio}/${fechaFin}/${item}/${persona}`);
 
-  GetNominaSelladoDetalladaItemPersona = (fechaInicio : any, fechaFin : any, item : any, persona : string) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getNominaSelladoDetalladaItemPersona/${fechaInicio}/${fechaFin}/${item}/${persona}`);
-
-  GetNominaSelladoDetalladaxBulto = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/GetNominaSelladoDetalladaxBulto/${fechaInicio}/${fechaFin}`);
+  GetNominaSelladoDetalladaxBulto = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${rutaBagPro}/ProcSellado/GetNominaSelladoDetalladaxBulto/${fechaInicio}/${fechaFin}`);
 
   /***************************************************** PROCEXTRUSION ***************************************************************/
+  srvObtenerListaProcExt = ():Observable<any[]> => this.http.get<any>(rutaBagPro + '/ProcExtrusion');
 
-  srvObtenerListaProcExt():Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
-  }
+  srvObtenerListaProcExtOt = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/OT/${ot}`);
 
-  srvObtenerListaProcExtOt(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OT/${ot}`);
-  }
+  srvObtenerListaPorRollo = (rollo : any, produ : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/MostrarRollos/${rollo}/${produ}`);
+  
+  srvObtenerListaProcExtOt_fechaFinal = (ot : any):Observable<any> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
 
-  srvObtenerListaPorRollo(rollo : any, produ : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarRollos/${rollo}/${produ}`);
-  }
+  srvObtenerListaProcextrusionProducido = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/OtConEmpaque/${ot}`);
 
-  srvObtenerListaProcExtOt_fechaFinal(ot : any):Observable<any> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
-  }
+  srvObtenerListaProcExtrusionRollosOT = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/RollosOT/${ot}`);
 
-  srvObtenerListaProcextrusionProducido(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OtConEmpaque/${ot}`);
-  }
+  srvObtenerListaProcExtrusionRollos = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/Rollos/${ot}`);
 
-  srvObtenerListaProcExtrusionRollosOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/RollosOT/${ot}`);
-  }
+  srvObtenerListaProcExtrusionFechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
+  
+  consultarFechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/Fechas/${fecha1}/${fecha2}`);
 
-  srvObtenerListaProcExtrusionRollos(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Rollos/${ot}`);
-  }
+  srvObtenerListaProcExtrusionFechasOT = (fecha1 : any, fecha2 : any, ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechasOTRollos/${fecha1}/${fecha2}/${ot}`);
 
-  srvObtenerListaProcExtrusionFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
-  }
+  consultarRollo = (rollo : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/consultarRollo/${rollo}`);
 
-  consultarFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Fechas/${fecha1}/${fecha2}`);
-  }
+  Delete = (id : any) => this.http.delete(rutaBagPro + `/ProcExtrusion/EliminarRolloProcExtrusion/${id}`);
 
-  srvObtenerListaProcExtrusionFechasOT(fecha1 : any, fecha2 : any, ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasOTRollos/${fecha1}/${fecha2}/${ot}`);
-  }
+  DeleteRollosExtrusion_Empaque = (id : any) => this.http.delete(rutaBagPro + `/ProcExtrusion/EliminarRollosExtrusion_Empaque/${id}`);
 
-  consultarRollo(rollo : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/consultarRollo/${rollo}`);
-  }
+  GetRollosExtrusion_Empaque_Sellado = (fechaInicial : any, fechaFinal : any, proceso : string, ruta : string) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getRollosExtrusion_Empaque_Sellado/${fechaInicial}/${fechaFinal}/${proceso}${ruta}`);
 
-  Delete(id : any) {
-    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRolloProcExtrusion/${id}`);
-  }
+  GetProcExtrusion_ProcSellado = (fechaInicio : any, fechaFin : any, ruta : any) => this.http.get<any>(`${rutaBagPro}/ProcExtrusion/getProcExtrusion_ProcSellado/${fechaInicio}/${fechaFin}${ruta}`);
 
-  DeleteRollosExtrusion_Empaque(id : any) {
-    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollosExtrusion_Empaque/${id}`);
-  }
+  getDatosxNomStatus = (status : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/DatosxNomStatus/${status}`);
 
-  GetRollosExtrusion_Empaque_Sellado(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/getRollosExtrusion_Empaque_Sellado/${fechaInicial}/${fechaFinal}/${proceso}${ruta}`);
-  }
+  getDatosxFechasxNomStatus = (fecha1 : any, fecha2 : any, status : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/DatosxFechasxNomStatus/${fecha1}/${fecha2}/${status}`);
 
-  GetProcExtrusion_ProcSellado = (fechaInicio : any, fechaFin : any, ruta : any) => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProcExtrusion_ProcSellado/${fechaInicio}/${fechaFin}${ruta}`);
+  getDatosxRolloxNomStatus = (rollo : any, status : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/DatosxRolloxNomStatus/${rollo}/${status}`);
 
-  /**  Obtener datos por NomStatus  */
-  getDatosxNomStatus(status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxNomStatus/${status}`);
-  }
+  getDatosxOTxNomStatus = (OT : any, status : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/DatosxOTxNomStatus/${OT}/${status}`);
 
-  getDatosxFechasxNomStatus(fecha1 : any, fecha2 : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxFechasxNomStatus/${fecha1}/${fecha2}/${status}`);
-  }
+  srvObtenerListaProcExtrusionOT = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/Orden_Trabajo/${ot}`);
 
-  getDatosxRolloxNomStatus(rollo : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxRolloxNomStatus/${rollo}/${status}`);
-  }
+  srvObtenerListaPorStatusExtrusion = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxExtrusion/${OT}`);
 
-  getDatosxOTxNomStatus(OT : any, status : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxOTxNomStatus/${OT}/${status}`);
-  }
+  srvObtenerListaPorStatusImpresion = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxImpresion/${OT}`);
 
-  srvObtenerListaProcExtrusionOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Orden_Trabajo/${ot}`);
-  }
+  srvObtenerListaPorStatusRotograbado = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxRotograbado/${OT}`);
 
-  /** Consultas por NomStatus en ProcExtrusion */
-  srvObtenerListaPorStatusExtrusion(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxExtrusion/${OT}`);
-  }
+  srvObtenerListaPorStatusDoblado = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxDoblado/${OT}`);
 
-  srvObtenerListaPorStatusImpresion(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxImpresion/${OT}`);
-  }
+  srvObtenerListaPorStatusLaminado = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxLaminado/${OT}`);
 
-  srvObtenerListaPorStatusRotograbado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxRotograbado/${OT}`);
-  }
+  srvObtenerListaPorStatusCorte = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxCorte/${OT}`);
 
-  srvObtenerListaPorStatusDoblado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxDoblado/${OT}`);
-  }
+  srvObtenerListaPorStatusEmpaque = (OT : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxEmpaque/${OT}`);
 
-  srvObtenerListaPorStatusLaminado(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxLaminado/${OT}`);
-  }
-
-  srvObtenerListaPorStatusCorte(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxCorte/${OT}`);
-  }
-
-  srvObtenerListaPorStatusEmpaque(OT : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxEmpaque/${OT}`);
-  }
-
-/** Servcios de datos consolidados para Estados Procesos OT */
-  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
-  }
+  srvObtenerDataConsolidada_StatusExtrusion = (OT : any, Proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
 
   /********************************************************** CLIENTESOT ****************************************************************/
+  srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
 
-  srvActualizar(id:number|String, data:any, estado : any) {
-    return this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
-  }
+  srvObtenerListaClienteOT_Item = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/OT/${ot}`);
 
-  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaClienteOT_Item(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT/${ot}`);
-  }
+  srvObtenerListaClienteOT_Item_Presentacion = (producto : number, presentacion : string):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${producto}/${presentacion}`);
 
-   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-   srvObtenerListaClienteOT_Item_Presentacion(producto : number, presentacion : string):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${producto}/${presentacion}`);
-  }
+  srvObtenerListaClienteOT_Fecha = (fecha : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/FechaCreacion/${fecha}`);
 
-  srvObtenerListaClienteOT_Fecha(fecha : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/FechaCreacion/${fecha}`);
-  }
+  srvObtenerListaClienteOT_Fechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/FechasCreacion?FechaCrea1=${fecha1}&FechaCrea2=${fecha2}`);
 
-  srvObtenerListaClienteOT_Fechas(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/FechasCreacion?FechaCrea1=${fecha1}&FechaCrea2=${fecha2}`);
-  }
+  srvObtenerListaClienteOT_ItemCostos = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
 
-  srvObtenerListaClienteOT_ItemCostos(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
-  }
+  srvObtenerListaClienteOT_UltimaOT = ():Observable<any> => this.http.get<any>(rutaBagPro + `/ClientesOt/UltimaOT/`);
 
-  srvObtenerListaClienteOT_UltimaOT():Observable<any> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/UltimaOT/`);
-  }
-
-  srvObtenerListaConsultarItem(fecha1 : any, fecha2 : any, item : any, precio : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/consultarItem/${fecha1}/${fecha2}/${item}/${precio}`);
-  }
-
-  GetCostoOrdenesUltimoMes(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOrdenesUltimoMes/${fecha1}/${fecha2}`);
-  }
-
-  GetCostoOrdenesUltimoMes_Vendedores(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Vendedores/${fecha1}/${fecha2}`);
-  }
-
-  GetCostoOrdenesUltimoMes_Clientes(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Clientes/${fecha1}/${fecha2}`);
-  }
-
-  GetPesoProcesosUltimoMes(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getPesoProcesosUltimoMes/${fecha1}/${fecha2}`);
-  }
-
-  GetCantOrdenesMateriales(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCantOrdenesMateriales/${fecha1}/${fecha2}`);
-  }
-
+  srvObtenerListaConsultarItem = (fecha1 : any, fecha2 : any, item : any, precio : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/consultarItem/${fecha1}/${fecha2}/${item}/${precio}`);
+  
+  GetCostoOrdenesUltimoMes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  
+  GetCostoOrdenesUltimoMes_Vendedores = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Vendedores/${fecha1}/${fecha2}`);
+  
+  GetCostoOrdenesUltimoMes_Clientes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Clientes/${fecha1}/${fecha2}`);
+  
+  GetPesoProcesosUltimoMes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getPesoProcesosUltimoMes/${fecha1}/${fecha2}`);
+  
+  GetCantOrdenesMateriales = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCantOrdenesMateriales/${fecha1}/${fecha2}`);
+  
   /**************************************************************** CLIENTESOTITEM *******************************************************/
+  srvObtenerListaClienteOTItems = ():Observable<any[]> => this.http.get<any>(rutaBagPro + '/ClientesOtItems');
 
-  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaClienteOTItems():Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');
-  }
+  srvObtenerItemsBagproXClienteItem = (codigo : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
 
-  srvObtenerItemsBagproXClienteItem(codigo : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
-  }
-
-  srvObtenerOTsPorVendedor(/*vendedor : any,*/ OT: any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/BuscarOTxVendedores/${OT}`);
-  }
+  srvObtenerOTsPorVendedor = (OT: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/BuscarOTxVendedores/${OT}`);
 
   /*********************************************************** DESPERDICIO **************************************************************/
+  srvObtenerListaDespercicios = ():Observable<any[]> => this.http.get<any>(rutaBagPro + '/Procdesperdicio');
 
-  // CONSULTAS A LA TABLA PROC_DESPERDICIOS DE BAGPRO
-  srvObtenerListaDespercicios():Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + '/Procdesperdicio');
-  }
+  srvObtenerListaDespercicios_Ot = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/Procdesperdicio/OT/${ot}`);
 
-  srvObtenerListaDespercicios_Ot(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/OT/${ot}`);
-  }
-
-  /* Rutas para consultas a la tabla de ProcImpresion_RolloBOPP*/
-  consultarOTImpresion(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
-  }
+  consultarOTImpresion = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
 
   /***************************************************************** Operarios **********************************************************/
-  srvObtenerListaOperariosExtrusion() {
-    return this.http.get<any>(this.rutaBagPro + '/OperariosProcesos/NombreOperarios');
-  }
+  srvObtenerListaOperariosExtrusion = () => this.http.get<any>(rutaBagPro + '/OperariosProcesos/NombreOperarios');
 
-  srvObtenerListaOperariosExtrusion2(nombre : any) {
-    return this.http.get<any>(this.rutaBagPro + `/OperariosProcesos/NombreOperarios2/${nombre}`);
-  }
+  srvObtenerListaOperariosExtrusion2 = (nombre : any) => this.http.get<any>(rutaBagPro + `/OperariosProcesos/NombreOperarios2/${nombre}`);
 
   /************************************************************** Clientes **************************************************************/
+  srvObtenerListaUltimosClientes = (fecha : any) => this.http.get<any>(rutaBagPro + `/Clientes/UltimosClientes/${fecha}`);
 
-  srvObtenerListaUltimosClientes(fecha : any) {
-    return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes/${fecha}`);
-  }
+  srvObtenerListaUltimosClientes2 = (fecha : any, cliente : any) => this.http.get<any>(rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
 
-  srvObtenerListaUltimosClientes2(fecha : any, cliente : any) {
-    return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
-  }
-
-  /** ProcSellado */
-  getNominaSelladoAcumuladaItem = (fecha1 : any, fecha2 : any):Observable<any[]> =>( this.http.get<any>(this.rutaBagPro + `/ProcSellado/getNominaSelladoAcumuladaItem/${fecha1}/${fecha2}`));
+  getNominaSelladoAcumuladaItem = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcSellado/getNominaSelladoAcumuladaItem/${fecha1}/${fecha2}`);
 }

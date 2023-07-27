@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Recibos de Caja</h2>
+      <h2 id="recibos" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Recibos de Caja</h2>
     </div>
 
     <div class="mb-4">
@@ -37,7 +37,7 @@
       <div class="col-md-6 text-left">
         <span class="p-float-label" id="rango-fechas">
           <!-- Rango de Fechas -->
-          <p-calendar inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
+          <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true"></p-calendar>
           <label for="FechaInicial">Rango de Fechas</label>
           <!-- Consultar Recibos -->
           <button pButton pRipple pTooltip="Consultar Recibos" label="Consultar" (click)="consultarRecibos()" icon="pi pi-search" class="p-button-danger ml-2" id="consultar"></button>
@@ -46,7 +46,7 @@
 
       <div class="col-md-6 text-right">
         <!-- Exportar excel -->
-        <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(fecha, fechaFinal)"></button>
+        <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" (click)="exportarExcel(fecha, fechaFinal)"></button>
       </div>
     </div>
   </p-toolbar>
@@ -90,7 +90,7 @@
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaRegistro', 'contains')"></th>
                 <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'usuario', 'contains')"></th>
               </tr>
-              <tr>
+              <tr id="campos">
                 <th>#</th>
                 <th scope="col" pSortableColumn="anoMes">Periodo <p-sortIcon field="anoMes"></p-sortIcon></th>
                 <th pSortableColumn="consecutivo" pReorderableColumn scope="col">Consecutivo <p-sortIcon field="consecutivo"></p-sortIcon></th>
@@ -126,9 +126,9 @@
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="6" class="text-right">Totales</td>
-                <td>{{totalRecibos | number}}</td>
+                <td id="total">{{totalRecibos | number}}</td>
                 <td colspan="5">COP</td>
-                <td class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(fecha, fechaFinal)"></button></td>
+                <td class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar2" (click)="exportarExcel(fecha, fechaFinal)"></button></td>
               </tr>
             </ng-template>
           </p-table>

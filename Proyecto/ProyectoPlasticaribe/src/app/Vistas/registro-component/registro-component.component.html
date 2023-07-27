@@ -112,7 +112,7 @@
 
     <hr>
 
-    <p-accordion>
+    <p-accordion id="roles">
       <p-accordionTab>
         <ng-template pTemplate="header">
           <div class="flex align-items-center">
@@ -156,7 +156,7 @@
               <td>{{data.rolUsu_Id}}</td>
               <td>{{data.rolUsu_Nombre}}</td>
               <td>{{data.rolUsu_Descripcion}}</td>
-              <td style="text-align: center;"><button id="editar" (click)="cargarRoles_Formulario(data.rolUsu_Id)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+              <td id="editarRol" style="text-align: center;"><button (click)="cargarRoles_Formulario(data.rolUsu_Id)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
             </tr>
           </ng-template>
           </p-table>

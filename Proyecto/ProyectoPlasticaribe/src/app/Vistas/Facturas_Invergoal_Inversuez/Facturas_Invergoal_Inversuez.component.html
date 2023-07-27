@@ -117,7 +117,7 @@
   </div>
 
   <!-- Tabla de Facturas -->
-  <div class="row g-3 my-3" id="tabla2">
+  <div class="row g-3 my-3" id="tabla">
     <div class="table-responsive">
       <p-table
         #dt
@@ -160,7 +160,7 @@
   <div>
     <div class="mb-3">
       <div class="row g-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botonesFinales">
           <button pButton class="p-button-danger" [disabled]="facturas_Ingresar.length == 0" type="button" label="Crear Entrada" icon="pi pi-check" (click)="guardarFacturas()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
         </div>

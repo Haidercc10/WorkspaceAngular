@@ -7,6 +7,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
+import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, stepsReporteRecibosCaja as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Recibos_Caja',
@@ -30,7 +32,8 @@ export class Recibos_CajaComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private servicioInventarioZeus : InventarioZeusService,
-                  private msj : MensajesAplicacionService) {
+                  private msj : MensajesAplicacionService,
+                    private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -98,7 +101,11 @@ export class Recibos_CajaComponent implements OnInit {
 
   //Función que mostrará un tutorial del uso del módulo
   verTutorial() {
-
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Función que se encarga de filtrar la información de la tabla

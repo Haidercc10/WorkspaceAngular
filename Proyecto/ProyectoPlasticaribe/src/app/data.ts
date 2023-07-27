@@ -781,8 +781,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'formulario',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros Eliminación de rollos!</h4>',
-    text: `<p>¡Llenando estos filtros se pueden consultar los rollos que se quieren eliminar, es obligatorio llenar los campos de <b>'Procesos'</b> y <b>'Bodega'</b>!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Filtros de eliminación</h4>',
+    text: `<p>Llenando estos filtros se pueden consultar los rollos que se desean eliminar, es obligatorio llenar el campo bodega.</p>`
   },
   {
     attachTo: {
@@ -795,8 +795,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'consultarRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar Rollos!</h4>',
-    text: `<p>¡Luego de haber llenado los filtros podemos debemos presionar el botón <b>'Consultar'</b> para obtener la información de los rollos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Consultar rollos</h4>',
+    text: `<p>Luego de diligenciar los filtros debemos presionar el botón <b>'Consultar'</b> para obtener la información de los rollos.</p>`
   },
   {
     attachTo: {
@@ -809,8 +809,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarFiltros',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Filtros!</h4>',
-    text: `<p>¡Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar filtros</h4>',
+    text: `<p>Para limpiar los filtros presionamos el botón <b>'Limpiar Campos'</b> y listo</p>`
   },
   {
     attachTo: {
@@ -823,8 +823,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla1',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Consultados!</h4>',
-    text: `<p>¡En esta tabla apareceran los rollos que se coincidan con los filtros antes digitados!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Rollos consultados</h4>',
+    text: `<p>En esta tabla apareceran los rollos que se coincidan con los filtros previamente consultados</p>`
   },
   {
     attachTo: {
@@ -837,8 +837,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Todos los Rollos!</h4>',
-    text: `<p>¡Presionando este checkbox se eligirán todos los rollos que se hayan consultado!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Elegir todos los rollos</h4>',
+    text: `<p>Presionando este checkbox se eligirán todos los rollos que se hayan consultado</p>`
   },
   {
     attachTo: {
@@ -851,8 +851,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Rollo!</h4>',
-    text: `<p>¡Presionando este checkbox se eligirá el rollo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Elegir rollo</h4>',
+    text: `<p>Presionando el checkbox que se encuentra en los registros de la tabla se seleccionará uno de los rollos</p>`
   },
   {
     attachTo: {
@@ -865,8 +865,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rollos Elegidos!</h4>',
-    text: `<p>¡En esta tabla apareceran los rollos que hayan sido elegidos previamente!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Rollos elegidos</h4>',
+    text: `<p>En esta tabla apareceran los rollos que hayan sido elegidos previamente</p>`
   },
   {
     attachTo: {
@@ -879,8 +879,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollos2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Todos los Rollos!</h4>',
-    text: `<p>¡Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar todos los rollos</h4>',
+    text: `<p>Presionando este checkbox se deseleccionarán todos los rollos que se hayan elegidos</p>`
   },
   {
     attachTo: {
@@ -893,8 +893,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'elegirRollo2',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar Rollo!</h4>',
-    text: `<p>¡Presionando este checkbox se deseleccionará el rollo!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar rollo</h4>',
+    text: `<p>Presionando el checkbox que se encuentra en los registros de la tabla se deseleccionará uno de los rollos </p>`
   },
   {
     attachTo: {
@@ -907,8 +907,8 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'tabla3',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla Consolidada!</h4>',
-    text: `<p>¡Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla consolidada</h4>',
+    text: `<p>Aquí aparecerán de manera consolidada por producto todos los rollos que hayan sido elegidos!<br>Se consolidarán por:</p>
           <ol>
             <li>Orden de Trabajo.</li>
             <li>Producto.</li>
@@ -927,8 +927,10 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'eliminarRollos',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Elimiar Rollos Seleccionados!</h4>',
-    text: `<p>¡Luego de haber seleccionado los rollos que queremos eliminar presionamos <b>'Eliminar Rollos'</b> para posteriormente ver un mensaje de confirmación preguntando por la base de datos de la que queremos eliminar los rollos, elegimos y se habrán eliminado los rollos!</p>`
+    title: '<h4 style="margin: auto; color: var(--rojo)">Eliminar rollos seleccionados</h4>',
+    text: `<p>Luego de haber seleccionado los rollos que queremos eliminar presionamos <b>'Eliminar Rollos'</b>.
+    <br><br> Posteriormente se nos mostrará un mensaje de confirmación preguntando por la base de datos de la que queremos eliminar
+    los rollos, elegimos y se habrán eliminado los rollos</p>`
   },
   {
     attachTo: {
@@ -940,7 +942,7 @@ export const stepsEliminarRollos : Step.StepOptions[] = [
     ],
     classes: 'custom-class-name-1 custom-class-name-2',
     id: 'limpiarTodo',
-    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar todo</h4>',
     text: `<p>¡Para limpiar todo (filtros y tablas) presionamos el botón <b>'Limpiar Todo'</b> y listo!</p>`
   },
 ];
@@ -3641,6 +3643,87 @@ export const stepsReporteDesperdicio : Step.StepOptions[] = [
   },
 ];
 
+/************************************************************ INVERGOAL E INVERSUEZ *********************************************************************/
+export const stepsInvergoalInversuez : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Invergoal e Inversuez!</h4>',
+    text: `<p>¡Desde este apartado podemos ingresar las facturas de invergoal e inversuez que se han emitido!</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Formulario!</h4>',
+    text: `<p>¡Se puede ingresar la información de la factura de invergoal e inversuez, llenando estos campos!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones1',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>¡Se pueden ir añadiendo las facturas en la tabla de abajo presionando el botón de <b>Añadir Factura</b>, se podrán limpiar los campos presionando el botón de <b>Limpiar Campos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Facturas!</h4>',
+    text: `<p>¡En esta tabla estarán apareciendo las facturas que hayamos digitado y añadido previamente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesFinales',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesFinales',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ingresar o Limpiar Todo!</h4>',
+    text: `<p>¡Si queremos ingresar las facturas que hemos digitado y añadido a la tabla presionamos el botón <b>Crear Entrada</b>!
+    <br><br>
+    ¡Para limpiar todos los campos y la tabla presionamos el botón <b>Limpiar Todo</b>!</p>`
+  },
+];
+
 /********************************************************* GESTIÓN DE ARCHIVOS *******************************************************************/
 export const stepsArchivos : Step.StepOptions[] = [
   {
@@ -5656,6 +5739,507 @@ export const stepsMovSolicitudesMP : Step.StepOptions[] = [
   },
 ]
 
+export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#titulo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'titulo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Solicitudes de material</h5>',
+    text: `<p>En este módulo podrás realizar <b>las solicitudes de material de producción</b> al encargado del inventario de materias primas. <br><br>
+    Haz clic en siguiente y <b>mira el paso a paso que creamos para ti!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#solicitud',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'solicitud',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Solicitud</h5>',
+    text: `<p>En este campo inicialmente visualizarás el <b>último consecutivo de la solicitud.</b><br><br>
+    Además podrás visualizar la solicitud que desees, <b>digitando el N° de la solicitud y presionando la tecla enter</b><br><br>
+    Si la solicitud existe, <b>se cargarán las materias prima asociadas</b> en la tabla que se encuentra en la parte inferior, donde podrás <b>agregar,
+    editar y eliminar las materias primas</b>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'ordenTrabajo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Orden de trabajo</h5>',
+    text: `<p>En este campo <b>debes digitar la orden de trabajo para la cual deseas solicitar el material</b> y luego presionar la tecla enter.<br><br>
+    Si la OT existe se cargará los siguientes datos:<br>
+    <b>- Cliente</b><br>
+    <b>- Referencia</b><br>
+    <b>- Tope de kilos de material a entregar.</b><br>
+    <b>- Cantidad restante por entregar</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#maquina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'maquina',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Maquina</h5>',
+    text: `<p>En este campo <b>debes digitar el n° de la maquina</b> en la cual se utilizará el material solicitado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#proceso',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'proceso',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Proceso</h5>',
+    text: `<p>En este campo <b>debes seleccionar el nombre del proceso</b> en el cual será utilizado el material solicitado.<br><br>
+    Recuerda que inicialmente se carga el proceso de <b>Extrusion</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'observacion',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Observación</h5>',
+    text: `<p>En este campo <b>puedes realizar un comentario u observación general de tu solicitud</b>.<br><br>
+    Dicha observación <b>podrá ser visualizada por el operario encargado de la entrega de materia prima</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Detalles de la OT</h5>',
+    text: `<p>Si existe la OT que consultaste inicialmente se cargarán los siguientes datos:<br>
+    <b>- Cliente</b><br>
+    <b>- Referencia</b><br>
+    <b>- Tope de kilos de material a entregar.</b><br>
+    <b>- Cantidad restante por entregar</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#materiaPrima',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'materiaPrima',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Selección de material</h5>',
+    text: `<p>Aquí puedes seleccionar los materiales que deseas solicitar.
+    Existen 2 formas de seleccionar el material:<br><br>
+    1. Si conoces el Id del material, <b>digitalo en el campo Id y presiona enter</b>. Esta acción cargará el nombre.<br>
+    2. También <b>puedes escribir el nombre en el campo Materia Prima,</b> allí se cargará una lista desplegable con materiales, <b>selecciona el que deseas solicitar.</b><br><br>
+    Luego de cargar el nombre del material <b>digita la cantidad que deseas solicitar</b> y selecciona la unidad de medida,
+    que inicialmente es <b>Kg (Kilogramos)</b>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Agregar Material</h5>',
+    text: `<p><b>Haciendo clic sobre el botón "agregar materia prima" </b>se cargará en la tabla el material que seleccionaste inicialmente y
+    que deseas solicitar.<br><br>
+    Si tienes algún error de digitación al momento de seleccionar un material, solo haz clic el <b>botón en limpiar campos mp</b>
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Material a solicitar</h5>',
+    text: `<p>En esta tabla encontrarás las materias primas que seleccionaste inicialmente y que deseas solicitar<br><br>
+    Si tienes algún error de digitación en los materiales cargados en la tabla, <b>tienes la opción de quitarlo haciendo clic el botón</b> <i class="pi pi-trash"></i>
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidad2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'cantidad2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Editar cantidad</h5>',
+    text: `<p><b>Este campo es editable</b>, si te equivocas, solo haz clic sobre este campo de la tabla
+    y <b>digita la cantidad que en realidad deseas solicitar y listo!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#quitarMP',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'quitarMP',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Quitar material</h5>',
+    text: `<p>Si definitivamente te equivocaste en uno de los materiales seleccionados, <b>quitalo de la tabla haciendo clic sobre el icono <i class="pi pi-trash"></i></b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botones2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Crear Solicitud</h5>',
+    text: `<p>Luego de seleccionar los materiales que deseas solicitar, <b>haz clic sobre el botón "crear solicitud" para guardar el registro</b><br><br>
+    Luego de esto, <b>se generará un formato PDF con las especificaciones de la solicitud</b>.<br><br>
+    Si te arrepientes de realizar la solicitud y ya tenías información cargada en la tabla y en el formulario de la parte superior, <b>haz clic sobre el botón limpiar todo!</b>
+    </p>`
+  },
+]
+
+export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#movimientos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'movimientos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
+    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de material de producción</b>, podrás apreciar la cantidad de
+    solicitudes <b>aceptadas, pendientes, parciales y finalizadas.</b> <br><br>
+    Tendrás filtros de búsqueda por:<br>
+    <b>- Id de solicitud</b><br>
+    <b>- Fechas de la solicitud</b><br>
+    <b>- Estado de la solicitud</b><br><br>
+    Además podrás apreciar en que estado se encuentra las solicitudes y los materiales de la mismas.<br><br>
+    También podrás <b>cargar los datos de la solicitud en un modal de asignaciones, y cancelar o finalizar la solicitud</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#rojo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rojo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
+    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de material que se encuentran canceladas actualmente de las ultimas 100 creadas.</b><br><br>
+    <b>Nota:</b> A las solicitudes con estado cancelado no se les puede crear una asignación.<br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#naranja',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'naranja',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
+    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de material que se encuentran pendientes actualmente de las ultimas 100 creadas.</b><br><br>
+    Las solicitudes con estado pendiente son a las que <b>no se les ha creado ó asociado una asignación.</b><br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#amarillo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'amarillo',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
+    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de material que se encuentran parciales actualmente de las ultimas 100 creadas.</b><br><br>
+    Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por el encargado de materia prima, ya tienen asignaciones asociadas, pero no se entregó toda la materia prima de la solicitud.</b><br><br>
+    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#verde',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'verde',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
+    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente de las ultimas 100 creadas</b><br><br>
+    Las solicitudes con estado finalizado son las que <b> ya tienen asignaciones creadas, en las cuales se les entregó toda la materia prima solicitada.</b><br><br>
+    Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'formulario1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-filter"></i> Filtros</h5>',
+    text: `<p>Aquí encontraremos <b>los filtros de búsqueda donde podrás realizar tus consultas.</b><br><br>
+    Además podrás crear las combinaciones que desees llenando los campos: <br>
+    <b>- Id de solicitud</b><br>
+    <b>- Fecha Inicial de la solicitud</b><br>
+    <b>- Fecha Final de la solicitud</b><br>
+    <b>- Estado de la solicitud</b><br><br>
+    Y luego solo <b>pulsa el botón consultar para ver la información solicitada!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botones1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'botones1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
+    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de material en la tabla</b> de registros consultados.
+    <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla1',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla1',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
+    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de material que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
+    <b>- Id</b><br>
+    <b>- OT</b><br>
+    <b>- Fecha Creación</b><br>
+    <b>- Estado General</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#detalle',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'detalle',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-eye"></i> Ver detalles de la solicitud</h5>',
+    text: `<p>Si existen registros en la tabla, <b>pulsa sobre el botón <i class="pi pi-eye"></i></b> para ver detalles de la solicitud del registro que seleccionaste. <br><br>
+    podrás apreciar <b>número de solicitud, operario solicitante, materias primas, cantidad pedida, cantidad asignada unidad de medida y el estado de las mismas</b> en la tabla detalles de la solicitud.</p>`
+  },
+  {
+    attachTo: {
+      element: '#matprimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'matprimas',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
+    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de material que selecciones de la tabla registros consultados.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#usuario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'usuario',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user"></i> Usuario solicitante</h5>',
+    text: `<p>Luego de hacer click en <b>el botón <i class="pi pi-eye"></i> ver detalles</b> en la tabla registros consultados, <b>aquí visualizarás el nombre del usuario que realizó el pedido de materia prima.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'tabla2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Materias Primas</h5>',
+    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, unidad de medida y el estado de las mismas</b><br><br></p>`
+  },
+  {
+    attachTo: {
+      element: '#aprobada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'aprobada',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Cantidad aprobada</h5>',
+    text: `<p>Este campo se refiere a <b>la cantidad de cada item de materia prima que se ha asignado en base a la solicitud</b> que esté visualizando en el momento.<br><br></p>`
+  },
+  {
+    attachTo: {
+      element: '#crear-oc',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'crear-oc',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
+    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de asignaciones de materia prima</b> y se cargará el <b>campo N°. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
+    Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
+    <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
+    <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
+  },
+  {
+    attachTo: {
+      element: '#finalizar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'finalizar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
+    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#cancelar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'cancelar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
+    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b><br><br>
+    </p>`
+  },
+]
+
 /******************************************************** MANTENIMIENTO DE ACTIVOS ***************************************************************/
 export const stepsPedidoMtto: Step.StepOptions[] = [
   {
@@ -6373,11 +6957,98 @@ export const stepsNomina : Step.StepOptions[] = [
     classes: '',
     id: 'nomina',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Nómina</h5>',
-    text: `<p>En este módulo encontrarás la información de la nómina de los operarios de sellado, tanto acumulada, como detallada por item y operario.</p>`
+    text: `<p>En este módulo encontrarás la información de la nómina de los operarios de sellado de manera acumulada y detallada por
+    item y empleado, además por cada rollo pesado.</p>`
   },
   {
     attachTo: {
       element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rango',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Seleccionar Rango</h5>',
+    text: `<p>En este campo puedes seleccionar un rango de fechas para generar la nomina de los operarios en ese lapso de tiempo elegido. </p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'consultar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Consultar Rango</h5>',
+    text: `<p>Luego de seleccionar el rango de fechas, presiona este botón para realizar la consulta de la nomina de los operarios de sellado. <br><br>
+    Nota: La consulta realizada agregará un día de más al rango de fechas, debido a que el turno de la noche del último día seleccionado
+    en el rango finaliza el día siguiente a las 7 am. </p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'filtros',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Filtrar columnas</h5>',
+    text: `<p>Luego de consultar el rango de fechas, desde estos campos podrás filtrar la información que se encuentre en la tabla por:
+    <br>- Cedula.
+    <br>- Operario.
+    <br>- Cargo.
+    <br>- Valor a Pagar.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#campos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'campos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Información acumulada</h5>',
+    text: `<p>Luego de realizar la consulta, encontrarás la información de los valores a devengar de manera acumulada por cada operario en el rango de fechas seleccionado.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#desplegable',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'desplegable',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Ver detalles por operario</h5>',
+    text: `<p>En esta columna en cada una de las filas de la tabla haciendo clic sobre el botón <i class="pi pi-angle-right"></i> se desplegará la información
+    de cada operario por item, se mostrará la cantidad de rollos que pesó de cada item. <br><br>
+    Además puedes ver de manera aún más detallada, por item, cada rollo pesado por el operario pulsando sobre el botón <i class="pi pi-eye"></i>.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#total',
       on: 'bottom'
     },
     buttons: [
@@ -6386,9 +7057,25 @@ export const stepsNomina : Step.StepOptions[] = [
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: '',
-    id: 'rango',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Seleccionar Rango</h5>',
-    text: `<p></p>`
+    id: 'total',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Total a pagar</h5>',
+    text: `<p>Aquí se verá el valor total a pagar de la nómina de sellado en el rango de fechas seleccionado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se mostrará un mensaje para elegir si deseas exportar la nomina de manera acumulada
+    por operario ó detallada rollo a rollo por cada empleado. </p>`
   },
 ]
 
@@ -8847,6 +9534,144 @@ export const stepsReporteRollosEliminados : Step.StepOptions[] = [
   },
 ];
 
+export const stepsReporteRecibosCaja : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#recibos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'recibos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Recibos de caja</h5>',
+    text: `<p>En este módulo encontrarás la información de los recibos de caja de pagos de facturas de venta que son guardados en Zeus por el área de cartera </p>`
+  },
+  {
+    attachTo: {
+      element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'rango',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Seleccionar Rango</h5>',
+    text: `<p>En este campo puedes seleccionar un rango de fechas para generar los recibos de caja guardados en el lapso de tiempo consultado. </p>`
+  },
+  {
+    attachTo: {
+      element: '#consultar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'consultar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Consultar Rango</h5>',
+    text: `<p>Luego de seleccionar el rango de fechas, presiona este botón para realizar la consulta de los recibos de caja
+    grabados por cartera en ese periodo de tiempo.</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'filtros',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Filtrar columnas</h5>',
+    text: `<p>Luego de consultar el rango de fechas, desde estos campos podrás filtrar la información que se encuentre en la tabla por:
+    <br>- Periodo.
+    <br>- Consecutivo.
+    <br>- Fecha Transacción.
+    <br>- Cliente.
+    <br>- Descripcion.
+    <br>- Valor.
+    <br>- Cuenta.
+    <br>- Vendedor.
+    <br>- Factura.
+    <br>- Fecha vencimiento.
+    <br>- Fecha registro.
+    <br>- Usuario.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#campos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'campos',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Información consultada</h5>',
+    text: `<p>Luego de realizar la consulta, encontrarás la información de los recibos de caja que han sido ingresados a zeus por parte de cartera en el rango de fechas seleccionado.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#total',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'total',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i>Valor total cancelado</h5>',
+    text: `<p>Aquí se visualizará el valor total cancelado de cada factura en el rango de fechas seleccionado.</p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se exportará a excel la información de los recibos de caja que se encuentre cargada en la tabla. </p>`
+  },
+  {
+    attachTo: {
+      element: '#exportar2',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: '',
+    id: 'exportar2',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Exportar a excel</h5>',
+    text: `<p>Pulsando sobre este botón se exportará a excel la información de los recibos de caja que se encuentre cargada en la tabla. </p>`
+  },
+]
+
 /******************************************************************* TICKETS **************************************************************************/
 export const stepsCreacionTickets : Step.StepOptions[] = [
   {
@@ -9190,13 +10015,44 @@ export const stepsUsuarios : Step.StepOptions[] = [
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back
+      builtInButtons.back,
+      builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'inactivar',
     id: 'tabla',
     title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user-minus font-size-16"></i> Inactivar usuarios</h5>',
     text: `Al hacer click sobre este botón, <b>podrás inactivar el usuario seleccionado en la tabla.</b>`
+  },
+  {
+    attachTo: {
+      element: '#roles',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'roles',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-users font-size-16"></i> Roles Usuarios</h5>',
+    text: `¡En esta sección podrás ver la lista de roles que se manejan!`
+  },
+  {
+    attachTo: {
+      element: '#editarRol',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'editarRol',
+    id: 'tabla',
+    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-pencil font-size-16"></i> Editar Roles</h5>',
+    text: `¡Podemos editar los roles de los usuarios, cambiando el nombre, descripción y las vistas a las cuales el rol puede acceder!`
   },
 ];
 
@@ -9879,10 +10735,10 @@ export const stepsDashboardCuentasPagar : Step.StepOptions[] = [
   },
 ];
 
-export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
+export const stepsDashboardGerencia : Step.StepOptions[] = [
   {
     attachTo: {
-      element: '#titulo',
+      element: '#none',
       on: 'bottom'
     },
     buttons: [
@@ -9890,15 +10746,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'titulo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Solicitudes de material</h5>',
-    text: `<p>En este módulo podrás realizar <b>las solicitudes de material de producción</b> al encargado del inventario de materias primas. <br><br>
-    Haz clic en siguiente y <b>mira el paso a paso que creamos para ti!</b></p>`
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Gerencia!</h4>',
+    text: `<p>¡En este dashboard estaremos viendo información general sobre los costos de la empresa!</p>`
   },
   {
     attachTo: {
-      element: '#solicitud',
+      element: '#cambiarAnio',
       on: 'bottom'
     },
     buttons: [
@@ -9906,18 +10761,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'solicitud',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Solicitud</h5>',
-    text: `<p>En este campo inicialmente visualizarás el <b>último consecutivo de la solicitud.</b><br><br>
-    Además podrás visualizar la solicitud que desees, <b>digitando el N° de la solicitud y presionando la tecla enter</b><br><br>
-    Si la solicitud existe, <b>se cargarán las materias prima asociadas</b> en la tabla que se encuentra en la parte inferior, donde podrás <b>agregar,
-    editar y eliminar las materias primas</b>.
-    </p>`
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Años!</h4>',
+    text: `<p>¡Si queremos cambiar los años que estamos viendo podemos hacerlo desde este recuadro!</p>`
   },
   {
     attachTo: {
-      element: '#ordenTrabajo',
+      element: '#seleccionarAnio',
       on: 'bottom'
     },
     buttons: [
@@ -9925,19 +10776,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'ordenTrabajo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> N° Orden de trabajo</h5>',
-    text: `<p>En este campo <b>debes digitar la orden de trabajo para la cual deseas solicitar el material</b> y luego presionar la tecla enter.<br><br>
-    Si la OT existe se cargará los siguientes datos:<br>
-    <b>- Cliente</b><br>
-    <b>- Referencia</b><br>
-    <b>- Tope de kilos de material a entregar.</b><br>
-    <b>- Cantidad restante por entregar</b></p>`
+    classes: 'card',
+    id: 'seleccionarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Año!</h4>',
+    text: `<p>¡Podemos seleccionar el año que queremos ver desde este recuadro!</p>`
   },
   {
     attachTo: {
-      element: '#maquina',
+      element: '#botonesGraficado',
       on: 'bottom'
     },
     buttons: [
@@ -9945,14 +10791,16 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'maquina',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Maquina</h5>',
-    text: `<p>En este campo <b>debes digitar el n° de la maquina</b> en la cual se utilizará el material solicitado.</p>`
+    classes: 'card',
+    id: 'botonesGraficado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Graficar y/o Limpiar!</h4>',
+    text: `<p>¡Luego de haber seleccionado el año podemos graficar la información del mismo presionando del botón rojo con el icono '<i class="pi pi-chart-bar"></i>'!
+    <br><br>
+    ¡Si lo que deseamos es limpiar las graficas podemos presionar el botón amarillo con el icono '<i class="pi pi-eraser"></i>'!</p>`
   },
   {
     attachTo: {
-      element: '#proceso',
+      element: '#facturacion',
       on: 'bottom'
     },
     buttons: [
@@ -9960,15 +10808,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'proceso',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Proceso</h5>',
-    text: `<p>En este campo <b>debes seleccionar el nombre del proceso</b> en el cual será utilizado el material solicitado.<br><br>
-    Recuerda que inicialmente se carga el proceso de <b>Extrusion</b></p>`
+    classes: 'card',
+    id: 'facturacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Facturación!</h4>',
+    text: `<p>¡Podemos ver la facturación graficada en este recuadro, a demás podemos ver el total de lo que se facturó en cada uno de los años selecionados!</p>`
   },
   {
     attachTo: {
-      element: '#observacion',
+      element: '#cuentasCobrar',
       on: 'bottom'
     },
     buttons: [
@@ -9976,15 +10823,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'observacion',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Observación</h5>',
-    text: `<p>En este campo <b>puedes realizar un comentario u observación general de tu solicitud</b>.<br><br>
-    Dicha observación <b>podrá ser visualizada por el operario encargado de la entrega de materia prima</b></p>`
+    classes: 'card',
+    id: 'cuentasCobrar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cuentas por Cobrar!</h4>',
+    text: `<p>¡Se puede ver la información de las cuentas por cobrar en este recuadro!</p>`
   },
   {
     attachTo: {
-      element: '#tabla1',
+      element: '#cuentasPagar',
       on: 'bottom'
     },
     buttons: [
@@ -9992,18 +10838,14 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Detalles de la OT</h5>',
-    text: `<p>Si existe la OT que consultaste inicialmente se cargarán los siguientes datos:<br>
-    <b>- Cliente</b><br>
-    <b>- Referencia</b><br>
-    <b>- Tope de kilos de material a entregar.</b><br>
-    <b>- Cantidad restante por entregar</b></p>`
+    classes: 'card',
+    id: 'cuentasPagar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cuentas por Pagar!</h4>',
+    text: `<p>¡Se puede ver la información de las cuentas por pagar en este recuadro!</p>`
   },
   {
     attachTo: {
-      element: '#materiaPrima',
+      element: '#compras',
       on: 'bottom'
     },
     buttons: [
@@ -10011,106 +10853,32 @@ export const stepsSolicitudMaterialProduccion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'materiaPrima',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Selección de material</h5>',
-    text: `<p>Aquí puedes seleccionar los materiales que deseas solicitar.
-    Existen 2 formas de seleccionar el material:<br><br>
-    1. Si conoces el Id del material, <b>digitalo en el campo Id y presiona enter</b>. Esta acción cargará el nombre.<br>
-    2. También <b>puedes escribir el nombre en el campo Materia Prima,</b> allí se cargará una lista desplegable con materiales, <b>selecciona el que deseas solicitar.</b><br><br>
-    Luego de cargar el nombre del material <b>digita la cantidad que deseas solicitar</b> y selecciona la unidad de medida,
-    que inicialmente es <b>Kg (Kilogramos)</b>.
-    </p>`
+    classes: 'card',
+    id: 'compras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Compras!</h4>',
+    text: `<p>¡Se puede ver la información de las compras realizadas por las empresas Plasticaribe, Invergoal e Inversuez!</p>`
   },
   {
     attachTo: {
-      element: '#botones1',
+      element: '#matPrima_Producto',
       on: 'bottom'
     },
     buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'botones1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Agregar Material</h5>',
-    text: `<p><b>Haciendo clic sobre el botón "agregar materia prima" </b>se cargará en la tabla el material que seleccionaste inicialmente y
-    que deseas solicitar.<br><br>
-    Si tienes algún error de digitación al momento de seleccionar un material, solo haz clic el <b>botón en limpiar campos mp</b>
-    </p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla2',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla2',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Material a solicitar</h5>',
-    text: `<p>En esta tabla encontrarás las materias primas que seleccionaste inicialmente y que deseas solicitar<br><br>
-    Si tienes algún error de digitación en los materiales cargados en la tabla, <b>tienes la opción de quitarlo haciendo clic el botón</b> <i class="pi pi-trash"></i>
-    </p>`
-  },
-  {
-    attachTo: {
-      element: '#cantidad2',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'cantidad2',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Editar cantidad</h5>',
-    text: `<p><b>Este campo es editable</b>, si te equivocas, solo haz clic sobre este campo de la tabla
-    y <b>digita la cantidad que en realidad deseas solicitar y listo!</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#quitarMP',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'quitarMP',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Quitar material</h5>',
-    text: `<p>Si definitivamente te equivocaste en uno de los materiales seleccionados, <b>quitalo de la tabla haciendo clic sobre el icono <i class="pi pi-trash"></i></b></p>`
-  },
-  {
-    attachTo: {
-      element: '#botones2',
-      on: 'bottom'
-    },
-    buttons: [
+      builtInButtons.cancel,
       builtInButtons.back,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'botones2',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class=""></i> Crear Solicitud</h5>',
-    text: `<p>Luego de seleccionar los materiales que deseas solicitar, <b>haz clic sobre el botón "crear solicitud" para guardar el registro</b><br><br>
-    Luego de esto, <b>se generará un formato PDF con las especificaciones de la solicitud</b>.<br><br>
-    Si te arrepientes de realizar la solicitud y ya tenías información cargada en la tabla y en el formulario de la parte superior, <b>haz clic sobre el botón limpiar todo!</b>
-    </p>`
+    classes: 'card',
+    id: 'matPrima_Producto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima Y Productos!</h4>',
+    text: `<p>¡Se puede ver la información del costo en cada uno de los meses del inventario de materia prima y productos en este recuadro!</p>`
   },
-]
+];
 
-export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
+export const stepsDashboardCostos : Step.StepOptions[] = [
   {
     attachTo: {
-      element: '#movimientos',
+      element: '#none',
       on: 'bottom'
     },
     buttons: [
@@ -10118,21 +10886,14 @@ export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'movimientos',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-arrow-right-arrow-left"></i> Mov. de solicitudes</h5>',
-    text: `<p>En este reporte se pueden ver los <b>movimientos de solicitudes de material de producción</b>, podrás apreciar la cantidad de
-    solicitudes <b>aceptadas, pendientes, parciales y finalizadas.</b> <br><br>
-    Tendrás filtros de búsqueda por:<br>
-    <b>- Id de solicitud</b><br>
-    <b>- Fechas de la solicitud</b><br>
-    <b>- Estado de la solicitud</b><br><br>
-    Además podrás apreciar en que estado se encuentra las solicitudes y los materiales de la mismas.<br><br>
-    También podrás <b>cargar los datos de la solicitud en un modal de asignaciones, y cancelar o finalizar la solicitud</b>.</p>`
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Costos!</h4>',
+    text: `<p>¡En este dashboard estaremos viendo información general sobre los <b>costos de la empresa</b>!</p>`
   },
   {
     attachTo: {
-      element: '#rojo',
+      element: '#cambiarAnio',
       on: 'bottom'
     },
     buttons: [
@@ -10140,242 +10901,166 @@ export const stepsMovSolicitudesMPExtrusion : Step.StepOptions[] = [
       builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'rojo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Solicitudes canceladas</h5>',
-    text: `<p>Aquí se podrá apreciar <b>la cantidad de solicitudes de material que se encuentran canceladas actualmente de las ultimas 100 creadas.</b><br><br>
-    <b>Nota:</b> A las solicitudes con estado cancelado no se les puede crear una asignación.<br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#naranja',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'naranja',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-exclamation-triangle"></i> Solicitudes pendientes</h5>',
-    text: `<p>En este apartado podrás apreciar <b>la cantidad de solicitudes de material que se encuentran pendientes actualmente de las ultimas 100 creadas.</b><br><br>
-    Las solicitudes con estado pendiente son a las que <b>no se les ha creado ó asociado una asignación.</b><br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#amarillo',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'amarillo',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-sliders-h"></i> Solicitudes parciales</h5>',
-    text: `<p>En este apartado podrás visualizar <b>la cantidad de solicitudes de material que se encuentran parciales actualmente de las ultimas 100 creadas.</b><br><br>
-    Las solicitudes con estado parcial son las que <b>ya han sido aprobadas por el encargado de materia prima, ya tienen asignaciones asociadas, pero no se entregó toda la materia prima de la solicitud.</b><br><br>
-    Además <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#verde',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'verde',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check"></i> Solicitudes finalizadas</h5>',
-    text: `<p>Aquí encontraremos <b> la cantidad de solicitudes de materia prima que se encuentran finalizadas actualmente de las ultimas 100 creadas</b><br><br>
-    Las solicitudes con estado finalizado son las que <b> ya tienen asignaciones creadas, en las cuales se les entregó toda la materia prima solicitada.</b><br><br>
-    Además  <b>haciendo click aquí se cargarán las solicitudes con este estado</b> en la tabla de registros consultados.</p>`
-  },
-  {
-    attachTo: {
-      element: '#formulario1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'formulario1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-filter"></i> Filtros</h5>',
-    text: `<p>Aquí encontraremos <b>los filtros de búsqueda donde podrás realizar tus consultas.</b><br><br>
-    Además podrás crear las combinaciones que desees llenando los campos: <br>
-    <b>- Id de solicitud</b><br>
-    <b>- Fecha Inicial de la solicitud</b><br>
-    <b>- Fecha Final de la solicitud</b><br>
-    <b>- Estado de la solicitud</b><br><br>
-    Y luego solo <b>pulsa el botón consultar para ver la información solicitada!</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#botones1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'botones1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-search"></i> Consultar / <i class="pi pi-eraser"></i> Limpiar Campos</h5>',
-    text: `<p>Luego de llenar los filtros por los que deseas realizar tu búsqueda, <b>haz clic sobre el botón Consultar para cargar la información del encabezado de la solicitud de material en la tabla</b> de registros consultados.
-    <br><br>Para reiniciar tu busqueda solo <b>haz click sobre el botón limpiar campos.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla1',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla1',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Encabezado de solicitudes</h5>',
-    text: `<p>Aquí podrás apreciar <b>el encabezado de las solicitudes de material que se encontraron luego de realizar tu consulta,</b> entre ellos su:<br><br>
-    <b>- Id</b><br>
-    <b>- OT</b><br>
-    <b>- Fecha Creación</b><br>
-    <b>- Estado General</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#detalle',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'detalle',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-eye"></i> Ver detalles de la solicitud</h5>',
-    text: `<p>Si existen registros en la tabla, <b>pulsa sobre el botón <i class="pi pi-eye"></i></b> para ver detalles de la solicitud del registro que seleccionaste. <br><br>
-    podrás apreciar <b>número de solicitud, operario solicitante, materias primas, cantidad pedida, cantidad asignada unidad de medida y el estado de las mismas</b> en la tabla detalles de la solicitud.</p>`
-  },
-  {
-    attachTo: {
-      element: '#matprimas',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'matprimas',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-list"></i> Detalles de la solicitud</h5>',
-    text: `<p>En este apartado podrás ver <b>los detalle de las solicitudes de material que selecciones de la tabla registros consultados.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#usuario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'usuario',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-user"></i> Usuario solicitante</h5>',
-    text: `<p>Luego de hacer click en <b>el botón <i class="pi pi-eye"></i> ver detalles</b> en la tabla registros consultados, <b>aquí visualizarás el nombre del usuario que realizó el pedido de materia prima.</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#tabla2',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'tabla2',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Materias Primas</h5>',
-    text: `<p>Aquí podrás apreciar <b>las materias primas solicitadas, la cantidad pedida, unidad de medida y el estado de las mismas</b><br><br></p>`
-  },
-  {
-    attachTo: {
-      element: '#aprobada',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'aprobada',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-box"></i> Cantidad aprobada</h5>',
-    text: `<p>Este campo se refiere a <b>la cantidad de cada item de materia prima que se ha asignado en base a la solicitud</b> que esté visualizando en el momento.<br><br></p>`
-  },
-  {
-    attachTo: {
-      element: '#crear-oc',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'crear-oc',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-window-maximize"></i> Cargar modal.</h5>',
-    text: `<p>Pulsando sobre este botón <b>se mostrará un modal con el módulo de asignaciones de materia prima</b> y se cargará el <b>campo N°. Solicitud</b> con el Id de la solicitud de materia prima.</b><br><br>
-    Asi como también <b>se cargará la tabla con las materias pedidas en la solicitud,</b> dicha tabla cuenta con 2 funcionalidades importantes tales como:<br><br>
-    <b>1. El campo de cantidad editable:</b> Haciendo clic sobre este campo podrás modificar la cantidad solicitada por el usuario.<br>
-    <b>2. Quitar materia(s) prima(s):</b> Haciendo clic sobre el botón <i class="pi pi-trash"></i> <b>podrás quitar las materias primas</b> que no deseas que se encuentren en la orden de compra por el motivo que desees.<br> </p>`
-  },
-  {
-    attachTo: {
-      element: '#finalizar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'finalizar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-check-square"></i> Finalizar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás finalizar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b></p>`
-  },
-  {
-    attachTo: {
-      element: '#cancelar',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: '',
-    id: 'cancelar',
-    title: '<h5 style="margin: auto; color: var(--rojo)"><i class="pi pi-ban"></i> Cancelar solicitud</h5>',
-    text: `<p>pulsando sobre este botón podrás cancelar la solicitud de materia prima, <b>solo si su estado (estado del encabezado) es pendiente ó parcial</b><br><br>
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Años!</h4>',
+    text: `<p>Incialmente se cargarán en las graficas los costos del año actual pero <b>tenemos la opción de graficar más años desde este apartado.</b>
+    <br><br>
+    Tambien <b>podemos exportar a un archivo de excel</b> los datos que se encuentran graficados o los datos de un rango de fechas que hayamos escogido.
     </p>`
   },
-]
+  {
+    attachTo: {
+      element: '#seleccionarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Año!</h4>',
+    text: `<p>En esta casilla tenemos la opción de <b>escoger un año</b> desde el 2019 hasta el año actual. <b>Este año escogido será el que se graficará.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesGraficado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesGraficado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Graficar y/o Limpiar!</h4>',
+    text: `<p>¡Luego de haber seleccionado el año <b>podemos graficar la información del mismo presionando del botón rojo con el icono '<i class="pi pi-chart-bar"></i>'</b>, se tardará 3 segundos en cargar y posteriormente aparecerá el año graficado!
+    <br><br>
+    ¡<b>Podemos limpiar la información graficada</b> presionando el botón gris con el icono '<i class="pi pi-eraser"></i>'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#seleccionarFechas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarFechas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Fechas!</h4>',
+    text: `<p>Otra de las opciones que tenemos es <b>seleccionar un rango de fechas</b>. Se buscará la información en el rango escogido y posteriormente <b>esa información será la que se vea en el archivo de excel</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonExcel',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonExcel',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Exportar a Excel!</h4>',
+    text: `<p><b>Si queremos exportar a un archivo de excel podemos presionar el botón verde con el icono '<i class="pi pi-file-excel"></i>'</b> e inmediatamente saldrá un mensaje de confirmación y iniciará la descarga del archivo.
+    <br>
+    <b>Nota:</b> Se exportarán los datos que se hayan seleccionado en el rango de fechas escogido, de lo contrario se exportará la información de los años que hayan sido graficados!</p>`
+  },
+  {
+    attachTo: {
+      element: '#costoFabricacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'costoFabricacion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Costos de Fabricación!</h4>',
+    text: `<p>Podemos ver los <b>costos de fabricación</b> en cada uno de los meses de los años que se han graficado, <b>podemos hacer comparativas entre años o meses</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#gastosAdmon',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'gastosAdmon',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos de Administración!</h4>',
+    text: `<p>Podemos ver los <b>costos de administración</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses</p>`
+  },
+  {
+    attachTo: {
+      element: '#gastosVentas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'gastosVentas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos de Ventas!</h4>',
+    text: `<p>En esta grafica estarán los <b>costos de ventas</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses.</p>`
+  },
+  {
+    attachTo: {
+      element: '#gastosNoOperacionales',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'gastosNoOperacionales',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos No Operacionales!</h4>',
+    text: `<p>Podemos ver los <b>costos no operacionales</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses.</p>`
+  },
+  {
+    attachTo: {
+      element: '#costosAnios',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'costosAnios',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Costos de los Años!</h4>',
+    text: `<p>En cada grafica se mostrarán los <b>costos de los años</b> que se han graficado, en la parte inferior de cada grafica estarán apareciendo los costos.</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaDetallada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaDetallada',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cuentas Detalladas!</h4>',
+    text: `<p>¡Podemos <b>ver las cuentas detalladas presionando este botón</b>, adicionalmente podemos <b>ver los movimientos de cada cuenta en cada mes seleccionando</b> en esta tabla alguna cuenta!</p>`
+  },
+];
