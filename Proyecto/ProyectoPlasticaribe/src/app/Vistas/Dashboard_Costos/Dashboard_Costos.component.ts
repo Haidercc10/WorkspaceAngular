@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
+import { Console } from 'console';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -354,9 +355,9 @@ export class Dashboard_CostosComponent implements OnInit {
     this.graficaSeleccionada = '';
     this.abrirModal1 = true;
     this.totalCostoSeleccionado = 0;
+    this.cargando = true;
 
     for (let index = 0; index < this.arrayAnios.length; index++) {
-
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(this.arrayAnios[index]).subscribe(data => {
         let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
 
@@ -382,18 +383,58 @@ export class Dashboard_CostosComponent implements OnInit {
         }
        });
     }
+    setTimeout(() => { this.cargando = false; }, 1000);
   }
 
   /** Función que limpiará el array de costos al momento de cerrar el modal */
   limpiarArrayCostos = () => this.arrayCostos = [];
 
   /** Llenar la tabla del primer modal  */
-  llenarTabla(datos : any){
-    for (let index = 0; index < datos.length; index++) {
-      this.cambiarNumeroAMes(datos[index]);
-      this.totalCostoSeleccionado += datos[index].valor;
-      this.arrayCostos.push(datos[index]);
+  llenarTabla(datas : any){
+    let cuentas : any[] = [];
+    for (let index = 0; index < datas.length; index++) {
+      if(!cuentas.includes(datas[index].cuenta.trim())) {
+        cuentas.push(datas[index].cuenta.trim());
+        let infoMeses : any = {
+          Cuenta : datas[index].cuenta,
+          Descripcion : datas[index].descripcionCuenta,
+          Enero : datas.filter(item => item.mes == '01' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Febrero : datas.filter(item => item.mes == '02' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Marzo : datas.filter(item => item.mes == '03' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Abril : datas.filter(item => item.mes == '04' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Mayo : datas.filter(item => item.mes == '05' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Junio : datas.filter(item => item.mes == '06' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Julio : datas.filter(item => item.mes == '07' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Agosto : datas.filter(item => item.mes == '08' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Septiembre : datas.filter(item => item.mes == '09' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Octubre : datas.filter(item => item.mes == '10' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Noviembre : datas.filter(item => item.mes == '11' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Diciembre : datas.filter(item => item.mes == '12' && item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          TotalCuenta : datas.filter(item => item.cuenta.trim() == datas[index].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
+          Anio : datas[index].anio,
+          Mes : datas[index].mes
+        }
+        this.arrayCostos.push(infoMeses);
+      }
     }
+  }
+
+  calcularCostoMensual(anio : string, mes : string) : number {
+    let total : number = 0;
+    if (mes == '01') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Enero, 0);
+    if (mes == '02') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Febrero, 0);
+    if (mes == '03') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Marzo, 0);
+    if (mes == '04') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Abril, 0);
+    if (mes == '05') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Mayo, 0);
+    if (mes == '06') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Junio, 0);
+    if (mes == '07') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Julio, 0);
+    if (mes == '08') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Agosto, 0);
+    if (mes == '09') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Septiembre, 0);
+    if (mes == '10') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Octubre, 0);
+    if (mes == '11') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Noviembre, 0);
+    if (mes == '12') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Diciembre, 0);
+    if (mes == '00') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.TotalCuenta, 0);
+    return total;
   }
 
   /** Aplicar filtro de busqueda a la tabla del primero modal. */
@@ -401,7 +442,7 @@ export class Dashboard_CostosComponent implements OnInit {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
       if(this.dt.filteredValue != null) {
-        this.totalCostoSeleccionado = 0;
+
         this.dt.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
       } else {
         this.totalCostoSeleccionado = 0;
@@ -411,62 +452,46 @@ export class Dashboard_CostosComponent implements OnInit {
   }
 
   /** Función que mostrará un segundo modal con los detalles de la cuenta en el periodo seleccionado  */
-  consultaCostosDetallados(datos : any){
+  consultaCostosDetallados(datos : any, mes : string){
     this.abrirModal2 = true;
     this.arrayGastos1 = [];
     this.totalCostoSeleccionado = 0;
     this.cuentaSeleccionada = [];
 
-    this.cambiarMesANumero(datos);
-    this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.anio, datos.mes, datos.cuenta).subscribe(data => {
+    this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.Anio, mes, datos.Cuenta).subscribe(data => {
       for(let index = 0; index < data.length; index++) {
         data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
+        this.totalCostoSeleccionado += data[index].valor;
         this.arrayGastos1.push(data[index]);
       }
     });
+
     setTimeout(() => {
-      this.cambiarNumeroAMes(datos);
-      this.cuentaSeleccionada = [datos.anio, datos.mes, datos.cuenta];
+      this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta];
+      console.log(mes)
     }, 500);
   }
-
-  /** Cambiar del numero al nombre del mes */
-  cambiarNumeroAMes(info : any){
-    info.mes == '01' ? info.mes = 'Enero' :
-    info.mes == '02' ? info.mes = 'Febrero' :
-    info.mes == '03' ? info.mes = 'Marzo' :
-    info.mes == '04' ? info.mes = 'Abril' :
-    info.mes == '05' ? info.mes = 'Mayo' :
-    info.mes == '06' ? info.mes = 'Junio' :
-    info.mes == '07' ? info.mes = 'Julio' :
-    info.mes == '08' ? info.mes = 'Agosto' :
-    info.mes == '09' ? info.mes = 'Septiembre' :
-    info.mes == '10' ? info.mes = 'Octubre' :
-    info.mes == '11' ? info.mes = 'Noviembre' :
-    info.mes == '12' ? info.mes = 'Diciembre' : '';
-  }
-
-  /** Cambiar del nombre del mes al número. */
-  cambiarMesANumero(info : any){
-    info.mes == 'Enero' ? info.mes = '01' :
-    info.mes == 'Febrero' ? info.mes = '02' :
-    info.mes == 'Marzo' ? info.mes = '03' :
-    info.mes == 'Abril' ? info.mes = '04' :
-    info.mes == 'Mayo' ? info.mes = '05' :
-    info.mes == 'Junio' ? info.mes = '06' :
-    info.mes == 'Julio' ? info.mes = '07' :
-    info.mes == 'Agosto' ? info.mes = '08' :
-    info.mes == 'Septiembre' ? info.mes = '09' :
-    info.mes == 'Octubre' ? info.mes = '10' :
-    info.mes == 'Noviembre' ? info.mes = '11' :
-    info.mes == 'Diciembre' ? info.mes = '12' : '';
+  cambiarNumeroAMes(mes : string) : string {
+    mes == '01' ? mes = 'Enero' :
+    mes == '02' ? mes = 'Febrero' :
+    mes == '03' ? mes = 'Marzo' :
+    mes == '04' ? mes = 'Abril' :
+    mes == '05' ? mes = 'Mayo' :
+    mes == '06' ? mes = 'Junio' :
+    mes == '07' ? mes = 'Julio' :
+    mes == '08' ? mes = 'Agosto' :
+    mes == '09' ? mes = 'Septiembre' :
+    mes == '10' ? mes = 'Octubre' :
+    mes == '11' ? mes = 'Noviembre' :
+    mes == '12' ? mes = 'Diciembre' : '';
+    return mes;
   }
 
   // Funcion que se encargará de exportar a un archivo de excel la información de las cuentas en cada uno de los meses
   exportarExcel(){
     this.cargando = true;
     let infoDocumento : any [] = [];
-    
+
     if (this.rangoFechas.length > 0) this.exportarExcel_RangoFechas();
     else {
       if (this.costo_Anio_fabricacion.length > 0) {
@@ -495,7 +520,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
     let infoDocumento : any [] = [];
     let title : string = `Determinación de Costos Desde ${moment(fechaInicial).format('MMMM').toUpperCase()} ${moment(fechaInicial).format('YYYY')} Hasta ${moment(fechaFinal).format('MMMM').toUpperCase()} ${moment(fechaFinal).format('YYYY')} - ${moment().format('DD-MM-YYYY')}`;
-    
+
     this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
       let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
       infoDocumento = [
@@ -648,4 +673,5 @@ export class Dashboard_CostosComponent implements OnInit {
     ]);
     return datos;
   }
+
 }
