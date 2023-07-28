@@ -86,7 +86,7 @@
 </div>-->
 
 
-<div class="mb-3" *ngIf="!load">
+<!--<div class="mb-3" *ngIf="!load">
   <div class="row g-3 font-size-14" id="table">
     <p-table
       #dt
@@ -103,7 +103,6 @@
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="header" >
-        <!--Filtros tabla-->
         <tr class="font-size-16" id="filtros">
           <th></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'periodo', 'contains')"></th>
@@ -113,7 +112,6 @@
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcionCuenta', 'contains')"></th>
           <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'valor', 'contains')"></th>
         </tr>
-        <!--Encabezado tabla-->
         <tr>
           <th>#</th>
           <th scope="col" pSortableColumn="periodo">Periodo <p-sortIcon field="periodo"></p-sortIcon></th>
@@ -124,7 +122,6 @@
           <th pSortableColumn="valor" pReorderableColumn scope="col">Valor <p-sortIcon field="valor"></p-sortIcon></th>
         </tr>
       </ng-template>
-      <!--Registros-->
       <ng-template pTemplate="body" let-gastos let-rowIndex="rowIndex">
         <tr (click)="consultaCostosDetallados(gastos)">
           <td><b>{{rowIndex + 1}}</b></td>
@@ -144,13 +141,124 @@
       </ng-template>
     </p-table>
   </div>
-</div>
+</div>-->
+
+<!--<p-dialog header="{{0}}" [modal]="true" [draggable]="false" [(visible)]="abrirModal1" [style]="{width: '80%'}">-->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3 font-size-14" id="table">
+      <p-table
+        #dt
+        [value]="arrayCostos"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        sortField="Anio"
+        sortMode="single"
+        [rowHover]="true"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        rowGroupMode="subheader"
+        groupRowsBy="Anio">
+        <ng-template pTemplate="header">
+          <!--Filtros tabla-->
+          <tr class="font-size-16" id="filtros">
+            <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cuenta', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Descripcion', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Enero', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Febrero', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Marzo', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Abril', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mayo', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Junio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Julio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Agosto', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Septiembre', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Octubre', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Noviembre', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Diciembre', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'TotalCuenta', 'contains')"></th>
+          </tr>
+          <tr>
+          <!--Encabezado tabla-->
+          <tr>
+            <th>#</th>
+            <th pSortableColumn="Cuenta" pReorderableColumn scope="col">Cuenta <p-sortIcon field="Cuenta"></p-sortIcon></th>
+            <th pSortableColumn="Descripcion" pReorderableColumn scope="col">Descripción <p-sortIcon field="Descripcion"></p-sortIcon></th>
+            <th pSortableColumn="Enero" pReorderableColumn scope="col">Enero <p-sortIcon field="Enero"></p-sortIcon></th>
+            <th pSortableColumn="Febrero" pReorderableColumn scope="col">Febrero <p-sortIcon field="Febrero"></p-sortIcon></th>
+            <th pSortableColumn="Marzo" pReorderableColumn scope="col">Marzo <p-sortIcon field="Marzo"></p-sortIcon></th>
+            <th pSortableColumn="Abril" pReorderableColumn scope="col">Abril <p-sortIcon field="Abril"></p-sortIcon></th>
+            <th pSortableColumn="Mayo" pReorderableColumn scope="col">Mayo <p-sortIcon field="Mayo"></p-sortIcon></th>
+            <th pSortableColumn="Junio" pReorderableColumn scope="col">Junio <p-sortIcon field="Junio"></p-sortIcon></th>
+            <th pSortableColumn="Julio" pReorderableColumn scope="col">Julio <p-sortIcon field="Julio"></p-sortIcon></th>
+            <th pSortableColumn="Agosto" pReorderableColumn scope="col">Agosto <p-sortIcon field="Agosto"></p-sortIcon></th>
+            <th pSortableColumn="Septiembre" pReorderableColumn scope="col">Septiembre <p-sortIcon field="Septiembre"></p-sortIcon></th>
+            <th pSortableColumn="Octubre" pReorderableColumn scope="col">Octubre <p-sortIcon field="Octubre"></p-sortIcon></th>
+            <th pSortableColumn="Noviembre" pReorderableColumn scope="col">Noviembre <p-sortIcon field="Noviembre"></p-sortIcon></th>
+            <th pSortableColumn="Diciembre" pReorderableColumn scope="col">Diciembre <p-sortIcon field="Diciembre"></p-sortIcon></th>
+            <th pSortableColumn="TotalCuenta" pReorderableColumn scope="col">Total Cuenta <p-sortIcon field="TotalCuenta"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <!--Consolidado por año-->
+        <ng-template pTemplate="groupheader" let-costo>
+          <tr pRowGroupHeader style="background-color: #83D3FF;">
+            <td colspan="16">
+              <span class="font-bold"><b>{{costo.Anio}}</b></span>
+            </td>
+          </tr>
+        </ng-template>
+        <!--Registros-->
+        <ng-template pTemplate="body" let-costo let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowIndex + 1}}</td>
+            <td>{{costo.Cuenta}}</td>
+            <td>{{costo.Descripcion}}</td>
+            <td (click)="consultaCostosDetallados(costo, '01')">{{costo.Enero | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '02')">{{costo.Febrero | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '03')">{{costo.Marzo | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '04')">{{costo.Abril | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '05')">{{costo.Mayo | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '06')">{{costo.Junio | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '07')">{{costo.Julio | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '08')">{{costo.Agosto | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '09')">{{costo.Septiembre | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '10')">{{costo.Octubre | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '11')">{{costo.Noviembre | number: '1.2-2'}}</td>
+            <td (click)="consultaCostosDetallados(costo, '12')">{{costo.Diciembre | number: '1.2-2'}}</td>
+            <td>{{costo.TotalCuenta | number: '1.2-2'}}</td>
+          </tr>
+        </ng-template>
+        <!--Footer-->
+        <ng-template pTemplate="groupfooter" let-costo>
+          <tr style="background-color: palegreen;">
+            <td colspan="3" class="text-right font-bold pr-6">Totales</td>
+            <td class="text-right font-bold pr-6">{{costo.totalEnero}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalFebrero}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalMarzo}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalAbril}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalMayo}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalJunio}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalJulio}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalAgosto}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalSeptiembre}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalOctubre}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalNoviembre}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalDiciembre}}</td>
+            <td class="text-right font-bold pr-6">{{costo.totalTotal}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+<!--</p-dialog>-->
 
 <p-dialog header="{{0}}" [modal]="true" [draggable]="false" [(visible)]="abrirModal2" [style]="{width: '80%'}">
   <div class="mb-3" >
     <div class="row g-3 font-size-14" id="table">
       <p-table
-        #dt
+        #dt1
         [value]="arrayGastos1"
         [resizableColumns]="true"
         columnResizeMode="expand"
@@ -164,9 +272,7 @@
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header" >
-          <!--Filtros tabla-->
-          <!--Encabezado tabla-->
-          <tr>
+            <tr>
             <th>#</th>
             <th pSortableColumn="fuente" pReorderableColumn scope="col">Fuente <p-sortIcon field="fuente"></p-sortIcon></th>
             <th pSortableColumn="fecha_Transaccion" pReorderableColumn scope="col">Fecha Transacción <p-sortIcon field="fecha_Transaccion"></p-sortIcon></th>
@@ -178,7 +284,6 @@
             <th pSortableColumn="proveedor" pReorderableColumn scope="col">Proveedor <p-sortIcon field="proveedor"></p-sortIcon></th>
           </tr>
         </ng-template>
-        <!--Registros-->
         <ng-template pTemplate="body" let-gasto let-rowIndex="rowIndex">
           <tr>
             <td><b>{{rowIndex + 1}}</b></td>
@@ -203,7 +308,6 @@
     </div>
   </div>
 </p-dialog>
-
 
 
 
