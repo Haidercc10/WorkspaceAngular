@@ -10889,7 +10889,7 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'none',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Costos!</h4>',
-    text: `<p>¡En este dashboard estaremos viendo información general sobre los costos de la empresa!</p>`
+    text: `<p>¡En este dashboard estaremos viendo información general sobre los <b>costos de la empresa</b>!</p>`
   },
   {
     attachTo: {
@@ -10904,7 +10904,10 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'cambiarAnio',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Años!</h4>',
-    text: `<p>¡Si queremos cambiar los años que estamos viendo podemos hacerlo desde este recuadro!</p>`
+    text: `<p>Incialmente se cargarán en las graficas los costos del año actual pero <b>tenemos la opción de graficar más años desde este apartado.</b>
+    <br><br>
+    Tambien <b>podemos exportar a un archivo de excel</b> los datos que se encuentran graficados o los datos de un rango de fechas que hayamos escogido.
+    </p>`
   },
   {
     attachTo: {
@@ -10919,7 +10922,7 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'seleccionarAnio',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Año!</h4>',
-    text: `<p>¡Podemos seleccionar el año que queremos ver desde este recuadro!</p>`
+    text: `<p>En esta casilla tenemos la opción de <b>escoger un año</b> desde el 2019 hasta el año actual. <b>Este año escogido será el que se graficará.</b></p>`
   },
   {
     attachTo: {
@@ -10934,11 +10937,41 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'botonesGraficado',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Graficar y/o Limpiar!</h4>',
-    text: `<p>¡Luego de haber seleccionado el año podemos graficar la información del mismo presionando del botón rojo con el icono '<i class="pi pi-chart-bar"></i>'!
+    text: `<p>¡Luego de haber seleccionado el año <b>podemos graficar la información del mismo presionando del botón rojo con el icono '<i class="pi pi-chart-bar"></i>'</b>, se tardará 3 segundos en cargar y posteriormente aparecerá el año graficado!
     <br><br>
-    ¡Si lo que deseamos es limpiar las graficas podemos presionar el botón amarillo con el icono '<i class="pi pi-eraser"></i>'!
-    <br><br>
-    ¡Si queremos exportar a un archivo de excel podemos presionar el botón azul con el icono '<i class="pi pi-file-excel"></i>'!</p>`
+    ¡<b>Podemos limpiar la información graficada</b> presionando el botón gris con el icono '<i class="pi pi-eraser"></i>'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#seleccionarFechas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarFechas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Fechas!</h4>',
+    text: `<p>Otra de las opciones que tenemos es <b>seleccionar un rango de fechas</b>. Se buscará la información en el rango escogido y posteriormente <b>esa información será la que se vea en el archivo de excel</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonExcel',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonExcel',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Exportar a Excel!</h4>',
+    text: `<p><b>Si queremos exportar a un archivo de excel podemos presionar el botón verde con el icono '<i class="pi pi-file-excel"></i>'</b> e inmediatamente saldrá un mensaje de confirmación y iniciará la descarga del archivo.
+    <br>
+    <b>Nota:</b> Se exportarán los datos que se hayan seleccionado en el rango de fechas escogido, de lo contrario se exportará la información de los años que hayan sido graficados!</p>`
   },
   {
     attachTo: {
@@ -10953,7 +10986,7 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'costoFabricacion',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Costos de Fabricación!</h4>',
-    text: `<p>¡Podemos ver el costo de fabricación en este recuadro!</p>`
+    text: `<p>Podemos ver los <b>costos de fabricación</b> en cada uno de los meses de los años que se han graficado, <b>podemos hacer comparativas entre años o meses</b>.</p>`
   },
   {
     attachTo: {
@@ -10968,7 +11001,7 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'gastosAdmon',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos de Administración!</h4>',
-    text: `<p>¡Podemos ver el costos de administración en este recuadro!</p>`
+    text: `<p>Podemos ver los <b>costos de administración</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses</p>`
   },
   {
     attachTo: {
@@ -10983,7 +11016,7 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'gastosVentas',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos de Ventas!</h4>',
-    text: `<p>¡Podemos ver el costos de ventas en este recuadro!</p>`
+    text: `<p>En esta grafica estarán los <b>costos de ventas</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses.</p>`
   },
   {
     attachTo: {
@@ -10998,7 +11031,22 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'gastosNoOperacionales',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Gastos No Operacionales!</h4>',
-    text: `<p>¡Podemos ver el costos no operacionales en este recuadro!</p>`
+    text: `<p>Podemos ver los <b>costos no operacionales</b> en cada uno de los meses de los años que se han graficado, de igual menera podemos hacer comparativas entre años o meses.</p>`
+  },
+  {
+    attachTo: {
+      element: '#costosAnios',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'costosAnios',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Costos de los Años!</h4>',
+    text: `<p>En cada grafica se mostrarán los <b>costos de los años</b> que se han graficado, en la parte inferior de cada grafica estarán apareciendo los costos.</p>`
   },
   {
     attachTo: {
@@ -11013,7 +11061,6 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     classes: 'card',
     id: 'tablaDetallada',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Cuentas Detalladas!</h4>',
-    text: `<p>¡Podemos ver las cuentas detalladas presionando este botón, adicionalmente podemos ver los movimientos de cada cuenta en cada mes seleccionando en esta tabla alguna cuenta!</p>`
+    text: `<p>¡Podemos <b>ver las cuentas detalladas presionando este botón</b>, adicionalmente podemos <b>ver los movimientos de cada cuenta en cada mes seleccionando</b> en esta tabla alguna cuenta!</p>`
   },
 ];
-
