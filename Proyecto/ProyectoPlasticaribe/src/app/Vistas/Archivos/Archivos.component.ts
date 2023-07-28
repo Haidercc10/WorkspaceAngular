@@ -1,16 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import { File } from 'buffer';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
 import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
-import { AppComponent } from 'src/app/app.component';
-import Swal from 'sweetalert2';
-import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
-import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
+import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
 
 @Component({
   selector: 'app-Archivos',
@@ -102,14 +101,13 @@ export class ArchivosComponent implements OnInit {
       for (let i = 0; i < datos_archivos.length; i++) {
         let nombreArchivos : string = datos_archivos[i].replace(`${ruta}\\`,'');
         if (nombreArchivos.indexOf("~$") == -1) {
-          let archivos : any = {
+          this.ArrayArchivos.push({
             archivoCarpeta : 'archivo',
             nombre : nombreArchivos,
             ruta : datos_archivos[i],
-          }
-          this.ArrayArchivos.push(archivos);
-          this.ArrayArchivos.sort((a,b) => a.nombre.localeCompare(b.nombre));
-        } else continue;
+          });
+        }
+        this.ArrayArchivos.sort((a,b) => a.nombre.localeCompare(b.nombre));
       }
     });
   }
@@ -121,16 +119,13 @@ export class ArchivosComponent implements OnInit {
     this.ruta = ruta.replace(`D:\\Calidad`, 'Calidad');
     this.archivosService.mostrarCarpetas(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
-        let nombreArchivos : string = datos_archivos[i].replace(`${ruta}`,'');
-        nombreArchivos = nombreArchivos.replace('\\', '');
-        let archivos : any = {
+        this.ArrayArchivos.push({
           archivoCarpeta : 'carpeta',
-          nombre : nombreArchivos,
+          nombre : datos_archivos[i].replace(`${ruta}`,'').replace('\\', ''),
           ruta : datos_archivos[i],
-        }
-        this.ArrayArchivos.push(archivos);
-        this.ArrayArchivos.sort((a,b) => a.nombre.localeCompare(b.nombre));
+        });
       }
+      this.ArrayArchivos.sort((a,b) => a.nombre.localeCompare(b.nombre));
     });
   }
 
@@ -163,7 +158,6 @@ export class ArchivosComponent implements OnInit {
 
   //Funcion que y le pasará el archivo que se cargó y llamará a la funcion que enviará la informacion al servidor para guardar el archivo en su disco local y guardar la informacion en la base de datos
   async subirArchivos(){
-    let categoria = this.formularioArchivo.value.CategoriaArchivos;
     let filePath : string = this.nombreCarpeta;
     for (let i = 0; i < this.selectedFile.length; i++) {
       const formData = new FormData();
@@ -201,15 +195,17 @@ export class ArchivosComponent implements OnInit {
   que se encargará de hacer la peticion al servidor y responderá con un dato blob, este dato se tomará en esta funcion nuevamente y creará  un elemento de tipo a
   que luego se encargará de realizar la descarga, luego de descargar el archivo este elemento se eliminará */
   descargarArchivos(nombre : string){
-    this.archivosService.descargarArchivos(nombre, this.nombreCarpeta + "\\").subscribe( data => {
+    this.archivosService.descargarArchivos(nombre, this.nombreCarpeta + "\\").subscribe(data => {
       const downloadedFile = new Blob([data.body!], { type: data.body! });
-      const a = document.createElement('a');
-      document.body.appendChild(a);
-      a.download = nombre;
-      a.href = URL.createObjectURL(downloadedFile);
-      a.target = '_blank';
-      a.click();
-      document.body.removeChild(a);
+      if (downloadedFile.type != ''){
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.download = nombre;
+        a.href = URL.createObjectURL(downloadedFile);
+        a.target = '_blank';
+        a.click();
+        document.body.removeChild(a);
+      }
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
     });
   }
