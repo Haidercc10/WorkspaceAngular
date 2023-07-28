@@ -21,6 +21,12 @@
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
+  <!-- <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button pButton class="p-button-danger" type="button" label="Crear Categorias" icon="pi pi-plus-circle" (click)="cargarModal()" pTooltip="Crear categorias de archivos" tooltipPosition="left"> </button>
+      <br>
+    </div>
+  </ng-container> -->
 
   <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
     <form [formGroup]="formularioArchivo" (ngSubmit)="subirArchivos()" id="formulario">
@@ -34,6 +40,13 @@
             </span>
           </div>
 
+          <!-- <div class="col-md-6">
+            <span class="p-float-label">
+              <p-dropdown formControlName="CategoriaArchivos" inputId="catArchivos" [autoDisplayFirst]="false" [options]="categoriasArchivos" optionValue="categoria_Id" optionLabel="categoria_Name"></p-dropdown>
+              <label for="catArchivos">Categorias</label>
+            </span>
+          </div> -->
+
           <div class="col-md-9" id="archivo">
             <p-fileUpload (onSelect)="onSelectFile($event)" chooseIcon="pi pi-image" [multiple]="true" chooseLabel="Elegir archivo(s)" [showUploadButton]="false" type="file"></p-fileUpload>
           </div>
@@ -44,6 +57,7 @@
       <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" id="subirArchivo" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
+          <!-- <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button> -->
         </div>
       </div>
     </form>
