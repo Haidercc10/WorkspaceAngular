@@ -599,26 +599,25 @@ export class PruebaImagenCatInsumoComponent implements OnInit  {
         this.arrayCostos.push(infoMeses);
       }
     }
+  }
 
-      let totalesMeses : any = {
-        titulo1 : '',
-        titulo2 : '',
-        titulo3 :'Totales',
-        totalEnero : datas.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
-        totalFebrero : datas.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
-        totalMarzo : datas.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
-        totalAbril : datas.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
-        totalMayo : datas.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
-        totalJunio : datas.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
-        totalJulio : datas.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
-        totalAgosto : datas.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
-        totalSeptiembre : datas.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
-        totalOctubre : datas.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
-        totalNoviembre : datas.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
-        totalDiciembre : datas.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
-        totalTotal : datas.reduce((a, b) => a + b.valor, 0)
-      }
-      this.arrayCostos.push(totalesMeses)
+  // Funcion que va a calcular el costo total del mes en un año
+  calcularCostoMensual(anio : string, mes : string) : number{
+    let total : number = 0;
+    if (mes == '01') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Enero, 0);
+    if (mes == '02') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Febrero, 0);
+    if (mes == '03') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Marzo, 0);
+    if (mes == '04') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Abril, 0);
+    if (mes == '05') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Mayo, 0);
+    if (mes == '06') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Junio, 0);
+    if (mes == '07') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Julio, 0);
+    if (mes == '08') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Agosto, 0);
+    if (mes == '09') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Septiembre, 0);
+    if (mes == '10') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Octubre, 0);
+    if (mes == '11') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Noviembre, 0);
+    if (mes == '12') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.Diciembre, 0);
+    if (mes == '00') total = this.arrayCostos.filter(item => item.Anio == anio).reduce((a, b) => a + b.TotalCuenta, 0);
+    return total;
   }
 
 
