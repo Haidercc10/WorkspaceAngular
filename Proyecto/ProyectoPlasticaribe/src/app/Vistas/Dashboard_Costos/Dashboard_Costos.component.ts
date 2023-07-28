@@ -465,11 +465,7 @@ export class Dashboard_CostosComponent implements OnInit {
         this.arrayGastos1.push(data[index]);
       }
     });
-
-    setTimeout(() => {
-      this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta];
-      console.log(mes)
-    }, 500);
+    setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
   }
   cambiarNumeroAMes(mes : string) : string {
     mes == '01' ? mes = 'Enero' :
