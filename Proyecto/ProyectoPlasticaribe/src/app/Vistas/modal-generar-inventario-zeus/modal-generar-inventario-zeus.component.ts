@@ -79,26 +79,23 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     else {
       this.load = false;
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const header = ["Item", "Cliente", "Nombre", "Existencias", "Precio", "Subtotal", "Presentación", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         let datos : any =[];
         if (this.dt.filteredValue != undefined) {
           for (const item of this.dt.filteredValue) {
-            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Precio, item.Cantidad, item.Presentacion, item.Precio_Total, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
             datos.push(datos1);
           }
         } else if (this.dt._value != undefined) {
           for (const item of this.dt._value) {
-            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Precio, item.Cantidad, item.Presentacion, item.Precio_Total, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Cantidad, item.Precio, item.Precio_Total, item.Presentacion, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
             datos.push(datos1);
           }
         }
         let workbook = new Workbook();
-        const imageId1 = workbook.addImage({
-          base64:  logoParaPdf,
-          extension: 'png',
-        });
+        //const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
-        worksheet.addImage(imageId1, 'A1:B3');
+        //worksheet.addImage(imageId1, 'A1:B3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
@@ -128,7 +125,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';

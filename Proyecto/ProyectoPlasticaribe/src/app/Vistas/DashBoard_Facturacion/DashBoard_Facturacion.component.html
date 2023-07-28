@@ -9,10 +9,10 @@
       <div class="p-3">
         <p-card>
           <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
-            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-dollar"></i> Ventas del Año</h3>
+            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-dollar"></i> Ventas del Día</h3>
           </div>
           <div class="mb-3">
-            <h4><b>{{totalFacturadoanio | currency : ' COP $'}}</b></h4>
+            <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
           </div>
         </p-card>
       </div>
@@ -31,6 +31,17 @@
       <div class="p-3">
         <p-card>
           <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
+            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Iva Ventas del Mes</h3>
+          </div>
+          <div class="mb-3">
+            <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+          </div>
+        </p-card>
+      </div>
+      
+      <div class="p-3">
+        <p-card>
+          <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
             <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-money-bill"></i> Total Ventas del Mes</h3>
           </div>
           <div>
@@ -42,21 +53,10 @@
       <div class="p-3">
         <p-card>
           <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
-            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-dollar"></i> Ventas del Día</h3>
+            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-dollar"></i> Ventas del Año</h3>
           </div>
           <div class="mb-3">
-            <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
-          </div>
-        </p-card>
-      </div>
-
-      <div class="p-3">
-        <p-card>
-          <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
-            <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Iva Ventas del Mes</h3>
-          </div>
-          <div class="mb-3">
-            <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+            <h4><b>{{totalFacturadoanio | currency : ' COP $'}}</b></h4>
           </div>
         </p-card>
       </div>
