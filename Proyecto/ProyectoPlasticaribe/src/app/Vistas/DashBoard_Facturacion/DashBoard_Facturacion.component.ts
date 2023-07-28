@@ -67,7 +67,6 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.llenarArrayAnos();
     this.tiempoExcedido();
     this.graficarDatos();
-    this.facturacionAnio();
   }
 
   tutorial(){

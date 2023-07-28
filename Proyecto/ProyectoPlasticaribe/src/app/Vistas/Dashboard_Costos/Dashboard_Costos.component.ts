@@ -37,7 +37,7 @@ export class Dashboard_CostosComponent implements OnInit {
   costo_Anio_administrativos : any [] = []; //Variable que va a almacenar los costos de administrativos por año
   costo_Anio_ventas : any [] = []; //Variable que va a almacenar los costos de ventas por año
   costo_Anio_noOperacionesles : any [] = []; //Variable que va a almacenar los costos de no operacionesles por año
-  
+
   cuentasFabricacion = ['730545', '730590', '730525', '730530', '730555', '730550', '730540', '730565', '730570', '730560', '740505', '720551', '730505', '730575', '730585'];
   cuentasAdministrativos = ['519595', '519565', '519590', '519535', '519530', '519525', '519520', '519510', '519505', '51559515', '51559505', '515520', '515515', '515505', '515095', '515015', '515005', '514540', '514525', '514515', '514510', '513595', '513555', '513550', '513545', '513540', '513535', '513530', '513525', '513520', '513515', '513510', '513505', '513095', '513040', '513025', '513010', '513005', '512505', '511595', '511515', '511510', '511095'];
   cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
@@ -384,7 +384,7 @@ export class Dashboard_CostosComponent implements OnInit {
     }
   }
 
-  /** Función que limpiará el array de costos al  */
+  /** Función que limpiará el array de costos al momento de cerrar el modal */
   limpiarArrayCostos = () => this.arrayCostos = [];
 
   /** Llenar la tabla del primer modal  */

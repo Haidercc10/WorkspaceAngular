@@ -70,7 +70,7 @@ export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la b
 export let rutaZeusContabilidad = "http://192.168.0.85:9065/api"; //Ruta de prueba del API
 // export let rutaZeusContabilidad = "http://192.168.0.190:9065/api"; //Ruta de prueba del API
 //export let rutaZeusContabilidad = "http://localhost:7067/api"; //Ruta de prueba del API
-// export let rutaZeusContabilidad = "http://192.168.0.153:9055/api"; //Ruta de prueba del API
+//export let rutaZeusContabilidad = "http://192.168.0.153:9055/api"; //Ruta de prueba del API
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */

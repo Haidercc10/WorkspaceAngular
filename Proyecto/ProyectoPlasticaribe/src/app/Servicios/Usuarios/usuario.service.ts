@@ -9,61 +9,36 @@ import { modelUsuario } from '../../Modelo/modelUsuario';
 })
 export class UsuarioService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-//Metodo buscar lista de Usuario
-  srvObtenerListaUsuario() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Usuarios')
-  }
+  //Metodo buscar lista de Usuario
+  srvObtenerListaUsuario = () => this.http.get<any>(rutaPlasticaribeAPI + '/Usuarios')
 
   // Enviará los datos al API para que está valide la existencia del usuario
-  GetLoginUsuario(usuario : number, contrasena : string, empresa : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getLoginUsuario/${usuario}/${contrasena}/${empresa}`);
-  }
+  GetLoginUsuario = (usuario : number, contrasena : string, empresa : number) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/getLoginUsuario/${usuario}/${contrasena}/${empresa}`);
+  
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/${id}`);
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
-  }
+  srvObtenerListaPorNombreUsuario = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/nombreUsuario/${nombre}`);
 
-  srvObtenerListaPorNombreUsuario(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/nombreUsuario/${nombre}`);
-  }
+  srvObtenerListaPorIdConductor = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/UsuarioConductor/${id}`);
 
-  srvObtenerListaPorIdConductor(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuarioConductor/${id}`);
-  }
-
-  GetConsdutores(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getConductores`);
-  }
+  GetConsdutores = () => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/getConductores`);
 
   GetVendedores = () => this.http.get<any>(`${rutaPlasticaribeAPI}/Usuarios/getVendedores`);
 
-//Metodo agregar Usuario
-  srvAgregarUsuario(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data)
-  }
-//Metodo actualizar Usuario
-  srvActualizarUsuario(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
-  }
-//Metodo eliminar Usuario
-  srvEliminarUsuario(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
-  }
+  //Metodo actualizar Usuario
+  srvActualizarUsuario = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
+  
+  //Metodo eliminar Usuario
+  srvEliminarUsuario = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Usuarios/${id}`);
 
-  srvGuardarUsuario(data : modelUsuario): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data);
-  }
+  srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Usuarios', data);
 
-  getUsuariosxId(id : any) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuariosxId/${id}`);
-  }
+  getUsuariosxId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/UsuariosxId/${id}`);
 
-  getUsuarios() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuariosSinParametros`);
-  }
+  getUsuarios = () => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/UsuariosSinParametros`);
+
+  getIpCliente = () : Observable<any> => this.http.get<any>('http://api.ipify.org/');
 }
