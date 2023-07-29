@@ -1239,48 +1239,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va a validar que una orden de trabajo esrá siendo eitada. Si validará si se está cambiando el estado por medio del botón con el lapiz o por medio de la selección de una o varias ot
   cambirEstadoOT() {
-    for (let i = 0; i < this.ordenesSeleccionadas.length; i++){
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(this.ordenesSeleccionadas[i].ot).subscribe(datos_ot => {
-        for (let i = 0; i < datos_ot.length; i++) {
-          let info : any = {
-            EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
-            EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
-            EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
-            EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
-            EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
-            EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg,
-            EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
-            EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
-            EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
-            EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
-            EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
-            EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
-            EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
-            EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
-            EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
-            UndMed_Id : datos_ot[i].undMed_Id,
-            Estado_Id : this.estadoModal,
-            Falla_Id : datos_ot[i].falla_Id,
-            EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
-            EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
-            EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
-            Usua_Id : datos_ot[i].usua_Id,
-            EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
-            EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
-            EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
-            EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
-            EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
-            EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
-            Cli_Id : datos_ot[i].cli_Id,
-            Prod_Id : datos_ot[i].prod_Id,
-            EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
-            EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
-          }
-          this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-            this.cambiarEstadoOTBagpro();
-            this.modalEstadosOT = false;
-          });
-        }
+    for (let i = 0; i < this.ordenesSeleccionadas.length; i++){      
+      this.estadosProcesos_OTService.PutEstadoOrdenTrabajo(this.ordenesSeleccionadas[i].ot, this.estadoModal).subscribe(() => {
+        this.cambiarEstadoOTBagpro();
+        this.modalEstadosOT = false;
       });
     }
     setTimeout(() => {

@@ -527,70 +527,70 @@
             </div>
           </ng-template>
         </p-table>
-
-        <!-- Modal Para cambiar el estado de la orden de trabajo -->
-        <p-dialog [(visible)]="modalEstadosOT" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
-          <ng-template pTemplate="content">
-            <div class="p-field">
-              <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
-            </div>
-
-            <div class="p-field">
-              <label class="p-mb-3">Estados de las ordenes de trabajo</label>
-              <div class="p-formgrid p-grid">
-                <div class="p-field-radiobutton p-col-6">
-                  <p-radioButton id="category1" name="category" value="15" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label for="category1" style="padding-left: 3%;">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-                <div class="p-field-radiobutton p-col-6">
-                  <p-radioButton id="category2" name="category" value="3" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label for="category1" style="padding-left: 3%;">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-                <div class="p-field-radiobutton p-col-6">
-                  <p-radioButton id="category3" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label for="category2" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-                <div class="p-field-radiobutton p-col-6">
-                  <p-radioButton id="category5" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label for="category3" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-                <div class="p-field-radiobutton p-col-6">
-                  <p-radioButton id="category6" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label for="category4" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-                <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
-                  <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
-                  <label class="font-size-20" for="category2" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                </div>
-              </div>
-            </div>
-          </ng-template>
-
-          <ng-template pTemplate="footer">
-            <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-            <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambirEstadoOT()"></button>
-          </ng-template>
-        </p-dialog>
-        <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
-
-
-        <p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: '70%'}" header="Rollos de la OT" [modal]="true" >
-          <ng-template pTemplate="content">
-            <app-DatosOT-Status></app-DatosOT-Status>
-          </ng-template>
-        </p-dialog>
-
-
-        <p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '70%'}" header="Reporte de costos" [modal]="true" >
-          <ng-template pTemplate="content">
-            <app-reporteCostosOT></app-reporteCostosOT>
-          </ng-template>
-        </p-dialog>
-
       </div>
     </div>
   </div>
 </p-card>
+
+
+<!-- Modal Para cambiar el estado de la orden de trabajo -->
+<p-dialog [(visible)]="modalEstadosOT" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
+    </div>
+
+    <div class="p-field">
+      <label class="p-mb-3">Estados de las ordenes de trabajo</label>
+      <div class="p-formgrid p-grid">
+        <div class="p-field-radiobutton p-col-6">
+          <p-radioButton id="category1" name="category" value="15" [(ngModel)]="estadoModal"></p-radioButton>
+          <label for="category1" style="padding-left: 3%;">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="p-field-radiobutton p-col-6">
+          <p-radioButton id="category2" name="category" value="3" [(ngModel)]="estadoModal"></p-radioButton>
+          <label for="category1" style="padding-left: 3%;">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="p-field-radiobutton p-col-6">
+          <p-radioButton id="category3" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
+          <label for="category2" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="p-field-radiobutton p-col-6">
+          <p-radioButton id="category5" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
+          <label for="category3" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="p-field-radiobutton p-col-6">
+          <p-radioButton id="category6" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
+          <label for="category4" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
+          <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
+          <label class="font-size-20" for="category2" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambirEstadoOT()"></button>
+  </ng-template>
+</p-dialog>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+
+<p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: '70%'}" header="Rollos de la OT" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-DatosOT-Status></app-DatosOT-Status>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '70%'}" header="Reporte de costos" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-reporteCostosOT></app-reporteCostosOT>
+  </ng-template>
+</p-dialog>
 
 <p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
   <ng-template pTemplate>

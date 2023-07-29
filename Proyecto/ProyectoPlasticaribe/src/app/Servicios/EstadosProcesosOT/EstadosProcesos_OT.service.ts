@@ -148,6 +148,8 @@ export class EstadosProcesos_OTService {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/ActualizacionFallaObservacion/${id}`, data);
   }
 
+  PutEstadoOrdenTrabajo = (ot : any, estado : any) => this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/putEstadoOrden/${ot}?estadoOt=${estado}`, estado);
+
   srvEliminar(id:number|string) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`);
   }
