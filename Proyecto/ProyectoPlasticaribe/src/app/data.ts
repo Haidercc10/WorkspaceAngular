@@ -11064,3 +11064,36 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
     text: `<p>¡Podemos <b>ver las cuentas detalladas presionando este botón</b>, adicionalmente podemos <b>ver los movimientos de cada cuenta en cada mes seleccionando</b> en esta tabla alguna cuenta!</p>`
   },
 ];
+
+export const stepsIngresoNomina : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#nomina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'nomina',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Ingreso de Nómina</h4>',
+    text: `<p>En este módulo podrás ingresar los registros de la nómina de los empleados de Plasticaribe SAS.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Formulario</h4>',
+    text: `<p>Para cargar los registros en la tabla debes diligenciar todos los campos</p>`
+  },
+];

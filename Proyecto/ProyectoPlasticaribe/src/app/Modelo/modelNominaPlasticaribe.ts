@@ -7,4 +7,5 @@ export interface modelNominaPlasticaribe {
     Nomina_FechaFinal : any;
     Nomina_Costo : number;
     Nomina_Observacion : string;
+    TpNomina_Id : number;
 }
