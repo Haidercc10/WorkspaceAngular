@@ -4,6 +4,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { CostosEmpresasService } from 'src/app/Servicios/CostosEmpresas/CostosEmpresas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
@@ -26,6 +27,10 @@ export class Dashboard_CostosComponent implements OnInit {
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   rangoFechas : any [] = []; //Variable que almacenará la información de la fecha de inicio y la fecha de fin
+
+  nominaAdministrativa : any [] = []; //Variable que almacenará la información de la nomina administrativa
+  nominaFabricacion : any [] = []; //Variable que almacenará la información de la nomina de fabricación
+  nominaVentas : any [] = []; //
 
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaCostosFabricacion : any; //Variable que va a almacenar los costos de fabricación
@@ -55,12 +60,17 @@ export class Dashboard_CostosComponent implements OnInit {
   cuentaSeleccionada : any[] = []; /** Array que mostrará la cuenta, el mes y el año en el titulo del segundo modal */
 
   constructor(private AppComponent : AppComponent,
-                private zeusContabilidad : ZeusContabilidadService,
-                  private msj : MensajesAplicacionService,
-                    private shepherdService: ShepherdService,){}
+                private msj : MensajesAplicacionService,
+                  private shepherdService: ShepherdService,
+                    private zeusContabilidad : ZeusContabilidadService,
+                      private costosService : CostosEmpresasService,){}
 
   ngOnInit(): void {
+    this.lecturaStorage();
     this.llenarArrayAnos();
+    this.nominaAdministrativaPlasticaribe();
+    this.nominaVentasPlasticaribe();
+    this.nominaFabricacionPlasticaribe();
     this.inicializarGraficas();
     this.llenarGraficas();
   }
@@ -163,9 +173,9 @@ export class Dashboard_CostosComponent implements OnInit {
       this.cargando = true;
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(`${this.anioSeleccionado}`).subscribe(dato => {
         let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-        let costosFabricacion = costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()));
-        let costosAdministrativos = costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()));
-        let costosVentas = costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()));
+        let costosFabricacion = [costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a, b) => a.concat(b));;
+        let costosAdministrativos = [costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a, b) => a.concat(b));
+        let costosVentas = [costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a, b) => a.concat(b));
         let costoNoOperacionales = costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()));
 
         this.datosCostosFabricacion(costosFabricacion);
@@ -174,6 +184,396 @@ export class Dashboard_CostosComponent implements OnInit {
         this.datosCostosNoOperacionesles(costoNoOperacionales);
       });
     } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
+  }
+
+  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe 
+  nominaAdministrativaPlasticaribe(){
+    this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA ADMINISTRACION PLASTICARIBE`).subscribe(data => {
+      data.forEach(costo => {
+        this.nominaAdministrativa = [
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.enero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "01",
+            periodo : `${costo.anio}01`,
+            valor : costo.enero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.febrero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "02",
+            periodo : `${costo.anio}02`,
+            valor : costo.febrero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.marzo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "03",
+            periodo : `${costo.anio}03`,
+            valor : costo.marzo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.abril,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "04",
+            periodo : `${costo.anio}04`,
+            valor : costo.abril
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.mayo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "05",
+            periodo : `${costo.anio}05`,
+            valor : costo.mayo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.junio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "06",
+            periodo : `${costo.anio}06`,
+            valor : costo.junio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.julio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "07",
+            periodo : `${costo.anio}07`,
+            valor : costo.julio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.agosto,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "08",
+            periodo : `${costo.anio}08`,
+            valor : costo.agosto
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.septiembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "09",
+            periodo : `${costo.anio}09`,
+            valor : costo.septiembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.octubre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "10",
+            periodo : `${costo.anio}10`,
+            valor : costo.octubre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.noviembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "11",
+            periodo : `${costo.anio}11`,
+            valor : costo.noviembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.diciembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "12",
+            periodo : `${costo.anio}12`,
+            valor : costo.diciembre
+          },
+        ];
+      });
+    });
+  }
+
+  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe 
+  nominaVentasPlasticaribe(){
+    this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
+      data.forEach(costo => {
+        this.nominaVentas = [
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.enero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "01",
+            periodo : `${costo.anio}01`,
+            valor : costo.enero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.febrero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "02",
+            periodo : `${costo.anio}02`,
+            valor : costo.febrero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.marzo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "03",
+            periodo : `${costo.anio}03`,
+            valor : costo.marzo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.abril,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "04",
+            periodo : `${costo.anio}04`,
+            valor : costo.abril
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.mayo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "05",
+            periodo : `${costo.anio}05`,
+            valor : costo.mayo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.junio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "06",
+            periodo : `${costo.anio}06`,
+            valor : costo.junio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.julio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "07",
+            periodo : `${costo.anio}07`,
+            valor : costo.julio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.agosto,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "08",
+            periodo : `${costo.anio}08`,
+            valor : costo.agosto
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.septiembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "09",
+            periodo : `${costo.anio}09`,
+            valor : costo.septiembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.octubre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "10",
+            periodo : `${costo.anio}10`,
+            valor : costo.octubre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.noviembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "11",
+            periodo : `${costo.anio}11`,
+            valor : costo.noviembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.diciembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "12",
+            periodo : `${costo.anio}12`,
+            valor : costo.diciembre
+          },
+        ];
+      });
+    });
+  }
+
+  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe 
+  nominaFabricacionPlasticaribe(){
+    this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
+      data.forEach(costo => {
+        this.nominaFabricacion = [
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.enero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "01",
+            periodo : `${costo.anio}01`,
+            valor : costo.enero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.febrero,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "02",
+            periodo : `${costo.anio}02`,
+            valor : costo.febrero
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.marzo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "03",
+            periodo : `${costo.anio}03`,
+            valor : costo.marzo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.abril,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "04",
+            periodo : `${costo.anio}04`,
+            valor : costo.abril
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.mayo,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "05",
+            periodo : `${costo.anio}05`,
+            valor : costo.mayo
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.junio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "06",
+            periodo : `${costo.anio}06`,
+            valor : costo.junio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.julio,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "07",
+            periodo : `${costo.anio}07`,
+            valor : costo.julio
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.agosto,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "08",
+            periodo : `${costo.anio}08`,
+            valor : costo.agosto
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.septiembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "09",
+            periodo : `${costo.anio}09`,
+            valor : costo.septiembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.octubre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "10",
+            periodo : `${costo.anio}10`,
+            valor : costo.octubre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.noviembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "11",
+            periodo : `${costo.anio}11`,
+            valor : costo.noviembre
+          },
+          {
+            anio: costo.anio,
+            credito: 0,
+            cuenta: "",
+            debito: costo.diciembre,
+            descripcionCuenta: "NOMINA PLASTICARIBE",
+            mes: "12",
+            periodo : `${costo.anio}12`,
+            valor : costo.diciembre
+          },
+        ];
+      });
+    });
   }
 
   // funcion que va a manejar los datos de los costos de fabricacion
