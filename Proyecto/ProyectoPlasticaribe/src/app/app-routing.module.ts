@@ -60,6 +60,7 @@ import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/repor
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
+import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 
 export const routes: Routes = [
 
@@ -165,6 +166,7 @@ export const routes: Routes = [
 
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Nómina'}, component: NominaComponent},
+  {path: 'ingreso-nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Nómina'}, component: Ingreso_NominaComponent},
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
   {path: 'solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Material Producción'}, component: SolicitudMP_ExtrusionComponent},

@@ -197,3 +197,7 @@ p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
 #rowToolbar ::ng-deep .row, .g-3 {
   --bs-gutter-x : 0
  }
+
+ ::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  color : #ff5252;
+ }

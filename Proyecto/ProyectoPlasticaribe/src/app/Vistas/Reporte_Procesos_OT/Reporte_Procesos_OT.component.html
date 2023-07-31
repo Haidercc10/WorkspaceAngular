@@ -299,7 +299,7 @@
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.rot < data.cant && data.rot > 0">
-                <td id="rot" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot | number}}</td>
+                <td id="rot" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila3">
@@ -315,8 +315,8 @@
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila3>
-                <td *ngIf="data.est != 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
               </ng-template>
 
               <!-- Doblado -->

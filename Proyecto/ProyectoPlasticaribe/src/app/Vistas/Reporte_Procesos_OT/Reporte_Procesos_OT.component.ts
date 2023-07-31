@@ -740,7 +740,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que consolutará los rollos pesados por cada proceso
-  seleccionarOTxStatus(form : any, proceso : any){
+  /*seleccionarOTxStatus(form : any, proceso : any){
     this.otSeleccionada = form.ot;
     console.log(form.rot)
     if (proceso == 'EXTRUSION' && form.ext > 0) {
@@ -1132,7 +1132,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     }
-  }
+  }*/
 
   seleccionarOTxProceso(data: any , proceso : string) {
     this.otSeleccionada = data.ot;
@@ -1150,9 +1150,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     });
     //Datos consolidados
     this.servicioBagPro.GetDatosConsolidados(this.otSeleccionada, proceso).subscribe(data2 => {
-      this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
       if(data2.length > 0) {
         setTimeout(() => {
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
           for (let i = 0; i < data2.length; i++) {
             this.llenarTablaConsolidada(data2[i]);
           }
@@ -1172,7 +1172,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       Maquina : datos.maquina,
       Turno : datos.turno,
       Status : datos.proceso,
-      Fecha : datos.fecha.replace("12:00:00 a.\u00A0m.", " ") + datos.hora,
+      Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("12:00:00 a.\u00A0m.", " ") + datos.hora,
     }
     this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
   }
@@ -1296,7 +1296,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va a validar que una orden de trabajo esrá siendo eitada. Si validará si se está cambiando el estado por medio del botón con el lapiz o por medio de la selección de una o varias ot
   cambirEstadoOT() {
-    for (let i = 0; i < this.ordenesSeleccionadas.length; i++){      
+    for (let i = 0; i < this.ordenesSeleccionadas.length; i++){
       this.estadosProcesos_OTService.PutEstadoOrdenTrabajo(this.ordenesSeleccionadas[i].ot, this.estadoModal).subscribe(() => {
         this.cambiarEstadoOTBagpro();
         this.modalEstadosOT = false;
