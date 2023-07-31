@@ -36,7 +36,7 @@ export class BagproService {
   srvObtenerListaPorStatusWiketiado = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
 
   srvObtenerDataConsolidada_StatusSellado = (OT : any, Proceso: any) => this.http.get<any>(rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
-  
+
   DeleteRollosSellado_Wiketiado = (id : any) => this.http.delete(rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
 
   srvObtenerListaFilasEmpaqueEnProcExtrusion = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
@@ -53,7 +53,7 @@ export class BagproService {
   srvObtenerListaProcExtOt = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/OT/${ot}`);
 
   srvObtenerListaPorRollo = (rollo : any, produ : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/MostrarRollos/${rollo}/${produ}`);
-  
+
   srvObtenerListaProcExtOt_fechaFinal = (ot : any):Observable<any> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
 
   srvObtenerListaProcextrusionProducido = (ot : any) => this.http.get<any>(rutaBagPro + `/ProcExtrusion/OtConEmpaque/${ot}`);
@@ -63,7 +63,7 @@ export class BagproService {
   srvObtenerListaProcExtrusionRollos = (ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/Rollos/${ot}`);
 
   srvObtenerListaProcExtrusionFechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
-  
+
   consultarFechas = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/Fechas/${fecha1}/${fecha2}`);
 
   srvObtenerListaProcExtrusionFechasOT = (fecha1 : any, fecha2 : any, ot : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/FechasOTRollos/${fecha1}/${fecha2}/${ot}`);
@@ -104,6 +104,10 @@ export class BagproService {
 
   srvObtenerDataConsolidada_StatusExtrusion = (OT : any, Proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
 
+  GetObtenerDatosxProcesos = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getObtenerDatosxProcesos/${OT}/${proceso}`);
+
+  GetDatosConsolidados = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getDatosConsolidados/${OT}/${proceso}`);
+
   /********************************************************** CLIENTESOT ****************************************************************/
   srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
 
@@ -120,17 +124,17 @@ export class BagproService {
   srvObtenerListaClienteOT_UltimaOT = ():Observable<any> => this.http.get<any>(rutaBagPro + `/ClientesOt/UltimaOT/`);
 
   srvObtenerListaConsultarItem = (fecha1 : any, fecha2 : any, item : any, precio : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/consultarItem/${fecha1}/${fecha2}/${item}/${precio}`);
-  
+
   GetCostoOrdenesUltimoMes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOrdenesUltimoMes/${fecha1}/${fecha2}`);
-  
+
   GetCostoOrdenesUltimoMes_Vendedores = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Vendedores/${fecha1}/${fecha2}`);
-  
+
   GetCostoOrdenesUltimoMes_Clientes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Clientes/${fecha1}/${fecha2}`);
-  
+
   GetPesoProcesosUltimoMes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getPesoProcesosUltimoMes/${fecha1}/${fecha2}`);
-  
+
   GetCantOrdenesMateriales = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ClientesOt/getCantOrdenesMateriales/${fecha1}/${fecha2}`);
-  
+
   /**************************************************************** CLIENTESOTITEM *******************************************************/
   srvObtenerListaClienteOTItems = ():Observable<any[]> => this.http.get<any>(rutaBagPro + '/ClientesOtItems');
 

@@ -13,6 +13,7 @@
     dataKey="id">
     <ng-template pTemplate="header">
       <tr class="font-size-13">
+        <th scope="col" pResizableColumn>#</th>
         <th scope="col" pResizableColumn>Item</th>
         <th scope="col" pResizableColumn>Cliente</th>
         <th scope="col" pResizableColumn>producto</th>
@@ -24,8 +25,9 @@
         <th scope="col" pResizableColumn>Fecha</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-ArrayDatosProcesos>
+    <ng-template pTemplate="body" let-ArrayDatosProcesos let-rowIndex="rowIndex">
       <tr class="font-size-13">
+        <td id="id" class="TextosInfoTabla"><b>{{rowIndex + 1}}</b></td>
         <td id="id" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Rollo}}</b></td>
         <td id="cliente" class="TextosInfoTabla">{{ArrayDatosProcesos.Cliente}}</td>
         <td id="producto" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Producto}}</b></td>

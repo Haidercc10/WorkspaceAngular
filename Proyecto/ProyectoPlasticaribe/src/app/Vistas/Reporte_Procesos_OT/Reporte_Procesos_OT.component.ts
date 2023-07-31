@@ -742,7 +742,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que consolutará los rollos pesados por cada proceso
   seleccionarOTxStatus(form : any, proceso : any){
     this.otSeleccionada = form.ot;
-
+    console.log(form.rot)
     if (proceso == 'EXTRUSION' && form.ext > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1134,6 +1134,63 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     }
   }
 
+  seleccionarOTxProceso(data: any , proceso : string) {
+    this.otSeleccionada = data.ot;
+    //Datos rollo a rollo
+    this.servicioBagPro.GetObtenerDatosxProcesos(this.otSeleccionada, proceso).subscribe(data => {
+      if(data.length > 0) {
+        this.modalProcesos = true;
+        setTimeout(() => {
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
+          for (let index = 0; index < data.length; index++) {
+            this.llenarTablaProcesos(data[index]);
+          }
+        }, 500);
+      } else this.msj.mensajeAdvertencia('Advertencia', `No se ha pesado ningún rollo en la OT N° ${this.otSeleccionada} en el proceso de ${proceso}`);
+    });
+    //Datos consolidados
+    this.servicioBagPro.GetDatosConsolidados(this.otSeleccionada, proceso).subscribe(data2 => {
+      this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
+      if(data2.length > 0) {
+        setTimeout(() => {
+          for (let i = 0; i < data2.length; i++) {
+            this.llenarTablaConsolidada(data2[i]);
+          }
+        }, 1000)
+      }
+    });
+  }
+
+  llenarTablaProcesos(datos : any){
+    const Info : any = {
+      Rollo : datos.rollo,
+      Cliente : datos.cliente,
+      Producto : datos.referencia,
+      Peso : datos.unidad != 'Kg' ? this.formatonumeros(datos.peso1) : this.formatonumeros(datos.peso2),
+      Unidad : datos.unidad,
+      Operador : datos.operario,
+      Maquina : datos.maquina,
+      Turno : datos.turno,
+      Status : datos.proceso,
+      Fecha : datos.fecha.replace("12:00:00 a.\u00A0m.", " ") + datos.hora,
+    }
+    this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+  }
+
+  llenarTablaConsolidada(datos_agrupados : any){
+    let info : any = {
+      Ot : datos_agrupados.ot,
+      Producto : datos_agrupados.referencia,
+      Operador : datos_agrupados.operario,
+      Peso : datos_agrupados.sumaCantidad1 != datos_agrupados.sumaCantidad2 ? this.formatonumeros(datos_agrupados.sumaCantidad1) : this.formatonumeros(datos_agrupados.sumaCantidad2),
+      Fecha : datos_agrupados.fecha.replace("12:00:00 a.\u00A0m.", " "),
+      Proceso : datos_agrupados.proceso,
+      Count : datos_agrupados.registros,
+    }
+    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+  }
+
   // Funcion que se encargará de limpiar los campos del modal de procesos
   limpiarModalProcesos(){
     this.modalProcesos = false;
@@ -1303,5 +1360,4 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       $event.stopPropagation();
     }, 500);
   }
-
 }

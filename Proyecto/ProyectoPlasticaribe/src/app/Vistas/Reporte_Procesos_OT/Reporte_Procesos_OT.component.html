@@ -241,246 +241,246 @@
               <!-- Extrusion -->
               <!-- Termianda -->
               <ng-container *ngIf="data.ext >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="ext" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext | number}}</td>
+                <td id="ext" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.ext < data.cant && data.ext > 0">
-                <td id="ext" scope="col" style="background-color: #F3FC20; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext | number}}</td>
+                <td id="ext" scope="col" style="background-color: #F3FC20; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila1">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="ext" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="ext" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="ext" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
+                  <td id="ext" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila1>
-                <td *ngIf="data.est != 'Anulado' && data.ext == 0 && data.ext < data.cant" id="ext" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.ext == 0 && data.ext < data.cant" id="ext" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.ext == 0 && data.ext < data.cant" id="ext" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.ext == 0 && data.ext < data.cant" id="ext" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'EXTRUSION')">{{data.ext == 0 ? 'NO' : data.ext | number}}</td>
               </ng-template>
 
               <!-- Impresion -->
               <!-- Termianda -->
               <ng-container *ngIf="data.imp >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="imp" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')" >{{data.imp | number}}</td>
+                <td id="imp" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')" >{{data.imp | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.imp < data.cant && data.imp > 0">
-                <td id="imp" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp | number}}</td>
+                <td id="imp" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila2">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="imp" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="imp" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="imp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
+                  <td id="imp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila2>
-                <td *ngIf="data.est != 'Anulado' && data.imp == 0 && data.imp < data.cant" id="imp" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.imp == 0 && data.imp < data.cant" id="imp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.imp == 0 && data.imp < data.cant" id="imp" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.imp == 0 && data.imp < data.cant" id="imp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.imp == 0 ? 'NO' : data.imp | number}}</td>
               </ng-template>
 
               <!-- Rotograbado -->
               <!-- Termianda -->
               <ng-container *ngIf="data.rot >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="rot" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'ROTOGRABADO')">{{data.rot | number}}</td>
+                <td id="rot" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')">{{data.rot | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.rot < data.cant && data.rot > 0">
-                <td id="rot" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot | number}}</td>
+                <td id="rot" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila3">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="rot" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="rot" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                  <td id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'IMPRESION')">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila3>
-                <td *ngIf="data.est != 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.rot == 0 && data.rot < data.cant" id="rot" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{data.rot == 0 ? 'NO' : data.rot | number}}</td>
               </ng-template>
 
               <!-- Doblado -->
               <!-- Termianda -->
               <ng-container *ngIf="data.dbl >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="dbl" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl | number}}</td>
+                <td id="dbl" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.dbl < data.cant && data.dbl > 0">
-                <td id="dbl" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl | number}}</td>
+                <td id="dbl" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila4">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="dbl" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="dbl" scope="col" style="background-color: #F6D45D; color: #495057;" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #F6D45D; color: #495057;" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="dbl" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
+                  <td id="dbl" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila4>
-                <td *ngIf="data.est != 'Anulado' && data.dbl == 0 && data.dbl < data.cant" id="dbl" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.dbl == 0 && data.dbl < data.cant" id="dbl" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.dbl == 0 && data.dbl < data.cant" id="dbl" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.dbl == 0 && data.dbl < data.cant" id="dbl" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'DOBLADO')">{{data.dbl == 0 ? 'NO' : data.dbl | number}}</td>
               </ng-template>
 
               <!-- laminado -->
               <!-- Termianda -->
               <ng-container *ngIf="data.lam >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="lam" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam | number}}</td>
+                <td id="lam" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.lam < data.cant && data.lam > 0">
-                <td id="lam" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam | number}}</td>
+                <td id="lam" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila5">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="lam" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="lam" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="lam" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
+                  <td id="lam" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila5>
-                <td *ngIf="data.est != 'Anulado' && data.lam == 0 && data.lam < data.cant" id="lam" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.lam == 0 && data.lam < data.cant" id="lam" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.lam == 0 && data.lam < data.cant" id="lam" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.lam == 0 && data.lam < data.cant" id="lam" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'LAMINADO')">{{data.lam == 0 ? 'NO' : data.lam | number}}</td>
               </ng-template>
 
               <!-- Corte -->
               <!-- Termianda -->
               <ng-container *ngIf="data.cor >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="cor" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor | number}}</td>
+                <td id="cor" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor | number}}</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.cor < data.cant && data.cor > 0">
-                <td id="cor" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor | number}}</td>
+                <td id="cor" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor | number}}</td>
               </ng-container>
               <!-- Abierta / Asignada / Anulado -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila6">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="cor" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="cor" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="cor" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
+                  <td id="cor" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila6>
-                <td *ngIf="data.est != 'Anulado' && data.cor == 0 && data.cor < data.cant" id="cor" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.cor == 0 && data.cor < data.cant" id="cor" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.cor == 0 && data.cor < data.cant" id="cor" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.cor == 0 && data.cor < data.cant" id="cor" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'CORTE')">{{data.cor == 0 ? 'NO' : data.cor | number}}</td>
               </ng-template>
 
               <!-- Empaque -->
               <!-- Termianda -->
               <ng-container *ngIf="data.emp >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="emp" scope="col" style="background-color: #8AFC9B; color: #495057 " (click)="seleccionarOTxStatus(data, 'EMPAQUE')"><b>{{data.emp | number}}</b></td>
+                <td id="emp" scope="col" style="background-color: #8AFC9B; color: #495057 " (click)="seleccionarOTxProceso(data, 'EMPAQUE')"><b>{{data.emp | number}}</b></td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.emp < data.cant && data.emp > 0">
-                <td id="emp" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')"><b>{{data.emp | number}}</b></td>
+                <td id="emp" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')"><b>{{data.emp | number}}</b></td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila7">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="emp" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="emp" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="emp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
+                  <td id="emp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')"><b>{{data.emp == 0 ? 'NO' : data.emp | number}}</b></td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila7>
-                <td *ngIf="data.est != 'Anulado' && data.emp == 0 && data.emp < data.cant" id="emp" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')">{{data.emp == 0 ? 'NO' : data.emp | number}}</td>
-                <td *ngIf="data.est == 'Anulado' && data.emp == 0 && data.emp < data.cant" id="emp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'EMPAQUE')">{{data.emp == 0 ? 'NO' : data.emp | number}}</td>
+                <td *ngIf="data.est != 'Anulado' && data.emp == 0 && data.emp < data.cant" id="emp" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')">{{data.emp == 0 ? 'NO' : data.emp | number}}</td>
+                <td *ngIf="data.est == 'Anulado' && data.emp == 0 && data.emp < data.cant" id="emp" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'EMPAQUE')">{{data.emp == 0 ? 'NO' : data.emp | number}}</td>
               </ng-template>
 
               <!-- Sellado -->
               <!-- Termianda -->
               <ng-container *ngIf="data.sel >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="sel" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')"><b>{{data.sel | number}} Kg - {{data.selUnd | number}} Und</b></td>
+                <td id="sel" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel | number}} Kg - {{data.selUnd | number}} Und</b></td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.sel < data.cant && data.sel > 0">
-                <td id="sel" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')"><b>{{data.sel | number}} Kg - {{data.selUnd | number}} Und</b></td>
+                <td id="sel" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel | number}} Kg - {{data.selUnd | number}} Und</b></td>
               </ng-container>
               <!-- Abierta / Asignada / Anulada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila8">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="sel" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="sel" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
                 </ng-container>
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="sel" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
+                  <td id="sel" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')"><b>{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</b></td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila8>
-                <td *ngIf="data.est != 'Anulado' && data.sel == 0 && data.sel < data.cant" id="sel" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')">{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</td>
-                <td *ngIf="data.est == 'Anulado' && data.sel == 0 && data.sel < data.cant" id="sel" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'SELLADO')">{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</td>
+                <td *ngIf="data.est != 'Anulado' && data.sel == 0 && data.sel < data.cant" id="sel" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')">{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</td>
+                <td *ngIf="data.est == 'Anulado' && data.sel == 0 && data.sel < data.cant" id="sel" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'SELLADO')">{{data.sel == 0 ? 'NO' : data.sel | number}} Kg - {{data.selUnd == 0 ? 'NO' : data.selUnd | number}} Und</td>
               </ng-template>
 
               <!-- Wiketiado -->
               <!-- Termianda -->
               <ng-container *ngIf="data.wik >= (data.cant) && data.est != 'Abierta'  && data.est != 'Asignada'">
-                <td id="wik" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd | number}} Und</td>
+                <td id="wik" scope="col" style="background-color: #8AFC9B; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd | number}} Und</td>
               </ng-container>
               <!-- Iniciada -->
               <ng-container *ngIf="data.wik < (data.cant) && data.wik > 0">
-                <td id="wik" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd | number}} Und</td>
+                <td id="wik" scope="col" style="background-color: #F9FC5B; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd | number}} Und</td>
               </ng-container>
               <!-- Asignada -->
               <ng-container *ngIf="(data.ext + data.imp + data.rot + data.dbl + data.lam + data.cor + data.emp  + data.sel + data.wik) == 0; else fila9">
                 <ng-container *ngIf="data.est == 'Asignada'">
-                  <td id="wik" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #83D3FF; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
                 </ng-container>
                 <!-- Abierta -->
                 <ng-container *ngIf="data.est == 'Abierta'">
-                  <td id="wik" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #F6D45D; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
                 </ng-container>
                 <!-- Anulada -->
                 <ng-container *ngIf="data.est == 'Anulado'">
-                  <td id="wik" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+                  <td id="wik" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
                 </ng-container>
               </ng-container>
               <!-- No iniciado -->
               <ng-template #fila9>
-                <td *ngIf="data.est != 'Anulado' && data.wik == 0 && data.wik < data.cant" id="wik" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
-                <td *ngIf="data.est == 'Anulado' && data.wik == 0 && data.wik < data.cant" id="wik" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxStatus(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+                <td *ngIf="data.est != 'Anulado' && data.wik == 0 && data.wik < data.cant" id="wik" scope="col" style="background-color: #EAEAEA; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
+                <td *ngIf="data.est == 'Anulado' && data.wik == 0 && data.wik < data.cant" id="wik" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
               </ng-template>
 
               <td id="cant" scope="col"><b>{{data.cantUnd}}</b></td>
