@@ -194,9 +194,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.enero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "01",
             periodo : `${costo.anio}01`,
             valor : costo.enero
@@ -204,9 +204,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.febrero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "02",
             periodo : `${costo.anio}02`,
             valor : costo.febrero
@@ -214,9 +214,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.marzo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "03",
             periodo : `${costo.anio}03`,
             valor : costo.marzo
@@ -224,9 +224,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.abril,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "04",
             periodo : `${costo.anio}04`,
             valor : costo.abril
@@ -234,9 +234,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.mayo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "05",
             periodo : `${costo.anio}05`,
             valor : costo.mayo
@@ -244,9 +244,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.junio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "06",
             periodo : `${costo.anio}06`,
             valor : costo.junio
@@ -254,9 +254,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.julio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "07",
             periodo : `${costo.anio}07`,
             valor : costo.julio
@@ -264,9 +264,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.agosto,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "08",
             periodo : `${costo.anio}08`,
             valor : costo.agosto
@@ -274,9 +274,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.septiembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "09",
             periodo : `${costo.anio}09`,
             valor : costo.septiembre
@@ -284,9 +284,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.octubre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "10",
             periodo : `${costo.anio}10`,
             valor : costo.octubre
@@ -294,9 +294,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.noviembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "11",
             periodo : `${costo.anio}11`,
             valor : costo.noviembre
@@ -304,9 +304,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "1",
             debito: costo.diciembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA ADMINISTRACION",
             mes: "12",
             periodo : `${costo.anio}12`,
             valor : costo.diciembre
@@ -324,9 +324,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.enero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "01",
             periodo : `${costo.anio}01`,
             valor : costo.enero
@@ -334,9 +334,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.febrero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "02",
             periodo : `${costo.anio}02`,
             valor : costo.febrero
@@ -344,9 +344,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.marzo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "03",
             periodo : `${costo.anio}03`,
             valor : costo.marzo
@@ -354,9 +354,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.abril,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "04",
             periodo : `${costo.anio}04`,
             valor : costo.abril
@@ -364,9 +364,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.mayo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "05",
             periodo : `${costo.anio}05`,
             valor : costo.mayo
@@ -374,9 +374,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.junio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "06",
             periodo : `${costo.anio}06`,
             valor : costo.junio
@@ -384,9 +384,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.julio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "07",
             periodo : `${costo.anio}07`,
             valor : costo.julio
@@ -394,9 +394,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.agosto,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "08",
             periodo : `${costo.anio}08`,
             valor : costo.agosto
@@ -404,9 +404,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.septiembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "09",
             periodo : `${costo.anio}09`,
             valor : costo.septiembre
@@ -414,9 +414,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.octubre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "10",
             periodo : `${costo.anio}10`,
             valor : costo.octubre
@@ -424,9 +424,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.noviembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "11",
             periodo : `${costo.anio}11`,
             valor : costo.noviembre
@@ -434,9 +434,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "2",
             debito: costo.diciembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA VENTAS",
             mes: "12",
             periodo : `${costo.anio}12`,
             valor : costo.diciembre
@@ -448,15 +448,15 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe 
   nominaFabricacionPlasticaribe(){
-    this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
+    this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA FABRICACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
         this.nominaFabricacion = [
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.enero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "01",
             periodo : `${costo.anio}01`,
             valor : costo.enero
@@ -464,9 +464,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.febrero,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "02",
             periodo : `${costo.anio}02`,
             valor : costo.febrero
@@ -474,9 +474,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.marzo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "03",
             periodo : `${costo.anio}03`,
             valor : costo.marzo
@@ -484,9 +484,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.abril,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "04",
             periodo : `${costo.anio}04`,
             valor : costo.abril
@@ -494,9 +494,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.mayo,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "05",
             periodo : `${costo.anio}05`,
             valor : costo.mayo
@@ -504,9 +504,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.junio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "06",
             periodo : `${costo.anio}06`,
             valor : costo.junio
@@ -514,9 +514,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.julio,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "07",
             periodo : `${costo.anio}07`,
             valor : costo.julio
@@ -524,9 +524,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.agosto,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "08",
             periodo : `${costo.anio}08`,
             valor : costo.agosto
@@ -534,9 +534,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.septiembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "09",
             periodo : `${costo.anio}09`,
             valor : costo.septiembre
@@ -544,9 +544,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.octubre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "10",
             periodo : `${costo.anio}10`,
             valor : costo.octubre
@@ -554,9 +554,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.noviembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "11",
             periodo : `${costo.anio}11`,
             valor : costo.noviembre
@@ -564,9 +564,9 @@ export class Dashboard_CostosComponent implements OnInit {
           {
             anio: costo.anio,
             credito: 0,
-            cuenta: "",
+            cuenta: "3",
             debito: costo.diciembre,
-            descripcionCuenta: "NOMINA PLASTICARIBE",
+            descripcionCuenta: "NOMINA FABRICACION",
             mes: "12",
             periodo : `${costo.anio}12`,
             valor : costo.diciembre
@@ -758,20 +758,20 @@ export class Dashboard_CostosComponent implements OnInit {
 
     for (let index = 0; index < this.arrayAnios.length; index++) {
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(this.arrayAnios[index]).subscribe(data => {
-        let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b))
+        let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b));
 
         if (numero == 1) {
-          let costoIndFabricacion : any = gastos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()));
+          let costoIndFabricacion : any = [gastos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b));
           this.llenarTabla(costoIndFabricacion);
           this.graficaSeleccionada = 'Costos indirectos de fabricación';
         }
         if (numero == 2) {
-          let gastosAdmon : any = gastos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()));
+          let gastosAdmon : any = [gastos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a, b) => a.concat(b));
           this.llenarTabla(gastosAdmon);
           this.graficaSeleccionada = 'Gastos de administración';
          }
         if (numero == 3) {
-          let gastosVentas : any = gastos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()));
+          let gastosVentas : any = [gastos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a, b) => a.concat(b));
           this.llenarTabla(gastosVentas);
           this.graficaSeleccionada = 'Gastos de ventas';
         }
@@ -782,7 +782,7 @@ export class Dashboard_CostosComponent implements OnInit {
         }
        });
     }
-    setTimeout(() => { this.cargando = false; }, 1000);
+    setTimeout(() => this.cargando = false, 1000);
   }
 
   /** Función que limpiará el array de costos al momento de cerrar el modal */
@@ -840,10 +840,8 @@ export class Dashboard_CostosComponent implements OnInit {
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      if(this.dt.filteredValue != null) {
-
-        this.dt.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
-      } else {
+      if (this.dt.filteredValue != null) this.dt.filteredValue.forEach(element => this.totalCostoSeleccionado += element.valor);
+      else {
         this.totalCostoSeleccionado = 0;
         this.arrayCostos.forEach(element => this.totalCostoSeleccionado += element.valor);
       }
@@ -866,6 +864,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
   }
+
   cambiarNumeroAMes(mes : string) : string {
     mes == '01' ? mes = 'Enero' :
     mes == '02' ? mes = 'Febrero' :
@@ -895,9 +894,9 @@ export class Dashboard_CostosComponent implements OnInit {
             let title : string = `Determinación de Costos del ${anio.anio} - ${moment().format('DD-MM-YYYY')}`;
             let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
             infoDocumento = [
-              this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
-              this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
-              this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
+              this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
+              this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
+              this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
               this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
             ].reduce((a, b) => a.concat(b));
             this.formatoExcel(title, infoDocumento);
@@ -1004,9 +1003,9 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet.getColumn(13).width = 22;
     worksheet.getColumn(14).width = 22;
     worksheet.getColumn(15).width = 22;
-    worksheet.mergeCells('A22:O22');
-    worksheet.mergeCells('A67:O67');
-    worksheet.mergeCells('A106:O106');
+    worksheet.mergeCells('A23:O23');
+    worksheet.mergeCells('A69:O69');
+    worksheet.mergeCells('A109:O109');
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
