@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelDtAsgRollos_Extrusion } from '../../Modelo/modelDtAsgRollos_Extrusion';
@@ -10,48 +9,13 @@ import { modelDtAsgRollos_Extrusion } from '../../Modelo/modelDtAsgRollos_Extrus
 })
 export class DetallesAsgRollos_ExtrusionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  constructor(private http : HttpClient) {}
 
-  //Encapsular httpclient en el constructor
-  constructor(private http : HttpClient,
-    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
+  crearPdf = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPDFUltimoId/${id}`);
 
-    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
-  }
+  getconsultaRollosFechas = (fechaInicial : any, fechaFinal : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesAsgRollos_Extrusion');
-  }
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${dato}`);
-  }
+  getconsultaRollosOT = (ot : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosOT/${ot}`);
 
-  crearPdf(id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPDFUltimoId/${id}`);
-  }
-
-  getconsultaRollosFechas(fechaInicial : any, fechaFinal : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
-  }
-
-  getconsultaRollosOT(ot : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosOT/${ot}`);
-  }
-
-  getCrearPdfSalida(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPdfSalida/${id}`);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${id}`, data);
-  }
-
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${id}`);
-  }
-
-  srvGuardar(data : modelDtAsgRollos_Extrusion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsgRollos_Extrusion', data);
-  }
+  srvGuardar = (data : modelDtAsgRollos_Extrusion): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetallesAsgRollos_Extrusion', data);
 }

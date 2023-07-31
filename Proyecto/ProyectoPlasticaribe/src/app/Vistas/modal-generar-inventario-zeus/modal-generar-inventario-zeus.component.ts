@@ -123,8 +123,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: color2 }
           }
-          row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';

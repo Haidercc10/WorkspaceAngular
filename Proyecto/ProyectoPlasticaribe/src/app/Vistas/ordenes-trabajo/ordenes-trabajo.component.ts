@@ -1365,23 +1365,9 @@ export class OrdenesTrabajoComponent implements OnInit {
     }, error => this.mensajeService.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
 
-  // Funcion que va a cambiar el estado de un cliente a "Activo"
+  // Funcion que va a cambiar el estado de un cliente a "Activo". El numero '1' corresponde a "Activo"
   cambiarEstadoCliente(cliente : number){
-    this.clienteServise.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
-      let info : any = {
-        Cli_Id : datos_cliente.cli_Id,
-        TipoIdentificacion_Id : datos_cliente.tipoIdentificacion_Id,
-        Cli_Nombre : datos_cliente.cli_Nombre,
-        Cli_Telefono : datos_cliente.cli_Telefono,
-        Cli_Email : datos_cliente.cli_Email,
-        TPCli_Id : datos_cliente.tPCLi_Id,
-        usua_Id : datos_cliente.usua_Id,
-        Estado_Id : 1,
-        Cli_Fecha : datos_cliente.cli_Fecha,
-        Cli_Hora : datos_cliente.cli_Hora,
-      }
-      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
-    }, error => this.mensajeService.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.error));
+    this.clienteServise.PutEstadoCliente(cliente, 1).subscribe(() => { }, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
