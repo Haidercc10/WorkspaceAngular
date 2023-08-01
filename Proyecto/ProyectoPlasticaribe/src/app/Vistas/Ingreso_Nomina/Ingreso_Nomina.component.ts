@@ -77,7 +77,7 @@ export class Ingreso_NominaComponent implements OnInit {
     if(fechaInicial == 'Fecha inválida') fechaInicial = null;
     if(fechaFinal == 'Fecha inválida') fechaFinal = null;
 
-    if(fechaInicial != null || fechaFinal != null) {
+    if(fechaInicial != null && fechaFinal != null) {
       if(pagoTotal > 0) {
         if(this.FormNomina.value.tipoNomina != null) {
           nombreTipoNomina = this.arrayTipoNomina.filter(item => item.tpNomina_Id == this.FormNomina.value.tipoNomina);

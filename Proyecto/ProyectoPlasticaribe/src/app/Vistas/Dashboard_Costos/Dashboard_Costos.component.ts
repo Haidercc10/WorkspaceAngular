@@ -186,7 +186,7 @@ export class Dashboard_CostosComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
-  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe 
+  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe
   nominaAdministrativaPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA ADMINISTRACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -316,7 +316,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe 
+  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe
   nominaVentasPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -446,7 +446,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe 
+  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe
   nominaFabricacionPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA FABRICACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -850,17 +850,19 @@ export class Dashboard_CostosComponent implements OnInit {
 
   /** Función que mostrará un segundo modal con los detalles de la cuenta en el periodo seleccionado  */
   consultaCostosDetallados(datos : any, mes : string){
-    this.abrirModal2 = true;
     this.arrayGastos1 = [];
     this.totalCostoSeleccionado = 0;
     this.cuentaSeleccionada = [];
 
     this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.Anio, mes, datos.Cuenta).subscribe(data => {
-      for(let index = 0; index < data.length; index++) {
-        data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
-        this.totalCostoSeleccionado += data[index].valor;
-        this.arrayGastos1.push(data[index]);
-      }
+      if(data.length > 0) {
+        this.abrirModal2 = true;
+        for(let index = 0; index < data.length; index++) {
+          data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
+          this.totalCostoSeleccionado += data[index].valor;
+          this.arrayGastos1.push(data[index]);
+        }
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`)
     });
     setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
   }
@@ -990,7 +992,7 @@ export class Dashboard_CostosComponent implements OnInit {
       row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
       row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
     });
-    
+
     worksheet.addRow([]);
     worksheet.addRow([]);
 
