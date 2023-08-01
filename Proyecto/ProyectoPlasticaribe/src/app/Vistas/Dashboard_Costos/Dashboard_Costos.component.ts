@@ -192,128 +192,20 @@ export class Dashboard_CostosComponent implements OnInit {
   nominaAdministrativaPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA ADMINISTRACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
-        this.nominaAdministrativa = [
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.enero,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "01",
-            periodo : `${costo.anio}01`,
-            valor : costo.enero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.febrero,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "02",
-            periodo : `${costo.anio}02`,
-            valor : costo.febrero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.marzo,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "03",
-            periodo : `${costo.anio}03`,
-            valor : costo.marzo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.abril,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "04",
-            periodo : `${costo.anio}04`,
-            valor : costo.abril
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.mayo,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "05",
-            periodo : `${costo.anio}05`,
-            valor : costo.mayo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.junio,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "06",
-            periodo : `${costo.anio}06`,
-            valor : costo.junio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.julio,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "07",
-            periodo : `${costo.anio}07`,
-            valor : costo.julio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.agosto,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "08",
-            periodo : `${costo.anio}08`,
-            valor : costo.agosto
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.septiembre,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "09",
-            periodo : `${costo.anio}09`,
-            valor : costo.septiembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.octubre,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "10",
-            periodo : `${costo.anio}10`,
-            valor : costo.octubre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.noviembre,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "11",
-            periodo : `${costo.anio}11`,
-            valor : costo.noviembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "1",
-            debito: costo.diciembre,
-            descripcionCuenta: "NOMINA ADMINISTRACION",
-            mes: "12",
-            periodo : `${costo.anio}12`,
-            valor : costo.diciembre
-          },
-        ];
+        this.nominaAdministrativa.push(
+          this.llenarCostosNomina(costo.anio, '01', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '02', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '03', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '04', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '05', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '06', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '07', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '08', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '09', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '10', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '11', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '12', costo.enero, '1', "NOMINA ADMINISTRACION"),
+        );
       });
     });
   }
@@ -322,128 +214,20 @@ export class Dashboard_CostosComponent implements OnInit {
   nominaVentasPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
-        this.nominaVentas = [
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.enero,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "01",
-            periodo : `${costo.anio}01`,
-            valor : costo.enero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.febrero,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "02",
-            periodo : `${costo.anio}02`,
-            valor : costo.febrero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.marzo,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "03",
-            periodo : `${costo.anio}03`,
-            valor : costo.marzo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.abril,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "04",
-            periodo : `${costo.anio}04`,
-            valor : costo.abril
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.mayo,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "05",
-            periodo : `${costo.anio}05`,
-            valor : costo.mayo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.junio,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "06",
-            periodo : `${costo.anio}06`,
-            valor : costo.junio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.julio,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "07",
-            periodo : `${costo.anio}07`,
-            valor : costo.julio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.agosto,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "08",
-            periodo : `${costo.anio}08`,
-            valor : costo.agosto
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.septiembre,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "09",
-            periodo : `${costo.anio}09`,
-            valor : costo.septiembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.octubre,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "10",
-            periodo : `${costo.anio}10`,
-            valor : costo.octubre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.noviembre,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "11",
-            periodo : `${costo.anio}11`,
-            valor : costo.noviembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "2",
-            debito: costo.diciembre,
-            descripcionCuenta: "NOMINA VENTAS",
-            mes: "12",
-            periodo : `${costo.anio}12`,
-            valor : costo.diciembre
-          },
-        ];
+        this.nominaVentas.push(
+          this.llenarCostosNomina(costo.anio, '01', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '02', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '03', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '04', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '05', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '06', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '07', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '08', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '09', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '10', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '11', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '12', costo.enero, '2', "NOMINA VENTAS"),
+        );
       });
     });
   }
@@ -452,130 +236,37 @@ export class Dashboard_CostosComponent implements OnInit {
   nominaFabricacionPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA FABRICACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
-        this.nominaFabricacion = [
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.enero,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "01",
-            periodo : `${costo.anio}01`,
-            valor : costo.enero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.febrero,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "02",
-            periodo : `${costo.anio}02`,
-            valor : costo.febrero
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.marzo,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "03",
-            periodo : `${costo.anio}03`,
-            valor : costo.marzo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.abril,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "04",
-            periodo : `${costo.anio}04`,
-            valor : costo.abril
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.mayo,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "05",
-            periodo : `${costo.anio}05`,
-            valor : costo.mayo
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.junio,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "06",
-            periodo : `${costo.anio}06`,
-            valor : costo.junio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.julio,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "07",
-            periodo : `${costo.anio}07`,
-            valor : costo.julio
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.agosto,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "08",
-            periodo : `${costo.anio}08`,
-            valor : costo.agosto
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.septiembre,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "09",
-            periodo : `${costo.anio}09`,
-            valor : costo.septiembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.octubre,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "10",
-            periodo : `${costo.anio}10`,
-            valor : costo.octubre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.noviembre,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "11",
-            periodo : `${costo.anio}11`,
-            valor : costo.noviembre
-          },
-          {
-            anio: costo.anio,
-            credito: 0,
-            cuenta: "3",
-            debito: costo.diciembre,
-            descripcionCuenta: "NOMINA FABRICACION",
-            mes: "12",
-            periodo : `${costo.anio}12`,
-            valor : costo.diciembre
-          },
-        ];
+        this.nominaFabricacion.push(
+          this.llenarCostosNomina(costo.anio, '01', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '02', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '03', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '04', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '05', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '06', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '07', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '08', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '09', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '10', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '11', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '12', costo.enero, '3', "NOMINA FABRICACION"),
+        );
       });
     });
+  }
+
+  // Funcion que va a llenar los costos de nomina
+  llenarCostosNomina(anio : any, mes : string, valor : number, cuenta : string, tipoNomina : string){
+    let datos : any = {
+      anio: anio.toString(),
+      credito: 0,
+      cuenta: cuenta,
+      debito: valor,
+      descripcionCuenta: tipoNomina,
+      mes: mes,
+      periodo : `${anio}${mes}`,
+      valor : valor
+    }
+    return datos;
   }
 
   // funcion que va a manejar los datos de los costos de fabricacion
@@ -848,7 +539,6 @@ export class Dashboard_CostosComponent implements OnInit {
 
   /** Función que mostrará un segundo modal con los detalles de la cuenta en el periodo seleccionado  */
   consultaCostosDetallados(datos : any, mes : string){
-    this.abrirModal2 = true;
     this.arrayGastos1 = [];
     this.totalCostoSeleccionado = 0;
     this.cuentaSeleccionada = [];
