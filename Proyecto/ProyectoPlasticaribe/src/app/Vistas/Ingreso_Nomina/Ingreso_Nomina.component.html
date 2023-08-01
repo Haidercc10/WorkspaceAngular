@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 id="recibos" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingreso de Nómina</h2>
+      <h2 id="nomina" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Ingreso de Nómina</h2>
     </div>
 
     <div class="mb-4">
@@ -56,14 +56,14 @@
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="valorTotal" id="valorTotal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-            <label for="valor">Valor total nómina</label>
+            <label for="valor">Valor nómina</label>
           </span>
         </div>
 
         <!-- Descripción -->
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
           <span class="p-float-label">
-            <textarea formControlName="descripcion" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="descripcion" [rows]="1" id="descripcion" maxlength="200" pInputTextarea></textarea>
             <label for="descripcion">Descripción</label>
           </span>
         </div>
@@ -71,7 +71,7 @@
     </div>
 
     <!--Botones-->
-    <div class="mb-4" id="botones1">
+    <div class="mb-4" id="botones">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Agregar registro" icon="pi pi-send" (click)="cargarTabla()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
@@ -84,8 +84,12 @@
     <hr class="colorLinea">
   </div>
 
+  <div class="mb-5">
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Tabla de registros</h2>
+  </div>
+
   <!-- Tabla de nomina entrante -->
-  <div class="row g-3" id="tabla2">
+  <div class="row g-3" id="tabla">
     <div class="table-responsive">
       <p-table
       #dt
@@ -118,13 +122,13 @@
             <td>{{nomina.tipoNomina}}</td>
             <td>{{nomina.valor | number: '1.2-2'}}</td>
             <td>{{nomina.descripcion}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar registro"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(nomina)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="4" class="text-right">Totales</td>
-            <td colspan="3">{{calcularTotal() | number: '1.2-2'}} COP</td>
+            <td colspan="3" id="total">{{calcularTotal() | number: '1.2-2'}} COP</td>
           </tr>
         </ng-template>
       </p-table>
@@ -136,8 +140,8 @@
     <div class="mb-3" id="botones2">
       <div class="row g-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntradaNomina()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
+          <button id="entrada" pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntradaNomina()"></button>
+          <button id="limpiarTodo" pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
         </div>
       </div>
     </div>

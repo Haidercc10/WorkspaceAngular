@@ -7079,6 +7079,196 @@ export const stepsNomina : Step.StepOptions[] = [
   },
 ]
 
+export const stepsIngresoNomina : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#nomina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'nomina',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Ingreso de Nómina</h4>',
+    text: `<p>En este módulo podrás <b>ingresar los registros de la nómina de los empleados</b> de Plasticaribe SAS.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formulario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'formulario',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Formulario</h4>',
+    text: `<p>Para cargar los registros en la tabla <b>debes diligenciar todos los campos del formulario.</b> <br><br>
+    <b>Nota:</b> Recuerda que puedes agregar varios registros de nominas a la tabla y luego crear la entrada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rango',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rango',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Rango de fechas</h4>',
+    text: `<p>En este campo debes <b>seleccionar el rango de fechas</b> de la nomina que deseas ingresar. </p>`
+  },
+  {
+    attachTo: {
+      element: '#tipoNomina',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tipoNomina',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tipo de nómina</h4>',
+    text: `<p>En este campo debes seleccionar el <b>tipo de nomina que deseas ingresar</b>, las opciones son:
+    <br><br>- <b>Administrativos:</b> Personal administrativo.
+    <br>- <b>Ventas:</b> Asesores comerciales.
+    <br>- <b>Fabricación:</b> Operarios de de producción. </p>`
+  },
+  {
+    attachTo: {
+      element: '#valorTotal',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'valorTotal',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Valor nómina</h4>',
+    text: `<p>Aquí debes <b>digitar el valor en pesos de la nómina</b> que deseas ingresar del rango de fechas elegido.</p>`
+  },
+  {
+    attachTo: {
+      element: '#descripcion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'descripcion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Descripción</h4>',
+    text: `<p><b>Opcional:</b> Si deseas puedes realizar una observación del registro que estás creando.</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Botones</h4>',
+    text: `<p><b>Agregar registro:</b> Luego de diligenciar los campos, debes hacer clic sobre este botón para enviar los datos a la tabla que se encuentra en la parte inferior.<br>
+    <b>Limpiar campos:</b> haz clic aquí si deseas borrar la información de los campos del formulario.</p>`
+  },
+  {
+    attachTo: {
+      element: '#tabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Tabla de registros</h4>',
+    text: `<p>En esta tabla se encontrarán <b>los registros que agregues inicialmente</b> desde el formulario.
+    <br><br><b>Nota:</b> Recuerda que puedes agregar la cantidad de registros que desees a la tabla y luego crear la entrada.</p>`
+  },
+  {
+    attachTo: {
+      element: '#total',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'total',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Valor Total</h4>',
+    text: `<p>Aquí podrás visualizar <b>el valor total en pesos de las nominas</b> cargadas en la tabla.</p>`
+  },
+  {
+    attachTo: {
+      element: '#quitar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'quitar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Quitar registros</h4>',
+    text: `<p>En esta columna podrás <b>quitar registros de la tabla</b>, si te equivocas en la adición de alguno.
+    <br><br> Solo <b>debes hacer clic sobre el botón con el icono de </b> <i class="pi pi-trash"></i> y se mostrará un mensaje de elección para quitar el registro.</p>`
+  },
+  {
+    attachTo: {
+      element: '#entrada',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'entrada',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Crear Entrada</h4>',
+    text: `<p>Haz clic aquí para <b>crear la entrada de los registros de nominas</b> cargados en la tabla. </p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarTodo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarTodo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar todo</h4>',
+    text: `<p>Pulsando este botón se quitaran los registros de la tabla y se limpiaran los campos de la búsqueda.</p>`
+  },
+];
+
 /******************************************************** ORDENES DE MAQUILA ***************************************************************/
 export const stepsOrdenMaquila: Step.StepOptions[] = [
   {
@@ -11065,35 +11255,4 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
   },
 ];
 
-export const stepsIngresoNomina : Step.StepOptions[] = [
-  {
-    attachTo: {
-      element: '#nomina',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'nomina',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Ingreso de Nómina</h4>',
-    text: `<p>En este módulo podrás ingresar los registros de la nómina de los empleados de Plasticaribe SAS.</p>`
-  },
-  {
-    attachTo: {
-      element: '#formulario',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.cancel,
-      builtInButtons.next,
-    ],
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    classes: 'card',
-    id: 'formulario',
-    title: '<h4 style="margin: auto; color: var(--rojo)">Formulario</h4>',
-    text: `<p>Para cargar los registros en la tabla debes diligenciar todos los campos</p>`
-  },
-];
+

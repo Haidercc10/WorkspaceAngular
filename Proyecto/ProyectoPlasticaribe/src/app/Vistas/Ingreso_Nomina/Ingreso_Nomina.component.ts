@@ -27,7 +27,8 @@ export class Ingreso_NominaComponent implements OnInit {
   arrayNomina : any = []; //Array que contendrá los registros de las nominas a ingresar.
   horaActual : any = moment().format('H:mm:ss'); //variable que contendrá la hora actual
   registroSeleccionado : any; // Registro que guardará las propiedades del registro seleccionado de la tabla.
-  arrayTipoNomina : any = [];
+  arrayTipoNomina : any = []; //Array que cargará los tipos de nomina en el combobox
+  numero : number = 0;
 
   constructor(private AppComponent : AppComponent,
                 private msj : MensajesAplicacionService,
@@ -73,12 +74,15 @@ export class Ingreso_NominaComponent implements OnInit {
     let pagoTotal : number = this.FormNomina.value.valorTotal;
     let nombreTipoNomina : any;
 
+    if(fechaInicial == 'Fecha inválida') fechaInicial = null;
+    if(fechaFinal == 'Fecha inválida') fechaFinal = null;
+
     if(fechaInicial != null || fechaFinal != null) {
       if(pagoTotal > 0) {
         if(this.FormNomina.value.tipoNomina != null) {
           nombreTipoNomina = this.arrayTipoNomina.filter(item => item.tpNomina_Id == this.FormNomina.value.tipoNomina);
-          console.log(nombreTipoNomina)
           let info : any = {
+            id : this.numero += 1,
             fecha1 : fechaInicial,
             fecha2 : fechaFinal,
             valor : pagoTotal,
@@ -88,6 +92,7 @@ export class Ingreso_NominaComponent implements OnInit {
           }
           this.arrayNomina.push(info);
           this.limpiarCampos();
+          console.log(this.arrayNomina);
         } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo tipo de nómina!`);
       } else this.msj.mensajeAdvertencia(`Advertencia`, `El valor de la nomina no puede ser equivalente a $0. Por favor, rectifique!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe elegir un rango de fechas válido`);
@@ -101,6 +106,8 @@ export class Ingreso_NominaComponent implements OnInit {
     this.FormNomina.reset();
     this.arrayNomina = [];
     this.calcularTotal();
+    this.numero = 0;
+    this.registroSeleccionado = [];
   }
 
   //Función que mostrará e valor total de las nominas que se desean ingresar.
@@ -133,9 +140,8 @@ export class Ingreso_NominaComponent implements OnInit {
       }
       if(!fallo) {
         this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);
-        setTimeout(() => {this.load = false; this.limpiarTodo(); }, 500);
+        setTimeout(() => { this.load = false; this.limpiarTodo(); }, 500);
       } else this.msj.mensajeError(`Error`, `Ocurrió un error al ingresar los registros de la(s) nominas(s). Por favor, verifique!`);
-
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla!`);
   }
 
@@ -143,7 +149,7 @@ export class Ingreso_NominaComponent implements OnInit {
   quitarRegistro(data : any){
     data = this.registroSeleccionado;
     this.onReject();
-    this.arrayNomina.splice(this.arrayNomina.findIndex((item) => item.descripcion == data.descripcion), 1);
+    this.arrayNomina.splice(this.arrayNomina.findIndex((item) => item.id == data.id), 1);
     this.calcularTotal();
   }
 
@@ -156,5 +162,6 @@ export class Ingreso_NominaComponent implements OnInit {
   //Función que quitará el msj de elección
   onReject = () => this.message.clear('registro');
 
+  //Función que cargará los diferentes tipos de nómina
   cargarTiposNomina = () => this.servicioTipoNomina.Get().subscribe(datos => this.arrayTipoNomina = datos);
 }
