@@ -114,9 +114,11 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
   /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
   cargarClientes(){
     let cliente : any = this.formFiltros.value.cliente;
-    let vendedor = this.storage_Id.toString();
+    let vendedor : any = this.ValidarRol == 2 ? this.storage_Id.toString() : this.formFiltros.value.idvendedor;
+
     if (vendedor.length == 2) vendedor = `0${vendedor}`;
     else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+
     if(cliente != null && cliente.length > 2){
       if(this.formFiltros.value.vendedor == null) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);
       else this.invetarioZeusService.GetCliente_Vendedor_LikeNombre(vendedor, cliente).subscribe(data => this.arrayClientes = data);
@@ -227,8 +229,10 @@ export class Reporte_Consolidado_FacturacionComponent implements OnInit {
       let producto : any = this.formFiltros.value.idItem;
       let nombreItem : any = this.formFiltros.value.item;
       let nombreVendedor : any = this.formFiltros.value.vendedor;
+
       if (vendedor.length == 2) vendedor = `0${vendedor}`;
       else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+
       if (producto != null) producto.toString();
       if (anoInicial == null) anoInicial = moment().year();
       if (anoFinal == null) anoFinal = anoInicial;

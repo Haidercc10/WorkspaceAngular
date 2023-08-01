@@ -133,12 +133,14 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
   cargarClientes(){
     let cliente : any = this.formFiltros.value.cliente;
-    let vendedor = this.storage_Id.toString();
+    let vendedor : any = this.ValidarRol == 2 ? this.storage_Id.toString() : this.formFiltros.value.idvendedor;
+
     if (vendedor.length == 2) vendedor = `0${vendedor}`;
     else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+
     if(cliente != null && cliente.length > 2){
-      if(this.formFiltros.value.vendedor == null) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);
-      else this.invetarioZeusService.GetCliente_Vendedor_LikeNombre(vendedor, cliente).subscribe(data => this.arrayClientes = data);
+      if(this.formFiltros.value.vendedor == null) {this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);}
+      else { this.invetarioZeusService.GetCliente_Vendedor_LikeNombre(vendedor, cliente).subscribe(data => { this.arrayClientes = data }); }
     }
   }
 
@@ -153,11 +155,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    let nuevo : any[] = this.arrayVendedores.filter((item) => item.nombvende == vendedorSeleccionado);
-    this.formFiltros.patchValue({
-      vendedor: nuevo[0].nombvende,
-      idvendedor : nuevo[0].idvende,
-    });
+    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
+    this.formFiltros.patchValue({ vendedor: nuevo[0].nombvende, idvendedor : nuevo[0].idvende, });
   }
 
   /** Al momento de seleccionar un cliente, se cargaran sus items */
