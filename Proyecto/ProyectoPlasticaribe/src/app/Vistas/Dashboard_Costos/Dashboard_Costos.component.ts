@@ -6,6 +6,7 @@ import moment from 'moment';
 import { Table } from 'primeng/table';
 import { CostosEmpresasService } from 'src/app/Servicios/CostosEmpresas/CostosEmpresas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCostos as defaultSteps } from 'src/app/data';
@@ -30,7 +31,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
   nominaAdministrativa : any [] = []; //Variable que almacenará la información de la nomina administrativa
   nominaFabricacion : any [] = []; //Variable que almacenará la información de la nomina de fabricación
-  nominaVentas : any [] = []; //
+  nominaVentas : any [] = []; //Variable que almacenará la información de la nomina de ventas
 
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaCostosFabricacion : any; //Variable que va a almacenar los costos de fabricación
@@ -63,7 +64,8 @@ export class Dashboard_CostosComponent implements OnInit {
                 private msj : MensajesAplicacionService,
                   private shepherdService: ShepherdService,
                     private zeusContabilidad : ZeusContabilidadService,
-                      private costosService : CostosEmpresasService,){}
+                      private costosService : CostosEmpresasService,
+                        private nominaService : Nomina_PlasticaribeService,){}
 
   ngOnInit(): void {
     this.lecturaStorage();
@@ -186,7 +188,7 @@ export class Dashboard_CostosComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
-  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe
+  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe 
   nominaAdministrativaPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA ADMINISTRACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -316,7 +318,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe
+  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe 
   nominaVentasPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -446,7 +448,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe
+  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe 
   nominaFabricacionPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA FABRICACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -759,23 +761,19 @@ export class Dashboard_CostosComponent implements OnInit {
     for (let index = 0; index < this.arrayAnios.length; index++) {
       this.zeusContabilidad.GetCostosCuentas_Mes_Mes(this.arrayAnios[index]).subscribe(data => {
         let gastos = [data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]].reduce((a, b) => a.concat(b));
-
         if (numero == 1) {
           let costoIndFabricacion : any = [gastos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b));
           this.llenarTabla(costoIndFabricacion);
           this.graficaSeleccionada = 'Costos indirectos de fabricación';
-        }
-        if (numero == 2) {
+        } else if (numero == 2) {
           let gastosAdmon : any = [gastos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a, b) => a.concat(b));
           this.llenarTabla(gastosAdmon);
           this.graficaSeleccionada = 'Gastos de administración';
-         }
-        if (numero == 3) {
+         } else if (numero == 3) {
           let gastosVentas : any = [gastos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a, b) => a.concat(b));
           this.llenarTabla(gastosVentas);
           this.graficaSeleccionada = 'Gastos de ventas';
-        }
-        if (numero == 4) {
+        } else if (numero == 4) {
           let gastoNoOperacionales : any = gastos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()));
           this.llenarTabla(gastoNoOperacionales);
           this.graficaSeleccionada = 'Gastos no operacionales';
@@ -850,21 +848,45 @@ export class Dashboard_CostosComponent implements OnInit {
 
   /** Función que mostrará un segundo modal con los detalles de la cuenta en el periodo seleccionado  */
   consultaCostosDetallados(datos : any, mes : string){
+    this.abrirModal2 = true;
     this.arrayGastos1 = [];
     this.totalCostoSeleccionado = 0;
     this.cuentaSeleccionada = [];
 
-    this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.Anio, mes, datos.Cuenta).subscribe(data => {
-      if(data.length > 0) {
-        this.abrirModal2 = true;
-        for(let index = 0; index < data.length; index++) {
-          data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
-          this.totalCostoSeleccionado += data[index].valor;
-          this.arrayGastos1.push(data[index]);
-        }
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`)
+    if (datos.Cuenta.length == 1) this.consultaMovimientosNomina(datos, mes);
+    else {
+      this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.Anio, mes, datos.Cuenta).subscribe(data => {
+        if (data.length > 0) {
+          this.abrirModal2 = true;
+          for(let index = 0; index < data.length; index++) {
+            data[index].fecha_Grabacion = data[index].fecha_Grabacion.replace('T', ' ');
+            this.totalCostoSeleccionado += data[index].valor;
+            this.arrayGastos1.push(data[index]);
+          }
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`);
+      });
+      setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
+    }
+  }
+
+  // Funcion que va a consultar los movimientos de nomina de un mes que sea seleccionado
+  consultaMovimientosNomina(datos : any, mes : string){
+    this.totalCostoSeleccionado = 0;
+    this.nominaService.GetMovimientosNomina(parseInt(datos.Anio), parseInt(mes)).subscribe(data => {
+      data.forEach(costo => {
+        this.arrayGastos1.push({
+          fuente : costo.fuente,
+          fecha_Transaccion : `${costo.fechaInicial.replace('T00:00:00', '')} - ${costo.fechaFinal.replace('T00:00:00', '')}`,
+          id_Cuenta : costo.cuenta,
+          cuenta : costo.cuenta,
+          descripcion_Transaccion : costo.descripcion,
+          valor : costo.valor,
+          fecha_Grabacion : costo.fechaRegistro.replace('T00:00:00', ''),
+          proveedor : costo.proveedor,
+        });
+        this.totalCostoSeleccionado += costo.valor;
+      }, err => this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`));
     });
-    setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
   }
 
   cambiarNumeroAMes(mes : string) : string {
@@ -978,45 +1000,30 @@ export class Dashboard_CostosComponent implements OnInit {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
         });
       };
-      row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    });
-
+    });    
     worksheet.addRow([]);
     worksheet.addRow([]);
-
     this.calcularTotales(datos).forEach(d => {
       let row = worksheet.addRow(d);
       row.eachCell(cell => {
         cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'AED6F1' } }
       });
-      row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-      row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
     });
 
+    worksheet.getColumn(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
     worksheet.getColumn(1).width = 15;
     worksheet.getColumn(2).width = 50;
     worksheet.getColumn(3).width = 22;
