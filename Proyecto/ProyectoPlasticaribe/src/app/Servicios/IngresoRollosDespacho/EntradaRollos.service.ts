@@ -9,32 +9,9 @@ import { modelEntradaRollos } from '../../Modelo/modelEntradaRollos';
 })
 export class EntradaRollosService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/EntradaRollo_Producto');
-  }
+  srvObtenerUltimoId = () => this.http.get<any>(rutaPlasticaribeAPI + `/EntradaRollo_Producto/UltumoID`);
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/EntradaRollo_Producto/${dato}`);
-  }
-
-  srvObtenerUltimoId(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/EntradaRollo_Producto/UltumoID`);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/EntradaRollo_Producto/${id}`, data);
-  }
-
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/EntradaRollo_Producto/${id}`);
-  }
-
-  srvGuardar(data : modelEntradaRollos): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/EntradaRollo_Producto', data);
-  }
+  srvGuardar = (data : modelEntradaRollos): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/EntradaRollo_Producto', data);
 }

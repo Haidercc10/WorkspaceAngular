@@ -9,34 +9,12 @@ import { modelOT_Laminado } from '../../Modelo/modelOT_Laminado';
 })
 export class OT_LaminadoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaOrden_Trabajo() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/OT_Laminado');
-  }
+  GetOT_Laminado = (ot : number) => this.http.get<any>(rutaPlasticaribeAPI + `/OT_Laminado/getOT_Laminado/${ot}`);
+    
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/OT_Laminado/${id}`, data);
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_Laminado/${dato}`);
-  }
-
-  GetOT_Laminado(ot : number) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_Laminado/getOT_Laminado/${ot}`);
-  }
-
-  //Metodo actualzar
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/OT_Laminado/${id}`, data);
-  }
-  //Metodo eliminar
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/OT_Laminado/${id}`);
-  }
-
-  srvGuardar(data : modelOT_Laminado): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/OT_Laminado', data);
-  }
+  srvGuardar = (data : modelOT_Laminado): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/OT_Laminado', data);
 
 }

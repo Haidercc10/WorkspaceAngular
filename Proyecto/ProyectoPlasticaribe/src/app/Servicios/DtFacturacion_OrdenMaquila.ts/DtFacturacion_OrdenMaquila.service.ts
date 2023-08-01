@@ -9,30 +9,9 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class DtFacturacion_OrdenMaquilaService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(rutaPlasticaribeAPI + '/DetalleFacturacion_OrdenMaquila');
-  }
+  GetConsultarFacturacion = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/getConsultarFacturacion/${dato}`);
 
-  getId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/${dato}`);
-  }
-
-  GetConsultarFacturacion(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/getConsultarFacturacion/${dato}`);
-  }
-
-  put(id:number|string, data:any) : Observable<any> {
-    return this.http.put(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/${id}`, data);
-  }
-
-  delete(id:number|string) {
-    return this.http.delete(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/${id}`);
-  }
-
-  insert(data : modelDtFacturacion_OrdenMaquila) : Observable<any> {
-    return this.http.post(rutaPlasticaribeAPI + '/DetalleFacturacion_OrdenMaquila', data);
-  }
+  insert = (data : modelDtFacturacion_OrdenMaquila) : Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetalleFacturacion_OrdenMaquila', data);
 }

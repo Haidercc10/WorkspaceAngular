@@ -9,36 +9,17 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class OrdenCompra_RemisionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo_OrdenCompra() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Remision_OrdenCompra');
-  }
+  getTodo_OrdenCompra = () => this.http.get<any>(rutaPlasticaribeAPI + '/Remision_OrdenCompra');
 
-  // Funcion que consultará el ultimo consecutivo de la orden de trabajo
-  getUltimoId_OrdenCompra(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra`);
-  }
+  getUltimoId_OrdenCompra = () => this.http.get<any>(rutaPlasticaribeAPI + `/Remision_OrdenCompra`);
 
-  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
-  getId_OrdenCompra(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra/${dato}`);
-  }
+  getId_OrdenCompra = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Remision_OrdenCompra/${dato}`);
 
-  //Metodo actualzar
-  putId_OrdenCompra(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra/${id}`, data);
-  }
-  //Metodo eliminar
-  deleteID_OrdenCompra(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra/${id}`);
-  }
+  putId_OrdenCompra = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Remision_OrdenCompra/${id}`, data);
+  
+  deleteID_OrdenCompra = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Remision_OrdenCompra/${id}`);
 
-  insert_OrdenCompra(data : modelOrdenCompraRemision): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Remision_OrdenCompra', data);
-  }
-
+  insert_OrdenCompra = (data : modelOrdenCompraRemision): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Remision_OrdenCompra', data);
 }

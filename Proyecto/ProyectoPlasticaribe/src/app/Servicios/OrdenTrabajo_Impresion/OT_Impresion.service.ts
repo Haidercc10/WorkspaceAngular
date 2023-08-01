@@ -9,34 +9,17 @@ import { modelOT_Impresion } from '../../Modelo/modelOT_Impresion';
 })
 export class OT_ImpresionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaOrden_Trabajo() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/OT_Impresion');
-  }
+  srvObtenerListaOrden_Trabajo = () => this.http.get<any>(rutaPlasticaribeAPI + '/OT_Impresion');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_Impresion/${dato}`);
-  }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/OT_Impresion/${dato}`);
 
-  GetOT_Impresion(ot : number) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_Impresion/getOT_Impresion/${ot}`);
-  }
+  GetOT_Impresion = (ot : number) => this.http.get<any>(rutaPlasticaribeAPI + `/OT_Impresion/getOT_Impresion/${ot}`);
 
-  //Metodo actualzar
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/OT_Impresion/${id}`, data);
-  }
-  //Metodo eliminar
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/OT_Impresion/${id}`);
-  }
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/OT_Impresion/${id}`, data);
+  
+  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/OT_Impresion/${id}`);
 
-  srvGuardar(data : modelOT_Impresion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/OT_Impresion', data);
-  }
-
+  srvGuardar = (data : modelOT_Impresion): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/OT_Impresion', data);
 }

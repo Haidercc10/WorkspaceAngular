@@ -9,42 +9,14 @@ import { modelMezclas } from '../../Modelo/modelMezclas';
 })
 export class MezclasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
+  
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Mezclas');
 
+  getMezclaNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezclas/getMezclaNombre/${nombre}`);
 
-  //
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Mezclas');
-  }
+  srvObtenerListaPorNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezclas/combinacionMezclas/${nombre}`);
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/${id}`);
-  }
-
-  getMezclaNombre(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/getMezclaNombre/${nombre}`);
-  }
-
-  srvObtenerListaPorNombre(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/combinacionMezclas/${nombre}`);
-  }
-
-  //
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Mezclas/${id}`, data);
-  }
-
-  //
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Mezclas/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelMezclas): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Mezclas', data)
-  }
+  srvGuardar = (data : modelMezclas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Mezclas', data);
 
 }

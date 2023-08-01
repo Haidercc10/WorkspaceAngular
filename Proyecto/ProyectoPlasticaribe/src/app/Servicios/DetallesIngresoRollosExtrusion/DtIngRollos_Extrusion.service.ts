@@ -9,81 +9,36 @@ import { modelDtIngRollo_Extrusion } from '../../Modelo/modelDtIngRollo_Extrusio
 })
 export class DtIngRollos_ExtrusionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion');
-  }
+  srvObtenerListaRollosDisponible = () => this.http.get<any>(rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion/getTodosRollosDisponibles');
 
-  srvObtenerListaRollosDisponible() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion/getTodosRollosDisponibles');
-  }
+  consultarRollo = (rollo : number) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollo/${rollo}`);
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${dato}`);
-  }
+  crearPdf = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPDFUltimoId/${id}`);
 
-  consultarRollos(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollos`);
-  }
+  getRollosDisponibles = (hoy : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponibles/${hoy}`);
 
-  consultarRollo(rollo : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollo/${rollo}`);
-  }
+  getRollosDisponiblesOT = (ot : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesOT/${ot}`);
 
-  crearPdf(id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPDFUltimoId/${id}`);
-  }
+  getTodosRollosDisponiblesAgrupados = () => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getTodosRollosDisponiblesAgrupados`);
 
-  getRollosDisponibles(hoy : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponibles/${hoy}`);
-  }
+  getRollosDisponiblesRollo = (rollo : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesRollo/${rollo}`);
 
-  getRollosDisponiblesOT(ot : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesOT/${ot}`);
-  }
+  getRollosDisponiblesFechas = (fechaInicial : any, fechaFinal : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesFechas/${fechaInicial}/${fechaFinal}`);
 
-  getTodosRollosDisponiblesAgrupados(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getTodosRollosDisponiblesAgrupados`);
-  }
+  getconsultaRollosFechas = (fechaInicial : any, fechaFinal : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
 
-  getRollosDisponiblesRollo(rollo : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesRollo/${rollo}`);
-  }
+  getconsultaRollosOT = (ot : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosOT/${ot}`);
 
-  getRollosDisponiblesFechas(fechaInicial : any, fechaFinal : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesFechas/${fechaInicial}/${fechaFinal}`);
-  }
+  getCrearPdfEntrada = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPdfEntrada/${id}`);
 
-  getconsultaRollosFechas(fechaInicial : any, fechaFinal : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
-  }
+  GetRollos = (data : any []): Observable<any> => this.http.post(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollos`, data);
 
-  getconsultaRollosOT(ot : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosOT/${ot}`);
-  }
+  srvActualizar = (id: any, data:any) => this.http.put(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`, data);
 
-  getCrearPdfEntrada(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPdfEntrada/${id}`);
-  }
+  EliminarRollExtrusion = (id : any) => this.http.delete(rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/EliminarRolloIngresados/${id}`);
 
-  GetRollos(data : any []): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollos`, data);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`, data);
-  }
-
-  EliminarRollExtrusion(id : any) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/EliminarRolloIngresados/${id}`);
-  }
-
-  srvGuardar(data : modelDtIngRollo_Extrusion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion', data);
-  }
+  srvGuardar = (data : modelDtIngRollo_Extrusion): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion', data);
 
 }

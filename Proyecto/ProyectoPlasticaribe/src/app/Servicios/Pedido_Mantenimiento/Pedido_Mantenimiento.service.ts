@@ -10,28 +10,14 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class Pedido_MantenimientoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
   constructor(private http : HttpClient) { }
 
-  GetTodo():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Pedido_Mantenimiento')
-  }
+  getUltimoIdPedido = () => this.http.get<any>(rutaPlasticaribeAPI + `/Pedido_Mantenimiento/getUltimoIdPedido`);
 
-  getUltimoIdPedido() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Pedido_Mantenimiento/getUltimoIdPedido`);
-  }
+  Put = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Pedido_Mantenimiento/${id}`, data);
 
-  Put(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Pedido_Mantenimiento/${id}`, data);
-  }
+  Delete = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Pedido_Mantenimiento/${id}`);
 
-  Delete(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Pedido_Mantenimiento/${id}`);
-  }
-
-  Insert(data : modelPedidoMantenimiento): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Pedido_Mantenimiento', data);
-  }
+  Insert = (data : modelPedidoMantenimiento): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Pedido_Mantenimiento', data);
 
 }

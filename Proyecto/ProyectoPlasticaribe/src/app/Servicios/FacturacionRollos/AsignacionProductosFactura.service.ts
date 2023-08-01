@@ -9,42 +9,11 @@ import { modelAsigProductosFacturas } from '../../Modelo/modelAsigProductosFactu
 })
 export class AsignacionProductosFacturaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  srvObtenerListaPorFactura = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta');
-  }
+  srvActualizarFactura = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/ActualizacionFactura/${id}`, data);
 
-  srvObtenerUltimoId() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta/UltimoId');
-  }
-
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${dato}`);
-  }
-
-  srvObtenerListaPorFactura(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${id}`, data);
-  }
-
-  srvActualizarFactura(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/ActualizacionFactura/${id}`, data);
-  }
-
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${id}`);
-  }
-
-  srvGuardar(data : modelAsigProductosFacturas): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
-  }
-
+  srvGuardar = (data : modelAsigProductosFacturas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
 }

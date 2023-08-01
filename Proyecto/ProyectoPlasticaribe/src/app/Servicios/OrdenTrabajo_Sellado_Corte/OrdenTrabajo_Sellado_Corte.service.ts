@@ -10,37 +10,14 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class OrdenTrabajo_Sellado_CorteService {
 
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(rutaPlasticaribeAPI + '/OT_SelladoCorte');
-  }
+  getTipoSellado_Formato = (tipoSellado : number, formato : number) => this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
 
-  getInfoPorId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/${dato}`);
-  }
+  GetOT_SelladoCorte = (ot : number) => this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getOT_Sellado_Corte/${ot}`);
+    
+  put = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`, data);
 
-  getTipoSellado_Formato(tipoSellado : number, formato : number){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
-  }
-
-  GetOT_SelladoCorte(ot : number) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getOT_Sellado_Corte/${ot}`);
-  }
-
-  //Metodo actualzar
-  put(id:number|string, data:any) {
-    return this.http.put(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`, data);
-  }
-  //Metodo eliminar
-  delete(id:number|string) {
-    return this.http.delete(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`);
-  }
-
-  post(data : modelOrdenTrabajo_SelladoCorte): Observable<any> {
-   return this.http.post(rutaPlasticaribeAPI + '/OT_SelladoCorte', data);
-  }
+  post = (data : modelOrdenTrabajo_SelladoCorte): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/OT_SelladoCorte', data);
 
 }

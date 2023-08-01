@@ -9,43 +9,19 @@ import { modelMaterial } from '../../Modelo/modelMaterial';
 })
 export class MaterialProductoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de Materiales
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Material_MatPrima');
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Material_MatPrima');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Material_MatPrima/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Material_MatPrima/${id}`);
 
-  srvObtenerListaPorNombreMaterial(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Material_MatPrima/nombreMaterial/${nombre}`);
-  }
+  srvObtenerListaPorNombreMaterial = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Material_MatPrima/nombreMaterial/${nombre}`);
 
+  srvAgregar = (data:any) => this.http.post(rutaPlasticaribeAPI + '/Material_MatPrima', data);
 
-  //Metodo agregar Materiales
-  srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Material_MatPrima', data)
-  }
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Material_MatPrima/${id}`, data);
 
-  //Metodo actualzar Materiales
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Material_MatPrima/${id}`, data);
-  }
+  srvEliminar = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Material_MatPrima/${id}`);
 
-  //Metodo eliminar Materiales
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Material_MatPrima/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelMaterial): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Material_MatPrima', data)
-  }
-
+  srvGuardar = (data : modelMaterial): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Material_MatPrima', data);
 }
