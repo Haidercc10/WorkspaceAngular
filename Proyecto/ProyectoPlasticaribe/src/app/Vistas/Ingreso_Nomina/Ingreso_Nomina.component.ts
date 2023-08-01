@@ -69,8 +69,8 @@ export class Ingreso_NominaComponent implements OnInit {
 
   //Funcion que cargará los registros del formulario a la tabla.
   cargarTabla() {
-    let fechaInicial : any = this.FormNomina.value.fechas.length > 0 ? moment(this.FormNomina.value.fechas[0]).format('YYYY-MM-DD') : null;
-    let fechaFinal : any = this.FormNomina.value.fechas.length > 0 ? moment(this.FormNomina.value.fechas[1]).format('YYYY-MM-DD') : null;
+    let fechaInicial : any = this.FormNomina.value.fechas != null ? moment(this.FormNomina.value.fechas[0]).format('YYYY-MM-DD') : null;
+    let fechaFinal : any = this.FormNomina.value.fechas != null ? moment(this.FormNomina.value.fechas[1]).format('YYYY-MM-DD') : null;
     let pagoTotal : number = this.FormNomina.value.valorTotal;
     let nombreTipoNomina : any;
 
@@ -92,7 +92,6 @@ export class Ingreso_NominaComponent implements OnInit {
           }
           this.arrayNomina.push(info);
           this.limpiarCampos();
-          console.log(this.arrayNomina);
         } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo tipo de nómina!`);
       } else this.msj.mensajeAdvertencia(`Advertencia`, `El valor de la nomina no puede ser equivalente a $0. Por favor, rectifique!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe elegir un rango de fechas válido`);
@@ -136,11 +135,11 @@ export class Ingreso_NominaComponent implements OnInit {
           TpNomina_Id: this.arrayNomina[index].tipo,
           Nomina_Observacion: this.arrayNomina[index].descripcion
         }
-        this.servicioNomina.Post(modelo).subscribe(data => { fallo = false }, error => { fallo = true; })
+        //this.servicioNomina.Post(modelo).subscribe(data => { fallo = false }, error => { fallo = true; })
       }
       if(!fallo) {
         this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);
-        setTimeout(() => { this.load = false; this.limpiarTodo(); }, 500);
+        setTimeout(() => { this.load = false; this.limpiarTodo(); }, 1000);
       } else this.msj.mensajeError(`Error`, `Ocurrió un error al ingresar los registros de la(s) nominas(s). Por favor, verifique!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla!`);
   }

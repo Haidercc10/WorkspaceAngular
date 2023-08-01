@@ -111,7 +111,7 @@
             <th scope="col">Tipo de nómina</th>
             <th scope="col">Valor total</th>
             <th scope="col">Descripción</th>
-            <th id="quitar" scope="col" id="quitar">Quitar</th>
+            <th id="quitar" class="text-center" scope="col" id="quitar">Quitar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
@@ -122,7 +122,7 @@
             <td>{{nomina.tipoNomina}}</td>
             <td>{{nomina.valor | number: '1.2-2'}}</td>
             <td>{{nomina.descripcion}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(nomina)"></i></td>
+            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(nomina)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">

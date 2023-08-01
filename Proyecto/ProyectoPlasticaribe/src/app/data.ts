@@ -7187,7 +7187,7 @@ export const stepsIngresoNomina : Step.StepOptions[] = [
     classes: 'card',
     id: 'botones',
     title: '<h4 style="margin: auto; color: var(--rojo)">Botones</h4>',
-    text: `<p><b>Agregar registro:</b> Luego de diligenciar los campos, debes hacer clic sobre este botón para enviar los datos a la tabla que se encuentra en la parte inferior.<br>
+    text: `<p><b>Agregar registro:</b> Luego de diligenciar los campos, debes hacer clic sobre este botón para enviar los datos a la tabla que se encuentra en la parte inferior.<br><br>
     <b>Limpiar campos:</b> haz clic aquí si deseas borrar la información de los campos del formulario.</p>`
   },
   {
@@ -7265,7 +7265,7 @@ export const stepsIngresoNomina : Step.StepOptions[] = [
     classes: 'card',
     id: 'limpiarTodo',
     title: '<h4 style="margin: auto; color: var(--rojo)">Limpiar todo</h4>',
-    text: `<p>Pulsando este botón se quitaran los registros de la tabla y se limpiaran los campos de la búsqueda.</p>`
+    text: `<p>Pulsando este botón se quitaran los registros de la tabla y se limpiaran los campos del formulario.</p>`
   },
 ];
 
