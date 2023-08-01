@@ -955,6 +955,8 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet.mergeCells('A5:O5');
     datos.forEach(d => {
       let row = worksheet.addRow(d);
+      row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
+      row.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } };
       if (d[0] == 'Totales'){
         if (d[1] != 'Gastos No Operacionales') {
           let titulo = '';
@@ -971,7 +973,7 @@ export class Dashboard_CostosComponent implements OnInit {
         }
         row.eachCell(cell => {
           cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } }
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
         });
       };
       row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
@@ -988,6 +990,31 @@ export class Dashboard_CostosComponent implements OnInit {
       row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
       row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
     });
+    
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+
+    this.calcularTotales(datos).forEach(d => {
+      let row = worksheet.addRow(d);
+      row.eachCell(cell => {
+        cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'AED6F1' } }
+      });
+      row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      row.getCell(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    });
+
     worksheet.getColumn(1).width = 15;
     worksheet.getColumn(2).width = 50;
     worksheet.getColumn(3).width = 22;
@@ -1068,4 +1095,28 @@ export class Dashboard_CostosComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular los totales de cada uno de los meses
+  calcularTotales(data : any){
+    let datos : any [] = ['','',0,0,0,0,0,0,0,0,0,0,0,0,0];
+    for (let i = 0; i < data.length; i++) {
+      datos = [
+        'Total',
+        'Total Gastos Mensuales',
+        datos[2] += data[i][0] != 'Totales' ? data[i][2] : 0,
+        datos[3] += data[i][0] != 'Totales' ? data[i][3] : 0,
+        datos[4] += data[i][0] != 'Totales' ? data[i][4] : 0,
+        datos[5] += data[i][0] != 'Totales' ? data[i][5] : 0,
+        datos[6] += data[i][0] != 'Totales' ? data[i][6] : 0,
+        datos[7] += data[i][0] != 'Totales' ? data[i][7] : 0,
+        datos[8] += data[i][0] != 'Totales' ? data[i][8] : 0,
+        datos[9] += data[i][0] != 'Totales' ? data[i][9] : 0,
+        datos[10] += data[i][0] != 'Totales' ? data[i][10] : 0,
+        datos[11] += data[i][0] != 'Totales' ? data[i][11] : 0,
+        datos[12] += data[i][0] != 'Totales' ? data[i][12] : 0,
+        datos[13] += data[i][0] != 'Totales' ? data[i][13] : 0,
+        datos[14] += data[i][0] == 'Totales' ? data[i][14] : 0,
+      ];
+    }
+    return [datos];
+  }
 }
