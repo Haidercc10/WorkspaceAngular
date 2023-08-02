@@ -9,28 +9,15 @@ import { modelTipoMantenimiento } from '../../Modelo/modelTipoMantenimiento';
 })
 export class Tipo_MantenimientoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
   constructor(private http : HttpClient) { }
 
-  GetTodo():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Mantenimiento')
-  }
+  GetTodo = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Tipo_Mantenimiento');
 
-  GetId(id : number) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`);
-  }
+  GetId = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`);
 
-  Put(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`, data);
-  }
+  Put = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`, data);
 
-  Delete(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`);
-  }
+  Delete = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`);
 
-  Insert(data : modelTipoMantenimiento): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Mantenimiento', data);
-  }
-
+  Insert = (data : modelTipoMantenimiento): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Tipo_Mantenimiento', data);
 }

@@ -8,9 +8,9 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class Tipos_NominaService {
 
-constructor(private http : HttpClient,) { }
+  constructor(private http : HttpClient,) { }
 
-Get = (): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina`);
+  Get = (): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina`);
 
-GetId = (id : number): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina/${id}`);
+  GetId = (id : number): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina/${id}`);
 }

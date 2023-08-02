@@ -8,28 +8,16 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
   providedIn: 'root'
 })
 export class TiposSelladoService {
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
+  
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/TiposSellados');
-  }
+  srvObtenerLista = () => this.http.get<any>(rutaPlasticaribeAPI + '/TiposSellados');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/TiposSellados/${dato}`);
-  }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/TiposSellados/${dato}`);
 
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/TiposSellados/${id}`, data);
-  }
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/TiposSellados/${id}`, data);
 
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/TiposSellados/${id}`);
-  }
+  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/TiposSellados/${id}`);
 
-  srvGuardar(data : modelTiposSellados): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/TiposSellados', data);
-  }
+  srvGuardar = (data : modelTiposSellados): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/TiposSellados', data);
 }

@@ -9,7 +9,6 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class TercerosService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
   getTodo() {

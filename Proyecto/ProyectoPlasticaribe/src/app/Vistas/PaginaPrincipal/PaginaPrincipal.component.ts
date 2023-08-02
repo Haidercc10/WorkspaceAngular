@@ -52,14 +52,15 @@ export class PaginaPrincipalComponent implements OnInit {
   //
   cambioTab(e : any) {
     var index = e.index;
-    if (index == 0) this.ordenTrabajo = true;
-    if (index == 1) this.facturacion = true;
-    if (index == 2) this.materiaPrima = true;
-    if (index == 3) this.pedidos = true;
-    if (index == 4) this.facturacionVendedores = true;
-    if (index == 5) this.recaudos = true;
-    if (index == 6) this.cuentasPagar = true;
-    if (index == 7) this.gerencia = true;
-    if (index == 8) this.costos = true;
+
+    index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
+    index == 1 ?  this.facturacion = true : this.facturacion = false;
+    index == 2 ?  this.materiaPrima = true : this.materiaPrima = false;
+    index == 3 ?  this.pedidos = true : this.pedidos = false;
+    index == 4 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
+    index == 5 ?  this.recaudos = true : this.recaudos = false;
+    index == 6 ?  this.cuentasPagar = true : this.cuentasPagar = false;
+    index == 7 ?  this.gerencia = true : this.gerencia = false;
+    index == 8 ?  this.costos = true : this.costos = false;
   }
 }

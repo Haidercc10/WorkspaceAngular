@@ -9,37 +9,14 @@ import { modelProveedor } from '../../Modelo/modelProveedor';
 })
 export class ProveedorService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de proveedor
-  srvObtenerLista():Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Proveedor')
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Proveedor');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Proveedor/${id}`);
 
-  getProveedorLike(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/getProveedorLike/${nombre}`);
-  }
+  getProveedorLike = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Proveedor/getProveedorLike/${nombre}`);
 
-  //Metodo actualzar proveedor
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Proveedor/${id}`, data);
-    }
-
-  //Metodo eliminar proveedor
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
-  }
-
-  //Metodo Guardar proveedor con un modelo
-  srvGuardar(data : modelProveedor): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data);
-   }
+  srvGuardar = (data : modelProveedor): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Proveedor', data);
 
 }

@@ -9,50 +9,10 @@ import { modelRecuperado } from '../../Modelo/modelRecuperado';
 })
 export class RecuperadoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de proveedor
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima')
-  }
-
-  srvObtenerUltimaAsignacion():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima/ultimoId')
-  }
-
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
-  }
-
-  srvObtenerListaPorFecha(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fecha/${id}`);
-  }
-
-  srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fechas?RecMp_FechaIngreso1=${fecha1}&RecMp_FechaIngreso2=${fecha2}`);
-  }
-
-//Metodo agregar proveedor
-  srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data)
-  }
-
-//Metodo actualzar proveedor
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`, data);
-  }
-
-//Metodo eliminar proveedor
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
-  }
-
-  //Metodo Guardar proveedor con un modelo
-  srvGuardar(data : modelRecuperado): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data);
-  }
+  srvObtenerUltimaAsignacion = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Recuperado_MatPrima/ultimoId');
+  
+  srvGuardar = (data : modelRecuperado): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Recuperado_MatPrima', data);
 
 }
