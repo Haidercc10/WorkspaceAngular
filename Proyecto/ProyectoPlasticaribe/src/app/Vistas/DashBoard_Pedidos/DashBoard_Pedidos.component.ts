@@ -6,6 +6,7 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/E
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardPedidos as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-DashBoard_Pedidos',
@@ -58,7 +59,8 @@ export class DashBoard_PedidosComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private ordenTrabajoService : EstadosProcesos_OTService,
-                    private shepherdService: ShepherdService) {
+                    private shepherdService: ShepherdService,
+                      private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -87,8 +89,10 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.pedidosZeus();
-    this.recargar();
+    if (this.paginaPrincial.pedidos) {
+      this.pedidosZeus();
+      this.recargar();
+    }
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

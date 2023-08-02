@@ -9,6 +9,7 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/E
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardMateriaPrima as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -58,11 +59,12 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
 
   constructor(private AppComponent : AppComponent,
-                    private ordenTrabajoService : EstadosProcesos_OTService,
-                        private materiaPrimaService : MateriaPrimaService,
-                          private boppService : EntradaBOPPService,
-                            private tintasCreadasService : DetallesAsignacionMPxTintasService,
-                              private shepherdService: ShepherdService) {
+                private ordenTrabajoService : EstadosProcesos_OTService,
+                  private materiaPrimaService : MateriaPrimaService,
+                    private boppService : EntradaBOPPService,
+                      private tintasCreadasService : DetallesAsignacionMPxTintasService,
+                        private shepherdService: ShepherdService,
+                          private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -91,11 +93,12 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){
-    //this.cargando = true;
-    this.cambiarNombreMes();
-    setTimeout(() => { this.materiasPrimas(); }, 1000);
-    this.recargarTab();
-    setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
+    if (this.paginaPrincial.materiaPrima){
+      this.cambiarNombreMes();
+      setTimeout(() => { this.materiasPrimas(); }, 1000);
+      this.recargarTab();
+      setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
+    }
   }
 
   /** Función paracambiar el nombre del mes a español */

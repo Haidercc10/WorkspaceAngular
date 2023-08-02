@@ -11,6 +11,7 @@ import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from '
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-Dashboard_CuentasPagar',
@@ -105,7 +106,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private servicioInventarioZeus : InventarioZeusService,
                       private msj : MensajesAplicacionService,
-                        private facturasInverService : Facturas_Invergoal_InversuezService,) {
+                        private facturasInverService : Facturas_Invergoal_InversuezService,
+                          private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -143,7 +145,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.consultarCartera();
+    if (this.paginaPrincial.cuentasPagar) this.consultarCartera();
   }
 
   // Función que ejecutará las peticiones de la cartera

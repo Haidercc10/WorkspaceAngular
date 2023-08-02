@@ -6,6 +6,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -58,7 +59,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private shepherdService: ShepherdService,
-                    private mensajeAplicacion : MensajesAplicacionService,) {
+                    private mensajeAplicacion : MensajesAplicacionService,
+                      private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -89,9 +91,11 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.facturacionAnio();
-    this.facturacion();
-    this.recargar();
+    if (this.paginaPrincial.facturacion) {
+      this.facturacionAnio();
+      this.facturacion();
+      this.recargar();
+    }
   }
 
   // Funcion que va a llenar el array de años

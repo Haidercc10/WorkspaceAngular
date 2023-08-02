@@ -1,6 +1,5 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Injectable({  providedIn: 'root' })
 
@@ -12,13 +11,10 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
 
 export class PaginaPrincipalComponent implements OnInit {
 
-  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
-
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  tutorial : boolean = true;
   ordenTrabajo : boolean = false;
   facturacion : boolean = false;
   materiaPrima : boolean = false;
@@ -52,7 +48,6 @@ export class PaginaPrincipalComponent implements OnInit {
   //
   cambioTab(e : any) {
     var index = e.index;
-
     index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
     index == 1 ?  this.facturacion = true : this.facturacion = false;
     index == 2 ?  this.materiaPrima = true : this.materiaPrima = false;

@@ -5,6 +5,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -27,7 +28,8 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
-                  private shepherdService: ShepherdService) {
+                  private shepherdService: ShepherdService,
+                    private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -57,8 +59,10 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.consultarCartera();
-    this.recargar();
+    if (this.paginaPrincial.recaudos){
+      this.consultarCartera();
+      this.recargar();
+    }
   }
 
   // Función que ejecutará las peticiones de la cartera
