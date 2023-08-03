@@ -23,6 +23,8 @@ constructor(private http : HttpClient) { }
 
     GetFacturas_Pagar = () : Observable<any[]> => this.http.get<any[]>(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/getFacturas_Pagar`);
 
+    GetFacturasPapel = (anio : number, mes : number, facturas : string []) => this.http.post(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/getFacturasPapel/${anio}/${mes}`, facturas);
+
     Post = (data : modelFacturasInvergoalInversuez) => this.http.post(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez`, data);
 
     Put = (id : number, data : modelFacturasInvergoalInversuez) => this.http.put(`${rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez/${id}`, data);

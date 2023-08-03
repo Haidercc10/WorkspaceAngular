@@ -5,6 +5,7 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { CostosEmpresasService } from 'src/app/Servicios/CostosEmpresas/CostosEmpresas.service';
+import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
@@ -643,7 +644,11 @@ export class Dashboard_CostosComponent implements OnInit {
 
   // Funcion que va a darle el formato y a colocarlos datos en el archivo que se exportará a excel
   formatoExcel(titulo : string, datos : any){
+    let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } };
+    let font : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+    let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
+    
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
@@ -655,16 +660,16 @@ export class Dashboard_CostosComponent implements OnInit {
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
-      cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      cell.font = font;
+      cell.border = border;
     });
     worksheet.mergeCells('A1:O3');
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
     tituloCostosFab.eachCell(cell => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
-      cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      cell.fill = fill;
+      cell.font = font;
+      cell.border = border
     });
     worksheet.mergeCells('A5:O5');
     datos.forEach(d => {
@@ -680,13 +685,13 @@ export class Dashboard_CostosComponent implements OnInit {
           worksheet.addRow([]);
           let titulorow = worksheet.addRow([titulo]);
           titulorow.eachCell(cell => {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } }
-            cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+            cell.fill = fill;
+            cell.font = font;
+            cell.border = border;
           });
         }
         row.eachCell(cell => {
-          cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+          cell.font = font;
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
         });
       };
@@ -696,7 +701,7 @@ export class Dashboard_CostosComponent implements OnInit {
     this.calcularTotales(datos).forEach(d => {
       let row = worksheet.addRow(d);
       row.eachCell(cell => {
-        cell.font = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+        cell.font = font;
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'AED6F1' } }
       });
     });

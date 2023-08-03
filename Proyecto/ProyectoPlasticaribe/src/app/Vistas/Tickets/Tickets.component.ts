@@ -75,7 +75,7 @@ export class TicketsComponent implements OnInit {
   enviarTickets(){
     if (this.FormTickets.valid) {
       let imagenes : string = '';
-      if (this.archivoSeleccionado.length > 0) {
+      if (this.archivoSeleccionado != null) {
         for (let i = 0; i < this.archivoSeleccionado.length; i++) {
           imagenes += `${this.archivoSeleccionado[i].name}|`;
         }
@@ -96,7 +96,7 @@ export class TicketsComponent implements OnInit {
          this.msj.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`);
          this.cargando = false;
       });
-      if (this.archivoSeleccionado.length > 0) this.enviarArchivos(this.archivoSeleccionado);
+      if (this.archivoSeleccionado != null) this.enviarArchivos(this.archivoSeleccionado);
       this.limpiarTodo();
     } else {
       this.msj.mensajeAdvertencia(`Advertencia`, `¡Hay Campos Vacios!`);
