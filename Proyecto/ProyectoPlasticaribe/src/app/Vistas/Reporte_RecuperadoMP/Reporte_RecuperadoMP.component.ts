@@ -215,7 +215,6 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   consultarPeletizadoDia(item : any){
     if (item.cantDia > 0) {
       this.modalInfoRecuperado = true;
-      console.log(1)
       this.modalRecuperado.arrayRegistros = [];
       this.consultaTurno = 'Día';
       let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
@@ -242,7 +241,6 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   //
   consultarPeletizadoNoche(item : any){
     this.modalInfoRecuperado = false;
-    console.log(item)
     if (item.cantNoche > 0) {
       this.modalInfoRecuperado = true;
       this.modalRecuperado.arrayRegistros = [];

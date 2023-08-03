@@ -13,4 +13,5 @@ export interface modelFacturasInvergoalInversuez {
     Cuenta : string;
     Estado_Factura : number;
     Observacion : string;
+    Restar_DashboardCostos : boolean;
 }

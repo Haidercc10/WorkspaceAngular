@@ -47,6 +47,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
       Proveedor : [null, Validators.required],
       Valor : [null, Validators.required],
       Cuenta : [null, Validators.required],
+      CuentaPapel : [false, Validators.required],
       Observaciones : [''],
     });
   }
@@ -80,7 +81,8 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
   cargarEmpresas() {
     this.Empresas = [
       { Id : '900362200', Nombre : 'INVERGOAL SAS' },
-      { Id : '900458314', Nombre : 'INVERSUEZ SAS' }
+      { Id : '900458314', Nombre : 'INVERSUEZ SAS' },
+      { Id : '800188732', Nombre : 'PLASTICARIBE SAS' }
     ]
   }
 
@@ -109,6 +111,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
       Proveedor : this.proveedores.filter(item => item.prov_Id == this.FormFacturas.value.Proveedor)[0].prov_Nombre,
       Valor : this.FormFacturas.value.Valor,
       Cuenta : this.FormFacturas.value.Cuenta,
+      Cuentas_Papel : this.FormFacturas.value.CuentaPapel,
     });
     this.resetForm();
   }
@@ -135,6 +138,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
         Cuenta: factura.Cuenta,
         Estado_Factura: 2,
         Observacion: this.FormFacturas.value.Observaciones == null ? '' : this.FormFacturas.value.Observaciones.toUpperCase(),
+        Restar_DashboardCostos : factura.Cuentas_Papel,
       };
       this.facturasService.Post(datos).subscribe(() => {
         ingresos += 1;

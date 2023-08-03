@@ -192,6 +192,7 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
           Cuenta: datos.cuenta,
           Estado_Factura: this.estadoSeleccionado,
           Observacion: datos.observacion,
+          Restar_DashboardCostos : false,
         };
         this.facturasService.Put(factura.Id, facturas).subscribe((data : any) => {
           this.cargando = false;

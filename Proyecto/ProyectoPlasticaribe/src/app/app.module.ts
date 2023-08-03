@@ -31,7 +31,6 @@ import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { DockModule } from 'primeng/dock';
 import { DropdownModule } from 'primeng/dropdown';
-import { EditorModule } from 'primeng/editor';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { GalleriaModule } from 'primeng/galleria';
@@ -63,6 +62,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
@@ -78,16 +78,21 @@ import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoar
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
 import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
+import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_Costos.component';
 import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
+import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
 import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
+import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
+import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
+import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { Inventario_Bodegas_RollosComponent } from './Vistas/Inventario_Bodegas_Rollos/Inventario_Bodegas_Rollos.component';
@@ -104,6 +109,7 @@ import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.c
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
+import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
 import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
@@ -166,12 +172,6 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
-import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
-import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
-import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
-import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_Costos.component';
-import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 
 @NgModule({
   declarations: [
@@ -347,7 +347,6 @@ import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.
     KnobModule,
     DataViewModule,
     RippleModule,
-    EditorModule,
     ImageModule,
     GalleriaModule,
     OverlayPanelModule,
@@ -359,6 +358,7 @@ import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.
     PanelMenuModule,
     FieldsetModule,
     AccordionModule,
+    ToggleButtonModule,
   ],
 
   providers: [

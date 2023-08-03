@@ -17,7 +17,6 @@ import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
 import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { ThisReceiver } from '@angular/compiler';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 
 @Component({
@@ -98,7 +97,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   esBopp : boolean = false; /** Variable que definirá si la materia prima que se está editando es bopp */
   idBoppGenerico : number = 1;
 
-
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
@@ -133,11 +131,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias(){
@@ -768,7 +762,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.dt_Biorientados2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
       if(this.dt_Biorientados2.filteredValue != null) {
-        console.log()
         this.valorTotalBopp = 0;
         this.cantInicialBopp = 0;
         this.cantEntranteBopp = 0;
