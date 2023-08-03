@@ -170,18 +170,20 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           this.costoPorPagar(1);
           this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
-              if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
-                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-                this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
-                this.cargando = false;
-              } else if (datos[i].id_Proveedor == '900362200') {
-                let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-                this.carteraInvergoal[index].Detalles.push(datos[i]);
-                this.cargando = false;
-              } else if (datos[i].id_Proveedor == '900458314') {
-                let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-                this.carteraInversuez[index].Detalles.push(datos[i]);
-                this.cargando = false;
+              if (datos[i].id_Proveedor != '7472582') {
+                if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
+                  let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor && item.Cuenta == datos[i].cuenta);
+                  this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
+                  this.cargando = false;
+                } else if (datos[i].id_Proveedor == '900362200') {
+                  let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                  this.carteraInvergoal[index].Detalles.push(datos[i]);
+                  this.cargando = false;
+                } else if (datos[i].id_Proveedor == '900458314') {
+                  let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                  this.carteraInversuez[index].Detalles.push(datos[i]);
+                  this.cargando = false;
+                }
               }
             }
           });
@@ -192,8 +194,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   // Funcion que va a tomar a calcular los dias de retraso de la factura
-  calcularDiasRetraso(factura : any, proveedor : any, data : any = this.carteraAgrupadaProveedores){
-    let index = data.findIndex(item => item.Id_Proveedor == proveedor);
+  calcularDiasRetraso(factura : any, proveedor : any, cuenta : any, data : any = this.carteraAgrupadaProveedores){
+    let index = data.findIndex(item => item.Id_Proveedor == proveedor && item.Cuenta == cuenta);
     let info : any [] = data[index].Detalles.filter(item => item.factura == factura);
     let dias : number = 0;
     for (let i = 0; i < info.length; i++) {
@@ -321,7 +323,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           {text: `${itemDetalles.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${this.formatonumeros(itemDetalles.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, item.Cuenta, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${itemDetalles.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
         ];
         proveedor.table.body.push(info);
