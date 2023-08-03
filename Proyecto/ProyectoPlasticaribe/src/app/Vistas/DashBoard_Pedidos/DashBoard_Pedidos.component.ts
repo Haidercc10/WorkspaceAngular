@@ -15,9 +15,6 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 })
 export class DashBoard_PedidosComponent implements OnInit {
 
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
@@ -40,7 +37,6 @@ export class DashBoard_PedidosComponent implements OnInit {
   mostrarTabla : boolean = false; //Variable que mostrará o no la información graficada
   multiAxisData: any;
   multiAxisOptions: any;
-  multiAxisPlugins = [ DataLabelsPlugin ];
 
   nombreGrafica : string;
   graficaPedidosClientes : any;
@@ -53,7 +49,6 @@ export class DashBoard_PedidosComponent implements OnInit {
   opcionesPedidosVendedores : any;
 
   infoTablaModal : any [] = [];
-  nroCard : string = ''; /** Variable que identificará cual es la card de la cual se desea mostrar la descripción */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
@@ -78,11 +73,7 @@ export class DashBoard_PedidosComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
+  lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
   recargar = () => setTimeout(() => { this.tiempoExcedido(); }, 60000);

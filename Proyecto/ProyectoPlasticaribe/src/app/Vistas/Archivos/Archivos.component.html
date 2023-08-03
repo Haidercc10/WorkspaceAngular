@@ -136,13 +136,6 @@
   </div>
 </p-card>
 
-  <!--Modal para crear categorias de archivos-->
-<p-dialog header="Crear categorias" [(visible)]="modal" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
-  <p class="m-3">
-    <app-CrearCategorias></app-CrearCategorias>
-  </p>
-</p-dialog>
-
 <p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-ruta let-index>
     <div class="flex flex-column" style="flex: 1">

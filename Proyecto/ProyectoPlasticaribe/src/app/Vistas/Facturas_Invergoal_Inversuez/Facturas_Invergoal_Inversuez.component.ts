@@ -206,12 +206,7 @@ export class Facturas_Invergoal_InversuezComponent implements OnInit {
               headerRows: 1,
               widths: ['*'],
               body: [
-                [
-                  {
-                    border: [false, true, false, false],
-                    text: ''
-                  },
-                ],
+                [ { border: [false, true, false, false], text: '' }, ],
               ]
             },
             layout: { defaultBorder: false, }

@@ -386,7 +386,6 @@ export class OcompraComponent implements OnInit {
     this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
     let solicitud = this.FormOrdenCompra.value.Solicitud;
-    let exp = /^([0-9])*$/;
 
     if (solicitud) {
       this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {

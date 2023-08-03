@@ -181,7 +181,6 @@ export class EntradaBOPPComponent implements OnInit {
             productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
             this.ArrayBOPP.push(productoExt);
             this.obtenerValorTotal();
-            console.log(this.ArrayBOPP)
             this.limpiarCampos();
             this.load = true;
           });
@@ -224,7 +223,7 @@ export class EntradaBOPPComponent implements OnInit {
         }
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
           this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
-        this.load = true;
+          this.load = true;
         }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
       }
     }
@@ -372,7 +371,6 @@ export class EntradaBOPPComponent implements OnInit {
       IdBoppGenerico : item.id,
       boppGenerico : item.nombre,
     });
-    console.log(item.id)
   }
 
   /** Factura */
@@ -392,17 +390,13 @@ export class EntradaBOPPComponent implements OnInit {
         Usua_Id : this.storage_Id,
         TpDoc_Id : 'FCO',
       }
-      this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(() => { this.obtenerUltimoIdFacturaCompra(); }, () => {
-        this.mensajeService.mensajeError(`Error`,`Error al crear la factura!`);
-      });
+      this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(() => this.obtenerUltimoIdFacturaCompra(), () => this.mensajeService.mensajeError(`Error`,`Error al crear la factura!`));
     }
   }
 
   /** Funcion para registrar el máximo ID de la factura */
   obtenerUltimoIdFacturaCompra() {
-    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos => this.creacionDetalleFactura(datos), () => {
-      this.mensajeService.mensajeError(`Error`, `Error al obtener la ultima factura creada!`);
-    });
+    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos => this.creacionDetalleFactura(datos), () => this.mensajeService.mensajeError(`Error`, `Error al obtener la ultima factura creada!`));
   }
 
    /** Funcion para registrar el detalle de la factura */
@@ -423,7 +417,7 @@ export class EntradaBOPPComponent implements OnInit {
         detalleError = true;
       });
     }
-    setTimeout(() => { if(!detalleError) this.crearRelacionOrdenCompra_Faccompra(idUltimafactura); }, 500);
+    setTimeout(() => !detalleError ? this.crearRelacionOrdenCompra_Faccompra(idUltimafactura) : null, 500);
   }
 
   /** Funcion para registrar la relación entre la factura y la OC */
@@ -432,9 +426,7 @@ export class EntradaBOPPComponent implements OnInit {
       Oc_Id : this.FormOpcional.value.OrdenCompra,
       Facco_Id : factura,
     }
-    this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
-      this.mensajeService.mensajeError(`Error`, `No se ha creado la relación entre la factura y la OC!`);
-    });
+    this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => this.mensajeService.mensajeError(`Error`, `No se ha creado la relación entre la factura y la OC!`));
   }
 
   /** Remisión */
@@ -451,9 +443,7 @@ export class EntradaBOPPComponent implements OnInit {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormOpcional.value.Observacion,
     }
-    this.servicioRemisiones.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => {
-      this.mensajeService.mensajeError(`Error`, `Error al crear la remisión!`);
-    });
+    this.servicioRemisiones.srvGuardar(datosRemision).subscribe(() => this.obtenerUltimoIdRemision(), () => this.mensajeService.mensajeError(`Error`, `Error al crear la remisión!`));
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las remisiones
@@ -467,7 +457,7 @@ export class EntradaBOPPComponent implements OnInit {
   //Funcion que creará el detalle de la remisión
   crearDetalleRemision(idRemision : any){
     let detalleError : boolean;
-    if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla")
+    if (this.ArrayBOPP.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla");
     else {
       for (let index = 0; index < this.ArrayBOPP.length; index++) {
         const datosRemisionMp : any = {
@@ -485,7 +475,7 @@ export class EntradaBOPPComponent implements OnInit {
           this.load = true;
         });
       }
-      setTimeout(() => { if (!detalleError) this.crearRelacionOrdenCompra_Remision(idRemision); }, 500);
+      setTimeout(() => !detalleError ? this.crearRelacionOrdenCompra_Remision(idRemision) : null, 500);
     }
   }
 
@@ -495,9 +485,7 @@ export class EntradaBOPPComponent implements OnInit {
       Oc_Id : this.FormOpcional.value.OrdenCompra,
       Rem_Id : remision,
     }
-    this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => {
-      this.mensajeService.mensajeError(`Error`, `No se ha creado la relacion entre la remisión y la OC!`);
-    });
+    this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(() => this.crearEntrada(), () => this.mensajeService.mensajeError(`Error`, `No se ha creado la relacion entre la remisión y la OC!`));
   }
 
   /** Funcion para validar que tipo de entrada de BOPP */
@@ -508,17 +496,17 @@ export class EntradaBOPPComponent implements OnInit {
 
     if((oc == null && factura == null && remision == null)) {
       this.crearEntrada();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 1000);
+      setTimeout(() => this.limpiarTodosLosCampos(), 1000);
     } else if (oc != null && factura != null && remision == null) {
       this.campoRemi_Faccompra = factura;
       this.tipoDoc = 'FCO'
       this.registrarFacturaBopp();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 3000);
+      setTimeout(() => this.limpiarTodosLosCampos(), 3000);
     } else if (oc != null && remision != null && factura == null) {
       this.campoRemi_Faccompra = remision;
       this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
-      setTimeout(() => { this.limpiarTodosLosCampos();}, 3000);
+      setTimeout(() => this.limpiarTodosLosCampos(), 3000);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
@@ -547,7 +535,7 @@ export class EntradaBOPPComponent implements OnInit {
     this.boppsGenericos = [];
     this.servicioBoppGenerico.srvObtenerLista().subscribe(data => {
       for (let index = 0; index < data.length; index++) {
-        this.boppsGenericos.push(data[index])
+        this.boppsGenericos.push(data[index]);
       }
     });
   }

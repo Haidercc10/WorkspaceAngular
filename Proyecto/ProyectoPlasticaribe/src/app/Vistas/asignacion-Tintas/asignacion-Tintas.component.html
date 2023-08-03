@@ -1,5 +1,6 @@
 <app-menuLateral></app-menuLateral>
 <br>
+<app-VistasFavoritas></app-VistasFavoritas>
 
 <div class="fondo">
   <div class="d-flex justify-content-center overlay" *ngIf="load">
@@ -249,5 +250,5 @@
 
 <!--Modal para crear materias primas -->
 <p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
-  <app-modal-crear-materias-primas></app-modal-crear-materias-primas>
+  <app-crear-materiaprima></app-crear-materiaprima>
 </p-dialog>

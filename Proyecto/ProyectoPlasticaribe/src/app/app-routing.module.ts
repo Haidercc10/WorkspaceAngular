@@ -130,7 +130,7 @@ export const routes: Routes = [
   {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
-  {path: 'opedidoproducto', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
+  // {path: 'opedidoproducto', component: OpedidoproductoComponent},
   {path: 'pedido-externo', canActivate: [VistasPermisosGuard], data: {nombre: 'Crear Pedido'}, component: PedidoExternoComponent},
 
   /***************************************************************** USUARIOS **********************************************************************************/
@@ -174,7 +174,7 @@ export const routes: Routes = [
   {path: 'reporte-solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Material Producción'}, component: Reporte_SolicitudMpExtrusionComponent},
 
   {path: 'facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Facturas'}, component: Facturas_Invergoal_InversuezComponent},
-  {path: 'Gestionar-facturas-invergoal-inversuez', component: Gestionar_Facturas_Invergoal_InversuezComponent},
+  {path: 'Gestionar-facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Gestion de Facturas'}, component: Gestionar_Facturas_Invergoal_InversuezComponent},
 
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},

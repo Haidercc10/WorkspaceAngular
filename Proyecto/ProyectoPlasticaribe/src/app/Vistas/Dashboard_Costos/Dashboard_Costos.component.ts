@@ -5,7 +5,6 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { CostosEmpresasService } from 'src/app/Servicios/CostosEmpresas/CostosEmpresas.service';
-import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
@@ -21,9 +20,6 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 export class Dashboard_CostosComponent implements OnInit {
 
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
@@ -87,11 +83,7 @@ export class Dashboard_CostosComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
+  lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   // Funcion que va a llenar el array de años
   llenarArrayAnos(){

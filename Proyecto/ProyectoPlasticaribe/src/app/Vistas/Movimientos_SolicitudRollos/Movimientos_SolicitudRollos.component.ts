@@ -9,6 +9,7 @@ import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { Formato_DocumentosService } from 'src/app/Servicios/Formato_Documentos/Formato_Documentos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
@@ -54,7 +55,8 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
                         private dtSolicitudService : Detalles_SolicitudRollosService,
                           private estadosService : EstadosService,
                             private solicitudService : Solicitud_Rollos_AreasService,
-                              private dtBgRollosService : Detalle_BodegaRollosService,) {
+                              private dtBgRollosService : Detalle_BodegaRollosService,
+                                private formatoDocsService : Formato_DocumentosService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -255,7 +257,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
           this.cargando = false;
         });
       } else this.msj.mensajeAdvertencia(`¡No puede cambiar el estado!`, `¡No se puede cambiar el estado de solicitudes que ya han sido 'Aceptadas' o 'Finalizadas'!`);
-    }, err => this.msj.mensajeAdvertencia(`¡No se encontró información sobre el rollo!`, `¡Es posible que el rollo ya no esté en la bodega solicitada!`));
+    }, () => this.msj.mensajeAdvertencia(`¡No se encontró información sobre el rollo!`, `¡Es posible que el rollo ya no esté en la bodega solicitada!`));
   }
 
   // Funcion que va a cambiar la bodega actual del rollo y a actualizar el proceso por el que ha pasado
@@ -316,14 +318,30 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
 
   /* funcion que va a crear un PDF. @param solicitud : number : numero de la solicitud. @return : void : no retorna nada*/
   crearPDF(solicitud : number) : void{
-    let codigo : string = ``, version : string = ``, vigencia : string = ``, nombre : string = this.storage_Nombre;
+    let codigo : string = ``, version : string = ``, nombreDocumento : string = ``, vigencia : string = ``, nombre : string = this.storage_Nombre;
     this.dtSolicitudService.GetInformacionSolicitud(solicitud).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         if (data[i].bodega_Solicitada == 'Producto Intermedio') {
+          nombreDocumento = ``
+          this.formatoDocsService.GetUltFormadoDoc(nombreDocumento).subscribe(data => {
+            data.forEach(formato => {
+              codigo = formato.codigo;
+              version = formato.version;
+              vigencia = formato.vigencia;
+            });
+          });
           codigo = 'FR-PR-MT-02';
           version = '01';
           vigencia = ``;
         } else if (data[i].bodega_Solicitada != 'Producto Intermedio' && data[i].bodega_Solicitada != 'Extrusion') {
+          nombreDocumento = ``
+          this.formatoDocsService.GetUltFormadoDoc(nombreDocumento).subscribe(data => {
+            data.forEach(formato => {
+              codigo = formato.codigo;
+              version = formato.version;
+              vigencia = formato.vigencia;
+            });
+          });
           codigo = 'FR-PR-01';
           version = '01';
           vigencia = ``;

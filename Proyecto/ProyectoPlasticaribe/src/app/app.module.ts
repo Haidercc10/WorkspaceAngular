@@ -73,7 +73,6 @@ import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_E
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { CalendarioComponent } from './Vistas/Calendario/Calendario.component';
 import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.component';
-import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
@@ -145,12 +144,10 @@ import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.c
 import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
 import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
-import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/crear-unidades-medidas.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
-import { ModalCrearMateriasPrimasComponent } from './Vistas/modal-crear-materias-primas/modal-crear-materias-primas.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
@@ -197,19 +194,16 @@ import { AppComponent } from './app.component';
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,
     CrearCategoriasMPComponent,
-    CrearUnidadesMedidasComponent,
     ReporteCostosOTComponent,
     DevolucionesMPComponent,
     AsignacionTintasComponent,
     CrearTintasComponent,
-    ModalCrearMateriasPrimasComponent,
     AsignacionBOPPComponent,
     EntradaBOPPComponent,
     AsignacionBOPP_TEMPORALComponent,
     ModalGenerarInventarioZeusComponent,
     MenuLateralComponent,
     ArchivosComponent,
-    CrearCategoriasComponent,
     OrdenesTrabajoComponent,
     Reporte_Procesos_OTComponent,
     Ingresar_ProductosComponent,

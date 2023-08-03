@@ -62,10 +62,9 @@ export class LoginComponentComponent implements OnInit {
 
   ngOnInit(): void {
     this.storage.clear();
-    this.cookiesServices.delete('MostrarEventosDia')
+    this.cookiesServices.delete('MostrarEventosDia');
     localStorage.clear();
     this.cargaDatosComboBox();
-    this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{ this.ipAddress = res.ip; });
   }
 
   // Funcion que guardará informacion a en la sesion

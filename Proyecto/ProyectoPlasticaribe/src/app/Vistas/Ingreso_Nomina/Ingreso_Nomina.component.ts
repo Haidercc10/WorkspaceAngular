@@ -135,7 +135,7 @@ export class Ingreso_NominaComponent implements OnInit {
           TpNomina_Id: this.arrayNomina[index].tipo,
           Nomina_Observacion: this.arrayNomina[index].descripcion
         }
-        //this.servicioNomina.Post(modelo).subscribe(data => { fallo = false }, error => { fallo = true; })
+        this.servicioNomina.Post(modelo).subscribe(() => fallo = false, () => fallo = true);
       }
       if(!fallo) {
         this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);

@@ -121,7 +121,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.comprasMesxMesInvergoal('900362200');
     this.graficarDatosSuez();
     this.comprasMesxMesInversuez('900458314');
-    // this.consultarFacturas();
   }
 
   // Funcion que iniciará el tutorial
@@ -144,9 +143,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
-  tiempoExcedido() {
-    if (this.paginaPrincial.cuentasPagar) this.consultarCartera();
-  }
+  tiempoExcedido = () => (this.paginaPrincial.cuentasPagar) ? this.consultarCartera() : undefined;
 
   // Función que ejecutará las peticiones de la cartera
   consultarCartera(){
@@ -414,7 +411,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   comprasMesxMesInvergoal(nit : string){
-    console.log(nit)
     let index : number = this.compradoAnioGoal.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       this.cargando = true;
@@ -444,7 +440,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   comprasMesxMesInversuez(nit : string){
-    console.log(nit)
     let index : number = this.compradoAnioSuez.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       this.cargando = true;
@@ -607,7 +602,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.comprasData.datasets.push(info);
     this.deudaMayor = Math.max(...info.data) + 1;
     this.comprasOptions.scales.y.suggestedMax = this.deudaMayor;
-    //this.cargando = false;
   }
 
   llenarGraficaComprasGoal(){
@@ -625,7 +619,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       tension: 0.3,
     };
     this.comprasDataGoal.datasets.push(info);
-    //this.cargando = false;
   }
 
   llenarGraficaComprasSuez(){

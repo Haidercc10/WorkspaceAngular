@@ -86,7 +86,7 @@ export class Gestion_TicketsComponent implements OnInit {
         const descripcionCorta = descripcion.length > 50 ? `${descripcion.substring(0,50)}...` : descripcion;
         const info : any = {codigo, fecha, estado, descripcion: descripcionCorta, descripcionTotal};
         this.tickets.push(info);
-        this.tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo))
+        this.tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo));
         this.tickets.sort((a,b) => b.estado.localeCompare(a.estado));
       }
     });
