@@ -7,50 +7,21 @@ import { modelRol } from '../../Modelo/modelRol';
 @Injectable({
   providedIn: 'root'
 })
+
 export class RolesService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de roles
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Rol_Usuario')
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Rol_Usuario');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
 
-  getRolxNombre(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRol/${nombre}`);
-  }
+  getRolxNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRol/${nombre}`);
 
-  likeGetNombre(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
-  }
+  likeGetNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
 
-  GetInformacionRoles = (rol : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Rol_Usuario/getInformacionRoles/${rol}`);
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Rol_Usuario/${id}`, data);
 
-  //Metodo agregar roles
-  srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)
-  }
-
-  //Metodo actualzar roles
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`, data);
-  }
-
-  //Metodo eliminar roles
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelRol): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)
-  }
+  srvGuardar = (data : modelRol): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Rol_Usuario', data);
 
 }

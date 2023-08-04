@@ -1,143 +1,46 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppComponent} from 'src/app/app.component';
+import { rutaPlasticaribeAPI, } from 'src/polyfills';
 import { modelBOPP } from '../../Modelo/modelBOPP';
-import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable( { providedIn: 'root' } )
 
 export class EntradaBOPPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP')
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP');
 
-  //Metodo buscar lista
-  GetBoppConExistencias():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/GetBoppConExistencias')
-  }
+  GetBoppConExistencias = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/GetBoppConExistencias');
 
-  srvObtenerListaPorId(id : any):Observable<any> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/${id}`)
-  }
+  srvObtenerListaPorId = (id : any):Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/${id}`);
 
-  srvObtenerListaPorSerial(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/serial/${id}`)
-  }
+  srvObtenerListaPorSerial = (id : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/serial/${id}`);
 
-  srvObtenerListaPorFecha(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/fecha/${id}`)
-  }
+  GetBoppStockInventario = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/getBoppStockInventario`);
 
-  srvObtenerListaPorFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/fechas?BOPP_FechaIngreso1=${fecha1}&BOPP_FechaIngreso2=${fecha2}`)
-  }
+  GetCantRollosIngresados_Mes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/getCantRollosIngresados_Mes/${fecha1}/${fecha2}`)
 
-  srvObtenerListaAgrupada():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/BoppAgrupado`)
-  }
+  GetCantRollosUtilizados_Mes = (fecha1 : any, fecha2 : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/getCantRollosUtilizados_Mes/${fecha1}/${fecha2}`)
+  
+  getBopp = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getDescripcion');
 
-  GetBoppStockInventario():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getBoppStockInventario`)
-  }
+  getMicras = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getMicras');
 
-  srvObtenerConsultaMov0(fechaIncial : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos0/${fechaIncial}`);
-  }
+  getPrecios = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getPrecios');
 
-  srvObtenerConsultaMov1(id, fechaIncial : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos1/${id}/${fechaIncial}`);
-  }
+  getAnchos = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getAnchos');
 
-  srvObtenerConsultaMov2(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos2/${id}`);
-  }
+  getSeriales = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getSeriales');
 
-  srvObtenerConsultaMov3(fechaIncial : any, fechaFinal : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos3/${fechaIncial}/${fechaFinal}`);
-  }
+  GetCategoriasBOPP = () => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getCategoriasBOPP');
 
-  srvObtenerConsultaMov4(ot : number, fechaIncial : any, fechaFinal : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos4/${ot}/${fechaIncial}/${fechaFinal}`);
-  }
+  srvActualizar = (id:any, data:any) => this.http.put(rutaPlasticaribeAPI + `/BOPP/${id}`, data);
 
-  srvObtenerConsultaMov5(fechaIncial : any, fechaFinal : any, id){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos5/${fechaIncial}/${fechaFinal}/${id}`);
-  }
+  srvGuardar = (data: modelBOPP): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/BOPP', data);
 
-  srvObtenerpdfMovimientos(ot : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/pdfMovimientos/${ot}`);
-  }
+  GetInventarioBoppsGenericos = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getInventarioBoppsGenericos');
 
-  srvObtenerConsultaMov6(id : any, fechaIncial : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos6/${id}/${fechaIncial}`);
-  }
-
-  GetRollosLike(data){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/GetRollosLike/${data}`);
-  }
-
-  GetCantRollosIngresados_Mes(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosIngresados_Mes/${fecha1}/${fecha2}`)
-  }
-
-  GetCantRollosUtilizados_Mes(fecha1 : any, fecha2 : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosUtilizados_Mes/${fecha1}/${fecha2}`)
-  }
-
-  //Metodos para buscar datos concurrentes en tabla BOPP.
-  getBopp():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getDescripcion')
-  }
-
-  getMicras():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getMicras')
-  }
-
-  getPrecios():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getPrecios')
-  }
-
-  getAnchos():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getAnchos')
-  }
-
-  getSeriales():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getSeriales')
-  }
-
-  GetCategoriasBOPP(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getCategoriasBOPP')
-  }
-
-  //Metodo agregar
-  srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
-  }
-
-  //Metodo actualzar
-  srvActualizar(id:any, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/BOPP/${id}`, data);
-  }
-
-  //Metodo eliminar
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/BOPP/${id}`);
-  }
-
-  srvGuardar(data: modelBOPP): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
-  }
-
-  GetInventarioBoppsGenericos = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getInventarioBoppsGenericos');
-
-  GetInventarioBopps = (fecha1 : any, fecha2 : any, id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getInventarioBopps/${fecha1}/${fecha2}/${id}`);
+  GetInventarioBopps = (fecha1 : any, fecha2 : any, id : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/BOPP/getInventarioBopps/${fecha1}/${fecha2}/${id}`);
 }

@@ -9,39 +9,17 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class Orden_MaquilaService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(rutaPlasticaribeAPI + '/Orden_Maquila');
-  }
+  GetUltimoId = () => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/GetUltimoId`);
 
-  getId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/${dato}`);
-  }
+  GetConsultaDocumentos = (fechaIncio : any, fechaFin : any, ruta : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaDocumentos/${fechaIncio}/${fechaFin}${ruta}`);
+  
+  GetConsultaConsolidado = (fechaIncio : any, fechaFin : any, ruta : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaConsolidado/${fechaIncio}/${fechaFin}${ruta}`);
+  
+  put = (id:number|string, data:any) : Observable<any> => this.http.put(rutaPlasticaribeAPI + `/Orden_Maquila/${id}`, data);
 
-  GetUltimoId() {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/GetUltimoId`);
-  }
+  delete = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Orden_Maquila/${id}`);
 
-  GetConsultaDocumentos(fechaIncio : any, fechaFin : any, ruta : string) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaDocumentos/${fechaIncio}/${fechaFin}${ruta}`);
-  }
-
-  GetConsultaConsolidado(fechaIncio : any, fechaFin : any, ruta : string) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaConsolidado/${fechaIncio}/${fechaFin}${ruta}`);
-  }
-
-  put(id:number|string, data:any) : Observable<any> {
-    return this.http.put(rutaPlasticaribeAPI + `/Orden_Maquila/${id}`, data);
-  }
-
-  delete(id:number|string) {
-    return this.http.delete(rutaPlasticaribeAPI + `/Orden_Maquila/${id}`);
-  }
-
-  insert(data : modelOrdenMaquila) : Observable<any> {
-    return this.http.post(rutaPlasticaribeAPI + '/Orden_Maquila', data);
-  }
-
+  insert = (data : modelOrdenMaquila) : Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Orden_Maquila', data);
 }

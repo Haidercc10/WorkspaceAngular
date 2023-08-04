@@ -92,7 +92,8 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
   cargarEmpresas() {
     this.Empresas = [
       { Id : '900362200', Nombre : 'INVERGOAL SAS' },
-      { Id : '900458314', Nombre : 'INVERSUEZ SAS' }
+      { Id : '900458314', Nombre : 'INVERSUEZ SAS' },
+      { Id : '800188732', Nombre : 'PLASTICARIBE SAS' }
     ]
   }
 
@@ -192,6 +193,7 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
           Cuenta: datos.cuenta,
           Estado_Factura: this.estadoSeleccionado,
           Observacion: datos.observacion,
+          Restar_DashboardCostos : false,
         };
         this.facturasService.Put(factura.Id, facturas).subscribe((data : any) => {
           this.cargando = false;
@@ -199,8 +201,7 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
           this.msj.mensajeConfirmacion('Actualización exitosa', 'La actualización fue exitosa');
           this.consultarFacturas();  
         });
-      }, (error : any) => {
-      });
+      }, () => this.msj.mensajeError("Error", "Ocurrió un error al actualizar la factura"));
     });
   }
 

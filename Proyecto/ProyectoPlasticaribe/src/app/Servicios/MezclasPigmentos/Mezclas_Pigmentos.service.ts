@@ -9,37 +9,16 @@ import { modelMezPigmento } from '../../Modelo/modelMezPigmento';
 })
 export class Mezclas_PigmentosService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Mezcla_Pigmento');
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Mezcla_Pigmento');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
 
-  getMezclasPigmentos(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/Nombres_Pigmentos/${nombre}`);
-  }
+  getMezclasPigmentos = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezcla_Pigmento/Nombres_Pigmentos/${nombre}`);
 
-  //
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`, data);
-  }
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`, data);
 
-  //
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelMezPigmento): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Mezcla_Pigmento', data)
-  }
+  srvGuardar = (data : modelMezPigmento): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Mezcla_Pigmento', data);
 
 }

@@ -8,34 +8,17 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class VistasFavoritasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-//Metodo buscar lista de Usuario
-  srvObtenerListaVistas() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/VistasFavoritas')
-  }
+  srvObtenerListaVistas = () => this.http.get<any>(rutaPlasticaribeAPI + '/VistasFavoritas');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
 
-  getVistasFavUsuario(id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/VistasFavoritas/getVistasFavUsuario/${id}`);
-  }
+  getVistasFavUsuario = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/VistasFavoritas/getVistasFavUsuario/${id}`);
 
-  updateVistasFavoritas(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`, data);
-  }
+  updateVistasFavoritas = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`, data);
 
-  deleteVistasFavoritas(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
-  }
+  deleteVistasFavoritas = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
 
-  insertVistasFavoritas(data : any): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/VistasFavoritas', data);
-  }
-
+  insertVistasFavoritas = (data : any): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/VistasFavoritas', data);
 }

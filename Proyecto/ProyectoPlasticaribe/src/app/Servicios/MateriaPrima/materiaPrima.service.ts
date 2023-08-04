@@ -9,136 +9,43 @@ import { modelMateriaPrima } from '../../Modelo/modelMateriaPrima';
 })
 export class MateriaPrimaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Materia_Prima');
 
-  //Metodo buscar lista de Productos
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima');
-  }
+  getMpTintaBopp = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Materia_Prima/getMpTintaBopp');
 
-  //Metodo buscar lista de Productos
-  getMpTintaBopp():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/getMpTintaBopp');
-  }
+  getInfoMpTintaBopp = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfoMpTintaBopp/${id}`);
 
-  //Metodo buscar lista de Productos
-  getInfoMpTintaBopp(id : any) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMpTintaBopp/${id}`);
-  }
+  GetInfo_MPTintasBOPP = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Materia_Prima/GetInfo_MPTintasBOPP');
 
-  //Metodo buscar lista de Productos
-  GetInfo_MPTintasBOPP():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/GetInfo_MPTintasBOPP');
-  }
+  getInfo_MpTintaBopp_Id = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfo_MpTintasBopp_Id/${id}`);
 
-  //Metodo buscar lista de Productos
-  getInfo_MpTintaBopp_Id(id : any) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfo_MpTintasBopp_Id/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
-  }
+  GetMateriasPrimasUtilizadasHoy = (fecha : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUtilizadasHoy/${fecha}`);
 
-  srvObtenerListaPorCategoria(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/categoria/${id}`);
-  }
+  GetMateriasPrimasUltilizadasMes = (fecha1 : any, fecha2 : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUltilizadasMes/${fecha1}/${fecha2}`);
 
-  srvObtenerListaNumero1(fecha1 : any, fecha2 : any, id : any, categoria : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario1/${fecha1}/${fecha2}/${id}/${categoria}`);
-  }
+  GetInventarioMateriasPrimas = () => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInventarioMateriasPrimas`);
 
-  srvObtenerListaNumero2(fecha1 : any, id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario2/${fecha1}/${id}`);
-  }
+  GetInventario = (fechaInicial : any, fechaFinal : any, id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInventario/${fechaInicial}/${fechaFinal}/${id}`);
 
-  srvObtenerListaNumero3(fecha1 : any, id : any, categoria : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario3/${fecha1}/${id}/${categoria}`);
-  }
+  GetCategoriasMateriaPrima = () => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
 
-  GetConsultaMateriaPrimaF(fecha1 : any, fecha2 : any, id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/GetConsultaMateriaPrimaFI/${fecha1}/${fecha2}/${id}`);
-  }
+  GetMoviemientos = (fechaInicial : any, fechaFinal : any, ruta : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
 
-  getMatPrimasConTintas():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/getMatPrimasYTintas');
-  }
+  GetInfoMovimientoAsignaciones = (codigo : string, tipoMov : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoAsignaciones/${codigo}/${tipoMov}`);
 
-  getMatPrimasConTintasxId(Id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMatPrimasYTintasxId/${Id}`);
-  }
+  GetInfoMovimientosDevoluciones = (codigo : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosDevoluciones/${codigo}`);
 
-  GetMateriaPrima_LikeNombre(nombre : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/GetMateriaPrima_LikeNombre/${nombre}`);
-  }
+  GetInfoMovimientoCreacionTinta = (codigo : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoCreacionTinta/${codigo}`);
 
-  GetMateriasPrimasUtilizadasHoy(fecha : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUtilizadasHoy/${fecha}`);
-  }
+  GetInfoMovimientosEntradas = (codigo : string, tipoMov : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosEntradas/${codigo}/${tipoMov}`);
 
-  GetMateriasPrimasUltilizadasMes(fecha1 : any, fecha2 : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUltilizadasMes/${fecha1}/${fecha2}`);
-  }
+  srvAgregar = (data : any) => this.http.post(rutaPlasticaribeAPI + '/Materia_Prima', data);
 
-  GetInventarioMateriasPrimas(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventarioMateriasPrimas`);
-  }
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
 
-  GetInventario(fechaInicial : any, fechaFinal : any, id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventario/${fechaInicial}/${fechaFinal}/${id}`);
-  }
-
-  GetCategoriasMateriaPrima(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
-  }
-
-  // Metodo que nos servirá para obtener informacion sobre los movimientos de materias primas
-  GetMoviemientos(fechaInicial : any, fechaFinal : any, ruta : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
-  }
-
-  GetInfoMovimientoAsignaciones(codigo : string, tipoMov : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoAsignaciones/${codigo}/${tipoMov}`);
-  }
-
-  GetInfoMovimientosDevoluciones(codigo : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosDevoluciones/${codigo}`);
-  }
-
-  GetInfoMovimientoCreacionTinta(codigo : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoCreacionTinta/${codigo}`);
-  }
-
-  GetInfoMovimientosEntradas(codigo : string, tipoMov : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosEntradas/${codigo}/${tipoMov}`);
-  }
-
-  //Metodo agregar Productos
-  srvAgregar(data : any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
-  }
-
-  //Metodo actualzar Productos
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
-  }
-
-  //Metodo eliminar Productos
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelMateriaPrima): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
-  }
-
-  getMaximoIdMatPrima() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMaximoIdMatPrima`);
-  }
-
+  srvGuardar = (data : modelMateriaPrima): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Materia_Prima', data);
 }

@@ -6,6 +6,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-DashBoard_Facturacion',
@@ -15,9 +16,6 @@ import { defaultStepOptions, stepsDashboardFacturacion as defaultSteps } from 's
 export class DashBoard_FacturacionComponent implements OnInit {
 
   cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
@@ -33,18 +31,6 @@ export class DashBoard_FacturacionComponent implements OnInit {
   totalFacuturadoMes : number = 0; //Variable que almacenará la cantidad total de lo que se ha facturado en el mes
   totalIvaVentaMes : number = 0; //Variable que almacenará el iva de ventas del mes
   totalIvaCompraMes : number = 0; //Varible que almacenará el iva de compra del mes
-  totalFacturado1 : number = 0; //Variable que almacenará lo facturado en el mes de enero
-  totalFacturado2 : number = 0; //Variable que almacenará lo facturado en el mes de febrero
-  totalFacturado3 : number = 0; //Varibal que almacenará lo facturado en el mes de marzo
-  totalFacturado4 : number = 0; //Variable que almcenará lo facturado en el mes de abril
-  totalFacturado5 : number = 0; //Variable que almcenará lo facturado en el mes de mayo
-  totalFacturado6 : number = 0; //Variable que almcenará lo facturado en el mes de junio
-  totalFacturado7 : number = 0; //Variable que almcenará lo facturado en el mes de julio
-  totalFacturado8 : number = 0; //Variable que almcenará lo facturado en el mes de agosto
-  totalFacturado9 : number = 0; //Variable que almcenará lo facturado en el mes de septiembre
-  totalFacturado10 : number = 0; //Variable que almcenará lo facturado en el mes de octubre
-  totalFacturado11 : number = 0; //Variable que almcenará lo facturado en el mes de noviembre
-  totalFacturado12 : number = 0; //Variable que almcenará lo facturado en el mes de diciembre
   totalFacturadoanio : number = 0; //Variable que almacenará lo facturado en todo el año
   facturadoAnios : any[] = []; //variable que almacenará la información de lo facturado por los años
 
@@ -58,7 +44,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private shepherdService: ShepherdService,
-                    private mensajeAplicacion : MensajesAplicacionService,) {
+                    private mensajeAplicacion : MensajesAplicacionService,
+                      private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -78,20 +65,18 @@ export class DashBoard_FacturacionComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
+  lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
   recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.facturacionAnio();
-    this.facturacion();
-    this.recargar();
+    if (this.paginaPrincial.facturacion) {
+      this.facturacionAnio();
+      this.facturacion();
+      this.recargar();
+    }
   }
 
   // Funcion que va a llenar el array de años

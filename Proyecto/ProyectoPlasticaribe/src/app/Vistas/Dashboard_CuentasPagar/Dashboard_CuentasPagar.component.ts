@@ -11,6 +11,7 @@ import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from '
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-Dashboard_CuentasPagar',
@@ -105,7 +106,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private servicioInventarioZeus : InventarioZeusService,
                       private msj : MensajesAplicacionService,
-                        private facturasInverService : Facturas_Invergoal_InversuezService,) {
+                        private facturasInverService : Facturas_Invergoal_InversuezService,
+                          private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -119,7 +121,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.comprasMesxMesInvergoal('900362200');
     this.graficarDatosSuez();
     this.comprasMesxMesInversuez('900458314');
-    // this.consultarFacturas();
   }
 
   // Funcion que iniciará el tutorial
@@ -142,9 +143,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
-  tiempoExcedido() {
-    this.consultarCartera();
-  }
+  tiempoExcedido = () => (this.paginaPrincial.cuentasPagar) ? this.consultarCartera() : undefined;
 
   // Función que ejecutará las peticiones de la cartera
   consultarCartera(){
@@ -172,7 +171,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
               if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
-                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor && item.Cuenta == datos[i].cuenta);
                 this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
                 this.cargando = false;
               } else if (datos[i].id_Proveedor == '900362200') {
@@ -193,8 +192,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   // Funcion que va a tomar a calcular los dias de retraso de la factura
-  calcularDiasRetraso(factura : any, proveedor : any, data : any = this.carteraAgrupadaProveedores){
-    let index = data.findIndex(item => item.Id_Proveedor == proveedor);
+  calcularDiasRetraso(factura : any, proveedor : any, cuenta : any, data : any = this.carteraAgrupadaProveedores){
+    let index = data.findIndex(item => item.Id_Proveedor == proveedor && item.Cuenta == cuenta);
     let info : any [] = data[index].Detalles.filter(item => item.factura == factura);
     let dias : number = 0;
     for (let i = 0; i < info.length; i++) {
@@ -322,7 +321,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           {text: `${itemDetalles.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${this.formatonumeros(itemDetalles.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
+          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, item.Cuenta, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
           {text: `${itemDetalles.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
         ];
         proveedor.table.body.push(info);
@@ -412,7 +411,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   comprasMesxMesInvergoal(nit : string){
-    console.log(nit)
     let index : number = this.compradoAnioGoal.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       this.cargando = true;
@@ -442,7 +440,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   }
 
   comprasMesxMesInversuez(nit : string){
-    console.log(nit)
     let index : number = this.compradoAnioSuez.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
       this.cargando = true;
@@ -605,7 +602,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     this.comprasData.datasets.push(info);
     this.deudaMayor = Math.max(...info.data) + 1;
     this.comprasOptions.scales.y.suggestedMax = this.deudaMayor;
-    //this.cargando = false;
   }
 
   llenarGraficaComprasGoal(){
@@ -623,7 +619,6 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
       tension: 0.3,
     };
     this.comprasDataGoal.datasets.push(info);
-    //this.cargando = false;
   }
 
   llenarGraficaComprasSuez(){

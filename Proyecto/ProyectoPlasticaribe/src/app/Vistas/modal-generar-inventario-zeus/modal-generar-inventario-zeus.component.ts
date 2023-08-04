@@ -3,14 +3,12 @@ import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
@@ -46,10 +44,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 private clienteOtItems : BagproService,
                   private existencias_ProductosService : ExistenciasProductosService,
                     private invMesProductoService : Inventario_Mes_ProductosService,
-                      private messageService: MessageService,
-                        private AppComponent : AppComponent,
-                          private shepherdService: ShepherdService,
-                            private mensajeService : MensajesAplicacionService,) {
+                      private AppComponent : AppComponent,
+                        private shepherdService: ShepherdService,
+                          private mensajeService : MensajesAplicacionService,) {
    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -123,8 +120,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: color2 }
           }
-          row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';

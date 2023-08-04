@@ -9,31 +9,17 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class TercerosService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(rutaPlasticaribeAPI + '/Terceros');
-  }
+  getTodo = () => this.http.get<any>(rutaPlasticaribeAPI + '/Terceros');
 
-  getId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Terceros/${dato}`);
-  }
+  getId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Terceros/${dato}`);
 
-  getTerceroLike(nombre : string){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Terceros/getTerceroLike/${nombre}`);
-  }
+  getTerceroLike = (nombre : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Terceros/getTerceroLike/${nombre}`);
 
-  put(id:number|string, data:any) {
-    return this.http.put(rutaPlasticaribeAPI + `/Terceros/${id}`, data);
-  }
+  put = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Terceros/${id}`, data);
 
-  delete(id:number|string) {
-    return this.http.delete(rutaPlasticaribeAPI + `/Terceros/${id}`);
-  }
+  delete = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Terceros/${id}`);
 
-  insert(data : modelTercero): Observable<any> {
-    return this.http.post(rutaPlasticaribeAPI + '/Terceros', data);
-  }
-
+  insert = (data : modelTercero): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Terceros', data);
 }

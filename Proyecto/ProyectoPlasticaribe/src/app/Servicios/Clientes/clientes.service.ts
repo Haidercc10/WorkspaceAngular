@@ -7,57 +7,28 @@ import { modelCliente } from '../../Modelo/modelCliente';
 @Injectable({
   providedIn: 'root'
 })
+
 export class ClientesService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de Productos
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Clientes');
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Clientes');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Clientes/${id}`);
 
-  srvObtenerListaPorEstado(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/estadoId/${id}`);
-  }
+  srvObtenerListaPorEstado = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Clientes/estadoId/${id}`);
 
-  srvObtenerListaPorNombreCliente(nombre : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/nombreCliente/${nombre}`);
-  }
+  srvObtenerListaPorNombreCliente = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Clientes/nombreCliente/${nombre}`);
 
   GetClientesVendedores = (vendedor : number, nombre : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Clientes/getClientesVendedores_LikeNombre/${vendedor}/${nombre}`);
 
-  //Metodo agregar Productos
-  srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)
-  }
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Clientes/${id}`, data);
 
-  //Metodo actualzar Productos
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Clientes/${id}`, data);
-  }
+  PutEstadoCliente = (id:number|String, estado:any) => this.http.put(rutaPlasticaribeAPI + `/Clientes/putEstadoCliente/${id}`, estado);
 
-  //Metodo actualzar Productos
-  PutEstadoCliente(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Clientes/putEstadoCliente/${id}`, data);
-  }
+  srvEliminar = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Clientes/${id}`);
 
-  //Metodo eliminar Productos
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
-  }
+  srvGuardar = (data : modelCliente): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Clientes', data);
 
-  //
-  srvGuardar(data : modelCliente): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)
-  }
-
-  LikeGetCliente = (dato : string): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/LikeGetClientes/${dato}`);
-
+  LikeGetCliente = (dato : string): Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/Clientes/LikeGetClientes/${dato}`);
 }

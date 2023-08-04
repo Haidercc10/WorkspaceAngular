@@ -164,22 +164,17 @@ export class ReporteCostosOTComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
     let ot : number = this.infoOT.value.ot;
     this.limpiarCampos();
-    let porcentajeMargen : number = 0;
     this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
       if (datos_OT.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
       else {
         for (const item of datos_OT) {
-          porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
+          let porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
 
           this.ordenTrabajo = ot;
           this.NombreCliente = item.clienteNom;
@@ -235,9 +230,9 @@ export class ReporteCostosOTComponent implements OnInit {
             }
           });
         }
+        this.consultaProceso(ot);
       }
     });
-    this.consultaProceso(ot);
   }
 
   // Funcion en la que se consultaran los procesos de por los que ha pasado la orden de trabajo y calculará el total de kg o unidades que se hizo en cada uno
@@ -245,39 +240,22 @@ export class ReporteCostosOTComponent implements OnInit {
     this.valorFinalOT = 0;
     this.diferencia = 0;
     this.diferenciaPorcentaje = 0;
-    this.cantidadSellandoUnidad = 0;
-    this.cantidadTotalExt = 0;
-    this.cantidadTotalImp = 0;
-    this.cantidadTotalDbl = 0;
-    this.cantidadTotalRot = 0;
-    this.cantidadTotalEmpaque = 0;
-    this.cantidadTotalCorte = 0;
-    this.cantidadTotalLaminado = 0;
-    this.cantidadTotalSella = 0;
-    this.cantidadTotalWiketiado = 0;
-    this.cantidadWiketiadoUnidad = 0;
 
     this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_procesos => {
-      for (let index = 0; index < datos_procesos.length; index++) {
-        if (datos_procesos[index].nomStatus == "EXTRUSION") this.cantidadTotalExt += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "IMPRESION") this.cantidadTotalImp += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "DOBLADO") this.cantidadTotalDbl += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "ROTOGRABADO") this.cantidadTotalRot += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "EMPAQUE") this.cantidadTotalEmpaque += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "CORTE") this.cantidadTotalCorte += datos_procesos[index].extnetokg;
-        else if (datos_procesos[index].nomStatus == "LAMINADO") this.cantidadTotalLaminado += datos_procesos[index].extnetokg;
-      }
+      this.cantidadTotalExt = datos_procesos.filter(item => item.proceso == 'EXTRUSION').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalImp = datos_procesos.filter(item => item.proceso == 'IMPRESION').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalDbl = datos_procesos.filter(item => item.proceso == 'DOBLADO').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalRot = datos_procesos.filter(item => item.proceso == 'ROTOGRABADO').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalEmpaque = datos_procesos.filter(item => item.proceso == 'EMPAQUE').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalCorte = datos_procesos.filter(item => item.proceso == 'CORTE').reduce((a,b) => a + b.total, 0);
+      this.cantidadTotalLaminado = datos_procesos.filter(item => item.proceso == 'LAMINADO').reduce((a,b) => a + b.total, 0);
+      
       //SELLADO Y WIKETIADO
       this.bagProServices.srvObtenerListaProcSelladoOT(ot).subscribe(datos_selado => {
-        for (let i = 0; i < datos_selado.length; i++) {
-          if (datos_selado[i].nomStatus == "SELLADO") {
-            this.cantidadTotalSella += datos_selado[i].peso;
-            this.cantidadSellandoUnidad += datos_selado[i].qty;
-          } else if (datos_selado[i].nomStatus == "Wiketiado") {
-            this.cantidadTotalWiketiado += datos_selado[i].peso;
-            this.cantidadWiketiadoUnidad += datos_selado[i].qty;
-          }
-        }
+        this.cantidadTotalSella = datos_selado.filter(item => item.proceso == 'SELLADO').reduce((a,b) => a + b.totalPeso, 0);
+        this.cantidadSellandoUnidad = datos_selado.filter(item => item.proceso == 'SELLADO').reduce((a,b) => a + b.totalUnd, 0);        
+        this.cantidadTotalWiketiado = datos_selado.filter(item => item.proceso == 'Wiketiado').reduce((a,b) => a + b.totalPeso, 0);
+        this.cantidadWiketiadoUnidad = datos_selado.filter(item => item.proceso == 'Wiketiado').reduce((a,b) => a + b.totalUnd, 0);
         this.cantidadPorcPerdidaProcesoaProceso(ot);
       });
     });
@@ -303,8 +281,8 @@ export class ReporteCostosOTComponent implements OnInit {
     }
     this.ArrayProcesos.push(cant);
     for (const item of this.ArrayProcesos) {
-      let Sellado = item.Sel.replace('KG', '');
-      let wiketiado = item.Wik.replace('KG', '');
+      let Sellado = this.cantidadTotalSella;
+      let wiketiado = this.cantidadTotalWiketiado;
 
       if (Sellado == 0 && item.Emp != 0 && wiketiado == 0) {
         this.bagProServices.srvObtenerListaProcExtOt_fechaFinal(ot).subscribe(datos_extrusion => {
@@ -424,11 +402,9 @@ export class ReporteCostosOTComponent implements OnInit {
   buildTableBody(data, columns) {
     var body = [];
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach((row) => {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
     return body;
@@ -439,685 +415,274 @@ export class ReporteCostosOTComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [20, 185, 40, 60, 50, 60, 40],
+        widths: [30, 200, 50, 55, 60, 60, 60],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
+        fillColor: (rowIndex, node, columnIndex) => (rowIndex == 0) ? '#CCCCCC' : null
       }
     };
   }
 
-  // Funcion que cargará el PDF con la infomración de la OT
-  CargarPDF(){
+  // Funcion que se encargará de crear un PDF con la información de la orden de trabajo
+  CrearPDF(){
     let nombre : string = this.storage_Nombre;
-    if (this.ArrayMateriaPrima.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
-    else {
-      for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-        for (const item of this.ArrayProcesos) {
-          let Sellado = item.Sel.replace(' KG', '');
-          let wiketiado = item.Wik.replace(' KG', '');
+    if (this.infoOT.valid) {
+      this.infoOT.value.ot = 123456;
+      let totalKg : number = 0, totalUnd : number = 0;
+      let titulo = `Reporte de Costos de la OT ${this.infoOT.value.ot}`;
+      this.ArrayProcesos.forEach(item => {
+        let Sellado = this.cantidadTotalSella;
+        let wiketiado = this.cantidadTotalWiketiado;
 
-          if (Sellado != 0 && wiketiado != 0 && item.Emp == 0) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${this.ordenTrabajo}`
-              },
-              footer: function(currentPage : any, pageCount : any) {
-                return [
-                  {
-                    columns: [
-                      { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                      { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                      { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                    ]
-                  }
-                ]
-              },
-              watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-              content : [
-                {
-                  columns: [
-                    {
-                      image : logoParaPdf,
-                      width : 220,
-                      height : 50
-                    },
-                    {
-                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                      alignment: 'center',
-                      style: 'titulo',
-                      margin: 30
-                    }
-                  ]
-                },
-                '\n \n',
-                {
-                  text: `Solicitado Por: ${this.storage_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `Fecha Creación OT: ${this.fechaOT}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de la Orden de Trabajo \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: [130, 220, '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `N°: ${this.ordenTrabajo}`,
-                        `Nombre Cliente: ${this.NombreCliente}`,
-                        `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
-                      ],
-                      [
-                        `Id Producto: ${this.idProducto}`,
-                        `Nombre Producto: ${this.nombreProducto}`,
-                        `Presentación: ${this.presentacionProducto}`
-                      ],
-                      [
-                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd.toFixed(2))}`,
-                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`,
-                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen.toFixed(2))}%`
-                      ],
-                      [
-                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg.toFixed(2))}`,
-                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd.toFixed(2))}`,
-                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg.toFixed(2))}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Comparativa \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        ``,
-                        `Valor OT`,
-                        `Cantidad Und`,
-                        `Cantidad Kg`
-                      ],
-                      [
-                        `Producido`,
-                        `$${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
-                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad)}`,
-                        `${this.formatonumeros(Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado).toFixed(2))}`
-                      ],
-                      [
-                        `Teorico`,
-                        `$${this.formatonumeros(this.valorEstimadoOT.toFixed(2))}`,
-                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd).toFixed(2))}`,
-                        `${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) Utilizada \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
-
-                {
-                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada.toFixed(2))}`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de la Producción en cada proceso \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt).toFixed(2))}`,
-                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp).toFixed(2))}`,
-                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot).toFixed(2))}`
-                      ],
-                      [
-                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl).toFixed(2))}`,
-                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado).toFixed(2))}`,
-                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque).toFixed(2))}`
-                      ],
-                      [
-                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado).toFixed(2))}`,
-                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella).toFixed(2))}`,
-                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte).toFixed(2))}`
-                      ],
-                    ]
-                  },
-
-                  layout: {
-                    fillColor: function (rowIndex, node, columnIndex) {
-                      return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
-                    }
-                  },
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  table: {
-                    widths: [1,'*'],
-                    style: 'header',
-                    body: [
-                      [
-                        '',
-                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
-                      ],
-                      [
-                        '',
-                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia.toFixed(2))}`,
-                      ],
-                      [
-                        '',
-                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje).toFixed(2))}%`,
-                      ],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  fontSize: 9,
-                },
-              ],
-              styles: {
-                header: {
-                  fontSize: 10,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          } else if (Sellado == 0 && item.Emp != 0) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${this.ordenTrabajo}`
-              },
-              watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-              content : [
-                {
-                  columns: [
-                    {
-                      image : logoParaPdf,
-                      width : 220,
-                      height : 50
-                    },
-                    {
-                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                      alignment: 'center',
-                      style: 'titulo',
-                      margin: 30
-                    }
-                  ]
-                },
-                '\n \n',
-                {
-                  text: `Solicitado Por: ${this.storage_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `Fecha Creación OT: ${this.fechaOT}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de la Orden de Trabajo \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: [130, 220, '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `N°: ${this.ordenTrabajo}`,
-                        `Nombre Cliente: ${this.NombreCliente}`,
-                        `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
-                      ],
-                      [
-                        `Id Producto: ${this.idProducto}`,
-                        `Nombre Producto: ${this.nombreProducto}`,
-                        `Presentación: ${this.presentacionProducto}`
-                      ],
-                      [
-                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
-                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
-                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
-                      ],
-                      [
-                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg)}`,
-                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
-                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg)}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Comparativa \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        ``,
-                        `Valor OT`,
-                        `Cantidad Und`,
-                        `Cantidad Kg`
-                      ],
-                      [
-                        `Producido`,
-                        `$${this.formatonumeros(this.valorFinalOT)}`,
-                        `${this.formatonumeros(this.cantProdSinMargenUnd)}`,
-                        `${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
-                      ],
-                      [
-                        `Teorico`,
-                        `$${this.formatonumeros(this.valorEstimadoOT)}`,
-                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd))}`,
-                        `${this.formatonumeros(this.cantProdSinMargenKg)}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) Utilizada \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
-
-                {
-                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada)}`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de la Producción en cada proceso \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt))}`,
-                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp))}`,
-                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot))}`
-                      ],
-                      [
-                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl))}`,
-                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado))}`,
-                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
-                      ],
-                      [
-                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))}`,
-                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella))}`,
-                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
-                      ],
-                    ]
-                  },
-
-                  layout: {
-                    fillColor: function (rowIndex, node, columnIndex) {
-                      return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
-                    }
-                  },
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  table: {
-                    widths: [1,'*'],
-                    style: 'header',
-                    body: [
-                      [
-                        '',
-                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT)}`,
-                      ],
-                      [
-                        '',
-                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia)}`,
-                      ],
-                      [
-                        '',
-                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje))}%`,
-                      ],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  fontSize: 9,
-                },
-              ],
-              styles: {
-                header: {
-                  fontSize: 10,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-
-          } else if (Sellado != 0 && item.Emp == 0) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${this.ordenTrabajo}`
-              },
-              watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-              content : [
-                {
-                  columns: [
-                    {
-                      image : logoParaPdf,
-                      width : 220,
-                      height : 50
-                    },
-                    {
-                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                      alignment: 'center',
-                      style: 'titulo',
-                      margin: 30
-                    }
-                  ]
-                },
-                '\n \n',
-                {
-                  text: `Solicitado Por: ${this.storage_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `Fecha Creación OT: ${this.fechaOT}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de la Orden de Trabajo \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: [130, 220, '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `N°: ${this.ordenTrabajo}`,
-                        `Nombre Cliente: ${this.NombreCliente}`,
-                        `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
-                      ],
-                      [
-                        `Id Producto: ${this.idProducto}`,
-                        `Nombre Producto: ${this.nombreProducto}`,
-                        `Presentación: ${this.presentacionProducto}`
-                      ],
-                      [
-                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
-                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
-                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
-                      ],
-                      [
-                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg)}`,
-                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
-                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg)}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Comparativa \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        ``,
-                        `Valor OT`,
-                        `Cantidad Und`,
-                        `Cantidad Kg`
-                      ],
-                      [
-                        `Producido`,
-                        `$${this.formatonumeros(this.valorFinalOT)}`,
-                        `${this.formatonumeros(this.cantidadSellandoUnidad)}`,
-                        `${this.formatonumeros(Math.round(this.cantidadTotalSella))}`
-                      ],
-                      [
-                        `Teorico`,
-                        `$${this.formatonumeros(this.valorEstimadoOT)}`,
-                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd))}`,
-                        `${this.formatonumeros(this.cantProdSinMargenKg)}`
-                      ],
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) Utilizada \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
-
-                {
-                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada)}`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                '\n \n',
-                {
-                  text: `\n Información detallada de la Producción en cada proceso \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt))}`,
-                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp))}`,
-                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot))}`
-                      ],
-                      [
-                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl))}`,
-                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado))}`,
-                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
-                      ],
-                      [
-                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))}`,
-                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella))}`,
-                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
-                      ],
-                    ]
-                  },
-
-                  layout: {
-                    fillColor: function (rowIndex, node, columnIndex) {
-                      return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
-                    }
-                  },
-                  fontSize: 9,
-                },
-                '\n \n',
-                {
-                  table: {
-                    widths: [1,'*'],
-                    style: 'header',
-                    body: [
-                      [
-                        '',
-                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT)}`,
-                      ],
-                      [
-                        '',
-                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia)}`,
-                      ],
-                      [
-                        '',
-                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje))}%`,
-                      ],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  fontSize: 9,
-                },
-              ],
-              styles: {
-                header: {
-                  fontSize: 10,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          }
-          break;
+        if (Sellado != 0 && wiketiado != 0 && item.Emp == 0) {
+          totalUnd = this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad;
+          totalKg = Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado);
+        } else if (Sellado == 0 && item.Emp != 0) {
+          totalUnd = this.cantProdSinMargenUnd;
+          totalKg = Math.round(this.cantidadTotalEmpaque);
+        } else if (Sellado != 0 && item.Emp == 0) {
+          totalUnd = this.cantidadSellandoUnidad;
+          totalKg = Math.round(this.cantidadTotalSella);
         }
-        break;
+      });
+
+      const pdfDefinicion : any = {
+        info: { title: titulo},
+        pageSize: { width: 630, height: 760 },
+        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+        pageMargins : [25, 110, 25, 35],
+        header: function(currentPage : any, pageCount : any) {
+          return [
+            {
+              margin: [20, 8, 20, 0],
+              columns: [
+                { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                {
+                  width: 300,
+                  alignment: 'center',
+                  table: {
+                    body: [
+                      [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                      [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                      [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                    ]
+                  },
+                  layout: 'noBorders',
+                  margin: [85, 20],
+                },
+                {
+                  width: '*',
+                  alignment: 'center',
+                  margin: [20, 20, 20, 0],
+                  table: {
+                    body: [
+                      [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    ]
+                  },
+                  layout: 'noBorders',
+                }
+              ]
+            },
+          ];
+        },
+        content : [
+          {
+            text: `\n Información detallada de la Orden de Trabajo \n \n`,
+            alignment: 'center',
+            style: 'header'
+          },
+          {
+            table: {
+              widths: [130, 220, '*'],
+              style: 'header',
+              body: [
+                [
+                  `N°: ${this.ordenTrabajo}`,
+                  `Nombre Cliente: ${this.NombreCliente}`,
+                  `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
+                ],
+                [
+                  `Item: ${this.idProducto}`,
+                  `Referencia: ${this.nombreProducto}`,
+                  `Presentación: ${this.presentacionProducto}`
+                ],
+                [
+                  `Cant Und: ${this.formatonumeros(this.cantProdSinMargenUnd.toFixed(2))}`,
+                  `Cant Kg: ${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`,
+                  `Cant Margen: ${this.formatonumeros(this.CantidadMargen.toFixed(2))}%`
+                ],
+                [
+                  `Cant Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg.toFixed(2))}`,
+                  `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd.toFixed(2))}`,
+                  `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg.toFixed(2))}`
+                ],
+              ]
+            },
+            layout: 'lightHorizontalLines',
+            fontSize: 9,
+          },
+          '\n',
+          {
+            text: `\n Comparativa \n \n`,
+            alignment: 'center',
+            style: 'header'
+          },
+          {
+            table: {
+              widths: ['*', '*', '*', '*'],
+              style: 'header',
+              body: [
+                [
+                  ``,
+                  `Valor OT`,
+                  `Cantidad Und`,
+                  `Cantidad Kg`
+                ],
+                [
+                  `Producido`,
+                  `$${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
+                  `${this.formatonumeros(totalUnd)}`,
+                  `${this.formatonumeros(totalKg.toFixed(2))}`
+                ],
+                [
+                  `Teorico`,
+                  `$${this.formatonumeros(this.valorEstimadoOT.toFixed(2))}`,
+                  `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd).toFixed(2))}`,
+                  `${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`
+                ],
+              ]
+            },
+            layout: 'lightHorizontalLines',
+            fontSize: 9,
+          },
+          '\n',
+          {
+            text: `\n Información detallada de Materia(s) Prima(s) Utilizada \n `,
+            alignment: 'center',
+            style: 'header'
+          },
+          this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
+          {
+            text: `\n Valor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada.toFixed(2))}`,
+            alignment: 'right',
+            style: 'header',
+          },
+          '\n \n',
+          {
+            text: `\n Información detallada de la Producción en cada proceso \n `,
+            alignment: 'center',
+            style: 'header'
+          },
+          {
+            table: {
+              widths: ['*', '*', '*'],
+              style: 'header',
+              body: [
+                [
+                  `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt).toFixed(2))}`,
+                  `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp).toFixed(2))}`,
+                  `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot).toFixed(2))}`
+                ],
+                [
+                  `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl).toFixed(2))}`,
+                  `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado).toFixed(2))}`,
+                  `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque).toFixed(2))}`
+                ],
+                [
+                  `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado).toFixed(2))}`,
+                  `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella).toFixed(2))}`,
+                  `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte).toFixed(2))}`
+                ],
+              ]
+            },
+
+            layout: {
+              fillColor: function (rowIndex, node, columnIndex) {
+                return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
+              }
+            },
+            fontSize: 9,
+          },
+          '\n \n',
+          {
+            table: {
+              widths: [1,'*'],
+              style: 'header',
+              body: [
+                [
+                  '',
+                  `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
+                ],
+                [
+                  '',
+                  `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia.toFixed(2))}`,
+                ],
+                [
+                  '',
+                  `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje).toFixed(2))}%`,
+                ],
+              ]
+            },
+            layout: 'noBorders',
+            fontSize: 9,
+          },
+        ],
+        styles: {
+          header: {
+            fontSize: 10,
+            bold: true
+          },
+          titulo: {
+            fontSize: 15,
+            bold: true
+          }
+        }
       }
-    }
+      const pdf = pdfMake.createPdf(pdfDefinicion);
+      pdf.open();
+
+    } else this.msj.mensajeAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
   }
 
   // Cambia el estado de la orden de trabajo en la nueva base de datos
   cambiarEstado2(ot : number, estado : any) {
+    let estadoFinal;
     this.estadosProcesos_OTService.srvObtenerListaPorOT(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        let info : any = {
-          EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
-          EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
-          EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
-          EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
-          EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
-          EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
-          EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
-          EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
-          EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
-          EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
-          EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
-          EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
-          EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
-          EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
-          EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
-          UndMed_Id : datos_ot[i].undMed_Id,
-          Estado_Id : estado,
-          Falla_Id : datos_ot[i].falla_Id,
-          EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
-          EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
-          EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
-          Usua_Id : datos_ot[i].usua_Id,
-          EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
-          EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
-          EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
-          EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
-          EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
-          EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
-          Cli_Id : datos_ot[i].cli_Id,
-          Prod_Id : datos_ot[i].prod_Id,
-          EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
-          EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
-        }
+      datos_ot.forEach(item => {
         if (estado == '0') {
-          let totalPedido : number = info.EstProcOT_CantidadPedida;
-          let kgSellado : number = info.EstProcOT_SelladoKg;
-          let kgEmpaque : number = info.EstProcOT_EmpaqueKg;
-          if (kgSellado >= totalPedido || kgEmpaque >= totalPedido) info.Estado_Id = 17 //TERMINADA
+          let totalPedido : number = item.estProcOT_CantidadPedida;
+          let kgSellado : number = item.estProcOT_SelladoKg;
+          let kgEmpaque : number = item.estProcOT_EmpaqueKg;
+          if (kgSellado >= totalPedido || kgEmpaque >= totalPedido) estadoFinal = 17 //TERMINADA
           else {
-            if ((info.EstProcOT_ExtrusionKg == 0
-                && info.EstProcOT_ImpresionKg == 0
-                && info.EstProcOT_RotograbadoKg == 0
-                && info.EstProcOT_LaminadoKg == 0
-                && info.EstProcOT_CorteKg == 0
-                && info.EstProcOT_DobladoKg == 0
-                && info.EstProcOT_SelladoKg == 0
-                && info.EstProcOT_EmpaqueKg == 0
-                && info.EstProcOT_WiketiadoKg == 0) && info.EstProcOT_CantMatPrimaAsignada > 0) info.Estado_Id = 14; //ASIGNADA
-            else if ((info.EstProcOT_ExtrusionKg > 0
-              || info.EstProcOT_ImpresionKg > 0
-              || info.EstProcOT_RotograbadoKg > 0
-              || info.EstProcOT_LaminadoKg > 0
-              || info.EstProcOT_CorteKg > 0
-              || info.EstProcOT_DobladoKg > 0
-              || info.EstProcOT_SelladoKg > 0
-              || info.EstProcOT_EmpaqueKg > 0
-              || info.EstProcOT_WiketiadoKg > 0) && info.EstProcOT_CantMatPrimaAsignada > 0) info.Estado_Id = 16; //EN PROCESO
-            else info.Estado_Id = 15; //ABIERTA
+            if ((item.estProcOT_ExtrusionKg == 0
+                && item.estProcOT_ImpresionKg == 0
+                && item.estProcOT_RotograbadoKg == 0
+                && item.estProcOT_LaminadoKg == 0
+                && item.estProcOT_CorteKg == 0
+                && item.estProcOT_DobladoKg == 0
+                && item.estProcOT_SelladoKg == 0
+                && item.estProcOT_EmpaqueKg == 0
+                && item.estProcOT_WiketiadoKg == 0) && item.estProcOT_CantMatPrimaAsignada > 0) estadoFinal = 14; //ASIGNADA
+            else if ((item.estProcOT_ExtrusionKg > 0
+              || item.estProcOT_ImpresionKg > 0
+              || item.estProcOT_RotograbadoKg > 0
+              || item.estProcOT_LaminadoKg > 0
+              || item.estProcOT_CorteKg > 0
+              || item.estProcOT_DobladoKg > 0
+              || item.estProcOT_SelladoKg > 0
+              || item.estProcOT_EmpaqueKg > 0
+              || item.estProcOT_WiketiadoKg > 0) && item.estProcOT_CantMatPrimaAsignada > 0) estadoFinal = 16; //EN PROCESO
+            else estadoFinal = 15; //ABIERTA
           }
-        } else if (estado == '4')estado = 3; //ANULADA
-        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => { });
-      }
+        } else if (estado == '4') estadoFinal = 3; //ANULADA
+        this.estadosProcesos_OTService.PutEstadoOrdenTrabajo(ot, estadoFinal);
+      });
     });
   }
 
@@ -1133,10 +698,10 @@ export class ReporteCostosOTComponent implements OnInit {
         usrCrea : this.usuarioCreador,
         estado : estado,
       }
-      this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(() => {
         this.cambiarEstado2(this.ordenTrabajo, estado);
-        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`)
-      }, error => { this.msj.mensajeError(`Error`, 'No se ha podido cambiar el estado de la OT'); });
+        this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`);
+      }, () => this.msj.mensajeError(`Error`, 'No se ha podido cambiar el estado de la OT'));
     }
   }
 
@@ -1151,14 +716,18 @@ export class ReporteCostosOTComponent implements OnInit {
         usrCrea : this.usuarioCreador,
         estado : '1',
       }
-      this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(() => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
         this.msj.mensajeConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
-      }, error => this.msj.mensajeError(`Error`, `No se ha podido cambiar el estado de la OT`));
+      }, () => this.msj.mensajeError(`Error`, `No se ha podido cambiar el estado de la OT`));
     }
   }
 
-  inhabilitarCampos = () => setTimeout(() => { this.infoOT.disable(); this.infoOT.get('ot').enable();this.infoOT.get('estadoOT').enable(); }, 1000);
+  inhabilitarCampos = () => setTimeout(() => {
+    this.infoOT.disable(); 
+    this.infoOT.get('ot').enable();
+    this.infoOT.get('estadoOT').enable();
+  }, 1000);
 
-  cargarEstados = () => this.arrayEstados = [ {valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}];
+  cargarEstados = () => this.arrayEstados = [{valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}];
 }

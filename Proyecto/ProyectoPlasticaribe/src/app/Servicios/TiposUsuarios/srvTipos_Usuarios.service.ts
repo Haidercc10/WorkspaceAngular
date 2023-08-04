@@ -11,17 +11,9 @@ export class SrvTipos_UsuariosService {
 
   constructor(private http : HttpClient) { }
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Tipo_Usuario');
 
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Usuario')
-  }
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Tipo_Usuario/${id}`);
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Usuario/${id}`);
-  }
-
-  Insert(data : any){
-    return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Usuario/', data);
-  }
+  Insert = (data : any) => this.http.post(rutaPlasticaribeAPI + '/Tipo_Usuario/', data);
 }

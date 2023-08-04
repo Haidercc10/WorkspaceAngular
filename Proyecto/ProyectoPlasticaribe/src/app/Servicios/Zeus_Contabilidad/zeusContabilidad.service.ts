@@ -7,7 +7,6 @@ import { rutaZeusContabilidad } from 'src/polyfills';
 })
 export class ZeusContabilidadService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
   /**************************************************************** FACTURAS BU *****************************************************************************/

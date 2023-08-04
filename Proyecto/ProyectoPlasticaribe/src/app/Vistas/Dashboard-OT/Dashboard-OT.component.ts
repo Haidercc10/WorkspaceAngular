@@ -8,6 +8,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardOT as defaultSteps } from 'src/app/data';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-Dashboard-OT',
@@ -59,16 +60,17 @@ export class DashboardOTComponent implements OnInit {
   modoSeleccionado : boolean
 
   constructor(private AppComponent : AppComponent,
-                private bagProService : BagproService,
-                  private ordenTrabajoService : EstadosProcesos_OTService,
-                    private zeusService : InventarioZeusService,
-                      private shepherdService: ShepherdService) {
+                private paginaPrincial : PaginaPrincipalComponent,
+                  private bagProService : BagproService,
+                    private ordenTrabajoService : EstadosProcesos_OTService,
+                      private zeusService : InventarioZeusService,
+                        private shepherdService: ShepherdService) {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.tiempoExcedido();
+    setTimeout(() => this.tiempoExcedido(), 1000);
   }
 
   tutorial(){
@@ -91,8 +93,10 @@ export class DashboardOTComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.llenarEstadosOrdenes();
-    this.recargar();
+    if (this.paginaPrincial.ordenTrabajo) {
+      this.llenarEstadosOrdenes();
+      this.recargar();
+    }
   }
 
   // Funcion que va a llenar la informacion de los estados de ordenes de trabajo

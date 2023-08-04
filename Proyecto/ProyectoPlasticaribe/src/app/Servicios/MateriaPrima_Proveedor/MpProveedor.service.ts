@@ -9,35 +9,16 @@ import { modelMpProveedor } from '../../Modelo/modelMpProveedor';
 })
 export class MpProveedorService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
+  
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Proveedor_MateriaPrima');
+  
+  srvAgregar = (data:any) => this.http.post(rutaPlasticaribeAPI + '/Proveedor_MateriaPrima', data);
+  
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Proveedor_MateriaPrima/${id}`, data);
+  
+  srvEliminar = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Proveedor_MateriaPrima/${id}`);
 
-
-  //Metodo buscar lista de proveedor
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Proveedor_MateriaPrima')
-    }
-
-  //Metodo agregar proveedor
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor_MateriaPrima', data)
-    }
-
-  //Metodo actualzar proveedor
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Proveedor_MateriaPrima/${id}`, data);
-    }
-
-  //Metodo eliminar proveedor
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Proveedor_MateriaPrima/${id}`);
-    }
-
-    //Duardar proveedor
-    srvGuardar(data : modelMpProveedor): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor_MateriaPrima', data);
-   }
+  srvGuardar = (data : modelMpProveedor): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Proveedor_MateriaPrima', data);
 
 }

@@ -108,7 +108,7 @@
                                 <td>{{detalles.fecha_Vencimiento}}</td>
                                 <td>{{detalles.saldo_Actual | number : '1.2-2'}}</td>
                                 <td>{{detalles.mora}}</td>
-                                <td>{{calcularDiasRetraso(detalles.factura, item.Id_Proveedor)}}</td>
+                                <td>{{calcularDiasRetraso(detalles.factura, item.Id_Proveedor, item.Cuenta)}}</td>
                               </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">

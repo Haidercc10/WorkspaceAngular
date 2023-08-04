@@ -9,71 +9,23 @@ import { modelProducto } from '../../Modelo/modelProducto';
 })
 export class ProductoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de Productos
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Producto')
-  }
+  srvObtenerListaPorId = (id : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/${id}`);
 
-  srvObtenerListaPorId(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/${id}`)
-  }
+  obtenerItemsLike = (letras : any): Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/consultaNombreItem/${letras}`);
 
-  srvObtenerListaPorIdProducto(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/IdProducto/${id}`)
-  }
+  srvObtenerListaPorIdProducto = (id : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/IdProducto/${id}`);
 
-  obtenerProductos(): Observable<any> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaGeneral`)
-  }
+  obtenerNombreProductos = (idProducto : any): Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/consultaNombreProducto/${idProducto}`);
 
-  GetIdUltimoProducto(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/getIdUltimoProducto`);
-  }
+  GetIdUltimoProducto = () => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/getIdUltimoProducto`);
 
-  //Metodo agregar Productos
-  srvAgregar(datos_Productos:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Producto', datos_Productos)
-  }
+  GetInfoProducto_Prod_Presentacion = (id : number, presentacion : string) : Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Producto/getInfoProducto_Prod_Presentacion/${id}/${presentacion}`);
 
-  //Metodo actualzar Productos
-  srvActualizar(id:any, datos_Productos:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
-  }
+  srvActualizar = (id:any, datos_Productos:any) => this.http.put(rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
 
-  //Metodo actualzar Productos
-  PutEstadoProducto(id: number, datos_Productos:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Producto/putEstadoProducto/${id}`, datos_Productos);
-  }
+  PutEstadoProducto = (id: number, datos_Productos:any) => this.http.put(rutaPlasticaribeAPI + `/Producto/putEstadoProducto/${id}`, datos_Productos);
 
-  //Metodo eliminar Productos
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Producto/${id}`);
-  }
-
-  //
-  srvGuardar(data : modelProducto): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Producto', data)
-  }
-
-  /** Obtener Info Producto de existencias */
-  srvObtenerPresentacionProducto(id : number|String):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/ConsultaProductoExistencia/${id}`);
-  }
-
-  obtenerNombreProductos(idProducto : any): Observable<any> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreProducto/${idProducto}`);
-  }
-
-  obtenerItemsLike(letras : any): Observable<any> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreItem/${letras}`);
-  }
-
-  GetInfoProducto_Prod_Presentacion(id : number, presentacion : string) : Observable<any[]> {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/Producto/getInfoProducto_Prod_Presentacion/${id}/${presentacion}`);
-  }
+  srvGuardar = (data : modelProducto): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Producto', data);
 }

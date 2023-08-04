@@ -43,12 +43,11 @@ export class MovimientoMPComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
-                  private messageService: MessageService,
-                    private materiaPrimaService : MateriaPrimaService,
-                      private detallesAsignacionService : DetallesAsignacionService,
-                        private bagProServices : BagproService,
-                          private shepherdService: ShepherdService,
-                            private mensajeService : MensajesAplicacionService,) {
+                  private materiaPrimaService : MateriaPrimaService,
+                    private detallesAsignacionService : DetallesAsignacionService,
+                      private bagProServices : BagproService,
+                        private shepherdService: ShepherdService,
+                          private mensajeService : MensajesAplicacionService,) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -1020,17 +1019,10 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro1($event, campo : any, valorCampo : string) {
-    this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro1 = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  aplicarfiltro2($event, campo : any, valorCampo : string) {
-    this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
-
-  aplicarfiltro3($event, campo : any, valorCampo : string) {
-    this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro3 = ($event, campo : any, valorCampo : string) => this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
   verTutorial() {

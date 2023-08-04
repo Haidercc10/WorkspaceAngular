@@ -1,6 +1,5 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
-import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Injectable({  providedIn: 'root' })
 
@@ -12,13 +11,10 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
 
 export class PaginaPrincipalComponent implements OnInit {
 
-  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
-
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  tutorial : boolean = true;
   ordenTrabajo : boolean = false;
   facturacion : boolean = false;
   materiaPrima : boolean = false;
@@ -52,14 +48,14 @@ export class PaginaPrincipalComponent implements OnInit {
   //
   cambioTab(e : any) {
     var index = e.index;
-    if (index == 0) this.ordenTrabajo = true;
-    if (index == 1) this.facturacion = true;
-    if (index == 2) this.materiaPrima = true;
-    if (index == 3) this.pedidos = true;
-    if (index == 4) this.facturacionVendedores = true;
-    if (index == 5) this.recaudos = true;
-    if (index == 6) this.cuentasPagar = true;
-    if (index == 7) this.gerencia = true;
-    if (index == 8) this.costos = true;
+    index == 0 ? this.ordenTrabajo = true : this.ordenTrabajo = false;
+    index == 1 ?  this.facturacion = true : this.facturacion = false;
+    index == 2 ?  this.materiaPrima = true : this.materiaPrima = false;
+    index == 3 ?  this.pedidos = true : this.pedidos = false;
+    index == 4 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
+    index == 5 ?  this.recaudos = true : this.recaudos = false;
+    index == 6 ?  this.cuentasPagar = true : this.cuentasPagar = false;
+    index == 7 ?  this.gerencia = true : this.gerencia = false;
+    index == 8 ?  this.costos = true : this.costos = false;
   }
 }

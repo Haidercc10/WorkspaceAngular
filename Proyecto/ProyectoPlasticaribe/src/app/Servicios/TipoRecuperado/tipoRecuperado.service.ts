@@ -9,38 +9,15 @@ import { modelTpRecuperado } from '../../Modelo/modelTpRecuperado';
 })
 export class TipoRecuperadoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de proveedor
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Recuperado')
-    }
+  GetTodo = () :Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Tipo_Recuperado');
 
-    srvObtenerListaPorId(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`);
-    }
+  Get_Id = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`);
 
-  //Metodo agregar proveedor
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Recuperado', data)
-    }
+  Put = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`, data);
 
-  //Metodo actualzar proveedor
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`, data);
-    }
+  Delete = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`);
 
-  //Metodo eliminar proveedor
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Tipo_Recuperado/${id}`);
-    }
-
-    //Metodo Guardar proveedor con un modelo
-    srvGuardar(data : modelTpRecuperado): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Recuperado', data);
-   }
-
+  Post = (data : modelTpRecuperado): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Tipo_Recuperado', data);
 }

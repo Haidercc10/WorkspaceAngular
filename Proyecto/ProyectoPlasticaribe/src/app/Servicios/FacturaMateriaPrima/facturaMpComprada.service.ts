@@ -9,67 +9,9 @@ import { modelFacturaMpCompra } from '../../Modelo/modelFacturaMpComprada';
 })
 export class FactuaMpCompradaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
-
-
-  //Metodo buscar lista de Facturas de Facturas de Materia Prima Comprada Comprada
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra')
-    }
-
-    UltimoIdFactura():Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra/UltimoIdFactura')
-    }
-
-    srvObtenerListaPorId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/${dato}`);
-    }
-
-    srvObtenerListaPorTipo(dato : string){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/api/Factura_Compra/%20?nombre=${dato}`);
-    }
-
-    srvObtenerListaPorUsuario(dato : number){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/F/${dato}`);
-    }
-
-    srvObtenerListaPorProvId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/P/${dato}`);
-    }
-
-    srvObtenerListaPorFecha(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/fecha/${dato}`);
-    }
-
-    srvObtenerListaPorFechas(fecha1 : any , fecha2 : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/fechas?Facco_FechaFactura1=${fecha1}&Facco_FechaFactura2=${fecha2}`);
-    }
-
-    srvObtenerListaPorCodigo(codigo : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/codigo/${codigo}`);
-    }
-
-  //Metodo agregar Facturas de Materia Prima Comprada
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Factura_Compra', data)
-    }
-
-  //Metodo actualzar Facturas de Materia Prima Comprada
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Factura_Compra/${id}`, data);
-    }
-
-  //Metodo eliminar Facturas de Materia Prima Comprada
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Factura_Compra/${id}`);
-    }
-
-    //Duardar Facturas de Materia Prima Comprada
-    srvGuardar(data : modelFacturaMpCompra): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Factura_Compra', data);
-   }
+  UltimoIdFactura = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Factura_Compra/UltimoIdFactura');
+  
+  srvGuardar = (data : modelFacturaMpCompra): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Factura_Compra', data);
 
 }

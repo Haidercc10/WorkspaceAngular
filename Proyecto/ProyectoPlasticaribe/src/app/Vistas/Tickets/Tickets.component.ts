@@ -69,16 +69,16 @@ export class TicketsComponent implements OnInit {
   }
 
   // Funcion que va a almacnear en una variable la informacion de los archivos seleccionados
-  onUpload(event) {
-    this.archivoSeleccionado = <File>event.currentFiles;
-  }
+  onUpload = (event) => this.archivoSeleccionado = <File>event.currentFiles;
 
   // Funcion que va a enviar a la base de datos la información del ticket
   enviarTickets(){
     if (this.FormTickets.valid) {
       let imagenes : string = '';
-      for (let i = 0; i < this.archivoSeleccionado.length; i++) {
-        imagenes += `${this.archivoSeleccionado[i].name}|`;
+      if (this.archivoSeleccionado != null) {
+        for (let i = 0; i < this.archivoSeleccionado.length; i++) {
+          imagenes += `${this.archivoSeleccionado[i].name}|`;
+        }
       }
       let info : any = {
         Ticket_Fecha : moment().format('YYYY-MM-DD'),
@@ -92,11 +92,11 @@ export class TicketsComponent implements OnInit {
       this.ticketService.crearTicket(info).subscribe(data => {
         this.crearPDF(data.ticket_Id);
         this.msj.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`);
-      }, error => {
+      }, () => {
          this.msj.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`);
          this.cargando = false;
-        });
-      if (this.archivoSeleccionado.length > 0) this.enviarArchivos(this.archivoSeleccionado);
+      });
+      if (this.archivoSeleccionado != null) this.enviarArchivos(this.archivoSeleccionado);
       this.limpiarTodo();
     } else {
       this.msj.mensajeAdvertencia(`Advertencia`, `¡Hay Campos Vacios!`);

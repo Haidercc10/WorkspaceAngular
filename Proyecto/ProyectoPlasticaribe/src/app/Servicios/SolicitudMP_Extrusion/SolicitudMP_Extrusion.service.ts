@@ -10,7 +10,7 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class SolicitudMP_ExtrusionService {
 
-constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
   GetId = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Solicitud_MatPrimaExtrusion/${id}`);
 

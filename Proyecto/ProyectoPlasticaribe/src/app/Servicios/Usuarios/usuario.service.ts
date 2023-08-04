@@ -9,15 +9,10 @@ import { modelUsuario } from '../../Modelo/modelUsuario';
 })
 export class UsuarioService {
 
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de Usuario
-  srvObtenerListaUsuario = () => this.http.get<any>(rutaPlasticaribeAPI + '/Usuarios')
+  srvObtenerListaUsuario = () => this.http.get<any>(rutaPlasticaribeAPI + '/Usuarios');
 
-  // Enviará los datos al API para que está valide la existencia del usuario
-  GetLoginUsuario = (usuario : number, contrasena : string, empresa : number) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/getLoginUsuario/${usuario}/${contrasena}/${empresa}`);
-  
   srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/${id}`);
 
   srvObtenerListaPorNombreUsuario = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/nombreUsuario/${nombre}`);
@@ -26,19 +21,15 @@ export class UsuarioService {
 
   GetConsdutores = () => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/getConductores`);
 
-  GetVendedores = () => this.http.get<any>(`${rutaPlasticaribeAPI}/Usuarios/getVendedores`);
-
-  //Metodo actualizar Usuario
-  srvActualizarUsuario = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
-  
-  //Metodo eliminar Usuario
-  srvEliminarUsuario = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Usuarios/${id}`);
-
-  srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Usuarios', data);
-
   getUsuariosxId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/UsuariosxId/${id}`);
 
   getUsuarios = () => this.http.get<any>(rutaPlasticaribeAPI + `/Usuarios/UsuariosSinParametros`);
 
-  getIpCliente = () : Observable<any> => this.http.get<any>('http://api.ipify.org/');
+  GetVendedores = () => this.http.get<any>(`${rutaPlasticaribeAPI}/Usuarios/getVendedores`);
+
+  srvActualizarUsuario = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
+  
+  srvEliminarUsuario = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Usuarios/${id}`);
+
+  srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Usuarios', data);
 }

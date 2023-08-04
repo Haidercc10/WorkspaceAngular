@@ -53,9 +53,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       private dtEntradaRollosService : DetallesEntradaRollosService,
                         private productosService : ProductoService,
                           private dtPreEntregaService : DtPreEntregaRollosService,
-                            private messageService: MessageService,
-                              private shepherdService: ShepherdService,
-                                private mensajeService : MensajesAplicacionService,) {
+                            private shepherdService: ShepherdService,
+                              private mensajeService : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
@@ -385,13 +384,8 @@ export class Ingresar_ProductosComponent implements OnInit {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
           const pdfDefinicion : any = {
-            info: {
-              title: `${id}`
-            },
-            pageSize: {
-              width: 630,
-              height: 760
-            },
+            info: { title: `${id}` },
+            pageSize: { width: 630, height: 760 },
             footer: function(currentPage : any, pageCount : any) {
               return [
                 {
@@ -496,14 +490,8 @@ export class Ingresar_ProductosComponent implements OnInit {
               },
             ],
             styles: {
-              header: {
-                fontSize: 10,
-                bold: true
-              },
-              titulo: {
-                fontSize: 20,
-                bold: true
-              }
+              header: { fontSize: 10, bold: true },
+              titulo: { fontSize: 20, bold: true }
             }
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);

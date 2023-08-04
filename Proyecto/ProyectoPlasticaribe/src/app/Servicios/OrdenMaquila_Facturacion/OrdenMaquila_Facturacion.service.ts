@@ -9,31 +9,17 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class OrdenMaquila_FacturacionService {
 
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(rutaPlasticaribeAPI + '/OrdenMaquila_Facturacion');
-  }
+  getTodo = () => this.http.get<any>(rutaPlasticaribeAPI + '/OrdenMaquila_Facturacion');
 
-  getId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion//${dato}`);
-  }
+  getId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion//${dato}`);
 
-  GetOrdenMaquilaFacturada(id : number, mp : number) {
-    return this.http.get<any>(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/getOrdenMaquilaFacturada/${id}/${mp}`);
-  }
+  GetOrdenMaquilaFacturada = (id : number, mp : number) => this.http.get<any>(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/getOrdenMaquilaFacturada/${id}/${mp}`);
+  
+  put = (id:number|string, data:any) : Observable<any> => this.http.put(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/${id}`, data);
 
-  put(id:number|string, data:any) : Observable<any> {
-    return this.http.put(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/${id}`, data);
-  }
+  delete = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/${id}`);
 
-  delete(id:number|string) {
-    return this.http.delete(rutaPlasticaribeAPI + `/OrdenMaquila_Facturacion/${id}`);
-  }
-
-  insert(data : modelOrdenMaquila_Facturacion) : Observable<any> {
-    return this.http.post(rutaPlasticaribeAPI + '/OrdenMaquila_Facturacion', data);
-  }
+  insert = (data : modelOrdenMaquila_Facturacion) : Observable<any> => this.http.post(rutaPlasticaribeAPI + '/OrdenMaquila_Facturacion', data);
 }

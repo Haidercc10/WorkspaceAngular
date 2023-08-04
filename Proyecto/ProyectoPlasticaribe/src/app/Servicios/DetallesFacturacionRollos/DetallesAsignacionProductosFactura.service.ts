@@ -9,53 +9,19 @@ import { modelDtAsgProductoFactura } from '../../Modelo/modelDtAsgProductoFactur
 })
 export class DetallesAsignacionProductosFacturaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta');
-  }
+  srvObtenerListaPorCodigoFactura = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${dato}`);
-  }
+  srvObtenerListaParaPDF = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf/${dato}`);
 
-  srvObtenerListaPorCodigoFactura(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
-  }
+  srvObtenerListaParaPDF2 = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf2/${dato}`);
 
-  srvObtenerListaParaPDF(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf/${dato}`);
-  }
+  srvConsultarPorFiltroFechas = (fecha1 : any, fecha2 : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fecha1}/${fecha2}`);
 
-  srvObtenerListaParaPDF2(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf2/${dato}`);
-  }
+  srvConsultarPorFiltroFactura = (factura : any, ot : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFactura/${factura}/${ot}`);
 
-  srvConsultarPorFiltroFechas(fecha1 : any, fecha2 : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fecha1}/${fecha2}`);
-  }
+  srvGuardar = (data : modelDtAsgProductoFactura): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta', data);
 
-  srvConsultarPorFiltroFactura(factura : any, ot : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFactura/${factura}/${ot}`);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${id}`, data);
-  }
-
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${id}`);
-  }
-
-  srvGuardar(data : modelDtAsgProductoFactura): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta', data);
-  }
-
-  srvObtenerDocumentosXFechas(fechaInicio : any, fechaFinal : any) : Observable<any> {
-    return this.http.get(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fechaInicio}/${fechaFinal}`);
-  }
-
+  srvObtenerDocumentosXFechas = (fechaInicio : any, fechaFinal : any) : Observable<any> => this.http.get(rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fechaInicio}/${fechaFinal}`);
 }

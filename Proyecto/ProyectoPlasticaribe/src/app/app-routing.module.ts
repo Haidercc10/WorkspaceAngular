@@ -7,8 +7,11 @@ import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Pr
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
+import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
+import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
+import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { Inventario_Bodegas_RollosComponent } from './Vistas/Inventario_Bodegas_Rollos/Inventario_Bodegas_Rollos.component';
@@ -23,6 +26,7 @@ import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.c
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
+import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
@@ -57,9 +61,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
-import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
-import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
-import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
+import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
 
 export const routes: Routes = [
 
@@ -128,7 +130,7 @@ export const routes: Routes = [
   {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
-  // {path: 'opedidoproducto', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
+  // {path: 'opedidoproducto', component: OpedidoproductoComponent},
   {path: 'pedido-externo', canActivate: [VistasPermisosGuard], data: {nombre: 'Crear Pedido'}, component: PedidoExternoComponent},
 
   /***************************************************************** USUARIOS **********************************************************************************/
@@ -165,13 +167,14 @@ export const routes: Routes = [
 
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Nómina'}, component: NominaComponent},
+  {path: 'ingreso-nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Nómina'}, component: Ingreso_NominaComponent},
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
   {path: 'solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Material Producción'}, component: SolicitudMP_ExtrusionComponent},
   {path: 'reporte-solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Material Producción'}, component: Reporte_SolicitudMpExtrusionComponent},
 
   {path: 'facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Facturas'}, component: Facturas_Invergoal_InversuezComponent},
-  {path: 'Gestionar-facturas-invergoal-inversuez', component: Gestionar_Facturas_Invergoal_InversuezComponent},
+  {path: 'Gestionar-facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Gestion de Facturas'}, component: Gestionar_Facturas_Invergoal_InversuezComponent},
 
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},

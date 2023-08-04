@@ -9,29 +9,16 @@ import { modelTipoDevolucion } from '../../Modelo/modelTipoDevolucion';
 })
 export class TipoDevolucionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
-  }
+  GetTodo = () => this.http.get<any>(rutaPlasticaribeAPI + '/');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
-  }
+  Get_Id = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `//${dato}`);
 
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
-  }
+  Put = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `//${id}`, data);
 
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
-  }
+  Delete = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `//${id}`);
 
-  srvGuardar(data : modelTipoDevolucion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
-  }
+  Post = (data : modelTipoDevolucion): Observable<any>  => this.http.post(rutaPlasticaribeAPI + '/', data);
 
 }

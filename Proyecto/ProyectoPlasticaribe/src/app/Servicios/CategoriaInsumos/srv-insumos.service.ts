@@ -1,47 +1,25 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppComponent} from 'src/app/app.component';
 import { modelProveedor } from '../../Modelo/modelProveedor';
-import { rutaPlasticaribeAPI,  } from 'src/polyfills';
+import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SrvInsumosService {
-
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
+  
   constructor(private http : HttpClient,) { }
+  
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Categoria_Insumo');
 
-  //Metodo buscar lista de proveedor
-srvObtenerLista():Observable<any[]> {
-  return this.http.get<any>(this.rutaPlasticaribeAPI + '/Categoria_Insumo')
-}
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`);
 
-srvObtenerListaPorId(id : any){
-  return this.http.get<any>(this.rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`);
-}
+  srvAgregar = (data:any) => this.http.post(rutaPlasticaribeAPI + '/Categoria_Insumo', data);
 
-//Metodo agregar proveedor
-srvAgregar(data:any) {
-  return this.http.post(this.rutaPlasticaribeAPI + '/Categoria_Insumo', data)
-}
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`, data);
 
-//Metodo actualzar proveedor
-srvActualizar(id:number|String, data:any) {
-  return this.http.put(this.rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`, data);
-}
+  srvEliminar = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`);
 
-//Metodo eliminar proveedor
-srvEliminar(id:number|String) {
-  return this.http.delete(this.rutaPlasticaribeAPI + `/Categoria_Insumo/${id}`);
-}
-
-//Metodo Guardar proveedor con un modelo
-srvGuardar(data : modelProveedor): Observable<any> {
- return this.http.post(this.rutaPlasticaribeAPI + '/Categoria_Insumo', data);
-}
+  srvGuardar = (data : modelProveedor): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Categoria_Insumo', data);
 }

@@ -9,7 +9,6 @@ import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data';
-import { CrearCategoriasComponent } from '../CrearCategorias/CrearCategorias.component';
 
 @Component({
   selector: 'app-Archivos',
@@ -36,7 +35,6 @@ export class ArchivosComponent implements OnInit {
   validarArchivo_Carpeta : boolean;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modal : boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
-  @ViewChild(CrearCategoriasComponent) modalCrearCategorias : CrearCategoriasComponent;
   clave : string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
   fileSeleccionado : any; /** Archivo/Carpeta seleccionado para ser eliminado */
   rutaSeleccionada : any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
@@ -368,11 +366,5 @@ export class ArchivosComponent implements OnInit {
         this.mostrarCarpetas(this.nombreCarpeta);
       });
     });
-  }
-
-  /** Función que cargará el modal de crear categorias */
-  cargarModal() {
-    this.modal = true;
-    this.modalCrearCategorias.limpiarCampos();
   }
 }

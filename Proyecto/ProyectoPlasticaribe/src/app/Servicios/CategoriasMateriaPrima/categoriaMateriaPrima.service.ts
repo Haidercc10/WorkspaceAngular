@@ -9,39 +9,12 @@ import { modelCategoriaMP } from '../../Modelo/modelCategoriaMP';
 })
 export class CategoriaMateriaPrimaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Categoria_MatPrima');
 
-  //Metodo buscar lista de categoria de materia prima
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Categoria_MatPrima')
-    }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Categoria_MatPrima/${dato}`);
 
-    srvObtenerListaPorId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Categoria_MatPrima/${dato}`);
-    }
-
-  //Metodo agregar categoria de materia prima
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Categoria_MatPrima', data)
-    }
-
-  //Metodo actualzar categoria de materia prima
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Categoria_MatPrima/${id}`, data);
-    }
-
-  //Metodo eliminar categoria de materia prima
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Categoria_MatPrima/${id}`);
-    }
-
-    //Duardar categoria de materia prima
-    srvGuardar(data : modelCategoriaMP): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Categoria_MatPrima', data);
-   }
+  srvAgregar = (data : modelCategoriaMP): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Categoria_MatPrima', data);
 
 }

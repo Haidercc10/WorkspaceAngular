@@ -8,53 +8,14 @@ import { rutaPlasticaribeAPI, } from 'src/polyfills';
 })
 export class AsignacionMPxTintasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  srvObtenerUltimaAsignacion = () => this.http.get<any>(rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/ultimoId`);
 
-  //Metodo buscar lista de Productos
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta');
-  }
+  srvGuardar = (data : any): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta', data);
 
-  srvObtenerUltimaAsignacion(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/ultimoId`);
-  }
+  srvObtenerListaMatPrimas = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta/CargarTintas_MatPrimas/');
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/${id}`);
-  }
-
-  //Metodo agregar Productos
-  srvAgregar(data : any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta', data)
-  }
-
-  //Metodo actualzar Productos
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/${id}`, data);
-  }
-
-  //Metodo eliminar Productos
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/${id}`);
-  }
-
-  //
-  srvGuardar(data : any /*modelAsignacionMPxTintas*/): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta', data)
-  }
-
-  /** Obtener lista de tintas y materias primas juntas */
-  srvObtenerListaMatPrimas():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta/CargarTintas_MatPrimas/');
-  }
-
-
-  srvObtenerListaMatPrimasPorId(ID : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/CargarMatPrimasXId/${ID}`);
-  }
+  srvObtenerListaMatPrimasPorId = (ID : any):Observable<any[]> =>this.http.get<any>(rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/CargarMatPrimasXId/${ID}`);
 
 }

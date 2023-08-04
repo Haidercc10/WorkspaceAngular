@@ -105,16 +105,10 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   // Funcion que limpia los todos los campos de la vista
-  LimpiarCampos() {
-    this.FormMateriaPrimaRecuperada.reset();
-  }
+  LimpiarCampos = () => this.FormMateriaPrimaRecuperada.reset();
 
   // Funcion que se encargará de trar los turnos de la empresa
   obtenerTurnos(){
@@ -127,9 +121,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
-  limpiarCamposMP(){
-    this.FormMateriaPrima.reset();
-  }
+  limpiarCamposMP = () => this.FormMateriaPrima.reset();
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
@@ -176,12 +168,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
     this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
       this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: datos_usuario.usua_Id, });
-    }, error => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`); });
+    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`));
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarRecuperado(){
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla")
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
     else {
       let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
       let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
@@ -200,9 +192,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         Usua_Operador: idUsuario,
       }
 
-      this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
-        this.obtenerUltimoIdRecuperado();
-      }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`); });
+      this.recuperadoService.srvGuardar(datosRecuperado).subscribe(() => this.obtenerUltimoIdRecuperado(), () => this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`));
     }
   }
 
@@ -228,12 +218,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             UndMed_Id : presentacionMateriaPrima,
             TpRecu_Id : tipoRecuperado,
           }
-          this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al registrar la materia prima recuperada!`); });
+          this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(() => {
+          }, () => this.mensajeService.mensajeError(`Error`, `¡Error al registrar la materia prima recuperada!`));
           this.moverInventarioMpAgregada();
         }
       }
-    }, error => { this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de recuperado!`); });
+    }, () => this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de recuperado!`));
   }
 
   //Funcion que va a validar la informacion que se ingresa a la tabla
@@ -276,7 +266,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
-        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(datos_mp_creada => {
+        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(() => {
           error = false;
           this.limpiarTodosCampos();
         });
@@ -336,7 +326,5 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   }
 
   /** Función para quitar mensaje de elección */
-  onReject(){
-    this.messageService.clear('recuperado');
-  }
+  onReject = () => this.messageService.clear('recuperado');
 }

@@ -9,6 +9,7 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/E
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardMateriaPrima as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-Dashboard_MatPrima',
@@ -20,9 +21,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   @ViewChild('op') op: OverlayPanel | undefined;
 
   /** Variables generales */
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
@@ -55,14 +53,13 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   ComparativoOptions: any;
   ComparativoPlugins = [ DataLabelsPlugin ];
 
-
-
   constructor(private AppComponent : AppComponent,
-                    private ordenTrabajoService : EstadosProcesos_OTService,
-                        private materiaPrimaService : MateriaPrimaService,
-                          private boppService : EntradaBOPPService,
-                            private tintasCreadasService : DetallesAsignacionMPxTintasService,
-                              private shepherdService: ShepherdService) {
+                private ordenTrabajoService : EstadosProcesos_OTService,
+                  private materiaPrimaService : MateriaPrimaService,
+                    private boppService : EntradaBOPPService,
+                      private tintasCreadasService : DetallesAsignacionMPxTintasService,
+                        private shepherdService: ShepherdService,
+                          private paginaPrincial : PaginaPrincipalComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -80,22 +77,19 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.AppComponent.storage_Id;
-    this.storage_Nombre = this.AppComponent.storage_Nombre;
-    this.ValidarRol = this.AppComponent.storage_Rol;
-  }
+  lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   /** Función para recargar el tab de materias primas */
   recargarTab = () => setTimeout(() => this.tiempoExcedido(), 60000);
 
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){
-    //this.cargando = true;
-    this.cambiarNombreMes();
-    setTimeout(() => { this.materiasPrimas(); }, 1000);
-    this.recargarTab();
-    setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
+    if (this.paginaPrincial.materiaPrima){
+      this.cambiarNombreMes();
+      setTimeout(() => { this.materiasPrimas(); }, 1000);
+      this.recargarTab();
+      setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
+    }
   }
 
   /** Función paracambiar el nombre del mes a español */

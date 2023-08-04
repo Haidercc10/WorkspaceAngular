@@ -9,29 +9,15 @@ import { modelPistas } from '../../Modelo/modelPistas';
 })
 export class PistasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Pistas');
-  }
+  srvObtenerLista = () => this.http.get<any>(rutaPlasticaribeAPI + '/Pistas');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Pistas/${dato}`);
-  }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Pistas/${dato}`);
 
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Pistas/${id}`, data);
-  }
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Pistas/${id}`, data);
 
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Pistas/${id}`);
-  }
+  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Pistas/${id}`);
 
-  srvGuardar(data : modelPistas): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Pistas', data);
-  }
-
+  srvGuardar = (data : modelPistas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Pistas', data);
 }

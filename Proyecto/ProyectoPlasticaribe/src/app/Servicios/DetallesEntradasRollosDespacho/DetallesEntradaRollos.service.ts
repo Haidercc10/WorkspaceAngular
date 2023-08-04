@@ -9,73 +9,21 @@ import { modelDtEntradaRollos } from '../../Modelo/modelDtEntradaRollos';
 })
 export class DetallesEntradaRollosService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
+  srvObtenerVerificarRollo = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/VerificarRollo/${dato}`);
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto');
-  }
+  srvConsultarProducto = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/consultarProducto/${dato}`);
 
-  getRollosProceso(proceso : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/GetRollosProceso/${proceso}`);
-  }
+  srvObtenerCrearPDF = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf/${dato}`);
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${dato}`);
-  }
+  srvObtenerCrearPDF2 = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf2/${dato}`);
 
-  srvObtenerVerificarRollo(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/VerificarRollo/${dato}`);
-  }
+  srvCrearPDFUltimoId = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPDFUltimoID/${id}`);
+  
+  GetRollos = (data : any []): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto/getRollos', data);
 
-  srvConsultarProducto(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/consultarProducto/${dato}`);
-  }
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
 
-  srvConsultaRollo(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/consultarRollo/${dato}`);
-  }
-
-  srvObtenerCrearPDF(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf/${dato}`);
-  }
-
-  srvObtenerCrearPDF2(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf2/${dato}`);
-  }
-
-  srvCrearPDFUltimoId(id : number) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPDFUltimoID/${id}`);
-  }
-
-  srvConsultarOTEntradas(ot : number) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/ConsultarOTReporteProcesosActual/${ot}`);
-  }
-
-  srvConsultarOtSalidas(ot : number) {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/ConsultarOTReporteProcesosSalidas/${ot}`);
-  }
-
-  GetRollos(data : any []): Observable<any>{
-    return this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto/getRollos', data);
-  }
-
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
-  }
-
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`);
-  }
-
-  srvGuardar(data : modelDtEntradaRollos): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto', data);
-  }
-
-  deleteRollosDespacho(id : any) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/EliminarRollo/${id}`);
-  }
+  srvGuardar = (data : modelDtEntradaRollos): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto', data);
 }

@@ -10,7 +10,7 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class SolicitudMateriaPrimaService {
 
-constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
   GetTodo = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Solicitud_MateriaPrima`);
 

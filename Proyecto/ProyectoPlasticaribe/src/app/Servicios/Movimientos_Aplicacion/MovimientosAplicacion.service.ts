@@ -8,28 +8,15 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class MovimientosAplicacionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  getTodo() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/MovientosAplicacion');
-  }
+  getTodo = () => this.http.get<any>(rutaPlasticaribeAPI + '/MovientosAplicacion');
 
-  getId(id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/MovientosAplicacion`);
-  }
+  getId = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/MovientosAplicacion`);
 
-  putId(id: any, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/MovientosAplicacion/${id}`, data);
-  }
+  putId = (id: any, data:any) => this.http.put(rutaPlasticaribeAPI + `/MovientosAplicacion/${id}`, data);
 
-  deleteID_(id: any) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/MovientosAplicacion/${id}`);
-  }
+  deleteID_ = (id: any) => this.http.delete(rutaPlasticaribeAPI + `/MovientosAplicacion/${id}`);
 
-  insert(data : any): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/MovientosAplicacion', data);
-  }
+  insert = (data : any): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/MovientosAplicacion', data);
 }

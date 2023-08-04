@@ -9,29 +9,15 @@ import { modelTpFallasTecnicas } from '../../Modelo/modelTpFallasTEcnicas';
 })
 export class TpFallasTecnicasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_FallaTecnica');
-  }
+  GetTodo = () : Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + '/Tipo_FallaTecnica');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${dato}`);
-  }
+  Get_Id = (dato : any) : Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${dato}`);
 
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${id}`, data);
-  }
+  Put = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${id}`, data);
 
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${id}`);
-  }
+  Delete = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Tipo_FallaTecnica/${id}`);
 
-  srvGuardar(data : modelTpFallasTecnicas): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_FallaTecnica', data);
-  }
-
+  Post = (data : modelTpFallasTecnicas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Tipo_FallaTecnica', data);
 }

@@ -7,6 +7,7 @@ import { modelDtSolicitudRollos } from 'src/app/Modelo/modelDtSolicitudRollos';
 import { modelSolicitudRollos } from 'src/app/Modelo/modelSolicitudRollos';
 import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { Detalles_SolicitudRollosService } from 'src/app/Servicios/Detalles_SolicitudRollos/Detalles_SolicitudRollos.service';
+import { Formato_DocumentosService } from 'src/app/Servicios/Formato_Documentos/Formato_Documentos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Solicitud_Rollos_AreasService } from 'src/app/Servicios/Solicitud_Rollos_Areas/Solicitud_Rollos_Areas.service';
@@ -46,7 +47,8 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
                       private procesosService : ProcesosService,
                         private solicitudRollosService : Solicitud_Rollos_AreasService,
                           private dtBgRollosService : Detalle_BodegaRollosService,
-                            private dtSolicitudRollosService : Detalles_SolicitudRollosService) {
+                            private dtSolicitudRollosService : Detalles_SolicitudRollosService,
+                              private formatoDocsService : Formato_DocumentosService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormConsultarRollos = this.frmBuilder.group({
@@ -334,14 +336,30 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
 
   // funcion que va a crear un PDF
   crearPDF(solicitud : number){
-    let codigo : string = ``, version : string = ``, vigencia : string = ``, nombre : string = this.storage_Nombre;
+    let codigo : string = ``, version : string = ``, vigencia : string = ``, nombreDocumento : string = ``, nombre : string = this.storage_Nombre;
     this.dtSolicitudRollosService.GetInformacionSolicitud(solicitud).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         if (data[i].bodega_Solicitada == 'Producto Intermedio') {
+          nombreDocumento = ``
+          this.formatoDocsService.GetUltFormadoDoc(nombreDocumento).subscribe(data => {
+            data.forEach(formato => {
+              codigo = formato.codigo;
+              version = formato.version;
+              vigencia = formato.vigencia;
+            });
+          });
           codigo = 'FR-PR-MT-02';
           version = '01';
           vigencia = ``;
         } else if (data[i].bodega_Solicitada != 'Producto Intermedio' && data[i].bodega_Solicitada != 'Extrusion') {
+          nombreDocumento = ``
+          this.formatoDocsService.GetUltFormadoDoc(nombreDocumento).subscribe(data => {
+            data.forEach(formato => {
+              codigo = formato.codigo;
+              version = formato.version;
+              vigencia = formato.vigencia;
+            });
+          });
           codigo = 'FR-PR-01';
           version = '01';
           vigencia = ``;

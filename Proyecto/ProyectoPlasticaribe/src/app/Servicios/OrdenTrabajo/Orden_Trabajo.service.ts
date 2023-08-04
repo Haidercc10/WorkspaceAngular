@@ -9,45 +9,23 @@ import { modelOrden_Trabajo } from '../../Modelo/modelOrden_Trabajo';
 })
 export class Orden_TrabajoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaOrden_Trabajo() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Orden_Trabajo');
-  }
+  srvObtenerListaOrden_Trabajo = () => this.http.get<any>(rutaPlasticaribeAPI + '/Orden_Trabajo');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${dato}`);
-  }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Trabajo/${dato}`);
 
-  srvObtenerListaNumeroOt(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/NumeroOt/${dato}`);
-  }
+  srvObtenerListaNumeroOt = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Trabajo/NumeroOt/${dato}`);
 
-  srvObtenerListaNumeroPedido(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/NumeroPedido/${dato}`);
-  }
+  srvObtenerListaNumeroPedido = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Trabajo/NumeroPedido/${dato}`);
 
-  srvObtenerListaPdfOTInsertada(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getPdfOTInsertada/${dato}`);
-  }
+  srvObtenerListaPdfOTInsertada = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Trabajo/getPdfOTInsertada/${dato}`);
 
-  GetInfoUltOT(producto : number, presentacion : string){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getInfoUltOT/${producto}/${presentacion}`);
-  }
+  GetInfoUltOT = (producto : number, presentacion : string) => this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Trabajo/getInfoUltOT/${producto}/${presentacion}`);
 
-  //Metodo actualzar Pedidos de Productos
-  srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`, data);
-  }
-  //Metodo eliminar Pedidos de Productos
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`);
-  }
+  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`, data);
+  
+  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`);
 
-  srvGuardar(data : modelOrden_Trabajo): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Orden_Trabajo', data);
-  }
+  srvGuardar = (data : modelOrden_Trabajo): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Orden_Trabajo', data);
 }

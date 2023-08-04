@@ -9,35 +9,15 @@ import { modelCategoria_Archivo } from '../../Modelo/modelCategoria_Archivo';
 })
 export class Categorias_ArchivosService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
-  //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
-  //Metodo buscar lista de
-  srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Categorias_Archivos')
-  }
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Categorias_Archivos');
 
-  srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Categorias_Archivos/${dato}`);
-  }
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Categorias_Archivos/${dato}`);
 
-  //
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Categorias_Archivos/${id}`, data);
-  }
+  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Categorias_Archivos/${id}`, data);
 
-  //
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Categorias_Archivos/${id}`);
-  }
+  srvEliminar = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/Categorias_Archivos/${id}`);
 
-  //
-  srvGuardar(data : modelCategoria_Archivo): Observable<any> {
-  return this.http.post(this.rutaPlasticaribeAPI + '/Categorias_Archivos', data);
-  }
-
-
-
+  srvGuardar = (data : modelCategoria_Archivo): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Categorias_Archivos', data);
 }
