@@ -170,20 +170,18 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
           this.costoPorPagar(1);
           this.zeusService.GetFacturasProveedores('220505').subscribe(datos => {
             for (let i = 0; i < datos.length; i++) {
-              if (datos[i].id_Proveedor != '7472582') {
-                if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
-                  let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor && item.Cuenta == datos[i].cuenta);
-                  this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
-                  this.cargando = false;
-                } else if (datos[i].id_Proveedor == '900362200') {
-                  let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-                  this.carteraInvergoal[index].Detalles.push(datos[i]);
-                  this.cargando = false;
-                } else if (datos[i].id_Proveedor == '900458314') {
-                  let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
-                  this.carteraInversuez[index].Detalles.push(datos[i]);
-                  this.cargando = false;
-                }
+              if (!['900458314','900362200'].includes(datos[i].id_Proveedor)) {
+                let index = this.carteraAgrupadaProveedores.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor && item.Cuenta == datos[i].cuenta);
+                this.carteraAgrupadaProveedores[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900362200') {
+                let index = this.carteraInvergoal.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInvergoal[index].Detalles.push(datos[i]);
+                this.cargando = false;
+              } else if (datos[i].id_Proveedor == '900458314') {
+                let index = this.carteraInversuez.findIndex(item => item.Id_Proveedor == datos[i].id_Proveedor);
+                this.carteraInversuez[index].Detalles.push(datos[i]);
+                this.cargando = false;
               }
             }
           });

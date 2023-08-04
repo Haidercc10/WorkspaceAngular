@@ -187,17 +187,17 @@ export class Dashboard_CostosComponent implements OnInit {
       data.forEach(costo => {
         this.nominaAdministrativa.push(
           this.llenarCostosNomina(costo.anio, '01', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '02', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '03', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '04', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '05', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '06', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '07', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '08', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '09', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '10', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '11', costo.enero, '1', "NOMINA ADMINISTRACION"),
-          this.llenarCostosNomina(costo.anio, '12', costo.enero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '02', costo.febrero, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '03', costo.marzo, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '04', costo.abril, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '05', costo.mayo, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '06', costo.junio, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '07', costo.julio, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '08', costo.agosto, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '09', costo.septiembre, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '10', costo.octubre, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '11', costo.noviembre, '1', "NOMINA ADMINISTRACION"),
+          this.llenarCostosNomina(costo.anio, '12', costo.diciembre, '1', "NOMINA ADMINISTRACION"),
         );
       });
     });
@@ -209,17 +209,17 @@ export class Dashboard_CostosComponent implements OnInit {
       data.forEach(costo => {
         this.nominaVentas.push(
           this.llenarCostosNomina(costo.anio, '01', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '02', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '03', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '04', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '05', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '06', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '07', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '08', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '09', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '10', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '11', costo.enero, '2', "NOMINA VENTAS"),
-          this.llenarCostosNomina(costo.anio, '12', costo.enero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '02', costo.febrero, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '03', costo.marzo, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '04', costo.abril, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '05', costo.mayo, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '06', costo.junio, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '07', costo.julio, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '08', costo.agosto, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '09', costo.septiembre, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '10', costo.octubre, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '11', costo.noviembre, '2', "NOMINA VENTAS"),
+          this.llenarCostosNomina(costo.anio, '12', costo.diciembre, '2', "NOMINA VENTAS"),
         );
       });
     });
@@ -231,17 +231,17 @@ export class Dashboard_CostosComponent implements OnInit {
       data.forEach(costo => {
         this.nominaFabricacion.push(
           this.llenarCostosNomina(costo.anio, '01', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '02', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '03', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '04', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '05', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '06', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '07', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '08', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '09', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '10', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '11', costo.enero, '3', "NOMINA FABRICACION"),
-          this.llenarCostosNomina(costo.anio, '12', costo.enero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '02', costo.febrero, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '03', costo.marzo, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '04', costo.abril, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '05', costo.mayo, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '06', costo.junio, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '07', costo.julio, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '08', costo.agosto, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '09', costo.septiembre, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '10', costo.octubre, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '11', costo.noviembre, '3', "NOMINA FABRICACION"),
+          this.llenarCostosNomina(costo.anio, '12', costo.diciembre, '3', "NOMINA FABRICACION"),
         );
       });
     });
