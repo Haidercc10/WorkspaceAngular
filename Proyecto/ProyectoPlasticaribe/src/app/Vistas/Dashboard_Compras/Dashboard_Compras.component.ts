@@ -25,7 +25,9 @@ export class Dashboard_ComprasComponent implements OnInit {
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar 
-  compraTotalAnio : number = 0; //Variable que almacenará el costo total de las compras realizadas en lo que va del año
+  compraTotalAnioPlasticaribe : number = 0; //Variable que almacenará el costo total de las compras de plasticaribe realizadas en lo que va del año
+  compraTotalAnioInvergoal : number = 0; //Variable que almacenará el costo total de las compras de Invergoal realizadas en lo que va del año
+  compraTotalAnioInversuez : number = 0; //Variable que almacenará el costo total de las compras de Inversuez realizadas en lo que va del año
   comprasAgrupadasPlasticaribe : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Plasticaribe
   comprasAgrupadasInvergoal : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Invergoal
   comprasAgrupadasInversuez : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Inversuez
@@ -131,26 +133,34 @@ export class Dashboard_ComprasComponent implements OnInit {
     if (this.paginaPrincial.compras){
       this.inicializarGraficas();
       this.consultarFacturasNoHabilitadas();
-      this.consultarCostos();
+      this.consultarCostos('0');
     }
   }
 
   // Funcion que va a sumar el costo total a pagar
   comprasEmpresa(data : any){
+    data == 1 ? this.consultarCostos('0') : null;
+    data == 2 ? this.consultarCostos('900362200') : null;
+    data == 3 ? this.consultarCostos('900458314') : null;
   }
 
   // Funcion que va a consultar las facturas que no se deben sumar y/o mostrar
   consultarFacturasNoHabilitadas = () => this.facturasService.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
 
-  // Funcion que va a realizar las peticiones de los costos de las compras
-  consultarCostos(){
+  // Funcion que va a realizar las peticiones de los costos de las compras de plasticaribe
+  consultarCostos(id : string){
     this.cargando = true;
-    this.compraTotalAnio = 0;
+    this.compraTotalAnioPlasticaribe = 0;
+    this.compraTotalAnioInvergoal = 0;
+    this.compraTotalAnioInversuez = 0;
     this.comprasAgrupadasPlasticaribe = [];
     this.comprasAgrupadasInvergoal = [];
     this.comprasAgrupadasInversuez = [];
-    this.zeusService.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
-      this.compraTotalAnio = data.reduce((a, b) => a + b.costo, 0);
+
+    this.zeusService.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
+      id == '0' ? this.compraTotalAnioPlasticaribe = data.reduce((a, b) => a + b.costo, 0) : null;
+      id == '900362200' ? this.compraTotalAnioInvergoal = data.reduce((a, b) => a + b.costo, 0) : null;
+      id == '900458314' ? this.compraTotalAnioInversuez = data.reduce((a, b) => a + b.costo, 0) : null;
       let costoAnio : any = [
         data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
         data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
@@ -165,10 +175,12 @@ export class Dashboard_ComprasComponent implements OnInit {
         data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
         data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
       ];
-      this.llenarGraficaPlasticaribe(costoAnio);
+      id == '0' ? this.llenarGraficaPlasticaribe(costoAnio) : null;
+      id == '900362200' ? this.llenarGraficaInvergoal(costoAnio) : null;
+      id == '900458314' ? this.llenarGraficaInversuez(costoAnio) : null;
     });
 
-    this.zeusService.GetCostos_Compras_Proveedores_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
+    this.zeusService.GetCostos_Compras_Proveedores_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
       let numDatos = 0;
       data.forEach(prov => {
         let info : any = {
@@ -179,16 +191,18 @@ export class Dashboard_ComprasComponent implements OnInit {
           Periodo : prov.periodo,
           Detalles : [],
         }
-        this.comprasAgrupadasPlasticaribe.push(info);
+        id == '0' ? this.comprasAgrupadasPlasticaribe.push(info) : null;
+        id == '900362200' ? this.comprasAgrupadasInvergoal.push(info) : null;
+        id == '900458314' ? this.comprasAgrupadasInversuez.push(info) : null;
         numDatos++;
-        if (numDatos == data.length) this.facturasProveedores();
+        if (numDatos == data.length) this.facturasProveedores(id);
       });      
     });
   }
 
   // Funcion que va a consultar cada una de las facturas de los proveedores
-  facturasProveedores(){
-    this.zeusService.GetCostos_Compras_Facturas_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
+  facturasProveedores(id : string){
+    this.zeusService.GetCostos_Compras_Facturas_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
       let numDatos = 0;
       data.forEach(fact => {
         let info : any = {
@@ -198,8 +212,16 @@ export class Dashboard_ComprasComponent implements OnInit {
           Costo : fact.costo,
           Cuenta : fact.cuenta2,
         }
-        let i = this.comprasAgrupadasPlasticaribe.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
-        i != -1 ? this.comprasAgrupadasPlasticaribe[i].Detalles.push(info) : null;
+        if (id == '0') {
+          let i = this.comprasAgrupadasPlasticaribe.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
+          i != -1 ? this.comprasAgrupadasPlasticaribe[i].Detalles.push(info) : null;
+        } else if (id == '900362200') {
+          let i = this.comprasAgrupadasInvergoal.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
+          i != -1 ? this.comprasAgrupadasInvergoal[i].Detalles.push(info) : null;
+        } else if (id == '900458314') {
+          let i = this.comprasAgrupadasInversuez.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
+          i != -1 ? this.comprasAgrupadasInversuez[i].Detalles.push(info) : null;
+        }        
         numDatos++;
         if (numDatos == data.length) this.cargando = false;
       });
@@ -222,5 +244,38 @@ export class Dashboard_ComprasComponent implements OnInit {
       tension: 0.3
     });
   }
-
+  
+  // Funcion que va a cargar los datos de la grafica
+  llenarGraficaInvergoal(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaComprasInvergoal.datasets.push({
+      label: `Año - ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
+  
+  // Funcion que va a cargar los datos de la grafica
+  llenarGraficaInversuez(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaComprasInversuez.datasets.push({
+      label: `Año - ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
 }
