@@ -164,6 +164,8 @@ export class InventarioZeusService {
 
   GetComprasMes_Mes_InverGoal_InverSuez = (anio : any, id : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes_Mes_InverGoal_InverSuez/${anio}/${id}`);
 
+  GetComprasDetalladas = (proveedor : any, factura : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasDetalladas/${proveedor}/${factura}`);
+
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 

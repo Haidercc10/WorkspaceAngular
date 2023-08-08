@@ -1,0 +1,50 @@
+
+<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [resizable]="true" header="" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content" let-facturas>
+    <div class="mb-3">
+      <h5>Detalles Factura {{arrayFacturas[0].factura}}</h5>
+    </div>
+    <div class="container-fluid font-size-14">
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+          <p-table
+              #dt
+              [value]="arrayFacturas"
+              styleClass="p-datatable-gridlines p-datatable-sm"
+              responsiveLayout="scroll"
+              [rowHover]="true"
+              dataKey="Id"
+              [scrollable]="true"
+              scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th scope="col">Factura</th>
+                <th scope="col">Id Material</th>
+                <th scope="col">Nombre </th>
+                <th scope="col">Cantidad </th>
+                <th scope="col">Medida</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Valor neto</th>
+                <th scope="col">Fecha Factura</th>
+                <th scope="col">Vencimiento</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-facturas>
+              <tr>
+                <td>{{facturas.factura}}</td>
+                <td>{{facturas.codigoMatPrima}}</td>
+                <td>{{facturas.matPrima}}</td>
+                <td>{{facturas.cantidad | number : '1.2-2'}}</td>
+                <td>{{facturas.unidad}}</td>
+                <td>{{facturas.grupo}}</td>
+                <td>{{facturas.valorNeto | number : '1.2-2'}}</td>
+                <td>{{facturas.fechaFactura}}</td>
+                <td>{{facturas.fechaVence}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
