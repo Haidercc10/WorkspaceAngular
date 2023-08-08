@@ -152,6 +152,8 @@ export class Dashboard_ComprasComponent implements OnInit {
     if (this.paginaPrincial.compras){
       this.consultarFacturasNoHabilitadas();
       this.consultarCostos('0');
+      this.consultarCostos('900362200');
+      this.consultarCostos('900458314');
     }
   }
 
