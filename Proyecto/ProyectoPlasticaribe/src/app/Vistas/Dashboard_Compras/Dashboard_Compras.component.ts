@@ -7,6 +7,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Component({
   selector: 'app-Dashboard_Compras',
@@ -24,24 +25,29 @@ export class Dashboard_ComprasComponent implements OnInit {
   @ViewChild('dt_comprasAgrupadas') dt_comprasAgrupadas: Table | undefined;
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
-  facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar 
+  facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar
   compraTotalAnioPlasticaribe : number = 0; //Variable que almacenará el costo total de las compras de plasticaribe realizadas en lo que va del año
   compraTotalAnioInvergoal : number = 0; //Variable que almacenará el costo total de las compras de Invergoal realizadas en lo que va del año
   compraTotalAnioInversuez : number = 0; //Variable que almacenará el costo total de las compras de Inversuez realizadas en lo que va del año
   comprasAgrupadasPlasticaribe : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Plasticaribe
   comprasAgrupadasInvergoal : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Invergoal
   comprasAgrupadasInversuez : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Inversuez
-  
+
   opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
   graficaComprasPlasticaribe : any; //Variable que va a almacenar los costos de las compras de plasticaribe
   graficaComprasInvergoal : any; //Variable que va a almacenar los costos de las compras de invergoal
   graficaComprasInversuez : any; //Variable que va a almacenar los costos de las compras de inversuez
 
+  arrayFacturas : any = []; /** Array de objetos que contendrá los detalles de las facturas consultadas de la 2da tabla */
+  modal : boolean = false; /** Variable que validará que se muestre el modal */
+  valorTotal : number = 0; /** Valor total de los detalles de las facturas  */
+
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
                     private paginaPrincial : PaginaPrincipalComponent,
-                      private facturasService : Facturas_Invergoal_InversuezService,) { }
+                      private facturasService : Facturas_Invergoal_InversuezService,
+                        private srvMovItems : InventarioZeusService,) { }
 
   ngOnInit() {
     this.llenarArrayAnos();
@@ -196,7 +202,7 @@ export class Dashboard_ComprasComponent implements OnInit {
         id == '900458314' ? this.comprasAgrupadasInversuez.push(info) : null;
         numDatos++;
         if (numDatos == data.length) this.facturasProveedores(id);
-      });      
+      });
     });
   }
 
@@ -206,6 +212,7 @@ export class Dashboard_ComprasComponent implements OnInit {
       let numDatos = 0;
       data.forEach(fact => {
         let info : any = {
+          NitProveedor : fact.id_Proveedor,
           Factura : fact.factura,
           Fecha_Factura : fact.fecha_Factura,
           Fecha_Vencimiento : fact.fecha_Vencimiento,
@@ -221,13 +228,13 @@ export class Dashboard_ComprasComponent implements OnInit {
         } else if (id == '900458314') {
           let i = this.comprasAgrupadasInversuez.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
           i != -1 ? this.comprasAgrupadasInversuez[i].Detalles.push(info) : null;
-        }        
+        }
         numDatos++;
         if (numDatos == data.length) this.cargando = false;
       });
     });
   }
-  
+
   // Funcion que va a cargar los datos de la grafica
   llenarGraficaPlasticaribe(data){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
@@ -244,7 +251,7 @@ export class Dashboard_ComprasComponent implements OnInit {
       tension: 0.3
     });
   }
-  
+
   // Funcion que va a cargar los datos de la grafica
   llenarGraficaInvergoal(data){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
@@ -261,7 +268,7 @@ export class Dashboard_ComprasComponent implements OnInit {
       tension: 0.3
     });
   }
-  
+
   // Funcion que va a cargar los datos de la grafica
   llenarGraficaInversuez(data){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
@@ -278,4 +285,23 @@ export class Dashboard_ComprasComponent implements OnInit {
       tension: 0.3
     });
   }
+
+  /** Función que cargará el detalle de las facturas con sus materias primas y valores*/
+  cargarInfoFacturas(proveedor : any, factura : any){
+    this.modal = true;
+    this.valorTotal = 0;
+    let registros : number = 0;
+    this.arrayFacturas = [];
+    this.srvMovItems.GetComprasDetalladas(proveedor, factura).subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        data[index].fechaFactura = data[index].fechaFactura.replace('T00:00:00', '');
+        data[index].fechaVence = data[index].fechaVence.replace('T00:00:00', '');
+        this.valorTotal += data[index].valorNeto;
+        this.arrayFacturas.push(data[index]);
+        registros++
+        if(registros == data.length) this.cargando = false;
+      }
+    });
+  }
+
 }

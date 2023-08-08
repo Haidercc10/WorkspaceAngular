@@ -1,8 +1,7 @@
 
-<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [resizable]="true" header="" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [resizable]="true" header="Detalles Factura {{0}}" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content" let-facturas>
     <div class="mb-3">
-      <h5>Detalles Factura {{arrayFacturas[0].factura}}</h5>
     </div>
     <div class="container-fluid font-size-14">
       <div class="mb-3" *ngIf="!cargando">
@@ -31,15 +30,22 @@
             </ng-template>
             <ng-template pTemplate="body" let-facturas>
               <tr>
-                <td>{{facturas.factura}}</td>
+                <td><b>{{facturas.factura}}</b></td>
                 <td>{{facturas.codigoMatPrima}}</td>
-                <td>{{facturas.matPrima}}</td>
+                <td><b>{{facturas.matPrima}}</b></td>
                 <td>{{facturas.cantidad | number : '1.2-2'}}</td>
                 <td>{{facturas.unidad}}</td>
-                <td>{{facturas.grupo}}</td>
+                <td><b>{{facturas.grupo}}</b></td>
                 <td>{{facturas.valorNeto | number : '1.2-2'}}</td>
                 <td>{{facturas.fechaFactura}}</td>
-                <td>{{facturas.fechaVence}}</td>
+                <td><b>{{facturas.fechaVence}}</b></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="6" class="text-right">Total Compra</td>
+                <td id="total">{{valorTotal | number : '1.2-2'}} COP</td>
+                <td colspan="2"></td>
               </tr>
             </ng-template>
           </p-table>

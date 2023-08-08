@@ -632,7 +632,7 @@ export class Dashboard_CostosComponent implements OnInit {
       infoDocumento = [
         this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
-        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
+        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
       ].reduce((a, b) => a.concat(b));
       this.formatoExcel(title, infoDocumento);
