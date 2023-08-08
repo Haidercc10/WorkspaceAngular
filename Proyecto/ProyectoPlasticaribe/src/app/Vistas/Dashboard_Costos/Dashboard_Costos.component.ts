@@ -625,9 +625,9 @@ export class Dashboard_CostosComponent implements OnInit {
     this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
       let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
       infoDocumento = [
-        this.calcularTotalMeses(costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim()))),
-        this.calcularTotalMeses(costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim()))),
-        this.calcularTotalMeses(costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim()))),
+        this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
+        this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
+        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
         this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
       ].reduce((a, b) => a.concat(b));
       this.formatoExcel(title, infoDocumento);
