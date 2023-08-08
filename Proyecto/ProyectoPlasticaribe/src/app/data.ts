@@ -11255,4 +11255,132 @@ export const stepsDashboardCostos : Step.StepOptions[] = [
   },
 ];
 
-
+export const stepsDashboardCompras : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Compras!</h4>',
+    text: `<p>¡En este Dashboard podremos ver los datos de las <b>compras de la empresa</b>, estos datos <b>saldrán agrupados por proveedor y periodo</b>!
+    <br>
+    Los datos estarán apareciendo agrupados por año, mes y proveedor.
+    <br><br>
+    De igual manera estará apareciendo un gráfico de barras donde se mostrarán los datos de las compras de cada mes del año.
+    </p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Elegir Años!</h4>',
+    text: `<p>Desde aquí podemos <b>añadir años</b> a la tabla y al grafico, tambien podemos <b>eliminarlos</b> de la misma</p>`
+  },
+  {
+    attachTo: {
+      element: '#seleccionarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar Año!</h4>',
+    text: `<p>En esta casilla tenemos la opción de <b>escoger un año</b> desde el 2019 hasta el año actual. <b>Este año escogido será el que se graficará.</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesGraficado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesGraficado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Graficar y/o Limpiar!</h4>',
+    text: `<p>¡Luego de haber seleccionado el año <b>podemos graficar la información del mismo presionando del botón rojo con el icono '<i class="pi pi-chart-bar"></i>'</b>, posteriormente aparecerá el año graficado!
+    <br><br>
+    ¡<b>Podemos limpiar la información graficada</b> presionando el botón gris con el icono '<i class="pi pi-eraser"></i>'</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#empresas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'empresas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Empresas!</h4>',
+    text: `<p>¡Aquí podremos cambiar de empresa y ver los datos de las compras de la empresa escogida!</p>`
+  },
+  {
+    attachTo: {
+      element: '#totalCartera',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'totalCartera',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Estado Proveedores!</h4>',
+    text: `<p>¡Aquí estaremos viendo el costo total de las compras de la empresa!</p>`
+  },
+  {
+    attachTo: {
+      element: '#datosProveedores',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'datosProveedores',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Facturas!</h4>',
+    text: `<p>¡Aquí estaremos viendo cada uno de los proveedores a los que se les debe dinero!</p>
+    ¡Estos aparecerán agrupados y detro de ellos podemos ver las facturas que tienen!`
+  }, 
+  {
+    attachTo: {
+      element: '#graficaCostos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'graficaCostos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Grafica!</h4>',
+    text: `<p>¡En esta grafica podremos ver los datos de las <b>compras de la empresa</b>, estos datos podremos verlos por cada uno de los meses!</p>`
+  },
+];
