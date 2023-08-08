@@ -1,0 +1,226 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ShepherdService } from 'angular-shepherd';
+import moment from 'moment';
+import { Table } from 'primeng/table';
+import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
+import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+
+@Component({
+  selector: 'app-Dashboard_Compras',
+  templateUrl: './Dashboard_Compras.component.html',
+  styleUrls: ['./Dashboard_Compras.component.css']
+})
+export class Dashboard_ComprasComponent implements OnInit {
+
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+
+  @ViewChild('dt_comprasAgrupadas') dt_comprasAgrupadas: Table | undefined;
+  anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
+  facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar 
+  compraTotalAnio : number = 0; //Variable que almacenará el costo total de las compras realizadas en lo que va del año
+  comprasAgrupadasPlasticaribe : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Plasticaribe
+  comprasAgrupadasInvergoal : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Invergoal
+  comprasAgrupadasInversuez : any []; //Variable que almacenará los datos de las compras agrupadas por proveedor, estas compras serán de la empresa Inversuez
+  
+  opcionesGrafica : any; //Variable que va a almacenar la opciones de cada grafica
+  graficaComprasPlasticaribe : any; //Variable que va a almacenar los costos de las compras de plasticaribe
+  graficaComprasInvergoal : any; //Variable que va a almacenar los costos de las compras de invergoal
+  graficaComprasInversuez : any; //Variable que va a almacenar los costos de las compras de inversuez
+
+  constructor(private AppComponent : AppComponent,
+                private zeusService : ZeusContabilidadService,
+                  private shepherdService: ShepherdService,
+                    private paginaPrincial : PaginaPrincipalComponent,
+                      private facturasService : Facturas_Invergoal_InversuezService,) { }
+
+  ngOnInit() {
+    this.llenarArrayAnos();
+    this.lecturaStorage();
+    this.validarConsulta();
+  }
+
+  // Funcion que iniciará el tutorial
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  // Funcion que va a llenar el array de años
+  llenarArrayAnos(){
+    for (let i = 0; i < this.anios.length; i++) {
+      let num_Mayor : number = Math.max(...this.anios);
+      if (num_Mayor == moment().year()) break;
+      this.anios.push(num_Mayor + 1);
+    }
+  }
+
+  // Funcion que se va a encargar del filtrado de información en las tablas
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_comprasAgrupadas!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  // Funcion que va a inicializar las variables con la información de las graficas
+  inicializarGraficas(){
+    this.opcionesGrafica = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 20 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
+          grid: { color: '#ebedef' },
+          min : 0
+        },
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    };
+
+    this.graficaComprasPlasticaribe = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.graficaComprasInvergoal = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.graficaComprasInversuez = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+  }
+
+  //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
+  validarConsulta(){
+    if (this.paginaPrincial.compras){
+      this.inicializarGraficas();
+      this.consultarFacturasNoHabilitadas();
+      this.consultarCostos();
+    }
+  }
+
+  // Funcion que va a sumar el costo total a pagar
+  comprasEmpresa(data : any){
+  }
+
+  // Funcion que va a consultar las facturas que no se deben sumar y/o mostrar
+  consultarFacturasNoHabilitadas = () => this.facturasService.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
+
+  // Funcion que va a realizar las peticiones de los costos de las compras
+  consultarCostos(){
+    this.cargando = true;
+    this.compraTotalAnio = 0;
+    this.comprasAgrupadasPlasticaribe = [];
+    this.comprasAgrupadasInvergoal = [];
+    this.comprasAgrupadasInversuez = [];
+    this.zeusService.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
+      this.compraTotalAnio = data.reduce((a, b) => a + b.costo, 0);
+      let costoAnio : any = [
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
+      ];
+      this.llenarGraficaPlasticaribe(costoAnio);
+    });
+
+    this.zeusService.GetCostos_Compras_Proveedores_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
+      let numDatos = 0;
+      data.forEach(prov => {
+        let info : any = {
+          Id_Proveedor : prov.id_Proveedor,
+          Proveedor : prov.proveedor,
+          Costo : prov.costo,
+          Cuenta : prov.cuenta2,
+          Periodo : prov.periodo,
+          Detalles : [],
+        }
+        this.comprasAgrupadasPlasticaribe.push(info);
+        numDatos++;
+        if (numDatos == data.length) this.facturasProveedores();
+      });      
+    });
+  }
+
+  // Funcion que va a consultar cada una de las facturas de los proveedores
+  facturasProveedores(){
+    this.zeusService.GetCostos_Compras_Facturas_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`).subscribe(data => {
+      let numDatos = 0;
+      data.forEach(fact => {
+        let info : any = {
+          Factura : fact.factura,
+          Fecha_Factura : fact.fecha_Factura,
+          Fecha_Vencimiento : fact.fecha_Vencimiento,
+          Costo : fact.costo,
+          Cuenta : fact.cuenta2,
+        }
+        let i = this.comprasAgrupadasPlasticaribe.findIndex(prov => prov.Id_Proveedor == fact.id_Proveedor && prov.Periodo == fact.periodo);
+        i != -1 ? this.comprasAgrupadasPlasticaribe[i].Detalles.push(info) : null;
+        numDatos++;
+        if (numDatos == data.length) this.cargando = false;
+      });
+    });
+  }
+  
+  // Funcion que va a cargar los datos de la grafica
+  llenarGraficaPlasticaribe(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaComprasPlasticaribe.datasets.push({
+      label: `Año - ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
+
+}

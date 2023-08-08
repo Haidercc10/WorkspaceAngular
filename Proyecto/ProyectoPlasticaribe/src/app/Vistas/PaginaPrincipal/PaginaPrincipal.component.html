@@ -89,6 +89,14 @@
         <app-Dashboard_Costos *ngIf="costos"></app-Dashboard_Costos>
       </p-tabPanel>
 
+      <!-- Compras -->
+      <p-tabPanel
+        header="Compras"
+        leftIcon="pi pi-credit-card"
+        tooltip="Información general sobre las compras de la empresa">
+        <app-Dashboard_Compras *ngIf="compras"></app-Dashboard_Compras>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

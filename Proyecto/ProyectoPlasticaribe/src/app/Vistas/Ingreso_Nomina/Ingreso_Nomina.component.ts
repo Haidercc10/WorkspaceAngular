@@ -121,7 +121,7 @@ export class Ingreso_NominaComponent implements OnInit {
   //Función que crear el registro de la entrada de la(s) nomina(s) en la base de datos
   crearEntradaNomina(){
     this.load = true;
-    let fallo : boolean  = false;
+    let cantDatos = 0;
     if(this.arrayNomina.length > 0) {
       for (let index = 0; index < this.arrayNomina.length; index++) {
         let modelo : modelNominaPlasticaribe = {
@@ -133,14 +133,17 @@ export class Ingreso_NominaComponent implements OnInit {
           Nomina_FechaFinal: this.arrayNomina[index].fecha2,
           Nomina_Costo: this.arrayNomina[index].valor,
           TpNomina_Id: this.arrayNomina[index].tipo,
-          Nomina_Observacion: this.arrayNomina[index].descripcion
+          Nomina_Observacion: this.arrayNomina[index].descripcion == null ? "" : this.arrayNomina[index].descripcion
         }
-        this.servicioNomina.Post(modelo).subscribe(() => fallo = false, () => fallo = true);
+        this.servicioNomina.Post(modelo).subscribe(() => {
+          cantDatos += 1;
+          if (cantDatos == this.arrayNomina.length) {
+            this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);
+            this.load = false; 
+            this.limpiarTodo();
+          }
+        }, () => this.msj.mensajeError(`Error`, `Ocurrió un error al ingresar los registros de la(s) nominas(s). Por favor, verifique!`));
       }
-      if(!fallo) {
-        this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);
-        setTimeout(() => { this.load = false; this.limpiarTodo(); }, 1000);
-      } else this.msj.mensajeError(`Error`, `Ocurrió un error al ingresar los registros de la(s) nominas(s). Por favor, verifique!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla!`);
   }
 
