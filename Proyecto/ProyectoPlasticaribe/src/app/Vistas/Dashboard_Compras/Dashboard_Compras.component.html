@@ -227,6 +227,7 @@
                                 <th pSortableColumn="Fecha_Vencimiento"><p-sortIcon field="Fecha_Vencimiento"></p-sortIcon> Vence</th>
                                 <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> Valor</th>
                                 <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                                <th class="text-center">Ver</th>
                               </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
@@ -237,6 +238,7 @@
                                 <td>{{detalles.Fecha_Vencimiento}}</td>
                                 <td>{{detalles.Costo | number : '1.2-2'}}</td>
                                 <td>{{detalles.Cuenta}}</td>
+                                <td class="text-center"><button pButton pRipple pTooltip="Ver detalles de factura" icon="pi pi-eye" class="p-button-success" (click)="cargarInfoFacturas(detalles.NitProveedor, detalles.Factura)"></button></td>
                               </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
@@ -337,6 +339,7 @@
                                 <th pSortableColumn="Fecha_Vencimiento"><p-sortIcon field="Fecha_Vencimiento"></p-sortIcon> Vence</th>
                                 <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> Valor</th>
                                 <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                                <th class="text-center">Ver</th>
                               </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
@@ -347,6 +350,7 @@
                                 <td>{{detalles.Fecha_Vencimiento}}</td>
                                 <td>{{detalles.Costo | number : '1.2-2'}}</td>
                                 <td>{{detalles.Cuenta}}</td>
+                                <td class="text-center"><button pButton pRipple pTooltip="Ver detalles de factura" icon="pi pi-eye" class="p-button-success" (click)="cargarInfoFacturas(detalles.NitProveedor, detalles.Factura)"></button></td>
                               </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
