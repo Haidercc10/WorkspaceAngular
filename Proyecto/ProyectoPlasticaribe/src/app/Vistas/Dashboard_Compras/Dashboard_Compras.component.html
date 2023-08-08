@@ -1,0 +1,429 @@
+<div class="fondo">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <!-- Toolbar con Años a escoger -->
+  <div class="row">
+    <div class="col-12">
+      <div class="toolbar m-auto">
+        <p-toolbar id="cambiarAnio">
+          <div class="row g-2 mb-4 justify-content-center align-middle">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 col-xxl-4 m-auto">
+              <h5>¡Elige el año que deseas graficar!</h5>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-8 col-xxl-8">
+              <div class="row m-auto justify-content-center">
+                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="seleccionarAnio">
+                  <p-dropdown class="m-auto" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="botonesGraficado">
+                  <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="validarConsulta()"></button>
+                  <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="inicializarGraficas()"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-toolbar>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 text-center fila-2">
+    <div class="py-3 px-2 col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-users"></i> Proveedores</h2>
+
+        <!-- Plasticaribe -->
+        <p-tabView [scrollable]="true" (onChange)="comprasEmpresa($event.index + 1)" id="empresas">
+          <p-tabPanel
+            header="PLASTICARIBE SAS"
+            leftIcon="pi pi-th-large">
+            <div class="mb-3" *ngIf="!cargando">
+              <div class="mb-3">
+                <div class="gap-2 d-grid d-md-flex justify-content-md-center" id="totalCartera">
+                  <p-chip label="Total compras: ${{compraTotalAnioPlasticaribe | currency : ' COP '}}"  class="mr-2"></p-chip>
+                </div>
+              </div>
+
+              <div class="row g-3 font-size-14" id="datosProveedores">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_comprasAgrupadas
+                  [value]="comprasAgrupadasPlasticaribe"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [rows]="comprasAgrupadasPlasticaribe.length"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr class="font-size-16" id="filtros">
+                      <th colspan="2"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Costo', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cuenta', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Periodo', 'contains')"></th>
+                    </tr>
+                    <tr>
+                      <th></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                      <th pSortableColumn="Periodo"><p-sortIcon field="Periodo"></p-sortIcon> Periodo</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td><button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button></td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Costo | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                      <td>{{item.Periodo}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7" id="facturasDetalladas">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraAgrupada
+                            [value]="item.Detalles"
+                            dataKey="Factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="Factura"><p-sortIcon field="Factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="Fecha_Factura"><p-sortIcon field="Fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="Fecha_Vencimiento"><p-sortIcon field="Fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                                <th class="text-center">Ver</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.Factura}}</td>
+                                <td>{{detalles.Fecha_Factura}}</td>
+                                <td>{{detalles.Fecha_Vencimiento}}</td>
+                                <td>{{detalles.Costo | number : '1.2-2'}}</td>
+                                <td>{{detalles.Cuenta}}</td>
+                                <td class="text-center"><button pButton pRipple pTooltip="Ver detalles de factura" icon="pi pi-eye" class="p-button-success" (click)="cargarInfoFacturas(detalles.NitProveedor, detalles.Factura)"></button></td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+
+              <div class="row g-3 m-4" id="graficaCostos">
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-chart-line"></i> Compras Plasticaribe</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaComprasPlasticaribe" [options]="opcionesGrafica"></p-chart>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <p-tabPanel
+            header="INVERGOAL SAS"
+            leftIcon="pi pi-th-large">
+            <div class="mb-3" *ngIf="!cargando">
+
+              <div class="mb-3">
+                <div class="gap-2 d-grid d-md-flex justify-content-md-center" id="costoTotal">
+                  <p-chip label="Total compras: ${{compraTotalAnioInvergoal | currency : ' COP '}}"  class="mr-2"></p-chip>
+                </div>
+              </div>
+
+              <div class="row g-3 font-size-14">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_comprasAgrupadasInvergoal
+                  [value]="comprasAgrupadasInvergoal"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [rows]="comprasAgrupadasInvergoal.length"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr class="font-size-16" id="filtros">
+                      <th colspan="2"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Costo', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cuenta', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Periodo', 'contains')"></th>
+                    </tr>
+                    <tr>
+                      <th></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                      <th pSortableColumn="Periodo"><p-sortIcon field="Periodo"></p-sortIcon> Periodo</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td>
+                        <button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                      </td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Costo | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                      <td>{{item.Periodo}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7" id="facturasDetalladas">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraAgrupada
+                            [value]="item.Detalles"
+                            dataKey="Factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="Factura"><p-sortIcon field="Factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="Fecha_Factura"><p-sortIcon field="Fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="Fecha_Vencimiento"><p-sortIcon field="Fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                                <th class="text-center">Ver</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.Factura}}</td>
+                                <td>{{detalles.Fecha_Factura}}</td>
+                                <td>{{detalles.Fecha_Vencimiento}}</td>
+                                <td>{{detalles.Costo | number : '1.2-2'}}</td>
+                                <td>{{detalles.Cuenta}}</td>
+                                <td class="text-center"><button pButton pRipple pTooltip="Ver detalles de factura" icon="pi pi-eye" class="p-button-success" (click)="cargarInfoFacturas(detalles.NitProveedor, detalles.Factura)"></button></td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+
+              <div class="row g-3 m-4">
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-chart-line"></i> Compras Invergoal</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaComprasInvergoal" [options]="opcionesGrafica"></p-chart>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <p-tabPanel
+            header="INVERSUEZ SAS"
+            leftIcon="pi pi-th-large">
+            <div class="mb-3" *ngIf="!cargando">
+
+              <div class="mb-3">
+                <div class="gap-2 d-grid d-md-flex justify-content-md-center" id="costoTotal">
+                  <p-chip label="Total compras: ${{compraTotalAnioInversuez | currency : ' COP '}}"  class="mr-2"></p-chip>
+                </div>
+              </div>
+
+              <div class="row g-3 font-size-14">
+                <p-table
+                  *ngIf="!cargando"
+                  #dt_comprasAgrupadasInversuez
+                  [value]="comprasAgrupadasInversuez"
+                  [resizableColumns]="true"
+                  columnResizeMode="expand"
+                  styleClass="p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [rows]="comprasAgrupadasInversuez.length"
+                  [rowHover]="true"
+                  dataKey="Id_Proveedor"
+                  [scrollable]="true"
+                  scrollHeight="50rem">
+                  <ng-template pTemplate="header">
+                    <tr class="font-size-16" id="filtros">
+                      <th colspan="2"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proveedor', 'contains')"></th>
+                      <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Costo', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cuenta', 'contains')"></th>
+                      <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Periodo', 'contains')"></th>
+                    </tr>
+                    <tr>
+                      <th></th>
+                      <th>#</th>
+                      <th pSortableColumn="Id_Proveedor"><p-sortIcon field="Id_Proveedor"></p-sortIcon> NIT/C.C</th>
+                      <th pSortableColumn="Proveedor"><p-sortIcon field="Proveedor"></p-sortIcon> Proveedor</th>
+                      <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> SubTotal</th>
+                      <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                      <th pSortableColumn="Periodo"><p-sortIcon field="Periodo"></p-sortIcon> Periodo</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr>
+                      <td>
+                        <button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                      </td>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{item.Id_Proveedor}}</td>
+                      <td>{{item.Proveedor}}</td>
+                      <td><b style="color: #00a2ff;">{{item.Costo | number : '1.2-2'}}</b></td>
+                      <td>{{item.Cuenta}}</td>
+                      <td>{{item.Periodo}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-item>
+                    <tr>
+                      <td colspan="7" id="facturasDetalladas">
+                        <div class="p-3">
+                          <p-table
+                            #dt_SubcarteraAgrupada
+                            [value]="item.Detalles"
+                            dataKey="Factura"
+                            styleClass="p-datatable-gridlines p-datatable-sm"
+                            [scrollable]="true"
+                            scrollHeight="30rem">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th pSortableColumn="Factura"><p-sortIcon field="Factura"></p-sortIcon> N° Factura</th>
+                                <th pSortableColumn="Fecha_Factura"><p-sortIcon field="Fecha_Factura"></p-sortIcon> Fecha</th>
+                                <th pSortableColumn="Fecha_Vencimiento"><p-sortIcon field="Fecha_Vencimiento"></p-sortIcon> Vence</th>
+                                <th pSortableColumn="Costo"><p-sortIcon field="Costo"></p-sortIcon> Valor</th>
+                                <th pSortableColumn="Cuenta"><p-sortIcon field="Cuenta"></p-sortIcon> Cuenta</th>
+                                <th class="text-center">Ver</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{rowIndex + 1}}</td>
+                                <td>{{detalles.Factura}}</td>
+                                <td>{{detalles.Fecha_Factura}}</td>
+                                <td>{{detalles.Fecha_Vencimiento}}</td>
+                                <td>{{detalles.Costo | number : '1.2-2'}}</td>
+                                <td>{{detalles.Cuenta}}</td>
+                                <td class="text-center"><button pButton pRipple pTooltip="Ver detalles de factura" icon="pi pi-eye" class="p-button-success" (click)="cargarInfoFacturas(detalles.NitProveedor, detalles.Factura)"></button></td>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                              <tr>
+                                <td colspan="8">No se encontraron registros</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+
+              <div class="row g-3 m-4">
+                <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-chart-line"></i> Compras Inversuez</h2>
+                <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaComprasInversuez" [options]="opcionesGrafica"></p-chart>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de compras detalladas -->
+<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [resizable]="true" header="Detalles Factura" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content" let-facturas>
+    <div class="mb-3">
+    </div>
+    <div class="container-fluid font-size-14">
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3 font-size-14" id="table">
+          <p-table
+              #dt
+              [value]="arrayFacturas"
+              styleClass="p-datatable-gridlines p-datatable-sm"
+              responsiveLayout="scroll"
+              [rowHover]="true"
+              dataKey="Id"
+              [scrollable]="true"
+              scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th scope="col">Factura</th>
+                <th scope="col">Id Material</th>
+                <th scope="col">Nombre </th>
+                <th scope="col">Cantidad </th>
+                <th scope="col">Medida</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Valor neto</th>
+                <th scope="col">Fecha Factura</th>
+                <th scope="col">Vencimiento</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-facturas>
+              <tr>
+                <td><b>{{facturas.factura}}</b></td>
+                <td>{{facturas.codigoMatPrima}}</td>
+                <td><b>{{facturas.matPrima}}</b></td>
+                <td>{{facturas.cantidad | number : '1.2-2'}}</td>
+                <td>{{facturas.unidad}}</td>
+                <td><b>{{facturas.grupo}}</b></td>
+                <td>{{facturas.valorNeto | number : '1.2-2'}}</td>
+                <td>{{facturas.fechaFactura}}</td>
+                <td><b>{{facturas.fechaVence}}</b></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="6" class="text-right">Total Compra</td>
+                <td id="total">{{valorTotal | number : '1.2-2'}} COP</td>
+                <td colspan="2"></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+

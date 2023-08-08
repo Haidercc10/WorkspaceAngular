@@ -115,7 +115,7 @@ export const routes: Routes = [
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   {path: 'IngresoRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Rollos'}, component : Ingreso_Rollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
   {path: 'Solicitud-Rollos-Bodegas', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud de Rollos'}, component : Solicitud_Rollos_BodegasComponent}, // Solicitud de Rollos
-  {path: 'Movimientos-Solicitud-Rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Solicitudes'}, component : Movimientos_SolicitudRollosComponent}, // Movimientos de las Solicitudes de Rollos
+  {path: 'Movimientos-Solicitud-Rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Solicitudes de Rollos'}, component : Movimientos_SolicitudRollosComponent}, // Movimientos de las Solicitudes de Rollos
   {path: 'Inventario-Bodegas-Rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario de Bodegas'}, component: Inventario_Bodegas_RollosComponent},
 
   // {path: 'AsignacionRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.

@@ -181,7 +181,7 @@ export class Dashboard_CostosComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
   }
 
-  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe 
+  // Funcion que va a traer los datos de la nomina administrativa de plasticaribe
   nominaAdministrativaPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA ADMINISTRACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -203,7 +203,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe 
+  // Funcion que va a traer los datos de la nomina de ventas de plasticaribe
   nominaVentasPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA VENTAS PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -225,7 +225,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
   }
 
-  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe 
+  // Funcion que va a traer los datos de la nomina de fabricacion de plasticaribe
   nominaFabricacionPlasticaribe(){
     this.costosService.GetCostosFacturacion(this.anioSeleccionado, `NOMINA FABRICACION PLASTICARIBE`).subscribe(data => {
       data.forEach(costo => {
@@ -536,8 +536,9 @@ export class Dashboard_CostosComponent implements OnInit {
     this.totalCostoSeleccionado = 0;
     this.cuentaSeleccionada = [];
 
-    if (datos.Cuenta.length == 1) this.consultaMovimientosNomina(datos, mes);
-    else {
+    if (datos.Cuenta.length == 1) {
+      this.consultaMovimientosNomina(datos, mes);
+    } else {
       this.zeusContabilidad.GetCostosCuentasxMesDetallada(datos.Anio, mes, datos.Cuenta).subscribe(data => {
         if (data.length > 0) {
           this.abrirModal2 = true;
@@ -548,27 +549,31 @@ export class Dashboard_CostosComponent implements OnInit {
           }
         } else this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`);
       });
-      setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
     }
+    setTimeout(() => this.cuentaSeleccionada = [datos.Anio, this.cambiarNumeroAMes(mes), datos.Cuenta], 500);
   }
 
   // Funcion que va a consultar los movimientos de nomina de un mes que sea seleccionado
   consultaMovimientosNomina(datos : any, mes : string){
     this.totalCostoSeleccionado = 0;
-    this.nominaService.GetMovimientosNomina(parseInt(datos.Anio), parseInt(mes)).subscribe(data => {
-      data.forEach(costo => {
-        this.arrayGastos1.push({
-          fuente : costo.fuente,
-          fecha_Transaccion : `${costo.fechaInicial.replace('T00:00:00', '')} - ${costo.fechaFinal.replace('T00:00:00', '')}`,
-          id_Cuenta : costo.cuenta,
-          cuenta : costo.cuenta,
-          descripcion_Transaccion : costo.descripcion,
-          valor : costo.valor,
-          fecha_Grabacion : costo.fechaRegistro.replace('T00:00:00', ''),
-          proveedor : costo.proveedor,
+    this.nominaService.GetMovimientosNomina(parseInt(datos.Anio), parseInt(mes), parseInt(datos.Cuenta)).subscribe(data => {
+      data == null ? data = 0 : data = data;
+      if(data != 0) {
+        this.abrirModal2 = true;
+        data.forEach(costo => {
+          this.arrayGastos1.push({
+            fuente : costo.fuente,
+            fecha_Transaccion : `${costo.fechaInicial.replace('T00:00:00', '')} - ${costo.fechaFinal.replace('T00:00:00', '')}`,
+            id_Cuenta : costo.cuenta,
+            cuenta : costo.cuenta,
+            descripcion_Transaccion : costo.descripcion,
+            valor : costo.valor,
+            fecha_Grabacion : costo.fechaRegistro.replace('T00:00:00', ''),
+            proveedor : costo.proveedor,
+          });
+          this.totalCostoSeleccionado += costo.valor;
         });
-        this.totalCostoSeleccionado += costo.valor;
-      }, err => this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la cuenta N° ${datos.Cuenta} en el periodo seleccionado!`));
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `No existen detalles de la ${datos.Descripcion} en el periodo seleccionado!`)
     });
   }
 
@@ -627,7 +632,7 @@ export class Dashboard_CostosComponent implements OnInit {
       infoDocumento = [
         this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
-        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
+        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
       ].reduce((a, b) => a.concat(b));
       this.formatoExcel(title, infoDocumento);
@@ -640,7 +645,7 @@ export class Dashboard_CostosComponent implements OnInit {
     let font : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
     let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
     const header = ['Cuentas', 'Descripción Cuentas', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Total'];
-    
+
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
@@ -687,7 +692,7 @@ export class Dashboard_CostosComponent implements OnInit {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
         });
       };
-    });    
+    });
     worksheet.addRow([]);
     worksheet.addRow([]);
     this.calcularTotales(datos).forEach(d => {

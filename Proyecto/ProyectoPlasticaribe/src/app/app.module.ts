@@ -169,6 +169,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Dashboard_ComprasComponent } from './Vistas/Dashboard_Compras/Dashboard_Compras.component';
 
 @NgModule({
   declarations: [
@@ -263,7 +264,8 @@ import { AppComponent } from './app.component';
     Dashboard_GeneralComponent,
     Recibos_CajaComponent,
     Dashboard_CostosComponent,
-    Ingreso_NominaComponent
+    Ingreso_NominaComponent,
+    Dashboard_ComprasComponent
   ],
 
   imports: [

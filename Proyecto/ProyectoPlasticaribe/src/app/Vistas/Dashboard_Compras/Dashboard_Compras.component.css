@@ -1,0 +1,166 @@
+.fondo {
+  background-image: linear-gradient(62deg, #d6b7ff 0%, #f2f8c2 100%);
+  height: 100%;
+}
+
+.header h3, .header .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojo);
+}
+
+.header2 h3, .header2 .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojoClaro);
+}
+
+.header h3:hover, .header .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.header2 h3:hover, .header2 .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.fila-1, .fila-2, .fila-3, .fila-4 {
+  padding: 0 2%;
+}
+
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
+  width: 100%;
+}
+
+p-chart ::ng-deep div ::ng-deep canvas {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.bg-naranja {
+  color: black;
+  background-color: #F6D45D;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-azul {
+  color: black;
+  background-color: #83D3FF;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-amarillo {
+  color: black;
+  background-color: #F3FC20;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-verde {
+  color: black;
+  background-color: #8AFC9B;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-rojo {
+  color: black;
+  background-color: #FF7878;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-verde2 {
+  color: black;
+  background-color: #53CC48;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.imagen {
+  width: 25%;
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .p-3 {
+    padding: 0.5rem !important;
+  }
+}
+
+.toolbar {
+  width: 60%;
+}
+
+p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
+  width: 100%;
+}
+
+p-dropdown {
+  margin: 0;
+}
+
+p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
+  width: 100%;
+}
+
+#table td, th{
+  font-size: calc(var(--font-size) * 13px);
+}
+
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+  display: flex;
+  width: 100%;
+}
+
+p-calendar ::ng-deep span button {
+  background-color: var(--rojo);
+  border: 0;
+  transition: all 1s;
+}
+
+p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+  background: var(--rojoHover);
+}
+
+p-calendar ::ng-deep .p-datepicker-header button {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep .p-datepicker-header button:hover {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep span button span {
+  display: block;
+}
+
+p-dialog ::ng-deep .p-dialog-header span {
+  color: var(--rojo);
+  align-items: center;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep .p-card {
+  align-items: center;
+  margin: auto;
+  width: 90%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+}
+
+p-toolbar ::ng-deep .p-toolbar {
+  justify-content: space-around !important;
+}
+
+ p-button ::ng-deep .p-button.p-button-icon-only, .p-button.p-button-success {
+  width: 2rem;
+  padding: 0.20rem 0;
+}

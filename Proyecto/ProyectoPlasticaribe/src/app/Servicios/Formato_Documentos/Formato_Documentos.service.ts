@@ -3,7 +3,10 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
+
 export class Formato_DocumentosService {
 
     constructor(private http : HttpClient) { }
