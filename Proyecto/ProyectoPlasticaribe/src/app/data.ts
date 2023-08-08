@@ -10915,7 +10915,6 @@ export const stepsDashboardCuentasPagar : Step.StepOptions[] = [
     },
     buttons: [
       builtInButtons.back,
-      builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',

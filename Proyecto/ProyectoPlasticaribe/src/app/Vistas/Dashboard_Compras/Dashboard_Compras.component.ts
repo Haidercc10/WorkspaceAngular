@@ -226,18 +226,18 @@ export class Dashboard_ComprasComponent implements OnInit {
       id == '900362200' ? this.compraTotalAnioInvergoal = data.reduce((a, b) => a + b.costo, 0) : null;
       id == '900458314' ? this.compraTotalAnioInversuez = data.reduce((a, b) => a + b.costo, 0) : null;
       let costoAnio : any = [
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
-        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('01')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('02')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('03')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('04')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('05')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('06')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('07')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('08')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('09')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('10')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('11')).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim().endsWith('12')).reduce((a, b) => a + b.costo, 0),
       ];
       id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado) ? this.llenarGraficaPlasticaribe(costoAnio) : null;
       id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado) ? this.llenarGraficaInvergoal(costoAnio) : null;
