@@ -467,40 +467,38 @@ export class Dashboard_GeneralComponent implements OnInit {
 
    // Funcion que va a buscar los datos de las compras
   BuscarDatosGrafica_Compras(id : string){
-      this.zeusContabilidad.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
-        let costoAnio : any = [
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
-          data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
-        ];
+    this.zeusContabilidad.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
+      let costoAnio : any = [
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
+      ];
 
-        if(id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
-          this.llenarGrafica_Compras_Plasticaribe(costoAnio);
-          let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
-          this.compras_Anios_Plasticaribe.push(info);
-        } else null;
-        if(id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
-          this.llenarGrafica_Compras_Invergoal(costoAnio);
-          let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
-          this.compras_Anios_Invergoal.push(info);
-        } else null;
-        if(id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
-          this.llenarGrafica_Compras_Inversuez(costoAnio);
-          let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
-          this.compras_Anios_Inversuez.push(info);
-        } else null;
-      });
-
-
+      if(id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Plasticaribe(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Plasticaribe.push(info);
+      } else null;
+      if(id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Invergoal(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Invergoal.push(info);
+      } else null;
+      if(id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Inversuez(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Inversuez.push(info);
+      } else null;
+    });
   }
 
   // Funcion que va a llenar la grafica de compras de plasticaribe
