@@ -754,46 +754,40 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       } else this.msj.mensajeAdvertencia('Advertencia', `No se ha pesado ningún rollo en la OT N° ${this.otSeleccionada} en el proceso de ${proceso}`);
     });
     //Datos consolidados
-    this.servicioBagPro.GetDatosConsolidados(this.otSeleccionada, proceso).subscribe(data2 => {
-      if(data2.length > 0) {
-        setTimeout(() => {
-          this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
-          for (let i = 0; i < data2.length; i++) {
-            this.llenarTablaConsolidada(data2[i]);
-          }
-        }, 1000)
-      }
-    });
+    setTimeout(() => {
+      this.MostrarDatosOTxStatus.ArrayDatosAgrupados = this.MostrarDatosOTxStatus.ArrayDatosProcesos.reduce((array, objeto) => {
+        console.log(objeto)
+        let info : any = { Operador : objeto.Operador, Fecha : objeto.Fecha, Peso : objeto.Peso, Producto : objeto.Producto, NroRollos : 1 }
+
+        const objetoEncontrado = array.find(item => item.Operador == info.Operador && item.Fecha == info.Fecha);
+        console.log(objetoEncontrado)
+        if(objetoEncontrado) {
+          objetoEncontrado.Peso += info.Peso;
+          objetoEncontrado.NroRollos++;
+        } else array.push(info);
+
+        return array;
+      }, []);
+      this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+    }, 2000);
   }
 
+  //Función que llenará la tabla de objetos.
   llenarTablaProcesos(datos : any){
     const Info : any = {
       Rollo : datos.rollo,
       Cliente : datos.cliente,
       Producto : datos.referencia,
-      Peso : datos.unidad != 'Kg' ? this.formatonumeros(datos.peso1) : this.formatonumeros(datos.peso2),
+      Peso : datos.unidad != 'Kg' ? datos.peso1 : datos.peso2,
       Unidad : datos.unidad,
       Operador : datos.operario,
       Maquina : datos.maquina,
       Turno : datos.turno,
       Status : datos.proceso,
-      Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("12:00:00 a.\u00A0m.", " ") + datos.hora,
+      Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("0:00:00", ""),//+ datos.hora,
+      Hora : datos.hora,
     }
     this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-  }
-
-  llenarTablaConsolidada(datos_agrupados : any){
-    let info : any = {
-      Ot : datos_agrupados.ot,
-      Producto : datos_agrupados.referencia,
-      Operador : datos_agrupados.operario,
-      Peso : datos_agrupados.sumaCantidad1 != datos_agrupados.sumaCantidad2 ? this.formatonumeros(datos_agrupados.sumaCantidad1) : this.formatonumeros(datos_agrupados.sumaCantidad2),
-      Fecha : datos_agrupados.fecha.replace("12:00:00 a.\u00A0m.", " "),
-      Proceso : datos_agrupados.proceso,
-      Count : datos_agrupados.registros,
-    }
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
   }
 
   // Funcion que se encargará de limpiar los campos del modal de procesos

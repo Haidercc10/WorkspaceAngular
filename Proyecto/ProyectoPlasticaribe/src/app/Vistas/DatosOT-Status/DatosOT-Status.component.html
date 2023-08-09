@@ -36,7 +36,7 @@
         <td id="maquina" class="TextosInfoTabla">{{ArrayDatosProcesos.Maquina}}</td>
         <td id="turno" class="TextosInfoTabla">{{ArrayDatosProcesos.Turno}}</td>
         <td id="status" class="TextosInfoTabla"><b>{{ArrayDatosProcesos.Status}}</b></td>
-        <td id="fecha" class="TextosInfoTabla">{{ArrayDatosProcesos.Fecha}}</td>
+        <td id="fecha" class="TextosInfoTabla">{{ArrayDatosProcesos.Fecha - ArrayDatosProcesos.Hora}}</td>
       </tr>
     </ng-template>
     </p-table>
@@ -76,9 +76,9 @@
       <tr class="font-size-13">
         <td id="Producto" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Producto}}</b></td>
         <td id="Operador" class="TextosInfoTabla">{{ArrayDatosAgrupados.Operador}}</td>
-        <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso}}</b></td>
+        <td id="Peso" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Peso | number: '1.2-2' }}</b></td>
         <td id="Fecha" class="TextosInfoTabla">{{ArrayDatosAgrupados.Fecha}}</td>
-        <td id="Count" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.Count}}</b></td>
+        <td id="Count" class="TextosInfoTabla"><b>{{ArrayDatosAgrupados.NroRollos}}</b></td>
       </tr>
     </ng-template>
     </p-table>
