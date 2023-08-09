@@ -111,29 +111,34 @@ export class Ingreso_Rollos_ExtrusionComponent implements OnInit {
     this.consolidadoProductos = [];
 
     this.bagProService.GetRollosExtrusion_Empaque_Sellado(fechaInicial, fechaFinal, 'EXTRUSION', ruta).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        rollosBagPro.push(data[i].rollo);
-      }
-      setTimeout(() => {
-        this.dtBgRollosService.GetRollos(rollosBagPro).subscribe(datos => {
-          for (let i = 0; i < datos.length; i++) {
-            rollosExistentes.push(datos[i].dtBgRollo_Rollo);
-          }
-          setTimeout(() => {
-            for (let i = 0; i < data.length; i++) {
-              if (datos.length > 0 && !rollosExistentes.includes(parseInt(data[i].rollo))) this.llenarRollosIngresar(data[i], false);
-              else if (datos.length > 0 && rollosExistentes.includes(parseInt(data[i].rollo))) {
-                let nuevo : any [] = datos.filter((item) => item.dtBgRollo_Rollo == data[i].rollo);
-                for (let j = 0; j < nuevo.length; j++) {
-                  if (nuevo[j].bgRollo_BodegaActual != 'EXT') this.llenarRollosIngresar(data[i], false);
-                  else this.llenarRollosIngresar(data[i], true);
-                }
-              }
-              if (datos.length == 0) this.llenarRollosIngresar(data[i], false);
+      if (data.length > 0) {
+        for (let i = 0; i < data.length; i++) {
+          rollosBagPro.push(data[i].rollo);
+        }
+        setTimeout(() => {
+          this.dtBgRollosService.GetRollos(rollosBagPro).subscribe(datos => {
+            for (let i = 0; i < datos.length; i++) {
+              rollosExistentes.push(datos[i].dtBgRollo_Rollo);
             }
-          }, 500);
-        });
-      }, 2500);
+            setTimeout(() => {
+              for (let i = 0; i < data.length; i++) {
+                if (datos.length > 0 && !rollosExistentes.includes(parseInt(data[i].rollo))) this.llenarRollosIngresar(data[i], false);
+                else if (datos.length > 0 && rollosExistentes.includes(parseInt(data[i].rollo))) {
+                  let nuevo : any [] = datos.filter((item) => item.dtBgRollo_Rollo == data[i].rollo);
+                  for (let j = 0; j < nuevo.length; j++) {
+                    if (nuevo[j].bgRollo_BodegaActual != 'EXT') this.llenarRollosIngresar(data[i], false);
+                    else this.llenarRollosIngresar(data[i], true);
+                  }
+                }
+                if (datos.length == 0) this.llenarRollosIngresar(data[i], false);
+              }
+            }, 500);
+          });
+        }, 2500);
+      } else {
+        this.mensajeService.mensajeAdvertencia(`¡No se encontró información de la OT ${ot} en las fechas elegidas!`, `Nota: Si no eligió fechas, estas se llenaron con la fecha del día de hoy.`);
+        this.cargando = false;
+      }
     });
   }
 

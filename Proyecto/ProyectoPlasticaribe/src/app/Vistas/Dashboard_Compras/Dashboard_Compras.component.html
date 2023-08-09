@@ -59,7 +59,7 @@
                   responsiveLayout="scroll"
                   [rows]="comprasAgrupadasPlasticaribe.length"
                   [rowHover]="true"
-                  dataKey="Id_Proveedor"
+                  dataKey="Id"
                   [scrollable]="true"
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
@@ -97,7 +97,7 @@
                       <td colspan="7" id="facturasDetalladas">
                         <div class="p-3">
                           <p-table
-                            #dt_SubcarteraAgrupada
+                            #dt_SubComprasAgrupadas
                             [value]="item.Detalles"
                             dataKey="Factura"
                             styleClass="p-datatable-gridlines p-datatable-sm"
@@ -149,7 +149,6 @@
             header="INVERGOAL SAS"
             leftIcon="pi pi-th-large">
             <div class="mb-3" *ngIf="!cargando">
-
               <div class="mb-3">
                 <div class="gap-2 d-grid d-md-flex justify-content-md-center" id="costoTotal">
                   <p-chip label="Total compras: ${{compraTotalAnioInvergoal | currency : ' COP '}}"  class="mr-2"></p-chip>
@@ -167,7 +166,7 @@
                   responsiveLayout="scroll"
                   [rows]="comprasAgrupadasInvergoal.length"
                   [rowHover]="true"
-                  dataKey="Id_Proveedor"
+                  dataKey="Id"
                   [scrollable]="true"
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
@@ -259,7 +258,6 @@
             header="INVERSUEZ SAS"
             leftIcon="pi pi-th-large">
             <div class="mb-3" *ngIf="!cargando">
-
               <div class="mb-3">
                 <div class="gap-2 d-grid d-md-flex justify-content-md-center" id="costoTotal">
                   <p-chip label="Total compras: ${{compraTotalAnioInversuez | currency : ' COP '}}"  class="mr-2"></p-chip>
@@ -277,7 +275,7 @@
                   responsiveLayout="scroll"
                   [rows]="comprasAgrupadasInversuez.length"
                   [rowHover]="true"
-                  dataKey="Id_Proveedor"
+                  dataKey="Id"
                   [scrollable]="true"
                   scrollHeight="50rem">
                   <ng-template pTemplate="header">
