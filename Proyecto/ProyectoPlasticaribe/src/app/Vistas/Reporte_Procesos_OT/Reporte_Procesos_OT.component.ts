@@ -756,11 +756,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     //Datos consolidados
     setTimeout(() => {
       this.MostrarDatosOTxStatus.ArrayDatosAgrupados = this.MostrarDatosOTxStatus.ArrayDatosProcesos.reduce((array, objeto) => {
-        console.log(objeto)
         let info : any = { Operador : objeto.Operador, Fecha : objeto.Fecha, Peso : objeto.Peso, Producto : objeto.Producto, NroRollos : 1 }
 
         const objetoEncontrado = array.find(item => item.Operador == info.Operador && item.Fecha == info.Fecha);
-        console.log(objetoEncontrado)
         if(objetoEncontrado) {
           objetoEncontrado.Peso += info.Peso;
           objetoEncontrado.NroRollos++;
@@ -774,6 +772,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Función que llenará la tabla de objetos.
   llenarTablaProcesos(datos : any){
+    console.log(datos)
     const Info : any = {
       Rollo : datos.rollo,
       Cliente : datos.cliente,
