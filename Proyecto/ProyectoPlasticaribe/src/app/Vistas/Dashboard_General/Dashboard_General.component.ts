@@ -218,7 +218,7 @@ export class Dashboard_GeneralComponent implements OnInit {
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
-    //this.consultarFacturasNoHabilitadas();
+    this.consultarFacturasNoHabilitadas();
     this.BuscarDatosGraficaFacturacion();
     this.BuscarDatosGraficaCuentas_Cobrar();
     this.BuscarDatosGraficaCuentas_Pagar();
@@ -462,95 +462,12 @@ export class Dashboard_GeneralComponent implements OnInit {
     });
   }
 
-  // Funcion que va a buscar los datos de las compras
-  /*BuscarDatosGrafica_Compras(){
-    let index : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
-      let costoMeses_Invergoal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
-      let costoMeses_Inversuez : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
-
-      this.zeusService.GetComprasMes_Mes_Plasticaribe(this.anioSeleccionado).subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Plasticaribe = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Plasticaribe(costoMeses_Plasticaribe);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Plasticaribe[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Plasticaribe.push(info_Anio);
-        }
-      });
-      this.zeusService.GetComprasMes_Mes_InverGoal_InverSuez(this.anioSeleccionado, '900362200').subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Invergoal = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Invergoal[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Invergoal[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Invergoal[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Invergoal[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Invergoal[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Invergoal[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Invergoal[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Invergoal[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Invergoal[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Invergoal[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Invergoal[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Invergoal[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Invergoal(costoMeses_Invergoal);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Invergoal.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Invergoal[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Invergoal.push(info_Anio);
-        }
-      });
-      this.zeusService.GetComprasMes_Mes_InverGoal_InverSuez(this.anioSeleccionado, '900458314').subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Inversuez = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Inversuez[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Inversuez[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Inversuez[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Inversuez[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Inversuez[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Inversuez[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Inversuez[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Inversuez[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Inversuez[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Inversuez[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Inversuez[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Inversuez[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Inversuez(costoMeses_Inversuez);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Inversuez[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Inversuez.push(info_Anio);
-        }
-      });
-    }
-  }*/
-
-  //consultarFacturasNoHabilitadas = () => this.srvFacturasGoalSuez.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
+  //.Función que consultará las facturas de papel, Si en zeus hay algunas que contengan el mismo código de factura, se les excluirá el costo.
+  consultarFacturasNoHabilitadas = () => this.srvFacturasGoalSuez.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
 
    // Funcion que va a buscar los datos de las compras
   BuscarDatosGrafica_Compras(id : string){
       this.zeusContabilidad.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
-        console.log(this.compras_Anios_Plasticaribe)
         let costoAnio : any = [
           data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
           data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
