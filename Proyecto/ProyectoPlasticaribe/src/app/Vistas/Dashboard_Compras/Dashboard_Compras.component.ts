@@ -174,6 +174,7 @@ export class Dashboard_ComprasComponent implements OnInit {
       let numDatos = 0;
       data.forEach(prov => {
         let info : any = {
+          Id : numDatos + 1,
           Id_Proveedor : prov.id_Proveedor,
           Proveedor : prov.proveedor,
           Costo : prov.costo,
@@ -317,5 +318,4 @@ export class Dashboard_ComprasComponent implements OnInit {
       }
     });
   }
-
 }
