@@ -252,7 +252,7 @@
               <td id="ot" scope="col" (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
               <td id="mp" scope="col">{{data.cli}}</td>
               <td id="mp" scope="col">{{data.prod}}</td>
-              <td id="mp" scope="col"><b>{{data.Mp | number : '1.2-2'}}</b></td>
+              <td id="mp" scope="col"><b>{{data.mp | number : '1.2-2'}}</b></td>
               <!-- Extrusion -->
               <!-- Termianda -->
               <ng-container *ngIf="data.ext >= data.cant && data.est != 'Abierta'  && data.est != 'Asignada'">
@@ -499,7 +499,8 @@
               </ng-template>
 
               <td id="desp" scope="col" (click)="data.desp != 0 || data.despUnd != 0 ? consultarRollosDespacho_OT(data.ot) : 0"><b><b>{{data.desp | number}} Kg - {{data.despUnd | number}} Und</b></b></td>
-              <td id="cant" scope="col"><b>{{data.cantUnd}}</b></td>
+              
+              <td id="cant" scope="col"><b>{{data.cantUnd | number : '1.2-2'}}</b></td>
 
               <!-- Terminada -->
               <ng-container *ngIf="data.est == 'Terminada'">
@@ -602,7 +603,7 @@
 </p-dialog>
 
 
-<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '70%'}" header="Reporte de costos" [modal]="true" >
+<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '95%'}" header="Reporte de costos" [modal]="true" >
   <ng-template pTemplate="content">
     <app-reporteCostosOT></app-reporteCostosOT>
   </ng-template>

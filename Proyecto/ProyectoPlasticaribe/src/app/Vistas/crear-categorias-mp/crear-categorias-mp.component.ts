@@ -40,7 +40,6 @@ export class CrearCategoriasMPComponent implements OnInit {
       CatMP_Descripcion: this.formCrearCategoriasMP.get('catDescripcion')?.value,
 
     }
-    console.log(CamposCategoriasMP);
     this.servicioCategoriasMP.srvAgregar(CamposCategoriasMP).subscribe(datosCategoriasMP => {
       const Toast = Swal.mixin({
         toast: true,

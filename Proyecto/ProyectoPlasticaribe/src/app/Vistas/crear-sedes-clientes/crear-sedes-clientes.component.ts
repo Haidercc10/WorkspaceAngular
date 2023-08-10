@@ -49,10 +49,8 @@ export class CrearSedesClientesComponent implements OnInit {
   validarCamposVacios() {
     if(this.FormSedesClientes.valid){
       Swal.fire("Los datos se enviaron correctamente");
-      console.log(this.FormSedesClientes);
     }else{
       Swal.fire("Hay campos vacios");
-      console.log(this.FormSedesClientes);
     }
 }
 

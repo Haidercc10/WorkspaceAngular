@@ -9,6 +9,7 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
@@ -17,9 +18,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src/app/data';
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
-import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
-import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +34,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
   @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
-  @ViewChild(ReportePedidos_ZeusComponent) ReportePedidos_Zeus : ReportePedidos_ZeusComponent;
 
   modeModal : boolean = false; //Variable que validará cuando el componente aparezca en un modal
 
@@ -210,7 +208,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
 
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -483,7 +481,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
     let ruta : string = '';
-    let cantDatos : number = 0;
 
     if (ot != null) ruta += `ot=${ot}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
@@ -503,43 +500,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
   llenarArray(data : any){
-    data.usua_Id = `${data.usua_Id}`
-    if (data.usua_Id.length == 2) data.usua_Id = `0${data.usua_Id}`;
-    else if (data.usua_Id.length == 1) data.usua_Id = `00${data.usua_Id}`;
+    data.usua = `${data.usua}`
+    if (data.usua.length == 2) data.usua = `0${data.usua}`;
+    else if (data.usua.length == 1) data.usua = `00${data.usua}`;
+    
+    data.fecha = data.fecha != null ? data.fecha.replace('T00:00:00', '') : data.fecha;
+    data.fechaInicio = data.fechaInicio != null ? data.fechaInicio.replace('T00:00:00', '') : data.fechaInicio;
+    data.fechaFinal = data.fechaFinal != null ? data.fechaFinal.replace('T00:00:00', '') : data.fechaFinal;
 
-    let info : any = {
-      ot : data.estProcOT_OrdenTrabajo,
-      Mp : data.estProcOT_CantMatPrimaAsignada,
-      ext : data.estProcOT_ExtrusionKg,
-      imp : data.estProcOT_ImpresionKg,
-      rot : data.estProcOT_RotograbadoKg,
-      dbl : data.estProcOT_DobladoKg,
-      lam : data.estProcOT_LaminadoKg,
-      cor : data.estProcOT_CorteKg,
-      emp : data.estProcOT_EmpaqueKg,
-      sel : data.estProcOT_SelladoKg,
-      selUnd : data.estProcOT_SelladoUnd,
-      wik : data.estProcOT_WiketiadoKg,
-      wikUnd : data.estProcOT_WiketiadoUnd,
-      desp : data.cantUndDespacho,
-      despUnd : data.cantKgDespacho,
-      cant : data.estProcOT_CantidadPedida,
-      cantUnd : `${this.formatonumeros(data.estProcOT_CantidadPedida)} Kg - ${this.formatonumeros(data.estProcOT_CantidadPedidaUnd)} Und`,
-      falla : data.falla_Nombre,
-      obs : data.estProcOT_Observacion,
-      est : data.estado_Nombre,
-      fecha : data.estProcOT_FechaCreacion.replace("T00:00:00", ""),
-      entrada : this.formatonumeros(data.estProcOT_CantProdIngresada),
-      salida : this.formatonumeros(data.estProcOT_CantProdFacturada),
-      fechaInicio : data.estProcOT_FechaInicio != null ? data.estProcOT_FechaInicio.replace("T00:00:00", "") : data.estProcOT_FechaInicio,
-      fechaFinal : data.estProcOT_FechaFinal != null ? data.estProcOT_FechaFinal.replace("T00:00:00", "") : data.estProcOT_FechaFinal,
-      und : data.undMed_Id,
-      usu : data.usua_Id,
-      nombreUsu : data.usua_Nombre,
-      cli : data.estProcOT_Cliente,
-      prod : data.prod_Nombre,
-      ped : data.estProcOT_Pedido,
-    }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
       { header: 'Vendedor', field: 'usu' },
@@ -551,17 +519,17 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       { header: 'Fecha Fin OT', field: 'fechaFinal'}
     ];
 
-    this.ArrayDocumento.push(info);
+    this.ArrayDocumento.push(data);
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));
-    this.load = true;
 
-    if (data.estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
-    if (data.estado_Nombre == 'Asignada') this.cantidadOTAsignadas += 1;
-    if (data.estado_Nombre == 'Terminada') this.cantidadOTTerminada += 1;
-    if (data.estado_Nombre == 'En proceso') this.cantidadOTIniciada += 1;
-    if (data.estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
-    if (data.estado_Nombre == 'Finalizada') this.cantidadOTFinalizada += 1;
-    if (data.estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
+    if (data.est == 'Abierta') this.catidadOTAbiertas += 1;
+    if (data.est == 'Asignada') this.cantidadOTAsignadas += 1;
+    if (data.est == 'Terminada') this.cantidadOTTerminada += 1;
+    if (data.est == 'En proceso') this.cantidadOTIniciada += 1;
+    if (data.est == 'Anulado') this.cantidadOtAnulada += 1;
+    if (data.est == 'Finalizada') this.cantidadOTFinalizada += 1;
+    if (data.est == 'Cerrada') this.cantidadOTCerrada += 1;
+    this.load = true;
   }
 
   // Funcion que va a consultar la información de los rollos en despacho de una orden de trabajo
@@ -589,7 +557,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         this.inventarioDetallado.push(info);
         if (num == data.length) this.load = true;
       }
-    }, err => this.load = true);
+    }, () => this.load = true);
   }
 
   seleccionarOTxProceso(data: any , proceso : string) {
@@ -685,9 +653,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
         }
         /**/
-        if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.")
+        if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.");
         else {
-          this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(datos_ot => {
+          this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(() => {
             this.msj.mensajeConfirmacion('¡Falla Agregada!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
             this.limpiarCampos();
           });
@@ -703,24 +671,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     setTimeout(() => {
       this.reporteCostos.load = false;
       this.reporteCostos.modeModal = true;
-      this.reporteCostos.infoOT.setValue({
-        ot : ot,
-        cliente : '',
-        IdProducto : '',
-        NombreProducto : '',
-        cantProductoSinMargenUnd : '',
-        cantProductoSinMargenKg : '',
-        margenAdicional : '',
-        cantProductoConMargen : '',
-        PresentacionProducto : '',
-        ValorUnidadProductoUnd : '',
-        ValorUnidadProductoKg : '',
-        ValorEstimadoOt : '',
-        fechaInicioOT : '',
-        fechaFinOT : '',
-        estadoOT : '',
-      });
-      setTimeout(() => { this.reporteCostos.consultaOTBagPro(); }, 500);
+      this.reporteCostos.infoOT.patchValue({ot : ot});
+      setTimeout(() => this.reporteCostos.consultaOTBagPro(), 500);
     }, 500);
   }
 
@@ -779,7 +731,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             usrCrea : datos_ot[i].usrCrea,
             estado : estadoFinal,
           }
-          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(datos_clientesOT => {
+          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(() => {
             this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
           });
         }
@@ -789,15 +741,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // cierra el modal de cambio de estado de ordenes de trabajo
   hideDialog = () => this.modalEstadosOT = false;
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError = (titulo : string, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia = (titulo : string, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color : string){

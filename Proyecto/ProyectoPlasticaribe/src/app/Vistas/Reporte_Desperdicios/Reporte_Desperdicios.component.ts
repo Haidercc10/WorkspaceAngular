@@ -115,7 +115,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
         productoId : nuevo[0].prod_Id,
         Producto: nuevo[0].prod_Nombre,
       });
-      console.log(this.formFiltros.value)
     } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
   }
 
