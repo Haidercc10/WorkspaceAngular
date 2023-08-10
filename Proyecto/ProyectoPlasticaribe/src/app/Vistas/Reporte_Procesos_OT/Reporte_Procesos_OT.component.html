@@ -161,7 +161,7 @@
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-center" id="cambiarEstados">
-              <button pButton icon="pi pi-pencil" label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0" (click)="abrirModalCambioEstado()"></button>
+              <button *ngIf="ValidarRol == 1 && storage_Id != 101"pButton icon="pi pi-pencil" label="Cambiar Estado" class="p-button-success p-mr-2" [disabled]="ordenesSeleccionadas.length == 0" (click)="abrirModalCambioEstado()"></button>
             </div>
 
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4 text-right" id="botonesColores">
@@ -213,6 +213,7 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'wik', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'desp', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
@@ -220,7 +221,7 @@
               <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
             <tr class="font-size-13" id="columnas">
-              <th style="width: 3rem" pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo"></p-tableHeaderCheckbox></th>
+              <th style="width: 3rem" pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo" *ngIf="ValidarRol == 1 && storage_Id != 101"></p-tableHeaderCheckbox></th>
               <th scope="col" pSortableColumn="ot" pResizableColumn id="ordenTrabajo">OT <p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
               <th scope="col" pSortableColumn="cli" pResizableColumn>Cliente <p-sortIcon field="cli"></p-sortIcon></th>
               <th scope="col" pSortableColumn="prod" pResizableColumn>Producto <p-sortIcon field="prod"></p-sortIcon></th>
@@ -234,6 +235,7 @@
               <th scope="col" pSortableColumn="emp" pResizableColumn>Empaque <p-sortIcon field="emp"></p-sortIcon></th>
               <th scope="col" pSortableColumn="sel" pResizableColumn>Sellado <p-sortIcon field="sel"></p-sortIcon></th>
               <th scope="col" pSortableColumn="wik" pResizableColumn>Wiketiado <p-sortIcon field="wik"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="desp" pResizableColumn>Despacho <p-sortIcon field="desp"></p-sortIcon></th>
               <th scope="col" pSortableColumn="cant" pResizableColumn>Cant. Producir <p-sortIcon field="cant"></p-sortIcon></th>
               <th scope="col" pSortableColumn="est" pResizableColumn>Estados <p-sortIcon field="est"></p-sortIcon></th>
               <th scope="col" pSortableColumn="fecha" pResizableColumn>Fecha Creación <p-sortIcon field="fecha"></p-sortIcon></th>
@@ -245,7 +247,7 @@
           <ng-template pTemplate="body" let-data let-columns="columns">
             <tr style="cursor: pointer; cursor: hand;">
               <td pFrozenColumn>
-                <p-tableCheckbox [value]="data"></p-tableCheckbox>
+                <p-tableCheckbox [value]="data" *ngIf="ValidarRol == 1 && storage_Id != 101"></p-tableCheckbox>
               </td>
               <td id="ot" scope="col" (click)="reporteOT(data.ot)"><b>{{data.ot}}</b></td>
               <td id="mp" scope="col">{{data.cli}}</td>
@@ -496,6 +498,7 @@
                 <td *ngIf="data.est == 'Anulado' && data.wik == 0 && data.wik < data.cant" id="wik" scope="col" style="background-color: #FF7878; color: #495057" (click)="seleccionarOTxProceso(data, 'Wiketiado')">{{data.wikUnd == 0 ? 'NO' : data.wikUnd | number}} Und</td>
               </ng-template>
 
+              <td id="desp" scope="col" (click)="data.desp != 0 || data.despUnd != 0 ? consultarRollosDespacho_OT(data.ot) : 0"><b><b>{{data.desp | number}} Kg - {{data.despUnd | number}} Und</b></b></td>
               <td id="cant" scope="col"><b>{{data.cantUnd}}</b></td>
 
               <!-- Terminada -->
@@ -528,8 +531,8 @@
 
               <td *ngFor="let col of columns">{{data[col.field]}}</td>
 
-              <td *ngIf="ValidarRol == 1 && storage_Id != 101" pFrozenColumn alignFrozen="right" [frozen]="true">
-                <button pButton pRipple icon="pi pi-pencil" [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2" (click)="abrirModalCambioEstado(data)"></button>
+              <td pFrozenColumn alignFrozen="right" [frozen]="true">
+                <button *ngIf="ValidarRol == 1 && storage_Id != 101" pButton pRipple icon="pi pi-pencil" [style]="{width: '30px', height: '30px'}" class="p-button-rounded p-button-success p-mr-2" (click)="abrirModalCambioEstado(data)"></button>
               </td>
             </tr>
           </ng-template>
@@ -602,6 +605,59 @@
 <p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '70%'}" header="Reporte de costos" [modal]="true" >
   <ng-template pTemplate="content">
     <app-reporteCostosOT></app-reporteCostosOT>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="modalInventarioDespacho" [style]="{width: '70vw'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <p-table
+      #dtDetallado
+      [value]="inventarioDetallado"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      dataKey="id"
+      [scrollable]="true"
+      scrollHeight="50rem">
+      <ng-template pTemplate="header"><tr>
+          <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+          <th pSortableColumn="Rollo">Rollo <p-sortIcon field="Rollo"></p-sortIcon></th>
+          <th pSortableColumn="Orden">Orden Trabajo <p-sortIcon field="Orden"></p-sortIcon></th>
+          <th pSortableColumn="Item">Item <p-sortIcon field="Item"></p-sortIcon></th>
+          <th pSortableColumn="Referencia">Referencia <p-sortIcon field="Referencia"></p-sortIcon></th>
+          <th pSortableColumn="Cantidad">Cantidad <p-sortIcon field="Cantidad"></p-sortIcon></th>
+          <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+          <th pSortableColumn="Fecha">Fecha <p-sortIcon field="Fecha"></p-sortIcon></th>
+          <th pSortableColumn="Extrusion">Extrusión <p-sortIcon field="Extrusion"></p-sortIcon></th>
+          <th pSortableColumn="ProductoIntermedio">Prod. Intermedio <p-sortIcon field="ProductoIntermedio"></p-sortIcon></th>
+          <th pSortableColumn="Impresion">Impresión <p-sortIcon field="Impresion"></p-sortIcon></th>
+          <th pSortableColumn="Rotograbado">Rotograbado <p-sortIcon field="Rotograbado"></p-sortIcon></th>
+          <th pSortableColumn="Sellado">Sellado <p-sortIcon field="Sellado"></p-sortIcon></th>
+          <th pSortableColumn="Despacho">Despacho <p-sortIcon field="Despacho"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{rowIndex + 1}}</b></td>
+          <td>{{data.Rollo}}</td>
+          <td>{{data.Orden}}</td>
+          <td>{{data.Item}}</td>
+          <td>{{data.Referencia}}</td>
+          <td>{{data.Cantidad | number : '1.2-2'}}</td>
+          <td>{{data.Presentacion}}</td>
+          <td>{{data.Fecha}}</td>
+          <td>{{data.Extrusion}}</td>
+          <td>{{data.ProductoIntermedio}}</td>
+          <td>{{data.Impresion}}</td>
+          <td>{{data.Rotograbado}}</td>
+          <td>{{data.Sellado}}</td>
+          <td>{{data.Despacho}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </ng-template>
 </p-dialog>
 

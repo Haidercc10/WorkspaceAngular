@@ -11,7 +11,6 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -20,6 +19,7 @@ import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -71,12 +71,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   infoColor : string = ''; /** Variable que servirá para mostrar la descripción de cada color */
   @ViewChild('op') op: OverlayPanel | undefined;
   ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
+  inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario de rollos detallado
+  modalInventarioDespacho : boolean = false; //Variable que validará cuando se muestra el modal de inventario de rollos despachados
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private fallasTecnicasService : FallasTecnicasService,
                     private estadosProcesos_OTService : EstadosProcesos_OTService,
-                      private srvEstadosOTVendedores : EstadosProcesosOTxVendedoresService,
+                      private bgRollosService : Detalle_BodegaRollosService,
                         private estadosService : EstadosService,
                           private servicioBagPro : BagproService,
                             private usuarioService : UsuarioService,
@@ -519,6 +521,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       selUnd : data.estProcOT_SelladoUnd,
       wik : data.estProcOT_WiketiadoKg,
       wikUnd : data.estProcOT_WiketiadoUnd,
+      desp : data.cantUndDespacho,
+      despUnd : data.cantKgDespacho,
       cant : data.estProcOT_CantidadPedida,
       cantUnd : `${this.formatonumeros(data.estProcOT_CantidadPedida)} Kg - ${this.formatonumeros(data.estProcOT_CantidadPedidaUnd)} Und`,
       falla : data.falla_Nombre,
@@ -558,6 +562,34 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (data.estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
     if (data.estado_Nombre == 'Finalizada') this.cantidadOTFinalizada += 1;
     if (data.estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
+  }
+
+  // Funcion que va a consultar la información de los rollos en despacho de una orden de trabajo
+  consultarRollosDespacho_OT(orden : number){
+    let num : number = 0;
+    this.inventarioDetallado = [];
+    this.bgRollosService.GetInventarioRollos_OrdenTrabajo(orden, 'DESP').subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        this.modalInventarioDespacho = true;
+        let info : any = {
+          Rollo: data[i].dtBgRollo_Rollo,
+          Orden: data[i].bgRollo_OrdenTrabajo,
+          Item: data[i].prod_Id,
+          Referencia: data[i].prod_Nombre,
+          Cantidad: data[i].dtBgRollo_Cantidad,
+          Presentacion: data[i].undMed_Id,
+          Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
+          Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
+          ProductoIntermedio: data[i].dtBgRollo_ProdIntermedio ? 'SI' : 'NO',
+          Impresion: data[i].dtBgRollo_Impresion ? 'SI' : 'NO',
+          Rotograbado: data[i].dtBgRollo_Rotograbado ? 'SI' : 'NO',
+          Sellado: data[i].dtBgRollo_Sellado ? 'SI' : 'NO',
+          Despacho: data[i].dtBgRollo_Despacho ? 'SI' : 'NO',
+        }
+        this.inventarioDetallado.push(info);
+        if (num == data.length) this.load = true;
+      }
+    }, err => this.load = true);
   }
 
   seleccionarOTxProceso(data: any , proceso : string) {
