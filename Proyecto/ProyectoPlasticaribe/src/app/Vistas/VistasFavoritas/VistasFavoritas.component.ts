@@ -136,8 +136,8 @@ export class VistasFavoritasComponent implements OnInit {
   buscarFavoritos(){
     this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(data => {
       data.forEach(element => {
-        this.vistasFavoritas = [ element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5, ]
-        this.mostrarVistasFav();
+        this.vistasFavoritas = [element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5,];
+        setTimeout(() => this.mostrarVistasFav(), 500);
       });
     }, () => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
   }

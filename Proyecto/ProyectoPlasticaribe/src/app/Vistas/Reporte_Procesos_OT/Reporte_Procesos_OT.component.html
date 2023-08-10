@@ -117,7 +117,7 @@
     <!-- Botones para consultar OT -->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton id="consultar" class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarOT()"></button>
+        <button pButton id="consultar" class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarInformacionOrdenesTrabajo()"></button>
         <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="agregarFalla" class="p-button-warning" type="button" label="Agregar Falla" icon="pi pi-check-circle" (click)="anadirFalla()"></button>
         <button pButton id="excel" class="p-button-success" type="button" label="Exportar a Excel" icon="pi pi-file-excel" (click)="exportToExcel()"></button>
@@ -198,33 +198,46 @@
 
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
+            <tr class="font-size-16" id="filtros">
+              <th pFrozenColumn></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ot', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cli', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'prod', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mp', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'ext', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'imp', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'rot', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'dbl', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'lam', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cor', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'emp', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'sel', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'wik', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cant', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'est', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+              <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+              <th pFrozenColumn alignFrozen="right" [frozen]="true"></th>
+            </tr>
             <tr class="font-size-13" id="columnas">
-              <th style="width: 3rem" pFrozenColumn>
-                <p-tableHeaderCheckbox id="elegirTodo"></p-tableHeaderCheckbox>
-              </th>
-              <th scope="col" pSortableColumn="ot" pResizableColumn id="ordenTrabajo">OT
-                <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
-              </th>
-              <th id="" scope="col" pSortableColumn="cli" pResizableColumn>Cliente
-                <p-sortIcon field="cli"></p-sortIcon>
-              </th>
-              <th id="" scope="col" pSortableColumn="prod" pResizableColumn>Producto
-                <p-sortIcon field="prod"></p-sortIcon>
-              </th>
-              <th id="" scope="col" pResizableColumn>Materia Prima</th>
-              <th id="procesos" scope="col" pResizableColumn>Extrusión</th>
-              <th id="" scope="col" pResizableColumn>Impresión</th>
-              <th id="" scope="col" pResizableColumn>Rotograbado</th>
-              <th id="" scope="col" pResizableColumn>Doblado</th>
-              <th id="" scope="col" pResizableColumn>Laminado</th>
-              <th id="" scope="col" pResizableColumn>Corte</th>
-              <th id="" scope="col" pResizableColumn>Empaque</th>
-              <th id="" scope="col" pResizableColumn>Sellado</th>
-              <th id="" scope="col" pResizableColumn>Wiketiado</th>
-              <th id="" scope="col" pResizableColumn>Cant. Producir</th>
-              <th id="" scope="col" pResizableColumn>Estados</th>
-              <th id="" scope="col" pResizableColumn>Fecha Creación</th>
-              <th *ngFor="let col of columns" pResizableColumn>{{col.header}}</th>
+              <th style="width: 3rem" pFrozenColumn><p-tableHeaderCheckbox id="elegirTodo"></p-tableHeaderCheckbox></th>
+              <th scope="col" pSortableColumn="ot" pResizableColumn id="ordenTrabajo">OT <p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="cli" pResizableColumn>Cliente <p-sortIcon field="cli"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="prod" pResizableColumn>Producto <p-sortIcon field="prod"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Mp" pResizableColumn>Materia Prima <p-sortIcon field="Mp"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="ext" pResizableColumn>Extrusión <p-sortIcon field="ext"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="imp" pResizableColumn>Impresión <p-sortIcon field="imp"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="rot" pResizableColumn>Rotograbado <p-sortIcon field="rot"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="dbl" pResizableColumn>Doblado <p-sortIcon field="dbl"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="lam" pResizableColumn>Laminado <p-sortIcon field="lam"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="cor" pResizableColumn>Corte <p-sortIcon field="cor"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="emp" pResizableColumn>Empaque <p-sortIcon field="emp"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="sel" pResizableColumn>Sellado <p-sortIcon field="sel"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="wik" pResizableColumn>Wiketiado <p-sortIcon field="wik"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="cant" pResizableColumn>Cant. Producir <p-sortIcon field="cant"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="est" pResizableColumn>Estados <p-sortIcon field="est"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="fecha" pResizableColumn>Fecha Creación <p-sortIcon field="fecha"></p-sortIcon></th>
+              <th *ngFor="let col of columns" pSortableColumn="{{col.field}}" pResizableColumn>{{col.header}} <p-sortIcon field="{{col.field}}"></p-sortIcon></th>
               <th id="cambiarEstado" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
             </tr>
           </ng-template>
