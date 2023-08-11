@@ -4,7 +4,6 @@ import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -17,7 +16,6 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src/app/data';
-import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
 
 @Injectable({
@@ -32,7 +30,6 @@ import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.com
 
 export class Reporte_Procesos_OTComponent implements OnInit {
 
-  @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
   @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
 
   modeModal : boolean = false; //Variable que validará cuando el componente aparezca en un modal
@@ -71,6 +68,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
   inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario de rollos detallado
   modalInventarioDespacho : boolean = false; //Variable que validará cuando se muestra el modal de inventario de rollos despachados
+  ArrayDatosProcesos = [];
+  ArrayDatosAgrupados : any [] = [] //variable que va a almacenar todos los agrupados de la OT en el proceso seleccionado
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -81,9 +80,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                           private servicioBagPro : BagproService,
                             private usuarioService : UsuarioService,
                               private clientesService : ClientesService,
-                                private messageService: MessageService,
-                                  private shepherdService: ShepherdService,
-                                    private msj : MensajesAplicacionService) {
+                                private shepherdService: ShepherdService,
+                                  private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -567,7 +565,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       if(data.length > 0) {
         this.modalProcesos = true;
         setTimeout(() => {
-          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
+          this.ArrayDatosProcesos = [];
           for (let index = 0; index < data.length; index++) {
             this.llenarTablaProcesos(data[index]);
           }
@@ -576,7 +574,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     });
     //Datos consolidados
     setTimeout(() => {
-      this.MostrarDatosOTxStatus.ArrayDatosAgrupados = this.MostrarDatosOTxStatus.ArrayDatosProcesos.reduce((array, objeto) => {
+      this.ArrayDatosAgrupados = this.ArrayDatosProcesos.reduce((array, objeto) => {
         let info : any = { 
           Operador : objeto.Operador, 
           Fecha : objeto.Fecha, 
@@ -591,7 +589,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         } else array.push(info);
         return array;
       }, []);
-      this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+      this.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
     }, 2000);
   }
 
@@ -610,14 +608,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("0:00:00", ""),//+ datos.hora,
       Hora : datos.hora,
     }
-    this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+    this.ArrayDatosProcesos.push(Info);
   }
 
   // Funcion que se encargará de limpiar los campos del modal de procesos
   limpiarModalProcesos(){
     this.modalProcesos = false;
-    this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
+    this.ArrayDatosProcesos = [];
+    this.ArrayDatosAgrupados = [];
   }
 
   // Funcion que va a añadir una falla o observacion a una ot

@@ -77,11 +77,11 @@ import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoar
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
 import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
+import { Dashboard_ComprasComponent } from './Vistas/Dashboard_Compras/Dashboard_Compras.component';
 import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_Costos.component';
 import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
 import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
-import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
@@ -169,7 +169,6 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Dashboard_ComprasComponent } from './Vistas/Dashboard_Compras/Dashboard_Compras.component';
 
 @NgModule({
   declarations: [
@@ -215,7 +214,6 @@ import { Dashboard_ComprasComponent } from './Vistas/Dashboard_Compras/Dashboard
     PreIngresoRollosExtrusionComponent,
     PreIngresoRolloSelladoComponent,
     InventarioProductosPBDDComponent,
-    DatosOTStatusComponent,
     Reporte_RecuperadoMPComponent,
     Modal_RptRecuperadoMPComponent,
     IngresoRollos_ExtrusionComponent,
