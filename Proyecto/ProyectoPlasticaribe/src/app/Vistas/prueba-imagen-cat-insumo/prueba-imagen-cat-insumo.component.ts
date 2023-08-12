@@ -86,10 +86,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
           Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
         }
-        console.log(modelo)
+        this.srvVistaPermisos.Post(modelo).subscribe(data => { this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`) },
+        error => { this.msjs.mensajeConfirmacion(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las rutas no pueden contener espacios, por favor, verifique!`);
-      //this.srvVistaPermisos.Post(modelo).subscribe(data => { this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`) },
-      //error => { this.msjs.mensajeConfirmacion(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); })
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe completar los campos vacios!`);
   }
 
