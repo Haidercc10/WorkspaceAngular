@@ -400,7 +400,7 @@ export class RegistroComponentComponent implements OnInit {
     this.formRoles = this.formBuilder.group({
       rolNombre : [null, Validators.required],
       rolDescripcion : [null, Validators.required],
-      Vistas : [null, Validators.required], 
+      Vistas : [null, Validators.required],
     })
   }
 
@@ -422,7 +422,7 @@ export class RegistroComponentComponent implements OnInit {
         else {
           const roles : modelRol = { RolUsu_Id : 0, RolUsu_Nombre : nombreRol, RolUsu_Descripcion : descripcionRol, }
           const tipoUsu : modelTipoUsuario = { tpUsu_Id: 0, tpUsu_Nombre: nombreRol, tpUsu_Descripcion: descripcionRol, }
-          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => { 
+          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {
             this.crearTipo_Usuario(tipoUsu);
             this.insertarPermisos(dataRol.rolUsu_Id);
           }, () => this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`));
@@ -514,6 +514,7 @@ export class RegistroComponentComponent implements OnInit {
         })
       });
     });
+    console.log(this.vistasAplicacion);
   }
 
   // Funcion que va a insertar la información de un rol en la tabla permisos
@@ -536,7 +537,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-  // Funcion que va a cargar la información de un rol en el formulario de roles 
+  // Funcion que va a cargar la información de un rol en el formulario de roles
   cargarRoles_Formulario(rol : any){
     this.accionDialogoNuevo = 'Rol';
     this.modalRol = true;
@@ -551,7 +552,7 @@ export class RegistroComponentComponent implements OnInit {
       this.vistasPermisosService.Get_By_Rol(rol).subscribe((data : any) => {
         data.forEach(element => this.vistasAplicacion.filter(item => item.key == element.id).forEach(item => this.vistasSeleccionadas.push(item)));
       });
-    });  
+    });
   }
 
   // Funcion que va a editar la información de un rol
@@ -576,7 +577,7 @@ export class RegistroComponentComponent implements OnInit {
       datos.forEach(element => nombreVistas.push(element.nombre));
       let nombreVistasSeleccionadas : any = [];
       this.vistasSeleccionadas.forEach(element => nombreVistasSeleccionadas.push(element.label));
-      
+
       this.vistasSeleccionadas.filter(item => !nombreVistas.includes(item.label)).forEach(vista => {
         this.vistasPermisosService.Get_By_Id(vista.key).subscribe(data => {
           const info : modelVistasPermisos = {

@@ -14,6 +14,8 @@ export class Vistas_PermisosService {
 
     Get_Todo = () : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos`);
 
+    Get_VistasDistintas = () : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/get_VistasDistintas`);
+
     Get_By_Id = (id : any) : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`);
 
     GetPermisos = (rol : any, ruta : any) : Observable<any> => this.http.get(`${rutaPlasticaribeAPI}/Vistas_Permisos/get_permisos/${rol}/${ruta}`);
@@ -31,4 +33,4 @@ export class Vistas_PermisosService {
     Put = (id : any, data : modelVistasPermisos) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`, data);
 
     Delete = (id : any) : Observable<any> => this.http.delete(`${rutaPlasticaribeAPI}/Vistas_Permisos/${id}`);
-}  
+}
