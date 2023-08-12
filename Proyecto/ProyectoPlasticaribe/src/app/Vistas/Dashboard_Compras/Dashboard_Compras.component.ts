@@ -174,6 +174,7 @@ export class Dashboard_ComprasComponent implements OnInit {
       let numDatos = 0;
       data.forEach(prov => {
         let info : any = {
+          Id : numDatos + 1,
           Id_Proveedor : prov.id_Proveedor,
           Proveedor : prov.proveedor,
           Costo : prov.costo,
@@ -239,18 +240,15 @@ export class Dashboard_ComprasComponent implements OnInit {
         data.filter(prov => prov.periodo.trim().endsWith('11')).reduce((a, b) => a + b.costo, 0),
         data.filter(prov => prov.periodo.trim().endsWith('12')).reduce((a, b) => a + b.costo, 0),
       ];
-      id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado) ? this.llenarGraficaPlasticaribe(costoAnio) : null;
-      id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado) ? this.llenarGraficaInvergoal(costoAnio) : null;
-      id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado) ? this.llenarGraficaInversuez(costoAnio) : null;
+      this.llenarGraficaPlasticaribe(costoAnio, id);
       this.cargando = false;
     });
   }
 
   // Funcion que va a cargar los datos de la grafica
-  llenarGraficaPlasticaribe(data){
-    this.anioGraficadoPlasticaribe.push(this.anioSeleccionado);
+  llenarGraficaPlasticaribe(data : any [], id : string){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
-    this.graficaComprasPlasticaribe.datasets.push({
+    let info = {
       label: `Año - ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',
@@ -261,43 +259,17 @@ export class Dashboard_ComprasComponent implements OnInit {
       pointHoverRadius: 15,
       fill : true,
       tension: 0.3
-    });
-  }
-
-  // Funcion que va a cargar los datos de la grafica
-  llenarGraficaInvergoal(data){
-    this.anioGraficadoInvergoal.push(this.anioSeleccionado);
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
-    this.graficaComprasInvergoal.datasets.push({
-      label: `Año - ${this.anioSeleccionado}`,
-      data: data,
-      yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
-      pointStyle: 'rectRot',
-      pointRadius: 10,
-      pointHoverRadius: 15,
-      fill : true,
-      tension: 0.3
-    });
-  }
-
-  // Funcion que va a cargar los datos de la grafica
-  llenarGraficaInversuez(data){
-    this.anioGraficadoInversuez.push(this.anioSeleccionado);
-    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
-    this.graficaComprasInversuez.datasets.push({
-      label: `Año - ${this.anioSeleccionado}`,
-      data: data,
-      yAxisID: 'y',
-      borderColor: color.substring(0, 4),
-      backgroundColor: color.substring(0, 4) + "2",
-      pointStyle: 'rectRot',
-      pointRadius: 10,
-      pointHoverRadius: 15,
-      fill : true,
-      tension: 0.3
-    });
+    };
+    if (id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
+      this.anioGraficadoPlasticaribe.push(this.anioSeleccionado);
+      this.graficaComprasPlasticaribe.datasets.push(info);
+    } else if (id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
+      this.anioGraficadoInvergoal.push(this.anioSeleccionado);
+      this.graficaComprasInvergoal.datasets.push(info);
+    } else if (id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
+      this.anioGraficadoInversuez.push(this.anioSeleccionado);
+      this.graficaComprasInversuez.datasets.push(info);
+    }
   }
 
   /** Función que cargará el detalle de las facturas con sus materias primas y valores*/
@@ -317,5 +289,4 @@ export class Dashboard_ComprasComponent implements OnInit {
       }
     });
   }
-
 }

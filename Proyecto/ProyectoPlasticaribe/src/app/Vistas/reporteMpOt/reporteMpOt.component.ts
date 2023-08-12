@@ -892,7 +892,6 @@ export class ReporteMpOtComponent implements OnInit {
       porcentaje_perdidaEmp = ((this.cantidadTotalEmpaque * 100) / cantTotalAsignadaEmpaque);
       porcentaje_perdidaLam = ((this.cantidadTotalLaminado * 100) / cantTotalAsignadaLaminado);
       porcentaje_perdidaWik = ((this.cantidadTotalWiketiado * 100) / cantTotalAsignadaWiketiado);
-      console.log(porcentaje_perdidaExt);
       this.porcentajeTotal
 
   }

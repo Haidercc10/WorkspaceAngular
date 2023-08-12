@@ -110,7 +110,7 @@ export const routes: Routes = [
 
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
   {path: 'ordenes-trabajo', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Trabajo'}, component: OrdenesTrabajoComponent},
-  {path: 'reportes-procesos-ot', canActivate: [VistasPermisosGuard], data: {nombre: 'reportes-procesos-ot'}, component: Reporte_Procesos_OTComponent},
+  {path: 'reportes-procesos-ot', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Procesos OT'}, component: Reporte_Procesos_OTComponent},
 
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   {path: 'IngresoRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Rollos'}, component : Ingreso_Rollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.

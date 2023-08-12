@@ -579,96 +579,50 @@ export class DashboardOTComponent implements OnInit {
   mostrarModalEstados(estado : string){
     this.modalEstadosOrdenes = true;
     this.modalEstadosProcesos_OT.modeModal = true;
+    this.modalEstadosProcesos_OT.formularioOT.reset()
     if (estado == 'Abierta') {
       this.nombreModalEstados = 'Ordenes de Trabajo Abiertas y No Iniciadas';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 15,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     } else if (estado == 'Asignada') {
       this.nombreModalEstados = 'Ordenes de Trabajo Asignadas y No Iniciadas';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 14,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     } else if (estado == 'En proceso') {
       this.nombreModalEstados = 'Ordenes de Trabajo En Proceso';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 16,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     } else if (estado == 'Terminada') {
       this.nombreModalEstados = 'Ordenes de Trabajo Terminadas';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 17,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     } else if (estado == 'Anulado') {
       this.nombreModalEstados = 'Ordenes de Trabajo Anuladas';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 13,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     } else if (estado == 'Cerrada') {
       this.nombreModalEstados = 'Ordenes de Trabajo Cerradas';
-      this.modalEstadosProcesos_OT.formularioOT.setValue({
-        idDocumento : null,
+      this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 18,
-        fallasOT : null,
-        ObservacionOT : '',
-        Vendedor : '',
-        cliente : null,
-        Id_Vendedor : null,
-        producto : null,
       });
-      this.modalEstadosProcesos_OT.consultarOT();
     }
+    this.modalEstadosProcesos_OT.consultarInformacionOrdenesTrabajo();
   }
 }

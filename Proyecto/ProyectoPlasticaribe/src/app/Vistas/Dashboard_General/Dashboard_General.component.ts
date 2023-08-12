@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { Facturas_Invergoal_InversuezService } from 'src/app/Servicios/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.service';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
@@ -48,13 +49,19 @@ export class Dashboard_GeneralComponent implements OnInit {
   inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de materia prima
   inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de productos
 
+  anioGraficadoPlasticaribe : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de plasticaribe
+  anioGraficadoInvergoal : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de invergoal
+  anioGraficadoInversuez : number [] = []; //Variable que va a almacenar los años que se han graficado para el tab de inversuez
+  facturasNoHabilitadas : string [] = []; //Variable que almacenará las facturas que no se deben sumar y/o mostrar
+
   constructor(private AppComponent : AppComponent,
                 private zeusService : InventarioZeusService,
                   private msj : MensajesAplicacionService,
                     private zeusContabilidad : ZeusContabilidadService,
                       private inventarioMatPrima : InventInicialDiaService,
                         private inventarioProductos : Inventario_Mes_ProductosService,
-                          private shepherdService: ShepherdService,) {
+                          private shepherdService: ShepherdService,
+                            private srvFacturasGoalSuez : Facturas_Invergoal_InversuezService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -156,52 +163,52 @@ export class Dashboard_GeneralComponent implements OnInit {
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
-    
+
     this.graficaFacturacion = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCuentas_Cobrar = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCuentas_Pagar_Plasticaribe = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCuentas_Pagar_Invergoal = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCuentas_Pagar_Inversuez = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCompras_Plasticaribe = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCompras_Invergoal = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaCompras_Inversuez = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaInventario_MatPrima = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
-    
+
     this.graficaInventario_Productos = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
@@ -211,10 +218,13 @@ export class Dashboard_GeneralComponent implements OnInit {
   // Funcion que va a llamar a las funciones que se encargaran de llenar las graficas
   llenarGraficas(){
     this.cargando = true;
+    this.consultarFacturasNoHabilitadas();
     this.BuscarDatosGraficaFacturacion();
     this.BuscarDatosGraficaCuentas_Cobrar();
     this.BuscarDatosGraficaCuentas_Pagar();
-    this.BuscarDatosGrafica_Compras();
+    this.BuscarDatosGrafica_Compras('0');
+    this.BuscarDatosGrafica_Compras('900362200');
+    this.BuscarDatosGrafica_Compras('900458314');
     this.BuscarDatosGraficaInventario_MatPrima();
     this.BuscarDatosGraficaInventario_Producto();
     setTimeout(() => this.cargando = false, 5000);
@@ -326,7 +336,7 @@ export class Dashboard_GeneralComponent implements OnInit {
   BuscarDatosGraficaCuentas_Pagar(){
     let index : number = this.cuentas_Pagar_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
     if (index == -1) {
-      let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];      
+      let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       let costoMeses_Invergoal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       let costoMeses_Inversuez : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.zeusContabilidad.GetCostosProveedores_Mes_Mes(this.anioSeleccionado.toString(), '220505').subscribe(dato => {
@@ -347,7 +357,7 @@ export class Dashboard_GeneralComponent implements OnInit {
               numMes == '11' ? 0 - mes.costo : costoMeses_Plasticaribe[10],
               numMes == '12' ? 0 - mes.costo : costoMeses_Plasticaribe[11],
             ];
-          
+
             let info_Plasticaribe : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Plasticaribe : number = this.cuentas_Pagar_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
             if (index_Plasticaribe != -1) this.cuentas_Pagar_Anios_Plasticaribe[index_Plasticaribe].costo += (0 - mes.costo);
@@ -367,7 +377,7 @@ export class Dashboard_GeneralComponent implements OnInit {
               numMes == '11' ? 0 - mes.costo : costoMeses_Invergoal[10],
               numMes == '12' ? 0 - mes.costo : costoMeses_Invergoal[11],
             ];
-          
+
             let info_Invergoal : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Invergoal : number = this.cuentas_Pagar_Anios_Invergoal.findIndex(item => item.anio == this.anioSeleccionado);
             if (index_Invergoal != -1) this.cuentas_Pagar_Anios_Invergoal[index_Invergoal].costo += (0 - mes.costo);
@@ -387,11 +397,11 @@ export class Dashboard_GeneralComponent implements OnInit {
               numMes == '11' ? 0 - mes.costo : costoMeses_Inversuez[10],
               numMes == '12' ? 0 - mes.costo : costoMeses_Inversuez[11],
             ];
-          
+
             let info_Inversuez : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
             let index_Inversuez : number = this.cuentas_Pagar_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
             if (index_Inversuez != -1) this.cuentas_Pagar_Anios_Inversuez[index_Inversuez].costo += (0 - mes.costo);
-            else this.cuentas_Pagar_Anios_Inversuez.push(info_Inversuez);   
+            else this.cuentas_Pagar_Anios_Inversuez.push(info_Inversuez);
           }
         });
         this.llenarGraficaCuentas_Pagar_Plasticaribe(costoMeses_Plasticaribe);
@@ -452,87 +462,43 @@ export class Dashboard_GeneralComponent implements OnInit {
     });
   }
 
-  // Funcion que va a buscar los datos de las compras
-  BuscarDatosGrafica_Compras(){
-    let index : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
-    if (index == -1) {
-      let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];      
-      let costoMeses_Invergoal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
-      let costoMeses_Inversuez : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+  //.Función que consultará las facturas de papel, Si en zeus hay algunas que contengan el mismo código de factura, se les excluirá el costo.
+  consultarFacturasNoHabilitadas = () => this.srvFacturasGoalSuez.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
 
-      this.zeusService.GetComprasMes_Mes_Plasticaribe(this.anioSeleccionado).subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Plasticaribe = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Plasticaribe[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Plasticaribe(costoMeses_Plasticaribe);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Plasticaribe.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Plasticaribe[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Plasticaribe.push(info_Anio); 
-        }
-      });
-      this.zeusService.GetComprasMes_Mes_InverGoal_InverSuez(this.anioSeleccionado, '900362200').subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Invergoal = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Invergoal[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Invergoal[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Invergoal[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Invergoal[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Invergoal[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Invergoal[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Invergoal[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Invergoal[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Invergoal[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Invergoal[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Invergoal[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Invergoal[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Invergoal(costoMeses_Invergoal);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Invergoal.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Invergoal[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Invergoal.push(info_Anio);
-        }
-      });
-      this.zeusService.GetComprasMes_Mes_InverGoal_InverSuez(this.anioSeleccionado, '900458314').subscribe(dato => {
-        for (let i = 0; i < dato.length; i++) {
-          let info : any = JSON.parse(`{${dato[i].replaceAll("'", '"')}}`);
-          costoMeses_Inversuez = [
-            i == 0 ? parseFloat(info.Valor) : costoMeses_Inversuez[0],
-            i == 1 ? parseFloat(info.Valor) : costoMeses_Inversuez[1],
-            i == 2 ? parseFloat(info.Valor) : costoMeses_Inversuez[2],
-            i == 3 ? parseFloat(info.Valor) : costoMeses_Inversuez[3],
-            i == 4 ? parseFloat(info.Valor) : costoMeses_Inversuez[4],
-            i == 5 ? parseFloat(info.Valor) : costoMeses_Inversuez[5],
-            i == 6 ? parseFloat(info.Valor) : costoMeses_Inversuez[6],
-            i == 7 ? parseFloat(info.Valor) : costoMeses_Inversuez[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses_Inversuez[8],
-            i == 9 ? parseFloat(info.Valor) : costoMeses_Inversuez[9],
-            i == 10 ? parseFloat(info.Valor) : costoMeses_Inversuez[10],
-            i == 11 ? parseFloat(info.Valor) : costoMeses_Inversuez[11],
-          ];
-          if (i == 11) this.llenarGrafica_Compras_Inversuez(costoMeses_Inversuez);
-          let info_Anio : any = { anio: this.anioSeleccionado, costo : parseFloat(info.Valor) };
-          let index2 : number = this.compras_Anios_Inversuez.findIndex(item => item.anio == this.anioSeleccionado);
-          if (index2 != -1) this.compras_Anios_Inversuez[index2].costo += parseFloat(info.Valor);
-          else this.compras_Anios_Inversuez.push(info_Anio);
-        }
-      });
-    }
+   // Funcion que va a buscar los datos de las compras
+  BuscarDatosGrafica_Compras(id : string){
+    this.zeusContabilidad.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, id).subscribe(data => {
+      let costoAnio : any = [
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0),
+        data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0),
+      ];
+
+      if(id == '0' && !this.anioGraficadoPlasticaribe.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Plasticaribe(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Plasticaribe.push(info);
+      } else null;
+      if(id == '900362200' && !this.anioGraficadoInvergoal.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Invergoal(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Invergoal.push(info);
+      } else null;
+      if(id == '900458314' && !this.anioGraficadoInversuez.includes(this.anioSeleccionado)) {
+        this.llenarGrafica_Compras_Inversuez(costoAnio);
+        let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
+        this.compras_Anios_Inversuez.push(info);
+      } else null;
+    });
   }
 
   // Funcion que va a llenar la grafica de compras de plasticaribe
@@ -551,7 +517,7 @@ export class Dashboard_GeneralComponent implements OnInit {
       tension: 0.3
     });
   }
-  
+
   // Funcion que va a llenar la grafica de compras de invergoal
   llenarGrafica_Compras_Invergoal(data){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);

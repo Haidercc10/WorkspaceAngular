@@ -143,7 +143,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
       } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
     }, error => { this.msj.mensajeError(`Error`, `Error al consultar registros de solicitudes de material`)} );
     setTimeout(() => { this.cargando = false; }, 1500);
-    console.log(this.arrayId);
   }
 
   /** Llenar array con los registros del encabezado de las solicitudes de materia prima. */
@@ -206,7 +205,6 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(datos_solicitud : any){
     let index = this.arrayId.indexOf(this.solicitudSeleccionada);
-    console.log(index)
     let [id, ot, fecha, estado] = [this.arrayRegistros[index].id, this.arrayRegistros[index].ot, this.arrayRegistros[index].fecha, this.arrayRegistros[index].estado];
     let nombre : string = this.AppComponent.storage_Nombre;
     //this.servicioDetlSolMP_Extrusion.getSolicitudMp_Extrusion(this.nroSolicitud).subscribe(datos_solicitud => {

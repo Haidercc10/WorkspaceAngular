@@ -4,21 +4,19 @@ import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { Detalle_BodegaRollosService } from 'src/app/Servicios/Detalle_BodegaRollos/Detalle_BodegaRollos.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReportesProcesosOT as defaultSteps } from 'src/app/data';
-import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
-import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,12 +30,11 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 
 export class Reporte_Procesos_OTComponent implements OnInit {
 
-  @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
   @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
-  @ViewChild(ReportePedidos_ZeusComponent) ReportePedidos_Zeus : ReportePedidos_ZeusComponent;
 
   modeModal : boolean = false; //Variable que validará cuando el componente aparezca en un modal
 
+  @ViewChild('dt') dt: Table | undefined;
   formularioOT !: FormGroup; //Variable de tipo formulario
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -69,19 +66,22 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   infoColor : string = ''; /** Variable que servirá para mostrar la descripción de cada color */
   @ViewChild('op') op: OverlayPanel | undefined;
   ordenesSeleccionadas : any [] = []; //Variable que se utilizará para almacenar las ordenes de trabajo que hayan sido elegidas
+  inventarioDetallado : any [] = []; //Vaariable que almacenará la información del inventario de rollos detallado
+  modalInventarioDespacho : boolean = false; //Variable que validará cuando se muestra el modal de inventario de rollos despachados
+  ArrayDatosProcesos = [];
+  ArrayDatosAgrupados : any [] = [] //variable que va a almacenar todos los agrupados de la OT en el proceso seleccionado
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private fallasTecnicasService : FallasTecnicasService,
                     private estadosProcesos_OTService : EstadosProcesos_OTService,
-                      private srvEstadosOTVendedores : EstadosProcesosOTxVendedoresService,
+                      private bgRollosService : Detalle_BodegaRollosService,
                         private estadosService : EstadosService,
                           private servicioBagPro : BagproService,
                             private usuarioService : UsuarioService,
                               private clientesService : ClientesService,
-                                private messageService: MessageService,
-                                  private shepherdService: ShepherdService,
-                                    private msj : MensajesAplicacionService) {
+                                private shepherdService: ShepherdService,
+                                  private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -99,10 +99,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.obtenerClientes();
+    this.obtenerVendedores();
     this.ObternerFallas();
     this.obtenerEstados();
-    this.obtenerVendedores();
-    this.obtenerClientes();
+    setTimeout(() => this.validarVendedor(), 500);
   }
 
   tutorial(){
@@ -121,11 +122,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpiará todos los campos de la vista
   limpiarCampos(){
@@ -139,6 +136,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
     this.otSeleccionada = 0;
+    this.validarVendedor();
   }
 
   // Funcion que exportará a excel todo el contenido de la tabla
@@ -208,7 +206,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
 
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -417,29 +415,33 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   // Funcion que obtendrá los clientes
-  obtenerClientes(){
-    this.clientesService.srvObtenerLista().subscribe(datos_clientes => { this.clientes = datos_clientes; });
-    this.clientes.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-  }
+  obtenerClientes = () => this.clientesService.srvObtenerLista().subscribe(datos_clientes => this.clientes = datos_clientes);
 
   // Funcion que nu cliente y guardará su id y mostrará en el campo el nombre
   selectEventCliente = () => this.formularioOT.patchValue({ cliente : this.clientes.filter((item) => item.cli_Id == this.formularioOT.value.cliente)[0].cli_Nombre, });
 
   // Funcion que traerá los vendedores
-  obtenerVendedores(){
-    this.vendedores = [];
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let i = 0; i < datos_usuarios.length; i++) {
-        if (datos_usuarios[i].rolUsu_Id == 2) this.vendedores.push(datos_usuarios[i]);
-        this.vendedores.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
-      }
-    });
-  }
+  obtenerVendedores = () => this.usuarioService.GetVendedores().subscribe(datos => this.vendedores = datos);
 
   // Funcion que va a llenar y buscar el campos vendedor
   buscarVendedor(){
     let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == this.formularioOT.value.Vendedor);
-    this.formularioOT.patchValue({ Vendedor : nuevo[0].usua_Nombre, Id_Vendedor : nuevo[0].usua_Id, });
+    this.formularioOT.patchValue({
+      Vendedor : nuevo[0].usua_Nombre,
+      Id_Vendedor : nuevo[0].usua_Id,
+    });
+  }
+
+  // Funcion que va a validar la que un vendedor sea quien inició sesión
+  validarVendedor(){
+    if (this.ValidarRol == 2) {
+      this.vendedores = this.vendedores.filter(item => item.usua_Id == this.storage_Id);
+      this.formularioOT.value.Vendedor = this.vendedores[0].usua_Id;
+      this.buscarVendedor();
+      this.clientes = this.clientes.filter(item => item.usua_Id == this.storage_Id);
+    }
+    this.vendedores.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+    this.clientes.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
   }
 
   // Funcion que mostrará las posibles fallas que puede tener una orden de trabajo en produccion
@@ -447,26 +449,28 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion que consultará los estados para ordenes de trabajo
   obtenerEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      this.estados = datos_estados.filter((item) => item.tpEstado_Id == 4 || item.estado_Id == 3);
+    this.estadosService.srvObtenerListaEstados().subscribe(datos => {
+      this.estados = datos.filter((item) => [3,4].includes(item.tpEstado_Id));
       this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
     })
   }
+  
+  /** Función que cargará el bopp agrupado por el génerico */
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //Funcion que consultará las ordenes de trabajo dependiendo de los filtros que se le pasen
-  consultarOT(){
+  consultarInformacionOrdenesTrabajo(){
     this.load = false;
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
-    let numOT : number = this.formularioOT.value.idDocumento;
-    let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
+    let ot : number = this.formularioOT.value.idDocumento;
+    let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? moment('2022-01-25').format('YYYY-MM-DD') : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
     let vendedor : any = this.formularioOT.value.Id_Vendedor;
     let cliente : any = this.formularioOT.value.cliente;
     let producto : any = this.formularioOT.value.producto;
-    if (this.ValidarRol == 2) vendedor = this.storage_Id;
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -475,246 +479,33 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
     let ruta : string = '';
-    let masDeUnFiltros : boolean = true;
-    if (fechaincial == 'Fecha inválida') fechaincial = null;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
 
-    //6
-    if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    //5
-    else if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    else if (numOT != null && fallas != null && estado != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    else if (numOT != null && fallas != null && estado != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}`;
-    else if (numOT != null && fallas != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
-    else if (numOT != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
-    else if (fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    //4
-    else if (numOT != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&vendedor=${vendedor}`;
-    else if (numOT != null && estado != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&estado=${estado}`;
-    else if (numOT != null && estado != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
-    else if (numOT != null && estado != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&estado=${estado}&vendedor=${vendedor}`;
-    else if (numOT != null && fallas != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}`;
-    else if (numOT != null && fallas != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
-    else if (numOT != null && fallas != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&vendedor=${vendedor}`;
-    else if (numOT != null && fallas != null && estado != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&estado=${estado}`;
-    else if (numOT != null && fallas != null && estado != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&estado=${estado}`;
-    else if (numOT != null && fallas != null && estado != null && vendedor != null) ruta = `?ot=${numOT}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    else if (estado != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
-    else if (fallas != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
-    //3
-    else if (numOT != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}`;
-    else if (numOT != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&vendedor=${vendedor}`;
-    else if (numOT != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&vendedor=${vendedor}`;
-    else if (numOT != null && estado != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&estado=${estado}`;
-    else if (numOT != null && estado != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&estado=${estado}`;
-    else if (numOT != null && fallas != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}`;
-    else if (numOT != null && fallas != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}`;
-    else if (numOT != null && fallas != null && estado != null) ruta = `?ot=${numOT}&falla=${fallas}&estado=${estado}`;
-    else if (numOT != null && estado != null && vendedor != null) ruta = `?ot=${numOT}&estado=${estado}&vendedor=${vendedor}`;
-    else if (vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&vendedor=${vendedor}`;
-    else if (estado != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&estado=${estado}`;
-    else if (estado != null && vendedor != null && producto != null) ruta = `?prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
-    else if (estado != null && vendedor != null && cliente != null) ruta = `?cli=${cliente}&estado=${estado}&vendedor=${vendedor}`;
-    else if (fallas != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}`;
-    else if (fallas != null && vendedor != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
-    else if (fallas != null && vendedor != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}&vendedor=${vendedor}`;
-    else if (fallas != null && estado != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}&estado=${estado}`;
-    else if (fallas != null && estado != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}&estado=${estado}`;
-    else if (fallas != null && estado != null && vendedor != null) ruta = `?falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
-    else if (numOT != null && fechaincial != null && fechaFinal != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
-      masDeUnFiltros = false;
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { this.msj.mensajeAdvertencia(`Advertencia`, 'Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-      else if (fechaFinal < fechaincial) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','La fecha final debe ser mayor que la fecha inicial');}, 4800);
-      else {
-        this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-          if(datos_ot.length == 0) {setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','No existen OTs creadas en las fechas consultadas.')}, 4800);
-          } else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              });
-            }
-          }
-        });
-      }
-    } else if (fechaincial != null && fechaFinal != null && fallas != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasFallas(fechaincial, fechaFinal, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && estado != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    }
-    //2
-    else if (numOT != null && fallas != null) ruta = `?ot=${numOT}&falla=${fallas}`;
-    else if (numOT != null && estado != null) ruta = `?ot=${numOT}&estado=${estado}`;
-    else if (numOT != null && vendedor != null) ruta = `?ot=${numOT}&vendedor=${vendedor}`;
-    else if (numOT != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}`;
-    else if (numOT != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}`;
-    else if (fallas != null && estado != null) ruta = `?falla=${fallas}&estado=${estado}`;
-    else if (fallas != null && vendedor != null) ruta = `?falla=${fallas}&vendedor=${vendedor}`;
-    else if (fallas != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}`;
-    else if (fallas != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}`;
-    else if (estado != null && vendedor != null) ruta = `?estado=${estado}&vendedor=${vendedor}`;
-    else if (estado != null && cliente != null) ruta = `?cli=${cliente}&estado=${estado}`;
-    else if (estado != null && producto != null) ruta = `?prod=${producto}&estado=${estado}`;
-    else if (vendedor != null && cliente != null) ruta = `?cli=${cliente}&vendedor=${vendedor}`;
-    else if (vendedor != null && producto != null) ruta = `?prod=${producto}&vendedor=${vendedor}`;
-    else if (cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}`;
-    //1
-    else if (numOT != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!','No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (fallas != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!','No se encontraron OTs con la falla consultada.'); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (vendedor != null) {
-      masDeUnFiltros = false;
-      this.srvEstadosOTVendedores.consultarPorFechasVendedor(this.today, this.today, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`); }, 4800);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i]);
-              }
-            });
-          }
-        }
-      });
-    } else if (estado != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorOtEstado(estado).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Estado consultado.`);}, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (cliente != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorCliente(cliente).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el Cliente consultado.`);}, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (producto != null) {
-      masDeUnFiltros = false;
-      this.estadosProcesos_OTService.srvObtenerListaPorProductos(producto).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {this.msj.mensajeAdvertencia('¡Advertencia!',`No se encontraron OT's con el producto consultado.`);}, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    }
-    //0
-    else ruta = '';
-    setTimeout(() => {
-      if (masDeUnFiltros == true){
-      if(fechaincial == null) fechaincial = this.today;
-      if(fechaFinal == null) fechaFinal = fechaincial;
-        this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal, ruta).subscribe(datos_ot => {
-          if (datos_ot.length == 0) setTimeout(() => { this.msj.mensajeAdvertencia('¡Advertencia!',`¡No se encontraron Ordenes de Trabajo con los parametros consultados!`); }, 3000);
-          else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        });
-      }
-    }, 1500);
+    if (ot != null) ruta += `ot=${ot}`;
+    if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
+    if (producto != null) ruta.length > 0 ? ruta += `&prod=${producto}` : ruta += `prod=${producto}`;
+    if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
+    if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
+    if (fallas != null) ruta.length > 0 ? ruta += `&falla=${fallas}` : ruta += `falla=${fallas}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
 
-    setTimeout(() => { this.load = true; }, 2500);
+    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
+      data.forEach(infoOt => this.llenarArray(infoOt));
+    }, error => {
+      this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
+      this.load = true;
+    });
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
   llenarArray(data : any){
-    data.usua_Id = `${data.usua_Id}`
-    if (data.usua_Id.length == 2) data.usua_Id = `0${data.usua_Id}`;
-    else if (data.usua_Id.length == 1) data.usua_Id = `00${data.usua_Id}`;
+    data.usua = `${data.usua}`
+    if (data.usua.length == 2) data.usua = `0${data.usua}`;
+    else if (data.usua.length == 1) data.usua = `00${data.usua}`;
+    
+    data.fecha = data.fecha != null ? data.fecha.replace('T00:00:00', '') : data.fecha;
+    data.fechaInicio = data.fechaInicio != null ? data.fechaInicio.replace('T00:00:00', '') : data.fechaInicio;
+    data.fechaFinal = data.fechaFinal != null ? data.fechaFinal.replace('T00:00:00', '') : data.fechaFinal;
 
-    if (data.estProcOT_FechaInicio == null) data.estProcOT_FechaInicio = data.estProcOT_FechaInicio
-    else data.estProcOT_FechaInicio = data.estProcOT_FechaInicio.replace("T00:00:00", "");
-
-    if (data.estProcOT_FechaFinal == null) data.estProcOT_FechaFinal = data.estProcOT_FechaFinal
-    else data.estProcOT_FechaFinal = data.estProcOT_FechaFinal.replace("T00:00:00", "");
-
-    let info : any = {
-      ot : data.estProcOT_OrdenTrabajo,
-      Mp : data.estProcOT_CantMatPrimaAsignada,
-      ext : data.estProcOT_ExtrusionKg,
-      imp : data.estProcOT_ImpresionKg,
-      rot : data.estProcOT_RotograbadoKg,
-      dbl : data.estProcOT_DobladoKg,
-      lam : data.estProcOT_LaminadoKg,
-      cor : data.estProcOT_CorteKg,
-      emp : data.estProcOT_EmpaqueKg,
-      sel : data.estProcOT_SelladoKg,
-      selUnd : data.estProcOT_SelladoUnd,
-      wik : data.estProcOT_WiketiadoKg,
-      wikUnd : data.estProcOT_WiketiadoUnd,
-      cant : data.estProcOT_CantidadPedida,
-      cantUnd : `${this.formatonumeros(data.estProcOT_CantidadPedida)} Kg - ${this.formatonumeros(data.estProcOT_CantidadPedidaUnd)} Und`,
-      falla : data.falla_Nombre,
-      obs : data.estProcOT_Observacion,
-      est : data.estado_Nombre,
-      fecha : data.estProcOT_FechaCreacion.replace("T00:00:00", ""),
-      entrada : this.formatonumeros(data.estProcOT_CantProdIngresada),
-      salida : this.formatonumeros(data.estProcOT_CantProdFacturada),
-      fechaInicio : data.estProcOT_FechaInicio,
-      fechaFinal : data.estProcOT_FechaFinal,
-      und : data.undMed_Id,
-      usu : data.usua_Id,
-      nombreUsu : data.usua_Nombre,
-      cli : data.estProcOT_Cliente,
-      prod : data.prod_Nombre,
-      ped : data.estProcOT_Pedido,
-    }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
       { header: 'Vendedor', field: 'usu' },
@@ -726,17 +517,45 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       { header: 'Fecha Fin OT', field: 'fechaFinal'}
     ];
 
-    this.ArrayDocumento.push(info);
+    this.ArrayDocumento.push(data);
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));
-    this.load = true;
 
-    if (data.estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
-    if (data.estado_Nombre == 'Asignada') this.cantidadOTAsignadas += 1;
-    if (data.estado_Nombre == 'Terminada') this.cantidadOTTerminada += 1;
-    if (data.estado_Nombre == 'En proceso') this.cantidadOTIniciada += 1;
-    if (data.estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
-    if (data.estado_Nombre == 'Finalizada') this.cantidadOTFinalizada += 1;
-    if (data.estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
+    if (data.est == 'Abierta') this.catidadOTAbiertas += 1;
+    if (data.est == 'Asignada') this.cantidadOTAsignadas += 1;
+    if (data.est == 'Terminada') this.cantidadOTTerminada += 1;
+    if (data.est == 'En proceso') this.cantidadOTIniciada += 1;
+    if (data.est == 'Anulado') this.cantidadOtAnulada += 1;
+    if (data.est == 'Finalizada') this.cantidadOTFinalizada += 1;
+    if (data.est == 'Cerrada') this.cantidadOTCerrada += 1;
+    this.load = true;
+  }
+
+  // Funcion que va a consultar la información de los rollos en despacho de una orden de trabajo
+  consultarRollosDespacho_OT(orden : number){
+    let num : number = 0;
+    this.inventarioDetallado = [];
+    this.bgRollosService.GetInventarioRollos_OrdenTrabajo(orden, 'DESP').subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        this.modalInventarioDespacho = true;
+        let info : any = {
+          Rollo: data[i].dtBgRollo_Rollo,
+          Orden: data[i].bgRollo_OrdenTrabajo,
+          Item: data[i].prod_Id,
+          Referencia: data[i].prod_Nombre,
+          Cantidad: data[i].dtBgRollo_Cantidad,
+          Presentacion: data[i].undMed_Id,
+          Fecha: data[i].bgRollo_FechaEntrada.replace('T00:00:00', ''),
+          Extrusion: data[i].dtBgRollo_Extrusion ? 'SI' : 'NO',
+          ProductoIntermedio: data[i].dtBgRollo_ProdIntermedio ? 'SI' : 'NO',
+          Impresion: data[i].dtBgRollo_Impresion ? 'SI' : 'NO',
+          Rotograbado: data[i].dtBgRollo_Rotograbado ? 'SI' : 'NO',
+          Sellado: data[i].dtBgRollo_Sellado ? 'SI' : 'NO',
+          Despacho: data[i].dtBgRollo_Despacho ? 'SI' : 'NO',
+        }
+        this.inventarioDetallado.push(info);
+        if (num == data.length) this.load = true;
+      }
+    }, () => this.load = true);
   }
 
   seleccionarOTxProceso(data: any , proceso : string) {
@@ -746,7 +565,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       if(data.length > 0) {
         this.modalProcesos = true;
         setTimeout(() => {
-          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
+          this.ArrayDatosProcesos = [];
           for (let index = 0; index < data.length; index++) {
             this.llenarTablaProcesos(data[index]);
           }
@@ -754,53 +573,49 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       } else this.msj.mensajeAdvertencia('Advertencia', `No se ha pesado ningún rollo en la OT N° ${this.otSeleccionada} en el proceso de ${proceso}`);
     });
     //Datos consolidados
-    this.servicioBagPro.GetDatosConsolidados(this.otSeleccionada, proceso).subscribe(data2 => {
-      if(data2.length > 0) {
-        setTimeout(() => {
-          this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
-          for (let i = 0; i < data2.length; i++) {
-            this.llenarTablaConsolidada(data2[i]);
-          }
-        }, 1000)
-      }
-    });
+    setTimeout(() => {
+      this.ArrayDatosAgrupados = this.ArrayDatosProcesos.reduce((array, objeto) => {
+        let info : any = { 
+          Operador : objeto.Operador, 
+          Fecha : objeto.Fecha, 
+          Peso : objeto.Peso, 
+          Producto : objeto.Producto, 
+          NroRollos : 1 
+        }
+        const objetoEncontrado = array.find(item => item.Operador == info.Operador && item.Fecha == info.Fecha);
+        if (objetoEncontrado) {
+          objetoEncontrado.Peso += info.Peso;
+          objetoEncontrado.NroRollos++;
+        } else array.push(info);
+        return array;
+      }, []);
+      this.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+    }, 2000);
   }
 
+  //Función que llenará la tabla de objetos.
   llenarTablaProcesos(datos : any){
     const Info : any = {
       Rollo : datos.rollo,
       Cliente : datos.cliente,
       Producto : datos.referencia,
-      Peso : datos.unidad != 'Kg' ? this.formatonumeros(datos.peso1) : this.formatonumeros(datos.peso2),
+      Peso : datos.unidad != 'Kg' ? datos.peso1 : datos.peso2,
       Unidad : datos.unidad,
       Operador : datos.operario,
       Maquina : datos.maquina,
       Turno : datos.turno,
       Status : datos.proceso,
-      Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("12:00:00 a.\u00A0m.", " ") + datos.hora,
+      Fecha : datos.proceso == 'SELLADO' ? datos.fecha : datos.fecha.replace("0:00:00", ""),//+ datos.hora,
+      Hora : datos.hora,
     }
-    this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-  }
-
-  llenarTablaConsolidada(datos_agrupados : any){
-    let info : any = {
-      Ot : datos_agrupados.ot,
-      Producto : datos_agrupados.referencia,
-      Operador : datos_agrupados.operario,
-      Peso : datos_agrupados.sumaCantidad1 != datos_agrupados.sumaCantidad2 ? this.formatonumeros(datos_agrupados.sumaCantidad1) : this.formatonumeros(datos_agrupados.sumaCantidad2),
-      Fecha : datos_agrupados.fecha.replace("12:00:00 a.\u00A0m.", " "),
-      Proceso : datos_agrupados.proceso,
-      Count : datos_agrupados.registros,
-    }
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+    this.ArrayDatosProcesos.push(Info);
   }
 
   // Funcion que se encargará de limpiar los campos del modal de procesos
   limpiarModalProcesos(){
     this.modalProcesos = false;
-    this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
+    this.ArrayDatosProcesos = [];
+    this.ArrayDatosAgrupados = [];
   }
 
   // Funcion que va a añadir una falla o observacion a una ot
@@ -836,9 +651,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
         }
         /**/
-        if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.")
+        if (falla == null) this.msj.mensajeAdvertencia('¡Advertencia!',"Debe seleccionar un tipo de falla.");
         else {
-          this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(datos_ot => {
+          this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(() => {
             this.msj.mensajeConfirmacion('¡Falla Agregada!', `¡Falla agregada a la OT ${this.otSeleccionada} con exito!`);
             this.limpiarCampos();
           });
@@ -854,24 +669,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     setTimeout(() => {
       this.reporteCostos.load = false;
       this.reporteCostos.modeModal = true;
-      this.reporteCostos.infoOT.setValue({
-        ot : ot,
-        cliente : '',
-        IdProducto : '',
-        NombreProducto : '',
-        cantProductoSinMargenUnd : '',
-        cantProductoSinMargenKg : '',
-        margenAdicional : '',
-        cantProductoConMargen : '',
-        PresentacionProducto : '',
-        ValorUnidadProductoUnd : '',
-        ValorUnidadProductoKg : '',
-        ValorEstimadoOt : '',
-        fechaInicioOT : '',
-        fechaFinOT : '',
-        estadoOT : '',
-      });
-      setTimeout(() => { this.reporteCostos.consultaOTBagPro(); }, 500);
+      this.reporteCostos.infoOT.patchValue({ot : ot});
+      setTimeout(() => this.reporteCostos.consultaOTBagPro(), 500);
     }, 500);
   }
 
@@ -909,7 +708,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     }
     setTimeout(() => {
       this.ordenesSeleccionadas = [];
-      this.consultarOT();
+      this.consultarInformacionOrdenesTrabajo();
     }, 2500);
   }
 
@@ -930,7 +729,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             usrCrea : datos_ot[i].usrCrea,
             estado : estadoFinal,
           }
-          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(datos_clientesOT => {
+          this.servicioBagPro.srvActualizar(this.ordenesSeleccionadas[i].ot, data, estadoFinal).subscribe(() => {
             this.msj.mensajeConfirmacion(`¡Orden de Trabajo Actualizada!`,`¡Se ha actualizado el estado de la Orden de Trabajo!`);
           });
         }
@@ -940,15 +739,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // cierra el modal de cambio de estado de ordenes de trabajo
   hideDialog = () => this.modalEstadosOT = false;
-
-  // Funcion que devolverá un mensaje de satisfactorio
-  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-
-  // Funcion que va a devolver un mensaje de error
-  mensajeError = (titulo : string, mensaje : any) => this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
-
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia = (titulo : string, mensaje : any) => this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
 
   // Función que mostrará la descripción de cada una de las card de los dashboard's
   mostrarDescripcion($event, color : string){

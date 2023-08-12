@@ -94,7 +94,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   }
 
   /** Cargar Inicialmente los estados del pedido/Mantenimiento */
-  inicializarFormularioEstados = () => this.formEstados.patchValue({ estado : null });
+  inicializarFormularioEstados = () => this.formEstados = this.frmBuilder.group({estado : [null, Validators.required]});
 
   /** Inicializar formulario de consulta de pedidos  */
   inicializarFormulario(){

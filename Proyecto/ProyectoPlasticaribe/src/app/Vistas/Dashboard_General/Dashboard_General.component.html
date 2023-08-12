@@ -11,13 +11,13 @@
                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5 m-auto">
                         <h5>¡Elige el año que deseas graficar!</h5>
                       </div>
-        
+
                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7">
                         <div class="row mb-4 justify-content-center">
                           <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-5" id="seleccionarAnio">
                             <p-dropdown class="mr-2"  [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
                           </div>
-        
+
                           <div class="p-2 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3" id="botonesGraficado">
                             <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficas()"></button>
                             <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="inicializarGraficas()"></button>
@@ -46,7 +46,7 @@
                 </p-toolbar>
             </p-card>
         </div>
-        
+
         <!-- Cuentas por Cobrar -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4" id="cuentasCobrar">
             <p-card>
@@ -54,7 +54,7 @@
                 <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCuentas_Cobrar" [options]="opcionesGrafica"></p-chart>
             </p-card>
         </div>
-        
+
         <!-- Cuentas por Pagar -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4" id="cuentasPagar">
             <p-card>
@@ -101,7 +101,7 @@
                 </p-tabView>
             </p-card>
         </div>
-        
+
         <!-- Compras -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-4" id="compras">
             <p-card>
@@ -113,9 +113,9 @@
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Plasticaribe" [options]="opcionesGrafica"></p-chart>
                         <p-toolbar>
                             <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Plasticaribe">
+                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Plasticaribe">
                                 <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
-                            </div>
+                              </div>
                             </div>
                         </p-toolbar>
                     </p-tabPanel>
@@ -126,9 +126,9 @@
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Invergoal" [options]="opcionesGrafica"></p-chart>
                         <p-toolbar>
                             <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Invergoal">
+                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Invergoal">
                                 <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
-                            </div>
+                              </div>
                             </div>
                         </p-toolbar>
                     </p-tabPanel>
@@ -137,11 +137,11 @@
                         header="Inversuez SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Inversuez" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
+                          <p-toolbar>
                             <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Inversuez">
+                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Inversuez">
                                 <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
-                            </div>
+                              </div>
                             </div>
                         </p-toolbar>
                     </p-tabPanel>
@@ -181,6 +181,6 @@
                     </p-tabPanel>
                 </p-tabView>
             </p-card>
-        </div>        
+        </div>
     </div>
 </div>
