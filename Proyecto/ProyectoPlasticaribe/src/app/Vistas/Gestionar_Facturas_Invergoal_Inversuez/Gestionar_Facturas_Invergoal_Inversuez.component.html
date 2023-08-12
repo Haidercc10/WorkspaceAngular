@@ -173,7 +173,7 @@
     </p-table>
     
     <!-- Modal Para cambiar el estado de la orden de trabajo -->
-    <p-dialog [(visible)]="modalEstados" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de Factura(s)" [modal]="true">
+    <p-dialog [(visible)]="modalEstados" [draggable]="false" [contentStyle]="{'overflow':'visible'}" [style]="{width: '350px'}" header="Cambio de estado de Factura(s)" [modal]="true">
         <ng-template pTemplate="content">
             <div class="p-field">
                 <label class="p-mb-3">Estados de las ordenes de trabajo</label>

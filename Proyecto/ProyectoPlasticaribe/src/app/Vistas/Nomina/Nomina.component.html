@@ -180,7 +180,7 @@
   </p-tabView>
 
   <!-- tabla detallada por operario(s) -->
-  <p-dialog [(visible)]="modalSellado" [style]="{width: '70vw'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
+  <p-dialog [(visible)]="modalSellado" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles de la nómina del operario {{operario}}" [modal]="true" styleClass="p-fluid">
     <ng-template pTemplate="content">
       <p-table
         #dtDetallada

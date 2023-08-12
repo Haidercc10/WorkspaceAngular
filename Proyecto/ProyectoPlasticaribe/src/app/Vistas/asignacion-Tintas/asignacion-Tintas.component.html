@@ -244,11 +244,11 @@
 </p-toast>
 
 <!--Modal para crear tintas -->
-<p-dialog header="Crear Tinta" [(visible)]="componenteCrearTintas" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Crear Tinta" [(visible)]="componenteCrearTintas" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
   <app-crear-tintas></app-crear-tintas>
 </p-dialog>
 
 <!--Modal para crear materias primas -->
-<p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Crear Materia Prima" [(visible)]="componenteCrearMateriasPrimas" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
   <app-crear-materiaprima></app-crear-materiaprima>
 </p-dialog>

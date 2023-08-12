@@ -233,13 +233,8 @@ export class CalendarioComponent implements OnInit {
 
   // Funcion que va a editar un evento
   editarEvento() {
-    let visibilidad : string = '';
-    let todos : string = '';
-    this.rolesService.srvObtenerLista().subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        todos += `|${data[i].rolUsu_Id}`
-      }
-    });
+    let visibilidad : string = '', todos : string = '';
+    this.rolesService.srvObtenerLista().subscribe(data => data.forEach(rol => todos += `|${rol.rolUsu_Id}`));
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {

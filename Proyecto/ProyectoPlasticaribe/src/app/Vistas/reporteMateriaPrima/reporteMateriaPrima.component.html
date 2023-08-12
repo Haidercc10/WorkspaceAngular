@@ -620,7 +620,7 @@
 </p-card>
 
 <!-- Modal Para Crear Materias Primas -->
-<p-dialog [(visible)]="modalCreacionMateriaPrima" [style]="{width: '70vw'}" [resizable]="true" header="¿Qué desea crear?" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modalCreacionMateriaPrima" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="¿Qué desea crear?" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <h5>¡Presione el botón de la materia prima que quiere crear!</h5>
@@ -635,21 +635,21 @@
 </p-dialog>
 
 <!-- Modal Para Crear Materias Primas -->
-<p-dialog [(visible)]="ModalCrearMateriaPrima" [style]="{width: '70vw'}" [resizable]="true" header="Crear Materia Primas" [modal]="true" >
+<p-dialog [(visible)]="ModalCrearMateriaPrima" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Crear Materia Primas" [modal]="true" >
   <ng-template pTemplate="content">
     <app-crear-materiaprima></app-crear-materiaprima>
   </ng-template>
 </p-dialog>
 
 <!-- Modal Para Crear Tintas -->
-<p-dialog [(visible)]="ModalCrearTintas" [style]="{width: '70vw'}" [resizable]="true" header="Crear Tintas / Solventes / Chips" [modal]="true" >
+<p-dialog [(visible)]="ModalCrearTintas" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Crear Tintas / Solventes / Chips" [modal]="true" >
   <ng-template pTemplate="content">
     <app-crear-tintas></app-crear-tintas>
   </ng-template>
 </p-dialog>
 
 <!-- Modal Para Editar Materias Primas -->
-<p-dialog [(visible)]="modalEditarMateriasPrimas" [style]="{width: '400px'}" [resizable]="true" header="Editar Materias Primas" [modal]="true">
+<p-dialog [(visible)]="modalEditarMateriasPrimas" [contentStyle]="{'overflow':'visible'}" [style]="{width: '400px'}" [resizable]="true" header="Editar Materias Primas" [modal]="true">
   <ng-template pTemplate="content">
     <br>
     <form [formGroup]="FormEdicionMateriaPrima" (ngSubmit)="editarMateriaPrima()">
@@ -742,7 +742,7 @@
 </p-dialog>
 
 <!--Modal para ver los bopp asociados al bopp genérico seleccionado-->
-<p-dialog [(visible)]="modalVerBopps" [style]="{width: '90vw'}" [resizable]="true" header="Rollo(s) asociado(s) a {{genericoSeleccionado}}" [modal]="true" >
+<p-dialog [(visible)]="modalVerBopps" [style]="{width: '90vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Rollo(s) asociado(s) a {{genericoSeleccionado}}" [modal]="true" >
   <ng-template pTemplate="content">
 
     <div class="row g-3 font-size-14" id="table">

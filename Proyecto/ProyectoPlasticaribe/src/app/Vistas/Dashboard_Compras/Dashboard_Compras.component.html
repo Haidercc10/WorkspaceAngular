@@ -369,7 +369,7 @@
 </div>
 
 <!-- Modal de compras detalladas -->
-<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [resizable]="true" header="Detalles Factura" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modal" [style]="{width: '80vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles Factura" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content" let-facturas>
     <div class="mb-3">
     </div>

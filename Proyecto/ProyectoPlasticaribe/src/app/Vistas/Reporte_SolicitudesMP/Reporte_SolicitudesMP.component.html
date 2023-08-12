@@ -251,7 +251,7 @@
   </div>
 </p-card>
 
-<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [(visible)]="modalOc" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalOc" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
   <app_ocompra_component></app_ocompra_component>
 </p-dialog>
 

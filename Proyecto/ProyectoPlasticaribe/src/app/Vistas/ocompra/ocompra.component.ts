@@ -754,7 +754,7 @@ export class OcompraComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${this.ordenCreada}!`); });
+    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${this.ordenCreada}!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
