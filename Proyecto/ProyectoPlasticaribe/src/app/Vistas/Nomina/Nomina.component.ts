@@ -193,6 +193,7 @@ export class NominaComponent implements OnInit {
           info.PagoTotal = 0
           info.detalle = [];
 
+          cedulas.push(info.Cedula);
           this.arraySellado.push(info);
           this.arraySellado.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
         }
