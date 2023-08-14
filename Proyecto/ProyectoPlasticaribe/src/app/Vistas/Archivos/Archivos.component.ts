@@ -18,6 +18,7 @@ import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data'
 export class ArchivosComponent implements OnInit {
 
   public formularioArchivo !: FormGroup;
+  modoInvitado : boolean = true;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -48,6 +49,9 @@ export class ArchivosComponent implements OnInit {
                         private messageService : MessageService,
                           private shepherdService: ShepherdService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
+    !localStorage.getItem('user') ? this.modoInvitado = false : this.modoInvitado = true;
+    
     this.formularioArchivo = this.frmBuilder.group({
       catImagen : ['', Validators.required],
       carpetaNueva : ['', Validators.required],
@@ -79,10 +83,7 @@ export class ArchivosComponent implements OnInit {
   }
 
   //Funcion que traerá las categorias existentes
-  obtenerCategorias(){
-    this.categoriasArchivos = [];
-    this.categoriaArchivosService.srvObtenerLista().subscribe(datos_categorias => { this.categoriasArchivos = datos_categorias; });
-  }
+  obtenerCategorias = () => this.categoriaArchivosService.srvObtenerLista().subscribe(datos_categorias => this.categoriasArchivos = datos_categorias);
 
   //Funcion que limpiará todos los campos
   limpiarCampos(){
@@ -133,15 +134,12 @@ export class ArchivosComponent implements OnInit {
     let nombreCarpeta : any = this.formularioArchivo.value.carpetaNueva;
     if (nombreCarpeta == '') this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo nombre de carpeta`);
     else {
-      for (let i = 0; i < this.ArrayArchivos.length; i++) {
-        nombresArchivosCarpetas.push(this.ArrayArchivos[i].nombre);
-      }
+      this.ArrayArchivos.forEach(data => nombresArchivosCarpetas.push(data.nombre));
       if (nombresArchivosCarpetas.includes(`${nombreCarpeta}`)) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Ya existe una archivo o carpeta con este nombre, debe cambiarlo!`);
       else {
         this.nombreCarpeta = `${this.nombreCarpeta}\\${nombreCarpeta}`
-        let ruta : string = this.nombreCarpeta;
-        this.ruta = ruta.replace(`D:\\Calidad\\`, '');
-        this.archivosService.crearCarpetas(ruta).subscribe(datos_archivo => {
+        this.ruta = this.nombreCarpeta.replace(`D:\\Calidad\\`, '');
+        this.archivosService.crearCarpetas(this.nombreCarpeta).subscribe(() => {
           this.mensajeService.mensajeConfirmacion(`Confirmación`, `La carpeta ha sido creada exitosamente!`);
           this.cargarArchivos(this.nombreCarpeta);
           this.mostrarCarpetas(this.nombreCarpeta);
@@ -161,7 +159,6 @@ export class ArchivosComponent implements OnInit {
       const formData = new FormData();
       formData.append('archivo', this.selectedFile[i]);
       try {
-        const data = await this.archivosService.srvGuardar(formData, this.today, 1, this.storage_Id, filePath).toPromise();
         this.cargarArchivos(filePath);
         this.mostrarCarpetas(filePath);
         this.mensajeService.mensajeConfirmacion(`¡Se subió el archivo seleccionado!`, `¡Se ha subido un archivo correcatamente!`);
@@ -222,27 +219,21 @@ export class ArchivosComponent implements OnInit {
         this.fileSeleccionado = index;
         this.messageService.add({severity:'warn', key: this.clave, summary:'Elección', detail: `Está seguro que desea eliminar la carpeta/archivo?`, sticky: true});
       }
-    }, 200)
+    }, 200);
   }
 
   /** Función para quitar mensaje de elección */
-  onReject(){
-    this.messageService.clear(this.clave);
-  }
+  onReject = () => this.messageService.clear(this.clave);
 
   // Funcion que permitirá eliminar un archivo
   eliminarArchivo(ruta : string, index : any){
     ruta = this.rutaSeleccionada;
     index = this.fileSeleccionado;
     this.onReject();
-    this.archivosService.eliminarArchivos(ruta).subscribe(datos_archivos => {
-     for (let i = 0; i < this.ArrayArchivos.length; i++) {
-      if(this.ArrayArchivos[i].nombre == index.nombre)
-      this.ArrayArchivos.splice(i, 1);
-     }
+    this.archivosService.eliminarArchivos(ruta).subscribe(() => {
+      this.ArrayArchivos.splice(this.ArrayArchivos.findIndex(item => item.nombre == index.nombre), 1);
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `Archivo eliminado con éxito!`);
-    }, error => { this.mensajeService.mensajeError(`Error`, `No fue posible eliminar el archivo`);
-    });
+    }, () => this.mensajeService.mensajeError(`Error`, `No fue posible eliminar el archivo`));
     this.clave = '';
   }
 
@@ -251,20 +242,15 @@ export class ArchivosComponent implements OnInit {
     ruta = this.rutaSeleccionada;
     index = this.fileSeleccionado;
     this.onReject();
-    this.archivosService.eliminarCarpetas(ruta).subscribe(datos_archivos => {
-      for (let i = 0; i < this.ArrayArchivos.length; i++) {
-        if(this.ArrayArchivos[i].nombre == index.nombre)
-        this.ArrayArchivos.splice(i, 1);
-       }
+    this.archivosService.eliminarCarpetas(ruta).subscribe(() => {
+      this.ArrayArchivos.splice(this.ArrayArchivos.findIndex(item => item.nombre == index.nombre), 1);
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `Carpeta eliminada con éxito!`);
-    }, error => { this.mensajeService.mensajeError(`Error`, `No fue posible eliminar la carpeta`);
-    });
+    }, () => this.mensajeService.mensajeError(`Error`, `No fue posible eliminar la carpeta`));
     this.clave = '';
   }
 
-  /*Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo,
-  ademas de darle valor a la variable que declara el la ruta incial y la que declara el nombre del archivo o carpeta*/
-  moverArchivoCarpeta(accion : string, ruta, nombre : string){
+  // Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo, ademas de darle valor a la variable que declara el la ruta incial y la que declara el nombre del archivo o carpeta
+  moverArchivoCarpeta(accion : string, ruta : string, nombre : string){
     this.clave = accion;
     setTimeout(() => {
       if (this.clave == 'copiar') {
@@ -280,29 +266,24 @@ export class ArchivosComponent implements OnInit {
   }
 
   /** Función que valida la acción de confirmar la copia de un archivo, contiene su ruta y nombre */
-  copyFiles(ruta : string, nombre : string, validador : number){
+  copyFiles(validador : number){
     this.onReject()
     this.copiar = true;
-    ruta = this.rutaInicial;
-    nombre = this.nombreArchivo;
     if (validador == 1) this.validarArchivo_Carpeta = true;
     else this.validarArchivo_Carpeta = false;
     this.clave = '';
   }
 
   /** Función que valida la acción de confirmar el movimiento de un archivo, contiene su ruta y nombre */
-  moveFiles(ruta : string, nombre : string, validador : number){
+  moveFiles(validador : number){
     this.onReject();
     this.mover = true;
-    ruta = this.rutaInicial;
-    nombre = this.nombreArchivo;
     if (validador == 1) this.validarArchivo_Carpeta = true;
     else this.validarArchivo_Carpeta = false;
     this.clave = '';
   }
 
-  /*Variable que se encargará de validar una vez mas el proceso que se va a realizar, una copia o un movimiento,
-  luego validará si es un archivo o carpeta y dependiendo de eso llamará a una funcion u otra*/
+  // Variable que se encargará de validar una vez mas el proceso que se va a realizar, una copia o un movimiento, luego validará si es un archivo o carpeta y dependiendo de eso llamará a una funcion u otra
   pegarArchivoCarpeta(){
     if (this.copiar) {
       if (this.validarArchivo_Carpeta) this.copiarArchivo();
@@ -321,7 +302,7 @@ export class ArchivosComponent implements OnInit {
 
   /* Funcion que va a encargarse de mover archivos de una ruta a otra, luego de moverlo lo cargará */
   moverArchivo(){
-    this.archivosService.moverArchivo(this.rutaInicial, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(datos_archivos => {
+    this.archivosService.moverArchivo(this.rutaInicial, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(() => {
       setTimeout(() => {
         this.ArrayArchivos = [];
         this.mover = false;
@@ -333,7 +314,7 @@ export class ArchivosComponent implements OnInit {
 
   // Funcion que va a encargarse de mover carpetas de una ruta a otra, luego de moverlo lo cargará
   moverCarpeta(){
-    this.archivosService.moverCarpeta(this.rutaInicial, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(datos_archivos => {
+    this.archivosService.moverCarpeta(this.rutaInicial, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(() => {
       setTimeout(() => {
         this.ArrayArchivos = [];
         this.mover = false;
@@ -345,7 +326,7 @@ export class ArchivosComponent implements OnInit {
 
   //Funcion que va a encargarse de enviar al api la peticion de copiar un archivo, luego de copiarlo lo cargará
   copiarArchivo(){
-    this.archivosService.copiarArchivo(`${this.rutaInicial}`, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(datos_archivos => {
+    this.archivosService.copiarArchivo(`${this.rutaInicial}`, `${this.nombreCarpeta}\\${this.nombreArchivo}`).subscribe(() => {
       this.ArrayArchivos = [];
       this.copiar = false;
       this.cargarArchivos(this.nombreCarpeta);
@@ -358,8 +339,8 @@ export class ArchivosComponent implements OnInit {
     let lengthCarpeta : any = this.rutaInicial.length;
     let Carpeta : any = this.rutaInicial.lastIndexOf("\\");
     let nombreCarpeta : string = this.rutaInicial.substring(Carpeta + 1, lengthCarpeta);
-    this.archivosService.crearCarpetas(`${this.nombreCarpeta}\\${nombreCarpeta}`).subscribe(datos_archivo => {
-      this.archivosService.copiarCarpeta(`${this.rutaInicial}`, `${this.nombreCarpeta}\\${nombreCarpeta}`).subscribe(datos_archivos => {
+    this.archivosService.crearCarpetas(`${this.nombreCarpeta}\\${nombreCarpeta}`).subscribe(() => {
+      this.archivosService.copiarCarpeta(`${this.rutaInicial}`, `${this.nombreCarpeta}\\${nombreCarpeta}`).subscribe(() => {
         this.ArrayArchivos = [];
         this.copiar = false;
         this.cargarArchivos(this.nombreCarpeta);

@@ -71,7 +71,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.cargarVistas(data);
       data.forEach(item => { dato += item.vp_Categoria; });
       dato = dato.replaceAll('||', '|').split('|');
-      dato.forEach(item => { if(!this.arrayVistas.includes(item) && item != "undefined") this.arrayVistas.push(item); })
+      dato.forEach(item => (!this.arrayVistas.includes(item) && item != "undefined") ? this.arrayVistas.push(item) : undefined);
     });
   }
 
@@ -103,7 +103,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe completar los campos vacios!`);
   }
 
-  limpiarCampos() { this.formVistas.reset(); this.formVistas.patchValue({ vRuta : '/' }); }
+  limpiarCampos() {
+    this.formVistas.reset();
+    this.formVistas.patchValue({ vRuta : '/' });
+  }
 
   cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => {this.arrayRoles = data});
 
@@ -118,18 +121,19 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         Dock : datos[index].vp_Icono_Dock,
         Ruta : datos[index].vp_Ruta,
         Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replace('|', ', '),
-        Roles : datos[index].vp_Id_Roles,
+        Roles : datos[index].vp_Id_Roles.replaceAll('|', ', ').substring(2, (datos[index].vp_Id_Roles.replaceAll('|', ', ').length - 2)),
       }
       this.arrayVistasPermisos.push(info);
       this.totalVistas += 1;
     }
-    setTimeout(() => { this.cargando = false; }, 1500);
+    setTimeout(() => this.cargando = false, 1500);
   }
 
   modalCrearVistas () {
     this.modal = true;
     this.palabra = `Crear`;
-    this.limpiarCampos(); }
+    this.limpiarCampos();
+  }
 
   eliminarVistas(){}
 

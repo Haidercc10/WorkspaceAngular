@@ -1,6 +1,8 @@
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="modoInvitado">
+  <app-menuLateral></app-menuLateral>
+  <app-VistasFavoritas></app-VistasFavoritas>
+</ng-container>
 <br>
-<app-VistasFavoritas></app-VistasFavoritas>
 
 <div class="contain">
   <!-- Navegador fin de parte superior -->
@@ -167,8 +169,8 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button *ngIf="this.clave == 'copiar'" type="button" pButton (click)="copyFiles(ruta, index, 1)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-          <button *ngIf="this.clave == 'mover'" type="button" pButton (click)="moveFiles(ruta, index, 1)" icon="pi pi-check-square" label="Si" class="p-button-success"></button>
+          <button *ngIf="this.clave == 'copiar'" type="button" pButton (click)="copyFiles(1)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="this.clave == 'mover'" type="button" pButton (click)="moveFiles(1)" icon="pi pi-check-square" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
