@@ -158,14 +158,14 @@
 </p-overlayPanel>
 
 <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+<p-dialog [(visible)]="modalEstadosOrdenes" [contentStyle]="{'overflow':'visible'}" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
   <ng-template pTemplate="content">
     <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
   </ng-template>
 </p-dialog>
 
 <!-- Modal desde el que se podrá editar un pedido -->
-<p-dialog [(visible)]="modalEditar" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+<p-dialog [(visible)]="modalEditar" [contentStyle]="{'overflow':'visible'}" [style]="{width: '90%'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
   <ng-template pTemplate="content">
     <app-Pedido-Externo></app-Pedido-Externo>
   </ng-template>

@@ -500,7 +500,7 @@
   </p-tabView>
 </p-card>
 
-<p-dialog [(visible)]="inventario" [style]="{width: '70vw'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="inventario" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Inventario Detallado" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <p-table
       #dtDetallado

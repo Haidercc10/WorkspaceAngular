@@ -165,7 +165,7 @@
   </div>
 </p-card>
 
-<p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [modal]="true" [style]="{ width: '80%' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [contentStyle]="{'overflow':'visible'}" [modal]="true" [style]="{ width: '80%' }" [draggable]="false" [resizable]="false">
   <div class="row g-4">
     <form [formGroup]="FormTicketResuelto" (ngSubmit)="ticket_Resuelto()">
       <div class="p-5 col-lg-12 col-md-12 col-sm-12 col-xs-12">

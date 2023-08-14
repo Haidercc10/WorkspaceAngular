@@ -377,7 +377,7 @@
 </p-toast>
 
 <!--Modal para crear bopp's genéricos -->
-<p-dialog [(visible)]="modalCrearBopp" [style]="{width: '60vw'}" [resizable]="true" header="Rollo(s) asociado(s)" [modal]="true" >
+<p-dialog [(visible)]="modalCrearBopp" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60vw'}" [resizable]="true" header="Rollo(s) asociado(s)" [modal]="true" >
   <ng-template pTemplate="content">
     <app-crear-bopp></app-crear-bopp>
   </ng-template>

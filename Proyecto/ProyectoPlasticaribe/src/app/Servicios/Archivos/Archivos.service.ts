@@ -65,5 +65,4 @@ export class ArchivosService {
   copiarCarpeta(rutaInicial : string, rutaFinal : string){
     return this.http.get(`${rutaPlasticaribeAPI}/Archivos/CopiarCarpetas?sourceDir=${rutaInicial}&destinationDir=${rutaFinal}&recursive=true`);
   }
-
 }

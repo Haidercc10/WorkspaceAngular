@@ -135,7 +135,7 @@
 </div>
 
 <!-- Modal donde se podrá ver algunas graficas -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarTabla" [style]="{width: '90%'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [contentStyle]="{'overflow':'visible'}" [draggable]="false" [(visible)]="mostrarTabla" [style]="{width: '90%'}">
   <p-table
     #dt3
     [resizableColumns]="true"

@@ -260,7 +260,7 @@
   </div>
 </p-card>
 
-<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [(visible)]="modalAsignacion" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
+<p-dialog header="Solicitud N° {{solicitudSeleccionada}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalAsignacion" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
   <app-asignacion-materia-prima></app-asignacion-materia-prima>
 </p-dialog>
 

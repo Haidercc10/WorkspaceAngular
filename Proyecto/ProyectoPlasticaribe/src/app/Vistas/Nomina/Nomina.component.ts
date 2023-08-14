@@ -182,25 +182,23 @@ export class NominaComponent implements OnInit {
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, moment(fechaFinal).add(1, 'days').format('YYYY-MM-DD')).subscribe(data => {
-      if(data.length > 0) {
-        for(let index = 0; index < data.length; index++) {
-          let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
+    this.servicioBagPro.GetNominaSelladoAcumuladaItem(fechaInicial, fechaFinal).subscribe(data => {
+      for(let index = 0; index < data.length; index++) {
+        let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
 
-          if(!cedulas.includes(info.Cedula)) {
-            info.Cedula = info.Cedula,
-            info.Operario = info.Operario,
-            info.Cargo = 'Operario Sellado',
-            info.PagoTotal = 0
-            info.detalle = [];
+        if(!cedulas.includes(info.Cedula)) {
+          info.Cedula = info.Cedula,
+          info.Operario = info.Operario,
+          info.Cargo = 'Operario Sellado',
+          info.PagoTotal = 0
+          info.detalle = [];
 
-            cedulas.push(info.Cedula);
-            this.arraySellado.push(info);
-            this.arraySellado.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
-          }
+          cedulas.push(info.Cedula);
+          this.arraySellado.push(info);
+          this.arraySellado.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
         }
-      } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`);
-    });
+      }
+    }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`));
     setTimeout(() => { this.cargarTabla2(fechaInicial, fechaFinal); }, 1500);
   }
 
@@ -209,7 +207,7 @@ export class NominaComponent implements OnInit {
     let array : any = [];
     this.totalNominaSellado = 0;
 
-    this.servicioBagPro.GetNominaSelladoAcumuladaItem(fecha1, moment(fecha2).add(1, 'days').format('YYYY-MM-DD')).subscribe(data => {
+    this.servicioBagPro.GetNominaSelladoAcumuladaItem(fecha1, fecha2).subscribe(data => {
       for(let index = 0; index < data.length; index++) {
         let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
         info.Cedula = info.Cedula,
@@ -257,7 +255,7 @@ export class NominaComponent implements OnInit {
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    this.servicioBagPro.GetNominaSelladoDetalladaItemPersona(fechaInicial, moment(fechaFinal).add(1, 'days').format('YYYY-MM-DD'), item, persona).subscribe(data => {
+    this.servicioBagPro.GetNominaSelladoDetalladaItemPersona(fechaInicial, fechaFinal, item, persona).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         let info : any = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
         info.Fecha = info.Fecha.replace('12:00:00 a.\u00A0m. ', ''),

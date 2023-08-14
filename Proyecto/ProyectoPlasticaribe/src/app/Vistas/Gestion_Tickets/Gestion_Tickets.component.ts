@@ -145,7 +145,7 @@ export class Gestion_TicketsComponent implements OnInit {
             this.limpiarTodo();
           }, () => {
             this.cargando = false;
-            return this.mensajeService.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`);
+            this.mensajeService.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`);
           });
         } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El ticket ya se encuentra en estado de revisión!`);
       });
@@ -169,7 +169,7 @@ export class Gestion_TicketsComponent implements OnInit {
           Ticket_RutaImagen : datos.ticket_RutaImagen,
           Ticket_NombreImagen : datos.ticket_NombreImagen,
         }
-        this.ticketService.actualizarTicket(datos.ticket_Id, info).subscribe(data => {
+        this.ticketService.actualizarTicket(datos.ticket_Id, info).subscribe(() => {
           let info : any = {
             TicketRev_Fecha : moment().format('YYYY-MM-DD'),
             TicketRev_Hora : moment().format('H:mm:ss'),

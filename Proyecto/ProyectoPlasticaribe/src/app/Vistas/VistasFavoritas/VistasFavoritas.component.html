@@ -9,7 +9,7 @@
     </p-dock>
   </div>
 
-  <p-dialog [(visible)]="displayTerminal" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true">
+  <p-dialog [(visible)]="displayTerminal" [contentStyle]="{'overflow':'visible'}" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true">
     <p-pickList
       [source]="disponiblesMostrar"
       [target]="targetProducts"

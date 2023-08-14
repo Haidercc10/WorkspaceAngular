@@ -224,7 +224,7 @@
   </div>
 
   <!-- Modal Para Crear Terceros-->
-  <p-dialog [(visible)]="modalCreacionTerceros" [style]="{width: '60%'}" [resizable]="true" header="Crear nuevo tercero" [modal]="true">
+  <p-dialog [(visible)]="modalCreacionTerceros" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60%'}" [resizable]="true" header="Crear nuevo tercero" [modal]="true">
     <ng-template pTemplate="content">
       <app-Crear-Tercero></app-Crear-Tercero>
     </ng-template>

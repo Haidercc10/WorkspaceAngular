@@ -160,7 +160,7 @@
     </p-table>
   </div>
 
-  <p-dialog *ngIf="load" header="OT Nro. {{otSeleccionada}}" [(visible)]="dialog" [style]="{width: '85%'}" [modal]="true" >
+  <p-dialog *ngIf="load" header="OT Nro. {{otSeleccionada}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="dialog" [style]="{width: '85%'}" [modal]="true" >
      <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
       <div class="table-responsive" *ngIf="load">
         <p-table

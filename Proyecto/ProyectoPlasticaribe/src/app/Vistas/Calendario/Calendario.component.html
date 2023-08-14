@@ -1,6 +1,6 @@
 <full-calendar [events]="events" [options]="options" *ngIf="!cargando"></full-calendar>
 
-<p-dialog [(visible)]="modalEvento" [style]="{width: '500px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '360px' }" header="{{accion}} Evento" [modal]="true">
+<p-dialog [(visible)]="modalEvento" [style]="{width: '500px', margin: 'auto', height: '830px'}" [contentStyle]="{'overflow':'visible'}" [breakpoints]="{ '960px': '360px' }" header="{{accion}} Evento" [modal]="true">
   <ng-template pTemplate="content">
     <form [formGroup]="FormEvento">
       <div class="row g-4 my-2">

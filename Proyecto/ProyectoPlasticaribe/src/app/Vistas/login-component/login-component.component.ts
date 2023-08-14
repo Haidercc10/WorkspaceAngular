@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +12,12 @@ import { AuthenticationService } from 'src/app/_Services/authentication.service'
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
+
+/**
+ * The `LoginComponentComponent` class handles the login functionality of the application.
+ * It includes methods for validating user credentials, logging in, and redirecting to different pages based on the user's role.
+ * It also interacts with various services for authentication and storing user information.
+ */
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -40,10 +45,9 @@ export class LoginComponentComponent implements OnInit {
                           private authenticationInvZeusService : AuthenticationService_InvZeus,
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,
-                                private http : HttpClient,
-                                  private encriptacion : EncriptacionService,
-                                    private cookiesServices : CookieService,
-                                      private mensajeService : MensajesAplicacionService,) {
+                                private encriptacion : EncriptacionService,
+                                  private cookiesServices : CookieService,
+                                    private mensajeService : MensajesAplicacionService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -77,7 +81,7 @@ export class LoginComponentComponent implements OnInit {
   cargaDatosComboBox = () => this.empresaServices.srvObtenerLista().subscribe(datos => this.empresas = datos, () => this.mensajeService.mensajeError('Error', '¡No fue posible consultar la Empresa, verifique!'));
 
   // Funcion que va a redireccionar al apartado de archivos
-  redireccionarArchivos = () => window.location.pathname = '/Archivos';
+  redireccionarArchivos = () => this.router.navigate(['/Archivos']);
 
   //Funcion que va a validar si hay campos vacios
   validarCamposVacios = () => this.formularioUsuario.valid ? this.consultaLogin() : this.mensajeService.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
@@ -103,7 +107,7 @@ export class LoginComponentComponent implements OnInit {
               "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
               "MovApp_Hora" : moment().format('H:mm:ss'),
             }
-            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos_Mov => {
+            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
               this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
               this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
               this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));

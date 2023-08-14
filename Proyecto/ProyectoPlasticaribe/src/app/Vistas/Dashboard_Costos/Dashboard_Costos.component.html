@@ -128,7 +128,7 @@
   </div>
 </div>
 
-<p-dialog header="Detalles de {{graficaSeleccionada}}" [modal]="true" [draggable]="false" [(visible)]="abrirModal1" (onHide)="limpiarArrayCostos()" [style]="{width: '90%'}">
+<p-dialog header="Detalles de {{graficaSeleccionada}}" [modal]="true" [contentStyle]="{'overflow':'visible'}" [draggable]="false" [(visible)]="abrirModal1" (onHide)="limpiarArrayCostos()" [style]="{width: '90%'}">
   <div class="mb-3" *ngIf="!cargando">
     <div class="row g-3 font-size-14" id="table">
       <p-table
