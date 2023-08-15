@@ -3,10 +3,10 @@
   <div *ngIf="!cargando">
     <p-toolbar styleClass="mb-4 gap-2">
       <ng-template pTemplate="left">
-        <button pButton pRipple id="nuevo" label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="modalCrearVistas()"></button>
-        <button pButton pRipple id="eliminar" label="Eliminar" icon="pi pi-trash" class="p-button-danger" (click)="eliminarVistas()"></button>
+        <button pButton pRipple id="nuevo" label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="accionModal('Crear')"></button>
+        <button pButton pRipple id="eliminar" label="Eliminar" *ngIf="vistaSeleccionada.length > 1; else inactivo;" icon="pi pi-trash" class="p-button-danger" (click)="mostrarEleccion(['0'])"></button>
         <ng-template #inactivo>
-          <button pButton pRipple id="eliminar-usuario" label="Eliminar"  icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
+          <button pButton pRipple id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
         </ng-template>
       </ng-template>
     </p-toolbar>
@@ -60,9 +60,12 @@
         <td class="text-center"><img src="../{{vistas.Dock}}" style="width: 2.5rem;"/></td>
         <td>{{vistas.Ruta}}</td>
         <td>{{vistas.Categoria}}</td>
-        <td>{{vistas.Roles}}</td>
+        <td class="text-center"><p-tieredMenu [model]="items" [baseZIndex]="10000"></p-tieredMenu></td>
         <td style="text-align: center;"><button id="editar" (click)="cargarVistas_Id(vistas)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-        <td style="text-align: center;"><button id="inactivar" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
+        <td style="text-align: center;"><button id="inactivar" *ngIf="vistaSeleccionada.length <= 1; else inactivo2;" (click)="mostrarEleccion(vistas)" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
+        <ng-template #inactivo2>
+          <td style="text-align: center;"><button id="inactivar" pButton pRipple icon="pi pi-trash" [disabled]="true" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
+        </ng-template>
       </tr>
     </ng-template>
     <ng-template pTemplate="summary">
@@ -75,7 +78,7 @@
 
 </p-card>
 
-<p-dialog [(visible)]="modal" [style]="{width: '40vw', }" [resizable]="true" header="{{palabra}} Vista" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modal" [style]="{width: '40vw', }" [resizable]="true" header="{{palabra}} Vista" (onHide)="cambiarPalabraClave()" [modal]="true" styleClass="p-fluid" [contentStyle]="{'overflow':'visible'}">
   <br>
   <form [formGroup]="formVistas">
     <div class="mb-3">
@@ -154,3 +157,27 @@
     </div>
   </form>
 </p-dialog>
+
+<p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-vista>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton *ngIf="vistaSeleccionada.length <= 1;" (click)="eliminarVistas(vista)" icon="pi pi-check" label="Sí" class="p-button-success"></button>
+          <button type="button" pButton *ngIf="vistaSeleccionada.length > 1;" (click)="eliminarVistas(vista)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+
+

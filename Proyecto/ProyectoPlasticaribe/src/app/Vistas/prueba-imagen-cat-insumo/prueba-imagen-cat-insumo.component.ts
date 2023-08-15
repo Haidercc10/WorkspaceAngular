@@ -1,12 +1,14 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MegaMenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { iconos } from 'src/app/Vistas/prueba-imagen-cat-insumo/Iconos';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -19,7 +21,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   modal : boolean = false;
   formVistas !: FormGroup;
   cargando : boolean = false;
-  vistaSeleccionada : any | undefined;
+  vistaSeleccionada : any = [];
   arrayRoles : any = [];
   rutaImagenes : string = `assets/Iconos_Menu/`;
   arrayVistasPermisos : any = [];
@@ -30,6 +32,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   first = 0; /** variable que mostrará  */
   categorias : any = [];
   iconos2 : any = [];
+  idRoles : any = [];
+  vistaEliminar : any = [];
+  items : MenuItem[];
   imagenes : any = [
   {nombre : "activos.png", descripcion: 'Activos' },  {nombre : "factura.png", descripcion: 'Factura' }, {nombre : "carpeta.png", descripcion: 'Carpeta' },  {nombre : "Pedidos_Zeus.png", descripcion: 'Pedidos Zeus' },
   {nombre : "devolucion.png", descripcion: 'Devolución' },  {nombre : "recibos.png", descripcion: 'Recibos' }, {nombre : "salida.png", descripcion: 'Salida' }, {nombre : "reportePedidos.png", descripcion: 'Reporte Pedidos' },
@@ -43,7 +48,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 private srvVistaPermisos : Vistas_PermisosService,
                   private msjs : MensajesAplicacionService,
-                    private srvRoles : RolesService,){
+                    private srvRoles : RolesService,
+                      private mensajes : MessageService, ){
 
     this.formVistas = this.frmBuilder.group({
       vId: [null],
@@ -60,6 +66,30 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.cargarVistasDistintas();
     this.cargarRoles();
     this.iconos2 = iconos;
+    this.items = [
+      {
+        label: 'Ver roles',
+        icon: 'pi pi-fw pi-eye',
+        items: [
+            {
+                label: 'Left',
+                icon: 'pi pi-fw pi-align-left'
+            },
+            {
+                label: 'Right',
+                icon: 'pi pi-fw pi-align-right'
+            },
+            {
+                label: 'Center',
+                icon: 'pi pi-fw pi-align-center'
+            },
+            {
+                label: 'Justify',
+                icon: 'pi pi-fw pi-align-justify'
+            }
+        ]
+      }
+    ]
   }
 
   cargarVistasDistintas() {
@@ -71,36 +101,50 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.cargarVistas(data);
       data.forEach(item => { dato += item.vp_Categoria; });
       dato = dato.replaceAll('||', '|').split('|');
-      dato.forEach(item => (!this.arrayVistas.includes(item) && item != "undefined") ? this.arrayVistas.push(item) : undefined);
+      dato.forEach(item => (!["undefined", ""].includes(item) && !this.arrayVistas.includes(item)) ? this.arrayVistas.push(item) : undefined);
     });
+    setTimeout(() => this.cargando = false, 1500);
   }
 
   registrarVista(){
     if(this.formVistas.valid) {
       if(!this.formVistas.value.vRuta.toString().includes(' ')) {
-        let modelo : modelVistasPermisos = {
-          Vp_Id : this.formVistas.value.vId,
-          Vp_Nombre: this.formVistas.value.vNombre,
-          Vp_Icono_Dock: this.rutaImagenes + `${this.formVistas.value.vDock}`,
-          Vp_Icono_Menu: this.formVistas.value.vIcono,
-          Vp_Ruta: this.formVistas.value.vRuta.toString().replace(' ', '-'),
-          Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
-          Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
-        }
-        if(this.palabra == 'Crear') {
-          console.log(1)
-          console.log(modelo)
-          //this.srvVistaPermisos.Post(modelo).subscribe(data => { this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`) },
-          //error => { this.msjs.mensajeConfirmacion(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
-        }
-        if(this.palabra == 'Editar') {
-          console.log(2)
-          console.log(modelo)
-          //this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(data => { this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`) },
-          //error => { this.msjs.mensajeConfirmacion(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
-        }
+        if(this.formVistas.value.vRuta != '/') {
+          this.cargando = true;
+          let modelo : modelVistasPermisos = {
+            Vp_Id : this.palabra == `Crear` ? 0 : this.formVistas.value.vId,
+            Vp_Nombre: this.formVistas.value.vNombre,
+            Vp_Icono_Dock: this.rutaImagenes + `${this.formVistas.value.vDock}`,
+            Vp_Icono_Menu: this.formVistas.value.vIcono,
+            Vp_Ruta: this.formVistas.value.vRuta.toString().replace(' ', '-'),
+            Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
+            Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
+          }
+          //Crear vista
+          if(this.palabra == 'Crear') {
+            this.srvVistaPermisos.Post(modelo).subscribe(data => { 
+              this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
+              setTimeout(() => { 
+                this.accionModal(`Crear`); 
+                this.cargarVistasDistintas();
+              }, 1000);
+            }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+          }
+          //Editar vista
+          if(this.palabra == 'Editar') {
+            this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(data => { 
+              this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha actualizado la vista ${modelo.Vp_Nombre} exitosamente!`);
+              setTimeout(() => { 
+                this.accionModal(`Editar`); 
+                this.cargarVistasDistintas();
+              }, 1000);
+            }, error => { this.msjs.mensajeError(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+          }
+
+        } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las ruta no puede ser "/", por favor verifique!`);  
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las rutas no pueden contener espacios, por favor, verifique!`);
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe completar los campos vacios!`);
+    
   }
 
   limpiarCampos() {
@@ -120,22 +164,21 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         Icono : datos[index].vp_Icono_Menu,
         Dock : datos[index].vp_Icono_Dock,
         Ruta : datos[index].vp_Ruta,
-        Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replace('|', ', '),
+        Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replaceAll('|', ', '),
         Roles : datos[index].vp_Id_Roles.replaceAll('|', ', ').substring(2, (datos[index].vp_Id_Roles.replaceAll('|', ', ').length - 2)),
       }
       this.arrayVistasPermisos.push(info);
       this.totalVistas += 1;
     }
-    setTimeout(() => this.cargando = false, 1500);
+    
   }
 
-  modalCrearVistas () {
-    this.modal = true;
+  accionModal(clave : string) {
+    (clave == `Crear`) ? this.modal =  true : this.modal = false;
+    this.cargando = false;
     this.palabra = `Crear`;
     this.limpiarCampos();
   }
-
-  eliminarVistas(){}
 
   cargarVistas_Id(vista : any){
     let imagen : any;
@@ -167,9 +210,35 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
   }
 
-  editarVistas() {
+  mostrarEleccion(item : any){
+    this.vistaEliminar = item;
+    console.log(this.vistaSeleccionada.length)
+    this.mensajes.add({severity:'warn', key:'eleccion', summary:'Elección', detail: this.vistaSeleccionada.length > 1 ? `Está seguro que desea eliminar las vistas seleccionadas?` : `Está seguro que desea eliminar la vista ${item.Nombre}?`, sticky: true});
+  }
+  
+  eliminarVistas(data : any){
+   let esError : boolean = false;
+   this.onReject(`eleccion`);
+   if(this.vistaSeleccionada.length > 1) { 
+    
+    this.vistaSeleccionada.forEach(element => { 
+      this.srvVistaPermisos.Delete(element.Id).subscribe(datos => { 
+        
+       }, error => { esError = true; } );
+    });
+   } else {
+    data = this.vistaEliminar;
+    this.srvVistaPermisos.Delete(data.Id).subscribe(data => { esError = false;  }, error => { esError = true; });
+   } 
 
+   if(!esError) {
+    this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
+    this.cargarVistasDistintas();
+   } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
   }
 
+  onReject = (dato : any) => this.mensajes.clear(dato);
+
+  cambiarPalabraClave = () => this.palabra = `Crear`;
 }
 
