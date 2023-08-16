@@ -146,7 +146,7 @@
   </div>
 
   <!-- INICIO MODAL PEDIDO-->
-  <p-dialog *ngIf="cargando" header="{{PedMtto}} Nro. {{numeroPedido}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="modal" [style]="{width: '70%'}" [modal]="true" >
+  <p-dialog *ngIf="cargando" header="{{PedMtto}} Nro. {{numeroPedido}}" [(visible)]="modal" [style]="{width: '70%'}" [modal]="true" >
     <ng-container *ngIf="pedido then Pedido else Mantenimiento;" ></ng-container>
     <!--Modal Pedido-->
     <ng-template #Pedido>
