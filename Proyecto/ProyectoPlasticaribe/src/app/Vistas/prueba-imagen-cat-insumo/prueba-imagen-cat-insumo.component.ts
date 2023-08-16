@@ -17,7 +17,7 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 })
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
-  arrayVistas : any = [];
+  arrayVistas : any = []; /** Array que contend */
   modal : boolean = false;
   formVistas !: FormGroup;
   cargando : boolean = false;
@@ -68,9 +68,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.iconos2 = iconos;
   }
 
+  //.Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
   cargarVistasDistintas() {
     this.arrayVistasPermisos = [];
-    this.totalVistas = 0;
     this.cargando = true;
     let dato: any;
     this.srvVistaPermisos.Get_Todo().subscribe(data => {
@@ -82,6 +82,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     setTimeout(() => this.cargando = false, 1500);
   }
 
+  //.Función que registrará o actualizará una vista
   registrarVista(){
     if(this.formVistas.valid) {
       if(!this.formVistas.value.vRuta.toString().includes(' ')) {
@@ -123,15 +124,19 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     
   }
 
+  //.Función que limpiará los campos
   limpiarCampos() {
     this.formVistas.reset();
     this.formVistas.patchValue({ vRuta : '/' });
   }
 
+  //.Función que cargará los roles en el campo del formulario
   cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => {this.arrayRoles = data});
 
+  //.Función que buscará por el nombre de la vista en la tabla
   aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
+  //.Función que cargará las vistas en la tabla
   cargarVistas(datos : any){
     for (let index = 0; index < datos.length; index++) {
       let info : any = {
@@ -146,11 +151,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       info.Roles.shift();
       info.Roles.pop();
       this.arrayVistasPermisos.push(info);
-      this.totalVistas += 1;
     }
-    
   }
 
+  //Acción que realizará el modal dependiendo la palabra clave
   accionModal(clave : string) {
     (clave == `Crear`) ? this.modal =  true : this.modal = false;
     this.cargando = false;
@@ -158,6 +162,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.limpiarCampos();
   }
 
+  //Acción que cargará las vistas para actualizarlas
   cargarVistas_Id(vista : any){
     let imagen : any;
     let icono : any;
@@ -167,6 +172,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let rolesSeleccionados : any [] = [];
     this.modal = true;
     this.palabra = `Editar`;
+    
     this.srvVistaPermisos.Get_By_Id(vista.Id).subscribe(data => {
       roles = data.vp_Id_Roles.split('|'); 
       roles.shift(); 
@@ -189,49 +195,45 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       });
       imagen = this.imagenes.filter(item => item.nombre == data.vp_Icono_Dock.replace('assets/Iconos_Menu/', ''));
       icono = this.iconos2.filter(item => item.icon == data.vp_Icono_Menu);
-
-      this.formVistas.patchValue({
-        vId: data.vp_Id, 
-        vNombre: data.vp_Nombre, 
-        vIcono: icono[0].icon,
-        vDock: imagen[0].nombre, 
-        vCategoria: categorias, 
-        vRuta: data.vp_Ruta,        
-      });
+      this.formVistas.patchValue({vId: data.vp_Id, vNombre: data.vp_Nombre, vIcono: icono[0].icon, vDock: imagen[0].nombre, vCategoria: categorias, vRuta: data.vp_Ruta, });
     });
   }
 
+  //Acción que mostrará la elección para confirmar la eliminación de una o varias vistas. 
   mostrarEleccion(item : any){
-    this.vistaEliminar = item;
-    console.log(this.vistaSeleccionada.length)
+    this.vistaSeleccionada.length > 1 ? item = this.vistaSeleccionada : this.vistaEliminar = item;
     this.mensajes.add({severity:'warn', key:'eleccion', summary:'Elección', detail: this.vistaSeleccionada.length > 1 ? `Está seguro que desea eliminar las vistas seleccionadas?` : `Está seguro que desea eliminar la vista ${item.Nombre}?`, sticky: true});
   }
   
+  //Función que eliminará una o varias vistas de la tabla y de la base de datos.
   eliminarVistas(data : any){
    let esError : boolean = false;
    this.onReject(`eleccion`);
+
    if(this.vistaSeleccionada.length > 1) { 
-    
-    this.vistaSeleccionada.forEach(element => { 
+    data = this.vistaSeleccionada;
+    data.forEach(element => { 
       this.srvVistaPermisos.Delete(element.Id).subscribe(datos => { 
-        
-       }, error => { esError = true; } );
+        this.arrayVistasPermisos.splice(this.arrayVistasPermisos.findIndex(item => item.Id == element.Id));
+      }, error => { esError = true; } );
     });
    } else {
     data = this.vistaEliminar;
     this.srvVistaPermisos.Delete(data.Id).subscribe(data => { esError = false;  }, error => { esError = true; });
    } 
-
    if(!esError) {
     this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
     this.cargarVistasDistintas();
    } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
   }
 
+  //.Quitar mensajes de elección.
   onReject = (dato : any) => this.mensajes.clear(dato);
 
+  //Acción que se realizará al momento de cerrar el modal
   cambiarPalabraClave = () => this.palabra = `Crear`;
 
+  //Función que se realizará al momento de seleccionar el botón de ver roles en la tabla.
   mostrarRoles($event, roles : any){
     this.infoRoles = [];
     roles.forEach(element => { 
@@ -240,6 +242,13 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       } 
     });
     setTimeout(() => { this.op!.toggle($event); $event.stopPropagation(); }, 500);
+  }
+
+  //Función que mostrará la cantidad de vistas disponibles
+  cantidadVistas() {
+    this.totalVistas = 0;
+    this.arrayVistasPermisos.forEach(element => { this.totalVistas += 1; });
+    return this.totalVistas;
   }
 }
 

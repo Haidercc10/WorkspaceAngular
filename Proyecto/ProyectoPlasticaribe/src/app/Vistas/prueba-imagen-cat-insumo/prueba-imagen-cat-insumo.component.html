@@ -38,7 +38,7 @@
     <!--Headers Tabla-->
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 4rem"><p-tableHeaderCheckbox id="check"></p-tableHeaderCheckbox></th>
+        <th style="width: 4rem"></th>
         <th scope="col" >#</th>
         <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
         <th scope="col" class="text-center">Icono</th>
@@ -59,9 +59,9 @@
         <td class="text-center"><i class="{{vistas.Icono}}"></i></td>
         <td class="text-center"><img src="../{{vistas.Dock}}" style="width: 2.5rem;"/></td>
         <td>{{vistas.Ruta}}</td>
-        <td>{{vistas.Categoria}}</td>
+        <td><b>{{vistas.Categoria}}</b></td>
         <td class="text-center">
-          <p-button id="editar" (click)="mostrarRoles($event, vistas.Roles)" icon="pi pi-fw pi-eye" label="Ver roles" styleClass="p-button-outlined p-button-text p-button-raised" pTooltip="Haz clic para ver quienes pueden tener acceso a la vista de '{{vistas.Nombre}}'"></p-button>
+          <p-button id="editar" (click)="mostrarRoles($event, vistas.Roles)" icon="pi pi-fw pi-eye" label="Ver roles" styleClass="p-button-outlined" pTooltip="Haz clic para ver quienes tienen acceso a la vista de '{{vistas.Nombre}}'"></p-button>
         </td>
         <td style="text-align: center;"><button id="editar" (click)="cargarVistas_Id(vistas)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
         <td style="text-align: center;"><button id="inactivar" *ngIf="vistaSeleccionada.length <= 1; else inactivo2;" (click)="mostrarEleccion(vistas)" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
@@ -72,7 +72,7 @@
     </ng-template>
     <ng-template pTemplate="summary">
       <div class="flex align-items-center justify-content-between font-size-16">
-        En total hay {{totalVistas}} Vistas.
+        En total hay {{cantidadVistas()}} Vistas.
       </div>
     </ng-template>
     </p-table>
@@ -150,8 +150,8 @@
         <!--Inicio Fila 3 Botones y Limpiar Campos-->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" type="button" label="{{palabra}} Vista" icon="pi pi-check" (click)="registrarVista()"></button>
-              <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+            <button pButton class="p-button-danger" type="button" label="{{palabra}}" icon="pi pi-check" (click)="registrarVista()"></button>
+              <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
           </div>
         </div>
 
