@@ -164,14 +164,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let roles : any = [];
     let rolesCargar : any = [];
     let categorias : any = [];
+    let rolesSeleccionados : any [] = [];
     this.modal = true;
     this.palabra = `Editar`;
-    console.log(this.arrayRoles)
     this.srvVistaPermisos.Get_By_Id(vista.Id).subscribe(data => {
-      roles = data.vp_Id_Roles.split('|'); roles.shift(); roles.pop();
-      categorias = data.vp_Categoria.split('|'); categorias.shift(); categorias.pop();
+      roles = data.vp_Id_Roles.split('|'); 
+      roles.shift(); 
+      roles.pop();
+      categorias = data.vp_Categoria.split('|'); 
+      categorias.shift(); 
+      categorias.pop();
       roles.forEach(element => { 
-        if(!['16'].includes(element)) this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { rolesCargar = this.arrayRoles.filter(item => item.rolUsu_Id == data.rolUsu_Id); console.log(rolesCargar);  /*if(data.rolUsu_Nombre != undefined) rolesCargar.push(data.rolUsu_Id)*/ });         
+        if(!['16'].includes(element)) {
+          this.srvRoles.srvObtenerListaPorId(element).subscribe(data => {
+            this.arrayRoles.forEach(rol => {
+              if (data.rolUsu_Id === rol.rolUsu_Id) {
+                rolesCargar.push(rol);
+                rolesSeleccionados.push(data.rolUsu_Id);
+                this.formVistas.patchValue({vRoles : rolesSeleccionados});
+              }
+            });
+          });
+        }
       });
       imagen = this.imagenes.filter(item => item.nombre == data.vp_Icono_Dock.replace('assets/Iconos_Menu/', ''));
       icono = this.iconos2.filter(item => item.icon == data.vp_Icono_Menu);
@@ -182,8 +196,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         vIcono: icono[0].icon,
         vDock: imagen[0].nombre, 
         vCategoria: categorias, 
-        vRuta: data.vp_Ruta, 
-        vRoles : rolesCarga,
+        vRuta: data.vp_Ruta,        
       });
     });
   }
