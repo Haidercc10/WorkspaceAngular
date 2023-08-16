@@ -68,6 +68,7 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { TieredMenuModule } from 'primeng/tieredmenu';
+import { ListboxModule } from 'primeng/listbox';
 import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
@@ -355,6 +356,7 @@ import { AppComponent } from './app.component';
     AccordionModule,
     ToggleButtonModule,
     TieredMenuModule,
+    ListboxModule,
   ],
 
   providers: [

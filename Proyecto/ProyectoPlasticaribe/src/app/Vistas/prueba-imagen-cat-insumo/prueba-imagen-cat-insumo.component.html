@@ -3,10 +3,10 @@
   <div *ngIf="!cargando">
     <p-toolbar styleClass="mb-4 gap-2">
       <ng-template pTemplate="left">
-        <button pButton pRipple id="nuevo" label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="accionModal('Crear')"></button>
-        <button pButton pRipple id="eliminar" label="Eliminar" *ngIf="vistaSeleccionada.length > 1; else inactivo;" icon="pi pi-trash" class="p-button-danger" (click)="mostrarEleccion(['0'])"></button>
+        <p-button id="nuevo" label="Nuevo" icon="pi pi-plus" styleClass="p-button-success mr-2" (click)="accionModal('Crear')"></p-button>
+        <p-button id="eliminar" label="Eliminar" *ngIf="vistaSeleccionada.length > 1; else inactivo;" icon="pi pi-trash" styleClass="p-button-danger" (click)="mostrarEleccion(['0'])"></p-button>
         <ng-template #inactivo>
-          <button pButton pRipple id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
+          <p-button id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" [disabled]="true" styleClass="p-button-danger"></p-button>
         </ng-template>
       </ng-template>
     </p-toolbar>
@@ -45,7 +45,7 @@
         <th scope="col" class="text-center">Dock</th>
         <th scope="col">Ruta</th>
         <th scope="col" pSortableColumn="Categoria">Categoria <p-sortIcon field="Categoria"></p-sortIcon></th>
-        <th scope="col" pSortableColumn="Roles">Roles <p-sortIcon field="Roles"></p-sortIcon></th>
+        <th scope="col" class="text-center">Roles</th>
         <th scope="col">Editar</th>
         <th scope="col">Eliminar</th>
       </tr>
@@ -60,7 +60,9 @@
         <td class="text-center"><img src="../{{vistas.Dock}}" style="width: 2.5rem;"/></td>
         <td>{{vistas.Ruta}}</td>
         <td>{{vistas.Categoria}}</td>
-        <td class="text-center"><p-tieredMenu [model]="items" [baseZIndex]="10000"></p-tieredMenu></td>
+        <td class="text-center">
+          <p-button id="editar" (click)="mostrarRoles($event, vistas.Roles)" icon="pi pi-fw pi-eye" label="Ver roles" styleClass="p-button-outlined p-button-text p-button-raised" pTooltip="Haz clic para ver quienes pueden tener acceso a la vista de '{{vistas.Nombre}}'"></p-button>
+        </td>
         <td style="text-align: center;"><button id="editar" (click)="cargarVistas_Id(vistas)" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
         <td style="text-align: center;"><button id="inactivar" *ngIf="vistaSeleccionada.length <= 1; else inactivo2;" (click)="mostrarEleccion(vistas)" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
         <ng-template #inactivo2>
@@ -78,14 +80,14 @@
 
 </p-card>
 
-<p-dialog [(visible)]="modal" [style]="{width: '40vw', }" [resizable]="true" header="{{palabra}} Vista" (onHide)="cambiarPalabraClave()" [modal]="true" styleClass="p-fluid" [contentStyle]="{'overflow':'visible'}">
+<p-dialog [(visible)]="modal" [style]="{width: '30vw', }" [resizable]="true" header="{{palabra}} Vista" (onHide)="cambiarPalabraClave()" [modal]="true" styleClass="p-fluid" [contentStyle]="{'overflow':'visible'}">
   <br>
   <form [formGroup]="formVistas">
-    <div class="mb-3">
+    <div class="mb-4">
       <div class="row g-4">
 
         <!-- Nombre Materia Prima -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <input formControlName="vNombre" id="vNombre" type="text" pInputText required/>
             <label for="vNombre">Nombre</label>
@@ -93,9 +95,9 @@
         </div>
 
          <!-- Menú -->
-         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
-            <p-dropdown formControlName="vIcono" inputId="vIcono" optionValue="icon" optionLabel="label" [autoDisplayFirst]="false" [options]="iconos2">
+            <p-dropdown formControlName="vIcono" inputId="vIcono" optionValue="icon" optionLabel="label" [filter]="true" filterBy="label" [autoDisplayFirst]="false" [options]="iconos2">
               <ng-template let-vista pTemplate="item">
                 <div class="flex align-items-center gap-2">
                   <div><i [class]="vista.icon"></i> {{ vista.label }}</div>
@@ -107,7 +109,7 @@
         </div>
 
         <!-- Icono  -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <p-dropdown formControlName="vDock" inputId="vDock" optionValue="nombre" optionLabel="descripcion" [options]="imagenes" [autoDisplayFirst]="false">
               <ng-template let-imagen pTemplate="item">
@@ -122,7 +124,7 @@
         </div>
 
         <!-- Categoria  -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <p-multiSelect formControlName="vCategoria" inputId="vCategoria" [options]="arrayVistas"></p-multiSelect>
             <label for="vCategoria">Categoria</label>
@@ -130,7 +132,7 @@
         </div>
 
         <!-- Ruta -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <input formControlName="vRuta" id="vRuta" type="text" pInputText required/>
             <label for="vRuta">Ruta</label>
@@ -138,7 +140,7 @@
         </div>
 
         <!-- Categoria  -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <p-multiSelect formControlName="vRoles" inputId="vRoles" [options]="arrayRoles" optionLabel="rolUsu_Nombre" optionValue="rolUsu_Id"></p-multiSelect>
             <label for="vRoles">Roles</label>
@@ -178,6 +180,12 @@
     </div>
   </ng-template>
 </p-toast>
+
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" [showCloseIcon]="true">
+  <ng-template pTemplate>
+    <div *ngFor="let item of infoRoles"><i class="pi pi-user"></i> {{item}}</div>
+  </ng-template>
+</p-overlayPanel>
 
 
 

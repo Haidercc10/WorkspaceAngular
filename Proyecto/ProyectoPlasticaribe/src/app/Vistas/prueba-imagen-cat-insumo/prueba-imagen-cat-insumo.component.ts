@@ -8,7 +8,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { iconos } from 'src/app/Vistas/prueba-imagen-cat-insumo/Iconos';
-import { MenuItem } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -32,9 +32,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   first = 0; /** variable que mostrará  */
   categorias : any = [];
   iconos2 : any = [];
-  idRoles : any = [];
   vistaEliminar : any = [];
-  items : MenuItem[];
+  infoRoles : any = [];
+  @ViewChild('op') op: OverlayPanel | undefined;
   imagenes : any = [
   {nombre : "activos.png", descripcion: 'Activos' },  {nombre : "factura.png", descripcion: 'Factura' }, {nombre : "carpeta.png", descripcion: 'Carpeta' },  {nombre : "Pedidos_Zeus.png", descripcion: 'Pedidos Zeus' },
   {nombre : "devolucion.png", descripcion: 'Devolución' },  {nombre : "recibos.png", descripcion: 'Recibos' }, {nombre : "salida.png", descripcion: 'Salida' }, {nombre : "reportePedidos.png", descripcion: 'Reporte Pedidos' },
@@ -66,30 +66,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.cargarVistasDistintas();
     this.cargarRoles();
     this.iconos2 = iconos;
-    this.items = [
-      {
-        label: 'Ver roles',
-        icon: 'pi pi-fw pi-eye',
-        items: [
-            {
-                label: 'Left',
-                icon: 'pi pi-fw pi-align-left'
-            },
-            {
-                label: 'Right',
-                icon: 'pi pi-fw pi-align-right'
-            },
-            {
-                label: 'Center',
-                icon: 'pi pi-fw pi-align-center'
-            },
-            {
-                label: 'Justify',
-                icon: 'pi pi-fw pi-align-justify'
-            }
-        ]
-      }
-    ]
   }
 
   cargarVistasDistintas() {
@@ -165,8 +141,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         Dock : datos[index].vp_Icono_Dock,
         Ruta : datos[index].vp_Ruta,
         Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replaceAll('|', ', '),
-        Roles : datos[index].vp_Id_Roles.replaceAll('|', ', ').substring(2, (datos[index].vp_Id_Roles.replaceAll('|', ', ').length - 2)),
+        Roles : datos[index].vp_Id_Roles.split('|'), //.replaceAll('|', ', ').substring(2, (datos[index].vp_Id_Roles.replaceAll('|', ', ').length - 2)),
       }
+      info.Roles.shift();
+      info.Roles.pop();
       this.arrayVistasPermisos.push(info);
       this.totalVistas += 1;
     }
@@ -188,24 +166,24 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let categorias : any = [];
     this.modal = true;
     this.palabra = `Editar`;
-    console.log(this.palabra)
-
+    console.log(this.arrayRoles)
     this.srvVistaPermisos.Get_By_Id(vista.Id).subscribe(data => {
-
       roles = data.vp_Id_Roles.split('|'); roles.shift(); roles.pop();
       categorias = data.vp_Categoria.split('|'); categorias.shift(); categorias.pop();
-      roles.forEach(element => { this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { if(data.rolUsu_Nombre != undefined) rolesCargar.push(data.rolUsu_Id) }); });
+      roles.forEach(element => { 
+        if(!['16'].includes(element)) this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { rolesCargar = this.arrayRoles.filter(item => item.rolUsu_Id == data.rolUsu_Id); console.log(rolesCargar);  /*if(data.rolUsu_Nombre != undefined) rolesCargar.push(data.rolUsu_Id)*/ });         
+      });
       imagen = this.imagenes.filter(item => item.nombre == data.vp_Icono_Dock.replace('assets/Iconos_Menu/', ''));
       icono = this.iconos2.filter(item => item.icon == data.vp_Icono_Menu);
 
       this.formVistas.patchValue({
-        vId : data.vp_Id,
-        vNombre : data.vp_Nombre,
-        vIcono : icono[0].icon,
-        vDock : imagen[0].nombre,
-        vCategoria : categorias,
-        vRuta : data.vp_Ruta,
-        vRoles : rolesCargar,
+        vId: data.vp_Id, 
+        vNombre: data.vp_Nombre, 
+        vIcono: icono[0].icon,
+        vDock: imagen[0].nombre, 
+        vCategoria: categorias, 
+        vRuta: data.vp_Ruta, 
+        vRoles : rolesCarga,
       });
     });
   }
@@ -240,5 +218,15 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   onReject = (dato : any) => this.mensajes.clear(dato);
 
   cambiarPalabraClave = () => this.palabra = `Crear`;
+
+  mostrarRoles($event, roles : any){
+    this.infoRoles = [];
+    roles.forEach(element => { 
+      if(!['16'].includes(element)) {
+        this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { this.infoRoles.push(data.rolUsu_Nombre); }); 
+      } 
+    });
+    setTimeout(() => { this.op!.toggle($event); $event.stopPropagation(); }, 500);
+  }
 }
 
