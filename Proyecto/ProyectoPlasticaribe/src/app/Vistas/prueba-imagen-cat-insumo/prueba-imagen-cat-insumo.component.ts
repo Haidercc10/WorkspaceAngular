@@ -18,22 +18,21 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
   arrayVistas : any = []; /** Array que contend */
-  modal : boolean = false;
-  formVistas !: FormGroup;
-  cargando : boolean = false;
-  vistaSeleccionada : any = [];
-  arrayRoles : any = [];
-  rutaImagenes : string = `assets/Iconos_Menu/`;
-  arrayVistasPermisos : any = [];
-  palabra : string = `Crear`
+  modal : boolean = false; //Variable que indicará si se verá o no el modal
+  formVistas !: FormGroup; //.Formulario de vistas
+  cargando : boolean = false; //.Carga que iniciará al realizar uan acción
+  vistaSeleccionada : any = []; // Vistas seleccionadas con los checkbox
+  arrayRoles : any = []; //.Array que cargará los roles 
+  rutaImagenes : string = `assets/Iconos_Menu/`; //ruta de las imagenes en el proyecto. 
+  arrayVistasPermisos : any = []; //.Array que mostrará todas las vistas
+  palabra : string = `Crear` //.Palabra que indicará si la cción a realizar es crear o actualizar.
   @ViewChild('dt') dt: Table | undefined;
-  totalVistas : number = 0;
+  totalVistas : number = 0; //Cantidad total de vistas
   rows = 10; /** Filas de la tabla que se cargaran inicialmente  */
-  first = 0; /** variable que mostrará  */
-  categorias : any = [];
-  iconos2 : any = [];
-  vistaEliminar : any = [];
-  infoRoles : any = [];
+  first = 0; /** variable la cantidad de registros con los que inicia la tabla.  */
+  iconos2 : any = []; /** Variable que mostrará todos los iconos de primeng */
+  vistaEliminar : any = []; /* Vista a eliminar desde la ultima columna de la tabla. */
+  infoRoles : any = []; //.Variable que mostrará la lista de los roles al presionar el botón ver roles de la tabla.
   @ViewChild('op') op: OverlayPanel | undefined;
   imagenes : any = [
   {nombre : "activos.png", descripcion: 'Activos' },  {nombre : "factura.png", descripcion: 'Factura' }, {nombre : "carpeta.png", descripcion: 'Carpeta' },  {nombre : "Pedidos_Zeus.png", descripcion: 'Pedidos Zeus' },
@@ -172,7 +171,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let rolesSeleccionados : any [] = [];
     this.modal = true;
     this.palabra = `Editar`;
-    
+
     this.srvVistaPermisos.Get_By_Id(vista.Id).subscribe(data => {
       roles = data.vp_Id_Roles.split('|'); 
       roles.shift(); 
