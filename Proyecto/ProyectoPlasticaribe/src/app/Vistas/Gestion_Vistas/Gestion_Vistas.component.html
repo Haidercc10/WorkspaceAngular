@@ -1,0 +1,225 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="usuarios" class="font-size-32">Gestión de Vistas</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<!--Inicio del componente-->
+<p-card>
+  <div *ngIf="!cargando">
+    <!--toolbar-->
+    <p-toolbar styleClass="mb-4 gap-2">
+      <ng-template pTemplate="left">
+        <p-button id="nuevo" label="Nuevo" icon="pi pi-plus" styleClass="p-button-success mr-2" (click)="accionModal('Crear')"></p-button>
+        <p-button id="eliminar" label="Eliminar" *ngIf="vistaSeleccionada.length > 1; else inactivo;" icon="pi pi-trash" styleClass="p-button-danger" (click)="mostrarEleccion(['0'])"></p-button>
+        <ng-template #inactivo>
+          <p-button id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" [disabled]="true" styleClass="p-button-danger"></p-button>
+        </ng-template>
+      </ng-template>
+    </p-toolbar>
+    <!--Tabla-->
+    <p-table
+    id="tabla"
+    #dt
+    [value]="arrayVistasPermisos"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="rows"
+    [showCurrentPageReport]="true"
+    [(first)]="first"
+    [rowsPerPageOptions]="[10,20,30,50,70,100]"
+    [rowHover]="true"
+    [globalFilterFields]="['Id','Nombre','Area']"
+    [(selection)]="vistaSeleccionada"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" id="buscar" placeholder="Buscar Vista..." (input)="aplicarfiltroGlobal($event, 'contains')" pTooltip="Busca usuarios por su Id, Nombre o Área" tooltipPosition="top"/>
+        </span>
+      </div>
+    </ng-template>
+    <!--Headers Tabla-->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem"></th>
+        <th scope="col" >#</th>
+        <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+        <th scope="col" class="text-center">Icono</th>
+        <th scope="col" class="text-center">Dock</th>
+        <th scope="col">Ruta</th>
+        <th scope="col" pSortableColumn="Categoria">Categoria <p-sortIcon field="Categoria"></p-sortIcon></th>
+        <th scope="col" class="text-center">Roles</th>
+        <th scope="col">Editar</th>
+        <th scope="col">Eliminar</th>
+      </tr>
+    </ng-template>
+    <!--Cuerpo Tabla-->
+    <ng-template pTemplate="body" let-vistas let-rowIndex="rowIndex">
+      <tr class="font-size-16">
+        <td ><p-tableCheckbox [value]="vistas"></p-tableCheckbox></td>
+        <td><b>{{rowIndex + 1}}</b></td>
+        <td><b>{{vistas.Nombre}}</b></td>
+        <td class="text-center"><i class="{{vistas.Icono}}"></i></td>
+        <td class="text-center"><img src="../{{vistas.Dock}}" style="width: 2.5rem;"/></td>
+        <td>{{vistas.Ruta}}</td>
+        <td><b>{{vistas.Categoria}}</b></td>
+        <td class="text-center">
+          <p-button id="editar" (click)="mostrarRoles($event, vistas.Roles)" icon="pi pi-fw pi-eye" label="Ver roles" styleClass="p-button-text p-button-success" pTooltip="Haz clic para ver quienes tienen acceso a la vista de '{{vistas.Nombre}}'"></p-button>
+        </td>
+        <td style="text-align: center;">
+          <p-button id="editar" (click)="cargarVistas_Id(vistas)" icon="pi pi-pencil" styleClass="p-button-rounded p-button-success mr-2"></p-button>
+        </td>
+        <td style="text-align: center;">
+          <p-button id="inactivar" *ngIf="vistaSeleccionada.length <= 1; else inactivo2;" (click)="mostrarEleccion(vistas)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger"></p-button>
+        </td>
+        <ng-template #inactivo2 style="text-align: center;">
+          <td>
+            <p-button id="inactivar" icon="pi pi-trash" [disabled]="true" styleClass="p-button-rounded p-button-danger"></p-button>
+          </td>
+        </ng-template>
+      </tr>
+    </ng-template>
+    <!--Pie Tabla-->
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between font-size-16">
+        En total hay {{cantidadVistas()}} Vistas.
+      </div>
+    </ng-template>
+    </p-table>
+  </div>
+
+</p-card>
+
+<!--Modal para crear y editar vistas-->
+<p-dialog [(visible)]="modal" [style]="{width: '400px', }" [resizable]="true" header="{{palabra}} Vista" (onHide)="cambiarPalabraClave()" [modal]="true" styleClass="p-fluid" [contentStyle]="{'overflow':'visible'}">
+  <br>
+  <form [formGroup]="formVistas">
+    <div class="mb-4">
+      <div class="row g-4">
+
+        <!-- Nombre Materia Prima -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <input formControlName="vNombre" id="vNombre" type="text" pInputText required/>
+            <label for="vNombre">Nombre</label>
+          </span>
+        </div>
+
+         <!-- Menú -->
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-dropdown formControlName="vIcono" inputId="vIcono" optionValue="icon" optionLabel="label" [filter]="true" filterBy="label" [autoDisplayFirst]="false" [options]="iconos2">
+              <ng-template let-vista pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div><i [class]="vista.icon"></i> {{ vista.label }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <label for="vIcono">Icono Menú</label>
+          </span>
+        </div>
+
+        <!-- Icono  -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-dropdown formControlName="vDock" inputId="vDock" optionValue="nombre" optionLabel="descripcion" [options]="imagenes" [autoDisplayFirst]="false">
+              <ng-template let-imagen pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <img src="../assets/Iconos_Menu/{{imagen.nombre}}" style="width: 15%;"/>
+                  <div>{{imagen.descripcion}}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <label for="vDock">Icono vista fav.</label>
+          </span>
+        </div>
+
+        <!-- Categoria  -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-multiSelect formControlName="vCategoria" inputId="vCategoria" [options]="arrayVistas"></p-multiSelect>
+            <label for="vCategoria">Categoria</label>
+          </span>
+        </div>
+
+        <!-- Ruta -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <input formControlName="vRuta" id="vRuta" type="text" pInputText required/>
+            <label for="vRuta">Ruta</label>
+          </span>
+        </div>
+
+        <!-- Categoria  -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-multiSelect formControlName="vRoles" inputId="vRoles" [options]="arrayRoles" optionLabel="rolUsu_Nombre" optionValue="rolUsu_Id"></p-multiSelect>
+            <label for="vRoles">Roles</label>
+          </span>
+        </div>
+
+        <!--Inicio Fila 3 Botones y Limpiar Campos-->
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-success" type="button" label="{{palabra}}" icon="pi pi-check" (click)="registrarVista()"></button>
+              <button pButton class="p-button-secondary" type="button" label="Limpiar" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</p-dialog>
+
+<!--Modal de elección de eliminación de vistas-->
+<p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-vista>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton *ngIf="vistaSeleccionada.length <= 1;" (click)="eliminarVistas(vista)" icon="pi pi-check" label="Sí" class="p-button-success"></button>
+          <button type="button" pButton *ngIf="vistaSeleccionada.length > 1;" (click)="eliminarVistas(vista)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Panel que cargará los roles -->
+<p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" [showCloseIcon]="true">
+  <ng-template pTemplate>
+    <div *ngFor="let item of infoRoles"><i class="pi pi-user"></i> {{item}}</div>
+  </ng-template>
+</p-overlayPanel>
+
+
+
+

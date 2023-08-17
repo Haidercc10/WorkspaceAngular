@@ -62,6 +62,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
+import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
 
 export const routes: Routes = [
 
@@ -138,6 +139,7 @@ export const routes: Routes = [
 
  /*************************************************************************************************************************************************************/
   {path: 'pruebas', canActivate: [VistasPermisosGuard], data: {nombre: 'Pruebas'}, component: PruebaImagenCatInsumoComponent},
+  {path: 'gestion-vistas', canActivate: [VistasPermisosGuard], data: {nombre: 'Vistas'}, component: Gestion_VistasComponent},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
   {path: 'pedido-mantenimiento', canActivate: [VistasPermisosGuard], data: {nombre: 'Pedido de Mantenimiento de Activos'}, component: PedidoMantenimientoComponent},
