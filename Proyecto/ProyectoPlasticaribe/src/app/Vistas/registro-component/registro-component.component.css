@@ -34,6 +34,9 @@ p-password ::ng-deep .p-password, p-password ::ng-deep .p-inputtext {
   width: 100%;
 }
 
+p-treeselect ::ng-deep div p-overlay div {
+  max-height: 120px;
+}
 /* p-password ::ng-deep .pi {
   display: flex;
 } */

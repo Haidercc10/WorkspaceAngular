@@ -194,6 +194,8 @@ export class ReporteCostosOTComponent implements OnInit {
           else if (item.estado == 4) this.estado = '4';
           else if (item.estado == 1) this.estado = '1';
 
+          console.log(this.estado)
+
           this.infoOT.patchValue({
             ot : ot,
             cliente : item.clienteNom,

@@ -67,6 +67,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { ListboxModule } from 'primeng/listbox';
 import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
@@ -159,6 +161,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
+import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
 import { ErrorInterceptor } from './_helpers/error.interceptor';
 import { errorInterceptor_BagPro } from './_helpers/error.interceptor_BagPro';
 import { ErrorInterceptor_ContaZeus } from './_helpers/error.interceptor_ContaZeus';
@@ -263,7 +266,8 @@ import { AppComponent } from './app.component';
     Recibos_CajaComponent,
     Dashboard_CostosComponent,
     Ingreso_NominaComponent,
-    Dashboard_ComprasComponent
+    Dashboard_ComprasComponent,
+    Gestion_VistasComponent
   ],
 
   imports: [
@@ -353,6 +357,8 @@ import { AppComponent } from './app.component';
     FieldsetModule,
     AccordionModule,
     ToggleButtonModule,
+    TieredMenuModule,
+    ListboxModule,
   ],
 
   providers: [

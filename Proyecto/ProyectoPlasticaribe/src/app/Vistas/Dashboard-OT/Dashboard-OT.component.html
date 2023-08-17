@@ -360,12 +360,12 @@
 </div>
 
 <!-- Modal donde se podrán ver las ordenes de trabajo -->
-<p-dialog [modal]="true" [draggable]="false" [(visible)]="modalEstadosOrdenes" [contentStyle]="{'overflow':'visible'}" [style]="{width: '95%'}">
+<p-dialog [modal]="true" [draggable]="false" [(visible)]="modalEstadosOrdenes" [style]="{width: '95%'}">
   <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
 </p-dialog>
 
 <!-- Modal donde se podrá ver algunas graficas de barras -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="mostrarGraficaBarras" [style]="{width: '95%'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaBarras" [style]="{width: '95%'}">
   <p-toolbar *ngIf="graficaMateriales">
     <div class="p-toolbar-group-start">
       <button pButton pTooltip="Graficar Cantidad" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="llenarGraficaMateriales(1)"></button>
@@ -378,6 +378,6 @@
 </p-dialog>
 
 <!-- Modal donde se podrán ver algunas graficas de pie -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="mostrarGraficaPie" [style]="{width: '80%'}">
+<p-dialog header="{{nombreGrafica}}" [modal]="true" [draggable]="false" [(visible)]="mostrarGraficaPie" [style]="{width: '80%'}">
   <p-chart type="pie" width="90%" height="400px" [data]="graficaPieData" [options]="graficaPieOptions"></p-chart>
 </p-dialog>
