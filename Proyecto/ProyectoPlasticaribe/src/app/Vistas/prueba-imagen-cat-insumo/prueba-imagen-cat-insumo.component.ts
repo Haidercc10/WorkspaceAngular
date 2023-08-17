@@ -1,7 +1,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MegaMenuItem, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -69,7 +69,13 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.iconos2 = iconos;
   }
 
-  //.Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
+  // Función que cargará los roles en el campo del formulario
+  cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => this.arrayRoles = data);
+
+  // Función que buscará por el nombre de la vista en la tabla
+  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+
+  // Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
   cargarVistasDistintas() {
     this.nombreVistas = [];
     this.arrayRutas = [];
@@ -78,7 +84,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let dato: any;
     this.srvVistaPermisos.Get_Todo().subscribe(data => {
       this.cargarVistas(data);
-      data.forEach(item => { dato += item.vp_Categoria; });
+      data.forEach(item => dato += item.vp_Categoria);
       dato = dato.replaceAll('||', '|').split('|');
       dato.forEach(item => (!["undefined", ""].includes(item) && !this.arrayVistas.includes(item)) ? this.arrayVistas.push(item) : undefined);
     });
@@ -137,12 +143,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.formVistas.reset();
     this.formVistas.patchValue({ vRuta : '/' });
   }
-
-  //.Función que cargará los roles en el campo del formulario
-  cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => {this.arrayRoles = data});
-
-  //.Función que buscará por el nombre de la vista en la tabla
-  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
 
   //.Función que cargará las vistas en la tabla
   cargarVistas(datos : any){
@@ -206,7 +206,14 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       });
       imagen = this.imagenes.filter(item => item.nombre == data.vp_Icono_Dock.replace('assets/Iconos_Menu/', ''));
       icono = this.iconos2.filter(item => item.icon == data.vp_Icono_Menu);
-      this.formVistas.patchValue({vId: data.vp_Id, vNombre: data.vp_Nombre, vIcono: icono[0].icon, vDock: imagen[0].nombre, vCategoria: categorias, vRuta: data.vp_Ruta, });
+      this.formVistas.patchValue({
+        vId: data.vp_Id, 
+        vNombre: data.vp_Nombre, 
+        vIcono: icono[0].icon, 
+        vDock: imagen[0].nombre, 
+        vCategoria: categorias, 
+        vRuta: data.vp_Ruta, 
+      });
     });
   }
 
@@ -218,24 +225,21 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   
   //Función que eliminará una o varias vistas de la tabla y de la base de datos.
   eliminarVistas(data : any){
-   let esError : boolean = false;
-   this.onReject(`eleccion`);
-
-   if(this.vistaSeleccionada.length > 1) { 
-    data = this.vistaSeleccionada;
-    data.forEach(element => { 
-      this.srvVistaPermisos.Delete(element.Id).subscribe(datos => { 
-        this.arrayVistasPermisos.splice(this.arrayVistasPermisos.findIndex(item => item.Id == element.Id));
-      }, error => { esError = true; } );
-    });
-   } else {
-    data = this.vistaEliminar;
-    this.srvVistaPermisos.Delete(data.Id).subscribe(data => { esError = false;  }, error => { esError = true; });
-   } 
-   if(!esError) {
-    this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
-    this.cargarVistasDistintas();
-   } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
+    let esError : boolean = false;
+    this.onReject(`eleccion`);
+    if(this.vistaSeleccionada.length > 1) { 
+      data = this.vistaSeleccionada;
+      data.forEach(element => { 
+        this.srvVistaPermisos.Delete(element.Id).subscribe(() => this.arrayVistasPermisos.splice(this.arrayVistasPermisos.findIndex(item => item.Id == element.Id)), () => esError = true);
+      });
+    } else {
+      data = this.vistaEliminar;
+      this.srvVistaPermisos.Delete(data.Id).subscribe(() => esError = false, () => esError = true);
+    } 
+    if(!esError) {
+      this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
+      this.cargarVistasDistintas();
+    } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
   }
 
   //.Quitar mensajes de elección.
@@ -248,17 +252,18 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   mostrarRoles($event, roles : any){
     this.infoRoles = [];
     roles.forEach(element => { 
-      if(!['16'].includes(element)) {
-        this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { this.infoRoles.push(data.rolUsu_Nombre); }); 
-      } 
+      if(!['16'].includes(element)) this.srvRoles.srvObtenerListaPorId(element).subscribe(data => this.infoRoles.push(data.rolUsu_Nombre));
     });
-    setTimeout(() => { this.op!.toggle($event); $event.stopPropagation(); }, 500);
+    setTimeout(() => {
+      this.op!.toggle($event); 
+      $event.stopPropagation();
+    }, 500);
   }
 
   //Función que mostrará la cantidad de vistas disponibles
   cantidadVistas() {
     this.totalVistas = 0;
-    this.arrayVistasPermisos.forEach(element => { this.totalVistas += 1; });
+    this.arrayVistasPermisos.forEach(() => this.totalVistas += 1);
     return this.totalVistas;
   }
 }

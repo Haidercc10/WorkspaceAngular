@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -18,6 +18,10 @@ import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/data';
 import { CrearBoppComponent } from '../crear-bopp/crear-bopp.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Entrada-BOPP',
