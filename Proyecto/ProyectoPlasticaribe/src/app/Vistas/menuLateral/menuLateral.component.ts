@@ -123,17 +123,18 @@ export class MenuLateralComponent implements OnInit {
       this.categorias = [];
       for (let i = 0; i < data.length; i++){
         data[i].split('|').forEach(element => {
-          if (this.categorias.length > 0 && element != '' && !['Inicio', 'Pruebas'].includes(element)) {
+          if (this.categorias.length > 0 && element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) {
             if (this.categorias.findIndex(item => item.label == element) == -1) this.categorias.push({label: element, icon: '', items: []});
-          } else if (element != '' && !['Inicio', 'Pruebas'].includes(element)) this.categorias.push({label: element, icon: '', items: []});
+          } else if (element != '' && !['Inicio', 'Pruebas', 'Vistas'].includes(element)) this.categorias.push({label: element, icon: '', items: []});
         });
       }
       this.categorias.sort((a, b) => a.label.localeCompare(b.label));
       this.categorias.unshift({label: `Inicio`, icon: 'pi pi-home', command: () => this.router.navigate(['/home'])});
-      if (this.storage_Id == 123456789) this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
-      setTimeout(() => {
-        this.cargarOpcionesMenu();
-      }, 50);
+      if (this.storage_Id == 123456789) {
+        this.categorias.unshift({label: `Vistas`, icon: 'pi pi-eye', command: () => this.router.navigate(['/gestion-vistas'])});
+        this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
+      }
+      setTimeout(() => this.cargarOpcionesMenu(), 50);
     });
   }
 
