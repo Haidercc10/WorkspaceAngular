@@ -1,7 +1,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MegaMenuItem, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -67,18 +67,56 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.iconos2 = iconos;
   }
 
-  //.Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
+  // Función que limpiará los campos
+  limpiarCampos() {
+    this.formVistas.reset();
+    this.formVistas.patchValue({ vRuta : '/' });
+  }
+
+  // Función que cargará los roles en el campo del formulario
+  cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => this.arrayRoles = data);
+
+  // Función que buscará por el nombre de la vista en la tabla
+  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+
+  // Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
   cargarVistasDistintas() {
     this.arrayVistasPermisos = [];
     this.cargando = true;
     let dato: any;
     this.srvVistaPermisos.Get_Todo().subscribe(data => {
       this.cargarVistas(data);
-      data.forEach(item => { dato += item.vp_Categoria; });
+      data.forEach(item => dato += item.vp_Categoria);
       dato = dato.replaceAll('||', '|').split('|');
       dato.forEach(item => (!["undefined", ""].includes(item) && !this.arrayVistas.includes(item)) ? this.arrayVistas.push(item) : undefined);
     });
     setTimeout(() => this.cargando = false, 1500);
+  }
+
+  // Función que cargará las vistas en la tabla
+  cargarVistas(datos : any){
+    for (let index = 0; index < datos.length; index++) {
+      let info : any = {
+        Id : datos[index].vp_Id,
+        Nombre : datos[index].vp_Nombre,
+        Icono : datos[index].vp_Icono_Menu,
+        Dock : datos[index].vp_Icono_Dock,
+        Ruta : datos[index].vp_Ruta,
+        Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replaceAll('|', ', '),
+        Roles : datos[index].vp_Id_Roles.split('|'),
+      }
+      info.Roles.shift();
+      info.Roles.pop();
+      this.arrayVistasPermisos.push(info);
+    }
+  }
+
+  //Acción que realizará el modal dependiendo la palabra clave
+  accionModal(clave : string) {
+    (clave == `Crear`) ? this.modal =  true : this.modal = false;
+    this.cargando = false;
+    this.palabra = `Crear`;
+    this.limpiarCampos();
   }
 
   //.Función que registrará o actualizará una vista
@@ -98,67 +136,29 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           }
           //Crear vista
           if(this.palabra == 'Crear') {
-            this.srvVistaPermisos.Post(modelo).subscribe(data => { 
+            this.srvVistaPermisos.Post(modelo).subscribe(() => { 
               this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
               setTimeout(() => { 
                 this.accionModal(`Crear`); 
                 this.cargarVistasDistintas();
               }, 1000);
-            }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+            }, () => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
           }
           //Editar vista
           if(this.palabra == 'Editar') {
-            this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(data => { 
+            this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(() => { 
               this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha actualizado la vista ${modelo.Vp_Nombre} exitosamente!`);
               setTimeout(() => { 
                 this.accionModal(`Editar`); 
                 this.cargarVistasDistintas();
               }, 1000);
-            }, error => { this.msjs.mensajeError(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+            }, () => { this.msjs.mensajeError(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
           }
 
         } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las ruta no puede ser "/", por favor verifique!`);  
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las rutas no pueden contener espacios, por favor, verifique!`);
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe completar los campos vacios!`);
     
-  }
-
-  //.Función que limpiará los campos
-  limpiarCampos() {
-    this.formVistas.reset();
-    this.formVistas.patchValue({ vRuta : '/' });
-  }
-
-  //.Función que cargará los roles en el campo del formulario
-  cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => {this.arrayRoles = data});
-
-  //.Función que buscará por el nombre de la vista en la tabla
-  aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
-
-  //.Función que cargará las vistas en la tabla
-  cargarVistas(datos : any){
-    for (let index = 0; index < datos.length; index++) {
-      let info : any = {
-        Id : datos[index].vp_Id,
-        Nombre : datos[index].vp_Nombre,
-        Icono : datos[index].vp_Icono_Menu,
-        Dock : datos[index].vp_Icono_Dock,
-        Ruta : datos[index].vp_Ruta,
-        Categoria : datos[index].vp_Categoria.slice(1, datos[index].vp_Categoria.length - 1).replaceAll('|', ', '),
-        Roles : datos[index].vp_Id_Roles.split('|'), //.replaceAll('|', ', ').substring(2, (datos[index].vp_Id_Roles.replaceAll('|', ', ').length - 2)),
-      }
-      info.Roles.shift();
-      info.Roles.pop();
-      this.arrayVistasPermisos.push(info);
-    }
-  }
-
-  //Acción que realizará el modal dependiendo la palabra clave
-  accionModal(clave : string) {
-    (clave == `Crear`) ? this.modal =  true : this.modal = false;
-    this.cargando = false;
-    this.palabra = `Crear`;
-    this.limpiarCampos();
   }
 
   //Acción que cargará las vistas para actualizarlas
@@ -194,7 +194,14 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       });
       imagen = this.imagenes.filter(item => item.nombre == data.vp_Icono_Dock.replace('assets/Iconos_Menu/', ''));
       icono = this.iconos2.filter(item => item.icon == data.vp_Icono_Menu);
-      this.formVistas.patchValue({vId: data.vp_Id, vNombre: data.vp_Nombre, vIcono: icono[0].icon, vDock: imagen[0].nombre, vCategoria: categorias, vRuta: data.vp_Ruta, });
+      this.formVistas.patchValue({
+        vId: data.vp_Id, 
+        vNombre: data.vp_Nombre, 
+        vIcono: icono[0].icon, 
+        vDock: imagen[0].nombre, 
+        vCategoria: categorias, 
+        vRuta: data.vp_Ruta, 
+      });
     });
   }
 
@@ -206,24 +213,21 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   
   //Función que eliminará una o varias vistas de la tabla y de la base de datos.
   eliminarVistas(data : any){
-   let esError : boolean = false;
-   this.onReject(`eleccion`);
-
-   if(this.vistaSeleccionada.length > 1) { 
-    data = this.vistaSeleccionada;
-    data.forEach(element => { 
-      this.srvVistaPermisos.Delete(element.Id).subscribe(datos => { 
-        this.arrayVistasPermisos.splice(this.arrayVistasPermisos.findIndex(item => item.Id == element.Id));
-      }, error => { esError = true; } );
-    });
-   } else {
-    data = this.vistaEliminar;
-    this.srvVistaPermisos.Delete(data.Id).subscribe(data => { esError = false;  }, error => { esError = true; });
-   } 
-   if(!esError) {
-    this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
-    this.cargarVistasDistintas();
-   } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
+    let esError : boolean = false;
+    this.onReject(`eleccion`);
+    if(this.vistaSeleccionada.length > 1) { 
+      data = this.vistaSeleccionada;
+      data.forEach(element => { 
+        this.srvVistaPermisos.Delete(element.Id).subscribe(() => this.arrayVistasPermisos.splice(this.arrayVistasPermisos.findIndex(item => item.Id == element.Id)), () => esError = true);
+      });
+    } else {
+      data = this.vistaEliminar;
+      this.srvVistaPermisos.Delete(data.Id).subscribe(() => esError = false, () => esError = true);
+    } 
+    if(!esError) {
+      this.msjs.mensajeConfirmacion(`OK!`, `Vista(s) eliminada(s) exitosamente!`); 
+      this.cargarVistasDistintas();
+    } else this.msjs.mensajeError(`Error`, `No fue posible eliminar las vistas seleccionadas, verifique!`);
   }
 
   //.Quitar mensajes de elección.
@@ -236,17 +240,18 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   mostrarRoles($event, roles : any){
     this.infoRoles = [];
     roles.forEach(element => { 
-      if(!['16'].includes(element)) {
-        this.srvRoles.srvObtenerListaPorId(element).subscribe(data => { this.infoRoles.push(data.rolUsu_Nombre); }); 
-      } 
+      if(!['16'].includes(element)) this.srvRoles.srvObtenerListaPorId(element).subscribe(data => this.infoRoles.push(data.rolUsu_Nombre));
     });
-    setTimeout(() => { this.op!.toggle($event); $event.stopPropagation(); }, 500);
+    setTimeout(() => {
+      this.op!.toggle($event); 
+      $event.stopPropagation();
+    }, 500);
   }
 
   //Función que mostrará la cantidad de vistas disponibles
   cantidadVistas() {
     this.totalVistas = 0;
-    this.arrayVistasPermisos.forEach(element => { this.totalVistas += 1; });
+    this.arrayVistasPermisos.forEach(() => this.totalVistas += 1);
     return this.totalVistas;
   }
 }
