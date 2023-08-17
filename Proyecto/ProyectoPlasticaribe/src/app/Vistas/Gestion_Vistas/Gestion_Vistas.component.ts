@@ -108,13 +108,17 @@ export class Gestion_VistasComponent implements OnInit {
               }
               //Crear vista
               if(this.palabra == 'Crear') {
-                this.srvVistaPermisos.Post(modelo).subscribe(data => { 
-                  this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
-                  setTimeout(() => { 
-                    this.accionModal(`Crear`); 
-                    this.cargarVistasDistintas();
-                  }, 1000);
-                }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+                if(!this.arrayRutas.includes(this.formVistas.value.vRuta)) {
+                  if(!this.nombreVistas.includes(this.formVistas.value.vNombre)) {
+                    this.srvVistaPermisos.Post(modelo).subscribe(data => { 
+                      this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
+                      setTimeout(() => { 
+                        this.accionModal(`Crear`); 
+                        this.cargarVistasDistintas();
+                      }, 1000);
+                    }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+                  } else this.msjs.mensajeAdvertencia(`Advertencia`, `El nombre de vista "${this.formVistas.value.vNombre}" ya existe, por favor, cambielo!`);
+                } else this.msjs.mensajeAdvertencia(`Advertencia`, `La ruta "${this.formVistas.value.vRuta}" ya existe, por favor, cambiela!`);
               }
               //Editar vista
               if(this.palabra == 'Editar') {
