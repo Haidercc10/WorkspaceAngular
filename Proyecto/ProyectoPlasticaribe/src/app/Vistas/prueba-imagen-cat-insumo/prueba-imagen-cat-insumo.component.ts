@@ -33,6 +33,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   iconos2 : any = []; /** Variable que mostrará todos los iconos de primeng */
   vistaEliminar : any = []; /* Vista a eliminar desde la ultima columna de la tabla. */
   infoRoles : any = []; //.Variable que mostrará la lista de los roles al presionar el botón ver roles de la tabla.
+  arrayRutas : any = [];
+  nombreVistas : any = [];
   @ViewChild('op') op: OverlayPanel | undefined;
   imagenes : any = [
   {nombre : "activos.png", descripcion: 'Activos' },  {nombre : "factura.png", descripcion: 'Factura' }, {nombre : "carpeta.png", descripcion: 'Carpeta' },  {nombre : "Pedidos_Zeus.png", descripcion: 'Pedidos Zeus' },
@@ -69,6 +71,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   //.Función que cargará las categorias en el listado del formulario y cargará todas las vistas en la tabla
   cargarVistasDistintas() {
+    this.nombreVistas = [];
+    this.arrayRutas = [];
     this.arrayVistasPermisos = [];
     this.cargando = true;
     let dato: any;
@@ -86,37 +90,42 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     if(this.formVistas.valid) {
       if(!this.formVistas.value.vRuta.toString().includes(' ')) {
         if(this.formVistas.value.vRuta != '/') {
-          this.cargando = true;
-          let modelo : modelVistasPermisos = {
-            Vp_Id : this.palabra == `Crear` ? 0 : this.formVistas.value.vId,
-            Vp_Nombre: this.formVistas.value.vNombre,
-            Vp_Icono_Dock: this.rutaImagenes + `${this.formVistas.value.vDock}`,
-            Vp_Icono_Menu: this.formVistas.value.vIcono,
-            Vp_Ruta: this.formVistas.value.vRuta.toString().replace(' ', '-'),
-            Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
-            Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
-          }
-          //Crear vista
-          if(this.palabra == 'Crear') {
-            this.srvVistaPermisos.Post(modelo).subscribe(data => { 
-              this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
-              setTimeout(() => { 
-                this.accionModal(`Crear`); 
-                this.cargarVistasDistintas();
-              }, 1000);
-            }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
-          }
-          //Editar vista
-          if(this.palabra == 'Editar') {
-            this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(data => { 
-              this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha actualizado la vista ${modelo.Vp_Nombre} exitosamente!`);
-              setTimeout(() => { 
-                this.accionModal(`Editar`); 
-                this.cargarVistasDistintas();
-              }, 1000);
-            }, error => { this.msjs.mensajeError(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
-          }
+          if(!this.arrayRutas.includes(this.formVistas.value.vRuta)) {
+            if(!this.nombreVistas.includes(this.formVistas.value.vNombre)) {
+              
+              this.cargando = true;
+              let modelo : modelVistasPermisos = {
+                Vp_Id : this.palabra == `Crear` ? 0 : this.formVistas.value.vId,
+                Vp_Nombre: this.formVistas.value.vNombre,
+                Vp_Icono_Dock: this.rutaImagenes + `${this.formVistas.value.vDock}`,
+                Vp_Icono_Menu: this.formVistas.value.vIcono,
+                Vp_Ruta: this.formVistas.value.vRuta.toString().replace(' ', '-'),
+                Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
+                Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
+              }
+              //Crear vista
+              if(this.palabra == 'Crear') {
+                this.srvVistaPermisos.Post(modelo).subscribe(data => { 
+                  this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha guardado la vista ${modelo.Vp_Nombre} exitosamente!`); 
+                  setTimeout(() => { 
+                    this.accionModal(`Crear`); 
+                    this.cargarVistasDistintas();
+                  }, 1000);
+                }, error => { this.msjs.mensajeError(`Error`, `No fue posible crear la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+              }
+              //Editar vista
+              if(this.palabra == 'Editar') {
+                this.srvVistaPermisos.Put(modelo.Vp_Id, modelo).subscribe(data => { 
+                  this.msjs.mensajeConfirmacion(`Excelente!`, `Se ha actualizado la vista ${modelo.Vp_Nombre} exitosamente!`);
+                  setTimeout(() => { 
+                    this.accionModal(`Editar`); 
+                    this.cargarVistasDistintas();
+                  }, 1000);
+                }, error => { this.msjs.mensajeError(`Error`, `No fue posible editar la vista ${modelo.Vp_Nombre}, por favor, verifique!`); });
+              }
 
+            } else this.msjs.mensajeAdvertencia(`Advertencia`, `El nombre de vista "${this.formVistas.value.vNombre}" ya existe, por favor, cambielo!`);
+          } else this.msjs.mensajeAdvertencia(`Advertencia`, `La ruta "${this.formVistas.value.vRuta}" ya existe, por favor, cambiela!`);
         } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las ruta no puede ser "/", por favor verifique!`);  
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `Las rutas no pueden contener espacios, por favor, verifique!`);
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe completar los campos vacios!`);
@@ -150,6 +159,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       info.Roles.shift();
       info.Roles.pop();
       this.arrayVistasPermisos.push(info);
+      this.arrayRutas.push(info.Ruta);
+      this.nombreVistas.push(info.Nombre);
+      console.log(this.arrayRutas)
     }
   }
 
