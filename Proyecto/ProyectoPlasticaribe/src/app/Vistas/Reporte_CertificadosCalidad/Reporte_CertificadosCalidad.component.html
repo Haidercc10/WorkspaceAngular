@@ -3,7 +3,7 @@
  <br>
  <app-VistasFavoritas></app-VistasFavoritas>
  
- <div class="d-flex justify-content-center overlay" *ngIf="!load">
+ <div class="d-flex justify-content-center overlay" *ngIf="load">
    <div style="margin: auto;">
      <p-progressSpinner></p-progressSpinner>
    </div>
@@ -50,7 +50,7 @@
         <!-- Fecha Inicial -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <p-calendar formControlName="fechaInicio" inputId="fechaInicial" [showIcon]="true"></p-calendar>
+            <p-calendar formControlName="fechaInicio" inputId="fechaInicial" [showIcon]="true" pTooltip="Filtro de fecha de creación de certificados" tooltipPosition="top"></p-calendar>
             <label for="fechaInicial">Fecha Inicial</label>
           </span>
         </div>
@@ -106,10 +106,10 @@
     <hr class="Linea">
   </div>
 
-   <div class="mb-3" *ngIf="load">
+   <div class="mb-3" *ngIf="!load">
     <div class="row g-3 font-size-14">
       <p-table
-        *ngIf="load"
+        *ngIf="!load"
         #dt_carteraAgrupada
         [value]="certificados"
         [resizableColumns]="true"
@@ -120,7 +120,7 @@
         [rows]="certificados.length"
         [rowsPerPageOptions]="[10,25,50,100]"
         [rowHover]="true"
-        dataKey="Id_Proveedor"
+        dataKey="Consecutivo"
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
@@ -135,7 +135,7 @@
           <tr>
             <th></th>
             <th>#</th>
-            <th pSortableColumn="Consecutivo"><p-sortIcon field="Consecutivo"></p-sortIcon> Consecutivo</th>
+            <th class="text-center" pSortableColumn="Consecutivo"><p-sortIcon field="Consecutivo"></p-sortIcon> Consecutivo</th>
             <th pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha Creación</th>
             <th pSortableColumn="Cliente"><p-sortIcon field="Cliente"></p-sortIcon> Cliente</th>
             <th pSortableColumn="Referencia"><p-sortIcon field="Referencia"></p-sortIcon> Referencia</th>
@@ -148,11 +148,11 @@
               <button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
             </td>
             <td>{{rowIndex + 1}}</td>
-            <td>{{item.Consecutivo}}</td>
+            <td class="text-center"><b>{{item.Consecutivo}}</b></td>
             <td>{{item.Fecha}}</td>
-            <td>{{item.Cliente}}</td>
+            <td><b>{{item.Cliente}}</b></td>
             <td>{{item.Referencia}}</td>
-            <td>{{item.Ot}}</td>
+            <td><b>{{item.Ot}}</b></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="rowexpansion" let-item>
@@ -161,36 +161,46 @@
               <div class="p-3">
                 <p-table
                   #dt_SubcarteraAgrupada
-                  [value]="item.Detalles"
-                  dataKey="factura"
+                  [value]="item.Parametros"
+                  dataKey="consecutivo"
                   styleClass="p-datatable-gridlines p-datatable-sm"
                   [scrollable]="true"
                   scrollHeight="30rem">
                   <ng-template pTemplate="header">
                     <tr>
                       <th>#</th>
-                      <th pSortableColumn="Parametro"><p-sortIcon field="Parametro"></p-sortIcon> Param. Cuantitativo</th>
-                      <th pSortableColumn="Unidad"><p-sortIcon field="Unidad"></p-sortIcon> Unidad</th>
-                      <th pSortableColumn="Tolerancia"><p-sortIcon field="Tolerancia"></p-sortIcon> Tolerancia</th>
-                      <th pSortableColumn="Minimo"><p-sortIcon field="Minimo"></p-sortIcon> Mínimo</th>
-                      <th pSortableColumn="Máximo"><p-sortIcon field="Máximo"></p-sortIcon> Máximo</th>
-                      <th>Días</th>
+                      <th>Param. Cuantitativo</th>
+                      <th>Unidad</th>
+                      <th>Nominal</th>
+                      <th>Tolerancia</th>
+                      <th>Mínimo</th>
+                      <th>Máximo</th>
                     </tr>
                   </ng-template>
-                  <ng-template pTemplate="body" let-detalles let-rowIndex="rowIndex">
+                  <ng-template pTemplate="body" let-cuantitativos let-rowIndex="rowIndex">
                     <tr>
                       <td>{{rowIndex + 1}}</td>
-                      <td>{{detalles.factura}}</td>
-                      <td>{{detalles.fecha_Factura}}</td>
-                      <td>{{detalles.fecha_Vencimiento}}</td>
-                      <td>{{detalles.saldo_Actual | number : '1.2-2'}}</td>
-                      <td>{{detalles.mora}}</td>
-                      <td>{{0}}</td>
+                      <td>{{cuantitativos.parametro}}</td>
+                      <td>{{cuantitativos.unidad}}</td>
+                      <td>{{cuantitativos.nominal | number : '1.2-2'}}</td>
+                      <td>{{cuantitativos.tolerancia | number }}</td>
+                      <td>{{cuantitativos.minimo | number : '1.2-2'}}</td>
+                      <td>{{cuantitativos.maximo | number : '1.2-2'}}</td>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="emptymessage">
                     <tr>
                       <td colspan="8">No se encontraron registros</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="footer" let-cuantitativos>
+                    <tr>
+                      <td colspan="2">Material: {{cuantitativos.material}}</td>
+                      <td>Resistencia: {{cuantitativos.resistencia}}</td>
+                      <td>Sellabilidad: {{cuantitativos.sellabilidad}}</td>
+                      <td>Transparencia: {{cuantitativos.transparencia}}</td>
+                      <td>Tratado: {{cuantitativos.tratado}}</td>
+                      <td>Impresión: {{cuantitativos.impresion}}</td>
                     </tr>
                   </ng-template>
                 </p-table>
