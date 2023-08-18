@@ -16,6 +16,10 @@ constructor(private http : HttpClient) { }
 
     Get_Id = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/${id}`);
 
+    GetMateriales = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/getMateriales`);
+
+    GetUltCertificadoItem = (item : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/getUltCertificadoItem/${item}`);
+
     Post = (data : modelCertificadosCalidad) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Certificados_Calidad`, data);
 
 }

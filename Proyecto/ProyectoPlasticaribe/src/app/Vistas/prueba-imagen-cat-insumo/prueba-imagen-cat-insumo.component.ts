@@ -29,7 +29,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   FormOrden !: FormGroup; //Variable que almacenará la información del formulario donde esta la información general de la orden de trabajo
   unidadesMedidas : any [] = []; //Variable que almacenará la información de las unidades de medida
-  arrayBooleano : string [] = ['Si', 'No']; //Variable que almacenará la información de los booleanos
+  arrayBooleano : string [] = ['Si', 'No', 'Conforme', 'N/A']; //Variable que almacenará la información de los booleanos
+  transparencia : string [] = ['Alta', 'Baja', 'Media', 'Si', 'No', 'N/A']; //Variable que almacenará la información de los booleanos
+  resistenciaSellabilidad : string [] = ['Alta', '', 'N/A']; //Variable que almacenará la información de los booleanos
   materiales : string [] = []; //Variable que almacenará la información de los materiales
   parametrosCuantitativos : any [] = []; //Variable que almacenará la información de los parametros cuantitativos de la orden de trabajo
   paramertosCualitativos : any [] = []; //Variable que almacenará la información de los parametros cualitativos de la orden de trabajo
@@ -44,6 +46,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.FormOrden = this.frmBuilder.group({
       Orden : [null, Validators.required],
       Cliente : [null, Validators.required],
+      Item : [null, Validators.required],
       Referencia : [null, Validators.required],
       Cantidad : [null, Validators.required],
       Presentacion : [null, Validators.required],
@@ -56,7 +59,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerUnidadesMedidas();
     this.llenarMateriales();
-    this.crearPdfCertificado(2);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -83,89 +85,119 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   // Funcion que va a llenar el array de materiales
   llenarMateriales(){
     this.materiales = [
-      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD',
-      'RESINA VIRGEN DE POLIPROPILENO BIORIENTAD',
-      'RESINA VIRGEN DE POLIETILENO DE ALTA DENSIDAD',
-      'RESINA VIRGEN DE POLIPROPILENO CAST + RESINA VIRGEN DE PEBD',
-      'LÁMINA DE RESINA VIRGEN DE CAST + RESINA VIRGEN DE PEBD',
+      '',
       'RESINA VIRGEN DE BOPP + RESINA VIRGEN DE PEBD',
-    ]
+      'RESINA VIRGEN DE POLIETILENO DE ALTA DENSIDAD',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD',
+      'RESINA VIRGEN DE POLIPROPILENO CAST + RESINA VIRGEN DE PEBD',
+      'RESINA VIRGEN DE POLIPROPILENO',
+      'POLIETILENO DE BAJA DENSIDAD',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD Y METALOCENO + PIGMENTO NEGRO DE HUMO',
+      'RESINA VIRGEN DE POLIETILENO DE ALTA DENSIDAD + POLIETILENO LINEA DE BAJA DENSIDAD',
+      'RESINA VIRGEN DE POLIPROPILENO BIORIENTADO',
+      'LÁMINA DE RESINA VIRGEN DE CAST + RESINA VIRGEN DE PEBD',
+      'RESINA VIRGEN DE POLIPROPILENO + DEPOSITO DE ALUMINIO',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO VERDE',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD NATURAL',
+      'RESINA DE POLIETILENO DE BAJA DENSIDAD',
+      'COEXTRUSIÓN POLIAMIDA + POLIETILENO',
+      'RESINA VIRGEN DE POLIETILENO',
+      'RESINA DE POLIETILENO + PIGMENTO',
+      'RESINA VIRGEN DE POLIESTER + POLIETILENO DE BAJA DENSIDAD',
+      'RESINA DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO NEGRO',
+      'RESINA VIRGEN DE POLIPROPILENO + POLIETILENO DE BAJA DENSIDAD',
+      'RESINA VIRGEN DE BOPP',
+      'RESINA VIRGEN DE BOPP BLANCO',
+      'RESINAS VIRGENES DE POLIMEROS TERMOPLASTICOS',
+      'RESINAS VIRGENES DE POLIETILENOS DE BAJA DENSIDAD',
+      'DEPOSITO DE ALUMINIO',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO AZUL',
+      'RESINA VIRGEN DE POLIETILENO DE ALTA DENSIDAD + PIGMENTO AZUL',
+      'RESINA DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO VERDE',
+      'RESINA VIRGEN DE POLIETILENO DE ALTA DENSIDAD + PIGMENTO BLANCO',
+      'RESINA VIRGEN DE RECUPERADO DE BAJA PIGMENTO NEGRO',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO ROJO',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO NEGRO',
+      'RESINA DE RECUPERADO',
+      'RESINA VIRGEN DE POLIPROPILENO MONORIENTATO',
+      'RESINA VIRGEN DE RECUPERADO DE BAJA + PIGMENTO NEGRO',
+      'RESINA VIRGEN DE POLIPROPILENO MONORIENTADO',
+      'RESINA DE POLIETILENO DE ALTA DENSIDAD + PIGMENTO VERDE',
+      'RESINA VIRGEN DE POLIETILENO DE BAJA DENSIDAD + PIGMENTO',
+      'TRILAMINADO DE  METALIZADO + POLIPROPILENO BIORENTADO + POLIETILENO DE BAJA DENSIDAD',
+    ];
+    this.certCalidadService.GetMateriales().subscribe(data => data.forEach(mat => !this.materiales.includes(mat) ? this.materiales.push(mat) : null));
   }
 
   // Funcion que va a consultar la información de la orden de trabajo
   consultarOrdenTrabajo(){
-    this.paramertosCualitativos = [];
-    this.parametrosCuantitativos = [];
     let orden : number = this.FormOrden.value.Orden;
+    this.limpiarTodo();
     this.bagproService.srvObtenerListaClienteOT_Item(orden).subscribe(data => {
+      if (data.length == 0) this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``);
       data.forEach(ot => {
         this.cargando = true;
-        let presentacion : string;
-
-        if (ot.ptPresentacionNom == 'Unidad') presentacion = 'Und';
-        else if (ot.ptPresentacionNom == 'Paquete') presentacion = 'Paquete';
-        else if (ot.ptPresentacionNom == 'Kilo') presentacion = 'Kg';
-        else if (ot.ptPresentacionNom == 'Rollo') presentacion = 'Rollo';
-
         this.FormOrden.patchValue({
+          Orden : orden,
           Cliente : ot.clienteNom,
+          Item : parseInt(ot.clienteItems),
           Referencia : ot.clienteItemsNom,
           Cantidad : ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
-          Presentacion : presentacion,
-          Observacion : ot.observacion,
-          Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD')
+          Presentacion : ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
+          Observacion : ``,
+          Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
-
-        this.calcularParametrosCuantitativos(ot);
-        this.llenarParametrosCualitativos(ot);
-
+        this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(data => {
+          this.calcularParametrosCuantitativos(data, ot);
+          this.llenarParametrosCualitativos(data, ot);
+        });
         this.cargando = false;
       });
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información de la OT ${orden}!`, ``));
   }
 
   // Funcion que va a calcular los datos del parametro cuantitativo
-  calcularParametrosCuantitativos(orden : any){
+  calcularParametrosCuantitativos(orden : any, dataBagpro : any = null){
     this.parametrosCuantitativos.push(
       {
         Nombre : `Calibre`,
-        UndMedida : orden.extUnidadesNom.trim(),
-        Nominal : parseFloat(orden.extCalibre),
-        Tolerancia : 0,
-        Minimo : 0,
-        Maximo : 0,
+        UndMedida : orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
+        Nominal : orden != null ? orden.nominal_Calibre : dataBagpro != null ? parseFloat(dataBagpro.extCalibre) : 0,
+        Tolerancia : orden != null ? orden.tolerancia_Calibre : 0,
+        Minimo : orden != null ? orden.minimo_Calibre : 0,
+        Maximo : orden != null ? orden.maximo_Calibre : 0,
       },
       {
         Nombre : `Ancho Frente`,
-        UndMedida : ``.trim(),
-        Nominal : parseFloat(orden.ptAnchopt),
-        Tolerancia : 0,
-        Minimo : 0,
-        Maximo : 0,
+        UndMedida : orden != null ? orden.unidad_AnchoFrente.trim() : 'N/E',
+        Nominal : orden != null ? orden.nominal_AnchoFrente : dataBagpro != null ? parseFloat(dataBagpro.ptAnchopt) : 0,
+        Tolerancia : orden != null ? orden.tolerancia_AnchoFrente : 0,
+        Minimo : orden != null ? orden.minimo_AnchoFrente : 0,
+        Maximo : orden != null ? orden.maximo_AnchoFrente : 0,
       },
       {
         Nombre : `Ancho Fuelle`,
-        UndMedida : ``.trim(),
-        Nominal : parseFloat(orden.ptFuelle),
-        Tolerancia : 0,
-        Minimo : 0,
-        Maximo : 0,
+        UndMedida : orden != null ? orden.unidad_AnchoFuelle.trim() : 'N/E',
+        Nominal : orden != null ? orden.nominal_AnchoFuelle : dataBagpro != null ? parseFloat(dataBagpro.ptFuelle) : 0,
+        Tolerancia : orden != null ? orden.tolerancia_AnchoFuelle : 0,
+        Minimo : orden != null ? orden.minimo_AnchoFuelle : 0,
+        Maximo : orden != null ? orden.maximo_AnchoFuelle : 0,
       },
       {
         Nombre : `Largo / Repetición`,
-        UndMedida : ``.trim(),
-        Nominal : parseFloat(orden.ptLargopt),
-        Tolerancia : 0,
-        Minimo : 0,
-        Maximo : 0,
+        UndMedida : orden != null ? orden.unidad_LargoRepeticion.trim() : 'N/E',
+        Nominal : orden != null ? orden.nominal_LargoRepeticion : dataBagpro != null ? parseFloat(dataBagpro.ptLargopt) : 0,
+        Tolerancia : orden != null ? orden.tolerancia_LargoRepeticion : 0,
+        Minimo : orden != null ? orden.minimo_LargoRepeticion : 0,
+        Maximo : orden != null ? orden.maximo_LargoRepeticion : 0,
       },
       {
         Nombre : `COF`,
-        UndMedida : ``.trim(),
-        Nominal : parseFloat(`1`),
-        Tolerancia : 0,
-        Minimo : 0,
-        Maximo : 0,
+        UndMedida : orden != null ? orden.unidad_Cof.trim() : 'N/E',
+        Nominal : orden != null ? orden.nominal_Cof : 0,
+        Tolerancia : orden != null ? orden.tolerancia_Cof : 0,
+        Minimo : orden != null ? orden.minimo_Cof : 0,
+        Maximo : orden != null ? orden.maximo_Cof : 0,
       },
     );
   }
@@ -185,31 +217,31 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   // Funcion que va a llenar los paramatros cualitativos de la orden de trabajo
-  llenarParametrosCualitativos(orden : any){
+  llenarParametrosCualitativos(orden : any, dataBagpro : any = null){
     this.paramertosCualitativos.push(
       {
         Nombre : `Material`,
-        Resulatado : ``,
+        Resulatado : orden != null ? orden.material : '',
       },
       {
         Nombre : `Resistencia`,
-        Resulatado : ``,
+        Resulatado : orden != null ? orden.resistencia : 'N/A',
       },
       {
         Nombre : `Sellabilidad`,
-        Resulatado : ``,
+        Resulatado : orden != null ? orden.sellabilidad : '',
       },
       {
         Nombre : `Transparencia`,
-        Resulatado : ``,
+        Resulatado : orden != null ? orden.transparencia : 'N/A',
       },
       {
         Nombre : `Tratado`,
-        Resulatado : ![1, 2].includes(orden.extTratado) ? 'Si' : 'No',
+        Resulatado : orden != null ? orden.tratado : dataBagpro != null ? ![1, 2].includes(dataBagpro.extTratado) ? 'Si' : 'No' : 'N/A',
       },
       {
         Nombre : `Impresión`,
-        Resulatado : orden.impresion.trim() == '1' ? 'Si' : 'No',
+        Resulatado : orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'Si' : 'No' : 'N/A',
       },
     );
   }
@@ -220,6 +252,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let datosCertificado : modelCertificadosCalidad = {
       Orden_Trabajo: this.FormOrden.value.Orden,
       Cliente: this.FormOrden.value.Cliente,
+      Item : this.FormOrden.value.Item,
       Referencia: this.FormOrden.value.Referencia,
       Cantidad_Producir: this.FormOrden.value.Cantidad,
       Presentacion_Producto: this.FormOrden.value.Presentacion,
@@ -506,4 +539,3 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
   }
 }
-

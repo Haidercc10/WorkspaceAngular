@@ -2,6 +2,7 @@ export interface modelCertificadosCalidad {
     Consecutivo? : number;
     Orden_Trabajo : number;
     Cliente : string;
+    Item : number;
     Referencia : string;
     Cantidad_Producir : number;
     Presentacion_Producto : string;

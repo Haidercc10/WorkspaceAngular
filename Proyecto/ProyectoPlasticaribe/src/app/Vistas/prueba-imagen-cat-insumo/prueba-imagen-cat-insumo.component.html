@@ -22,7 +22,7 @@
   </div>
 </div>
 
-<p-card>
+<p-card class="mb-5">
   <div class="mb-4">
     <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
   </div>
@@ -125,7 +125,7 @@
             <td [pEditableColumn]="data.UndMedida" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-dropdown [autoDisplayFirst]="false" [(ngModel)]="data.UndMedida" [options]="unidadesMedidas" optionLabel="undMed_Id" optionValue="undMed_Id" appendTo="body"></p-dropdown>
+                  <p-dropdown [autoDisplayFirst]="true" [(ngModel)]="data.UndMedida" [options]="unidadesMedidas" optionLabel="undMed_Id" optionValue="undMed_Id" appendTo="body"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{data.UndMedida}}
@@ -169,7 +169,7 @@
   </div>
 
   <!-- Tabla com información de los parametros cualitativos -->
-  <div class="row g-3">
+  <div class="row g-3 mb-4">
     <div class="table-responsive">
       <p-table
       #dt
@@ -192,17 +192,10 @@
             <td [pEditableColumn]="data.Resulatado" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <ng-container *ngIf="['Impresión', 'Tratado', 'Material'].includes(data.Nombre); else escritura">
-                    <ng-container *ngIf="['Impresión', 'Tratado'].includes(data.Nombre); else material">
-                      <p-dropdown [autoDisplayFirst]="false" [(ngModel)]="data.Resulatado" [options]="arrayBooleano"appendTo="body"></p-dropdown>
-                    </ng-container>
-                    <ng-template #material>
-                      <p-dropdown [autoDisplayFirst]="false" [(ngModel)]="data.Resulatado" [options]="materiales"appendTo="body"></p-dropdown>
-                    </ng-template>
-                  </ng-container>
-                  <ng-template #escritura>
-                    <input [(ngModel)]="data.Resulatado" type="text" pInputText/>
-                  </ng-template>                  
+                  <p-dropdown *ngIf="['Material'].includes(data.Nombre)" [(ngModel)]="data.Resulatado" [autoDisplayFirst]="true" [editable]="true" [options]="materiales" appendTo="body"></p-dropdown>
+                  <p-dropdown *ngIf="['Resistencia', 'Sellabilidad'].includes(data.Nombre)" [(ngModel)]="data.Resulatado" [autoDisplayFirst]="true" [editable]="true" [options]="resistenciaSellabilidad" appendTo="body"></p-dropdown>
+                  <p-dropdown *ngIf="['Transparencia'].includes(data.Nombre)" [(ngModel)]="data.Resulatado" [autoDisplayFirst]="true" [editable]="true" [options]="transparencia" appendTo="body"></p-dropdown>
+                  <p-dropdown *ngIf="['Impresión', 'Tratado'].includes(data.Nombre)" [(ngModel)]="data.Resulatado" [autoDisplayFirst]="true" [options]="arrayBooleano" appendTo="body"></p-dropdown>                       
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{data.Resulatado}}
