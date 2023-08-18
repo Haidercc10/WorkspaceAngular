@@ -18,4 +18,5 @@ constructor(private http : HttpClient) { }
 
     Post = (data : modelCertificadosCalidad) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Certificados_Calidad`, data);
 
+    GetCertificados = ( fecha1 : any, fecha2 : any, ruta : string = ``) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/GetCertificados/${fecha1}/${fecha2}${ruta}`);
 }
