@@ -63,6 +63,7 @@ import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostos
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
 import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
+import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
 
 export const routes: Routes = [
 
@@ -181,6 +182,8 @@ export const routes: Routes = [
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
 
+   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
+   {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
 ]
 
 @NgModule({

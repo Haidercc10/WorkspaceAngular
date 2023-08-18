@@ -172,6 +172,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
 
 @NgModule({
   declarations: [
@@ -267,7 +268,8 @@ import { AppComponent } from './app.component';
     Dashboard_CostosComponent,
     Ingreso_NominaComponent,
     Dashboard_ComprasComponent,
-    Gestion_VistasComponent
+    Gestion_VistasComponent, 
+    Reporte_CertificadosCalidadComponent
   ],
 
   imports: [
