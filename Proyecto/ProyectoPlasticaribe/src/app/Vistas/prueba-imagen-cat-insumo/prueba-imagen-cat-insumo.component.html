@@ -34,7 +34,7 @@
       <!-- Orden de Trabajo -->
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="Orden"  type="text" pInputText/>
+          <input formControlName="Orden"  type="text" pInputText [required]="true"/>
           <label for="ordenTrabajo">OT</label>
         </span>
       </div>
@@ -42,7 +42,7 @@
       <!-- Cliente -->
       <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-5 col-xxl-5">
         <span class="p-float-label">
-          <input formControlName="Cliente" id="Cliente" type="text" pInputText/>
+          <input formControlName="Cliente" id="Cliente" type="text" pInputText [required]="true"/>
           <label for="cliente">Cliente</label>
         </span>
       </div>
@@ -50,7 +50,7 @@
       <!-- Referencia -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-5">
         <span class="p-float-label">
-          <input formControlName="Referencia" id="Referencia" type="text" pInputText/>
+          <input formControlName="Referencia" id="Referencia" type="text" pInputText [required]="true"/>
           <label for="Referencia">Referencia</label>
         </span>
       </div>
@@ -66,7 +66,7 @@
       <!-- Presentación -->
       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="Presentacion" inputId="Presentacion" [autoDisplayFirst]="false" [options]="unidadesMedidas" optionLabel="undMed_Id" optionValue="undMed_Id"></p-dropdown>
+          <p-dropdown formControlName="Presentacion" inputId="Presentacion" [autoDisplayFirst]="false" [options]="unidadesMedidas" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true"></p-dropdown>
           <label for="Presentacion">Presentación</label>
         </span>
       </div>
@@ -84,7 +84,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Consultar Orden" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
-        <button pButton class="p-button-success" type="button" label="Crear Certificado" icon="pi pi-check" (click)="guardarCertificados()"></button>
+        <button pButton class="p-button-success" type="button" label="Crear Certificado" icon="pi pi-check" [disabled]="!FormOrden.valid" (click)="guardarCertificados()"></button>
       </div>
     </div>
   </form>
@@ -142,36 +142,18 @@
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td [pEditableColumn]="data.Toletancia" pEditableColumnField="price" class="cursor">
+            <td [pEditableColumn]="data.Tolerancia" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="data.Toletancia"></p-inputNumber>
+                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="data.Tolerancia"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{data.Toletancia | number : '1.2-2' }}
+                  {{data.Tolerancia | number : '1.2-2' }}
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td [pEditableColumn]="data.Minimo" pEditableColumnField="price" class="cursor">
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="data.Minimo"></p-inputNumber>
-                </ng-template>
-                <ng-template pTemplate="output">
-                  {{data.Minimo | number : '1.2-2' }}
-                </ng-template>
-              </p-cellEditor>
-            </td>
-            <td [pEditableColumn]="data.Maximo" pEditableColumnField="price" class="cursor">
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="data.Maximo"></p-inputNumber>
-                </ng-template>
-                <ng-template pTemplate="output">
-                  {{data.Maximo | number : '1.2-2' }}
-                </ng-template>
-              </p-cellEditor>
-            </td>             
+            <td>{{calcularMinParametrosCuantitativos(data) | number : '1.2-2' }}</td>
+            <td>{{calcularMaxParametrosCuantitativos(data) | number : '1.2-2' }}</td>            
           </tr>
         </ng-template>
       </p-table>
@@ -210,7 +192,17 @@
             <td [pEditableColumn]="data.Resulatado" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input [(ngModel)]="data.Resulatado" type="text" pInputText/>
+                  <ng-container *ngIf="['Impresión', 'Tratado', 'Material'].includes(data.Nombre); else escritura">
+                    <ng-container *ngIf="['Impresión', 'Tratado'].includes(data.Nombre); else material">
+                      <p-dropdown [autoDisplayFirst]="false" [(ngModel)]="data.Resulatado" [options]="arrayBooleano"appendTo="body"></p-dropdown>
+                    </ng-container>
+                    <ng-template #material>
+                      <p-dropdown [autoDisplayFirst]="false" [(ngModel)]="data.Resulatado" [options]="materiales"appendTo="body"></p-dropdown>
+                    </ng-template>
+                  </ng-container>
+                  <ng-template #escritura>
+                    <input [(ngModel)]="data.Resulatado" type="text" pInputText/>
+                  </ng-template>                  
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{data.Resulatado}}
