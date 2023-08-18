@@ -12,12 +12,11 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { firmaJefeCalidad } from './FirmaJefeCalidad';
 
 @Component({
-  selector: 'app-prueba-imagen-cat-insumo',
-  templateUrl: './prueba-imagen-cat-insumo.component.html',
-  styleUrls: ['./prueba-imagen-cat-insumo.component.css']
+  selector: 'app-Certificado-Calidad',
+  templateUrl: './Certificado-Calidad.component.html',
+  styleUrls: ['./Certificado-Calidad.component.css']
 })
-
-export class PruebaImagenCatInsumoComponent implements OnInit {
+export class CertificadoCalidadComponent implements OnInit {
 
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
