@@ -125,7 +125,7 @@
             <td [pEditableColumn]="data.UndMedida" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-dropdown [autoDisplayFirst]="true" [(ngModel)]="data.UndMedida" [options]="unidadesMedidas" optionLabel="undMed_Id" optionValue="undMed_Id" appendTo="body"></p-dropdown>
+                  <p-dropdown [autoDisplayFirst]="true" [(ngModel)]="data.UndMedida" [options]="unidadesMedidas" optionLabel="undMed_Nombre" optionValue="undMed_Id" appendTo="body"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{data.UndMedida}}

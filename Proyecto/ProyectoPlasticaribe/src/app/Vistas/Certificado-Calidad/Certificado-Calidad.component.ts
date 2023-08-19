@@ -16,6 +16,7 @@ import { firmaJefeCalidad } from './FirmaJefeCalidad';
   templateUrl: './Certificado-Calidad.component.html',
   styleUrls: ['./Certificado-Calidad.component.css']
 })
+
 export class CertificadoCalidadComponent implements OnInit {
 
   cargando : boolean = false;
@@ -27,8 +28,8 @@ export class CertificadoCalidadComponent implements OnInit {
 
   FormOrden !: FormGroup; //Variable que almacenará la información del formulario donde esta la información general de la orden de trabajo
   unidadesMedidas : any [] = []; //Variable que almacenará la información de las unidades de medida
-  arrayBooleano : string [] = ['Si', 'No', 'Conforme', 'N/A']; //Variable que almacenará la información de los booleanos
-  transparencia : string [] = ['Alta', 'Baja', 'Media', 'Si', 'No', 'N/A']; //Variable que almacenará la información de los booleanos
+  arrayBooleano : string [] = ['N/A', 'Si', 'No', 'Conforme']; //Variable que almacenará la información de los booleanos
+  transparencia : string [] = ['N/A', 'Alta', 'Baja', 'Media', 'Si', 'No']; //Variable que almacenará la información de los booleanos
   resistenciaSellabilidad : string [] = ['Alta', '', 'N/A']; //Variable que almacenará la información de los booleanos
   materiales : string [] = []; //Variable que almacenará la información de los materiales
   parametrosCuantitativos : any [] = []; //Variable que almacenará la información de los parametros cuantitativos de la orden de trabajo
@@ -75,6 +76,7 @@ export class CertificadoCalidadComponent implements OnInit {
   // Funcion que va a limpiar todo 
   limpiarTodo() {
     this.FormOrden.reset();
+    this.llenarMateriales();
     this.parametrosCuantitativos = [];
     this.paramertosCualitativos = [];
     this.cargando = false;
@@ -142,10 +144,10 @@ export class CertificadoCalidadComponent implements OnInit {
           Referencia : ot.clienteItemsNom,
           Cantidad : ot.ptPresentacionNom == 'Kilo' ? ot.datosotKg : ot.datoscantBolsa,
           Presentacion : ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
-          Observacion : ``,
           Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(data => {
+          this.FormOrden.patchValue({Observacion : data == null ? '' : data.observacion });
           this.calcularParametrosCuantitativos(data, ot);
           this.llenarParametrosCualitativos(data, ot);
         });
@@ -156,7 +158,7 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a calcular los datos del parametro cuantitativo
   calcularParametrosCuantitativos(orden : any, dataBagpro : any = null){
-    this.parametrosCuantitativos.push(
+    this.parametrosCuantitativos = [
       {
         Nombre : `Calibre`,
         UndMedida : orden != null ? orden.unidad_Calibre : dataBagpro != null ? dataBagpro.extUnidadesNom.trim() : 'N/E',
@@ -197,7 +199,7 @@ export class CertificadoCalidadComponent implements OnInit {
         Minimo : orden != null ? orden.minimo_Cof : 0,
         Maximo : orden != null ? orden.maximo_Cof : 0,
       },
-    );
+    ];
   }
 
   // Funcion que va a calular el minimo de los parametros cuantitativos
@@ -216,7 +218,7 @@ export class CertificadoCalidadComponent implements OnInit {
 
   // Funcion que va a llenar los paramatros cualitativos de la orden de trabajo
   llenarParametrosCualitativos(orden : any, dataBagpro : any = null){
-    this.paramertosCualitativos.push(
+    this.paramertosCualitativos = [
       {
         Nombre : `Material`,
         Resulatado : orden != null ? orden.material : '',
@@ -241,7 +243,7 @@ export class CertificadoCalidadComponent implements OnInit {
         Nombre : `Impresión`,
         Resulatado : orden != null ? orden.impresion : dataBagpro != null ? dataBagpro.impTinta1.trim() == '1' ? 'Si' : 'No' : 'N/A',
       },
-    );
+    ];
   }
 
   // Funcion que va a enviar de los certificados a la base de datos
@@ -305,9 +307,8 @@ export class CertificadoCalidadComponent implements OnInit {
   crearPdfCertificado(id : number){
     this.certCalidadService.Get_Id(id).subscribe(datos => {
       let titulo : string = `Certificado de Calidad N° ${datos.consecutivo}`;
-      let nombreUsuario : string = this.storage_Nombre;
       const pdfDefinicion : any = {
-        info: { title: titulo},
+        info: { title: titulo },
         pageSize: { width: 630, height: 760 },
         watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
         pageMargins : [25, 110, 25, 35],
@@ -339,7 +340,6 @@ export class CertificadoCalidadComponent implements OnInit {
                       [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                       [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos.fecha_Registro.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                       [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos.hora_Registro, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombreUsuario, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
                     ]
                   },
                   layout: 'noBorders',
@@ -366,21 +366,19 @@ export class CertificadoCalidadComponent implements OnInit {
         },
         content : [
           {
-            style: 'tablaEmpresa',
             table: {
               widths: [60, '*', 60, '*'],
-              style: 'header',
               body: [
                 [
-                  { border: [true, true, false, false], text: `Orden / Lote`, style: 'titulo', },
+                  { border: [true, true, false, false], text: `Orden / Lote`, bold: true },
                   { border: [false, true, false, false], text: `${datos.orden_Trabajo}` },
-                  { border: [true, true, false, false], text: `Referencia`, style: 'titulo', },
+                  { border: [true, true, false, false], text: `Referencia`, bold: true },
                   { border: [false, true, true, false], text: `${datos.referencia}` },
                 ],
                 [
-                  { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
+                  { border: [true, false, false, true], text: `Cliente`, bold: true },
                   { border: [false, false, true, true], text: `${datos.cliente}` },
-                  { border: [false, false, false, true], text: `Cantidad`, style: 'titulo', },
+                  { border: [false, false, false, true], text: `Cantidad`, bold: true },
                   { border: [false, false, true, true], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
                 ],
               ]
@@ -392,15 +390,15 @@ export class CertificadoCalidadComponent implements OnInit {
             margin: [5, 10],
             table: {
               headerRows: 1,
-              widths: [125, 100, 70, 80, 80, '*'],
+              widths: [125, 100, 70, 85, 75, '*'],
               body: [
                 [
-                  { text: 'Parametro Cuantitativo', fillColor: '#bbb', fontSize: 9 },
-                  { text: 'Und. Medida', fillColor: '#bbb', fontSize: 9 },
-                  { text: 'Nominal', fillColor: '#bbb', fontSize: 9 },
-                  { text: 'Tolerancia', fillColor: '#bbb', fontSize: 9 },
-                  { text: 'Mínimo', fillColor: '#bbb', fontSize: 9 },
-                  { text: 'Máximo', fillColor: '#bbb', fontSize: 9 },
+                  { text: 'Parametro Cuantitativo', fillColor: '#bbb', bold: true, fontSize: 9 },
+                  { text: 'Und. Medida', fillColor: '#bbb', bold: true, fontSize: 9 },
+                  { text: 'Nominal', fillColor: '#bbb', bold: true, fontSize: 9 },
+                  { text: 'Tolerancia', fillColor: '#bbb', bold: true, fontSize: 9 },
+                  { text: 'Mínimo', fillColor: '#bbb', bold: true, fontSize: 9 },
+                  { text: 'Máximo', fillColor: '#bbb', bold: true, fontSize: 9 },
                 ],
               ]
             },
@@ -462,8 +460,8 @@ export class CertificadoCalidadComponent implements OnInit {
               widths: [150, '*'],
               body: [
                 [
-                  { text: 'Parametro Cualitativo', fillColor: '#bbb', fontSize: 9, alignment: 'center' },
-                  { text: 'Resultado', fillColor: '#bbb', fontSize: 9, alignment: 'center' },
+                  { text: 'Parametro Cualitativo', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
+                  { text: 'Resultado', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
                 ],
               ]
             },
