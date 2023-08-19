@@ -74,18 +74,22 @@
 
         <!-- Cliente -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-users"></i>
-            <input formControlName="cliente" id="Cliente" type="text" pInputText required/>
+          <span class="p-float-label">
+            <input formControlName="cliente" id="Cliente" list="clientes" (keyup)="cargarClientes()" autocomplete="off" (change)="seleccionarClientes()" type="text" pInputText/>
+            <datalist id="clientes">
+              <option value={{item}} *ngFor="let item of clientes">{{item}}</option>
+            </datalist>
             <label for="Cliente">Cliente</label>
           </span>
         </div>
 
         <!-- Referencia -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-box"></i>
-            <input formControlName="referencia" id="Referencia" type="text" pInputText required/>
+          <span class="p-float-label">
+            <input formControlName="referencia" id="Referencia" list="referencias" (keyup)="cargarItems()" autocomplete="off" (change)="seleccionarItems()" type="text" pInputText/>
+            <datalist id="referencias">
+              <option value={{itm.item}} *ngFor="let itm of items">{{itm.referencia}}</option>
+            </datalist>
             <label for="Referencia">Referencia</label>
           </span>
         </div>
@@ -130,16 +134,22 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ot', 'contains')"></th>
+            <th></th>
           </tr>
           <tr>
             <th></th>
             <th>#</th>
             <th class="text-center" pSortableColumn="Consecutivo"><p-sortIcon field="Consecutivo"></p-sortIcon> Consecutivo</th>
-            <th pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha Creación</th>
+            <th class="text-center" pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha Creación</th>
             <th pSortableColumn="Cliente"><p-sortIcon field="Cliente"></p-sortIcon> Cliente</th>
             <th pSortableColumn="Referencia"><p-sortIcon field="Referencia"></p-sortIcon> Referencia</th>
-            <th pSortableColumn="Ot"><p-sortIcon field="Ot"></p-sortIcon> OT</th>
+            <th class="text-center" pSortableColumn="Cantidad"><p-sortIcon field="Cantidad"></p-sortIcon> Cantidad</th>
+            <th class="text-center" pSortableColumn="Presentación"><p-sortIcon field="Presentacion"></p-sortIcon> Presentación</th>
+            <th class="text-center" pSortableColumn="Ot"><p-sortIcon field="Ot"></p-sortIcon> OT</th>
+            <th class="text-center"> Ver PDF</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
@@ -152,12 +162,15 @@
             <td>{{item.Fecha}}</td>
             <td><b>{{item.Cliente}}</b></td>
             <td>{{item.Referencia}}</td>
-            <td><b>{{item.Ot}}</b></td>
+            <td class="text-center"><b>{{item.Cantidad | number: '1.2-2'}}</b></td>
+            <td class="text-center">{{item.Presentacion}}</td>
+            <td class="text-center"><b>{{item.Ot}}</b></td>
+            <td class="text-center"><p-button id="inactivar" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="rowexpansion" let-item>
           <tr>
-            <td colspan="7" id="facturasDetalladas">
+            <td colspan="10" id="">
               <div class="p-3">
                 <p-table
                   #dt_SubcarteraAgrupada
@@ -193,17 +206,33 @@
                       <td colspan="8">No se encontraron registros</td>
                     </tr>
                   </ng-template>
-                  <ng-template pTemplate="footer" let-cuantitativos>
-                    <tr>
-                      <td colspan="2">Material: {{cuantitativos.material}}</td>
-                      <td>Resistencia: {{cuantitativos.resistencia}}</td>
-                      <td>Sellabilidad: {{cuantitativos.sellabilidad}}</td>
-                      <td>Transparencia: {{cuantitativos.transparencia}}</td>
-                      <td>Tratado: {{cuantitativos.tratado}}</td>
-                      <td>Impresión: {{cuantitativos.impresion}}</td>
-                    </tr>
-                  </ng-template>
                 </p-table>
+                <br>
+                <p-table [value]="item.Parametros2"
+                styleClass="p-datatable-gridlines p-datatable-sm">
+                  <ng-template pTemplate="header">
+                      <tr>
+                          <th>Param. Cualitativo</th>
+                          <th>Material</th>
+                          <th>Resistencia</th>
+                          <th>Sellabilidad</th>
+                          <th>Transparencia</th>
+                          <th>Tratado</th>
+                          <th>Impresión</th>
+                      </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-cualitativo>
+                      <tr>
+                          <td><b>{{ 'Resultado' }}</b></td>
+                          <td>{{ cualitativo.material }}</td>
+                          <td>{{ cualitativo.resistencia }}</td>
+                          <td>{{ cualitativo.sellabilidad }}</td>
+                          <td>{{ cualitativo.transparencia }}</td>
+                          <td>{{ cualitativo.tratado }}</td>
+                          <td>{{ cualitativo.impresion }}</td>
+                      </tr>
+                  </ng-template>
+              </p-table>
               </div>
             </td>
           </tr>

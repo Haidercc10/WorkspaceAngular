@@ -60,3 +60,11 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   text-align: center;
   color: var(--rojo);
 }
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2.5rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2.5rem;
+}

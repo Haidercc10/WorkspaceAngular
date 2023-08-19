@@ -19,12 +19,15 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined; /** Tabla que contendrá la información de los certificados */
   FormFiltros !: FormGroup; /** Formulario que contendrá los filtros de búsqueda */
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  parametrosCualitativos : any = ['Calibre', 'Ancho frente', 'Ancho fuelle', 'Largo/Repetición', 'COF']; /** Array que contendrá la información de los parametros cualitativos */
+  parametrosCualitativos : any = []; /** Array que contendrá la información de los parametros cualitativos */
+  clientes : any = []; /** Array que contendrá la información de los clientes */
+  items : any = []; /** Array que contendrá la información de los items */  
 
   constructor(private AppComponent : AppComponent, 
                 private fBuilder : FormBuilder,
                   private srvCertificados : Certificados_CalidadService, 
-                    private msjs : MensajesAplicacionService) {
+                    private msjs : MensajesAplicacionService, 
+                      ) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.fBuilder.group({
@@ -33,6 +36,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
       fechaFin : [null],
       ot : [null],
       cliente : [null],
+      item : [null],
       referencia : [null],
     });            
   }
@@ -53,7 +57,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     let consecutivo : any = this.FormFiltros.value.consecutivo
     let ot : any = this.FormFiltros.value.ot
     let cliente : any = this.FormFiltros.value.cliente
-    let referencia : any = this.FormFiltros.value.referencia;
+    let referencia : any = this.FormFiltros.value.item;
     let fechaInicio : any = this.FormFiltros.value.fechaInicio;
     let fechaFin : any = this.FormFiltros.value.fechaFin;
     let ruta : any = ``;
@@ -61,7 +65,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     if(fechaInicio == `Fecha inválida`) fechaInicio = null;
     if(fechaFin == `Fecha inválida`) fechaFin = null;
 
-    fechaInicio == null ? fechaInicio = `2023-08-18` : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
+    fechaInicio == null ? fechaInicio = moment().subtract(1, 'M').format('YYYY-MM-DD') : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
     fechaFin == null ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
 
     if(consecutivo != null) ruta += `consec=${consecutivo}`;
@@ -72,25 +76,28 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     this.srvCertificados.GetCertificados(fechaInicio, fechaFin, ruta).subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
-          this.cargarTabla(data[index]);
+          this.cargarTablas(data[index]);
         }
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados`);
     });
     setTimeout(() => { this.load = false; }, 1500);
   }
 
-  cargarTabla(data : any){
+  cargarTablas(data : any){
     let info : any = {
       Consecutivo : data.consecutivo,
       Fecha : data.fecha_Registro.replace('T00:00:00', ''),
       Cliente : data.cliente,
       Referencia : data.referencia,
       Ot : data.orden_Trabajo,
-      Parametros : []
+      Cantidad : data.cantidad_Producir,
+      Presentacion : data.presentacion_Producto,
+      Parametros : [],
+      Parametros2 : []
     }
     this.certificados.push(info);
     
-    let infoParametros : any = [
+    let parametrosCuantitativos  : any = [
       {
         consecutivo : data.consecutivo,
         parametro : `Calibre`,
@@ -136,6 +143,14 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
         minimo : data.minimo_Cof, 
         maximo : data.maximo_Cof,
       },
+    ]
+
+    for (let index = 0; index < parametrosCuantitativos.length; index++) {
+      let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCuantitativos[index].consecutivo);
+      this.certificados[indice].Parametros.push(parametrosCuantitativos[index]);
+    }  
+
+    let parametrosCualitativos  : any = [
       {
         consecutivo : data.consecutivo,
         material : data.material,
@@ -145,15 +160,45 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
         tratado : data.tratado,
         impresion : data.impresion, 
       }
-    ]
+    ];
 
-    for (let index = 0; index < infoParametros.length; index++) {
-      let indice = this.certificados.findIndex(x => x.Consecutivo == infoParametros[index].consecutivo && x.Consecutivo);
-      this.certificados[indice].Parametros.push(infoParametros[index]);
-      console.log(this.certificados);
+    for (let index = 0; index < parametrosCualitativos.length; index++) {
+      let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCualitativos[index].consecutivo);
+      this.certificados[indice].Parametros2.push(parametrosCualitativos[index]);
     }
   }
 
   limpiarCampos = () => this.FormFiltros.reset();
   
+  cargarClientes(){
+    this.clientes = [];
+    let cliente : any = this.FormFiltros.value.cliente;
+    if(cliente != null && cliente.length > 1) {
+      this.srvCertificados.GetClientes(cliente).subscribe(data => {
+        if(data.length > 0) this.clientes = data;
+      });
+    }  
+  }
+
+  seleccionarClientes(){
+    let clienteSeleccionado : any = this.FormFiltros.value.cliente;
+    let nuevo : any[] = this.clientes.filter((item) => item == clienteSeleccionado);
+    this.FormFiltros.patchValue({ cliente : nuevo[0], });
+  }
+
+  cargarItems(){
+    this.items = [];
+    let referencia : any = this.FormFiltros.value.referencia;
+    if(referencia != null && referencia.length > 1) {
+      this.srvCertificados.GetItems(referencia).subscribe(data => {
+        if(data.length > 0) this.items = data;
+      });
+    }  
+  }
+
+  seleccionarItems(){
+    let itemSeleccionado : any = this.FormFiltros.value.referencia;
+    let nuevo : any[] = this.items.filter((itm) => itm.item == itemSeleccionado);
+    this.FormFiltros.patchValue({ item : nuevo[0].item, referencia : nuevo[0].referencia,});
+  }
 }
