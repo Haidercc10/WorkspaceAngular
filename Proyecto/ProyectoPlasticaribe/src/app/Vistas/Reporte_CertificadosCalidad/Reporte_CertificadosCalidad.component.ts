@@ -6,6 +6,7 @@ import { Table } from 'primeng/table';
 import { Certificados_CalidadService } from 'src/app/Servicios/Certificados_Calidad/Certificados_Calidad.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
+import { CertificadoCalidadComponent } from '../Certificado-Calidad/Certificado-Calidad.component';
 
 @Component({
   selector: 'app-Reporte_CertificadosCalidad',
@@ -21,13 +22,14 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   parametrosCualitativos : any = []; /** Array que contendrá la información de los parametros cualitativos */
   clientes : any = []; /** Array que contendrá la información de los clientes */
-  items : any = []; /** Array que contendrá la información de los items */  
+  items : any = []; /** Array que contendrá la información de los items */ 
 
   constructor(private AppComponent : AppComponent, 
                 private fBuilder : FormBuilder,
                   private srvCertificados : Certificados_CalidadService, 
-                    private msjs : MensajesAplicacionService, 
-                      ) {
+                    private msjs : MensajesAplicacionService,
+                      private Certificados : CertificadoCalidadComponent,) {
+
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.fBuilder.group({
@@ -42,15 +44,16 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.consultarCertificados();
   }
 
   tutorial(){}
 
+  //Cargar la tabla según los filtros consultados
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
+  //Consultar los certificados de calidad con los diferentes filtros
   consultarCertificados(){
     this.load = true;
     this.certificados = [];
@@ -69,9 +72,10 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     fechaFin == null ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
 
     if(consecutivo != null) ruta += `consec=${consecutivo}`;
-    if(ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : `ot=${ot}`;
-    if(cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : `cliente=${cliente}`;
-    if(referencia != null) ruta.length > 0 ?  ruta += `&referencia=${referencia}` : `referencia=${referencia}`;
+    if(ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
+    if(cliente != null) { ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`; console.log(ruta) }
+    if(referencia != null) ruta.length > 0 ?  ruta += `&referencia=${referencia}` : ruta += `referencia=${referencia}`;
+    ruta.length > 0 ? ruta = `?${ruta}` : null;
 
     this.srvCertificados.GetCertificados(fechaInicio, fechaFin, ruta).subscribe(data => {
       if(data.length > 0) {
@@ -83,6 +87,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     setTimeout(() => { this.load = false; }, 1500);
   }
 
+  //Cargar las tablas del reporte
   cargarTablas(data : any){
     let info : any = {
       Consecutivo : data.consecutivo,
@@ -144,7 +149,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
         maximo : data.maximo_Cof,
       },
     ]
-
+    //Cargue parametros cuantitativos
     for (let index = 0; index < parametrosCuantitativos.length; index++) {
       let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCuantitativos[index].consecutivo);
       this.certificados[indice].Parametros.push(parametrosCuantitativos[index]);
@@ -162,43 +167,44 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
       }
     ];
 
+    //Cargue parametros cualitativos
     for (let index = 0; index < parametrosCualitativos.length; index++) {
       let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCualitativos[index].consecutivo);
       this.certificados[indice].Parametros2.push(parametrosCualitativos[index]);
     }
   }
 
+  //.Limpiar los campos del formulario de filtros
   limpiarCampos = () => this.FormFiltros.reset();
   
+  //.Cargar los nombres de los clientes en el datalist para luego ser seleccionado
   cargarClientes(){
     this.clientes = [];
     let cliente : any = this.FormFiltros.value.cliente;
-    if(cliente != null && cliente.length > 1) {
-      this.srvCertificados.GetClientes(cliente).subscribe(data => {
-        if(data.length > 0) this.clientes = data;
-      });
-    }  
+    if(cliente != null && cliente.length > 1) this.srvCertificados.GetClientes(cliente).subscribe(data => { if(data.length > 0) this.clientes = data; });  
   }
 
+  //.Seleccionar los clientes por nombre 
   seleccionarClientes(){
     let clienteSeleccionado : any = this.FormFiltros.value.cliente;
     let nuevo : any[] = this.clientes.filter((item) => item == clienteSeleccionado);
     this.FormFiltros.patchValue({ cliente : nuevo[0], });
   }
 
+  //.Cargar los productos en el array de items
   cargarItems(){
     this.items = [];
     let referencia : any = this.FormFiltros.value.referencia;
-    if(referencia != null && referencia.length > 1) {
-      this.srvCertificados.GetItems(referencia).subscribe(data => {
-        if(data.length > 0) this.items = data;
-      });
-    }  
+    if(referencia != null && referencia.length > 1) this.srvCertificados.GetItems(referencia).subscribe(data => { if(data.length > 0) this.items = data; });  
   }
 
+  //.Intercambiar el id del item por el nombre de la referencia
   seleccionarItems(){
     let itemSeleccionado : any = this.FormFiltros.value.referencia;
     let nuevo : any[] = this.items.filter((itm) => itm.item == itemSeleccionado);
     this.FormFiltros.patchValue({ item : nuevo[0].item, referencia : nuevo[0].referencia,});
   }
+
+  //Mostrar formato pdf de los certificados de calidad
+  mostrarPdf = (consecutivo : number) => this.Certificados.crearPdfCertificado(consecutivo);
 }

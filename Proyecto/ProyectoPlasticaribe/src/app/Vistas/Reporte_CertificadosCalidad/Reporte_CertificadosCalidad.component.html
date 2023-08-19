@@ -165,7 +165,7 @@
             <td class="text-center"><b>{{item.Cantidad | number: '1.2-2'}}</b></td>
             <td class="text-center">{{item.Presentacion}}</td>
             <td class="text-center"><b>{{item.Ot}}</b></td>
-            <td class="text-center"><p-button id="inactivar" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger"></p-button></td>
+            <td class="text-center"><p-button id="inactivar" icon="pi pi-file-pdf" (click)="mostrarPdf(item.Consecutivo)" styleClass="p-button-rounded p-button-danger"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="rowexpansion" let-item>

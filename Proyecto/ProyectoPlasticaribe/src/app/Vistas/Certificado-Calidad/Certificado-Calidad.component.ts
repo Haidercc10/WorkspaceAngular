@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -10,6 +10,10 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { firmaJefeCalidad } from './FirmaJefeCalidad';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Certificado-Calidad',
