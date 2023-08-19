@@ -92,113 +92,28 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   consultarFiltros(){
     this.cargando = true;
     this.registrosConsultados = [];
-    let ocConsultadas : number [] = [];
-    let size_query : number;
+    let cantDatos : number = 0;
+    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let oc : number = this.FormConsultarFiltros.value.Documento;
-    let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
-    let estado : any = this.FormConsultarFiltros.value.estadoDoc;
+    let fechaincial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
+    let estado : any = this.FormConsultarFiltros.value.estadoDoc;    
+    let ruta : string = '';
 
-    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
+    if (oc != null) ruta += `orden=${oc}`;
+    if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
 
-    if (oc != null && fechaFinal != null && fechaInicial != null && estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (oc != null && fechaFinal != null && fechaInicial) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (oc != null && fechaInicial != null && estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (datos_orden[i].estado_Id == estado && datos_orden[i].fecha == fechaInicial) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (fechaFinal != null && fechaInicial != null && estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (oc != null && fechaInicial != null) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (datos_orden[i].fecha == fechaInicial) this.llenarTabla(datos_orden)[i];
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (oc != null && estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (datos_orden[i].estado_Id == estado) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (fechaInicial != null && estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (fechaInicial != null && fechaFinal != null) {
-      this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaFinal).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (oc != null) {
-      this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (fechaInicial != null) {
-      this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaInicial).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else if (estado != null) {
-      this.dtOrdenCompraService.GetOrdenCompra_Estado(estado).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    } else {
-      this.dtOrdenCompraService.GetOrdenCompra_fechas(this.today, this.today).subscribe(datos_orden => {
-        size_query = datos_orden.length;
-        for (let i = 0; i < datos_orden.length; i++) {
-          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
-          ocConsultadas.push(datos_orden[i].consecutivo);
-        }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`); });
-    }
-    setTimeout(() => { this.cargando = false; }, 2000);
+    this.dtOrdenCompraService.GetOrdenesCompras(fechaincial, fechaFinal, ruta).subscribe(datos_orden => {
+      datos_orden.forEach(orden => {
+        this.llenarTabla(orden);
+        cantDatos++;
+        cantDatos == datos_orden.length ? this.cargando = false : null;
+      });
+    }, () => {
+      this.msj.mensajeError(`Error`, `¡No se pudo encontrar información con los filtros consultados!`);
+      this.cargando = false;
+    });
   }
 
   // Funcion que servirá para llenar la tabla que se verá que está en la vista con la informacion que devuelve la consulta
