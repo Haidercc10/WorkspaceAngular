@@ -10,6 +10,8 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { firmaJefeCalidad } from './FirmaJefeCalidad';
+import { ShepherdService } from 'angular-shepherd';
+import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +46,8 @@ export class CertificadoCalidadComponent implements OnInit {
                   private msj : MensajesAplicacionService,
                     private certCalidadService : Certificados_CalidadService,
                       private undMedService : UnidadMedidaService,
-                        private bagproService : BagproService,){
+                        private bagproService : BagproService,
+                          private shepherdService: ShepherdService,){
 
     this.FormOrden = this.frmBuilder.group({
       Orden : [null, Validators.required],
@@ -62,6 +65,14 @@ export class CertificadoCalidadComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerUnidadesMedidas();
     this.llenarMateriales();
+  }
+
+  tutorial() {
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

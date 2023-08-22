@@ -11383,3 +11383,129 @@ export const stepsDashboardCompras : Step.StepOptions[] = [
     text: `<p>¡En esta grafica podremos ver los datos de las <b>compras de la empresa</b>, estos datos podremos verlos por cada uno de los meses!</p>`
   },
 ];
+
+/******************************************************************** CERTIFICADOS DE CALIDAD **********************************************************************/
+export const CertificadoCalidad : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Certificado de Calidad!</h4>',
+    text: `<p>¡!</p>`
+  },
+  {
+    attachTo: {
+      element: '#buscarOrdenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'buscarOrdenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información de la OT!</h4>',
+    text: `<p>Para poder llenar el certificado necesitamos saber la información de la OT que queremos certificar, para ello <b>podemos escribir el número identificativo de la orden de trabajo en el campo 'OT'</b>, luego podemos <b>presionar 'Enter' o presionar el botón rojo</b>.</p>
+    <br>
+    <p>Al hacer esto <b>se consultará la información de la OT y la información del último certificado que se le hizo al Itema de la OT</b>. Con base en eso se llenará la información <b>pero si al item no se le ha hecho un certificado</b> entonces se colocará la información de la OT y <b>se deberá editar de manera manual</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>¡Cons estos botones podemos realizar diferentes acciones con la información consultada, acontinuación se estarán describiendo y explicando cada uno de los botones!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consultarOrden',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'consultarOrden',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consultar OT!</h4>',
+    text: `<p>¡Tenemos 2 formas de consultar la información de uan orden de trabajo, una de ellas es con el botón consultar. Para utilizar esta opción solo <b>debemos escribir el número de la orden de trabajo (en su respectivo campo) y presionar click sobre este botón!</b></p>`
+  },
+  {
+    attachTo: {
+      element: '#limpiarCampos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'limpiarCampos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Limpiar Todo!</h4>',
+    text: `<p>¡Con este botón podremos limpiar todo el formulario y las tablas de la página, es decir, lo podemos utilizar si queremos buscar otra OT o si queremos volver a crear un certificado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearCertificado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'crearCertificado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Certificado!</h4>',
+    text: `<p>¡Una vez hayamos buscado, corregido y corroborado la información de la OT <b>podremos crear un certificado de calidad presionando este botón</b>, que <b>se encargará de enviar la información de la OT a la base de datos y posteriormente creará un PDF</b> con la información del certificado de calidad!</p>`
+  },
+  {
+    attachTo: {
+      element: '#parametrosCuantitativos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'parametrosCuantitativos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Parametros Cuantitativos!</h4>',
+    text: `<p>¡<b>Cuando buscamos la información de la OT, se nos cargarán los parametros cuantitativos</b> de la OT, <b>si deseamos cambiar la información de alguno de estos parametros</b>, podemos hacerlo <b>presionando click sobre el dato que queremos cambiar y escribir o elegir la nueva información</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#parametrosCualitativos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'parametrosCualitativos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Parametros Cualitativos!</h4>',
+    text: `<p>¡Al igual que los parametros cuantitativos, se nos cargarán los parametros cualitativos de la OT, <b>si deseamos cambiar la información de alguno de estos parametros</b>, podemos hacerlo de la misma manera!</p>`
+  },
+]

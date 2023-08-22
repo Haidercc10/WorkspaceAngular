@@ -23,12 +23,16 @@
 </div>
 
 <p-card class="mb-5">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
   <div class="mb-4">
     <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
   </div>
 
   <!-- Información General Orden de Trabajo -->
-  <form [formGroup]="FormOrden" (ngSubmit)="consultarOrdenTrabajo()">
+  <form [formGroup]="FormOrden" (ngSubmit)="consultarOrdenTrabajo()" id="buscarOrdenTrabajo">
     <div class="row g-4 mb-4">
       
       <!-- Orden de Trabajo -->
@@ -80,11 +84,11 @@
       </div>
     </div>
 
-    <div class="row mt-2">
+    <div class="row mt-2" id="botones">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="submit" label="Consultar Orden" icon="pi pi-search"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
-        <button pButton class="p-button-success" type="button" label="Crear Certificado" icon="pi pi-check" [disabled]="!FormOrden.valid" (click)="guardarCertificados()"></button>
+        <button pButton id="consultarOrden" class="p-button-danger" type="submit" label="Consultar Orden" icon="pi pi-search"></button>
+        <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
+        <button pButton id="crearCertificado" class="p-button-success" type="button" label="Crear Certificado" icon="pi pi-check" [disabled]="!FormOrden.valid" (click)="guardarCertificados()"></button>
       </div>
     </div>
   </form>
@@ -98,7 +102,7 @@
   </div>
 
   <!-- Tabla com información de los parametros cuantitativos -->
-  <div class="row g-3">
+  <div class="row g-3" id="parametrosCuantitativos">
     <div class="table-responsive">
       <p-table
       #dt
@@ -169,7 +173,7 @@
   </div>
 
   <!-- Tabla com información de los parametros cualitativos -->
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4" id="parametrosCualitativos">
     <div class="table-responsive">
       <p-table
       #dt
