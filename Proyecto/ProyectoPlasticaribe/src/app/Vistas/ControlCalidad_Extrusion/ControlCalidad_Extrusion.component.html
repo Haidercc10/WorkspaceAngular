@@ -1,0 +1,224 @@
+<p-toast></p-toast>
+<p-table [value]="registros" dataKey="id" editMode="row" [tableStyle]="{'min-width': '50rem'}">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width:20%">Ronda</th>
+            <th style="width:20%">OT</th>
+            <th style="width:20%">Maquina</th>
+            <th style="width:20%">Cliente</th>
+            <th style="width:20%">Referencia</th>
+            <th style="width:20%">N° Rollo</th>
+            <th style="width:20%">Pigmento</th>
+            <th style="width:20%">Ancho Tub.</th>
+            <th style="width:20%">Peso Metro (g)</th>
+            <th style="width:20%">Ancho (Cm)</th>
+            <th style="width:20%">Min</th>
+            <th style="width:20%">Max</th>
+            <th style="width:20%">Prom</th>
+            <th style="width:20%">Apariencia</th>
+            <th style="width:20%">Tratado</th>
+            <th style="width:20%">Rasgado</th>
+            <th style="width:20%">Tipo Bobina</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="registro">
+            <!--Ronda-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.code">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.code}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--OT-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.name" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.name}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Maquina-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.inventoryStatus" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.inventoryStatus}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Cliente-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.price">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.price | currency: 'USD'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Referencia-->
+            <td>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="registro.code">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{registro.code}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <!--Rollo-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.name" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.name}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Pigmento-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.inventoryStatus" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.inventoryStatus}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Ancho-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.price">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.price | currency: 'USD'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Peso-->
+            <td>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="registro.code">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{registro.code}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <!--Ancho-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.name" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.name}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Min-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.inventoryStatus" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.inventoryStatus}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Max-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.price">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.price | currency: 'USD'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Prom-->
+            <td>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="registro.code">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{registro.code}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <!--Apariencia-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.name" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.name}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Tratado-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.inventoryStatus" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.inventoryStatus}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Rasgado-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.price">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.price | currency: 'USD'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Tipo Bobina-->
+            <td>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="registro.price">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{registro.price | currency: 'USD'}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <!--Botones-->
+            <td>
+                <div class="flex align-items-center justify-content-center gap-2">
+                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
+                </div>
+            </td>
+            
+        </tr>
+    </ng-template>
+</p-table>
