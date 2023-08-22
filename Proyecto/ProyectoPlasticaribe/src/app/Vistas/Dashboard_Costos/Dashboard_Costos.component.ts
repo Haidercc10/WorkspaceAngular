@@ -46,6 +46,9 @@ export class Dashboard_CostosComponent implements OnInit {
   cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
   cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
+  cuentasCostosFijos = ['720551', '740505', '513510', '523510', '523525', '513530', '511595', '521595', '513505', '523505', '730555', '513535', '730505', '519535', '523550', '730585', '515515', '51559515','51559505', '515520', '515505', '53050505', '530515', '521005', '521010', '521015', '521020', '521025', '521030', '521095', '521505'];
+  cuentasCostosVariables = ['523005', '523010', '523015', '523020', '523030', '523035', '523040', '523060', '523070', '523075', '523095', '523520', '529560', '730565', '730570', '513540', '519520', '521540', '511515', '53050510', '530525', '530535', '530595', '519565', '"529505', '529510', '529520', '529525', '529530', '529535', '529540', '529545', '529550', '529555', '529560', '529565', '529570', '529595', '512505'];
+
   arrayCostos : any = []; /** Array que cargará la información de las cuentas empezadas con 71, 51, 52, ó 53 en la tabla del primero modal */
   arrayGastos1 : any = []; /** Array que cargará la información de una cuenta en un periodo en especifico en la tabla del segundo modal */
   totalCostoSeleccionado : number = 0; /** Variable que almacenará el valor total de el tipo de costos cargados en el modal */
@@ -596,7 +599,7 @@ export class Dashboard_CostosComponent implements OnInit {
   // Funcion que se encargará de exportar a un archivo de excel la información de las cuentas en cada uno de los meses
   exportarExcel(){
     this.cargando = true;
-    let infoDocumento : any [] = [];
+    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
 
     if (this.rangoFechas.length > 0) this.exportarExcel_RangoFechas();
     else {
@@ -611,7 +614,12 @@ export class Dashboard_CostosComponent implements OnInit {
               this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
               this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
             ].reduce((a, b) => a.concat(b));
-            this.formatoExcel(title, infoDocumento);
+            
+            costosAgrupados = [
+              this.calcularTotalMeses([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b)), 'Costos y Gastos Fijos'),
+              this.calcularTotalMeses([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b)), 'Costos y Gastos Variables'),
+            ].reduce((a, b) => a.concat(b));
+            this.formatoExcel(title, infoDocumento, costosAgrupados);
           });
         });
       } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
@@ -624,7 +632,7 @@ export class Dashboard_CostosComponent implements OnInit {
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    let infoDocumento : any [] = [];
+    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
     let title : string = `Determinación de Costos Desde ${moment(fechaInicial).format('MMMM').toUpperCase()} ${moment(fechaInicial).format('YYYY')} Hasta ${moment(fechaFinal).format('MMMM').toUpperCase()} ${moment(fechaFinal).format('YYYY')} - ${moment().format('DD-MM-YYYY')}`;
 
     this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
@@ -635,12 +643,17 @@ export class Dashboard_CostosComponent implements OnInit {
         this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
       ].reduce((a, b) => a.concat(b));
-      this.formatoExcel(title, infoDocumento);
+
+      costosAgrupados = [
+        this.calcularTotalMeses([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b)), 'Costos y Gastos Fijos'),
+        this.calcularTotalMeses([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b)), 'Costos y Gastos Variables'),
+      ].reduce((a, b) => a.concat(b));
+      this.formatoExcel(title, infoDocumento, costosAgrupados);
     });
   }
 
   // Funcion que va a darle el formato y a colocarlos datos en el archivo que se exportará a excel
-  formatoExcel(titulo : string, datos : any){
+  formatoExcel(titulo : string, datos : any, datosAgrupados : any = []){
     let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } };
     let font : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
     let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -648,6 +661,8 @@ export class Dashboard_CostosComponent implements OnInit {
 
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+    
+    // HOJA 1, COSTOS DETALLADOS
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
     worksheet.addImage(imageId1, 'A1:B3');
     let titleRow = worksheet.addRow([titulo]);
@@ -662,6 +677,8 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet.mergeCells('A1:O3');
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+    
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
     tituloCostosFab.eachCell(cell => {
       cell.fill = fill;
@@ -735,6 +752,92 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet.mergeCells('A69:O69');
     worksheet.mergeCells('A109:O109');
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
+
+    //HOJA 2, CONSOLIDADO DE COSTOS
+    let worksheet2 = workbook.addWorksheet(`Consolidado de Costos`);
+    worksheet2.addImage(imageId1, 'A1:B3');
+    let titleRow2 = worksheet2.addRow(['Consolidado de Costos']);
+    titleRow2.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    worksheet2.addRow([]);
+    worksheet2.addRow([]);
+    let headerRow2 = worksheet2.addRow(header);
+    headerRow2.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+      cell.font = font;
+      cell.border = border;
+    });
+    worksheet2.mergeCells('A1:O3');
+    worksheet2.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    let tituloCostosFijos = worksheet2.addRow(['Costos y Gastos Fijos']);
+    tituloCostosFijos.eachCell(cell => {
+      cell.fill = fill;
+      cell.font = font;
+      cell.border = border
+    });
+    worksheet2.mergeCells('A5:O5');
+    datosAgrupados.forEach(d => {
+      let row = worksheet2.addRow(d);
+      row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
+      row.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } };
+      if (d[0] == 'Totales'){
+        if (d[1] != 'Costos y Gastos Variables') {
+          let titulo = '';
+          if (d[1] == 'Costos y Gastos Fijos') titulo = 'Costos y Gastos Variables';
+          worksheet2.addRow([]);
+          let titulorow = worksheet2.addRow([titulo]);
+          titulorow.eachCell(cell => {
+            cell.fill = fill;
+            cell.font = font;
+            cell.border = border;
+          });
+        }
+        row.eachCell(cell => {
+          cell.font = font;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
+        });
+      };
+    });
+    worksheet2.addRow([]);
+    worksheet2.addRow([]);
+    this.calcularTotales(datosAgrupados).forEach(d => {
+      let row = worksheet2.addRow(d);
+      row.eachCell(cell => {
+        cell.font = font;
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'AED6F1' } }
+      });
+    });
+
+    worksheet2.getColumn(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(1).width = 15;
+    worksheet2.getColumn(2).width = 50;
+    worksheet2.getColumn(3).width = 22;
+    worksheet2.getColumn(4).width = 22;
+    worksheet2.getColumn(5).width = 22;
+    worksheet2.getColumn(6).width = 22;
+    worksheet2.getColumn(7).width = 22;
+    worksheet2.getColumn(8).width = 22;
+    worksheet2.getColumn(9).width = 22;
+    worksheet2.getColumn(10).width = 22;
+    worksheet2.getColumn(11).width = 22;
+    worksheet2.getColumn(12).width = 22;
+    worksheet2.getColumn(13).width = 22;
+    worksheet2.getColumn(14).width = 22;
+    worksheet2.getColumn(15).width = 22;
+    worksheet2.mergeCells('A35:O35');
+    worksheet2.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
+
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       fs.saveAs(blob, titulo + `.xlsx`);
@@ -744,7 +847,7 @@ export class Dashboard_CostosComponent implements OnInit {
   }
 
   // Funcion que va a devolver un array con los totales de cada uno de los meses para cada una de las cuentas
-  calcularTotalMeses(data : any){
+  calcularTotalMeses(data : any, tipoCosto : string = ''){
     let datos : any [] = [];
     let cuentas : any [] = [];
     let tituloTotal = '';
@@ -769,10 +872,13 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '12' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0)
         ]);
-        if ((data[i].cuenta).toString().startsWith('7')) tituloTotal = 'Costos Indirectos de Fabricación';
-        else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
-        else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
-        else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
+        if (tipoCosto != '') tituloTotal = tipoCosto;
+        else {
+          if ((data[i].cuenta).toString().startsWith('7')) tituloTotal = 'Costos Indirectos de Fabricación';
+          else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
+          else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
+          else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
+        }
       }
     }
 
