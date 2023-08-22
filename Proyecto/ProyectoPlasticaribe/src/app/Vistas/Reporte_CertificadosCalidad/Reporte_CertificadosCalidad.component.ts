@@ -23,6 +23,10 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   parametrosCualitativos : any = []; /** Array que contendrá la información de los parametros cualitativos */
   clientes : any = []; /** Array que contendrá la información de los clientes */
   items : any = []; /** Array que contendrá la información de los items */ 
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
   constructor(private AppComponent : AppComponent, 
                 private fBuilder : FormBuilder,
@@ -44,8 +48,17 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
+  }
+  
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  //Tutorial que muestra el uso del módulo. 
   tutorial(){}
 
   //Cargar la tabla según los filtros consultados
