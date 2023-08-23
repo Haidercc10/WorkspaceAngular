@@ -48,6 +48,8 @@ export class BagproService {
   GetDatosConsolidados = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getDatosConsolidados/${OT}/${proceso}`);
 
   GetInformacionOrden_ProcesoExt = (orden : string, proceso : string) => this.http.get<any>(`${rutaBagPro}/ProcExtrusion/getInformacionOrden_Proceso/${orden}/${proceso}`);
+  
+  getOtControlCalidadExtrusion = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getOtControlCalidadExtrusion/${OT}/${proceso}`);
 
   /********************************************************** CLIENTESOT ****************************************************************/
 

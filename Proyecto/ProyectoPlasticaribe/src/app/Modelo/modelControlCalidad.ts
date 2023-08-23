@@ -1,5 +1,29 @@
 export interface modelControlCalidad_Extrusion {
-
+    CcExt_Id? : number;
+    Turno_Id : string;
+    Usua_Id : number;
+    CcExt_Maquina : number;
+    CcExt_Ronda : number;
+    CcExt_OT : number;
+    CcExt_Cliente : string;
+    Prod_Id : string;
+    Referencia : string;
+    CcExt_Rollo : number;
+    Pigmento_Id : number;
+    CcExt_AnchoTubular : number;
+    CcExt_PesoMetro : number;
+    CcExt_Ancho : number;
+    UndMed_Id : string;
+    CcExt_CalibreMax : number;
+    CcExt_CalibreMin : number;
+    CcExt_CalibreProm : number;
+    CcExt_Apariencia : string;
+    CcExt_Tratado : string;
+    CcExt_Rasgado : string;
+    CcExt_TipoBobina : string;
+    CcExt_Fecha : string;
+    CcExt_Hora : string;
+    CcExt_Observacion : string;  
 }
 
 export interface modelControlCalidad_Impresion {
