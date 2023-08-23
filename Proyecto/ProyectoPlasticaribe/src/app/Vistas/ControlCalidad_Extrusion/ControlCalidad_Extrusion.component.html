@@ -1,43 +1,58 @@
-<p-toast></p-toast>
-<p-table [value]="registros" dataKey="id" editMode="row" *ngIf="!load" [tableStyle]="{'min-width': '50rem'}">
+<button pButton class="p-button-danger" type="button" (click)="cargarRegistro(undefined)" label="Añadir registro" icon="pi pi-pencil"></button>
+<p-table [value]="registros" dataKey="Rollo" editMode="row" *ngIf="!load" [tableStyle]="{'min-width': '50rem'}">
     <ng-template pTemplate="header">
         <tr>
-            <th colspan="10"></th>
+            <th colspan="11"></th>
             <th colspan="3" class="text-center">Calibre (3 Mediciones)</th>
-            <th colspan="4"></th>
+            <th colspan="5"></th>
         </tr>
         <tr>
-            <th>Ronda</th>
-            <th>OT</th>
-            <th>Maquina</th>
-            <th>Cliente</th>
-            <th>Referencia</th>
-            <th>N° Rollo</th>
-            <th>Pigmento</th>
-            <th>Ancho Tub.</th>
-            <th>Peso Metro (g)</th>
-            <th>Ancho (Cm)</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Prom</th>
-            <th>Apariencia</th>
-            <th>Tratado</th>
-            <th>Rasgado</th>
-            <th>Tipo Bobina</th>
+          <th>OT</th>
+          <th>Ronda</th>
+          <th>Turno</th>
+          <th>Maquina</th>
+          <th>Cliente</th>
+          <th>Referencia</th>
+          <th>N° Rollo</th>
+          <th>Pigmento</th>
+          <th>Ancho Tub.</th>
+          <th>Peso Metro (g)</th>
+          <th>Ancho (Cm)</th>
+          <th>Min</th>
+          <th>Max</th>
+          <th>Prom</th>
+          <th>Apariencia</th>
+          <th>Tratado</th>
+          <th>Rasgado</th>
+          <th>Tipo Bobina</th>
+          <th>Acciones</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
         <tr [pEditableRow]="registro">
-            <!--Ronda-->
-            <td>{{ri + 1}}</td>
             <!--OT-->
-            <td>
+             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.OT" (keyup.enter)="consultarOT(registro)" required>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Ronda-->
+            <td>
+                {{registro.Ronda}}
+            </td>
+             <!--Turno-->
+             <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Turno}}
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -228,7 +243,7 @@
         </div>
         <div class="p-fluid" style="display: flex;">
           <div class="col-6" style="margin-right: 5px;">
-            <button type="button" pButton (click)="onRowEditSave(item)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+            <button type="button" pButton (click)="validarId(item)" icon="pi pi-check" label="Si" class="p-button-success"></button>
           </div>
           <div class="col-6">
             <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
@@ -236,5 +251,5 @@
         </div>
       </div>
     </ng-template>
-  </p-toast>
+</p-toast>
 
