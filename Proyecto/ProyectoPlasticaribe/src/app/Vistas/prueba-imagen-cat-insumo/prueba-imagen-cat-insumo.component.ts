@@ -26,6 +26,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ubicacionFotoCelda : string [] = ['IZQUIERDA','DERECHA']; //Variable que se usará para almacenar la ubicacion de la fotocelda en el proceso de impresión
   turno : string [] = ['DIA','NOCHE']; //Variable que se usará para almacenar el turno
+  datosClonados : any [] = []; //Variable que se usará para almacenar los datos clonados
   datosControlCal_Extrusion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de extrusion
   datosControlCal_Impresion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de impresion
   datosControlCal_Doblado : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de doblado
@@ -164,6 +165,16 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ConsultarDatosControlCal_Sellado() {
   }
 
+  // Función que va a crear una copia de la información que se está editando
+  editandoFila = (data : any)  => this.datosClonados[data.Id as string] = { ...data };
+
+  // Función que va a eliminar la copia de la información que se estaban editando y restablecerá los datos de la tabla a como estaban antes de empezar la edición
+  edicionCancelada(data: any, index: number, controlCalidad : string) {
+    if (controlCalidad == 'DOBLADO') this.datosControlCal_Doblado[index] = this.datosClonados[data.Id as string];
+    else if (controlCalidad == 'IMPRESION') this.datosControlCal_Impresion[index] = this.datosClonados[data.Id as string];
+    delete this.datosClonados[data.Id as string];
+  }
+
   // Funcion que va a consultar los datos de una orden de trabajo en el proceso de doblado y corte
   consultarDatosOrdenTrabajo_ProcExtrusion(orden : string, id : number, procesos : any) {
     this.cargando = true;
@@ -171,7 +182,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       let turno : string, maquina : string [] = [];
       const time = moment(moment(), 'hh:mm:ss');
       const beforeTime = moment('07:00:00', 'hh:mm:ss');
-      const afterTime = moment('17:59:59', 'hh:mm:ss');      
+      const afterTime = moment('17:59:59', 'hh:mm:ss');
       (time.isBetween(beforeTime, afterTime)) ? turno = 'DIA' : (time.isBetween(afterTime, beforeTime)) ? turno = 'NOCHE' : ``;
 
       data.forEach(ot => {
