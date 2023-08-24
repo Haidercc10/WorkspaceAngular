@@ -677,7 +677,6 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet.mergeCells('A1:O3');
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-
     
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
     tituloCostosFab.eachCell(cell => {
@@ -712,7 +711,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet.addRow([]);
     worksheet.addRow([]);
-    this.calcularTotales(datos).forEach(d => {
+    this.calcularTotales(datos, 'Totales').forEach(d => {
       let row = worksheet.addRow(d);
       row.eachCell(cell => {
         cell.font = font;
@@ -768,7 +767,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet2.mergeCells('A1:O3');
     worksheet2.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    let tituloCostosFijos = worksheet2.addRow(['Costos y Gastos Fijos']);
+    let tituloCostosFijos = worksheet2.addRow(['COSTO Y GASTOS FIJOS']);
     tituloCostosFijos.eachCell(cell => {
       cell.fill = fill;
       cell.font = font;
@@ -782,13 +781,13 @@ export class Dashboard_CostosComponent implements OnInit {
       if (d[0] == ''){
         if (d[1] != 'TOTAL COSTO Y GASTOS VARIABLES') {
           let titulo = '';
-          if (d[1] == 'CTOTAL COSTO Y GASTOS FIJOS') titulo = 'TOTAL COSTO Y GASTOS VARIABLES';
+          if (d[1] == 'TOTAL COSTO Y GASTOS FIJOS') titulo = 'COSTO Y GASTOS VARIABLES';
           worksheet2.addRow([]);
           let titulorow = worksheet2.addRow([titulo]);
           titulorow.eachCell(cell => {
             cell.fill = fill;
             cell.font = font;
-            cell.border = border;
+            cell.border = border
           });
         }
         row.eachCell(cell => {
@@ -799,7 +798,7 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet2.addRow([]);
     worksheet2.addRow([]);
-    this.calcularTotales(datosAgrupados).forEach(d => {
+    this.calcularTotales(datosAgrupados, '').forEach(d => {
       let row = worksheet2.addRow(d);
       row.eachCell(cell => {
         cell.font = font;
@@ -914,7 +913,7 @@ export class Dashboard_CostosComponent implements OnInit {
     let gas : any [] = ['730555', '513555'];
     let telefono : any [] = ['513535'];
     let mantenimientoReparaciones : any [] = ['730505', '730575', '514515', '514525', '514540', '515005', '515015', '524515', '524520', '524525', '524540', '525015', '525095'];
-    let combustible : any [] = ['730540', '51559515', '529535'];
+    let combustible : any [] = ['730540', '51559515', '529535', '52559515'];
     let transporteFletes : any [] = ['730550', '513550', '523550'];
     let conos : any [] = ['730585', '730590'];
     let gastosViajes : any [] = ['515505', '515515', '515520', '51559505', '525505', '525515', '525520', '52559505'];
@@ -1045,25 +1044,25 @@ export class Dashboard_CostosComponent implements OnInit {
   }
 
   // Funcion que va a calcular los totales de cada uno de los meses
-  calcularTotales(data : any){
+  calcularTotales(data : any, datoValidar : string){
     let datos : any [] = ['','',0,0,0,0,0,0,0,0,0,0,0,0,0];
     for (let i = 0; i < data.length; i++) {
       datos = [
         'Total',
         'Total Gastos Mensuales',
-        datos[2] += data[i][0] != '' ? data[i][2] : 0,
-        datos[3] += data[i][0] != '' ? data[i][3] : 0,
-        datos[4] += data[i][0] != '' ? data[i][4] : 0,
-        datos[5] += data[i][0] != '' ? data[i][5] : 0,
-        datos[6] += data[i][0] != '' ? data[i][6] : 0,
-        datos[7] += data[i][0] != '' ? data[i][7] : 0,
-        datos[8] += data[i][0] != '' ? data[i][8] : 0,
-        datos[9] += data[i][0] != '' ? data[i][9] : 0,
-        datos[10] += data[i][0] != '' ? data[i][10] : 0,
-        datos[11] += data[i][0] != '' ? data[i][11] : 0,
-        datos[12] += data[i][0] != '' ? data[i][12] : 0,
-        datos[13] += data[i][0] != '' ? data[i][13] : 0,
-        datos[14] += data[i][0] == '' ? data[i][14] : 0,
+        datos[2] += data[i][0] != datoValidar ? data[i][2] : 0,
+        datos[3] += data[i][0] != datoValidar ? data[i][3] : 0,
+        datos[4] += data[i][0] != datoValidar ? data[i][4] : 0,
+        datos[5] += data[i][0] != datoValidar ? data[i][5] : 0,
+        datos[6] += data[i][0] != datoValidar ? data[i][6] : 0,
+        datos[7] += data[i][0] != datoValidar ? data[i][7] : 0,
+        datos[8] += data[i][0] != datoValidar ? data[i][8] : 0,
+        datos[9] += data[i][0] != datoValidar ? data[i][9] : 0,
+        datos[10] += data[i][0] != datoValidar ? data[i][10] : 0,
+        datos[11] += data[i][0] != datoValidar ? data[i][11] : 0,
+        datos[12] += data[i][0] != datoValidar ? data[i][12] : 0,
+        datos[13] += data[i][0] != datoValidar ? data[i][13] : 0,
+        datos[14] += data[i][0] == datoValidar ? data[i][14] : 0,
       ];
     }
     return [datos];
