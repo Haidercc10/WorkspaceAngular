@@ -18,6 +18,8 @@ constructor(private http: HttpClient) { }
 
     GetRegistrosHoy = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_CorteDoblado/getRegistrosHoy`);
 
+    GetUltRegistroItem = (item : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_CorteDoblado/getUltRegistroItem/${item}`);
+
     Post = (data: modelControlCalidad_CorteDoblado) : Observable<any> => this.http.post<any>(`${rutaPlasticaribeAPI}/ControlCalidad_CorteDoblado`, data);
 
     Put = (Id: number, data: modelControlCalidad_CorteDoblado) : Observable<any> => this.http.put<any>(`${rutaPlasticaribeAPI}/ControlCalidad_CorteDoblado/${Id}`, data);

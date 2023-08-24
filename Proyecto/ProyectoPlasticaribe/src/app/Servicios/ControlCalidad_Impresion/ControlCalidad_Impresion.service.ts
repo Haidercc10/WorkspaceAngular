@@ -16,6 +16,10 @@ export class ControlCalidad_ImpresionService {
 
     Get_Id = (Id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Impresion/${Id}`);
 
+    GetRegistrosHoy = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Impresion/getRegistrosHoy`);
+
+    GetUltRegistroItem = (item : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Impresion/getUltRegistroItem/${item}`);
+
     Post = (data: modelControlCalidad_Impresion) : Observable<any> => this.http.post<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Impresion`, data);
 
     Put = (Id: number, data: modelControlCalidad_Impresion) : Observable<any> => this.http.put<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Impresion/${Id}`, data);

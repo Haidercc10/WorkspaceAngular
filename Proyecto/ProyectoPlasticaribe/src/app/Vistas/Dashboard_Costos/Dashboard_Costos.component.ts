@@ -616,8 +616,8 @@ export class Dashboard_CostosComponent implements OnInit {
             ].reduce((a, b) => a.concat(b));
             
             costosAgrupados = [
-              this.calcularTotalMeses([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b)), 'Costos y Gastos Fijos'),
-              this.calcularTotalMeses([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b)), 'Costos y Gastos Variables'),
+              this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
+              this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
             ].reduce((a, b) => a.concat(b));
             this.formatoExcel(title, infoDocumento, costosAgrupados);
           });
@@ -645,8 +645,8 @@ export class Dashboard_CostosComponent implements OnInit {
       ].reduce((a, b) => a.concat(b));
 
       costosAgrupados = [
-        this.calcularTotalMeses([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b)), 'Costos y Gastos Fijos'),
-        this.calcularTotalMeses([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b)), 'Costos y Gastos Variables'),
+        this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
+        this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
       ].reduce((a, b) => a.concat(b));
       this.formatoExcel(title, infoDocumento, costosAgrupados);
     });
@@ -779,10 +779,10 @@ export class Dashboard_CostosComponent implements OnInit {
       let row = worksheet2.addRow(d);
       row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
       row.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } };
-      if (d[0] == 'Totales'){
-        if (d[1] != 'Costos y Gastos Variables') {
+      if (d[0] == ''){
+        if (d[1] != 'TOTAL COSTO Y GASTOS VARIABLES') {
           let titulo = '';
-          if (d[1] == 'Costos y Gastos Fijos') titulo = 'Costos y Gastos Variables';
+          if (d[1] == 'CTOTAL COSTO Y GASTOS FIJOS') titulo = 'TOTAL COSTO Y GASTOS VARIABLES';
           worksheet2.addRow([]);
           let titulorow = worksheet2.addRow([titulo]);
           titulorow.eachCell(cell => {
@@ -835,7 +835,7 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet2.getColumn(13).width = 22;
     worksheet2.getColumn(14).width = 22;
     worksheet2.getColumn(15).width = 22;
-    worksheet2.mergeCells('A64:O64');
+    worksheet2.mergeCells('A26:O26');
     worksheet2.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
 
     workbook.xlsx.writeBuffer().then((data) => {
@@ -851,7 +851,6 @@ export class Dashboard_CostosComponent implements OnInit {
     let datos : any [] = [];
     let cuentas : any [] = [];
     let tituloTotal = '';
-
     for (let i = 0; i < data.length; i++) {
       if (!cuentas.includes(data[i].cuenta.trim())){
         cuentas.push(data[i].cuenta.trim());
@@ -902,6 +901,149 @@ export class Dashboard_CostosComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular y agrupar los cortos de cada uno de los meses de los costos fijos
+  calcularCostosAgrupadosFijos(data : any []){
+    let datos : any [] = [];
+    let dotacionSumTrabajadores : any [] = ['720551'];
+    let gastosPersonal : any [] = ['740505', '3', '2', '1', '513510', '523510'];
+    let acueductoAlcantarillado : any [] = ['730525', '513525', '523525'];
+    let energiaElectrica : any [] = ['730530', '513530', '523530'];
+    let impAlumbradoPublico : any [] = ['511595', '521595'];
+    let tasaSeguridadConvivencia : any [] = ['513505'];
+    let tasaVigilancia : any [] = ['523505'];
+    let gas : any [] = ['730555', '513555'];
+    let telefono : any [] = ['513535'];
+    let mantenimientoReparaciones : any [] = ['730505', '730575', '514515', '514525', '514540', '515005', '515015', '524515', '524520', '524525', '524540', '525015', '525095'];
+    let combustible : any [] = ['730540', '51559515', '529535'];
+    let transporteFletes : any [] = ['730550', '513550', '523550'];
+    let conos : any [] = ['730585', '730590'];
+    let gastosViajes : any [] = ['515505', '515515', '515520', '51559505', '525505', '525515', '525520', '52559505'];
+    let gravamenFinanciero : any [] = ['53050505'];
+    let comisiones : any [] = ['519505', '529505', '530515'];
+    let horarios : any [] = ['511095'];
+    let impuestoIndustriaComercio : any [] = ['521505'];
+    
+    datos = [
+      this.calcularCostoAgrupado(data.filter(item => dotacionSumTrabajadores.includes(item.cuenta.trim())), 'DOTACIÓN Y SUMINISTRO A TRABAJADORES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gastosPersonal.includes(item.cuenta.trim())), 'GASTO DE PERSONAL', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => acueductoAlcantarillado.includes(item.cuenta.trim())), 'ACUEDUCTO Y ALCANTARILLADO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => energiaElectrica.includes(item.cuenta.trim())), 'ENERGIA ELECTRICA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => impAlumbradoPublico.includes(item.cuenta.trim())), 'IMPUESTO ALUMBRADO PÚBLICO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => tasaSeguridadConvivencia.includes(item.cuenta.trim())), 'TASA DE SEGURIDAD Y CONVIVENCIA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => tasaVigilancia.includes(item.cuenta.trim())), 'TASA DE VIGILANCIA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gas.includes(item.cuenta.trim())), 'GAS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => telefono.includes(item.cuenta.trim())), 'TELEFONO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => mantenimientoReparaciones.includes(item.cuenta.trim())), 'MANTENIMIENTO Y REPARACIONES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => combustible.includes(item.cuenta.trim())), 'COMBUSTIBLES Y LUBRICANTES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => transporteFletes.includes(item.cuenta.trim())), 'TRANSPORTES, FLETES Y ACARREOS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => conos.includes(item.cuenta.trim())), 'CONOS Y OTROS MATERIALES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gastosViajes.includes(item.cuenta.trim())), 'GASTOS DE VIAJES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gravamenFinanciero.includes(item.cuenta.trim())), 'GRAVAMEN A LOS MOVIMIENTOS FINANCIEROS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => comisiones.includes(item.cuenta.trim())), 'COMISIONES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => horarios.includes(item.cuenta.trim())), 'HONORARIOS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoIndustriaComercio.includes(item.cuenta.trim())), 'IMPUESTO DE INDUSTRIA Y COMERCIO', 'FIJO'),
+    ].reduce((a,b) => a.concat(b));
+    datos.push([
+      '',
+      'TOTAL COSTO Y GASTOS FIJOS',
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;  
+  }
+
+  // Funcion que va a calcular y agrupar los cortos de cada uno de los meses de los costos variables
+  calcularCostosAgrupadosVariables(data : any []){
+    let datos : any [] = [];
+    let seguros : any [] = ['513005', '513010', '513025', '513040', '513095', '523010', '523040', '523060', '523075', '523095'];
+    let procesamientoDatos : any [] = ['513520', '523520'];
+    let casinoRestaurantes : any [] = ['730560', '529560'];
+    let utilesPapeleria : any [] = ['730565', '519530', '529530'];
+    let aseoCafeteria : any [] = ['730570', '519525', '529525'];
+    let correosPortesTelegramas : any [] = ['513540', '523540'];
+    let gastosRepresentacion : any [] = ['519520', '529520'];
+    let impuestoVehiculos : any [] = ['521540'];
+    let impuestoPropiedadRaiz : any [] = ['511515'];
+    let chequera : any [] = ['53050510'];
+    let diferenciaCambio : any [] = ['530525'];
+    let descuentosComerciales : any [] = ['530535'];
+    let otrosFinancieros : any [] = ['530595'];
+    let parqueadero : any [] = ['529565'];
+    let diversos : any [] = ['529540', '529595'];
+    let contribuciones : any [] = ['512505'];
+
+    datos = [
+      this.calcularCostoAgrupado(data.filter(item => seguros.includes(item.cuenta.trim())), 'SEGUROS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => procesamientoDatos.includes(item.cuenta.trim())), 'PROCESAMIENTO DE DATOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => casinoRestaurantes.includes(item.cuenta.trim())), 'CASINOS Y RESTAURANTES', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => utilesPapeleria.includes(item.cuenta.trim())), 'UTILES Y PAPELERIA', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => aseoCafeteria.includes(item.cuenta.trim())), 'ELEMENTOS DE ASEO Y CAFETERIA', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => correosPortesTelegramas.includes(item.cuenta.trim())), 'CORREOS, PORTES Y TELEGRAMAS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => gastosRepresentacion.includes(item.cuenta.trim())), 'GASTOS DE REPRESENTACIÓN', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoVehiculos.includes(item.cuenta.trim())), 'IMPUESTO DE VEHICULO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoPropiedadRaiz.includes(item.cuenta.trim())), 'IMPUESTO PROPIEDAD RAIZ', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => chequera.includes(item.cuenta.trim())), 'CHEQUERAS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => diferenciaCambio.includes(item.cuenta.trim())), 'DIFERENCIA EN CAMBIO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => descuentosComerciales.includes(item.cuenta.trim())), 'DESCUENTOS COMERCIALES CONDICIONADOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => otrosFinancieros.includes(item.cuenta.trim())), 'OTROS FINANCIEROS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => parqueadero.includes(item.cuenta.trim())), 'PARQUEADERO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => diversos.includes(item.cuenta.trim())), 'DIVERSOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => contribuciones.includes(item.cuenta.trim())), 'CONTRIBUCIONES', 'VARIABLE'),
+    ].reduce((a,b) => a.concat(b));
+    datos.push([
+      '',
+      'TOTAL COSTO Y GASTOS VARIABLES',
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;  
+  }
+
+  // funcion que va a  calcular el total del costo agrupado que le sea pasado
+  calcularCostoAgrupado(data : any [], titulo : string, tipo : string){
+    let datos : any [] = [];
+    datos.push([
+      tipo,
+      titulo,
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;
+  }
+
   // Funcion que va a calcular los totales de cada uno de los meses
   calcularTotales(data : any){
     let datos : any [] = ['','',0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -909,19 +1051,19 @@ export class Dashboard_CostosComponent implements OnInit {
       datos = [
         'Total',
         'Total Gastos Mensuales',
-        datos[2] += data[i][0] != 'Totales' ? data[i][2] : 0,
-        datos[3] += data[i][0] != 'Totales' ? data[i][3] : 0,
-        datos[4] += data[i][0] != 'Totales' ? data[i][4] : 0,
-        datos[5] += data[i][0] != 'Totales' ? data[i][5] : 0,
-        datos[6] += data[i][0] != 'Totales' ? data[i][6] : 0,
-        datos[7] += data[i][0] != 'Totales' ? data[i][7] : 0,
-        datos[8] += data[i][0] != 'Totales' ? data[i][8] : 0,
-        datos[9] += data[i][0] != 'Totales' ? data[i][9] : 0,
-        datos[10] += data[i][0] != 'Totales' ? data[i][10] : 0,
-        datos[11] += data[i][0] != 'Totales' ? data[i][11] : 0,
-        datos[12] += data[i][0] != 'Totales' ? data[i][12] : 0,
-        datos[13] += data[i][0] != 'Totales' ? data[i][13] : 0,
-        datos[14] += data[i][0] == 'Totales' ? data[i][14] : 0,
+        datos[2] += data[i][0] != '' ? data[i][2] : 0,
+        datos[3] += data[i][0] != '' ? data[i][3] : 0,
+        datos[4] += data[i][0] != '' ? data[i][4] : 0,
+        datos[5] += data[i][0] != '' ? data[i][5] : 0,
+        datos[6] += data[i][0] != '' ? data[i][6] : 0,
+        datos[7] += data[i][0] != '' ? data[i][7] : 0,
+        datos[8] += data[i][0] != '' ? data[i][8] : 0,
+        datos[9] += data[i][0] != '' ? data[i][9] : 0,
+        datos[10] += data[i][0] != '' ? data[i][10] : 0,
+        datos[11] += data[i][0] != '' ? data[i][11] : 0,
+        datos[12] += data[i][0] != '' ? data[i][12] : 0,
+        datos[13] += data[i][0] != '' ? data[i][13] : 0,
+        datos[14] += data[i][0] == '' ? data[i][14] : 0,
       ];
     }
     return [datos];
