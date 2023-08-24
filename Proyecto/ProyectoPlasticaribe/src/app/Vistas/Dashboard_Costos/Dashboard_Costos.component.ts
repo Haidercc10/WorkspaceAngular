@@ -46,6 +46,9 @@ export class Dashboard_CostosComponent implements OnInit {
   cuentasVentas = ['529595', '529565', '529560', '529540', '529535', '529530', '529525', '529520', '529505', '52559515', '52559505', '525520', '525515', '525505', '525095', '525015', '524540', '524525', '524520', '524515', '523595', '523550', '523540', '523530', '523525', '523520', '523510', '523505', '523095', '523075', '523060', '523040', '523010', '521595', '521540', '521505'];
   cuentasNoOperacionesles = ['53050505', '53050510', '530515', '530525', '530535', '530595'];
 
+  cuentasCostosFijos = ['720551', '740505', '513510', '523510', '730525', '523525', '513525', '730530', '513530', '523530', '511595', '521595', '513505', '523505', '730555', '513555', '513535', '730505', '730575', '514515', '514525', '514540', '515005', '515015', '524515', '524520', '524525', '524540', '525015', '525095', '730540', '51559515', '52559515', '529535', '523550', '730550', '513550', '730585', '730590', '515515', '51559505', '515520', '515505', '525505', '525515', '52559505', '525520', '53050505', '530515', '519505', '529505', '511095', '521505', ];
+  cuentasCostosVariables = ['513005','513010','513025','513040','513095','523010','523040','523060','523075','523095','513520','523520','529560','529560','730565','529530','519530','730570','519525','529525','513540','523540','519520','529520','521540','511515','53050510','530525','530535','530595','529565','529540','529595','512505',];
+
   arrayCostos : any = []; /** Array que cargará la información de las cuentas empezadas con 71, 51, 52, ó 53 en la tabla del primero modal */
   arrayGastos1 : any = []; /** Array que cargará la información de una cuenta en un periodo en especifico en la tabla del segundo modal */
   totalCostoSeleccionado : number = 0; /** Variable que almacenará el valor total de el tipo de costos cargados en el modal */
@@ -596,7 +599,7 @@ export class Dashboard_CostosComponent implements OnInit {
   // Funcion que se encargará de exportar a un archivo de excel la información de las cuentas en cada uno de los meses
   exportarExcel(){
     this.cargando = true;
-    let infoDocumento : any [] = [];
+    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
 
     if (this.rangoFechas.length > 0) this.exportarExcel_RangoFechas();
     else {
@@ -611,7 +614,12 @@ export class Dashboard_CostosComponent implements OnInit {
               this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),,
               this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
             ].reduce((a, b) => a.concat(b));
-            this.formatoExcel(title, infoDocumento);
+            
+            costosAgrupados = [
+              this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
+              this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
+            ].reduce((a, b) => a.concat(b));
+            this.formatoExcel(title, infoDocumento, costosAgrupados);
           });
         });
       } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
@@ -624,7 +632,7 @@ export class Dashboard_CostosComponent implements OnInit {
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
 
-    let infoDocumento : any [] = [];
+    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
     let title : string = `Determinación de Costos Desde ${moment(fechaInicial).format('MMMM').toUpperCase()} ${moment(fechaInicial).format('YYYY')} Hasta ${moment(fechaFinal).format('MMMM').toUpperCase()} ${moment(fechaFinal).format('YYYY')} - ${moment().format('DD-MM-YYYY')}`;
 
     this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
@@ -635,12 +643,17 @@ export class Dashboard_CostosComponent implements OnInit {
         this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
         this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim())))
       ].reduce((a, b) => a.concat(b));
-      this.formatoExcel(title, infoDocumento);
+
+      costosAgrupados = [
+        this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
+        this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
+      ].reduce((a, b) => a.concat(b));
+      this.formatoExcel(title, infoDocumento, costosAgrupados);
     });
   }
 
   // Funcion que va a darle el formato y a colocarlos datos en el archivo que se exportará a excel
-  formatoExcel(titulo : string, datos : any){
+  formatoExcel(titulo : string, datos : any, datosAgrupados : any = []){
     let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'fcffa0' } };
     let font : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
     let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -648,6 +661,8 @@ export class Dashboard_CostosComponent implements OnInit {
 
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+    
+    // HOJA 1, COSTOS DETALLADOS
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
     worksheet.addImage(imageId1, 'A1:B3');
     let titleRow = worksheet.addRow([titulo]);
@@ -662,6 +677,8 @@ export class Dashboard_CostosComponent implements OnInit {
     });
     worksheet.mergeCells('A1:O3');
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+    
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
     tituloCostosFab.eachCell(cell => {
       cell.fill = fill;
@@ -735,6 +752,92 @@ export class Dashboard_CostosComponent implements OnInit {
     worksheet.mergeCells('A69:O69');
     worksheet.mergeCells('A109:O109');
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
+
+    //HOJA 2, CONSOLIDADO DE COSTOS
+    let worksheet2 = workbook.addWorksheet(`Consolidado de Costos`);
+    worksheet2.addImage(imageId1, 'A1:B3');
+    let titleRow2 = worksheet2.addRow(['Consolidado de Costos']);
+    titleRow2.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    worksheet2.addRow([]);
+    worksheet2.addRow([]);
+    let headerRow2 = worksheet2.addRow(header);
+    headerRow2.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+      cell.font = font;
+      cell.border = border;
+    });
+    worksheet2.mergeCells('A1:O3');
+    worksheet2.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    let tituloCostosFijos = worksheet2.addRow(['Costos y Gastos Fijos']);
+    tituloCostosFijos.eachCell(cell => {
+      cell.fill = fill;
+      cell.font = font;
+      cell.border = border
+    });
+    worksheet2.mergeCells('A5:O5');
+    datosAgrupados.forEach(d => {
+      let row = worksheet2.addRow(d);
+      row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
+      row.getCell(15).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'cbffd3' } };
+      if (d[0] == ''){
+        if (d[1] != 'TOTAL COSTO Y GASTOS VARIABLES') {
+          let titulo = '';
+          if (d[1] == 'CTOTAL COSTO Y GASTOS FIJOS') titulo = 'TOTAL COSTO Y GASTOS VARIABLES';
+          worksheet2.addRow([]);
+          let titulorow = worksheet2.addRow([titulo]);
+          titulorow.eachCell(cell => {
+            cell.fill = fill;
+            cell.font = font;
+            cell.border = border;
+          });
+        }
+        row.eachCell(cell => {
+          cell.font = font;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'A2D9CE' } }
+        });
+      };
+    });
+    worksheet2.addRow([]);
+    worksheet2.addRow([]);
+    this.calcularTotales(datosAgrupados).forEach(d => {
+      let row = worksheet2.addRow(d);
+      row.eachCell(cell => {
+        cell.font = font;
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'AED6F1' } }
+      });
+    });
+
+    worksheet2.getColumn(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+    worksheet2.getColumn(1).width = 15;
+    worksheet2.getColumn(2).width = 50;
+    worksheet2.getColumn(3).width = 22;
+    worksheet2.getColumn(4).width = 22;
+    worksheet2.getColumn(5).width = 22;
+    worksheet2.getColumn(6).width = 22;
+    worksheet2.getColumn(7).width = 22;
+    worksheet2.getColumn(8).width = 22;
+    worksheet2.getColumn(9).width = 22;
+    worksheet2.getColumn(10).width = 22;
+    worksheet2.getColumn(11).width = 22;
+    worksheet2.getColumn(12).width = 22;
+    worksheet2.getColumn(13).width = 22;
+    worksheet2.getColumn(14).width = 22;
+    worksheet2.getColumn(15).width = 22;
+    worksheet2.mergeCells('A26:O26');
+    worksheet2.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
+
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       fs.saveAs(blob, titulo + `.xlsx`);
@@ -744,11 +847,10 @@ export class Dashboard_CostosComponent implements OnInit {
   }
 
   // Funcion que va a devolver un array con los totales de cada uno de los meses para cada una de las cuentas
-  calcularTotalMeses(data : any){
+  calcularTotalMeses(data : any, tipoCosto : string = ''){
     let datos : any [] = [];
     let cuentas : any [] = [];
     let tituloTotal = '';
-
     for (let i = 0; i < data.length; i++) {
       if (!cuentas.includes(data[i].cuenta.trim())){
         cuentas.push(data[i].cuenta.trim());
@@ -769,16 +871,162 @@ export class Dashboard_CostosComponent implements OnInit {
           data.filter(item => item.mes == '12' && item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0),
           data.filter(item => item.cuenta.trim() == data[i].cuenta.trim()).reduce((a, b) => a + b.valor, 0)
         ]);
-        if ((data[i].cuenta).toString().startsWith('7')) tituloTotal = 'Costos Indirectos de Fabricación';
-        else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
-        else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
-        else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
+        if (tipoCosto != '') tituloTotal = tipoCosto;
+        else {
+          if ((data[i].cuenta).toString().startsWith('7')) tituloTotal = 'Costos Indirectos de Fabricación';
+          else if ((data[i].cuenta).toString().startsWith('51')) tituloTotal = 'Gastos de Administración y Finanzas';
+          else if ((data[i].cuenta).toString().startsWith('52')) tituloTotal = 'Gastos de Ventas';
+          else if ((data[i].cuenta).toString().startsWith('53')) tituloTotal = 'Gastos No Operacionales';
+        }
       }
     }
 
     datos.push([
       'Totales',
       tituloTotal,
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular y agrupar los cortos de cada uno de los meses de los costos fijos
+  calcularCostosAgrupadosFijos(data : any []){
+    let datos : any [] = [];
+    let dotacionSumTrabajadores : any [] = ['720551'];
+    let gastosPersonal : any [] = ['740505', '3', '2', '1', '513510', '523510'];
+    let acueductoAlcantarillado : any [] = ['730525', '513525', '523525'];
+    let energiaElectrica : any [] = ['730530', '513530', '523530'];
+    let impAlumbradoPublico : any [] = ['511595', '521595'];
+    let tasaSeguridadConvivencia : any [] = ['513505'];
+    let tasaVigilancia : any [] = ['523505'];
+    let gas : any [] = ['730555', '513555'];
+    let telefono : any [] = ['513535'];
+    let mantenimientoReparaciones : any [] = ['730505', '730575', '514515', '514525', '514540', '515005', '515015', '524515', '524520', '524525', '524540', '525015', '525095'];
+    let combustible : any [] = ['730540', '51559515', '529535'];
+    let transporteFletes : any [] = ['730550', '513550', '523550'];
+    let conos : any [] = ['730585', '730590'];
+    let gastosViajes : any [] = ['515505', '515515', '515520', '51559505', '525505', '525515', '525520', '52559505'];
+    let gravamenFinanciero : any [] = ['53050505'];
+    let comisiones : any [] = ['519505', '529505', '530515'];
+    let horarios : any [] = ['511095'];
+    let impuestoIndustriaComercio : any [] = ['521505'];
+    
+    datos = [
+      this.calcularCostoAgrupado(data.filter(item => dotacionSumTrabajadores.includes(item.cuenta.trim())), 'DOTACIÓN Y SUMINISTRO A TRABAJADORES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gastosPersonal.includes(item.cuenta.trim())), 'GASTO DE PERSONAL', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => acueductoAlcantarillado.includes(item.cuenta.trim())), 'ACUEDUCTO Y ALCANTARILLADO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => energiaElectrica.includes(item.cuenta.trim())), 'ENERGIA ELECTRICA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => impAlumbradoPublico.includes(item.cuenta.trim())), 'IMPUESTO ALUMBRADO PÚBLICO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => tasaSeguridadConvivencia.includes(item.cuenta.trim())), 'TASA DE SEGURIDAD Y CONVIVENCIA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => tasaVigilancia.includes(item.cuenta.trim())), 'TASA DE VIGILANCIA', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gas.includes(item.cuenta.trim())), 'GAS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => telefono.includes(item.cuenta.trim())), 'TELEFONO', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => mantenimientoReparaciones.includes(item.cuenta.trim())), 'MANTENIMIENTO Y REPARACIONES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => combustible.includes(item.cuenta.trim())), 'COMBUSTIBLES Y LUBRICANTES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => transporteFletes.includes(item.cuenta.trim())), 'TRANSPORTES, FLETES Y ACARREOS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => conos.includes(item.cuenta.trim())), 'CONOS Y OTROS MATERIALES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gastosViajes.includes(item.cuenta.trim())), 'GASTOS DE VIAJES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => gravamenFinanciero.includes(item.cuenta.trim())), 'GRAVAMEN A LOS MOVIMIENTOS FINANCIEROS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => comisiones.includes(item.cuenta.trim())), 'COMISIONES', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => horarios.includes(item.cuenta.trim())), 'HONORARIOS', 'FIJO'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoIndustriaComercio.includes(item.cuenta.trim())), 'IMPUESTO DE INDUSTRIA Y COMERCIO', 'FIJO'),
+    ].reduce((a,b) => a.concat(b));
+    datos.push([
+      '',
+      'TOTAL COSTO Y GASTOS FIJOS',
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;  
+  }
+
+  // Funcion que va a calcular y agrupar los cortos de cada uno de los meses de los costos variables
+  calcularCostosAgrupadosVariables(data : any []){
+    let datos : any [] = [];
+    let seguros : any [] = ['513005', '513010', '513025', '513040', '513095', '523010', '523040', '523060', '523075', '523095'];
+    let procesamientoDatos : any [] = ['513520', '523520'];
+    let casinoRestaurantes : any [] = ['730560', '529560'];
+    let utilesPapeleria : any [] = ['730565', '519530', '529530'];
+    let aseoCafeteria : any [] = ['730570', '519525', '529525'];
+    let correosPortesTelegramas : any [] = ['513540', '523540'];
+    let gastosRepresentacion : any [] = ['519520', '529520'];
+    let impuestoVehiculos : any [] = ['521540'];
+    let impuestoPropiedadRaiz : any [] = ['511515'];
+    let chequera : any [] = ['53050510'];
+    let diferenciaCambio : any [] = ['530525'];
+    let descuentosComerciales : any [] = ['530535'];
+    let otrosFinancieros : any [] = ['530595'];
+    let parqueadero : any [] = ['529565'];
+    let diversos : any [] = ['529540', '529595'];
+    let contribuciones : any [] = ['512505'];
+
+    datos = [
+      this.calcularCostoAgrupado(data.filter(item => seguros.includes(item.cuenta.trim())), 'SEGUROS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => procesamientoDatos.includes(item.cuenta.trim())), 'PROCESAMIENTO DE DATOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => casinoRestaurantes.includes(item.cuenta.trim())), 'CASINOS Y RESTAURANTES', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => utilesPapeleria.includes(item.cuenta.trim())), 'UTILES Y PAPELERIA', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => aseoCafeteria.includes(item.cuenta.trim())), 'ELEMENTOS DE ASEO Y CAFETERIA', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => correosPortesTelegramas.includes(item.cuenta.trim())), 'CORREOS, PORTES Y TELEGRAMAS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => gastosRepresentacion.includes(item.cuenta.trim())), 'GASTOS DE REPRESENTACIÓN', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoVehiculos.includes(item.cuenta.trim())), 'IMPUESTO DE VEHICULO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => impuestoPropiedadRaiz.includes(item.cuenta.trim())), 'IMPUESTO PROPIEDAD RAIZ', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => chequera.includes(item.cuenta.trim())), 'CHEQUERAS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => diferenciaCambio.includes(item.cuenta.trim())), 'DIFERENCIA EN CAMBIO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => descuentosComerciales.includes(item.cuenta.trim())), 'DESCUENTOS COMERCIALES CONDICIONADOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => otrosFinancieros.includes(item.cuenta.trim())), 'OTROS FINANCIEROS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => parqueadero.includes(item.cuenta.trim())), 'PARQUEADERO', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => diversos.includes(item.cuenta.trim())), 'DIVERSOS', 'VARIABLE'),
+      this.calcularCostoAgrupado(data.filter(item => contribuciones.includes(item.cuenta.trim())), 'CONTRIBUCIONES', 'VARIABLE'),
+    ].reduce((a,b) => a.concat(b));
+    datos.push([
+      '',
+      'TOTAL COSTO Y GASTOS VARIABLES',
+      data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '04').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '05').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '06').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '07').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '08').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '09').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '10').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '11').reduce((a, b) => a + b.valor, 0),
+      data.filter(item => item.mes == '12').reduce((a, b) => a + b.valor, 0),
+      data.reduce((a, b) => a + b.valor, 0)
+    ]);
+    return datos;  
+  }
+
+  // funcion que va a  calcular el total del costo agrupado que le sea pasado
+  calcularCostoAgrupado(data : any [], titulo : string, tipo : string){
+    let datos : any [] = [];
+    datos.push([
+      tipo,
+      titulo,
       data.filter(item => item.mes == '01').reduce((a, b) => a + b.valor, 0),
       data.filter(item => item.mes == '02').reduce((a, b) => a + b.valor, 0),
       data.filter(item => item.mes == '03').reduce((a, b) => a + b.valor, 0),
@@ -803,19 +1051,19 @@ export class Dashboard_CostosComponent implements OnInit {
       datos = [
         'Total',
         'Total Gastos Mensuales',
-        datos[2] += data[i][0] != 'Totales' ? data[i][2] : 0,
-        datos[3] += data[i][0] != 'Totales' ? data[i][3] : 0,
-        datos[4] += data[i][0] != 'Totales' ? data[i][4] : 0,
-        datos[5] += data[i][0] != 'Totales' ? data[i][5] : 0,
-        datos[6] += data[i][0] != 'Totales' ? data[i][6] : 0,
-        datos[7] += data[i][0] != 'Totales' ? data[i][7] : 0,
-        datos[8] += data[i][0] != 'Totales' ? data[i][8] : 0,
-        datos[9] += data[i][0] != 'Totales' ? data[i][9] : 0,
-        datos[10] += data[i][0] != 'Totales' ? data[i][10] : 0,
-        datos[11] += data[i][0] != 'Totales' ? data[i][11] : 0,
-        datos[12] += data[i][0] != 'Totales' ? data[i][12] : 0,
-        datos[13] += data[i][0] != 'Totales' ? data[i][13] : 0,
-        datos[14] += data[i][0] == 'Totales' ? data[i][14] : 0,
+        datos[2] += data[i][0] != '' ? data[i][2] : 0,
+        datos[3] += data[i][0] != '' ? data[i][3] : 0,
+        datos[4] += data[i][0] != '' ? data[i][4] : 0,
+        datos[5] += data[i][0] != '' ? data[i][5] : 0,
+        datos[6] += data[i][0] != '' ? data[i][6] : 0,
+        datos[7] += data[i][0] != '' ? data[i][7] : 0,
+        datos[8] += data[i][0] != '' ? data[i][8] : 0,
+        datos[9] += data[i][0] != '' ? data[i][9] : 0,
+        datos[10] += data[i][0] != '' ? data[i][10] : 0,
+        datos[11] += data[i][0] != '' ? data[i][11] : 0,
+        datos[12] += data[i][0] != '' ? data[i][12] : 0,
+        datos[13] += data[i][0] != '' ? data[i][13] : 0,
+        datos[14] += data[i][0] == '' ? data[i][14] : 0,
       ];
     }
     return [datos];

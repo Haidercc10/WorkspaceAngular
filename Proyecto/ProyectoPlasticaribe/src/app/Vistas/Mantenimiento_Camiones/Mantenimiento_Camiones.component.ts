@@ -62,7 +62,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     this.inicializarFormulario2();
     this.inicializarFormularioMtto();
     this.inicializarFormularioEstados();
-   }
+  }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -76,21 +76,13 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   }
 
   /** cargar la información de los proveedores al momento de llamar el modal */
-  getProveedores(){
-    this.servicioProveedores.srvObtenerLista().subscribe(dataProveedores => {
-      for (let index = 0; index < dataProveedores.length; index++) {
-        this.arrayProveedores.push(dataProveedores[index]);
-      }
-    }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información de las proveedores!`));
-  }
+  getProveedores = () => this.servicioProveedores.srvObtenerLista().subscribe(data => this.arrayProveedores = data, () => this.mensajeService.mensajeError(`¡No se ha podido obtener información de las proveedores!`,``));
 
   /** Cargar Inicialmente los estados del pedido/Mantenimiento */
   getEstados(){
-    this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
-      for (let index = 0; index < dataEstados.length; index++) {
-        if(dataEstados[index].estado_Id == 11 || dataEstados[index].estado_Id == 16 || dataEstados[index].estado_Id == 17) this.arrayEstados.push(dataEstados[index].estado_Nombre);
-      }
-    }, () => { this.mensajeService.mensajeError(`Error`,'¡No se ha podido obtener información de los estados!'); });
+    this.servicioEstados.srvObtenerListaEstados().subscribe(data => {
+      data.forEach(estado => ([11, 16, 17].includes(estado.estado_Id)) ? this.arrayEstados.push(estado.estado_Nombre) : null);
+    }, () => this.mensajeService.mensajeError(`Error`,'¡No se ha podido obtener información de los estados!'));
   }
 
   /** Cargar Inicialmente los estados del pedido/Mantenimiento */
@@ -134,58 +126,38 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Consultar pedidos / mantenimientos */
   consultar(){
     this.cargando = false;
-    let pedido : number = this.formConsultarPedidoMtto.value.idPedido;
-    let mtto : number = this.formConsultarPedidoMtto.value.idMtto;
-    let tipoMov : string = this.formConsultarPedidoMtto.value.tipoMov;
-    let fechaInicio : any = moment(this.formConsultarPedidoMtto.value.fechaInicio).format('YYYY-MM-DD');
-    let fechaFin : any = moment(this.formConsultarPedidoMtto.value.fechaFin).format('YYYY-MM-DD');
-    let ruta : string = ``;
+    const pedido : number = this.formConsultarPedidoMtto.value.idPedido;
+    const mtto : number = this.formConsultarPedidoMtto.value.idMtto;
+    const tipoMov : string = this.formConsultarPedidoMtto.value.tipoMov;
+    const fechaInicio : any = moment(this.formConsultarPedidoMtto.value.fechaInicio).format('YYYY-MM-DD') == 'Fecha inválida' ? moment('2023-08-17').format() : moment(this.formConsultarPedidoMtto.value.fechaInicio).format('YYYY-MM-DD');
+    const fechaFin : any = moment(this.formConsultarPedidoMtto.value.fechaFin).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format() : moment(this.formConsultarPedidoMtto.value.fechaFin).format('YYYY-MM-DD');
     this.arrayPedido = [];
-
-    if (fechaInicio == 'Fecha inválida') fechaInicio = null;
-    if (fechaFin == 'Fecha inválida') fechaFin = null;
-
-    if(fechaInicio == null) fechaInicio = fechaInicio = this.today;
-    if(fechaFin == null) fechaFin = fechaFin = fechaInicio;
+    const ruta : string = this.buildRuta(pedido, mtto, tipoMov);
+  
+    this.servicioMtto.GetPedido_Mantenimiento(fechaInicio, fechaFin, ruta).subscribe(data => {
+      if(data.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`¡No se ha encontrado información de los pedidos y/o mantenimientos con los filtros consultados!`);
+      else data.forEach(datos => this.cargarTablaInicial(datos));
+    }, () => this.mensajeService.mensajeError(`Error`,'¡No se pudo obtener información de los pedidos y/o mantenimientos consultados!'));
+    setTimeout(() => this.cargando = true, 1000);
+  }
+  
+  buildRuta(pedido: number, mtto: number, tipoMov: string): string {
+    let ruta: string = '';
+  
     if(pedido != null && mtto == null) mtto = -1;
     if(pedido == null && mtto != null) pedido = -1;
-
-    if (pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null ) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
-    } else if(pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null) { ruta = ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
-    } else if(pedido != null &&  mtto != null && fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
-    } else if(pedido != null && tipoMov != null &&  fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
-    } else if(mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
-    } else if(pedido != null && mtto != null &&  tipoMov != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
-    } else if(pedido != null && mtto != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
-    } else if(pedido != null && tipoMov != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
-    } else if(pedido != null && fechaInicio != null &&  fechaFin != null) { ruta = `?consecutivo=${pedido}`
-    } else if(mtto != null && tipoMov != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
-    } else if(mtto != null && fechaInicio != null &&  fechaFin != null) { ruta = `?consecutivo2=${mtto}`
-    } else if(tipoMov != null && fechaInicio != null &&  fechaFin != null) { ruta = `?tipoMov=${tipoMov}`
-    } else if(fechaInicio != null &&  fechaFin != null) { ruta = ruta;
-    } else if(tipoMov != null &&  fechaInicio != null) { ruta = `?tipoMov=${tipoMov}`
-    } else if(mtto != null &&  fechaInicio != null) { ruta = `?consecutivo2=${mtto}`
-    } else if(pedido != null && mtto != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
-    } else if(mtto != null && tipoMov != null) { ruta = `?consecutivo2=${mtto}&tipoMov=${tipoMov}`
-    } else if(pedido != null && fechaInicio != null) { ruta = `?consecutivo=${pedido}`
-    } else if(pedido != null && tipoMov != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
-    } else if(tipoMov != null) {  ruta = `?tipoMov=${tipoMov}`
-    }
-
-    this.servicioMtto.GetPedido_Mantenimiento(fechaInicio, fechaFin, ruta).subscribe(dataPedMtto => {
-      if(dataPedMtto.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`,`¡No se ha encontrado información de los pedidos y/o mantenimientos con los filtros consultados!`);
-      else {
-        for (let index = 0; index < dataPedMtto.length; index++) {
-          this.cargarTablaInicial(dataPedMtto[index])
-        }
-      }
-    }, () => { this.mensajeService.mensajeError(`Error`,'¡No se pudo obtener información de los pedidos y/o mantenimientos consultados!') });
-    setTimeout(() => { this.cargando = true }, 1000);
+  
+    if (pedido != null) ruta += `consecutivo=${pedido}`;
+    if (mtto != null) ruta.length > 0 ? ruta += `&consecutivo2=${mtto}` : ruta += `consecutivo2=${mtto}`;
+    if (tipoMov != null) ruta.length > 0 ? ruta += `&tipoMov=${tipoMov}` : ruta += `tipoMov=${tipoMov}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+  
+    return ruta;
   }
 
   /** Información que se cargará en la tabla inicial luego de realizar la consulta.  */
   cargarTablaInicial(datos : any) {
-    const info : any = {
+    this.arrayPedido.push({
       pedidoId : datos.id_Movimiento,
       tipoMov : datos.tipo_Movimiento,
       fecha : datos.fecha.replace('T00:00:00', ''),
@@ -193,8 +165,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       usuario : datos.usuario,
       estado : datos.estado,
       observacion : datos.observacion,
-    }
-    this.arrayPedido.push(info);
+    });
   }
 
   /** Cargar modal con la información detallada del pedido */
@@ -204,17 +175,14 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     this.getProveedores();
 
     this.cargarEncabezadoPedidoModal(item);
-    this.servicioDetPedMtto.GetPedidoxId(item.pedidoId).subscribe(dataDetPedido => {
-      for (let index = 0; index < dataDetPedido.length; index++) {
-        this.cargarDetallePedidoModal(dataDetPedido[index]);
-      }
-    }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha encontrado información del pedido ${item.pedidoId}!`); });
+    this.servicioDetPedMtto.GetPedidoxId(item.pedidoId).subscribe(data => data.forEach(datos => this.cargarDetallePedidoModal(datos)), 
+      () => this.mensajeService.mensajeError(`Error`,`¡No se ha encontrado información del pedido ${item.pedidoId}!`));
   }
 
   /** Cargar detalle del pedido en la tabla alojada en el modal. */
   cargarDetallePedidoModal(datos : any){
     this.arrayDetallePedido =[];
-    const info : any = {
+    this.arrayDetallePedido.push({
       codigo : datos.dtPedMtto_Codigo,
       idActivo : datos.actv_Id,
       activo : datos.actv_Nombre,
@@ -222,13 +190,12 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       idTipoMtto : datos.tpMtto_Id,
       tipoMtto : datos.tpMtto_Nombre,
       fechaFalla : datos.dtPedMtto_FechaFalla.replace('T00:00:00', ''),
-    }
-    this.arrayDetallePedido.push(info);
+    });
   }
 
   /** Cargar los campos del modal con la información del pedido */
   cargarEncabezadoPedidoModal(encabezado : any){
-    this.formPedidoCompletado.setValue({
+    this.formPedidoCompletado.patchValue({
       pedFecha : encabezado.fecha,
       pedHora : encabezado.hora,
       pedUsuario: encabezado.usuario,
@@ -261,14 +228,13 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       Mtto_HoraRegistro: moment().format("H:mm:ss"),
     }
     this.servicioMtto.Insert(encabezado).subscribe(dataMtto => {
-      this.servicioMtto.GetUltimoId().subscribe(() => {  this.guardarDetallePedido(dataMtto.mtto_Id);
-      }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del último pedido creado!`); });
-    }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido guardar el pedido!`) });
+      this.servicioMtto.GetUltimoId().subscribe(() => this.guardarDetallePedido(dataMtto.mtto_Id), () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del último pedido creado!`));
+    }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido guardar el pedido!`));
   }
 
   /** Funcion que insertará en la base de datos los detalles del mantenimiento. */
   guardarDetallePedido(idMantenimiento : any){
-    let error : boolean = false;
+    let numDatos = 0;
     for (let index = 0; index < this.arrayDetallePedido.length; index++) {
       const detallePedido : modelDtMantenimiento = {
         Mtto_Id: idMantenimiento,
@@ -278,20 +244,16 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         DtMtto_Descripcion: '',
         Estado_Id : 11
       }
-      this.servicioDetMtto.Insert(detallePedido).subscribe(() => error = false, () => {
-        error = true; 
-        this.mensajeService.mensajeError(`Error`,`¡No se han gusrdado los activos del pedido!`); 
-      });
-    }
-    if(!error) {
-      this.onReject();
-      this.cargando = false;
-      setTimeout(() => {
-        this.cargando = true;
-         this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Entrada de mantenimiento aceptada con éxito!`);
-         this.modal = false;
-         this.consultar();
-      }, 500);
+      this.servicioDetMtto.Insert(detallePedido).subscribe(() => {
+        numDatos++;
+        if (numDatos == this.arrayDetallePedido.length) {
+          this.onReject();
+          this.cargando = true;
+          this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Entrada de mantenimiento aceptada con éxito!`);
+          this.modal = false;
+          this.consultar();
+        }
+      }, () => this.mensajeService.mensajeError(`Error`,`¡No se han gusrdado los activos del pedido!`));
     }
   }
 
@@ -320,8 +282,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
           this.cargarMantenimiento(dataMtto[index]);
           this.PedMtto = 'Mantenimiento';
         }
-      }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
-
+      }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`));
     } else if (item.tipoMov == 'Pedido de Mantenimiento') {
       this.servicioMtto.GetPedidoAceptado(item.pedidoId).subscribe(dataPedAceptado => {
         if(dataPedAceptado.length == 0) {
@@ -333,10 +294,9 @@ export class Mantenimiento_CamionesComponent implements OnInit {
             this.PedMtto = 'Pedido';
           }
         }
-      }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del pedido!`); });
-
+      }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del pedido!`));
     }
-    setTimeout(() => {this.cargando = true; }, 500);
+    setTimeout(() => this.cargando = true, 500);
   }
 
   /** Cargar encabezado de mantenimiento en los campos del modal */
@@ -386,7 +346,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         this.cargarDetalleMttoModal(dataDetalleMtto[index]);
         this.precioTotalMtto += dataDetalleMtto[index].dtMtto_Precio;
       }
-    }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`));
   }
 
   /** Cargar tabla del detalle de mantenimiento en el modal */
@@ -412,7 +372,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
         this.getDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto, item.descripcionMtto);
       }
-    }, () => { this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`); });
+    }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido obtener información del mantenimiento!`));
     this.obtenerPrecio(this.arrayDetalleMtto);
   }
 
@@ -440,7 +400,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   actualizarDetallexCodigo(detalleMtto : any){
     this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(() => {
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro actualizado con éxito!`);
-      setTimeout(() => { this.obtenerNuevoEstadoEncabezado(detalleMtto.Mtto_Id); }, 1000);
+      setTimeout(() => this.obtenerNuevoEstadoEncabezado(detalleMtto.Mtto_Id), 1000);
     }, () => this.mensajeService.mensajeError(`Error`,`¡No se ha podido actualizar el estado del activo!`));
   }
 

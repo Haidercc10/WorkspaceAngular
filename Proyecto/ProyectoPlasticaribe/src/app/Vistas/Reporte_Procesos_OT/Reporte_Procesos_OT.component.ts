@@ -463,8 +463,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.load = false;
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
+    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let ot : number = this.formularioOT.value.idDocumento;
-    let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? moment('2022-01-25').format('YYYY-MM-DD') : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
+    let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
@@ -488,9 +489,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (fallas != null) ruta.length > 0 ? ruta += `&falla=${fallas}` : ruta += `falla=${fallas}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
 
-    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => {
-      data.forEach(infoOt => this.llenarArray(infoOt));
-    }, error => {
+    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => data.forEach(infoOt => this.llenarArray(infoOt)), error => {
       this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
       this.load = true;
     });

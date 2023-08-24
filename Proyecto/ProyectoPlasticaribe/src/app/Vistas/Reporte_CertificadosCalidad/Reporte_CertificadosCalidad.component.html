@@ -1,0 +1,245 @@
+ <!-- Inicio Contenedor total -->
+ <app-menuLateral></app-menuLateral>
+ <br>
+ <app-VistasFavoritas></app-VistasFavoritas>
+ 
+ <div class="d-flex justify-content-center overlay" *ngIf="load">
+   <div style="margin: auto;">
+     <p-progressSpinner></p-progressSpinner>
+   </div>
+ </div>
+ 
+ <div class="contain">
+   <!-- Navegador fin de parte superior -->
+   <div class="container-fluid">
+     <!-- principal -->
+     <div class="mb-4 Titulo">
+       <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Reporte de Certificados de Calidad</h2>
+     </div>
+ 
+     <div class="mb-4">
+       <hr class="colorLinea">
+     </div>
+   </div>
+ </div>
+ 
+ <p-card>
+   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+   </div>
+ 
+   <!-- Inicio titulo -->
+   <div class="mb-4">
+     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-search"></i> Consultar certificados</h4>
+   </div>
+   <br>
+
+   <form [formGroup]="FormFiltros" (ngSubmit)="consultarCertificados()">
+    <div class="mb-4" id="formulario1">
+      <div class="row g-4">
+
+        <!-- Consecutivo -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="consecutivo" id="Consecutivo" type="text" pInputText required/>
+            <label for="Consecutivo">Consecutivo</label>
+          </span>
+        </div>
+
+        <!-- Fecha Inicial -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaInicio" inputId="fechaInicial" [showIcon]="true" pTooltip="Filtro de fecha de creación de certificados" tooltipPosition="top"></p-calendar>
+            <label for="fechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaFin" inputId="fechaFinal" [showIcon]="true"></p-calendar>
+            <label for="fechaFinal">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- OT -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-file"></i>
+            <input formControlName="ot" id="OT" type="text" pInputText required/>
+            <label for="OT">OT</label>
+          </span>
+        </div>
+
+        <!-- Cliente -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-float-label">
+            <input formControlName="cliente" id="Cliente" list="clientes" (keyup)="cargarClientes()" autocomplete="off" (change)="seleccionarClientes()" type="text" pInputText/>
+            <datalist id="clientes">
+              <option value={{item}} *ngFor="let item of clientes">{{item}}</option>
+            </datalist>
+            <label for="Cliente">Cliente</label>
+          </span>
+        </div>
+
+        <!-- Referencia -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+          <span class="p-float-label">
+            <input formControlName="referencia" id="Referencia" list="referencias" (keyup)="cargarItems()" autocomplete="off" (change)="seleccionarItems()" type="text" pInputText/>
+            <datalist id="referencias">
+              <option value={{itm.item}} *ngFor="let itm of items">{{itm.referencia}}</option>
+            </datalist>
+            <label for="Referencia">Referencia</label>
+          </span>
+        </div>
+       
+      </div>
+    </div>
+
+      <!-- Botones -->
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
+        <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+      </div>
+    </div>
+    </form>
+
+  <div class="mb-5">
+    <hr class="Linea">
+  </div>
+
+   <div class="mb-3" *ngIf="!load">
+    <div class="row g-3 font-size-14">
+      <p-table
+        *ngIf="!load"
+        #dt_carteraAgrupada
+        [value]="certificados"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="certificados.length"
+        [rowsPerPageOptions]="[10,25,50,100]"
+        [rowHover]="true"
+        dataKey="Consecutivo"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr class="font-size-16" id="filtros">
+            <th colspan="2"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Consecutivo', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ot', 'contains')"></th>
+            <th></th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>#</th>
+            <th class="text-center" pSortableColumn="Consecutivo"><p-sortIcon field="Consecutivo"></p-sortIcon> Consecutivo</th>
+            <th class="text-center" pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha Creación</th>
+            <th pSortableColumn="Cliente"><p-sortIcon field="Cliente"></p-sortIcon> Cliente</th>
+            <th pSortableColumn="Referencia"><p-sortIcon field="Referencia"></p-sortIcon> Referencia</th>
+            <th class="text-center" pSortableColumn="Cantidad"><p-sortIcon field="Cantidad"></p-sortIcon> Cantidad</th>
+            <th class="text-center" pSortableColumn="Presentación"><p-sortIcon field="Presentacion"></p-sortIcon> Presentación</th>
+            <th class="text-center" pSortableColumn="Ot"><p-sortIcon field="Ot"></p-sortIcon> OT</th>
+            <th class="text-center"> Ver PDF</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-expanded="expanded" let-rowIndex="rowIndex">
+          <tr>
+            <td>
+              <button id="desplegar" type="button" pButton pRipple [pRowToggler]="item" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            </td>
+            <td>{{rowIndex + 1}}</td>
+            <td class="text-center"><b>{{item.Consecutivo}}</b></td>
+            <td>{{item.Fecha}}</td>
+            <td><b>{{item.Cliente}}</b></td>
+            <td>{{item.Referencia}}</td>
+            <td class="text-center"><b>{{item.Cantidad | number: '1.2-2'}}</b></td>
+            <td class="text-center">{{item.Presentacion}}</td>
+            <td class="text-center"><b>{{item.Ot}}</b></td>
+            <td class="text-center"><p-button id="inactivar" icon="pi pi-file-pdf" (click)="mostrarPdf(item.Consecutivo)" styleClass="p-button-rounded p-button-danger"></p-button></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-item>
+          <tr>
+            <td colspan="10" id="">
+              <div class="p-3">
+                <p-table
+                  #dt_SubcarteraAgrupada
+                  [value]="item.Parametros"
+                  dataKey="consecutivo"
+                  styleClass="p-datatable-gridlines p-datatable-sm"
+                  [scrollable]="true"
+                  scrollHeight="30rem">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>#</th>
+                      <th>Param. Cuantitativo</th>
+                      <th>Unidad</th>
+                      <th>Nominal</th>
+                      <th>Tolerancia</th>
+                      <th>Mínimo</th>
+                      <th>Máximo</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-cuantitativos let-rowIndex="rowIndex">
+                    <tr>
+                      <td>{{rowIndex + 1}}</td>
+                      <td>{{cuantitativos.parametro}}</td>
+                      <td>{{cuantitativos.unidad}}</td>
+                      <td>{{cuantitativos.nominal | number : '1.2-2'}}</td>
+                      <td>{{cuantitativos.tolerancia | number }}</td>
+                      <td>{{cuantitativos.minimo | number : '1.2-2'}}</td>
+                      <td>{{cuantitativos.maximo | number : '1.2-2'}}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="8">No se encontraron registros</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+                <br>
+                <p-table [value]="item.Parametros2"
+                styleClass="p-datatable-gridlines p-datatable-sm">
+                  <ng-template pTemplate="header">
+                      <tr>
+                          <th>Param. Cualitativo</th>
+                          <th>Material</th>
+                          <th>Resistencia</th>
+                          <th>Sellabilidad</th>
+                          <th>Transparencia</th>
+                          <th>Tratado</th>
+                          <th>Impresión</th>
+                      </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-cualitativo>
+                      <tr>
+                          <td><b>{{ 'Resultado' }}</b></td>
+                          <td>{{ cualitativo.material }}</td>
+                          <td>{{ cualitativo.resistencia }}</td>
+                          <td>{{ cualitativo.sellabilidad }}</td>
+                          <td>{{ cualitativo.transparencia }}</td>
+                          <td>{{ cualitativo.tratado }}</td>
+                          <td>{{ cualitativo.impresion }}</td>
+                      </tr>
+                  </ng-template>
+              </p-table>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-card> 
+
+

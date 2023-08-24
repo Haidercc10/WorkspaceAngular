@@ -1,0 +1,70 @@
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+  display: flex;
+  width: 100%;
+}
+
+p-calendar ::ng-deep span button {
+  background-color: var(--rojo);
+  border: 0;
+  transition: all 1s;
+}
+
+p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+  background: var(--rojoHover);
+}
+
+p-calendar ::ng-deep .p-datepicker-header button {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep .p-datepicker-header button:hover {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep span button span {
+  display: block;
+}
+
+::ng-deep .p-card {
+  align-items: center;
+  margin: auto;
+  width: 90%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5%;
+}
+
+::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+  display: flex;
+  width: 100%;
+}
+
+p-tabview ::ng-deep li ::ng-deep .p-tabview-nav-link {
+  color: var(--rojo) !important;
+  border: none !important;
+}
+
+p-divider ::ng-deep span {
+  color: white !important;
+  background-color: var(--rojo);
+}
+
+p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
+  align-items: center;
+  text-align: center;
+  color: var(--rojo);
+}
+
+::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+  height: 2.5rem;
+}
+
+::ng-deep .p-button.p-button-icon-only {
+  width: 2.5rem;
+}

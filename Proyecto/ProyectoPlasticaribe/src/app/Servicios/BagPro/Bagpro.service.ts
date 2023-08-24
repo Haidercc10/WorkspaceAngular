@@ -25,6 +25,8 @@ export class BagproService {
 
   GetNominaSelladoDetalladaxBulto = (fechaInicio : any, fechaFin : any) => this.http.get<any>(`${rutaBagPro}/ProcSellado/GetNominaSelladoDetalladaxBulto/${fechaInicio}/${fechaFin}`);
 
+  GetInformacionOrden_Proceso = (orden : string, proceso : string) => this.http.get<any>(`${rutaBagPro}/ProcSellado/getInformacionOrden_Proceso/${orden}/${proceso}`);
+
   /***************************************************** PROCEXTRUSION ***************************************************************/
 
   srvObtenerListaProcExt = ():Observable<any[]> => this.http.get<any>(rutaBagPro + '/ProcExtrusion');
@@ -44,6 +46,10 @@ export class BagproService {
   GetObtenerDatosxProcesos = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getObtenerDatosxProcesos/${OT}/${proceso}`);
 
   GetDatosConsolidados = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getDatosConsolidados/${OT}/${proceso}`);
+
+  GetInformacionOrden_ProcesoExt = (orden : string, proceso : string) => this.http.get<any>(`${rutaBagPro}/ProcExtrusion/getInformacionOrden_Proceso/${orden}/${proceso}`);
+  
+  getOtControlCalidadExtrusion = (OT : any, proceso: any):Observable<any[]> => this.http.get<any>(rutaBagPro + `/ProcExtrusion/getOtControlCalidadExtrusion/${OT}/${proceso}`);
 
   /********************************************************** CLIENTESOT ****************************************************************/
 

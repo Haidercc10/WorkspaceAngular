@@ -75,30 +75,19 @@ export class PedidoMantenimientoComponent implements OnInit {
   }
 
   // Funcion que cargará los activos
-  obtenerActivos(){
-    this.activosService.GetTodo().subscribe(datos => this.activos = datos, () => {
-      this.mensajeService.mensajeError(`Error`, `¡No se encontraron activos para realizar el pedido!`),
-      this.cargando = false;
-    });
-  }
+  obtenerActivos = () => this.activosService.GetTodo().subscribe(datos => this.activos = datos, () => this.mensajeService.mensajeError(`¡No se encontraron activos para realizar el pedido!`, ``));
 
   // Funcion que obtendrá el id el ultimo pedido creado para saber que consecutivo es el siguiente
   obtenerUlimoId(){
-    this.pedidoMantenimientoService.getUltimoIdPedido().subscribe(datos_ultimoPedido => {
-      this.FormPedidoMantenimiento.patchValue({ ConsecutivoPedido : datos_ultimoPedido + 1, });
-    }, () => {
-      this.mensajeService.mensajeError(`Error`, `¡No se puedo obtener el consecutivo del próximo pedido!`);
-      this.cargando = false;
-    });
+    this.pedidoMantenimientoService.getUltimoIdPedido().subscribe(datos => this.FormPedidoMantenimiento.patchValue({ConsecutivoPedido : datos + 1}), () => this.FormPedidoMantenimiento.patchValue({ConsecutivoPedido : 1}));
   }
 
   // Función que obtendrá todos los tipos de mantenimiento
-  obtenerTiposMantenimiento = () => this.tipoMantenimientoService.GetTodo().subscribe(datos => this.tiposMantenimiento = datos, () => this.mensajeService.mensajeError(`Error`, `¡No se pudieron obtener los diferentes tipos de mantenimientos!`));
+  obtenerTiposMantenimiento = () => this.tipoMantenimientoService.GetTodo().subscribe(datos => this.tiposMantenimiento = datos);
 
   // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
   buscarActivoSeleccionado(){
-    let id : any = this.FormPedidoMantenimiento.value.Activo;
-    let nuevo : any[] = this.activos.filter((item) => item.actv_Id == id);
+    let nuevo : any[] = this.activos.filter((item) => item.actv_Id == this.FormPedidoMantenimiento.value.Activo);
     this.FormPedidoMantenimiento.patchValue({
       IdActivo : nuevo[0].actv_Id,
       Activo : nuevo[0].actv_Nombre,
@@ -107,8 +96,7 @@ export class PedidoMantenimientoComponent implements OnInit {
 
   // Funcion que va a tomar el id de l tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
   buscarTipoMantenimientoSeleccionado(){
-    let id : any = this.FormPedidoMantenimiento.value.TipoMantenimiento;
-    let nuevo : any[] = this.tiposMantenimiento.filter((item) => item.tpMtto_Id == id);
+    let nuevo : any[] = this.tiposMantenimiento.filter((item) => item.tpMtto_Id == this.FormPedidoMantenimiento.value.TipoMantenimiento);
     this.FormPedidoMantenimiento.patchValue({
       IdTipoMantenimiento : nuevo[0].tpMtto_Id,
       TipoMantenimiento : nuevo[0].tpMtto_Nombre,
@@ -118,13 +106,14 @@ export class PedidoMantenimientoComponent implements OnInit {
   // Funcion que limpiará los campos donde se elegen los activos a los que se les hará mantenimiento
   limpiarCampos(){
     this.FormPedidoMantenimiento.reset();
+    this.obtenerUlimoId();
     this.cargando = false;
   }
 
   // Funcion que va a limpiar todos los campos y dejará la vista como nueva
   limpiarTodo(){
-    this.obtenerUlimoId();
     this.FormPedidoMantenimiento.reset();
+    this.obtenerUlimoId();
     this.idActivosSeleccionados = [];
     this.activosSeleccionados = [];
     this.cargando = false;
@@ -132,7 +121,6 @@ export class PedidoMantenimientoComponent implements OnInit {
 
   // Funcion que sleccionará un activo
   seleccionarActivo(){
-    this.cargando = true;
     if (this.FormPedidoMantenimiento.valid) {
       if (!this.idActivosSeleccionados.includes(this.FormPedidoMantenimiento.value.IdActivo)){
         let info : any = {
@@ -145,31 +133,17 @@ export class PedidoMantenimientoComponent implements OnInit {
         info.Fecha = moment(this.FormPedidoMantenimiento.value.FechaDaño).format('YYYY-MM-DD');
         this.activosSeleccionados.push(info);
         this.idActivosSeleccionados.push(info.Id);
-        this.cargando = false;
-      } else {
-        this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);
-        this.cargando = false;
-      }
-    } else {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
-      this.cargando = false;
-    }
+      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);
+    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que quitará de la tabla de los activos seleccionados
   quitarActivo(item : any){
     item = this.activoSeleccionado;
     this.onReject();
-    for (let i = 0; i < this.activosSeleccionados.length; i++) {
-      for (let j = 0; j < this.idActivosSeleccionados.length; j++) {
-        if (item.Id == this.activosSeleccionados[i].Id && item.Id == this.idActivosSeleccionados[j]) {
-          this.activosSeleccionados.splice(i,1);
-          this.idActivosSeleccionados.splice(j,1);
-          this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha eliminado el activo ${item.Nombre} de la tabla!`);
-          break;
-        }
-      }
-    }
+    this.activosSeleccionados.splice(this.activosSeleccionados.findIndex(i => i.Id == item.Id), 1);
+    this.idActivosSeleccionados.splice(this.idActivosSeleccionados.findIndex(i => i == item.Id), 1);
+    this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha eliminado el activo ${item.Nombre} de la tabla!`);
   }
 
   // Funcion que quitará todos los activos seleccionados para mantenimiento
@@ -183,16 +157,14 @@ export class PedidoMantenimientoComponent implements OnInit {
   // Funcion que creará el pedido de mantenimiento de activos
   crearPedido(){
     if (this.activosSeleccionados.length > 0) {
-      let observacion : string = this.FormPedidoMantenimiento.value.Observacion;
-      if (observacion == null) observacion = '';
       let info : any = {
         Usua_Id : this.storage_Id,
         PedMtto_Fecha : this.today,
         PedMtto_Hora : moment().format('H:mm:ss'),
         Estado_Id : 11,
-        PedMtto_Observacion : observacion,
+        PedMtto_Observacion : this.FormPedidoMantenimiento.value.Observacion == null ? '' : this.FormPedidoMantenimiento.value.Observacion.toUpperCase(),
       }
-      this.pedidoMantenimientoService.Insert(info).subscribe(() => this.buscarUltimoID(), () => {
+      this.pedidoMantenimientoService.Insert(info).subscribe(data => this.buscarUltimoID(data.pedMtto_Id), () => {
         this.mensajeService.mensajeError(`Error`, '¡Ha ocurrido un error al crear el pedido de mantenimiento!');
         this.cargando = false;
       });
@@ -203,28 +175,26 @@ export class PedidoMantenimientoComponent implements OnInit {
   }
 
   // Funcion que va a buscar el ultimo Id del ultimo pedido creado y creará los detalles de manteniientos
-  buscarUltimoID(){
-    this.pedidoMantenimientoService.getUltimoIdPedido().subscribe(datos_ultimoPedido => {
-      for (let i = 0; i < this.activosSeleccionados.length; i++) {
-        let info : any = {
-          PedMtto_Id : datos_ultimoPedido,
-          Actv_Id : this.activosSeleccionados[i].Id,
-          TpMtto_Id : this.activosSeleccionados[i].Id_TipoMantenimiento,
-          DtPedMtto_FechaFalla : this.activosSeleccionados[i].Fecha,
-        }
-        this.dtPedidoMantenimientoService.Insert(info).subscribe(() => {}, () => {
-          this.mensajeService.mensajeError(`Error`, `¡Error al almacenar los activos a los que se les hará mantenimientos!`);
-          this.cargando = false;
-        });
+  buscarUltimoID(id : number){
+    let numDatos = 0;
+    for (let i = 0; i < this.activosSeleccionados.length; i++) {
+      let info : any = {
+        PedMtto_Id : id,
+        Actv_Id : this.activosSeleccionados[i].Id,
+        TpMtto_Id : this.activosSeleccionados[i].Id_TipoMantenimiento,
+        DtPedMtto_FechaFalla : this.activosSeleccionados[i].Fecha,
       }
-      setTimeout(() => {
-        this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha creado un Pedido de mantenimiento para ${this.activosSeleccionados.length} activo(s)!`);
-        this.limpiarTodo();
-      }, 10 * this.activosSeleccionados.length);
-    }, () => {
-      this.mensajeService.mensajeError(`Error`, `¡No se puedo obtener el consecutivo del próximo pedido!`);
-      this.cargando = false;
-    });
+      this.dtPedidoMantenimientoService.Insert(info).subscribe(() => {
+        numDatos++;
+        if (numDatos == this.activosSeleccionados.length) {
+          this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha creado un Pedido de mantenimiento para ${this.activosSeleccionados.length} activo(s)!`);
+          this.limpiarTodo();
+        }
+      }, () => {
+        this.mensajeService.mensajeError(`Error`, `¡Error al almacenar los activos a los que se les hará mantenimientos!`);
+        this.cargando = false;
+      });
+    }
   }
 
   mostrarEleccion(item : any, modo : string){
@@ -233,11 +203,7 @@ export class PedidoMantenimientoComponent implements OnInit {
       if(this.llave == 'uno') {
         this.activoSeleccionado = item;
         this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea quitar el activo ${item.Nombre} de la tabla?`, sticky: true});
-      }
-
-      if(this.llave == 'todos') {
-        this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea eliminar todos los activos de la tabla?`, sticky: true});
-      }
+      } else if(this.llave == 'todos') this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea eliminar todos los activos de la tabla?`, sticky: true});
     }, 200);
   }
 

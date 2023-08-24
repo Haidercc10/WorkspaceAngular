@@ -13,20 +13,15 @@ export class DetallesOrdenesCompraService {
 
   GetOrdenCompra = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra/${dato}`);
 
-  GetOrdenCompra_fechas = (fecha1 : any, fecha2 : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_fechas/${fecha1}/${fecha2}`);
-
-  GetOrdenCompra_Estado = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_Estado/${dato}`);
-
-  GetOrdenCompra_EstadoFechas = (dato : any, fecha1 : any, fecha2 : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_EstadoFechas/${dato}/${fecha1}/${fecha2}`);
-
   GetMateriaPrimaOrdenCompa = (orden : number, mp : number) => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/getMateriaPrimaOrdenCompa/${orden}/${mp}`);
 
   GetListaOrdenesComprasxId = (IdOrden : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/InfoOrdenCompraxId/${IdOrden}`);
+
+  GetOrdenesCompras = (fecha1 : any, fecha2 : any, ruta : string) => this.http.get<any>(`${rutaPlasticaribeAPI}/Detalle_OrdenCompra/getOrdenesCompras/${fecha1}/${fecha2}${ruta}`);
 
   putId_DtOrdenCompra = (id: any, data:any) => this.http.put(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/${id}`, data);
     
   deleteID_DtOrdenCompra = (id:any) => this.http.delete(rutaPlasticaribeAPI + `/Detalle_OrdenCompra/${id}`);
 
   insert_DtOrdenCompra = (data : modelDtOrdenCompra): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Detalle_OrdenCompra', data);
-
 }

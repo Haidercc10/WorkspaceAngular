@@ -3,12 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { VistasPermisosGuard } from './Guards/vistas-permisos.guard';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
+import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
+import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
@@ -29,6 +31,7 @@ import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExt
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
 import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
@@ -61,8 +64,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
-import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
-import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
+import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
 
 export const routes: Routes = [
 
@@ -181,7 +183,13 @@ export const routes: Routes = [
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
 
-]
+   /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
+   {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
+   {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
+
+   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
+   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
+  ]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
