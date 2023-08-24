@@ -1,19 +1,19 @@
-<button pButton class="p-button-danger" type="button" (click)="cargarRegistro(undefined)" label="Añadir registro" icon="pi pi-pencil"></button>
-<p-table [value]="registros" dataKey="Rollo" editMode="row" *ngIf="!load" [tableStyle]="{'min-width': '50rem'}">
+<button pButton class="p-button-danger" type="button" (click)="agregarFila()" label="Añadir registro" icon="pi pi-pencil"></button>
+<p-table [value]="registros" dataKey="Id" editMode="row" *ngIf="!load" [tableStyle]="{'min-width': '50rem'}">
     <ng-template pTemplate="header">
         <tr>
             <th colspan="11"></th>
             <th colspan="3" class="text-center">Calibre (3 Mediciones)</th>
-            <th colspan="5"></th>
+            <th colspan="6"></th>
         </tr>
         <tr>
           <th>OT</th>
           <th>Ronda</th>
           <th>Turno</th>
-          <th>Maquina</th>
+          <th>Maq.</th>
           <th>Cliente</th>
           <th>Referencia</th>
-          <th>N° Rollo</th>
+          <th>Rollo</th>
           <th>Pigmento</th>
           <th>Ancho Tub.</th>
           <th>Peso Metro (g)</th>
@@ -25,6 +25,7 @@
           <th>Tratado</th>
           <th>Rasgado</th>
           <th>Tipo Bobina</th>
+          <th>Observacion</th>
           <th>Acciones</th>
         </tr>
     </ng-template>
@@ -34,7 +35,7 @@
              <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.OT" (keyup.enter)="consultarOT(registro)" required>
+                        <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro)" required>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -45,8 +46,8 @@
             <td>
                 {{registro.Ronda}}
             </td>
-             <!--Turno-->
-             <td>
+            <!--Turno-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
@@ -221,12 +222,23 @@
                 </ng-template>
             </p-cellEditor>
             </td>
+            <!--Observacion-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Observacion">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Observacion}}
+                    </ng-template>
+                </p-cellEditor>
+              </td>
             <!--Botones-->
             <td>
                 <div class="flex align-items-center justify-content-center gap-2">
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro)" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>
             </td>
         </tr>
