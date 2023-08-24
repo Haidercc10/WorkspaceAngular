@@ -175,6 +175,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
 @NgModule({
   declarations: [
@@ -273,7 +274,8 @@ import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extru
     Gestion_VistasComponent, 
     Reporte_CertificadosCalidadComponent,
     CertificadoCalidadComponent,
-    ControlCalidad_ExtrusionComponent
+    ControlCalidad_ExtrusionComponent, 
+    ControlCalidad_SelladoComponent,
   ],
 
   imports: [

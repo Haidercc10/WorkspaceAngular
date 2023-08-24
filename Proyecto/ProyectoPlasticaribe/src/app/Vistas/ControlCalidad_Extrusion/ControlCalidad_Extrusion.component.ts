@@ -275,6 +275,4 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Cerrar Dialogo de eliminación
   onReject = (dato : any) => this.msg.clear(dato);
-
-
 }

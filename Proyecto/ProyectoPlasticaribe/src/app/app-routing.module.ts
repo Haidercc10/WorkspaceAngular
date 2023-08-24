@@ -65,6 +65,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
 export const routes: Routes = [
 
@@ -188,7 +189,8 @@ export const routes: Routes = [
    {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
 
    /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
+   //{path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
+   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_SelladoComponent},
   ]
 
 @NgModule({
