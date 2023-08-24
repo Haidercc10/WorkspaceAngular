@@ -30,7 +30,7 @@ export interface modelControlCalidad_Impresion {
     Id? : number;
     Usua_Id : number;
     Fecha_Registro : any;
-    Hora_Resgitros : string;
+    Hora_Registro : string;
     Turno_Id : string;
     Maquina : string;
     Ronda : string;

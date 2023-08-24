@@ -62,28 +62,27 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  //Función que cargará la información de los pigmentos
+  //
   cargarPigmentos = () => this.srvPigmentos.srvObtenerLista().subscribe(data => { this.pigmentos = data; }); 
 
-  //Función que cargará la información de los turnos
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
-  //Función que cargará los registros del día actual
+  //
   mostrarRegistrosHoy() {
     this.load = true;
     this.registros = [];
     this.srvCcExtrusion.Get_TodoHoy().subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
-          this.cargarTablaRegistrosHoy(data[index]);
+          this.cargarRegistrosCCExtrusion(data[index]);
         }
       }
     });
-    setTimeout(() => { this.load = false; }, 500);
+    setTimeout(() => { this.load = false; }, 1000);
   }
 
-  //Función que cargará la tabla con los registros del día actual
-  cargarTablaRegistrosHoy(datos : any) {
+  //
+  cargarRegistrosCCExtrusion(datos : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.pigmento_Id);
     
     let info : any = {
@@ -96,7 +95,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Item : datos.prod_Id,
       Referencia : datos.referencia,
       Rollo : datos.ccExt_Rollo,
-      Pigmento : datos.pigmento_Id,
+      Pigmento : pigmento[0].pigmt_Nombre,
       AnchoTubular : datos.ccExt_AnchoTubular,
       PesoMetro : datos.ccExt_PesoMetro,
       Ancho : datos.ccExt_Ancho,
@@ -107,14 +106,11 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Tratado : datos.ccExt_Tratado,
       Rasgado : datos.ccExt_Rasgado,
       TipoBobina : datos.ccExt_TipoBobina,
-      Observacion : datos.ccExt_Observacion,
     }
     this.registros.push(info);
-    this.registros.sort((a, b) => a.Ronda - b.Ronda);
-    this.registros.sort((a, b) => a.OT - b.OT);
   }
 
-  //Función que va a consultar la información de la OT a la que desea agregar una ronda.
+  //
   consultarOT(datos : any){
     this.load = true;
     this.srvCcExtrusion.GetOtControlCalidad_Extrusion(datos.OT).subscribe(dataPbdd => {
@@ -132,25 +128,22 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         this.cargarRegistro(data[indice]);
       } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
     });
-    setTimeout(() => { this.load = false; }, 1000);
+    setTimeout(() => { this.load = false; }, 50);
   }
 
-  //Función que agregará una fila vacia a la tabla de registros.
-  agregarFila = () => this.registros.push({});
-
-  //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
+  //
   cargarRegistro(data : any){
     let info : any = {
       Id : 0,
       Ronda : this.ronda == 0 ? 1 : this.ronda, 
       Turno : `NE`,
-      OT : data.ot,
-      Maquina : data.maquina, 
-      Cliente : data.cliente,
-      Item : data.item,
-      Referencia : data.referencia,
-      Rollo : data.rollo,
-      Pigmento : parseInt(data.pigmentoId.trim()),
+      OT : data == undefined ? `` : data.ot,
+      Maquina : data == undefined ? `` : data.maquina, 
+      Cliente : data == undefined ? `` : data.cliente,
+      Item : data == undefined ? `` : data.item,
+      Referencia : data == undefined ? `` : data.referencia,
+      Rollo : data == undefined ? 0 : data.rollo,
+      Pigmento : data == undefined ? `` : parseInt(data.pigmentoId.trim()),
       AnchoTubular : 0,
       PesoMetro : 0,
       Ancho : 0,
@@ -165,7 +158,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.registros.push(info);
   }
 
-  //Función que registrará la ronda de la OT a la que desea agregar una ronda.
+  //Crear
   registrarRonda(fila : any) {
     let esError : boolean = false;
     this.onReject(`eleccion`);
@@ -194,7 +187,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: fila.Observacion
+      CcExt_Observacion: ``
     }
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
@@ -207,19 +200,16 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //
   onRowEditInit(data : any) {
     //this.registroSeleccionado = data;
-    this.registroSeleccionado = data;
-    console.log(this.registroSeleccionado)
-    
   }
+   
   
-  //Función que validará por Id si se debe realizar una edición o una creación de un registro.
+  //
   validarId(data : any){
     data = this.registroSeleccionado;
     if(data.Id > 0) this.editarRonda(data);
     else this.registrarRonda(data);
   }
 
-  //Función que actualizará el registro de una ronda de la OT
   editarRonda(fila : any) {
     console.log(fila.Id)
     let esError : boolean = false;
@@ -249,7 +239,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: fila.Observacion
+      CcExt_Observacion: ``
     }
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
@@ -260,12 +250,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //función que cancela la selección de la fila.
-  onRowEditCancel(data : any, index : number) {
-   console.log(this.registroSeleccionado)
-   this.registros[index] = this.registroSeleccionado;
+  onRowEditCancel(data : any) {
+    console.log(3);
+    console.log(data);
   }
   
-   // Función para mostrar una elección de creación o actualización de un registro
+   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(data : any){
     this.registroSeleccionado = data;
 
@@ -273,6 +263,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     else this.msg.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea crear la ronda N° ${data.Ronda} de la OT N° ${data.OT}?`, sticky: true});
   }
 
-  //Cerrar Dialogo de eliminación
+  /** Cerrar Dialogo de eliminación*/
   onReject = (dato : any) => this.msg.clear(dato);
 }

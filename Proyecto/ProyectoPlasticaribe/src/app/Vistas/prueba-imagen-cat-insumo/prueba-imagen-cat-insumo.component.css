@@ -2,8 +2,9 @@ span{
     color: #db4149;
 }
 
-.labelMateriaPrima{
-    font-size: calc(var(--font-size) * 16px);
+.noEnviados{
+    background-color: rgb(255, 231, 193) !important; 
+    color: #071426 !important;
 }
 
 .p-input-icon-left {

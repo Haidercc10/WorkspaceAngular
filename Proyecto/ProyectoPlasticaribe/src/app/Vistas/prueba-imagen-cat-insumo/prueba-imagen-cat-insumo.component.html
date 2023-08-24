@@ -3,9 +3,9 @@
 <app-VistasFavoritas></app-VistasFavoritas>
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
-    <div style="margin: auto;">
-      <p-progressSpinner></p-progressSpinner>
-    </div>
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
 </div>
 
 <div class="contain">
@@ -23,749 +23,580 @@
 </div>
 
 <p-card class="mb-5">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-      <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-    </div>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
 
-    <div class="mb-4">
-      <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-    </div>
+  <div class="mb-4">
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
+  </div>
 
-    <p-tabView [scrollable]="true">
-      <!-- Extrusion -->
-      <p-tabPanel
-        header="Extrusión"
-        leftIcon="pi pi-bolt"
-        tooltip="Control de Extrusión">
-        <div class="mb-4">
-          <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-        </div>
+  <p-tabView [scrollable]="true">
+    <!-- Extrusion -->
+    <p-tabPanel
+      header="Extrusión"
+      leftIcon="pi pi-bolt"
+      tooltip="Control de Extrusión">        
+    </p-tabPanel>
+    
+    <!-- Impresion -->
+    <p-tabPanel
+      header="Impresión"
+      leftIcon="pi pi-print"
+      tooltip="Control de Impresión">
+      <div class="mb-4">
+        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
+      </div>
 
-        <!--  -->
-        <p-table
-          #dt_Extrusion
-          dataKey="ot"
-          [value]="datosControlCal_Extrusion"
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="50rem"
-          editMode="row">
-          <ng-template pTemplate="caption">
-            <div class="row g-4 p-3">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                <button pButton pRipple label="Adicional" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila()"></button>
-              </div>
+      <p-table
+        #dt_Doblado
+        dataKey="Id"
+        [value]="datosControlCal_Impresion"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        editMode="row">
+        <ng-template pTemplate="caption">
+          <div class="row g-4 p-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+              <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Impresion()"></button>
             </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th>#</th>
-              <th>OT</th>
-              <th>Ronda</th>
-              <th>Maquina</th>
-              <th>Cliente</th>
-              <th>Item</th>
-              <th>Referencia</th>
-              <th>Ancho (Cms)</th>
-              <th>Calibre</th>
-              <th>Cod. Barras</th>
-              <th>Tipo Embobinado</th>
-              <th>Paso Entre Guía</th>
-              <th>Observación</th>
-              <th colspan="2"></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
-            <tr [pEditableRow]="datos">
-              <td>{{rowIndex + 1}}</td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.orden">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.orden}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.ronda">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.ronda}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.maquina">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.maquina}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.cliente">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.cliente}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.item">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.item}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.referencia">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.referencia}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.ancho">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.ancho}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.calibre">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.calibre}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.codBarras">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.codBarras}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.tpEmbobinado">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.tpEmbobinado}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.pasoGuia">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.pasoGuia}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" [(ngModel)]="datos.observacion">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.observacion}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <div class="flex align-items-center justify-content-center gap-2">
-                  <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
-                  <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                  <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-        
-      </p-tabPanel>
-      
-      <!-- Impresion -->
-      <p-tabPanel
-        header="Impresión"
-        leftIcon="pi pi-print"
-        tooltip="Control de Impresión">
-        <div class="mb-4">
-          <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-        </div>
-
-        <p-table
-          #dt_Doblado
-          dataKey="Id"
-          [value]="datosControlCal_Impresion"
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="50rem"
-          editMode="row">
-          <ng-template pTemplate="caption">
-            <div class="row g-4 p-3">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Impresion()"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th colspan="10"></th>
+            <th colspan="9" class="text-center">Secuencia de Colores</th>
+            <th colspan="11"></th>
+          </tr>
+          <tr>
+            <th style="min-width:100px" pFrozenColumn>OT</th>
+            <th style="min-width:100px">Ronda</th>
+            <th style="min-width:100px">Maquina</th>
+            <th style="min-width:100px">Turno</th>
+            <th style="min-width:200px">Cliente</th>
+            <th style="min-width:100px">Item</th>
+            <th style="min-width:200px">Referencia</th>
+            <th style="min-width:150px">Lote de Rollo Sin Imp</th>
+            <th style="min-width:150px">Prueba de Tratado</th>
+            <th style="min-width:100px">Ancho de Rollo</th>
+            <th style="min-width:50px">Cian</th>
+            <th style="min-width:50px">Magenta</th>
+            <th style="min-width:50px">Amarillo</th>
+            <th style="min-width:50px">Negro</th>
+            <th style="min-width:50px">Base</th>
+            <th style="min-width:50px">Pantone</th>
+            <th style="min-width:50px">Pantone</th>
+            <th style="min-width:50px">Pantone</th>
+            <th style="min-width:50px">Pantone</th>
+            <th style="min-width:150px">Tipo Embobinado</th>
+            <th style="min-width:150px">Cod. Barras</th>
+            <th style="min-width:200px">Texto</th>
+            <th style="min-width:150px">Ubicación Fotocelda</th>
+            <th style="min-width:150px">Registro de Colores</th>
+            <th style="min-width:150px">Adherencia de Tinta</th>
+            <th style="min-width:150px">Conformidad Laminado</th>
+            <th style="min-width:150px">Paso Entre Guía</th>
+            <th style="min-width:200px">Observación</th>
+            <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
+          <tr [pEditableRow]="datos" [ngClass]="{'noEnviados' : datos.Id_PkBd == 0}">
+            <td pFrozenColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Orden_Trabajo" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.Orden_Trabajo, datos.Id, '|ROTOGRABADO|IMPRESION|')">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor" pTooltip="No se ha guardado esta información" pBadge style="font-size: 16px" severity="danger"></i>
+                  {{datos.Orden_Trabajo}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Ronda">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Ronda}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Maquina">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Maquina}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-dropdown [autoDisplayFirst]="false" [options]="turno" appendTo="body" [(ngModel)]="datos.Turno_Id"></p-dropdown>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Turno_Id}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Cliente">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Cliente}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [useGrouping]="false" [(ngModel)]="datos.Prod_Id"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Prod_Id}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Nombre_Producto">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Nombre_Producto}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.LoteRollo_SinImpresion">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.LoteRollo_SinImpresion}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Prueba_Tratado">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Prueba_Tratado}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="datos.Ancho_Rollo"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Ancho_Rollo}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Cian">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Cian}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Magenta">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Magenta}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Amarillo">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Amarillo}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Negro">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Negro}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Base">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Base}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Pantone1">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Pantone1}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Pantone2">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Pantone2}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Pantone3">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Pantone3}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Pantone4">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Secuencia_Pantone4}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Tipo_Embobinado">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Tipo_Embobinado}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Codigo_Barras">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Codigo_Barras}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Texto">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Texto}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-dropdown [(ngModel)]="datos.Fotocelda" [autoDisplayFirst]="false" [options]="ubicacionFotoCelda" appendTo="body"></p-dropdown>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Fotocelda}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Registro_Colores">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Registro_Colores}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Adherencia_Tinta">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Adherencia_Tinta}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Conformidad_Laminado">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Conformidad_Laminado}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.PasoGuia_Repetecion">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.PasoGuia_Repetecion}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.Observacion">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.Observacion}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td pFrozenColumn alignFrozen="right" [frozen]="true">
+              <div class="flex align-items-center justify-content-center gap-2">
+                <button *ngIf="!editing" (click)="editandoFila(datos)" pButton pRipple pTooltip="Editar / Agregar Información" type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
+                <button *ngIf="editing" (click)="validarDatosControlCal_Impresion(datos)" pButton pRipple pTooltip="Guardar Información" type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                <button *ngIf="editing" (click)="edicionCancelada(datos, rowIndex, 'IMPRESION')" pButton pRipple pTooltip="Cancelar" type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
               </div>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="min-width:100px" pFrozenColumn>OT</th>
-              <th style="min-width:100px">Ronda</th>
-              <th style="min-width:100px">Maquina</th>
-              <th style="min-width:100px">Turno</th>
-              <th style="min-width:200px">Cliente</th>
-              <th style="min-width:100px">Item</th>
-              <th style="min-width:200px">Referencia</th>
-              <th style="min-width:150px">Lote de Rollo Sin Imp</th>
-              <th style="min-width:150px">Prueba de Tratado</th>
-              <th style="min-width:100px">Ancho de Rollo</th>
-              <th style="min-width:50px">Cian</th>
-              <th style="min-width:50px">Magenta</th>
-              <th style="min-width:50px">Amarillo</th>
-              <th style="min-width:50px">Negro</th>
-              <th style="min-width:50px">Base</th>
-              <th style="min-width:50px">Pantone</th>
-              <th style="min-width:50px">Pantone</th>
-              <th style="min-width:50px">Pantone</th>
-              <th style="min-width:50px">Pantone</th>
-              <th style="min-width:150px">Tipo Embobinado</th>
-              <th style="min-width:150px">Cod. Barras</th>
-              <th style="min-width:200px">Texto</th>
-              <th style="min-width:150px">Ubicación Fotocelda</th>
-              <th style="min-width:150px">Registro de Colores</th>
-              <th style="min-width:150px">Adherencia de Tinta</th>
-              <th style="min-width:150px">Conformidad Laminado</th>
-              <th style="min-width:150px">Paso Entre Guía</th>
-              <th style="min-width:200px">Observación</th>
-              <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
-            <tr [pEditableRow]="datos">
-              <td pFrozenColumn>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Orden_Trabajo" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.Orden_Trabajo, datos.Id, '|ROTOGRABADO|IMPRESION|')">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Orden_Trabajo}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Ronda">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Ronda}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Maquina">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Maquina}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Turno_Id">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Turno_Id}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Cliente">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Cliente}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Prod_Id">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Prod_Id}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Nombre_Producto">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Nombre_Producto}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.LoteRollo_SinImpresion">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.LoteRollo_SinImpresion}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Prueba_Tratado">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Prueba_Tratado}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Ancho_Rollo">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Ancho_Rollo}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Cian">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Cian}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Magenta">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Magenta}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Amarillo">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Amarillo}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Negro">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Negro}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Base">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Base}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Pantone1">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Pantone1}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Pantone2">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Pantone2}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Pantone3">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Pantone3}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Secuencia_Pantone4">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Secuencia_Pantone4}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Tipo_Embobinado">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Tipo_Embobinado}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Codigo_Barras">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Codigo_Barras}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Texto">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Texto}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <p-dropdown [(ngModel)]="datos.Fotocelda" [autoDisplayFirst]="true" [editable]="true" [options]="ubicacionFotoCelda" appendTo="body"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Fotocelda}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Registro_Colores">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Registro_Colores}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Adherencia_Tinta">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Adherencia_Tinta}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Conformidad_Laminado">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Conformidad_Laminado}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.PasoGuia_Repetecion">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.PasoGuia_Repetecion}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.Observacion">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.Observacion}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td pFrozenColumn alignFrozen="right" [frozen]="true">
-                <div class="flex align-items-center justify-content-center gap-2">
-                  <button *ngIf="!editing" pButton pRipple pTooltip="Editar / Agregar Información" type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
-                  <button *ngIf="editing" pButton pRipple pTooltip="Guardar Información" type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2" (click)="validarDatosControlCal_Impresion(datos)"></button>
-                  <button *ngIf="editing" pButton pRipple pTooltip="Cancelar" type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>         
-      </p-tabPanel>
-      
-      <!-- Doblado Corte -->
-      <p-tabPanel
-        header="Corte y Doblado"
-        leftIcon="pi pi-database"
-        tooltip="Control de Corte y Doblado">
-        <div class="mb-4">
-          <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-        </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>         
+    </p-tabPanel>
+    
+    <!-- Doblado Corte -->
+    <p-tabPanel
+      header="Corte y Doblado"
+      leftIcon="pi pi-database"
+      tooltip="Control de Corte y Doblado">
+      <div class="mb-4">
+        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
+      </div>
 
-        <p-table
-          #dt_Doblado
-          dataKey="Id"
-          [value]="datosControlCal_Doblado"
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="50rem"
-          editMode="row">
-          <ng-template pTemplate="caption">
-            <div class="row g-4 p-3">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Doblado()"></button>
-              </div>
+      <p-table
+        #dt_Doblado
+        dataKey="Id"
+        [value]="datosControlCal_Doblado"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        editMode="row">
+        <ng-template pTemplate="caption">
+          <div class="row g-4 p-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+              <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Doblado()"></button>
             </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="min-width:100px" pFrozenColumn>OT</th>
-              <th style="min-width:100px">Ronda</th>
-              <th style="min-width:100px">Maquina</th>
-              <th style="min-width:100px">Turno</th>
-              <th style="min-width:200px">Cliente</th>
-              <th style="min-width:100px">Item</th>
-              <th style="min-width:200px">Referencia</th>
-              <th style="min-width:100px">Ancho (Cms)</th>
-              <th style="min-width:100px">Calibre</th>
-              <th style="min-width:150px">Cod. Barras</th>
-              <th style="min-width:150px">Tipo Embobinado</th>
-              <th style="min-width:100px">Paso Entre Guía</th>
-              <th style="min-width:200px">Observación</th>
-              <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
-            <tr [pEditableRow]="datos">
-              <td pFrozenColumn>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.orden" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.orden, datos.Id, '|DOBLADO|EMPAQUE|CORTE|')">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.orden}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.ronda">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.ronda}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.maquina">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.maquina}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.turno">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.turno}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:250px" [(ngModel)]="datos.cliente">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.cliente}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.item">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.item}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:250px" [(ngModel)]="datos.referencia">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.referencia}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.ancho">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.ancho}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.calibre">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.calibre}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:200px" [(ngModel)]="datos.codBarras">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.codBarras}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:200px" [(ngModel)]="datos.tpEmbobinado">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.tpEmbobinado}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:100px" [(ngModel)]="datos.pasoGuia">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.pasoGuia}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input pInputText type="text" style="min-width:300px" [(ngModel)]="datos.observacion">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{datos.observacion}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td pFrozenColumn alignFrozen="right" [frozen]="true">
-                <div class="flex align-items-center justify-content-center gap-2">
-                  <button *ngIf="!editing" pButton pRipple pTooltip="Editar / Agregar Información" type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
-                  <button *ngIf="editing" pButton pRipple pTooltip="Guardar Información" type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2" (click)="validarDatosControlCal_Doblado(datos)"></button>
-                  <button *ngIf="editing" pButton pRipple pTooltip="Cancelar" type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>        
-      </p-tabPanel>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="min-width:100px" pFrozenColumn>OT</th>
+            <th style="min-width:100px">Ronda</th>
+            <th style="min-width:100px">Maquina</th>
+            <th style="min-width:100px">Turno</th>
+            <th style="min-width:200px">Cliente</th>
+            <th style="min-width:100px">Item</th>
+            <th style="min-width:200px">Referencia</th>
+            <th style="min-width:100px">Ancho (Cms)</th>
+            <th style="min-width:100px">Calibre</th>
+            <th style="min-width:150px">Cod. Barras</th>
+            <th style="min-width:150px">Tipo Embobinado</th>
+            <th style="min-width:100px">Paso Entre Guía</th>
+            <th style="min-width:200px">Observación</th>
+            <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
+          <tr [pEditableRow]="datos" [ngClass]="{'noEnviados' : datos.Id_PkBd == 0}">
+            <td pFrozenColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.orden" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.orden, datos.Id, '|DOBLADO|EMPAQUE|CORTE|')">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor" pTooltip="No se ha guardado esta información" pBadge style="font-size: 16px" severity="danger"></i>
+                  {{datos.orden}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.ronda">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.ronda}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.maquina">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.maquina}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-dropdown [autoDisplayFirst]="false" [options]="turno" appendTo="body" [(ngModel)]="datos.turno"></p-dropdown>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.turno}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.cliente">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.cliente}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [useGrouping]="false" [(ngModel)]="datos.item"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.item}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.referencia">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.referencia}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="datos.ancho"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.ancho}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="datos.calibre"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.calibre}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.codBarras">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.codBarras}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.tpEmbobinado">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.tpEmbobinado}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.pasoGuia">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.pasoGuia}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="datos.observacion">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{datos.observacion}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td pFrozenColumn alignFrozen="right" [frozen]="true">
+              <div class="flex align-items-center justify-content-center gap-2">
+                <button *ngIf="!editing" (click)="editandoFila(datos)" pButton pRipple pTooltip="Editar / Agregar Información" type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
+                <button *ngIf="editing" (click)="validarDatosControlCal_Doblado(datos)" pButton pRipple pTooltip="Guardar Información" type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                <button *ngIf="editing" (click)="edicionCancelada(datos, rowIndex, 'DOBLADO')"  pButton pRipple pTooltip="Cancelar" type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>        
+    </p-tabPanel>
+    
+    <!-- Sellado -->
+    <p-tabPanel
+      header="Sellado"
+      leftIcon="pi pi-map"
+      tooltip="Control de Sellado">
       
-      <!-- Sellado -->
-      <p-tabPanel
-        header="Sellado"
-        leftIcon="pi pi-map"
-        tooltip="Control de Sellado">
-        
-      </p-tabPanel>
-    </p-tabView>
+    </p-tabPanel>
+  </p-tabView>
 </p-card>
