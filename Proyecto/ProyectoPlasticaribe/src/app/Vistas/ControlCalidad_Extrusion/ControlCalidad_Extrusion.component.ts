@@ -35,8 +35,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   apariencias : any = ["NORMAL", "RASGADO"]; //Array que va a contener las apariencias de el/los rollos verificados
   pigmentos : any = []; //Array que va a contener los registros de los pigmentos de los productos
   registroSeleccionado : any = []; //Array que va a contener el registro seleccionado de la tabla.
-  ronda : number = 0;
-  turnos : any = [];
+  ronda : number = 0; //Variable que se usará para almacenar la ronda del controles de sellado
+  turnos : any = []; //Array que va a contener los registros de los turnos
+  registroClonado : any = {}; //Variable que clonará un objeto cuando se desee editar y lo quitará si se cancela la edición 
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -62,12 +63,13 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  //
+  //Función que consultará todos los Pigmentos
   cargarPigmentos = () => this.srvPigmentos.srvObtenerLista().subscribe(data => { this.pigmentos = data; }); 
 
+  //Función que consultará los turnos
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
-  //
+  //Función que consultará las OT con rondas el día de hoy
   mostrarRegistrosHoy() {
     this.load = true;
     this.registros = [];
@@ -78,10 +80,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => { this.load = false; }, 1000);
+    setTimeout(() => { this.load = false; }, 2000);
   }
 
-  //
+  //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
   cargarRegistrosCCExtrusion(datos : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.pigmento_Id);
     
@@ -109,6 +111,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Observacion : datos.ccExt_Observacion,
     }
     this.registros.push(info);
+    this.registros.sort((a, b) => a.Ronda - b.Ronda);
+    this.registros.sort((a, b) => a.OT - b.OT);
   }
 
   //Función que va a consultar la información de la OT a la que desea agregar una ronda.
@@ -131,12 +135,14 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         });
       }
     }, 500);
-    setTimeout(() => { this.load = false; }, 1000);
+    setTimeout(() => { this.load = false; }, 2000);
   }
 
   //Función que agregará una fila vacia a la tabla de registros.
-  agregarFila = () => this.registros.push({});
-
+  agregarFila() {
+    if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    else this.registros.unshift({});
+  }
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
   cargarRegistro(data : any, indexTabla : number){
     let info : any = {
@@ -165,7 +171,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.registros[indexTabla] = info;
   }
 
-  //Crear
+  //Función que va a registrar la ronda de la OT a la que desea agregar una ronda.
   registrarRonda(fila : any) {
     let esError : boolean = false;
     this.onReject(`eleccion`);
@@ -204,21 +210,18 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     }
   }
 
-  //
-  onRowEditInit(data : any) {
-    //this.registroSeleccionado = data;
-  }
-   
+  //Función que se ejecutará cuando se haga click en el botón de Editar
+  onRowEditInit = (data : any, indice : number) => this.registroClonado[indice] = {...data};
   
-  //
+  //Función que validará si la ronda ya existe, si existe se editará, si no se creará
   validarId(data : any){
     data = this.registroSeleccionado;
     if(data.Id > 0) this.editarRonda(data);
     else this.registrarRonda(data);
   }
 
+  //Función que editará la información de la ronda y OT seleccionada
   editarRonda(fila : any) {
-    console.log(fila.Id)
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
@@ -256,10 +259,11 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     } 
   }
 
-  //función que cancela la selección de la fila.
-  onRowEditCancel(data : any) {
-    console.log(3);
-    console.log(data);
+  //función que cancela la selección/edición de la fila.
+  onRowEditCancel(data : any, indice : number) {
+    console.log(indice)
+    this.registros[indice] = this.registroClonado[indice];
+    delete this.registroClonado[indice];
   }
   
    /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Console } from 'console';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { modelControlCalidad_Sellado } from 'src/app/Modelo/modelControlCalidad';
@@ -24,7 +23,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   hora : any = moment().format('HH:mm:ss'); //.Hora actual
   registroSeleccionado : any; //.Objeto que contendrá los datos del registro seleccionado
   ronda : number = 0;  //.Variable que cargará el numero de la ronda de una OT.
-  registrosClonados = {};
+  registroClonado : any = {};
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -52,7 +51,11 @@ export class ControlCalidad_SelladoComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  agregarFila = () => this.registros.push({});
+  //Función que agregará una fila vacia a la tabla de registros.
+  agregarFila() {
+    if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    else this.registros.unshift({});
+  }
 
   //.Función que cargará la información de los turnos
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
@@ -66,9 +69,10 @@ export class ControlCalidad_SelladoComponent implements OnInit {
         for (let index = 0; index < data.length; index++) {
           this.cargarTabla(data[index]);
         }
+        this.load = false;
       }
     });
-    setTimeout(() => { this.load = false; }, 1000);
+    
   }
 
   //. Función que cargará la tabla con los registros del día actual
@@ -118,7 +122,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
             let info : any = {
               Id : 0,
               Ronda : this.ronda,
-              Turno : `NE`,
+              Turno : `DIA`,
               OT : data[0].ot,
               Maquina : parseInt(data[0].maquina.trim()),
               Item : data[0].item,
@@ -141,7 +145,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Observacion : ``,
             }
             this.registros[index] = info;
-          } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
+          } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`)
         });
       }
       
@@ -156,6 +160,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //Función que guardará los registros del día actual
   creacionEdicionRonda(fila : any) {
+    this.load = true;
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Sellado = {
@@ -190,20 +195,22 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
     if(fila.Id > 0) {
       this.srvCcSellado.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-      if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`)
+      if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
         this.mostrarRegistrosHoy();
+        setTimeout(() => { this.load = false; }, 2500);
       }
     } else {
       this.srvCcSellado.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
+      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
         this.mostrarRegistrosHoy();
+        setTimeout(() => { this.load = false; }, 2500);
       }
     }
-  }
+  }  
 
   //. Función para mostrar una elección de creación o actualización de un registro
   mostrarEleccion(data : any){
@@ -215,7 +222,12 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   //. Función para cerrar el dialogo de elección
   onReject = (dato : any) => this.msg.clear(dato);
 
-  filaEditar(fila : any) {
-    console.log(fila)
+  filaEditar = (fila : any, index : number) => this.registroClonado[index] = {...fila};
+    
+  filaCancelar(fila : any, index : number) {
+    this.registros[index] = this.registroClonado[index];
+    delete this.registroClonado[index];
   }
+
 }
+

@@ -57,7 +57,7 @@ editMode="row">
              <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)" required>
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -83,7 +83,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                   <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.Maquina">
+                      <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
                   </ng-template>
                   <ng-template pTemplate="output">
                       {{registro.Maquina}}
@@ -116,7 +116,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Rollo" required>
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Rollo"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Rollo}}
@@ -138,7 +138,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.AnchoTubular">
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.AnchoTubular"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.AnchoTubular | number: '1.2-2'}}
@@ -149,7 +149,7 @@ editMode="row">
             <td>
               <p-cellEditor>
                   <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.PesoMetro">
+                      <p-inputNumber type="text" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.PesoMetro"></p-inputNumber>
                   </ng-template>
                   <ng-template pTemplate="output">
                       {{registro.PesoMetro | number: '1.2-2'}}
@@ -160,7 +160,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Ancho" required>
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.Ancho"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Ancho | number: '1.2-2'}}
@@ -171,7 +171,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.CalMin">
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2"  [(ngModel)]="registro.CalMin"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.CalMin | number: '1.2-2'}}
@@ -182,7 +182,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.CalMax">
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.CalMax"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.CalMax | number: '1.2-2'}}
@@ -193,7 +193,7 @@ editMode="row">
             <td>
               <p-cellEditor>
                   <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.CalProm">
+                      <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.CalProm"></p-inputNumber>
                   </ng-template>
                   <ng-template pTemplate="output">
                       {{registro.CalProm | number : '1.2-2'}}
@@ -258,9 +258,9 @@ editMode="row">
             <!--Botones-->
             <td pFrozenColumn [frozen]="true" alignFrozen="right">
                 <div class="flex align-items-center justify-content-center gap-2">
-                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro)" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro)" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>
             </td>
         </tr>

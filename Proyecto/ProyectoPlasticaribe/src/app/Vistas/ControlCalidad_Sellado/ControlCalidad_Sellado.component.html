@@ -59,8 +59,7 @@
             <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true"
-                            (keyup.enter)="consultarOT(registro, ri)">
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -71,7 +70,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Ronda" required>
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Ronda"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Ronda}}
@@ -94,7 +93,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Maquina">
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Maquina}}
@@ -102,7 +101,7 @@
                 </p-cellEditor>
             </td>
             <!--Referencia-->
-            <td>
+            <td [ariaReadOnly]="true">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.Referencia">
@@ -116,7 +115,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Calibre">
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Calibre"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Calibre | number: '1.2-2'}}
@@ -127,7 +126,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Ancho">
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Ancho"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Ancho | number : '1.2-2'}}
@@ -138,7 +137,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Largo">
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Largo"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Largo | number : '1.2-2'}}
@@ -149,7 +148,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Af_Izquierdo">
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Af_Izquierdo"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Af_Izquierdo | number : '1.2-2'}}
@@ -160,7 +159,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Af_Derecho">
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Af_Derecho"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Af_Derecho | number : '1.2-2'}}
@@ -171,7 +170,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Af_Abajo" required>
+                        <p-inputNumber mode="decimal" [maxFractionDigits]="2" type="number" [(ngModel)]="registro.Af_Abajo"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Af_Abajo | number : '1.2-2'}}
@@ -266,7 +265,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.BolsasxPaq">
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.BolsasxPaq"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.BolsasxPaq | number : '1.2-2'}}
@@ -287,9 +286,9 @@
             <!--botones-->
             <td pFrozenColumn [frozen]="true" alignFrozen="right">
                 <div class="flex align-items-center justify-content-center gap-2">
-                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro)" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="filaCancelar(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>
             </td>
         </tr>
