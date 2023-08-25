@@ -189,8 +189,8 @@ export const routes: Routes = [
    {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
 
    /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-   //{path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
-   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_SelladoComponent},
+   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
+   //{path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_SelladoComponent},
   ]
 
 @NgModule({

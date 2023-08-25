@@ -1,5 +1,15 @@
-<button pButton class="p-button-danger" type="button" (click)="cargarRegistro(undefined)" label="Añadir registro" icon="pi pi-pencil"></button>
-<p-table [value]="registros" dataKey="Rollo" editMode="row" *ngIf="!load" [tableStyle]="{'min-width': '50rem'}">
+<button pButton class="p-button-danger" type="button" (click)="agregarFila()" label="Añadir registro" icon="pi pi-pencil"></button>
+<p-table 
+*ngIf="!load"
+[value]="registros" 
+dataKey="Id" 
+editMode="row" 
+columnResizeMode="expand"
+[resizableColumns]="true"
+styleClass="p-datatable-gridlines p-datatable-sm"
+responsiveLayout="scroll"    
+[scrollable]="true"
+scrollHeight="50rem" >
     <ng-template pTemplate="header">
         <tr>
             <th colspan="11"></th>
@@ -7,8 +17,8 @@
             <th colspan="5"></th>
         </tr>
         <tr>
-          <th>OT</th>
-          <th>Ronda</th>
+          <th pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
+          <th pFrozenColumn [frozen]="true" alignFrozen="left">Ronda</th>
           <th>Turno</th>
           <th>Maquina</th>
           <th>Cliente</th>
@@ -25,16 +35,17 @@
           <th>Tratado</th>
           <th>Rasgado</th>
           <th>Tipo Bobina</th>
-          <th>Acciones</th>
+          <th>Observacion</th>
+          <th pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
         <tr [pEditableRow]="registro">
             <!--OT-->
-             <td>
+             <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.OT" (keyup.enter)="consultarOT(registro)" required>
+                        <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)" required>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -42,7 +53,7 @@
                 </p-cellEditor>
             </td>
             <!--Ronda-->
-            <td>
+            <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 {{registro.Ronda}}
             </td>
              <!--Turno-->
@@ -222,7 +233,7 @@
             </p-cellEditor>
             </td>
             <!--Botones-->
-            <td>
+            <td pFrozenColumn [frozen]="true" alignFrozen="right">
                 <div class="flex align-items-center justify-content-center gap-2">
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>

@@ -110,32 +110,38 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.registros.push(info);
   }
 
-  //
-  consultarOT(datos : any){
+  //Función que va a consultar la información de la OT a la que desea agregar una ronda.
+  consultarOT(datos : any, indexTabla : number){
     this.load = true;
-    this.srvCcExtrusion.GetOtControlCalidad_Extrusion(datos.OT).subscribe(dataPbdd => {
-      if(dataPbdd.length > 0) {
-        let cantRondas : number = dataPbdd.length - 1;
-        this.ronda = dataPbdd[cantRondas].ccExt_Ronda;
-        this.ronda += 1;
-      }
-    });
-    this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
-      if(data.length > 0){
-        let cantRegistros : number = data.length;
-        let indice = Math.floor(Math.random() * cantRegistros);
+    this.ronda = 0;
+    this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato; });
+    setTimeout(() => {
+      this.ronda += 1;
+      if(this.ronda > 3) {
+        this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
         this.registros.pop();
-        this.cargarRegistro(data[indice]);
-      } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
-    });
-    setTimeout(() => { this.load = false; }, 50);
+      } else {
+        this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
+          if(data.length > 0){
+            let cantRegistros : number = data.length;
+            let indice = Math.floor(Math.random() * cantRegistros);
+            //this.registros.pop();
+            this.cargarRegistro(data[indice], indexTabla);
+          } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
+        });
+      }
+    }, 500);
+    setTimeout(() => { this.load = false; }, 1000);
   }
 
-  //
-  cargarRegistro(data : any){
+  //Función que agregará una fila vacia a la tabla de registros.
+  agregarFila = () => this.registros.push({});
+
+  //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
+  cargarRegistro(data : any, indexTabla : number){
     let info : any = {
       Id : 0,
-      Ronda : this.ronda == 0 ? 1 : this.ronda, 
+      Ronda : this.ronda, 
       Turno : `NE`,
       OT : data == undefined ? `` : data.ot,
       Maquina : data == undefined ? `` : data.maquina, 
@@ -155,7 +161,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Rasgado : ``,
       TipoBobina : ``,
     }
-    this.registros.push(info);
+    this.registros[indexTabla] = info;
   }
 
   //Crear

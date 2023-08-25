@@ -109,8 +109,10 @@ export class ControlCalidad_SelladoComponent implements OnInit {
     this.srvCcSellado.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato });
     setTimeout(() => {
       this.ronda += 1
-      if(this.ronda > 3) this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
-      else {
+      if(this.ronda > 3) {
+        this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
+        this.registros.pop();
+      } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `SELLADO`).subscribe(data => {
           if(data.length > 0){
             let info : any = {
@@ -139,8 +141,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Observacion : ``,
             }
             this.registros[index] = info;
-            this.registros.sort((a, b) => a.Ronda - b.Ronda);
-            this.registros.sort((a, b) => a.OT - b.OT);
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
@@ -204,47 +204,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       }
     }
   }
-
-  //Función que guardará los registros del día actual
-  /*actualizarRonda(fila : any) {
-    let esError : boolean = false;
-    this.onReject(`eleccion`);
-    let modelo : modelControlCalidad_Sellado = {
-      CcSel_Id : fila.Id,
-      Turno_Id: fila.Turno,
-      Usua_Id: this.storage_Id,
-      CcSel_Maquina: fila.Maquina,
-      CcSel_Ronda: fila.Ronda,
-      CcSel_OT: fila.OT,
-      Prod_Id: fila.Item,
-      Referencia: fila.Referencia,
-      CcSel_Calibre: fila.Calibre,
-      CcSel_Ancho: fila.Ancho,
-      CcSel_Largo: fila.Largo,
-      UndMed_AL: 'Cms',
-      AnchoFuelle_Izq: fila.Af_Izquierdo,
-      AnchoFuelle_Der: fila.Af_Derecho,
-      AnchoFuelle_Abajo: fila.Af_Abajo,
-      UndMed_AF: 'Cms',
-      CcSel_Rasgado: fila.Rasgado,
-      CcSel_PruebaFiltrado: fila.Filtrado,
-      CcSel_PruebaPresion: fila.Presion,
-      CcSel_Sellabilidad: fila.Sellabilidad,
-      CcSel_Impresion: fila.Impresion,
-      CcSel_Precorte: fila.Precorte,
-      CcSel_Perforacion: fila.Perforacion,
-      CcSel_CantBolsasxPaq: fila.BolsasxPaq,
-      CcSel_Fecha: this.today,
-      CcSel_Hora: this.hora,
-      CcSel_Observacion: fila.Observacion
-    }
-    this.srvCcSellado.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-     if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`)
-     else {
-      this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
-      this.mostrarRegistrosHoy();
-    }
-  }*/
 
   //. Función para mostrar una elección de creación o actualización de un registro
   mostrarEleccion(data : any){

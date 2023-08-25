@@ -1,7 +1,24 @@
 <button pButton class="p-button-danger" type="button" (click)="agregarFila()" label="Añadir registro" icon="pi pi-pencil"></button>
-  <p-table [value]="registros" dataKey="Id" *ngIf="!load" editMode="row" [tableStyle]="{'min-width': '50rem'}">
+  <p-table 
+  *ngIf="!load"
+  columnResizeMode="expand"
+  [resizableColumns]="true"
+  styleClass="p-datatable-gridlines p-datatable-sm"
+  responsiveLayout="scroll"      
+  [value]="registros" 
+  dataKey="Id" 
+  editMode="row" 
+  [scrollable]="true"
+  scrollHeight="50rem" 
+  >
       <ng-template pTemplate="header">
-         
+          <tr>
+            <th colspan="8"></th>
+            <th colspan="3" class="text-center">Ancho de fuelle (Cms)</th>
+            <th></th>
+            <th colspan="2" class="text-center">Pruebas</th>
+            <th colspan="8"></th>
+          </tr>
           <tr>
               <th pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
               <th pFrozenColumn [frozen]="true" alignFrozen="left">Ronda</th>
@@ -232,7 +249,7 @@
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.BolsasxPaq">
                     </ng-template>
-                    <ng-template pTemplate="output">  
+                    <ng-template pTemplate="output">
                         {{registro.BolsasxPaq | number : '1.2-2'}}
                     </ng-template>
                 </p-cellEditor>
