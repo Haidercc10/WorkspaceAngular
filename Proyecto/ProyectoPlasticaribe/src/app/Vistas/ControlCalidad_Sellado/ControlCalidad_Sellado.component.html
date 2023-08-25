@@ -68,14 +68,7 @@
             </td>
             <!--Ronda-->
             <td>
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Ronda"></p-inputNumber>
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{registro.Ronda}}
-                    </ng-template>
-                </p-cellEditor>
+                {{registro.Ronda}}
             </td>
             <!--Turno-->
             <td>
@@ -104,7 +97,7 @@
             <td [ariaReadOnly]="true">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Referencia">
+                        <input pInputText type="text" [readonly]="true" [(ngModel)]="registro.Referencia">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Referencia}}

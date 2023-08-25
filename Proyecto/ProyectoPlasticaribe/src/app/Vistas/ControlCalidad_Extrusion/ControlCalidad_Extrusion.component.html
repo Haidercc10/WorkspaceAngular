@@ -94,7 +94,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText type="text" [(ngModel)]="registro.Cliente">
+                        <input pInputText type="text" [readonly]="true" [(ngModel)]="registro.Cliente">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Cliente}}
@@ -105,7 +105,7 @@ editMode="row">
             <td>
               <p-cellEditor>
                   <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.Referencia">
+                      <input pInputText type="text" [readonly]="true" [(ngModel)]="registro.Referencia">
                   </ng-template>
                   <ng-template pTemplate="output">
                       {{registro.Referencia}}
@@ -127,7 +127,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-dropdown [options]="pigmentos" appendTo="body" [(ngModel)]="registro.Pigmento" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [style]="{'width':'100%'}"></p-dropdown>
+                        <p-dropdown [options]="pigmentos" appendTo="body" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [style]="{'width':'100%'}"></p-dropdown>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Pigmento}}

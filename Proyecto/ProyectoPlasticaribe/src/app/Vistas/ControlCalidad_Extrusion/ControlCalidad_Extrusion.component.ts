@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Console } from 'console';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { InitEditableRow } from 'primeng/table';
 import { modelControlCalidad_Extrusion } from 'src/app/Modelo/modelControlCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_ExtrusionService } from 'src/app/Servicios/ControlCalidad_Extrusion/ControlCalidad_Extrusion.service';
@@ -143,19 +145,22 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else this.registros.unshift({});
   }
+
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
   cargarRegistro(data : any, indexTabla : number){
+    let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
+    console.log(pigmento);
     let info : any = {
       Id : 0,
       Ronda : this.ronda, 
-      Turno : `NE`,
+      Turno : `DIA`,
       OT : data.ot,
       Maquina : data.maquina, 
       Cliente : data.cliente,
       Item : data.item,
       Referencia : data.referencia,
       Rollo : data.rollo,
-      Pigmento : parseInt(data.pigmentoId),
+      Pigmento : pigmento[0].pigmt_Id,
       AnchoTubular : 0,
       PesoMetro : 0,
       Ancho : 0,
@@ -211,7 +216,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //Función que se ejecutará cuando se haga click en el botón de Editar
-  onRowEditInit = (data : any, indice : number) => this.registroClonado[indice] = {...data};
+  onRowEditInit(data : any, indice : number) {
+    console.log(indice)
+    this.registroClonado[indice] = {...data};
+  }
   
   //Función que validará si la ronda ya existe, si existe se editará, si no se creará
   validarId(data : any){
@@ -222,6 +230,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que editará la información de la ronda y OT seleccionada
   editarRonda(fila : any) {
+    let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
+    console.log(pigmento)
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
@@ -235,7 +245,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Prod_Id: fila.Item,
       Referencia: fila.Referencia,
       CcExt_Rollo: fila.Rollo,
-      Pigmento_Id: fila.Pigmento,
+      Pigmento_Id: pigmento[0].pigmt_Id,
       CcExt_AnchoTubular: fila.AnchoTubular,
       CcExt_PesoMetro: fila.PesoMetro,
       CcExt_Ancho: fila.Ancho,
@@ -261,7 +271,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //función que cancela la selección/edición de la fila.
   onRowEditCancel(data : any, indice : number) {
-    console.log(indice)
     this.registros[indice] = this.registroClonado[indice];
     delete this.registroClonado[indice];
   }
@@ -269,11 +278,15 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
    /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(data : any){
     this.registroSeleccionado = data;
-
     if(data.Id > 0) this.msg.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea actualizar la ronda N° ${data.Ronda} de la OT N° ${data.OT}?`, sticky: true});
     else this.msg.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea crear la ronda N° ${data.Ronda} de la OT N° ${data.OT}?`, sticky: true});
   }
 
   /** Cerrar Dialogo de eliminación*/
   onReject = (dato : any) => this.msg.clear(dato);
+
+  mostrarPigmento (registro : any, indice : number){
+    console.log(registro.Pigmento);
+    
+  }
 }
