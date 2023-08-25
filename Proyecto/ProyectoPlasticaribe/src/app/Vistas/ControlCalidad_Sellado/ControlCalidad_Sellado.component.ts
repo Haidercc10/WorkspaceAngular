@@ -115,7 +115,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       this.ronda += 1
       if(this.ronda > 3) {
         this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
-        this.registros.pop();
+        this.registros.shift();
       } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `SELLADO`).subscribe(data => {
           if(data.length > 0){

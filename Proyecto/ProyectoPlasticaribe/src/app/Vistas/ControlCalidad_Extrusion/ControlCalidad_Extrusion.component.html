@@ -57,7 +57,7 @@ editMode="row">
              <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri, editing)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -127,7 +127,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-dropdown [options]="pigmentos" appendTo="body" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [style]="{'width':'100%'}"></p-dropdown>
+                        <p-dropdown [options]="pigmentos" appendTo="body" [(ngModel)]="registro.Pigmento" optionLabel="pigmt_Nombre" optionValue="pigmt_Nombre" [style]="{'width':'100%'}"></p-dropdown>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Pigmento}}

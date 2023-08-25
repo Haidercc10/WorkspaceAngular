@@ -82,7 +82,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => { this.load = false; }, 2000);
+    this.load = false;
   }
 
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
@@ -118,7 +118,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //Función que va a consultar la información de la OT a la que desea agregar una ronda.
-  consultarOT(datos : any, indexTabla : number){
+  consultarOT(datos : any, indexTabla : number, editando : boolean){
     this.load = true;
     this.ronda = 0;
     this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato; });
@@ -126,13 +126,13 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       this.ronda += 1;
       if(this.ronda > 3) {
         this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
-        this.registros.pop();
+        this.registros.shift();
       } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
           if(data.length > 0){
             let cantRegistros : number = data.length;
             let indice = Math.floor(Math.random() * cantRegistros);
-            this.cargarRegistro(data[indice], indexTabla);
+            this.cargarRegistro(data[indice], indexTabla, editando);
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
@@ -147,7 +147,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
-  cargarRegistro(data : any, indexTabla : number){
+  cargarRegistro(data : any, indexTabla : number, editando){
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
     console.log(pigmento);
     let info : any = {
@@ -160,7 +160,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Item : data.item,
       Referencia : data.referencia,
       Rollo : data.rollo,
-      Pigmento : pigmento[0].pigmt_Id,
+      Pigmento : pigmento[0].pigmt_Nombre,
       AnchoTubular : 0,
       PesoMetro : 0,
       Ancho : 0,
@@ -178,6 +178,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que va a registrar la ronda de la OT a la que desea agregar una ronda.
   registrarRonda(fila : any) {
+    let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
+    this.load = true;
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
@@ -191,7 +193,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Prod_Id: fila.Item,
       Referencia: fila.Referencia,
       CcExt_Rollo: fila.Rollo,
-      Pigmento_Id: fila.Pigmento,
+      Pigmento_Id: pigmento[0].pigmt_Id,
       CcExt_AnchoTubular: fila.AnchoTubular,
       CcExt_PesoMetro: fila.PesoMetro,
       CcExt_Ancho: fila.Ancho,
@@ -210,14 +212,16 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
      else {
-      this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
       this.mostrarRegistrosHoy();
+      setTimeout(() => { 
+        this.load = false;
+        this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
+      }, 3000);
     }
   }
 
   //Función que se ejecutará cuando se haga click en el botón de Editar
   onRowEditInit(data : any, indice : number) {
-    console.log(indice)
     this.registroClonado[indice] = {...data};
   }
   
@@ -231,7 +235,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que editará la información de la ronda y OT seleccionada
   editarRonda(fila : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
-    console.log(pigmento)
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
@@ -264,8 +267,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
     else {
-      this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
       this.mostrarRegistrosHoy();
+      this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
+      setTimeout(() => { this.load = false; }, 2500);
     } 
   }
 
