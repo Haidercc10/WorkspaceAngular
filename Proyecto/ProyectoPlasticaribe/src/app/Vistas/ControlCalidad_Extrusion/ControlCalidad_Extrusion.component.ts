@@ -133,11 +133,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
             let cantRegistros : number = data.length;
             let indice = Math.floor(Math.random() * cantRegistros);
             this.cargarRegistro(data[indice], indexTabla, editando);
+            this.load = false;
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
     }, 500);
-    setTimeout(() => { this.load = false; }, 2000);
+   
   }
 
   //Función que agregará una fila vacia a la tabla de registros.
@@ -235,6 +236,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que editará la información de la ronda y OT seleccionada
   editarRonda(fila : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
+    this.load = true;
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
@@ -288,9 +290,4 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   /** Cerrar Dialogo de eliminación*/
   onReject = (dato : any) => this.msg.clear(dato);
-
-  mostrarPigmento (registro : any, indice : number){
-    console.log(registro.Pigmento);
-    
-  }
 }
