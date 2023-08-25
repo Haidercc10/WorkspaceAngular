@@ -1,107 +1,119 @@
-<button pButton class="p-button-danger" type="button" (click)="agregarFila()" label="Añadir registro" icon="pi pi-pencil"></button>
-  <p-table 
-  *ngIf="!load"
-  columnResizeMode="expand"
-  [resizableColumns]="true"
-  styleClass="p-datatable-gridlines p-datatable-sm"
-  responsiveLayout="scroll"      
-  [value]="registros" 
-  dataKey="Id" 
-  editMode="row" 
-  [scrollable]="true"
-  scrollHeight="50rem" 
-  >
-      <ng-template pTemplate="header">
-          <tr>
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+<p-table 
+ *ngIf="!load" 
+ columnResizeMode="expand" 
+ [resizableColumns]="true"
+ styleClass="p-datatable-gridlines p-datatable-sm" 
+ responsiveLayout="scroll" 
+ [value]="registros" 
+ dataKey="Id"
+ editMode="row" 
+ [scrollable]="true" 
+ scrollHeight="50rem">
+    <ng-template pTemplate="caption">
+        <div class="row g-4 p-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="agregarFila()"></button>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+        <tr>
             <th colspan="8"></th>
             <th colspan="3" class="text-center">Ancho de fuelle (Cms)</th>
             <th></th>
             <th colspan="2" class="text-center">Pruebas</th>
             <th colspan="8"></th>
-          </tr>
-          <tr>
-              <th pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
-              <th pFrozenColumn [frozen]="true" alignFrozen="left">Ronda</th>
-              <th>Turno</th>
-              <th>Maq.</th>
-              <th>Referencia</th>
-              <th>Calibre</th>
-              <th>Ancho</th>
-              <th>Largo</th>
-              <th>Izq.</th>
-              <th>Der.</th>
-              <th>Abajo</th>
-              <th>Rasgado</th>
-              <th>Filtrado</th>
-              <th>Presion</th>
-              <th>Sellabilidad</th>
-              <th>Impresión</th>
-              <th>Precorte</th>
-              <th>Perforación</th>
-              <th>Bolsas x Paq.</th>
-              <th>Observación</th>
-              <th pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
-          </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
-          <tr [pEditableRow]="registro">
-              <!--OT-->
-              <td pFrozenColumn [frozen]="true" alignFrozen="left">
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)">
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.OT}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Ronda-->
-              <td pFrozenColumn [frozen]="true" alignFrozen="left">
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <input pInputText type="text" [(ngModel)]="registro.Ronda" required>
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.Ronda}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Turno-->
-              <td>
+        </tr>
+        <tr>
+            <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
+            <th style="min-width : 80px">Ronda</th>
+            <th style="min-width : 80px">Turno</th>
+            <th style="min-width : 80px">Maq.</th>
+            <th style="min-width : 300px">Referencia</th>
+            <th style="min-width : 80px">Calibre</th>
+            <th style="min-width : 80px">Ancho</th>
+            <th style="min-width : 80px">Largo</th>
+            <th style="min-width : 80px">Izq.</th>
+            <th style="min-width : 80px">Der.</th>
+            <th style="min-width : 100px">Abajo</th>
+            <th style="min-width : 100px">Rasgado</th>
+            <th style="min-width : 80px">Filtrado</th>
+            <th style="min-width : 80px">Presion</th>
+            <th style="min-width : 100px">Sellabilidad</th>
+            <th style="min-width : 100px">Impresión</th>
+            <th style="min-width : 100px">Precorte</th>
+            <th style="min-width : 100px">Perforación</th>
+            <th style="min-width : 100px">Bolsas x Paq.</th>
+            <th style="min-width : 200px">Observación</th>
+            <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="registro">
+            <!--OT-->
+            <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Turno}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true"
+                            (keyup.enter)="consultarOT(registro, ri)">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.OT}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Maquina-->
-              <td>
+            </td>
+            <!--Ronda-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.Maquina">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Maquina}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Ronda" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Ronda}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Referencia-->
-              <td>
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <input pInputText type="text" [(ngModel)]="registro.Referencia">
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.Referencia}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Calibre-->
-              <td>
+            </td>
+            <!--Turno-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno"
+                            optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Turno}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Maquina-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Maquina">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Maquina}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Referencia-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Referencia">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Referencia}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Calibre-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.Calibre">
@@ -110,42 +122,42 @@
                         {{registro.Calibre | number: '1.2-2'}}
                     </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Ancho-->
-              <td>
+            </td>
+            <!--Ancho-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.Ancho">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Ancho | number : '1.2-2'}}
-                  </ng-template>
-              </p-cellEditor>
-              </td>
-              <!--Largo-->
-              <td>
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="registro.Largo">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Largo | number : '1.2-2'}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Ancho">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Ancho | number : '1.2-2'}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Ancho Fuelle Izq.-->
-              <td>
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <input pInputText type="text" [(ngModel)]="registro.Af_Izquierdo">
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.Af_Izquierdo | number : '1.2-2'}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Ancho Fuelle Der.-->
-              <td>
+            </td>
+            <!--Largo-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Largo">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Largo | number : '1.2-2'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Ancho Fuelle Izq.-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Af_Izquierdo">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Af_Izquierdo | number : '1.2-2'}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Ancho Fuelle Der.-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.Af_Derecho">
@@ -154,97 +166,104 @@
                         {{registro.Af_Derecho | number : '1.2-2'}}
                     </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Ancho Fuelle Abajo.-->
-              <td>
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <input pInputText type="text" [(ngModel)]="registro.Af_Abajo" required>
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.Af_Abajo | number : '1.2-2'}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Rasgado.-->
-              <td>
+            </td>
+            <!--Ancho Fuelle Abajo.-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Rasgado" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Rasgado}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Af_Abajo" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Af_Abajo | number : '1.2-2'}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Filtrado-->
-              <td>
+            </td>
+            <!--Rasgado.-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Filtrado" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Filtrado}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Rasgado"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Rasgado}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Presión-->
-              <td>
+            </td>
+            <!--Filtrado-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Presion" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Presion}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Filtrado"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Filtrado}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Sellabilidad-->
-              <td>
+            </td>
+            <!--Presión-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="resistencia" appendTo="body" [(ngModel)]="registro.Sellabilidad" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Sellabilidad}}
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Presion"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Presion}}
+                    </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--Impresión-->
-              <td>
-                  <p-cellEditor>
-                      <ng-template pTemplate="input">
-                          <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Impresion" [style]="{'width':'100%'}"></p-dropdown>
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                          {{registro.Impresion}}
-                      </ng-template>
-                  </p-cellEditor>
-              </td>
-              <!--Precorte.-->
-              <td>
+            </td>
+            <!--Sellabilidad-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Precorte" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Precorte}}
-                  </ng-template>
-              </p-cellEditor>
-              </td>
-              <!--Perforación.-->
-              <td>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="resistencia" appendTo="body" [(ngModel)]="registro.Sellabilidad"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Sellabilidad}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Impresión-->
+            <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Perforacion" [style]="{'width':'100%'}"></p-dropdown>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{registro.Perforacion}}
-                  </ng-template>
-              </p-cellEditor>
-              </td>
-              <!--Cant. bolsas por paquete-->
-              <td>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Impresion"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Impresion}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Precorte.-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Precorte"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Precorte}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Perforación.-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="eleccion" appendTo="body" [(ngModel)]="registro.Perforacion"
+                            [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Perforacion}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Cant. bolsas por paquete-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.BolsasxPaq">
@@ -253,9 +272,9 @@
                         {{registro.BolsasxPaq | number : '1.2-2'}}
                     </ng-template>
                 </p-cellEditor>
-              </td>
-               <!--Observación-->
-               <td>
+            </td>
+            <!--Observación-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" [(ngModel)]="registro.Observacion">
@@ -264,36 +283,36 @@
                         {{registro.Observacion}}
                     </ng-template>
                 </p-cellEditor>
-              </td>
-              <!--botones-->
-              <td pFrozenColumn [frozen]="true" alignFrozen="right">
-                  <div class="flex align-items-center justify-content-center gap-2">
-                      <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro)" class="p-button-rounded p-button-text"></button>
-                      <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)"  class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                      <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"  class="p-button-rounded p-button-text p-button-danger"></button>
-                  </div>
-              </td>
-          </tr>
-      </ng-template>
-  </p-table>
+            </td>
+            <!--botones-->
+            <td pFrozenColumn [frozen]="true" alignFrozen="right">
+                <div class="flex align-items-center justify-content-center gap-2">
+                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro)" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
 
-  <p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
+<p-toast position="center" key="eleccion" (onClose)="onReject('eleccion')" [baseZIndex]="5000">
     <ng-template let-message pTemplate="message" let-item>
-      <div class="flex flex-column" style="flex: 1">
-        <div class="text-center">
-          <i class="pi pi-exclamation-triangle font-size-48"></i>
-          <h4>{{message.summary}}</h4>
-          <p>{{message.detail}}</p>
+        <div class="flex flex-column" style="flex: 1">
+            <div class="text-center">
+                <i class="pi pi-exclamation-triangle font-size-48"></i>
+                <h4>{{message.summary}}</h4>
+                <p>{{message.detail}}</p>
+            </div>
+            <div class="p-fluid" style="display: flex;">
+                <div class="col-6" style="margin-right: 5px;">
+                    <button type="button" pButton (click)="validarId(item)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+                </div>
+                <div class="col-6">
+                    <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+                </div>
+            </div>
         </div>
-        <div class="p-fluid" style="display: flex;">
-          <div class="col-6" style="margin-right: 5px;">
-            <button type="button" pButton (click)="validarId(item)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-          </div>
-          <div class="col-6">
-            <button type="button" pButton (click)="onReject('eleccion')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
-          </div>
-        </div>
-      </div>
     </ng-template>
 </p-toast>
 

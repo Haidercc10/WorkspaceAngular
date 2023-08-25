@@ -106,6 +106,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Tratado : datos.ccExt_Tratado,
       Rasgado : datos.ccExt_Rasgado,
       TipoBobina : datos.ccExt_TipoBobina,
+      Observacion : datos.ccExt_Observacion,
     }
     this.registros.push(info);
   }
@@ -125,7 +126,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
           if(data.length > 0){
             let cantRegistros : number = data.length;
             let indice = Math.floor(Math.random() * cantRegistros);
-            //this.registros.pop();
             this.cargarRegistro(data[indice], indexTabla);
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
@@ -143,13 +143,13 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Id : 0,
       Ronda : this.ronda, 
       Turno : `NE`,
-      OT : data == undefined ? `` : data.ot,
-      Maquina : data == undefined ? `` : data.maquina, 
-      Cliente : data == undefined ? `` : data.cliente,
-      Item : data == undefined ? `` : data.item,
-      Referencia : data == undefined ? `` : data.referencia,
-      Rollo : data == undefined ? 0 : data.rollo,
-      Pigmento : data == undefined ? `` : parseInt(data.pigmentoId.trim()),
+      OT : data.ot,
+      Maquina : data.maquina, 
+      Cliente : data.cliente,
+      Item : data.item,
+      Referencia : data.referencia,
+      Rollo : data.rollo,
+      Pigmento : parseInt(data.pigmentoId),
       AnchoTubular : 0,
       PesoMetro : 0,
       Ancho : 0,
@@ -160,6 +160,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Tratado : ``,
       Rasgado : ``,
       TipoBobina : ``,
+      Observacion : ``,
     }
     this.registros[indexTabla] = info;
   }
@@ -193,7 +194,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: ``
+      CcExt_Observacion: fila.Observacion
     }
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
@@ -245,7 +246,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: ``
+      CcExt_Observacion: fila.Observacion
     }
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);

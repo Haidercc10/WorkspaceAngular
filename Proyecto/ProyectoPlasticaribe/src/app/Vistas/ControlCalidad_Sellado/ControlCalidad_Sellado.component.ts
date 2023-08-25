@@ -15,15 +15,15 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./ControlCalidad_Sellado.component.css']
 })
 export class ControlCalidad_SelladoComponent implements OnInit {
-  registros : any = [];
-  turnos : any = [];
-  eleccion : any = ["SI", "NO"];
-  resistencia : any = ["NO APLICA", "BAJA", "MEDIA", "ALTA"];
-  load : boolean = false;
-  today : any = moment().format('YYYY-MM-DD');
-  hora : any = moment().format('HH:mm:ss');
-  registroSeleccionado : any;
-  ronda : number = 0; 
+  registros : any = []; //.Array que cargará los registros en la tabla
+  turnos : any = []; //.Array que cargará los turnos
+  eleccion : any = ["SI", "NO"]; //.Array que se mostrará en campos de elección
+  resistencia : any = ["NO APLICA", "BAJA", "MEDIA", "ALTA"]; //.Array que cargará la resistencia de sellabilidad de un producto
+  load : boolean = false; //.Variable que se usará durante la carga de un proceso que requiera tiempo
+  today : any = moment().format('YYYY-MM-DD'); //.Fecha actual
+  hora : any = moment().format('HH:mm:ss'); //.Hora actual
+  registroSeleccionado : any; //.Objeto que contendrá los datos del registro seleccionado
+  ronda : number = 0;  //.Variable que cargará el numero de la ronda de una OT.
   registrosClonados = {};
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -68,7 +68,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => { this.load = false; }, 800);
+    setTimeout(() => { this.load = false; }, 1000);
   }
 
   //. Función que cargará la tabla con los registros del día actual
