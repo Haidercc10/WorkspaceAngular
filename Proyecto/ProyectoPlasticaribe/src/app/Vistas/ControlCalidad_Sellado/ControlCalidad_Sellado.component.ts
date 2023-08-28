@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { modelControlCalidad_Sellado } from 'src/app/Modelo/modelControlCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_SelladoService } from 'src/app/Servicios/ControlCalidad_Sellado/ControlCalidad_Sellado.service';
@@ -29,7 +30,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-
+  @ViewChild('dtSellado') dtSellado: Table | undefined;
 
   constructor(private srvTurnos : TurnosService,
                 private srvCcSellado : ControlCalidad_SelladoService, 
@@ -53,6 +54,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
+    if(this.registros.length == 0) this.registros.unshift({});
     if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else this.registros.unshift({});
   }
@@ -62,10 +64,10 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //.Función que cargará los registros del día actual
   mostrarRegistrosHoy() {
-    this.load = true;
     this.registros = [];
     this.srvCcSellado.GetControlCalidad_SelladoHoy().subscribe(data => {
       if(data.length > 0) {
+        this.load = true;
         for (let index = 0; index < data.length; index++) {
           this.cargarTabla(data[index]);
         }
@@ -145,6 +147,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Observacion : ``,
             }
             this.registros[index] = info;
+            setTimeout(() => {this.dtSellado.initRowEdit(this.dtSellado.value[0]);}, 500); 
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`)
         });
       }
