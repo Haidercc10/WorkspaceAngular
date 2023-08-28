@@ -220,14 +220,16 @@ export class CertificadoCalidadComponent implements OnInit {
   // Funcion que va a calular el minimo de los parametros cuantitativos
   calcularMinParametrosCuantitativos(data : any){
     let i = this.parametrosCuantitativos.findIndex(item => item.Nombre == data.Nombre);
-    this.parametrosCuantitativos[i].Minimo = this.parametrosCuantitativos[i].Nominal - ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
+    if (data.Nombre == 'Calibre') this.parametrosCuantitativos[i].Minimo = this.parametrosCuantitativos[i].Nominal - ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
+    else this.parametrosCuantitativos[i].Minimo = this.parametrosCuantitativos[i].Nominal - this.parametrosCuantitativos[i].Tolerancia;
     return this.parametrosCuantitativos[i].Minimo;
   }
 
   // Funcion que va a calular el maximo de los parametros cuantitativos
   calcularMaxParametrosCuantitativos(data : any){
     let i = this.parametrosCuantitativos.findIndex(item => item.Nombre == data.Nombre);
-    this.parametrosCuantitativos[i].Maximo = this.parametrosCuantitativos[i].Nominal + ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
+    if (data.Nombre == 'Calibre') this.parametrosCuantitativos[i].Maximo = this.parametrosCuantitativos[i].Nominal + ((this.parametrosCuantitativos[i].Nominal * this.parametrosCuantitativos[i].Tolerancia) / 100);
+    else this.parametrosCuantitativos[i].Maximo = this.parametrosCuantitativos[i].Nominal + this.parametrosCuantitativos[i].Tolerancia;
     return this.parametrosCuantitativos[i].Maximo;
   }
 
