@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelControlCalidad_CorteDoblado, modelControlCalidad_Impresion } from 'src/app/Modelo/modelControlCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_CorteDobladoService } from 'src/app/Servicios/ControlCalidad_CorteDoblado/ControlCalidad_CorteDoblado.service';
@@ -24,10 +25,13 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
+  @ViewChild ('dt_Doblado') dt_Doblado : Table; //Variable que se usará para almacenar la tabla de la vista'
+  @ViewChild ('dt_Impresion') dt_Impresion : Table; //Variable que se usará para almacenar la tabla de la vista)
+
+  rondas : string [] = ['1', '2', '3']; //Variable que se usará para almacenar las rondas
   ubicacionFotoCelda : string [] = ['IZQUIERDA','DERECHA']; //Variable que se usará para almacenar la ubicacion de la fotocelda en el proceso de impresión
   turno : string [] = ['DIA','NOCHE']; //Variable que se usará para almacenar el turno
   datosClonados : any [] = []; //Variable que se usará para almacenar los datos clonados
-  datosControlCal_Extrusion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de extrusion
   datosControlCal_Impresion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de impresion
   datosControlCal_Doblado : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de doblado
 
@@ -64,11 +68,14 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  // Funcion que va a añadir una fila mas a la tabla de impresion, para que pueda ser agregado un dato  
+  //Función que se encarga de filtrar la información de la tabla
+  aplicarfiltro = ($event, campo : any, datos : Table) => datos!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  // Funcion que va a añadir una fila mas a la tabla de impresion, para que pueda ser agregado un dato 
   AgregarFila_Impresion() {
-    if (this.datosControlCal_Impresion[this.datosControlCal_Impresion.length - 1].Id_PkBd != 0) {
-      this.datosControlCal_Impresion.push({ 
-        Id : this.datosControlCal_Impresion.length == 0 ? 1 : this.datosControlCal_Impresion[this.datosControlCal_Impresion.length - 1].Id + 1, 
+    if ((this.datosControlCal_Impresion.length > 0 && Math.min(...this.datosControlCal_Impresion.map(x => x.Id_PkBd)) != 0) || this.datosControlCal_Impresion.length == 0) {
+      this.datosControlCal_Impresion.unshift({ 
+        Id : this.datosControlCal_Impresion.length == 0 ? 1 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 2, 
         Id_PkBd : 0 
       });
     } else this.msj.mensajeAdvertencia(`¡Solo puede agregar un dato a la vez!`);
@@ -76,26 +83,23 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va añadir una fila mas a la tabla, para que pueda ser agregado un dato a doblado
   AgregarFila_Doblado() {
-    if (this.datosControlCal_Doblado[this.datosControlCal_Doblado.length - 1].Id_PkBd != 0) {
-      this.datosControlCal_Doblado.push({ 
-        Id : this.datosControlCal_Doblado.length == 0 ? 1 : this.datosControlCal_Doblado[this.datosControlCal_Doblado.length - 1].Id + 1, 
+    if ((this.datosControlCal_Doblado.length > 0 && Math.min(...this.datosControlCal_Doblado.map(x => x.Id_PkBd)) != 0) || this.datosControlCal_Doblado.length == 0) {
+      this.datosControlCal_Doblado.unshift({ 
+        Id : this.datosControlCal_Doblado.length == 0 ? 1 : Math.max(...this.datosControlCal_Doblado.map(o => o.Id)) + 2, 
         Id_PkBd : 0 
       });
     } else this.msj.mensajeAdvertencia(`¡Solo puede agregar un dato a la vez!`);
   }
 
-  // Fucion que va a consultar los datos de los controles de calidad del area de extrusión
-  ConsultarDatosControlCal_Extrusion() {
-  }
-
   // Fucion que va a consultar los datos de los controles de calidad del area de impresión
   ConsultarDatosControlCal_Impresion() {
     this.datosControlCal_Impresion = [];
+    this.datosClonados = [];
+    this.cargando = true;
     this.controlImp.GetRegistrosHoy().subscribe(data => {
-      this.cargando = true;
       data.forEach(control => {
         this.datosControlCal_Impresion.push({
-          Id : this.datosControlCal_Impresion.length == 0 ? 1 : this.datosControlCal_Impresion[this.datosControlCal_Impresion.length - 1].Id + 1,
+          Id : this.datosControlCal_Impresion.length == 0 ? 1 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 1,
           Id_PkBd : control.id,
           Turno_Id : control.turno_Id,
           Maquina : control.maquina,
@@ -128,19 +132,19 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           PasoGuia_Repetecion : control.pasoGuia_Repetecion,
           Observacion : control.observacion,
         });
-        this.cargando = false;
       });
-    });
+    }, () => this.cargando = false, () => this.cargando = false);
   }
 
   // Fucion que va a consultar los datos de los controles de calidad del area de doblado y corte
   ConsultarDatosControlCal_DobladoCorte() {
     this.datosControlCal_Doblado = [];
+    this.datosClonados = [];
     this.controlDbl.GetRegistrosHoy().subscribe(data => {
       this.cargando = true;
       data.forEach(control => {
         this.datosControlCal_Doblado.push({
-          Id : this.datosControlCal_Doblado.length == 0 ? 1 : this.datosControlCal_Doblado[this.datosControlCal_Doblado.length - 1].Id + 1,
+          Id : this.datosControlCal_Doblado.length == 0 ? 1 : Math.max(...this.datosControlCal_Doblado.map(o => o.Id)) + 1,
           Id_PkBd : control.id,
           orden : control.orden_Trabajo,
           ronda : control.ronda,
@@ -161,10 +165,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
   }
 
-  // Fucion que va a consultar los datos de los controles de calidad del area de sellado
-  ConsultarDatosControlCal_Sellado() {
-  }
-
   // Función que va a crear una copia de la información que se está editando
   editandoFila = (data : any)  => this.datosClonados[data.Id as string] = { ...data };
 
@@ -172,40 +172,39 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   edicionCancelada(data: any, index: number, controlCalidad : string) {
     if (controlCalidad == 'DOBLADO') this.datosControlCal_Doblado[index] = this.datosClonados[data.Id as string];
     else if (controlCalidad == 'IMPRESION') this.datosControlCal_Impresion[index] = this.datosClonados[data.Id as string];
-    delete this.datosClonados[data.Id as string];
+    this.datosClonados = [];
   }
 
   // Funcion que va a consultar los datos de una orden de trabajo en el proceso de doblado y corte
   consultarDatosOrdenTrabajo_ProcExtrusion(orden : string, id : number, procesos : any) {
     this.cargando = true;
     this.bagproService.GetInformacionOrden_ProcesoExt(orden, procesos).subscribe(data => {
-      let turno : string, maquina : string [] = [];
-      const time = moment(moment(), 'hh:mm:ss');
-      const beforeTime = moment('07:00:00', 'hh:mm:ss');
-      const afterTime = moment('17:59:59', 'hh:mm:ss');
-      (time.isBetween(beforeTime, afterTime)) ? turno = 'DIA' : (time.isBetween(afterTime, beforeTime)) ? turno = 'NOCHE' : ``;
+      let turno : string = ``, maquina : string [] = [];
+      const ahora = moment(moment(), 'hh:mm:ss');
+      const dia = moment('07:00:00', 'hh:mm:ss');
+      const noche = moment('17:59:59', 'hh:mm:ss');
+      (ahora.isBetween(dia, noche)) ? turno = 'DIA' : (ahora.isBetween(noche, dia)) ? turno = 'NOCHE' : ``;
+
+      if (procesos == '|DOBLADO|EMPAQUE|CORTE|') this.datosControlCal_Doblado.splice(this.datosControlCal_Doblado.findIndex(item => item.Id == id), 1);
+      else if (procesos == '|ROTOGRABADO|IMPRESION|') this.datosControlCal_Impresion.splice(this.datosControlCal_Impresion.findIndex(item => item.Id == id), 1);
 
       data.forEach(ot => {
         if (!maquina.includes(ot.maquina)) {
           maquina.push(ot.maquina);
-          if (['DOBLADO','CORTE','EMPAQUE'].includes(ot.nomStatus)) this.llenarDatosOrdenTrabajo_DobladoCorte(ot, id, orden, turno);
-          else if (['ROTOGRABADO', 'IMPRESION'].includes(ot.nomStatus)) this.llenarDatosOrdenTrabajo_Impresion(ot, id, orden, turno);
+          if (['DOBLADO','CORTE','EMPAQUE'].includes(ot.nomStatus)) this.llenarDatosOrdenTrabajo_DobladoCorte(ot, orden, turno);
+          else if (['ROTOGRABADO', 'IMPRESION'].includes(ot.nomStatus)) this.llenarDatosOrdenTrabajo_Impresion(ot, orden, turno);
         }
       });
-
-      if (procesos == '|DOBLADO|EMPAQUE|CORTE|') this.datosControlCal_Doblado.splice(this.datosControlCal_Doblado.findIndex(item => item.Id == id), 1);
-      else if (procesos == '|ROTOGRABADO|IMPRESION|') this.datosControlCal_Impresion.splice(this.datosControlCal_Impresion.findIndex(item => item.Id == id), 1);
-      
     }, () => {
-      this.msj.mensajeError(`¡No se encontró información de la OT '${orden}' en el proceso ${procesos.replaceAll('|', ', ')}!`);
+      this.msj.mensajeError(`¡No se encontró información de la OT '${orden}' en el proceso ${procesos.replaceAll('|', ', ').substring(1, procesos.replaceAll('|', ', ').length - 2)}!`);
       this.cargando = false;
     }, () => this.cargando = false);
   }
 
   // Funcion que va a llenar datos de la orden de trabajo en el proceso de doblado y corte
-  llenarDatosOrdenTrabajo_DobladoCorte(ot : any, id : number, orden : string, turno : string) {    
+  llenarDatosOrdenTrabajo_DobladoCorte(ot : any, orden : string, turno : string) {    
     const info : any = {
-      Id : id,
+      Id : this.datosControlCal_Doblado.length == 0 ? 1 : Math.max(...this.datosControlCal_Doblado.map(o => o.Id)) + 2,
       Id_PkBd : 0,
       orden : orden,
       ronda : ``,
@@ -221,11 +220,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       pasoGuia : ``,
       observacion : ``,
     };
-    info.id = this.datosControlCal_Doblado.length == 0 ? 1 : this.datosControlCal_Doblado[this.datosControlCal_Doblado.length - 1].Id + 1;
-    id = info.Id;
-    this.datosControlCal_Doblado.push(info);
+    this.datosControlCal_Doblado.unshift(info);
     this.controlDbl.GetUltRegistroItem(parseInt(ot.clienteItem)).subscribe(res => {
-      let i : number = this.datosControlCal_Doblado.findIndex(item => item.Id == id);
+      let i : number = this.datosControlCal_Doblado.findIndex(item => item.Id == info.Id);
       this.datosControlCal_Doblado[i].ancho = res.ancho;
       this.datosControlCal_Doblado[i].calibre = res.calibre;
       this.datosControlCal_Doblado[i].codBarras = res.codigo_Barras;
@@ -236,9 +233,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   // Funcion que va a llenar datos de la orden de trabajo en el proceso de impresion
-  llenarDatosOrdenTrabajo_Impresion(ot : any, id : number, orden : string, turno : string) {
+  llenarDatosOrdenTrabajo_Impresion(ot : any, orden : string, turno : string) {
     const info : any = {
-      Id : id,
+      Id : this.datosControlCal_Impresion.length == 0 ? 2 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 2,
       Id_PkBd : 0,
       Turno_Id : turno,
       Maquina : ot.maquina.toString(),
@@ -270,12 +267,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       Conformidad_Laminado : ``,
       PasoGuia_Repetecion : ``,
       Observacion : ``,
-    }    
-    info.Id = this.datosControlCal_Impresion.length == 0 ? 1 : this.datosControlCal_Impresion[this.datosControlCal_Impresion.length - 1].Id + 1;
-    id = info.Id;
-    this.datosControlCal_Impresion.push(info);    
+    }
+    this.datosControlCal_Impresion.unshift(info);    
     this.controlImp.GetUltRegistroItem(parseInt(ot.clienteItem)).subscribe(res => {
-      let i : number = this.datosControlCal_Impresion.findIndex(item => item.Id == id);
+      let i : number = this.datosControlCal_Impresion.findIndex(item => item.Id == info.Id);
       this.datosControlCal_Impresion[i].LoteRollo_SinImpresion = res.loteRollo_SinImpresion;
       this.datosControlCal_Impresion[i].Prueba_Tratado = res.prueba_Tratado;
       this.datosControlCal_Impresion[i].Ancho_Rollo = res.ancho_Rollo;
@@ -359,7 +354,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   // Funcion que va a enviar al api los datos del control de calidad de impresion que se desea actualizar
   actualizarControlCalidad_Imp(id : number) {
     this.cargando = true;
-    let i : number = this.datosControlCal_Impresion.findIndex(item => item.Id == id);
+    let i : number = this.datosControlCal_Impresion.findIndex(item => item.Id_PkBd == id);
     const control : modelControlCalidad_Impresion = {
       Id : id,
       Usua_Id: this.storage_Id,
@@ -407,7 +402,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   // Funcion que va a validar que los datos del control de calidad de doblado estén completos y ver si el control de calidad de doblado ya existe
   validarDatosControlCal_Doblado(datos : any) {
     if (datos.Id_PkBd == 0) this.guardarControlCalidad_Dbl(datos.Id);
-    else this.controlDbl.Get_Id(datos.Id_PkBd).subscribe(data => this.actualizarControlCalidad_Dbl(data.id));
+    else if (datos.Id_PkBd > 0) this.controlDbl.Get_Id(datos.Id_PkBd).subscribe(data => this.actualizarControlCalidad_Dbl(data.id));
+    else this.msj.mensajeAdvertencia(`¡Debe llenar los campos buscando una orden de trabajo!`);
   }
 
   // Funcion que va a enviar al api los datos del control de calidad de doblado que se desea almacenar

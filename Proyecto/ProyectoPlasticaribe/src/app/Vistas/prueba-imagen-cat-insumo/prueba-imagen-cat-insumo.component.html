@@ -22,13 +22,9 @@
   </div>
 </div>
 
-<p-card class="mb-5">
+<p-card>
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
-  <div class="mb-4">
-    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
   </div>
 
   <p-tabView [scrollable]="true">
@@ -37,7 +33,7 @@
       header="Extrusión"
       leftIcon="pi pi-bolt"
       tooltip="Control de Extrusión">
-      <app-ControlCalidad_Extrusion></app-ControlCalidad_Extrusion>        
+      <app-ControlCalidad_Extrusion></app-ControlCalidad_Extrusion>
     </p-tabPanel>
     
     <!-- Impresion -->
@@ -45,14 +41,10 @@
       header="Impresión"
       leftIcon="pi pi-print"
       tooltip="Control de Impresión">
-      <div class="mb-4">
-        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-      </div>
-
       <p-table
-        #dt_Doblado
-        dataKey="Id"
+        #dt_Impresion
         [value]="datosControlCal_Impresion"
+        dataKey="Id"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
@@ -63,12 +55,48 @@
         editMode="row">
         <ng-template pTemplate="caption">
           <div class="row g-4 p-3">
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-              <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Impresion()"></button>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+              <div class="d-inline-flex p-2">
+                <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Impresion()"></button>
+              </div>
+              <div class="d-inline-flex p-2">
+                <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-th-large text-center"></i> Control de Calidad de Impresión</h3>
+              </div>
             </div>
           </div>
         </ng-template>
         <ng-template pTemplate="header">
+          <tr>
+            <th style="min-width:100px; z-index: 51;" pFrozenColumn><input pInputText (input)="aplicarfiltro($event, 'Orden_Trabajo', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Ronda', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Maquina', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Turno_Id', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Cliente', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Prod_Id', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Nombre_Producto', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'LoteRollo_SinImpresion', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Prueba_Tratado', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Ancho_Rollo', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Cian', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Magenta', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Amarillo', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Negro', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Base', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Pantone1', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Pantone2', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Pantone3', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Secuencia_Pantone4', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Tipo_Embobinado', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Codigo_Barras', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Texto', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Fotocelda', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Registro_Colores', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Adherencia_Tinta', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Conformidad_Laminado', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'PasoGuia_Repetecion', dt_Impresion)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', dt_Impresion)"></th>
+            <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
+          </tr>
           <tr>
             <th colspan="10"></th>
             <th colspan="9" class="text-center">Secuencia de Colores</th>
@@ -108,21 +136,21 @@
         </ng-template>
         <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
           <tr [pEditableRow]="datos" [ngClass]="{'noEnviados' : datos.Id_PkBd == 0}">
-            <td pFrozenColumn>
+            <td pFrozenColumn style="z-index: 50;">
               <p-cellEditor>
                 <ng-template pTemplate="input">
                   <input pInputText type="text" [(ngModel)]="datos.Orden_Trabajo" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.Orden_Trabajo, datos.Id, '|ROTOGRABADO|IMPRESION|')">
                 </ng-template>
                 <ng-template pTemplate="output">
-                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor" pTooltip="No se ha guardado esta información" pBadge style="font-size: 16px" severity="danger"></i>
-                  {{datos.Orden_Trabajo}}
+                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor font-size-16" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>
+                  <b class="px-3">{{datos.Orden_Trabajo}}</b>
                 </ng-template>
               </p-cellEditor>
             </td>
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Ronda">
+                  <p-dropdown [autoDisplayFirst]="false" [options]="rondas" appendTo="body" [(ngModel)]="datos.Ronda"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Ronda}}
@@ -406,14 +434,10 @@
       header="Corte y Doblado"
       leftIcon="pi pi-database"
       tooltip="Control de Corte y Doblado">
-      <div class="mb-4">
-        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Orden de Trabajo</h3>
-      </div>
-
       <p-table
         #dt_Doblado
-        dataKey="Id"
         [value]="datosControlCal_Doblado"
+        dataKey="Id"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
@@ -424,12 +448,33 @@
         editMode="row">
         <ng-template pTemplate="caption">
           <div class="row g-4 p-3">
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-              <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Doblado()"></button>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+              <div class="d-inline-flex p-2">
+                <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="AgregarFila_Doblado()"></button>
+              </div>
+              <div class="d-inline-flex p-2">
+                <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-th-large"></i> Control de Calidad de Doblado y Corte</h3>
+              </div>
             </div>
           </div>
         </ng-template>
         <ng-template pTemplate="header">
+          <tr>
+            <th style="min-width:100px; z-index: 51;" pFrozenColumn><input pInputText (input)="aplicarfiltro($event, 'Orden_Trabajo', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'ronda', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'maquina', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'turno', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'cliente', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'item', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'referencia', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'ancho', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'calibre', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'codBarras', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'tpEmbobinado', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'pasoGuia', dt_Doblado)"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'observacion', dt_Doblado)"></th>
+            <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2"></th>
+          </tr>
           <tr>
             <th style="min-width:100px" pFrozenColumn>OT</th>
             <th style="min-width:100px">Ronda</th>
@@ -449,21 +494,21 @@
         </ng-template>
         <ng-template pTemplate="body" let-datos let-editing="editing" let-rowIndex="rowIndex">
           <tr [pEditableRow]="datos" [ngClass]="{'noEnviados' : datos.Id_PkBd == 0}">
-            <td pFrozenColumn>
+            <td pFrozenColumn style="z-index: 50;">
               <p-cellEditor>
                 <ng-template pTemplate="input">
                   <input pInputText type="text" [(ngModel)]="datos.orden" pAutoFocus [autofocus]="true" (keyup.enter)="consultarDatosOrdenTrabajo_ProcExtrusion(datos.orden, datos.Id, '|DOBLADO|EMPAQUE|CORTE|')">
                 </ng-template>
                 <ng-template pTemplate="output">
-                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor" pTooltip="No se ha guardado esta información" pBadge style="font-size: 16px" severity="danger"></i>
-                  {{datos.orden}}
+                  <i *ngIf="datos.Id_PkBd == 0" class="pi pi-exclamation-circle cursor font-size-14" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>
+                  <b>{{datos.orden}}</b>
                 </ng-template>
               </p-cellEditor>
             </td>
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.ronda">
+                  <p-dropdown [autoDisplayFirst]="false" [options]="rondas" appendTo="body" [(ngModel)]="datos.ronda"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.ronda}}
