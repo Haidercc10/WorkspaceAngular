@@ -223,16 +223,6 @@ p-dropdown .p-dropdown, p-inputnumber, p-inputnumber span, p-inputnumber input, 
   width: 100%;
 }
 
-p-calendar span button {
-  background-color: var(--rojo);
-  border: 0;
-  transition: all 1s;
-}
-
-p-calendar span .p-datepicker-trigger:hover {
-  background: var(--rojoHover);
-}
-
 p-calendar .p-datepicker-header button {
   background: #fff0;
 }
@@ -245,9 +235,18 @@ p-calendar span button span {
   display: block;
 }
 
+p-dialog .p-dialog-header span {
+  color: var(--rojo);
+  align-items: center;
+}
+
 .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
   display: flex;
   width: 100%;
+}
+
+p-toolbar .p-toolbar {
+  justify-content: space-around !important;
 }
 
 .p-card .p-card-content {

@@ -27,6 +27,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   @ViewChild ('dt_Doblado') dt_Doblado : Table; //Variable que se usará para almacenar la tabla de la vista'
   @ViewChild ('dt_Impresion') dt_Impresion : Table; //Variable que se usará para almacenar la tabla de la vista)
+  rangoFechas : any [] = []; //Variable que se usará para almacenar el rango de fechas
 
   rondas : string [] = ['1', '2', '3']; //Variable que se usará para almacenar las rondas
   ubicacionFotoCelda : string [] = ['IZQUIERDA','DERECHA']; //Variable que se usará para almacenar la ubicacion de la fotocelda en el proceso de impresión
@@ -46,8 +47,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.ConsultarDatosControlCal_Impresion();
-    this.ConsultarDatosControlCal_DobladoCorte();
+    this.consultarDatos()
   }
 
   tutorial() {
@@ -91,12 +91,20 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Solo puede agregar un dato a la vez!`);
   }
 
+  // Funcion que va a consultar los registros de controles de calidad 
+  consultarDatos(){
+    this.ConsultarDatosControlCal_Impresion();
+    this.ConsultarDatosControlCal_DobladoCorte();
+  }
+
   // Fucion que va a consultar los datos de los controles de calidad del area de impresión
   ConsultarDatosControlCal_Impresion() {
+    let inicio = this.rangoFechas[0] == null || this.rangoFechas.length == 0 ? moment().format('YYYY-MM-DD') : moment(this.rangoFechas[0]).format('YYYY-MM-DD');
+    let fin = this.rangoFechas[1] == null || this.rangoFechas.length == 0 ? moment().format('YYYY-MM-DD') : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
     this.datosControlCal_Impresion = [];
     this.datosClonados = [];
     this.cargando = true;
-    this.controlImp.GetRegistrosHoy().subscribe(data => {
+    this.controlImp.GetRegistros(inicio, fin).subscribe(data => {
       data.forEach(control => {
         this.datosControlCal_Impresion.push({
           Id : this.datosControlCal_Impresion.length == 0 ? 1 : Math.max(...this.datosControlCal_Impresion.map(o => o.Id)) + 1,
@@ -138,9 +146,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Fucion que va a consultar los datos de los controles de calidad del area de doblado y corte
   ConsultarDatosControlCal_DobladoCorte() {
+    let inicio = this.rangoFechas[0] == null || this.rangoFechas.length == 0 ? moment().format('YYYY-MM-DD') : moment(this.rangoFechas[0]).format('YYYY-MM-DD');
+    let fin = this.rangoFechas[1] == null || this.rangoFechas.length == 0 ? moment().format('YYYY-MM-DD') : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
     this.datosControlCal_Doblado = [];
     this.datosClonados = [];
-    this.controlDbl.GetRegistrosHoy().subscribe(data => {
+    this.controlDbl.GetRegistros(inicio, fin).subscribe(data => {
       this.cargando = true;
       data.forEach(control => {
         this.datosControlCal_Doblado.push({
