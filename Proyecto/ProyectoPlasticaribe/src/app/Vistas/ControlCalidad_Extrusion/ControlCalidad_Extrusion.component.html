@@ -1,8 +1,8 @@
 <div class="d-flex justify-content-center overlay" *ngIf="load">
     <div style="margin: auto;">
-      <p-progressSpinner></p-progressSpinner>
+        <p-progressSpinner></p-progressSpinner>
     </div>
-  </div>
+</div>
 
 <p-table 
 #dtExtrusion
@@ -70,7 +70,7 @@ editMode="row">
                 {{registro.Ronda}}
             </td>
              <!--Turno-->
-             <td>
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
@@ -259,7 +259,7 @@ editMode="row">
             <!--Botones-->
             <td pFrozenColumn [frozen]="true" alignFrozen="right">
                 <div class="flex align-items-center justify-content-center gap-2">
-                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="!editing" id="edit_{{ri}}" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>

@@ -136,7 +136,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
             let indice = Math.floor(Math.random() * cantRegistros);
             this.cargarRegistro(data[indice], indexTabla, editando);
             this.load = false;
-            //this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]);
+            setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
@@ -154,7 +154,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
   cargarRegistro(data : any, indexTabla : number, editando){
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
-    console.log(pigmento);
     let info : any = {
       Id : 0,
       Ronda : this.ronda, 
