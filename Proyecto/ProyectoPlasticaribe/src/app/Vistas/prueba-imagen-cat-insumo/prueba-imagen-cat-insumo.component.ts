@@ -172,7 +172,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         });
         this.cargando = false;
       });
-    });
+    }, () => this.cargando = false, () => this.cargando = false);
   }
 
   // Función que va a crear una copia de la información que se está editando
