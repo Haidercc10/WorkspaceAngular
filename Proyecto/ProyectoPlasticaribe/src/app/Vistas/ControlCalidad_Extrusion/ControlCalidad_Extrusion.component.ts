@@ -40,7 +40,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   turnos : any = []; //Array que va a contener los registros de los turnos
   registroClonado : any = {}; //Variable que clonará un objeto cuando se desee editar y lo quitará si se cancela la edición 
   habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
-  @ViewChild('dtExtrusion') dtExtrusion: Table;
+  @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -137,6 +137,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
             this.cargarRegistro(data[indice], indexTabla, editando);
             this.load = false;
             setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
+            //setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 500); 
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
@@ -146,7 +147,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros.length == 0) this.registros.unshift({})
+    if(this.registros.length == 0) this.registros.unshift({});
     else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else this.registros.unshift({});
   }
