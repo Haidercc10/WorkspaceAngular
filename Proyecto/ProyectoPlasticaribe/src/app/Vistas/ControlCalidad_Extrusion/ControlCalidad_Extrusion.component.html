@@ -50,6 +50,7 @@ editMode="row">
           <th style="min-width : 100px">Tipo Bobina</th>
           <th style="min-width : 200px">Observacion</th>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
+          <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Eliminar</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
@@ -264,6 +265,11 @@ editMode="row">
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>
             </td>
+            <td pFrozenColumn [frozen]="true" alignFrozen="right">
+                <div class="flex align-items-center justify-content-center gap-2">
+                    <button pButton pRipple type="button" pInitEditableRow icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
+                </div>
+            </td>        
         </tr>
     </ng-template>
 </p-table>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -9,6 +9,8 @@ import { ControlCalidad_ImpresionService } from 'src/app/Servicios/ControlCalida
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
+import { ControlCalidad_ExtrusionComponent } from '../ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { ControlCalidad_SelladoComponent } from '../ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -41,7 +43,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private controlDbl : ControlCalidad_CorteDobladoService,
                       private controlImp : ControlCalidad_ImpresionService,
-                        private bagproService : BagproService,) {
+                        private bagproService : BagproService,
+                          private controlExt : ControlCalidad_ExtrusionComponent,
+                            private controlSella : ControlCalidad_SelladoComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -95,6 +99,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   consultarDatos(){
     this.ConsultarDatosControlCal_Impresion();
     this.ConsultarDatosControlCal_DobladoCorte();
+    this.controlExt.mostrarRegistrosHoy(this.rangoFechas[0], this.rangoFechas[1]);  
+    this.controlSella.mostrarRegistrosHoy(this.rangoFechas[0], this.rangoFechas[1]);
   }
 
   // Fucion que va a consultar los datos de los controles de calidad del area de impresión
@@ -141,7 +147,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           Observacion : control.observacion,
         });
       });
-    }, () => this.cargando = false, () => this.cargando = false);
+    }, () => this.cargando = false);
   }
 
   // Fucion que va a consultar los datos de los controles de calidad del area de doblado y corte

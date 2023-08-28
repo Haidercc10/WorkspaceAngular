@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
@@ -10,6 +10,10 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({ 
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-ControlCalidad_Extrusion',
@@ -48,7 +52,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
                     private srvPigmentos : PigmentoProductoService, 
                       private srvCcExtrusion : ControlCalidad_ExtrusionService, 
                         private msg : MessageService, 
-                          private srvTurnos : TurnosService) { 
+                          private srvTurnos : TurnosService, ) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -56,7 +60,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.cargarTurnos();
-    this.mostrarRegistrosHoy();
+    //this.mostrarRegistrosHoy(null, null);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -73,17 +77,25 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
   //Función que consultará las OT con rondas el día de hoy
-  mostrarRegistrosHoy() {
-    this.load = true;
+  mostrarRegistrosHoy(fechaInicio : any, fechaFin : any) {
     this.registros = [];
-    this.srvCcExtrusion.Get_TodoHoy().subscribe(data => {
+    this.load = true;
+    if(fechaInicio == `Fecha inválida`) fechaInicio = null
+    if(fechaFin == `Fecha inválida`) fechaFin = null
+
+    fechaInicio == null || fechaInicio.length == 0 ? fechaInicio = this.today : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
+    fechaFin == null ? fechaFin = fechaInicio : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
+    
+    this.srvCcExtrusion.Get_TodoHoy(fechaInicio, fechaFin).subscribe(data => {
       if(data.length > 0) {
+        console.log(100)
         for (let index = 0; index < data.length; index++) {
           this.cargarRegistrosCCExtrusion(data[index]);
         }
       }
+      this.load = false;
+      console.log(200)
     });
-    this.load = false;
   }
 
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
@@ -100,7 +112,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Item : datos.prod_Id,
       Referencia : datos.referencia,
       Rollo : datos.ccExt_Rollo,
-      Pigmento : pigmento[0].pigmt_Nombre,
+      Pigmento : `NO APLICA`,
       AnchoTubular : datos.ccExt_AnchoTubular,
       PesoMetro : datos.ccExt_PesoMetro,
       Ancho : datos.ccExt_Ancho,
@@ -217,7 +229,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
      else {
-      this.mostrarRegistrosHoy();
+      this.mostrarRegistrosHoy(null, null);
       setTimeout(() => { 
         this.load = false;
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
@@ -273,7 +285,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
     else {
-      this.mostrarRegistrosHoy();
+      this.mostrarRegistrosHoy(null, null);
       this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
       setTimeout(() => { this.load = false; }, 2500);
     } 
@@ -294,4 +306,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   /** Cerrar Dialogo de eliminación*/
   onReject = (dato : any) => this.msg.clear(dato);
+
+  quitarRegistro(index : number){
+    this.registros.splice(index, 1);
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -8,6 +8,10 @@ import { ControlCalidad_SelladoService } from 'src/app/Servicios/ControlCalidad_
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-ControlCalidad_Sellado',
@@ -42,7 +46,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cargarTurnos();
-    this.mostrarRegistrosHoy();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -55,7 +58,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
     if(this.registros.length == 0) this.registros.unshift({});
-    if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else this.registros.unshift({});
   }
 
@@ -63,16 +66,22 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
   //.Función que cargará los registros del día actual
-  mostrarRegistrosHoy() {
+  mostrarRegistrosHoy(fechaInicio : any, fechaFin : any) {
     this.registros = [];
-    this.srvCcSellado.GetControlCalidad_SelladoHoy().subscribe(data => {
+    this.load = true;
+    if(fechaInicio == `Fecha inválida`) fechaInicio = null
+    if(fechaFin == `Fecha inválida`) fechaFin = null
+
+    fechaInicio == null ? fechaInicio = this.today : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
+    fechaFin == null ? fechaFin = fechaInicio : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
+
+    this.srvCcSellado.GetControlCalidad_SelladoHoy(fechaInicio, fechaFin).subscribe(data => {
       if(data.length > 0) {
-        this.load = true;
         for (let index = 0; index < data.length; index++) {
           this.cargarTabla(data[index]);
         }
-        this.load = false;
       }
+      this.load = false;
     });
     
   }
@@ -201,7 +210,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
-        this.mostrarRegistrosHoy();
+        this.mostrarRegistrosHoy(null, null);
         setTimeout(() => { this.load = false; }, 2500);
       }
     } else {
@@ -209,7 +218,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-        this.mostrarRegistrosHoy();
+        this.mostrarRegistrosHoy(null, null);
         setTimeout(() => { this.load = false; }, 2500);
       }
     }

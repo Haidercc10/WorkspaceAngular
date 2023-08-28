@@ -16,7 +16,7 @@ export class ControlCalidad_SelladoService {
 
     Get_Id = (Id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Sellado/${Id}`);
 
-    GetControlCalidad_SelladoHoy = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Sellado/getControlCalidad_SelladoHoy`);
+    GetControlCalidad_SelladoHoy = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Sellado/getControlCalidad_SelladoHoy/${fecha1}/${fecha2}`);
 
     GetRonda = (ot : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Sellado/getRonda/${ot}`);
 
