@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 import { modelControlCalidad_Sellado } from 'src/app/Modelo/modelControlCalidad';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
-@Injectable()
+@Injectable({
+    providedIn : 'root'
+})
+
 export class ControlCalidad_SelladoService {
 
     constructor(private http: HttpClient) { }
