@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Console } from 'console';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
-import { InitEditableRow } from 'primeng/table';
+import { InitEditableRow, Table } from 'primeng/table';
 import { modelControlCalidad_Extrusion } from 'src/app/Modelo/modelControlCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_ExtrusionService } from 'src/app/Servicios/ControlCalidad_Extrusion/ControlCalidad_Extrusion.service';
@@ -40,6 +39,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   ronda : number = 0; //Variable que se usará para almacenar la ronda del controles de sellado
   turnos : any = []; //Array que va a contener los registros de los turnos
   registroClonado : any = {}; //Variable que clonará un objeto cuando se desee editar y lo quitará si se cancela la edición 
+  habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
+  @ViewChild('dtExtrusion') dtExtrusion: Table;
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -130,10 +131,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
           if(data.length > 0){
+            editando = true;
             let cantRegistros : number = data.length;
             let indice = Math.floor(Math.random() * cantRegistros);
             this.cargarRegistro(data[indice], indexTabla, editando);
             this.load = false;
+            //this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]);
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
         });
       }
@@ -143,7 +146,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    if(this.registros.length == 0) this.registros.unshift({})
+    else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else this.registros.unshift({});
   }
 
