@@ -35,17 +35,22 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   @ViewChild('dtSellado') dtSellado: Table | undefined;
+  rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de sellado
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private srvTurnos : TurnosService,
                 private srvCcSellado : ControlCalidad_SelladoService, 
                   private srvBagpro : BagproService, 
                     private msjs : MensajesAplicacionService, 
                       private msg : MessageService, 
-                        private AppComponent : AppComponent) { }
+                        private AppComponent : AppComponent) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;                       
+                         }
 
   ngOnInit() {
     this.lecturaStorage();
     this.cargarTurnos();
+    this.mostrarRegistrosHoy();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -66,15 +71,12 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
   //.Función que cargará los registros del día actual
-  mostrarRegistrosHoy(fechaInicio : any, fechaFin : any) {
+  mostrarRegistrosHoy() {
     this.registros = [];
     this.load = true;
-    if(fechaInicio == `Fecha inválida`) fechaInicio = null
-    if(fechaFin == `Fecha inválida`) fechaFin = null
-
-    fechaInicio == null ? fechaInicio = this.today : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
-    fechaFin == null ? fechaFin = fechaInicio : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
-
+    let fechaInicio : any = this.rangoFechas[0] == null || this.rangoFechas[0].length == 0 ? this.today : moment(this.rangoFechas[0]).format('YYYY-MM-DD');
+    let fechaFin : any = this.rangoFechas[1] == null || this.rangoFechas[1].length == 0 ? fechaInicio : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
+    
     this.srvCcSellado.GetControlCalidad_SelladoHoy(fechaInicio, fechaFin).subscribe(data => {
       if(data.length > 0) {
         for (let index = 0; index < data.length; index++) {
@@ -156,7 +158,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Observacion : ``,
             }
             this.registros[index] = info;
-            setTimeout(() => {this.dtSellado.initRowEdit(this.dtSellado.value[0]);}, 500); 
+            setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 500); 
           } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`)
         });
       }
@@ -210,7 +212,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
-        this.mostrarRegistrosHoy(null, null);
+        this.mostrarRegistrosHoy();
         setTimeout(() => { this.load = false; }, 2500);
       }
     } else {
@@ -218,7 +220,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-        this.mostrarRegistrosHoy(null, null);
+        this.mostrarRegistrosHoy();
         setTimeout(() => { this.load = false; }, 2500);
       }
     }
@@ -234,12 +236,17 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   //. Función para cerrar el dialogo de elección
   onReject = (dato : any) => this.msg.clear(dato);
 
+  //. Función que clona la fila seleccionada para poder editarla.
   filaEditar = (fila : any, index : number) => this.registroClonado[index] = {...fila};
-    
+  
+  // Función que cancela la edición de la fila.
   filaCancelar(fila : any, index : number) {
     this.registros[index] = this.registroClonado[index];
     delete this.registroClonado[index];
   }
+
+  //Función que se encarga de filtrar la información de la tabla
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtSellado!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
 }
 

@@ -34,7 +34,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
-  registros : any = []; //Array que va a contener los registros de los controles de sellado
+  public registros : any = []; //Array que va a contener los registros de los controles de sellado
   eleccion : any = ["Si", "No"]; //Array que va a contener los registros de los controles de sellado
   tiposBobinas : any = ["TUBULAR", "LÁMINA"]; //Array que va a contener los registros de los controles de sellado
   apariencias : any = ["NORMAL", "RASGADO"]; //Array que va a contener las apariencias de el/los rollos verificados
@@ -45,6 +45,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   registroClonado : any = {}; //Variable que clonará un objeto cuando se desee editar y lo quitará si se cancela la edición 
   habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
+  rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
+  
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -52,7 +54,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
                     private srvPigmentos : PigmentoProductoService, 
                       private srvCcExtrusion : ControlCalidad_ExtrusionService, 
                         private msg : MessageService, 
-                          private srvTurnos : TurnosService, ) { 
+                          private srvTurnos : TurnosService,) { 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -60,7 +62,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.cargarTurnos();
-    //this.mostrarRegistrosHoy(null, null);
+    this.mostrarRegistrosHoy();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -77,24 +79,19 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
 
   //Función que consultará las OT con rondas el día de hoy
-  mostrarRegistrosHoy(fechaInicio : any, fechaFin : any) {
+  mostrarRegistrosHoy() {
     this.registros = [];
     this.load = true;
-    if(fechaInicio == `Fecha inválida`) fechaInicio = null
-    if(fechaFin == `Fecha inválida`) fechaFin = null
-
-    fechaInicio == null || fechaInicio.length == 0 ? fechaInicio = this.today : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
-    fechaFin == null ? fechaFin = fechaInicio : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
+    let fechaInicio : any = this.rangoFechas[0] == null || this.rangoFechas[0].length == 0 ? this.today : moment(this.rangoFechas[0]).format('YYYY-MM-DD');
+    let fechaFin : any = this.rangoFechas[1] == null || this.rangoFechas[1].length == 0 ? fechaInicio : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
     
     this.srvCcExtrusion.Get_TodoHoy(fechaInicio, fechaFin).subscribe(data => {
       if(data.length > 0) {
-        console.log(100)
         for (let index = 0; index < data.length; index++) {
           this.cargarRegistrosCCExtrusion(data[index]);
         }
       }
       this.load = false;
-      console.log(200)
     });
   }
 
@@ -112,7 +109,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Item : datos.prod_Id,
       Referencia : datos.referencia,
       Rollo : datos.ccExt_Rollo,
-      Pigmento : `NO APLICA`,
+      Pigmento : pigmento[0].pigmt_Nombre,
       AnchoTubular : datos.ccExt_AnchoTubular,
       PesoMetro : datos.ccExt_PesoMetro,
       Ancho : datos.ccExt_Ancho,
@@ -229,7 +226,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
      else {
-      this.mostrarRegistrosHoy(null, null);
+      this.mostrarRegistrosHoy();
       setTimeout(() => { 
         this.load = false;
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
@@ -285,7 +282,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
     else {
-      this.mostrarRegistrosHoy(null, null);
+      this.mostrarRegistrosHoy();
       this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
       setTimeout(() => { this.load = false; }, 2500);
     } 
@@ -310,4 +307,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   quitarRegistro(index : number){
     this.registros.splice(index, 1);
   }
+
+  //Función que se encarga de filtrar la información de la tabla
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 }

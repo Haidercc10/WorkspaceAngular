@@ -12,6 +12,7 @@ import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/
 import { ControlCalidad_ExtrusionComponent } from '../ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
 import { ControlCalidad_SelladoComponent } from '../ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
+
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
   templateUrl: './prueba-imagen-cat-insumo.component.html',
@@ -37,6 +38,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   datosClonados : any [] = []; //Variable que se usará para almacenar los datos clonados
   datosControlCal_Impresion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de impresion
   datosControlCal_Doblado : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de doblado
+  esExtrusionSellado : boolean = true; //Variable que se usará para saber si se esta trabajando con el area de sellado
 
   constructor(private AppComponent : AppComponent,
                 private msj : MensajesAplicacionService,
@@ -99,8 +101,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   consultarDatos(){
     this.ConsultarDatosControlCal_Impresion();
     this.ConsultarDatosControlCal_DobladoCorte();
-    this.controlExt.mostrarRegistrosHoy(this.rangoFechas[0], this.rangoFechas[1]);  
-    this.controlSella.mostrarRegistrosHoy(this.rangoFechas[0], this.rangoFechas[1]);
   }
 
   // Fucion que va a consultar los datos de los controles de calidad del area de impresión
@@ -178,7 +178,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         });
         this.cargando = false;
       });
-    }, () => this.cargando = false, () => this.cargando = false);
+    });
   }
 
   // Función que va a crear una copia de la información que se está editando
@@ -486,4 +486,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       this.cargando = false;
     }, () => this.cargando = false);
   }
+
+  cambioTab = (index : any)  => index == 0 || index == 3 ? this.esExtrusionSellado = true : this.esExtrusionSellado = false;
 }

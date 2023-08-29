@@ -4,6 +4,23 @@
     </div>
 </div>
 
+<div class="row m-3 g-2">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 mt-3">
+      <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Buscar Controles de Calidad</h3>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 mr-2">
+      <span class="p-float-label" id="rango-fechas">
+        <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+        <label for="FechaInicial">Rango de Fechas</label>
+      </span>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3">
+      <div class="d-grid gap-2 d-md-flex">
+        <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="mostrarRegistrosHoy()"></button>
+      </div>
+    </div>
+</div>
+
 <p-table 
 #dtExtrusion
 *ngIf="!load"
@@ -25,9 +42,31 @@ editMode="row">
     </ng-template>
     <ng-template pTemplate="header">
         <tr>
+            <th><input pInputText (input)="aplicarfiltro($event, 'OT', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Ronda', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Turno', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Maquina', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Rollo', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Pigmento', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'AnchoTubular', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'PesoMetro', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Ancho', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'CalMin', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'CalMax', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'CalProm', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Apariencia', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Tratado', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Rasgado', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'TipoBobina', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
+            <th></th>
+        </tr>
+        <tr>
             <th colspan="11"></th>
             <th colspan="3" class="text-center">Calibre (3 Mediciones)</th>
-            <th colspan="6"></th>
+            <th colspan="7"></th>
         </tr>
         <tr>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
@@ -50,7 +89,6 @@ editMode="row">
           <th style="min-width : 100px">Tipo Bobina</th>
           <th style="min-width : 200px">Observacion</th>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
-          <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Eliminar</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
@@ -264,12 +302,7 @@ editMode="row">
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                 </div>
-            </td>
-            <td pFrozenColumn [frozen]="true" alignFrozen="right">
-                <div class="flex align-items-center justify-content-center gap-2">
-                    <button pButton pRipple type="button" pInitEditableRow icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
-                </div>
-            </td>        
+            </td>      
         </tr>
     </ng-template>
 </p-table>
