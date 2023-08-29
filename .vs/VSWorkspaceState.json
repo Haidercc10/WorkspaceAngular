@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Proyecto",
+    "\\Proyecto\\ProyectoPlasticaribe",
+    "\\Proyecto\\ProyectoPlasticaribe\\src",
+    "\\Proyecto\\ProyectoPlasticaribe\\src\\app",
+    "\\Proyecto\\ProyectoPlasticaribe\\src\\app\\Vistas"
   ],
-  "SelectedNode": "\\C:\\Users\\Sistemas\\Documents\\GitHub\\Angular",
   "PreviewInSolutionExplorer": false
 }

@@ -176,6 +176,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
 import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
+import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 
 @NgModule({
   declarations: [
@@ -276,6 +277,7 @@ import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado
     CertificadoCalidadComponent,
     ControlCalidad_ExtrusionComponent, 
     ControlCalidad_SelladoComponent,
+    ControlCalidadComponent,
   ],
 
   imports: [
