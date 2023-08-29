@@ -37,6 +37,8 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   @ViewChild('dtSellado') dtSellado: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de sellado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  esRegistro : boolean = false; //Variable que se usará para saber si se está editando un registro nuevo
+
 
   constructor(private srvTurnos : TurnosService,
                 private srvCcSellado : ControlCalidad_SelladoService, 
@@ -68,7 +70,10 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   }
 
   //.Función que cargará la información de los turnos
-  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
+  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { 
+    this.turnos = data; 
+    this.turnos = this.turnos.filter(item => ["DIA", "NOCHE"].includes(item.turno_Id));
+  }); 
 
   //.Función que cargará los registros del día actual
   mostrarRegistrosHoy() {
@@ -113,15 +118,18 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       Precorte : datos.ccSel_Precorte,
       Perforacion : datos.ccSel_Perforacion,
       BolsasxPaq : datos.ccSel_CantBolsasxPaq,
+      Fecha : datos.ccSel_Fecha.replace('T00:00:00', ''),
       Observacion : datos.ccSel_Observacion,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
     this.registros.sort((a, b) => a.OT - b.OT);
+    this.registros.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
   }
 
   //. Consultar la OT que se encuentra en la fila seleccionada
   consultarOT(datos : any, index : number){
+    this.load = true;
     this.ronda = 0;
     this.srvCcSellado.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato });
     setTimeout(() => {
@@ -155,14 +163,18 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Precorte : ``,
               Perforacion : ``,
               BolsasxPaq : data[0].cantBolsasxPaq,
+              Fecha : this.today,
               Observacion : ``,
             }
             this.registros[index] = info;
+            this.load = false;
             setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 500); 
-          } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`)
+          } else {
+            this.load = false;
+            this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de la OT N° ${datos.OT} en el proceso de SELLADO`);
+          } 
         });
       }
-      
     }, 200);
   }     
 
@@ -212,16 +224,20 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
-        this.mostrarRegistrosHoy();
-        setTimeout(() => { this.load = false; }, 2500);
+        setTimeout(() => { 
+          this.mostrarRegistrosHoy();
+          this.load = false; 
+        }, 500); 
       }
     } else {
       this.srvCcSellado.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
       if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
       else {
         this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-        this.mostrarRegistrosHoy();
-        setTimeout(() => { this.load = false; }, 2500);
+        setTimeout(() => { 
+          this.mostrarRegistrosHoy();
+          this.load = false; 
+        }, 500); 
       }
     }
   }  
@@ -237,10 +253,14 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   onReject = (dato : any) => this.msg.clear(dato);
 
   //. Función que clona la fila seleccionada para poder editarla.
-  filaEditar = (fila : any, index : number) => this.registroClonado[index] = {...fila};
+  filaEditar(fila : any, index : number) {
+    index > 0 ? this.esRegistro = false : this.esRegistro = true; 
+    this.registroClonado[index] = {...fila};
+  } 
   
   // Función que cancela la edición de la fila.
   filaCancelar(fila : any, index : number) {
+    index > 0 ? this.esRegistro = false : this.esRegistro = true;
     this.registros[index] = this.registroClonado[index];
     delete this.registroClonado[index];
   }
@@ -248,5 +268,9 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtSellado!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  quitarRegistro(index : number){
+    index > 0 ? this.esRegistro = false : this.esRegistro = true;
+    this.registros.splice(index, 1);
+  }
 }
 

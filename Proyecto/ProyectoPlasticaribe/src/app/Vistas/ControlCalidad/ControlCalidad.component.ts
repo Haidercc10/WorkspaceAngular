@@ -9,8 +9,6 @@ import { ControlCalidad_ImpresionService } from 'src/app/Servicios/ControlCalida
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
-import { ControlCalidad_ExtrusionComponent } from '../ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
-import { ControlCalidad_SelladoComponent } from '../ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
 @Component({
   selector: 'app-ControlCalidad',
@@ -43,9 +41,7 @@ export class ControlCalidadComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private controlDbl : ControlCalidad_CorteDobladoService,
                       private controlImp : ControlCalidad_ImpresionService,
-                        private bagproService : BagproService,
-                          private controlExt : ControlCalidad_ExtrusionComponent,
-                            private controlSella : ControlCalidad_SelladoComponent,) {
+                        private bagproService : BagproService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
