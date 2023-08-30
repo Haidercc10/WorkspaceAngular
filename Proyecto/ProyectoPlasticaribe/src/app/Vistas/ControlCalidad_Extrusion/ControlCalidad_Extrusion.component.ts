@@ -37,7 +37,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   public registros : any = []; //Array que va a contener los registros de los controles de sellado
   eleccion : any = ["Si", "No"]; //Array que va a contener los registros de los controles de sellado
   tiposBobinas : any = ["TUBULAR", "LÁMINA"]; //Array que va a contener los registros de los controles de sellado
-  apariencias : any = ["NORMAL", "RASGADO"]; //Array que va a contener las apariencias de el/los rollos verificados
+  apariencias : any = ["OK", "MAL ESTADO"]; //Array que va a contener las apariencias de el/los rollos verificados
   pigmentos : any = []; //Array que va a contener los registros de los pigmentos de los productos
   registroSeleccionado : any = []; //Array que va a contener el registro seleccionado de la tabla.
   ronda : number = 0; //Variable que se usará para almacenar la ronda del controles de sellado
@@ -125,6 +125,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       TipoBobina : datos.ccExt_TipoBobina,
       Fecha : datos.ccExt_Fecha.replace('T00:00:00', ''),
       Observacion : datos.ccExt_Observacion,
+      CalibreTB : datos.ccExt_CalibreTB,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
@@ -163,9 +164,15 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros.length == 0) this.registros.unshift({});
+    if(this.registros.length == 0) {
+      this.registros.unshift({});
+      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
+    }
     else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
-    else this.registros.unshift({});
+    else {
+      this.registros.unshift({});
+      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
+    }
   }
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
@@ -182,16 +189,17 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Referencia : data.referencia,
       Rollo : data.rollo,
       Pigmento : pigmento[0].pigmt_Nombre,
-      AnchoTubular : 0,
+      AnchoTubular : data.ancho,
       PesoMetro : 0,
-      Ancho : 0,
+      Ancho : data.ancho,
       CalMin : 0,
       CalMax : 0,
       CalProm : 0,
-      Apariencia : ``,
-      Tratado : ``,
-      Rasgado : ``,
-      TipoBobina : ``,
+      Apariencia : `No`,
+      Tratado : data.tratadoId == `2` ? `No` : `Si`,
+      Rasgado : `No`,
+      TipoBobina : `TUBULAR`,
+      CalibreTB : data.calibre,
       Fecha : this.today,
       Observacion : ``,
     }
@@ -230,7 +238,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: fila.Observacion
+      CcExt_Observacion: fila.Observacion,
+      CcExt_CalibreTB: fila.CalibreTB,
     }
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
@@ -263,7 +272,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
-      CcExt_Id : fila.Id,
+      CcExt_Id: fila.Id,
       Turno_Id: fila.Turno,
       Usua_Id: this.storage_Id,
       CcExt_Maquina: fila.Maquina,
@@ -287,7 +296,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_TipoBobina: fila.TipoBobina,
       CcExt_Fecha: this.today,
       CcExt_Hora: this.hora,
-      CcExt_Observacion: fila.Observacion
+      CcExt_Observacion: fila.Observacion,
+      CcExt_CalibreTB: fila.CalibreTB
     }
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);

@@ -23,7 +23,8 @@ export interface modelControlCalidad_Extrusion {
     CcExt_TipoBobina : string;
     CcExt_Fecha : string;
     CcExt_Hora : string;
-    CcExt_Observacion : string;  
+    CcExt_Observacion : string;
+    CcExt_CalibreTB : number;  
 }
 
 export interface modelControlCalidad_Impresion {

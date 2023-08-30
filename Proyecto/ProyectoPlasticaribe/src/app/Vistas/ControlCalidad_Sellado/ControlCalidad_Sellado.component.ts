@@ -21,8 +21,8 @@ import { AppComponent } from 'src/app/app.component';
 export class ControlCalidad_SelladoComponent implements OnInit {
   registros : any = []; //.Array que cargará los registros en la tabla
   turnos : any = []; //.Array que cargará los turnos
-  eleccion : any = ["SI", "NO"]; //.Array que se mostrará en campos de elección
-  resistencia : any = ["NO APLICA", "BAJA", "MEDIA", "ALTA"]; //.Array que cargará la resistencia de sellabilidad de un producto
+  eleccion : any = ["SI", "NO", "OK"]; //.Array que se mostrará en campos de elección
+  resistencia : any = ["OK", "NO APLICA", "BAJA", "MEDIA", "ALTA"]; //.Array que cargará la resistencia de sellabilidad de un producto
   load : boolean = false; //.Variable que se usará durante la carga de un proceso que requiera tiempo
   today : any = moment().format('YYYY-MM-DD'); //.Fecha actual
   hora : any = moment().format('HH:mm:ss'); //.Hora actual
@@ -64,9 +64,15 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros.length == 0) this.registros.unshift({});
+    if(this.registros.length == 0) {
+      this.registros.unshift({});
+      setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
+    } 
     else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
-    else this.registros.unshift({});
+    else {
+      this.registros.unshift({});
+      setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
+    }
   }
 
   //.Función que cargará la información de los turnos
@@ -154,14 +160,13 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Af_Izquierdo : data[0].anchoFuelle_Derecha,
               Af_Derecho : data[0].anchoFuelle_Izquierda,
               Af_Abajo : data[0].anchoFuelle_Abajo,
-              Apariencia : ``,
-              Rasgado : ``,
-              Filtrado : ``,
-              Presion : ``,
-              Sellabilidad :``,
-              Impresion : ``,
-              Precorte : ``,
-              Perforacion : ``,
+              Rasgado : `OK`,
+              Filtrado : `NO`,
+              Presion : `NO`,
+              Sellabilidad :`OK`,
+              Impresion : data[0].impresion == `0` ? `NO` : `SI`,
+              Precorte : `NO`,
+              Perforacion : `NO`,
               BolsasxPaq : data[0].cantBolsasxPaq,
               Fecha : this.today,
               Observacion : ``,

@@ -60,6 +60,7 @@ editMode="row">
             <th><input pInputText (input)="aplicarfiltro($event, 'Tratado', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Rasgado', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'TipoBobina', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'CalibreTB', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
             <th></th>
@@ -67,7 +68,9 @@ editMode="row">
         <tr>
             <th colspan="11"></th>
             <th colspan="3" class="text-center">Calibre (3 Mediciones)</th>
-            <th colspan="7"></th>
+            <th colspan="3"></th>
+            <th colspan="2" class="text-center">Tipo Bobina</th>
+            <th colspan="3"></th>
         </tr>
         <tr>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
@@ -87,7 +90,8 @@ editMode="row">
           <th style="min-width : 100px">Apariencia</th>
           <th style="min-width : 100px">Tratado</th>
           <th style="min-width : 100px">Rasgado</th>
-          <th style="min-width : 100px">Tipo Bobina</th>
+          <th style="min-width : 100px">Tipo</th>
+          <th style="min-width : 100px">Calibre</th>
           <th style="min-width : 100px">Fecha Registro</th>
           <th style="min-width : 200px">Observacion</th>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
@@ -286,6 +290,17 @@ editMode="row">
                 </ng-template>
             </p-cellEditor>
             </td>
+             <!--Calibre TB-->
+             <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.CalibreTB"></p-inputNumber>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.CalibreTB | number : '1.2-2'}}
+                    </ng-template>
+                </p-cellEditor>
+              </td>
             <!--Fecha-->
             <td>
                 <p-cellEditor>
