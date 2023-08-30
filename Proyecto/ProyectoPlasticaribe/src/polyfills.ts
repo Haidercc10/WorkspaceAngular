@@ -54,9 +54,9 @@ export let rutaPlasticaribeAPI = "http://192.168.0.193:9085/api"; //Ruta local d
 // export let rutaPlasticaribeAPI = "http://192.168.0.190:9086/api"; //Ruta al servidor de la base de datos nuevas
 
 /* RUTA PRINCIPAL DE API BAGPRO */
- export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
+//  export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
 //export let rutaBagPro = "https://localhost:7160/api";
-// export let rutaBagPro = "http://192.168.0.193:9095/api"; //Ruta al servidor de la base de datos de BagPro --- PRUEBA LOCAL
+export let rutaBagPro = "http://192.168.0.193:9095/api"; //Ruta al servidor de la base de datos de BagPro --- PRUEBA LOCAL
 // export let rutaBagPro = "http://192.168.0.190:9095/api"; //Ruta al servidor de la base de datos nuevas
 
 

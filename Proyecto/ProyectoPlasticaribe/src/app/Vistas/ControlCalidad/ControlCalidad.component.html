@@ -136,10 +136,10 @@
             <th style="min-width:50px">Amarillo</th>
             <th style="min-width:50px">Negro</th>
             <th style="min-width:50px">Base</th>
-            <th style="min-width:50px">Pantone</th>
-            <th style="min-width:50px">Pantone</th>
-            <th style="min-width:50px">Pantone</th>
-            <th style="min-width:50px">Pantone</th>
+            <th style="min-width:80px">Pantone</th>
+            <th style="min-width:80px">Pantone</th>
+            <th style="min-width:80px">Pantone</th>
+            <th style="min-width:80px">Pantone</th>
             <th style="min-width:150px">Tipo Embobinado</th>
             <th style="min-width:150px">Cod. Barras</th>
             <th style="min-width:200px">Texto</th>
@@ -168,7 +168,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-dropdown [autoDisplayFirst]="false" [options]="rondas" appendTo="body" [(ngModel)]="datos.Ronda"></p-dropdown>
+                  <p-dropdown [autoDisplayFirst]="true" [options]="rondas" appendTo="body" [(ngModel)]="datos.Ronda"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Ronda}}
@@ -258,7 +258,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Cian">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="booleanos" appendTo="body" [(ngModel)]="datos.Secuencia_Cian"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Secuencia_Cian}}
@@ -268,7 +268,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Magenta">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="booleanos" appendTo="body" [(ngModel)]="datos.Secuencia_Magenta"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Secuencia_Magenta}}
@@ -278,7 +278,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Amarillo">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="booleanos" appendTo="body" [(ngModel)]="datos.Secuencia_Amarillo"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Secuencia_Amarillo}}
@@ -288,7 +288,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Negro">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="booleanos" appendTo="body" [(ngModel)]="datos.Secuencia_Negro"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Secuencia_Negro}}
@@ -298,7 +298,7 @@
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="text" [(ngModel)]="datos.Secuencia_Base">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="booleanos" appendTo="body" [(ngModel)]="datos.Secuencia_Base"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{datos.Secuencia_Base}}

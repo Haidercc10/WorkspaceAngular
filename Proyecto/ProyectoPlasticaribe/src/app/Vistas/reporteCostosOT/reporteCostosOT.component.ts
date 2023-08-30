@@ -217,7 +217,7 @@ export class ReporteCostosOTComponent implements OnInit {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
                 for (let j = 0; j < datos_devolucionesMP.length; j++) {
                   this.devolucion = datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
-                  this.llenarTablaMP(datos_devolucionesMP[j]);
+                  this.llenarTablaMPDevuelta(datos_devolucionesMP[j]);
                 }
               });
             }
@@ -225,7 +225,7 @@ export class ReporteCostosOTComponent implements OnInit {
           this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
             if (datos_asignacionMP.length != 0){
               for (let j = 0; j < datos_asignacionMP.length; j++) {
-                this.llenarTablaMP(datos_asignacionMP[j]);
+                this.llenarTablaMPAsignada(datos_asignacionMP[j]);
               }
             }
           });
@@ -319,83 +319,84 @@ export class ReporteCostosOTComponent implements OnInit {
     this.load = true;
   }
 
-  // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
-  llenarTablaMP(formulario : any){
-    if (this.devolucion != 0) {
-      if (formulario.matPri_Id != 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id == 449) {
-        this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
-          const infoDoc : any = {
-            Id : datos_materiaPrima.matPri_Id,
-            Nombre : datos_materiaPrima.matPri_Nombre,
-            Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
-            Presentacion : datos_materiaPrima.undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
-            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
-            Proceso : 'Devolución',
-          }
-          this.totalMPEntregada -= infoDoc.Cantidad;
-          this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
-          this.ArrayMateriaPrima.push(infoDoc);
-          this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-          this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-        });
-      } else if (formulario.matPri_Id == 84 && formulario.tinta_Id != 2001 && formulario.bopP_Id == 449) {
-        this.tintaService.srvObtenerListaPorId(formulario.tinta_Id).subscribe(datos_tinta => {
-          const infoDoc : any = {
-            Id : datos_tinta.tinta_Id,
-            Nombre : datos_tinta.tinta_Nombre,
-            Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
-            Presentacion : datos_tinta.undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_tinta.tinta_Precio),
-            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
-            Proceso : 'Devolución',
-          }
-          this.totalMPEntregada -= infoDoc.Cantidad;
-          this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio);
-          this.ArrayMateriaPrima.push(infoDoc);
-          this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-          this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-        });
-      } else if (formulario.matPri_Id == 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id != 449) {
-        this.boppService.srvObtenerListaPorId(formulario.bopP_Id).subscribe(datos => {
-          let datos_bopp : any = [datos];
-          for (let i = 0; i < datos_bopp.length; i++) {
-            const infoDoc : any = {
-              Id : datos_bopp[i].bopP_Id,
-              Nombre : datos_bopp[i].bopP_Nombre,
-              Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
-              Presentacion : datos_bopp[i].undMed_Id,
-              PrecioUnd : this.formatonumeros(datos_bopp[i].bopP_Precio),
-              SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
-              Proceso : 'Devolución',
-            }
-            this.totalMPEntregada -= infoDoc.Cantidad;
-            this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio);
-            this.ArrayMateriaPrima.push(infoDoc);
-            this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-            this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-          }
-        });
-      }
-      this.load = true;
-    } else {
-      const infoDoc : any = {
-        Id : formulario.materiaPrima,
-        Nombre : formulario.nombreMP,
-        Cantidad : formulario.cantMP,
-        Presentacion : formulario.undMedida,
-        PrecioUnd : this.formatonumeros(formulario.precio),
-        SubTotal : this.formatonumeros(Math.round(formulario.subTotal)),
-        Proceso : formulario.nombreProceso,
-      }
-
-      this.totalMPEntregada += infoDoc.Cantidad;
-      this.ValorMPEntregada += (formulario.subTotal);
-      this.ArrayMateriaPrima.push(infoDoc);
-      this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-      this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-      this.load = true;
+  // Funcion para llenar la tabla con la materia prima asignada para la OT consultada
+  llenarTablaMPAsignada(formulario : any){
+    const infoDoc : any = {
+      Id : formulario.materiaPrima,
+      Nombre : formulario.nombreMP,
+      Cantidad : formulario.cantMP,
+      Presentacion : formulario.undMedida,
+      PrecioUnd : this.formatonumeros(formulario.precio),
+      SubTotal : this.formatonumeros(Math.round(formulario.subTotal)),
+      Proceso : formulario.nombreProceso,
     }
+
+    this.totalMPEntregada += infoDoc.Cantidad;
+    this.ValorMPEntregada += (formulario.subTotal);
+    this.ArrayMateriaPrima.push(infoDoc);
+    this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+    this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+    this.load = true;
+  }
+
+  // Funcion para llenar la tabla con la materia prima devuelta para la OT consultada
+  llenarTablaMPDevuelta(formulario : any){
+    if (formulario.matPri_Id != 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id == 449) {
+      this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
+        const infoDoc : any = {
+          Id : datos_materiaPrima.matPri_Id,
+          Nombre : datos_materiaPrima.matPri_Nombre,
+          Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+          Presentacion : datos_materiaPrima.undMed_Id,
+          PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
+          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
+          Proceso : 'Devolución',
+        }
+        this.totalMPEntregada -= infoDoc.Cantidad;
+        this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
+        this.ArrayMateriaPrima.push(infoDoc);
+        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+      });
+    } else if (formulario.matPri_Id == 84 && formulario.tinta_Id != 2001 && formulario.bopP_Id == 449) {
+      this.tintaService.srvObtenerListaPorId(formulario.tinta_Id).subscribe(datos_tinta => {
+        const infoDoc : any = {
+          Id : datos_tinta.tinta_Id,
+          Nombre : datos_tinta.tinta_Nombre,
+          Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+          Presentacion : datos_tinta.undMed_Id,
+          PrecioUnd : this.formatonumeros(datos_tinta.tinta_Precio),
+          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
+          Proceso : 'Devolución',
+        }
+        this.totalMPEntregada -= infoDoc.Cantidad;
+        this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio);
+        this.ArrayMateriaPrima.push(infoDoc);
+        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+      });
+    } else if (formulario.matPri_Id == 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id != 449) {
+      this.boppService.srvObtenerListaPorId(formulario.bopP_Id).subscribe(datos => {
+        let datos_bopp : any = [datos];
+        for (let i = 0; i < datos_bopp.length; i++) {
+          const infoDoc : any = {
+            Id : datos_bopp[i].bopP_Id,
+            Nombre : datos_bopp[i].bopP_Nombre,
+            Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+            Presentacion : datos_bopp[i].undMed_Id,
+            PrecioUnd : this.formatonumeros(datos_bopp[i].bopP_Precio),
+            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
+            Proceso : 'Devolución',
+          }
+          this.totalMPEntregada -= infoDoc.Cantidad;
+          this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio);
+          this.ArrayMateriaPrima.push(infoDoc);
+          this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+          this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+        }
+      });
+    }
+    this.load = true;
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -9,8 +9,6 @@ import { ControlCalidad_ImpresionService } from 'src/app/Servicios/ControlCalida
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
-import { ControlCalidad_ExtrusionComponent } from '../ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
-import { ControlCalidad_SelladoComponent } from '../ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 
 @Component({
   selector: 'app-ControlCalidad',
@@ -31,7 +29,8 @@ export class ControlCalidadComponent implements OnInit {
   rangoFechas : any [] = []; //Variable que se usará para almacenar el rango de fechas
 
   rondas : string [] = ['1', '2', '3']; //Variable que se usará para almacenar las rondas
-  ubicacionFotoCelda : string [] = ['IZQUIERDA','DERECHA']; //Variable que se usará para almacenar la ubicacion de la fotocelda en el proceso de impresión
+  booleanos : string [] = ['', 'SI', 'NO']; //Variable que se usará para almacenar los boleanos
+  ubicacionFotoCelda : string [] = ['', 'IZQUIERDA','DERECHA']; //Variable que se usará para almacenar la ubicacion de la fotocelda en el proceso de impresión
   turno : string [] = ['DIA','NOCHE']; //Variable que se usará para almacenar el turno
   datosClonados : any [] = []; //Variable que se usará para almacenar los datos clonados
   datosControlCal_Impresion : any [] = []; //Variable que va a almacenar los datos del control de calidad del area de impresion
@@ -43,9 +42,7 @@ export class ControlCalidadComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private controlDbl : ControlCalidad_CorteDobladoService,
                       private controlImp : ControlCalidad_ImpresionService,
-                        private bagproService : BagproService,
-                          private controlExt : ControlCalidad_ExtrusionComponent,
-                            private controlSella : ControlCalidad_SelladoComponent,) {
+                        private bagproService : BagproService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -260,7 +257,7 @@ export class ControlCalidadComponent implements OnInit {
       Nombre_Producto : ot.clienteItemNombre.trim(),
       LoteRollo_SinImpresion : ``,
       Prueba_Tratado : ``,
-      Ancho_Rollo : 0,
+      Ancho_Rollo : parseFloat(ot.extancho),
       Secuencia_Cian : ``,
       Secuencia_Magenta : ``,
       Secuencia_Amarillo : ``,
@@ -330,31 +327,31 @@ export class ControlCalidadComponent implements OnInit {
       Maquina: this.datosControlCal_Impresion[i].Maquina,
       Ronda: this.datosControlCal_Impresion[i].Ronda,
       Orden_Trabajo: this.datosControlCal_Impresion[i].Orden_Trabajo,
-      Cliente: this.datosControlCal_Impresion[i].Cliente,
+      Cliente: (this.datosControlCal_Impresion[i].Cliente).toUpperCase(),
       Prod_Id: this.datosControlCal_Impresion[i].Prod_Id,
-      Nombre_Producto: this.datosControlCal_Impresion[i].Nombre_Producto,
-      LoteRollo_SinImpresion: this.datosControlCal_Impresion[i].LoteRollo_SinImpresion,
-      Prueba_Tratado: this.datosControlCal_Impresion[i].Prueba_Tratado,
+      Nombre_Producto: (this.datosControlCal_Impresion[i].Nombre_Producto).toUpperCase(),
+      LoteRollo_SinImpresion: (this.datosControlCal_Impresion[i].LoteRollo_SinImpresion).toString().toUpperCase(),
+      Prueba_Tratado: (this.datosControlCal_Impresion[i].Prueba_Tratado).toString().toUpperCase(),
       Ancho_Rollo: this.datosControlCal_Impresion[i].Ancho_Rollo,
-      Secuencia_Cian: this.datosControlCal_Impresion[i].Secuencia_Cian,
-      Secuencia_Magenta: this.datosControlCal_Impresion[i].Secuencia_Magenta,
-      Secuencia_Amarillo: this.datosControlCal_Impresion[i].Secuencia_Amarillo,
-      Secuencia_Negro: this.datosControlCal_Impresion[i].Secuencia_Negro,
-      Secuencia_Base: this.datosControlCal_Impresion[i].Secuencia_Base,
-      Secuencia_Pantone1: this.datosControlCal_Impresion[i].Secuencia_Pantone1,
-      Secuencia_Pantone2: this.datosControlCal_Impresion[i].Secuencia_Pantone2,
-      Secuencia_Pantone3: this.datosControlCal_Impresion[i].Secuencia_Pantone3,
-      Secuencia_Pantone4: this.datosControlCal_Impresion[i].Secuencia_Pantone4,
-      Tipo_Embobinado: this.datosControlCal_Impresion[i].Tipo_Embobinado,
-      Codigo_Barras: this.datosControlCal_Impresion[i].Codigo_Barras,
-      Texto: this.datosControlCal_Impresion[i].Texto,
+      Secuencia_Cian: (this.datosControlCal_Impresion[i].Secuencia_Cian).toString().toUpperCase(),
+      Secuencia_Magenta: (this.datosControlCal_Impresion[i].Secuencia_Magenta).toString().toUpperCase(),
+      Secuencia_Amarillo: (this.datosControlCal_Impresion[i].Secuencia_Amarillo).toString().toUpperCase(),
+      Secuencia_Negro: (this.datosControlCal_Impresion[i].Secuencia_Negro).toString().toUpperCase(),
+      Secuencia_Base: (this.datosControlCal_Impresion[i].Secuencia_Base).toString().toUpperCase(),
+      Secuencia_Pantone1: (this.datosControlCal_Impresion[i].Secuencia_Pantone1).toString().toUpperCase(),
+      Secuencia_Pantone2: (this.datosControlCal_Impresion[i].Secuencia_Pantone2).toString().toUpperCase(),
+      Secuencia_Pantone3: (this.datosControlCal_Impresion[i].Secuencia_Pantone3).toString().toUpperCase(),
+      Secuencia_Pantone4: (this.datosControlCal_Impresion[i].Secuencia_Pantone4).toString().toUpperCase(),
+      Tipo_Embobinado: (this.datosControlCal_Impresion[i].Tipo_Embobinado).toString().toUpperCase(),
+      Codigo_Barras: (this.datosControlCal_Impresion[i].Codigo_Barras).toString().toUpperCase(),
+      Texto: (this.datosControlCal_Impresion[i].Texto).toString().toUpperCase(),
       Fotocelda_Izquierda: this.datosControlCal_Impresion[i].Fotocelda == 'IZQUIERDA' ? true : false,
       Fotcelda_Derecha: this.datosControlCal_Impresion[i].Fotocelda == 'DERECHA' ? true : false,
-      Registro_Colores: this.datosControlCal_Impresion[i].Registro_Colores,
-      Adherencia_Tinta: this.datosControlCal_Impresion[i].Adherencia_Tinta,
-      Conformidad_Laminado: this.datosControlCal_Impresion[i].Conformidad_Laminado,
-      PasoGuia_Repetecion: this.datosControlCal_Impresion[i].PasoGuia_Repetecion,
-      Observacion: this.datosControlCal_Impresion[i].Observacion
+      Registro_Colores: (this.datosControlCal_Impresion[i].Registro_Colores).toString().toUpperCase(),
+      Adherencia_Tinta: (this.datosControlCal_Impresion[i].Adherencia_Tinta).toString().toUpperCase(),
+      Conformidad_Laminado: (this.datosControlCal_Impresion[i].Conformidad_Laminado).toString().toUpperCase(),
+      PasoGuia_Repetecion: (this.datosControlCal_Impresion[i].PasoGuia_Repetecion).toString().toUpperCase(),
+      Observacion: (this.datosControlCal_Impresion[i].Observacion).toString().toUpperCase()
     }
     this.controlImp.Post(control).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Registro guardado exitosamente!`);
@@ -378,31 +375,31 @@ export class ControlCalidadComponent implements OnInit {
       Maquina: this.datosControlCal_Impresion[i].Maquina,
       Ronda: this.datosControlCal_Impresion[i].Ronda,
       Orden_Trabajo: this.datosControlCal_Impresion[i].Orden_Trabajo,
-      Cliente: this.datosControlCal_Impresion[i].Cliente,
+      Cliente: (this.datosControlCal_Impresion[i].Cliente).toUpperCase(),
       Prod_Id: this.datosControlCal_Impresion[i].Prod_Id,
-      Nombre_Producto: this.datosControlCal_Impresion[i].Nombre_Producto,
-      LoteRollo_SinImpresion: this.datosControlCal_Impresion[i].LoteRollo_SinImpresion,
-      Prueba_Tratado: this.datosControlCal_Impresion[i].Prueba_Tratado,
+      Nombre_Producto: (this.datosControlCal_Impresion[i].Nombre_Producto).toUpperCase(),
+      LoteRollo_SinImpresion: (this.datosControlCal_Impresion[i].LoteRollo_SinImpresion).toString().toUpperCase(),
+      Prueba_Tratado: (this.datosControlCal_Impresion[i].Prueba_Tratado).toString().toUpperCase(),
       Ancho_Rollo: this.datosControlCal_Impresion[i].Ancho_Rollo,
-      Secuencia_Cian: this.datosControlCal_Impresion[i].Secuencia_Cian,
-      Secuencia_Magenta: this.datosControlCal_Impresion[i].Secuencia_Magenta,
-      Secuencia_Amarillo: this.datosControlCal_Impresion[i].Secuencia_Amarillo,
-      Secuencia_Negro: this.datosControlCal_Impresion[i].Secuencia_Negro,
-      Secuencia_Base: this.datosControlCal_Impresion[i].Secuencia_Base,
-      Secuencia_Pantone1: this.datosControlCal_Impresion[i].Secuencia_Pantone1,
-      Secuencia_Pantone2: this.datosControlCal_Impresion[i].Secuencia_Pantone2,
-      Secuencia_Pantone3: this.datosControlCal_Impresion[i].Secuencia_Pantone3,
-      Secuencia_Pantone4: this.datosControlCal_Impresion[i].Secuencia_Pantone4,
-      Tipo_Embobinado: this.datosControlCal_Impresion[i].Tipo_Embobinado,
-      Codigo_Barras: this.datosControlCal_Impresion[i].Codigo_Barras,
-      Texto: this.datosControlCal_Impresion[i].Texto,
+      Secuencia_Cian: (this.datosControlCal_Impresion[i].Secuencia_Cian).toString().toUpperCase(),
+      Secuencia_Magenta: (this.datosControlCal_Impresion[i].Secuencia_Magenta).toString().toUpperCase(),
+      Secuencia_Amarillo: (this.datosControlCal_Impresion[i].Secuencia_Amarillo).toString().toUpperCase(),
+      Secuencia_Negro: (this.datosControlCal_Impresion[i].Secuencia_Negro).toString().toUpperCase(),
+      Secuencia_Base: (this.datosControlCal_Impresion[i].Secuencia_Base).toString().toUpperCase(),
+      Secuencia_Pantone1: (this.datosControlCal_Impresion[i].Secuencia_Pantone1).toString().toUpperCase(),
+      Secuencia_Pantone2: (this.datosControlCal_Impresion[i].Secuencia_Pantone2).toString().toUpperCase(),
+      Secuencia_Pantone3: (this.datosControlCal_Impresion[i].Secuencia_Pantone3).toString().toUpperCase(),
+      Secuencia_Pantone4: (this.datosControlCal_Impresion[i].Secuencia_Pantone4).toString().toUpperCase(),
+      Tipo_Embobinado: (this.datosControlCal_Impresion[i].Tipo_Embobinado).toString().toUpperCase(),
+      Codigo_Barras: (this.datosControlCal_Impresion[i].Codigo_Barras).toString().toUpperCase(),
+      Texto: (this.datosControlCal_Impresion[i].Texto).toString().toUpperCase(),
       Fotocelda_Izquierda: this.datosControlCal_Impresion[i].Fotocelda == 'IZQUIERDA' ? true : false,
       Fotcelda_Derecha: this.datosControlCal_Impresion[i].Fotocelda == 'DERECHA' ? true : false,
-      Registro_Colores: this.datosControlCal_Impresion[i].Registro_Colores,
-      Adherencia_Tinta: this.datosControlCal_Impresion[i].Adherencia_Tinta,
-      Conformidad_Laminado: this.datosControlCal_Impresion[i].Conformidad_Laminado,
-      PasoGuia_Repetecion: this.datosControlCal_Impresion[i].PasoGuia_Repetecion,
-      Observacion: this.datosControlCal_Impresion[i].Observacion
+      Registro_Colores: (this.datosControlCal_Impresion[i].Registro_Colores).toString().toUpperCase(),
+      Adherencia_Tinta: (this.datosControlCal_Impresion[i].Adherencia_Tinta).toString().toUpperCase(),
+      Conformidad_Laminado: (this.datosControlCal_Impresion[i].Conformidad_Laminado).toString().toUpperCase(),
+      PasoGuia_Repetecion: (this.datosControlCal_Impresion[i].PasoGuia_Repetecion).toString().toUpperCase(),
+      Observacion: (this.datosControlCal_Impresion[i].Observacion).toString().toUpperCase()
     }
     this.controlImp.Put(id, control).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Registro actualizado exitosamente!`);
@@ -432,16 +429,16 @@ export class ControlCalidadComponent implements OnInit {
       Maquina: this.datosControlCal_Doblado[i].maquina,
       Ronda: this.datosControlCal_Doblado[i].ronda,
       Orden_Trabajo: this.datosControlCal_Doblado[i].orden,
-      Cliente: this.datosControlCal_Doblado[i].cliente,
+      Cliente: (this.datosControlCal_Doblado[i].cliente).toString().toUpperCase(),
       Prod_Id: this.datosControlCal_Doblado[i].item,
-      Nombre_Producto: this.datosControlCal_Doblado[i].referencia,
+      Nombre_Producto: (this.datosControlCal_Doblado[i].referencia).toString().toUpperCase(),
       Ancho: this.datosControlCal_Doblado[i].ancho,
       UndMed_Id: 'Cms',
       Calibre: this.datosControlCal_Doblado[i].calibre,
-      Codigo_Barras: this.datosControlCal_Doblado[i].codBarras,
-      Tipo_Embobinado: this.datosControlCal_Doblado[i].tpEmbobinado,
-      PasoEntre_Guia: this.datosControlCal_Doblado[i].pasoGuia,
-      Observacion: this.datosControlCal_Doblado[i].observacion,
+      Codigo_Barras: (this.datosControlCal_Doblado[i].codBarras).toString().toUpperCase(),
+      Tipo_Embobinado: (this.datosControlCal_Doblado[i].tpEmbobinado).toString().toUpperCase(),
+      PasoEntre_Guia: (this.datosControlCal_Doblado[i].pasoGuia).toString().toUpperCase(),
+      Observacion: (this.datosControlCal_Doblado[i].observacion).toString().toUpperCase(),
     };
     this.controlDbl.Post(control).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Registro guardado exitosamente!`);
@@ -465,16 +462,16 @@ export class ControlCalidadComponent implements OnInit {
       Maquina: this.datosControlCal_Doblado[i].maquina,
       Ronda: this.datosControlCal_Doblado[i].ronda,
       Orden_Trabajo: this.datosControlCal_Doblado[i].orden,
-      Cliente: this.datosControlCal_Doblado[i].cliente,
+      Cliente: (this.datosControlCal_Doblado[i].cliente).toString().toUpperCase(),
       Prod_Id: this.datosControlCal_Doblado[i].item,
-      Nombre_Producto: this.datosControlCal_Doblado[i].referencia,
+      Nombre_Producto: (this.datosControlCal_Doblado[i].referencia).toString().toUpperCase(),
       Ancho: this.datosControlCal_Doblado[i].ancho,
       UndMed_Id: 'Cms',
       Calibre: this.datosControlCal_Doblado[i].calibre,
-      Codigo_Barras: this.datosControlCal_Doblado[i].codBarras,
-      Tipo_Embobinado: this.datosControlCal_Doblado[i].tpEmbobinado,
-      PasoEntre_Guia: this.datosControlCal_Doblado[i].pasoGuia,
-      Observacion: this.datosControlCal_Doblado[i].observacion,
+      Codigo_Barras: (this.datosControlCal_Doblado[i].codBarras).toString().toUpperCase(),
+      Tipo_Embobinado: (this.datosControlCal_Doblado[i].tpEmbobinado).toString().toUpperCase(),
+      PasoEntre_Guia: (this.datosControlCal_Doblado[i].pasoGuia).toString().toUpperCase(),
+      Observacion: (this.datosControlCal_Doblado[i].observacion).toString().toUpperCase(),
     };
     this.controlDbl.Put(id, control).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Registro actualizado exitosamente!`);
