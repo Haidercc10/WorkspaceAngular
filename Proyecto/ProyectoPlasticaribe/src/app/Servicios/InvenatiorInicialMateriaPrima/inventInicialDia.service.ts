@@ -15,4 +15,8 @@ export class InventInicialDiaService {
   srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/InventarioInicialXDia_MatPrima/${dato}`);
 
   Get_Cantidad_Material_Meses = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/get_Cantidad_Material_Meses`);
+
+  GetCostoInventarioMateriasPrimas = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/getCostoInventarioMateriasPrimas`);
+
+  GetCostoInventarioBiorientado = (mes : number, anio : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/getCostoInventarioBiorientado/${mes}/${anio}`);
 }

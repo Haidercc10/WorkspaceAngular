@@ -78,26 +78,19 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     let fechaFin : any = this.FormFiltros.value.fechaFin;
     let ruta : any = ``;
     
-    if(fechaInicio == `Fecha inválida`) fechaInicio = null;
-    if(fechaFin == `Fecha inválida`) fechaFin = null;
-
-    fechaInicio == null ? fechaInicio = moment().subtract(1, 'M').format('YYYY-MM-DD') : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
-    fechaFin == null ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
+    fechaInicio == `Fecha inválida` ? fechaInicio = moment().subtract(1, 'M').format('YYYY-MM-DD') : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
+    fechaFin == `Fecha inválida` ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
 
     if(consecutivo != null) ruta += `consec=${consecutivo}`;
     if(ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
-    if(cliente != null) { ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`; console.log(ruta) }
+    if(cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if(referencia != null) ruta.length > 0 ?  ruta += `&referencia=${referencia}` : ruta += `referencia=${referencia}`;
     ruta.length > 0 ? ruta = `?${ruta}` : null;
 
     this.srvCertificados.GetCertificados(fechaInicio, fechaFin, ruta).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          this.cargarTablas(data[index]);
-        }
-      } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados`);
-    });
-    setTimeout(() => { this.load = false; }, 1500);
+      if(data.length > 0) data.forEach(info => this.cargarTablas(info));
+      else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados`);
+    }, () => this.load = false, () => this.load = false);
   }
 
   //Cargar las tablas del reporte
