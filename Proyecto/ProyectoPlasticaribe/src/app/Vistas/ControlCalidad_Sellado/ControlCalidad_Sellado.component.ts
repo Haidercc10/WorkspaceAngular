@@ -64,11 +64,12 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros.length == 0) {
+    if(this.registros.length == 0 || this.registros[0] == undefined) {
       this.registros.unshift({});
       setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
-    } else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
-    else {
+    } else if(this.registros[0].Id == undefined) {
+      this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    } else {
       this.registros.unshift({});
       setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
     }
