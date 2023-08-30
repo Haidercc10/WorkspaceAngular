@@ -67,8 +67,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
     if(this.registros.length == 0) {
       this.registros.unshift({});
       setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
-    } 
-    else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    } else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else {
       this.registros.unshift({});
       setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
@@ -157,9 +156,9 @@ export class ControlCalidad_SelladoComponent implements OnInit {
               Calibre : data[0].calibre,
               Ancho : data[0].ancho,
               Largo : data[0].largo, 
-              Af_Izquierdo : data[0].anchoFuelle_Derecha,
-              Af_Derecho : data[0].anchoFuelle_Izquierda,
-              Af_Abajo : data[0].anchoFuelle_Abajo,
+              Af_Izquierdo : 0,
+              Af_Derecho : 0,
+              Af_Abajo : 0,
               Rasgado : `OK`,
               Filtrado : `NO`,
               Presion : `NO`,

@@ -167,8 +167,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     if(this.registros.length == 0) {
       this.registros.unshift({});
       setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
-    }
-    else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    } else if(this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
     else {
       this.registros.unshift({});
       setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
