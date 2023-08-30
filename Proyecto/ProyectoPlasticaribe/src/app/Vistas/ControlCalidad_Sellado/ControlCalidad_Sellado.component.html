@@ -64,6 +64,7 @@
             <th><input pInputText (input)="aplicarfiltro($event, 'Precorte', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Perforacion', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'BolsasxPaq', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
             <th></th>
         </tr>
@@ -72,7 +73,7 @@
             <th colspan="3" class="text-center">Ancho de fuelle (Cms)</th>
             <th></th>
             <th colspan="2" class="text-center">Pruebas</th>
-            <th colspan="8"></th>
+            <th colspan="9"></th>
         </tr>
         <tr>
             <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
@@ -94,6 +95,7 @@
             <th style="min-width : 100px">Precorte</th>
             <th style="min-width : 100px">Perforación</th>
             <th style="min-width : 100px">Bolsas x Paq.</th>
+            <th style="min-width : 100px">Fecha Registro</th>
             <th style="min-width : 200px">Observación</th>
             <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
         </tr>
@@ -310,6 +312,17 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
+             <!--Fecha-->
+             <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Fecha" [readOnly]="true">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Fecha}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
             <!--Observación-->
             <td>
                 <p-cellEditor>
@@ -327,6 +340,7 @@
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="filaCancelar(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing && esRegistro" pButton pRipple type="button" pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
                 </div>
             </td>
         </tr>

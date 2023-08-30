@@ -60,6 +60,7 @@ editMode="row">
             <th><input pInputText (input)="aplicarfiltro($event, 'Tratado', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Rasgado', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'TipoBobina', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Observacion', 'contains')"></th>
             <th></th>
         </tr>
@@ -87,6 +88,7 @@ editMode="row">
           <th style="min-width : 100px">Tratado</th>
           <th style="min-width : 100px">Rasgado</th>
           <th style="min-width : 100px">Tipo Bobina</th>
+          <th style="min-width : 100px">Fecha Registro</th>
           <th style="min-width : 200px">Observacion</th>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
         </tr>
@@ -97,7 +99,7 @@ editMode="row">
              <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri, editing)"></p-inputNumber>
+                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.OT}}
@@ -284,6 +286,17 @@ editMode="row">
                 </ng-template>
             </p-cellEditor>
             </td>
+            <!--Fecha-->
+            <td>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" [(ngModel)]="registro.Fecha" [readOnly]="true">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Fecha}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
             <!--Observación-->
             <td>
                 <p-cellEditor>
@@ -301,6 +314,7 @@ editMode="row">
                     <button *ngIf="!editing" id="edit_{{ri}}" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing && esRegistro" pButton pRipple type="button" pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
                 </div>
             </td>      
         </tr>

@@ -46,7 +46,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
-  
+  esRegistro : boolean = false; //Variable que se usará para saber si se está editando un registro nuevo
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -76,7 +76,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   cargarPigmentos = () => this.srvPigmentos.srvObtenerLista().subscribe(data => { this.pigmentos = data; }); 
 
   //Función que consultará los turnos
-  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { this.turnos = data; }); 
+  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { 
+    this.turnos = data; 
+    this.turnos = this.turnos.filter(item => ["DIA", "NOCHE"].includes(item.turno_Id));
+   }); 
 
   //Función que consultará las OT con rondas el día de hoy
   mostrarRegistrosHoy() {
@@ -120,15 +123,17 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Tratado : datos.ccExt_Tratado,
       Rasgado : datos.ccExt_Rasgado,
       TipoBobina : datos.ccExt_TipoBobina,
+      Fecha : datos.ccExt_Fecha.replace('T00:00:00', ''),
       Observacion : datos.ccExt_Observacion,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
     this.registros.sort((a, b) => a.OT - b.OT);
+    this.registros.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
   }
 
   //Función que va a consultar la información de la OT a la que desea agregar una ronda.
-  consultarOT(datos : any, indexTabla : number, editando : boolean){
+  consultarOT(datos : any, indexTabla : number){
     this.load = true;
     this.ronda = 0;
     this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato; });
@@ -140,14 +145,16 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
           if(data.length > 0){
-            editando = true;
             let cantRegistros : number = data.length;
             let indice = Math.floor(Math.random() * cantRegistros);
-            this.cargarRegistro(data[indice], indexTabla, editando);
+            this.cargarRegistro(data[indice], indexTabla);
             this.load = false;
             setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
             //setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 500); 
-          } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
+          } else { 
+            this.load = false;
+            this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
+          } 
         });
       }
     }, 500);
@@ -162,7 +169,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
-  cargarRegistro(data : any, indexTabla : number, editando){
+  cargarRegistro(data : any, indexTabla : number){
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
     let info : any = {
       Id : 0,
@@ -185,6 +192,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Tratado : ``,
       Rasgado : ``,
       TipoBobina : ``,
+      Fecha : this.today,
       Observacion : ``,
     }
     this.registros[indexTabla] = info;
@@ -196,6 +204,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.load = true;
     let esError : boolean = false;
     this.onReject(`eleccion`);
+
     let modelo : modelControlCalidad_Extrusion = {
       CcExt_Id: 0,
       Turno_Id: fila.Turno,
@@ -226,16 +235,17 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
      else {
-      this.mostrarRegistrosHoy();
+      this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
       setTimeout(() => { 
+        this.mostrarRegistrosHoy();
         this.load = false;
-        this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-      }, 3000);
+      }, 500);
     }
   }
 
   //Función que se ejecutará cuando se haga click en el botón de Editar
   onRowEditInit(data : any, indice : number) {
+    (indice > 0 || data.Id > 0) ? this.esRegistro = false : this.esRegistro = true; 
     this.registroClonado[indice] = {...data};
   }
   
@@ -282,14 +292,17 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
     if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
     else {
-      this.mostrarRegistrosHoy();
       this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
-      setTimeout(() => { this.load = false; }, 2500);
+      setTimeout(() => { 
+        this.mostrarRegistrosHoy();
+        this.load = false; 
+      }, 500);
     } 
   }
 
   //función que cancela la selección/edición de la fila.
   onRowEditCancel(data : any, indice : number) {
+    indice > 0 ? this.esRegistro = false : this.esRegistro = true; 
     this.registros[indice] = this.registroClonado[indice];
     delete this.registroClonado[indice];
   }
@@ -304,7 +317,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   /** Cerrar Dialogo de eliminación*/
   onReject = (dato : any) => this.msg.clear(dato);
 
+  //Quitar registro de la tabla
   quitarRegistro(index : number){
+    index > 0 ? this.esRegistro = false : this.esRegistro = true;
     this.registros.splice(index, 1);
   }
 
