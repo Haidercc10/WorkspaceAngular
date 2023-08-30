@@ -38,6 +38,8 @@ export class EntradaBOPPService {
 
   srvActualizar = (id:any, data:any) => this.http.put(rutaPlasticaribeAPI + `/BOPP/${id}`, data);
 
+  PutInventarioBiorientado = (id : number, cantidad : number) => this.http.put(rutaPlasticaribeAPI + `/BOPP/putInventarioBiorientado/${id}/${cantidad}`, cantidad);
+
   srvGuardar = (data: modelBOPP): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/BOPP', data);
 
   GetInventarioBoppsGenericos = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/BOPP/getInventarioBoppsGenericos');

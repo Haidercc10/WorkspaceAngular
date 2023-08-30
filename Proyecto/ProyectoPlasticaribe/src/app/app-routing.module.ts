@@ -4,6 +4,7 @@ import { VistasPermisosGuard } from './Guards/vistas-permisos.guard';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
+import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
@@ -64,9 +65,6 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
-import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
-import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
-import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 
 export const routes: Routes = [
 
@@ -185,13 +183,13 @@ export const routes: Routes = [
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
 
-   /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
-   {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
-   {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
+  /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
+  {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
+  {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
 
-   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-   {path: 'control-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad'}, component: ControlCalidadComponent},
-  ]
+  /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
+  {path: 'control-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad'}, component: ControlCalidadComponent},
+]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
