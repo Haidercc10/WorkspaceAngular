@@ -2,7 +2,7 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
-import { InitEditableRow, Table } from 'primeng/table';
+import { Table } from 'primeng/table';
 import { modelControlCalidad_Extrusion } from 'src/app/Modelo/modelControlCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_ExtrusionService } from 'src/app/Servicios/ControlCalidad_Extrusion/ControlCalidad_Extrusion.service';
@@ -46,7 +46,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
-  esRegistro : boolean = false; //Variable que se usará para saber si se está editando un registro nuevo
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -126,6 +125,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       Fecha : datos.ccExt_Fecha.replace('T00:00:00', ''),
       Observacion : datos.ccExt_Observacion,
       CalibreTB : datos.ccExt_CalibreTB,
+      Guardado : true,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
@@ -254,7 +254,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que se ejecutará cuando se haga click en el botón de Editar
   onRowEditInit(data : any, indice : number) {
-    (indice > 0 || data.Id > 0) ? this.esRegistro = false : this.esRegistro = true; 
     this.registroClonado[indice] = {...data};
   }
   
@@ -312,7 +311,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //función que cancela la selección/edición de la fila.
   onRowEditCancel(data : any, indice : number) {
-    indice > 0 ? this.esRegistro = false : this.esRegistro = true; 
     this.registros[indice] = this.registroClonado[indice];
     delete this.registroClonado[indice];
   }
@@ -329,7 +327,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Quitar registro de la tabla
   quitarRegistro(index : number){
-    index > 0 ? this.esRegistro = false : this.esRegistro = true;
     this.registros.splice(index, 1);
   }
 

@@ -101,7 +101,7 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
-        <tr [pEditableRow]="registro">
+        <tr [pEditableRow]="registro" [ngClass]="{'noEnviados' : !registro.Guardado}">
             <!--OT-->
             <td pFrozenColumn [frozen]="true" alignFrozen="left">
                 <p-cellEditor>
@@ -109,6 +109,7 @@
                         <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
+                        <i *ngIf="!registro.Guardado" class="pi pi-exclamation-circle cursor font-size-16" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>
                         {{registro.OT}}
                     </ng-template>
                 </p-cellEditor>
@@ -340,7 +341,7 @@
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="filaEditar(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="filaCancelar(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
-                    <button *ngIf="editing && esRegistro" pButton pRipple type="button" pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
+                    <button *ngIf="editing && !registro.Guardado" pButton pRipple type="button" pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
                 </div>
             </td>
         </tr>

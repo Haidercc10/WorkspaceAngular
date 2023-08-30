@@ -37,7 +37,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   @ViewChild('dtSellado') dtSellado: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de sellado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  esRegistro : boolean = false; //Variable que se usará para saber si se está editando un registro nuevo
 
 
   constructor(private srvTurnos : TurnosService,
@@ -126,6 +125,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       BolsasxPaq : datos.ccSel_CantBolsasxPaq,
       Fecha : datos.ccSel_Fecha.replace('T00:00:00', ''),
       Observacion : datos.ccSel_Observacion,
+      Guardado : true,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
@@ -259,13 +259,11 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   //. Función que clona la fila seleccionada para poder editarla.
   filaEditar(fila : any, index : number) {
-    index > 0 ? this.esRegistro = false : this.esRegistro = true; 
     this.registroClonado[index] = {...fila};
   } 
   
   // Función que cancela la edición de la fila.
   filaCancelar(fila : any, index : number) {
-    index > 0 ? this.esRegistro = false : this.esRegistro = true;
     this.registros[index] = this.registroClonado[index];
     delete this.registroClonado[index];
   }
@@ -274,7 +272,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtSellado!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   quitarRegistro(index : number){
-    index > 0 ? this.esRegistro = false : this.esRegistro = true;
     this.registros.splice(index, 1);
   }
 }
