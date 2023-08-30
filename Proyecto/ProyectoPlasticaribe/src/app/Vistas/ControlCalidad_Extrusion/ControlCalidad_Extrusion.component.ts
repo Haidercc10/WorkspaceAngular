@@ -72,13 +72,15 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   //Función que consultará todos los Pigmentos
-  cargarPigmentos = () => this.srvPigmentos.srvObtenerLista().subscribe(data => { this.pigmentos = data; }); 
+  cargarPigmentos = () => this.srvPigmentos.srvObtenerLista().subscribe(data => this.pigmentos = data); 
 
   //Función que consultará los turnos
-  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { 
-    this.turnos = data; 
-    this.turnos = this.turnos.filter(item => ["DIA", "NOCHE"].includes(item.turno_Id));
-   }); 
+  cargarTurnos() {
+    this.srvTurnos.srvObtenerLista().subscribe(data => { 
+      this.turnos = data; 
+      this.turnos = this.turnos.filter(item => ["DIA", "NOCHE"].includes(item.turno_Id));
+    });
+  }
 
   //Función que consultará las OT con rondas el día de hoy
   mostrarRegistrosHoy() {
@@ -88,13 +90,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let fechaFin : any = this.rangoFechas[1] == null || this.rangoFechas[1].length == 0 ? fechaInicio : moment(this.rangoFechas[1]).format('YYYY-MM-DD');
     
     this.srvCcExtrusion.Get_TodoHoy(fechaInicio, fechaFin).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          this.cargarRegistrosCCExtrusion(data[index]);
-        }
-      }
-      this.load = false;
-    });
+      if(data.length > 0) data.forEach(res => this.cargarRegistrosCCExtrusion(res));
+    }, null, () => this.load = false);
   }
 
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
@@ -137,11 +134,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   consultarOT(datos : any, indexTabla : number){
     this.load = true;
     this.ronda = 0;
-    this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => { this.ronda = dato; });
-    setTimeout(() => {
+    this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => this.ronda = dato, null, () => {
       this.ronda += 1;
       if(this.ronda > 3) {
-        this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`)
+        this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`);
         this.registros.shift();
       } else {
         this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
@@ -151,27 +147,24 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
             this.cargarRegistro(data[indice], indexTabla);
             this.load = false;
             setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
-            //setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 500); 
           } else { 
             this.load = false;
-            this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`)
+            this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`);
           } 
         });
       }
-    }, 500);
-   
+    });
   }
 
   //Función que agregará una fila vacia a la tabla de registros.
   agregarFila() {
-    if(this.registros.length == 0 || this.registros[0] == undefined) {
+    if (this.registros.length == 0 || this.registros[0] == undefined) {
       this.registros.unshift({});
-      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
-    } else if(this.registros[0].Id == undefined) {
-      this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
-    } else {
+      setTimeout(() => this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]), 200); 
+    } else if (this.registros[0].Id == undefined) this.msjs.mensajeAdvertencia(`Advertencia`, `No se puede agregar otra fila vacia!`);
+    else {
       this.registros.unshift({});
-      setTimeout(() => { this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]); }, 200); 
+      setTimeout(() => this.dtExtrusion.initRowEdit(this.dtExtrusion.value[0]), 200); 
     }
   }
 
@@ -210,7 +203,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   registrarRonda(fila : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
     this.load = true;
-    let esError : boolean = false;
     this.onReject(`eleccion`);
 
     let modelo : modelControlCalidad_Extrusion = {
@@ -241,21 +233,14 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_Observacion: fila.Observacion,
       CcExt_CalibreTB: fila.CalibreTB,
     }
-    this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-     if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`)
-     else {
+    this.srvCcExtrusion.Post(modelo).subscribe(() => {
       this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-      setTimeout(() => { 
-        this.mostrarRegistrosHoy();
-        this.load = false;
-      }, 500);
-    }
+      setTimeout(() => this.mostrarRegistrosHoy(), 500);
+    }, () => this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`), () => this.load = false); 
   }
 
   //Función que se ejecutará cuando se haga click en el botón de Editar
-  onRowEditInit(data : any, indice : number) {
-    this.registroClonado[indice] = {...data};
-  }
+  onRowEditInit = (data : any, indice : number) => this.registroClonado[indice] = {...data};
   
   //Función que validará si la ronda ya existe, si existe se editará, si no se creará
   validarId(data : any){
@@ -268,7 +253,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   editarRonda(fila : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
     this.load = true;
-    let esError : boolean = false;
     this.onReject(`eleccion`);
     let modelo : modelControlCalidad_Extrusion = {
       CcExt_Id: fila.Id,
@@ -298,19 +282,14 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CcExt_Observacion: fila.Observacion,
       CcExt_CalibreTB: fila.CalibreTB
     }
-    this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(data => { esError = false; }, error => { esError = true; });
-    if(esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
-    else {
+    this.srvCcExtrusion.Put(fila.Id, modelo).subscribe(() => {
       this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada correctamente!`);
-      setTimeout(() => { 
-        this.mostrarRegistrosHoy();
-        this.load = false; 
-      }, 500);
-    } 
+      setTimeout(() => this.mostrarRegistrosHoy(), 500);
+    }, () => this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`), () => this.load = false); 
   }
 
   //función que cancela la selección/edición de la fila.
-  onRowEditCancel(data : any, indice : number) {
+  onRowEditCancel(indice : number) {
     this.registros[indice] = this.registroClonado[indice];
     delete this.registroClonado[indice];
   }
@@ -326,9 +305,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   onReject = (dato : any) => this.msg.clear(dato);
 
   //Quitar registro de la tabla
-  quitarRegistro(index : number){
-    this.registros.splice(index, 1);
-  }
+  quitarRegistro = (index : number) => this.registros.splice(index, 1);
 
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);

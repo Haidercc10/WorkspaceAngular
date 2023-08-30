@@ -329,7 +329,7 @@ editMode="row">
                 <div class="flex align-items-center justify-content-center gap-2">
                     <button *ngIf="!editing" id="edit_{{ri}}" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(registro, ri)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="mostrarEleccion(registro)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(registro, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(ri)" class="p-button-rounded p-button-text p-button-danger"></button>
                     <button *ngIf="editing && !registro.Guardado" pButton pRipple type="button" pTooltip="Quitar registro" icon="pi pi-trash" (click)="quitarRegistro(ri)" class="p-button-rounded p-button-danger"></button>
                 </div>
             </td>      
