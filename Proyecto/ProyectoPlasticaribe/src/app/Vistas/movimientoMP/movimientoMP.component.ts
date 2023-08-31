@@ -67,11 +67,7 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion para obtener los diferentes tipos de documentos que podemos encontrar
   obtenerTipoDocumento(){
@@ -91,7 +87,7 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // Funcion que va a obtener la información de las materias primas
-  obtenerMateriasPrimas = () => this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos => { this.materiasPrimas = datos; });
+  obtenerMateriasPrimas = () => this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos => this.materiasPrimas = datos);
 
   // Funcion que va a limpiar el formulario
   limpiarCampos = () => this.formMovimientos.reset();
@@ -114,15 +110,13 @@ export class MovimientoMPComponent implements OnInit {
     this.movimientosPolietilenos = [];
     this.movimientosTintas = [];
     this.movimientosBiorientados = [];
+    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let codigo : any = this.formMovimientos.value.Codigo;
-    let fechaInicial : any = moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD');
-    let fechaFinal : any =moment( this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
+    let fechaInicial : any = moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD');
+    let fechaFinal : any =moment( this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
     let tipoMovimiento : any = this.formMovimientos.value.TipoMovimiento;
     let materiaPrima : any = this.formMovimientos.value.MateriasPrimas_Id;
     let ruta : string = ``;
-
-    if (fechaInicial == 'Fecha inválida') fechaInicial = moment().format('YYYY-MM-DD');
-    if (fechaFinal == 'Fecha inválida') fechaFinal = fechaInicial;
 
     if (codigo != null && tipoMovimiento != null && materiaPrima != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}&materiaPrima=${materiaPrima}`;
     else if (codigo != null && tipoMovimiento != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}`;
@@ -167,16 +161,12 @@ export class MovimientoMPComponent implements OnInit {
         if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id != 449 || datos[i].bopp_Id != 1)) this.movimientosBiorientados.push(info);
         this.movimientosBiorientados.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
         this.movimientosBiorientados.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
-        this.cargando = false;
       }
-      if (datos.length == 0) {
-        this.cargando = false;
-        this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
-      }
+      if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
     }, () => {
       this.cargando = false;
       this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`)
-    });
+    }, () => this.cargando = false);
 
     if (codigo != null) {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
@@ -194,6 +184,7 @@ export class MovimientoMPComponent implements OnInit {
   // Funcion que va a validar el tipo de movimiento para crear el pdf
   validarTipoMovimiento(data : any){
     this.datosPdf = [];
+    this.cargando = true;
     if (data.Movimiento == 'ASIGMP' || data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY' || data.Movimiento == 'ASIGTINTAS') {
       this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -217,8 +208,8 @@ export class MovimientoMPComponent implements OnInit {
           }
           this.datosPdf.push(info);
         }
-        setTimeout(() => { this.crearPDFAsignaciones(datos); }, 1500);
-      });
+        setTimeout(() => this.crearPDF(datos), 1500);
+      }, () => this.cargando = false, () => this.cargando = false);
     } else if (data.Movimiento == 'CRTINTAS') {
       this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -249,8 +240,8 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() => { this.crearPDFCreacionTinta(datos); }, 1500);
-      });
+        setTimeout(() =>  this.crearPDF(datos), 1500);
+      }, () => this.cargando = false, () => this.cargando = false);
     } else if (data.Movimiento == 'DEVMP') {
       this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -284,8 +275,8 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() => { this.crearPDFDevoluciones(datos); }, 1500);
-      });
+        setTimeout(() =>  this.crearPDF(datos), 1500);
+      }, () => this.cargando = false, () => this.cargando = false);
     } else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') {
       this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -318,119 +309,104 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() => { this.crearPDFEntradasMateriasPrimas(datos); }, 1500);
-      });
+        setTimeout(() => this.crearPDF(datos), 1500);
+      }, () => this.cargando = false, () => this.cargando = false);
     }
   }
 
-  // Funcion que va a crear un PDF para las asignaciones de materia prima
-  crearPDFAsignaciones(data : any){
-    let nombre : string = this.AppComponent.storage_Nombre;
+  // Funcion que va a crear un PDF
+  crearPDF(data : any){
     for (let i = 0; i < data.length; i++) {
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
         pageSize: { width: 630, height: 760 },
-        footer: function(currentPage : any, pageCount : any) {
+        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+        pageMargins : [25, 130, 25, 35],
+        header: function(currentPage : any, pageCount : any) {
           return [
             {
+              margin: [20, 8, 20, 0],
               columns: [
-                { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                {
+                  width: 300,
+                  alignment: 'center',
+                  table: {
+                    body: [
+                      [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                      [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                      [{text: `${data[i].tipo_Movimiento} N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
+                    ]
+                  },
+                  layout: 'noBorders',
+                  margin: [85, 20],
+                },
+                {
+                  width: '*',
+                  alignment: 'center',
+                  margin: [20, 20, 20, 0],
+                  table: {
+                    body: [
+                      [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].fecha.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].usuario, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    ]
+                  },
+                  layout: 'noBorders',
+                }
               ]
-            }
-          ]
-        },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        content : [
-          {
-            columns: [
-              {
-                image : logoParaPdf,
-                width : 220,
-                height : 50
+            },
+            {
+              margin: [20, 0],
+              table: {
+                headerRows: 1,
+                widths: ['*'],
+                body: [
+                  [
+                    {
+                      border: [false, true, false, false],
+                      text: ''
+                    },
+                  ],
+                ]
               },
-              {
-                text: `${data[i].tipo_Movimiento} N° ${data[i].id}`,
-                alignment: 'right',
-                style: 'titulo',
-                margin: 30
-              }
-            ]
-          },
-          '\n \n',
-          {
-            style: 'tablaEmpresa',
+              layout: { defaultBorder: false, }
+            },
+          ];
+        },
+        content : [
+          ['Remisión', 'Factura de Compra'].includes(data[i].tipo_Movimiento) ? {
+            text: `\n Información detallada del Proveedor \n \n`,
+            alignment: 'center',
+            style: 'header'
+          } : '',
+          ['Remisión', 'Factura de Compra'].includes(data[i].tipo_Movimiento) ? {
+            style: 'tablaCliente',
             table: {
-              widths: [90, 167, 90, 166],
+              widths: [210,171, 171],
               style: 'header',
               body: [
                 [
-                  {
-                    border: [false, false, false, false],
-                    text: `Nombre Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Nombre}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Fecha`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                  },
+                  `ID: ${data[i].proveedor_Id}`,
+                  `Tipo de ID: ${data[i].tipo_Id_Proveedor}`,
+                  `Tipo de Proveedor: ${data[i].tipo_Proveedor}`
                 ],
                 [
-                  {
-                    border: [false, false, false, false],
-                    text: `NIT Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Id}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Orden de Trabajo`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].codigo}`
-                  },
+                  `Nombre: ${data[i].proveedor}`,
+                  `Telefono: ${data[i].telefono_Proveedor}`,
+                  `Ciudad: ${data[i].ciudad_Proveedor}`
                 ],
                 [
-                  {
-                    border: [false, false, false, false],
-                    text: `Dirección`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Direccion}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Maquina`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].maquina}`
-                  },
+                  `E-mail: ${data[i].correo_Proveedor}`,
+                  ``,
+                  ``
                 ]
               ]
             },
-            layout: { defaultBorder: false, },
+            layout: 'lightHorizontalLines',
             fontSize: 9,
-          },
-          '\n \n',
-          {
-            text: `Usuario: ${data[i].usuario}\n`,
-            alignment: 'left',
-            style: 'header',
-          },
-          '\n \n',
+          } : '',
           {
             text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
             alignment: 'center',
@@ -440,7 +416,7 @@ export class MovimientoMPComponent implements OnInit {
           {
             style: 'tablaTotales',
             table: {
-              widths: [197, '*', 50, '*', '*', 98],
+              widths: [227, '*', 50, '*', '*', 98],
               style: 'header',
               body: [
                 [
@@ -483,488 +459,7 @@ export class MovimientoMPComponent implements OnInit {
       }
       const pdf = pdfMake.createPdf(pdfDefinicion);
       pdf.open();
-      break;
-    }
-  }
-
-  // Funcion que va a crear un PDF para las devoluciones de materia prima
-  crearPDFDevoluciones(data : any){
-    let nombre : string = this.AppComponent.storage_Nombre;
-    for (let i = 0; i < data.length; i++) {
-      const pdfDefinicion : any = {
-        info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
-        pageSize: { width: 630, height: 760 },
-        footer: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              columns: [
-                { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-              ]
-            }
-          ]
-        },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        content : [
-          {
-            columns: [
-              {
-                image : logoParaPdf,
-                width : 220,
-                height : 50
-              },
-              {
-                text: `${data[i].tipo_Movimiento} N° ${data[i].id}`,
-                alignment: 'right',
-                style: 'titulo',
-                margin: 30
-              }
-            ]
-          },
-          '\n \n',
-          {
-            style: 'tablaEmpresa',
-            table: {
-              widths: [90, 167, 90, 166],
-              style: 'header',
-              body: [
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `Nombre Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Nombre}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Fecha`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                  },
-                ],
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `NIT Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Id}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Orden de Trabajo`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].codigo}`
-                  },
-                ],
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `Dirección`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Direccion}`
-                  },
-                  {},
-                  {},
-                ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n \n',
-          {
-            text: `Usuario: ${data[i].usuario}\n`,
-            alignment: 'left',
-            style: 'header',
-          },
-          '\n \n',
-          {
-            text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-          this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']),
-          {
-            style: 'tablaTotales',
-            table: {
-              widths: [197, '*', 50, '*', '*', 98],
-              style: 'header',
-              body: [
-                [
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Peso Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`
-                  },
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Valor Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 8,
-          },
-          '\n \n',
-          {
-            text: `\n \nObservación: \n ${data[i].observacion}\n`,
-            style: 'header',
-          }
-        ],
-        styles: {
-          header: { fontSize: 10, bold: true },
-          titulo: { fontSize: 20, bold: true }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      break;
-    }
-  }
-
-  // Funcion que va a crear un PDF para las creaciones de tintas
-  crearPDFCreacionTinta(data : any) {
-    let nombre : string = this.AppComponent.storage_Nombre;
-    for (let i = 0; i < data.length; i++) {
-      const pdfDefinicion : any = {
-        info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
-        pageSize: { width: 630, height: 760 },
-        footer: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              columns: [
-                { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-              ]
-            }
-          ]
-        },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        content : [
-          {
-            columns: [
-              {
-                image : logoParaPdf,
-                width : 220,
-                height : 50
-              },
-              {
-                text: `${data[i].tipo_Movimiento} N° ${data[i].id}`,
-                alignment: 'right',
-                style: 'titulo',
-                margin: 30
-              }
-            ]
-          },
-          '\n \n',
-          {
-            style: 'tablaEmpresa',
-            table: {
-              widths: [90, 167, 90, 166],
-              style: 'header',
-              body: [
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `Nombre Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Nombre}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Fecha`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                  },
-                ],
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `NIT Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Id}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Dirección`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Direccion}`
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n \n',
-          {
-            text: `Usuario: ${data[i].usuario}\n`,
-            alignment: 'left',
-            style: 'header',
-          },
-          '\n',
-          {
-            text: `Se crearon ${this.formatonumeros(data[i].cantidad_Creada)} Kg de la Tinta ${data[i].tinta_Creada}\n`,
-            alignment: 'left',
-            style: 'header',
-          },
-          '\n',
-          {
-            text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-          this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']),
-          {
-            style: 'tablaTotales',
-            table: {
-              widths: [197, '*', 50, '*', '*', 98],
-              style: 'header',
-              body: [
-                [
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Peso Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`
-                  },
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Valor Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 8,
-          },
-          '\n \n',
-          {
-            text: `\n \nObservación: \n ${data[i].observacion == null ? '' : data[i].observacion}\n`,
-            style: 'header',
-          }
-        ],
-        styles: {
-          header: { fontSize: 10, bold: true },
-          titulo: { fontSize: 20, bold: true }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      break;
-    }
-  }
-
-  // Funcion que va a crear un PDF para las entradas de materias primas
-  crearPDFEntradasMateriasPrimas(data : any) {
-    let nombre : string = this.AppComponent.storage_Nombre;
-    for (let i = 0; i < data.length; i++) {
-      const pdfDefinicion : any = {
-        info: { title: `${data[i].tipo_Movimiento} N° ${data[i].codigo}` },
-        pageSize: { width: 630, height: 760 },
-        footer: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              columns: [
-                { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-              ]
-            }
-          ]
-        },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        content : [
-          {
-            columns: [
-              {
-                image : logoParaPdf,
-                width : 220,
-                height : 50
-              },
-              {
-                text: `${data[i].tipo_Movimiento} N° ${data[i].codigo}`,
-                alignment: 'right',
-                style: 'titulo',
-                margin: 30
-              }
-            ]
-          },
-          '\n \n',
-          {
-            style: 'tablaEmpresa',
-            table: {
-              widths: [90, 167, 90, 166],
-              style: 'header',
-              body: [
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `Nombre Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Nombre}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Fecha`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                  },
-                ],
-                [
-                  {
-                    border: [false, false, false, false],
-                    text: `NIT Empresa`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Id}`
-                  },
-                  {
-                    border: [false, false, false, false],
-                    text: `Dirección`
-                  },
-                  {
-                    border: [false, false, false, true],
-                    text: `${data[i].empresa_Direccion}`
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n \n',
-          {
-            text: `Usuario: ${data[i].usuario}\n`,
-            alignment: 'left',
-            style: 'header',
-          },
-          '\n \n',
-          {
-            text: `\n\n Información detallada del Proveedor \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-          {
-            style: 'tablaCliente',
-            table: {
-              widths: ['*', '*', '*'],
-              style: 'header',
-              body: [
-                [
-                  `ID: ${data[i].proveedor_Id}`,
-                  `Tipo de ID: ${data[i].tipo_Id_Proveedor}`,
-                  `Tipo de Proveedor: ${data[i].tipo_Proveedor}`
-                ],
-                [
-                  `Nombre: ${data[i].proveedor}`,
-                  `Telefono: ${data[i].telefono_Proveedor}`,
-                  `Ciudad: ${data[i].ciudad_Proveedor}`
-                ],
-                [
-                  `E-mail: ${data[i].correo_Proveedor}`,
-                  ``,
-                  ``
-                ]
-              ]
-            },
-            layout: 'lightHorizontalLines',
-            fontSize: 9,
-          },
-          '\n \n',
-          {
-            text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-          this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']),
-          {
-            style: 'tablaTotales',
-            table: {
-              widths: [197, '*', 50, '*', '*', 98],
-              style: 'header',
-              body: [
-                [
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Peso Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`
-                  },
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Valor Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 8,
-          },
-          '\n \n',
-          {
-            text: `\n \nObservación: \n ${data[i].observacion}\n`,
-            style: 'header',
-          }
-        ],
-        styles: {
-          header: { fontSize: 10, bold: true },
-          titulo: { fontSize: 20, bold: true }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
+      this.cargando = false;
       break;
     }
   }
@@ -988,7 +483,7 @@ export class MovimientoMPComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [50, 197, 50, 50, 50, 98],
+        widths: [50, 227, 50, 50, 50, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
@@ -1001,27 +496,16 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // Funcion que va a devolver la cantidad total pesada de materia prima asignada
-  calcularTotalCantidad(data : any) : number{
-    let can : number = 0;
-    for (const item of data) {
-      can += item.cantidad;
-    }
-    return can;
-  }
+  calcularTotalCantidad = (data : any) : number => data.reduce((a, b) => a + b.cantidad, 0);
 
   // Funcion que va a devolver el costo total de la materia prima asignada
-  calcularTotalCosto(data : any) : number{
-    let can : number = 0;
-    for (const item of data) {
-      can += item.subTotal;
-    }
-    return can;
-  }
+  calcularTotalCosto = (data : any) : number => data.reduce((a, b) => a + b.subTotal, 0);
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
   aplicarfiltro1 = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   aplicarfiltro2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   aplicarfiltro3 = ($event, campo : any, valorCampo : string) => this.dt3!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
