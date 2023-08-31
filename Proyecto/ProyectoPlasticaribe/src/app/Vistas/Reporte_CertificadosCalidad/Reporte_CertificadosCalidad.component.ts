@@ -108,6 +108,8 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     }
     this.certificados.push(info);
     
+    
+
     let parametrosCuantitativos  : any = [
       {
         consecutivo : data.consecutivo,

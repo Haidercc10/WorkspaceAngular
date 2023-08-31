@@ -92,7 +92,7 @@ editMode="row">
           <th style="min-width : 100px">Rasgado</th>
           <th style="min-width : 100px">Tipo</th>
           <th style="min-width : 100px">Calibre</th>
-          <th style="min-width : 100px">Fecha Registro</th>
+          <th style="min-width : 120px">Fecha Registro</th>
           <th style="min-width : 200px">Observacion</th>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
         </tr>
@@ -100,14 +100,14 @@ editMode="row">
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
         <tr [pEditableRow]="registro" [ngClass]="{'noEnviados' : !registro.Guardado}">
             <!--OT-->
-             <td pFrozenColumn [frozen]="true" alignFrozen="left">
+             <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
+                        <p-inputNumber  type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         <i *ngIf="!registro.Guardado" class="pi pi-exclamation-circle cursor font-size-16" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>
-                        {{registro.OT}}
+                        <b>{{registro.OT}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -119,7 +119,7 @@ editMode="row">
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
+                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" [style]="{'width':'100%'}"></p-dropdown>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Turno}}
@@ -133,7 +133,7 @@ editMode="row">
                       <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
                   </ng-template>
                   <ng-template pTemplate="output">
-                      {{registro.Maquina}}
+                      <b>{{registro.Maquina}}</b>
                   </ng-template>
                 </p-cellEditor>
             </td>
@@ -155,7 +155,7 @@ editMode="row">
                       <input pInputText type="text" [readonly]="true" [(ngModel)]="registro.Referencia">
                   </ng-template>
                   <ng-template pTemplate="output">
-                      {{registro.Referencia}}
+                      <b>{{registro.Referencia}}</b>
                   </ng-template>
               </p-cellEditor>
             </td>
@@ -287,7 +287,7 @@ editMode="row">
                     <p-dropdown [options]="tiposBobinas" appendTo="body" [(ngModel)]="registro.TipoBobina" [style]="{'width':'100%'}"></p-dropdown>
                 </ng-template>
                 <ng-template pTemplate="output">
-                    {{registro.TipoBobina}}
+                    <b>{{registro.TipoBobina}}</b>
                 </ng-template>
             </p-cellEditor>
             </td>
@@ -309,7 +309,7 @@ editMode="row">
                         <input pInputText type="text" [(ngModel)]="registro.Fecha" [readOnly]="true">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{registro.Fecha}}
+                        <b>{{registro.Fecha}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>

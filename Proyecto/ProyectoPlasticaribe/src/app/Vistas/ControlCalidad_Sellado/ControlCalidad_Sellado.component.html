@@ -103,14 +103,14 @@
     <ng-template pTemplate="body" let-registro let-editing="editing" let-ri="rowIndex">
         <tr [pEditableRow]="registro" [ngClass]="{'noEnviados' : !registro.Guardado}">
             <!--OT-->
-            <td pFrozenColumn [frozen]="true" alignFrozen="left">
+            <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         <i *ngIf="!registro.Guardado" class="pi pi-exclamation-circle cursor font-size-16" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>
-                        {{registro.OT}}
+                        <b>{{registro.OT}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -122,8 +122,7 @@
             <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno"
-                            optionLabel="turno_Nombre" optionValue="turno_Id" [style]="{'width':'100%'}"></p-dropdown>
+                        <p-dropdown [options]="turnos" appendTo="body" [(ngModel)]="registro.Turno" [style]="{'width':'100%'}"></p-dropdown>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Turno}}
@@ -137,7 +136,7 @@
                         <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{registro.Maquina}}
+                        <b>{{registro.Maquina}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -148,7 +147,7 @@
                         <input pInputText type="text" [readonly]="true" [(ngModel)]="registro.Referencia">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{registro.Referencia}}
+                        <b>{{registro.Referencia}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -309,7 +308,7 @@
                         <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.BolsasxPaq"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{registro.BolsasxPaq | number : '1.2-2'}}
+                        <b>{{registro.BolsasxPaq | number : '1.2-2'}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -320,7 +319,7 @@
                         <input pInputText type="text" [(ngModel)]="registro.Fecha" [readOnly]="true">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{registro.Fecha}}
+                        <b>{{registro.Fecha}}</b>
                     </ng-template>
                 </p-cellEditor>
             </td>
