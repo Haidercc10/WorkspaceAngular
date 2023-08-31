@@ -28,5 +28,5 @@ constructor(private http : HttpClient) { }
 
     GetItems = (item : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/getItems/${item}`); 
 
-    GetParametrosCualitativos = (id : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/getParametrosCualitativos/${id}`); 
+    GetParametrosCuantitativos = (id : string) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Certificados_Calidad/getParametrosCuantitativos/${id}`); 
 }

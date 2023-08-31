@@ -49,7 +49,6 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.consultarCertificados();
   }
   
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -111,7 +110,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     this.certificados.push(info);
     this.parametros2(data);
     
-    this.srvCertificados.GetParametrosCualitativos(data.consecutivo).subscribe(datos => {
+    this.srvCertificados.GetParametrosCuantitativos(data.consecutivo).subscribe(datos => {
       for (let indx = 0; indx < this.parametros2(data).length; indx++) {
         let indice = this.certificados.findIndex(x => x.Consecutivo == this.parametros2(data)[indx].consecutivo);
         this.certificados[indice].Parametros2.push(this.parametros2(data)[indx]);
@@ -123,6 +122,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     });
   }
 
+  //.Función que cargará y retornará los parametros cualitativos del reporte
   parametros2(data : any) {
     let parametrosCualitativos  : any = [
       {
