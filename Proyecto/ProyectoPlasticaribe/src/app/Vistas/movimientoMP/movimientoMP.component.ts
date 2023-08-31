@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -185,6 +184,7 @@ export class MovimientoMPComponent implements OnInit {
   validarTipoMovimiento(data : any){
     this.datosPdf = [];
     this.cargando = true;
+    let informacionPdf : any;
     if (data.Movimiento == 'ASIGMP' || data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY' || data.Movimiento == 'ASIGTINTAS') {
       this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -208,8 +208,8 @@ export class MovimientoMPComponent implements OnInit {
           }
           this.datosPdf.push(info);
         }
-        setTimeout(() => this.crearPDF(datos), 1500);
-      }, () => this.cargando = false, () => this.cargando = false);
+        informacionPdf = datos;
+      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
     } else if (data.Movimiento == 'CRTINTAS') {
       this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -240,8 +240,8 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() =>  this.crearPDF(datos), 1500);
-      }, () => this.cargando = false, () => this.cargando = false);
+        informacionPdf = datos;
+      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
     } else if (data.Movimiento == 'DEVMP') {
       this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -275,8 +275,8 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() =>  this.crearPDF(datos), 1500);
-      }, () => this.cargando = false, () => this.cargando = false);
+        informacionPdf = datos;
+      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
     } else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') {
       this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -309,8 +309,8 @@ export class MovimientoMPComponent implements OnInit {
             this.datosPdf.push(info);
           }, 500);
         }
-        setTimeout(() => this.crearPDF(datos), 1500);
-      }, () => this.cargando = false, () => this.cargando = false);
+        informacionPdf = datos;
+      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
     }
   }
 
