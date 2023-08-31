@@ -20,7 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ControlCalidad_SelladoComponent implements OnInit {
   registros : any = []; //.Array que cargará los registros en la tabla
-  turnos : any = []; //.Array que cargará los turnos
+  turnos : any = ["DIA", "NOCHE"]; //.Array que cargará los turnos
   eleccion : any = ["SI", "NO", "OK"]; //.Array que se mostrará en campos de elección
   resistencia : any = ["OK", "NO APLICA", "BAJA", "MEDIA", "ALTA"]; //.Array que cargará la resistencia de sellabilidad de un producto
   load : boolean = false; //.Variable que se usará durante la carga de un proceso que requiera tiempo
@@ -39,8 +39,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
 
-  constructor(private srvTurnos : TurnosService,
-                private srvCcSellado : ControlCalidad_SelladoService, 
+  constructor(private srvCcSellado : ControlCalidad_SelladoService, 
                   private srvBagpro : BagproService, 
                     private msjs : MensajesAplicacionService, 
                       private msg : MessageService, 
@@ -50,7 +49,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.cargarTurnos();
     this.mostrarRegistrosHoy();
   }
 
@@ -73,12 +71,6 @@ export class ControlCalidad_SelladoComponent implements OnInit {
       setTimeout(() => { this.dtSellado.initRowEdit(this.dtSellado.value[0]); }, 200); 
     }
   }
-
-  //.Función que cargará la información de los turnos
-  cargarTurnos = () => this.srvTurnos.srvObtenerLista().subscribe(data => { 
-    this.turnos = data; 
-    this.turnos = this.turnos.filter(item => ["DIA", "NOCHE"].includes(item.turno_Id));
-  }); 
 
   //.Función que cargará los registros del día actual
   mostrarRegistrosHoy() {
@@ -271,8 +263,7 @@ export class ControlCalidad_SelladoComponent implements OnInit {
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtSellado!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  quitarRegistro(index : number){
-    this.registros.splice(index, 1);
-  }
+  //.Quitar registro de la tabla
+  quitarRegistro = (index : number) => this.registros.splice(index, 1);
 }
 
