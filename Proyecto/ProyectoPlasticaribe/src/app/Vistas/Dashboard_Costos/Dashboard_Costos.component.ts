@@ -720,7 +720,6 @@ export class Dashboard_CostosComponent implements OnInit {
       cell.font = font;
       cell.border = border;
     });
-    worksheet.mergeCells('A1:O3');
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
@@ -729,7 +728,6 @@ export class Dashboard_CostosComponent implements OnInit {
       cell.font = font;
       cell.border = border
     });
-    worksheet.mergeCells('A5:O5');
     datos.forEach(d => {
       let row = worksheet.addRow(d);
       row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
@@ -765,38 +763,16 @@ export class Dashboard_CostosComponent implements OnInit {
       });
     });
 
-    worksheet.getColumn(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet.getColumn(1).width = 15;
-    worksheet.getColumn(2).width = 50;
-    worksheet.getColumn(3).width = 22;
-    worksheet.getColumn(4).width = 22;
-    worksheet.getColumn(5).width = 22;
-    worksheet.getColumn(6).width = 22;
-    worksheet.getColumn(7).width = 22;
-    worksheet.getColumn(8).width = 22;
-    worksheet.getColumn(9).width = 22;
-    worksheet.getColumn(10).width = 22;
-    worksheet.getColumn(11).width = 22;
-    worksheet.getColumn(12).width = 22;
-    worksheet.getColumn(13).width = 22;
-    worksheet.getColumn(14).width = 22;
-    worksheet.getColumn(15).width = 22;
-    worksheet.mergeCells('A23:O23');
-    worksheet.mergeCells('A69:O69');
-    worksheet.mergeCells('A109:O109');
-    worksheet.mergeCells('A118:O118');
+    let formatNumber : number [] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+    for (let i = 1; i < 16; i++) {
+      worksheet.getColumn(i).width = 22;
+      worksheet.getColumn(1).width = 15;
+      worksheet.getColumn(2).width = 50;
+    }
+    
+    let unirCeldasHoja1 : string [] = ['A1:O3', 'A5:O5', 'A23:O23', 'A69:O69', 'A109:O109', 'A118:O118'];
+    unirCeldasHoja1.forEach(cell => worksheet.mergeCells(cell));
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
 
     //HOJA 2, CONSOLIDADO DE COSTOS
@@ -812,7 +788,6 @@ export class Dashboard_CostosComponent implements OnInit {
       cell.font = font;
       cell.border = border;
     });
-    worksheet2.mergeCells('A1:O3');
     worksheet2.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     let tituloCostosFijos = worksheet2.addRow(['COSTO Y GASTOS FIJOS']);
     tituloCostosFijos.eachCell(cell => {
@@ -820,7 +795,6 @@ export class Dashboard_CostosComponent implements OnInit {
       cell.font = font;
       cell.border = border
     });
-    worksheet2.mergeCells('A5:O5');
     datosAgrupados.forEach(d => {
       let row = worksheet2.addRow(d);
       row.getCell(15).font = { name: 'Comic Sans MS', family: 4, size: 9, bold: true };
@@ -854,36 +828,14 @@ export class Dashboard_CostosComponent implements OnInit {
       });
     });
 
-    worksheet2.getColumn(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(12).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(13).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-    worksheet2.getColumn(1).width = 15;
-    worksheet2.getColumn(2).width = 50;
-    worksheet2.getColumn(3).width = 22;
-    worksheet2.getColumn(4).width = 22;
-    worksheet2.getColumn(5).width = 22;
-    worksheet2.getColumn(6).width = 22;
-    worksheet2.getColumn(7).width = 22;
-    worksheet2.getColumn(8).width = 22;
-    worksheet2.getColumn(9).width = 22;
-    worksheet2.getColumn(10).width = 22;
-    worksheet2.getColumn(11).width = 22;
-    worksheet2.getColumn(12).width = 22;
-    worksheet2.getColumn(13).width = 22;
-    worksheet2.getColumn(14).width = 22;
-    worksheet2.getColumn(15).width = 22;
-    worksheet2.mergeCells('A26:O26');
-    worksheet2.mergeCells('A45:O45');
+    formatNumber.forEach(i => worksheet2.getColumn(i).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00');
+    for (let i = 1; i < 16; i++) {
+      worksheet2.getColumn(i).width = 22;
+      worksheet2.getColumn(1).width = 15;
+      worksheet2.getColumn(2).width = 50;
+    }
+    let unirCeldasHoja2 : string [] = ['A1:O3', 'A5:O5', 'A26:O26', 'A45:O45'];
+    unirCeldasHoja2.forEach(cell => worksheet2.mergeCells(cell));
     worksheet2.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
 
     workbook.xlsx.writeBuffer().then((data) => {

@@ -124,7 +124,6 @@ import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZe
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 import { Reporte_MaquilasComponent } from './Vistas/Reporte_Maquilas/Reporte_Maquilas.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
-import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
@@ -236,7 +235,6 @@ import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.
     Reporte_MantenimientoComponent,
     Reporte_DesperdiciosComponent,
     ReportePedidos_ZeusComponent,
-    Reporte_PedidosVendedoresComponent,
     Reporte_FacturacionZeusComponent,
     Orden_MaquilaComponent,
     CrearTerceroComponent,

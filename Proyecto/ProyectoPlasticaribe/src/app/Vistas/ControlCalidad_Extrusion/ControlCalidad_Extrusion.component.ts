@@ -287,7 +287,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let infoDocumento : any = [];
     let title = "CONTROL DE CALIDAD DE EXTRUSIÓN";
 
-    setTimeout(() => {
     const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
     const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
     for (const item of datos) {
@@ -298,7 +297,11 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
     
     let worksheet = workbook.addWorksheet(title);
-    worksheet.addImage(imageId1, 'A1:C3');
+    worksheet.addImage(imageId1, {
+      tl: { col: 0.3, row: 0.45 },
+      ext: { width: 150, height: 40 },
+      editAs: 'oneCell'
+    });
     let titleRow = worksheet.addRow([]);
     titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
     worksheet.addRow([]);
@@ -329,15 +332,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
-    
-    worksheet.mergeCells('A1:C3');
-    worksheet.mergeCells('D1:P3');
-    worksheet.mergeCells('Q1:R1');
-    worksheet.mergeCells('Q2:R2');
-    worksheet.mergeCells('Q3:R3');
-    worksheet.mergeCells('B5:C5');
-    worksheet.mergeCells('F5:G5');
-    worksheet.mergeCells('H5:R5');
+    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5'];
+    unirCeldas.forEach(cell => worksheet.mergeCells(cell));
     worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.getCell('H7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
     worksheet.getCell('I7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
@@ -353,20 +349,17 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     worksheet.getCell('Q1').font = { name: 'Calibri', family: 4, size: 10 };
     worksheet.getCell('Q2').font = { name: 'Calibri', family: 4, size: 10 };
     worksheet.getCell('Q3').font = { name: 'Calibri', family: 4, size: 10 };
-    worksheet.getCell('A1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    worksheet.getCell('D1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    worksheet.getCell('Q1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    worksheet.getCell('Q2').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    worksheet.getCell('Q3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    worksheet.getCell('H5').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    infoDocumento.forEach(d => {  
+    let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5'];
+    fila1.forEach(f => worksheet.getCell(f).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    });
+    infoDocumento.forEach(d => {
       let row = worksheet.addRow(d);
-      row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      let formatNumber : number [] = [8, 9, 10, 11, 12, 13];
+      formatNumber.forEach(f => row.getCell(f).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
       //let qty= row.getCell(7);
       //let color = 'ADD8E6';
       //qty.fill = {
@@ -397,12 +390,11 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     setTimeout(() => {
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        fs.saveAs(blob, title + `.xlsx`);
+        fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
       });
       this.load = false;
       this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del ` + title + `!`);
-    }, 1000);
-  }, 1500);
+    }, 400);
         
   }
 
