@@ -1,5 +1,6 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -8,8 +9,9 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ControlCalidad_ExtrusionService } from 'src/app/Servicios/ControlCalidad_Extrusion/ControlCalidad_Extrusion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
-import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import * as fs from 'file-saver';
 
 @Injectable({ 
   providedIn: 'root'
@@ -46,6 +48,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   habilitarCampos : boolean = false; //Variable que se usará para habilitar o deshabilitar los campos de la vista
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
+  rondas : any = [1, 2, 3]; //Variable que va a contener las rondas de los controles de extrusion
+  maquinas : any = []; 
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -60,6 +64,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.mostrarRegistrosHoy();
+    this.exportarExcel();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -124,26 +129,22 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   consultarOT(datos : any, indexTabla : number){
     this.load = true;
     this.ronda = 0;
-    this.srvCcExtrusion.GetRonda(datos.OT).subscribe(dato => this.ronda = dato, null, () => {
-      this.ronda += 1;
-      if(this.ronda > 3) {
-        this.msjs.mensajeAdvertencia(`Advertencia`, `Ya completó las rondas permitidas para la OT N° ${datos.OT}!`);
-        this.registros.shift();
-      } else {
-        this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
-          if(data.length > 0){
-            let cantRegistros : number = data.length;
-            let indice = Math.floor(Math.random() * cantRegistros);
-            this.cargarRegistro(data[indice], indexTabla);
-            this.load = false;
-            setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
-          } else { 
-            this.load = false;
-            this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`);
-          } 
-        });
-      }
+    this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
+      if(data.length > 0){
+        data.forEach(dato => {
+        if(!this.maquinas.includes(dato.maquina)){
+            this.maquinas.push(dato.maquina);
+            this.cargarRegistro(data[0], indexTabla);
+          }
+        }); 
+        this.load = false;
+        setTimeout(() => document.getElementById(`edit_${indexTabla}`).click(), 100);
+      } else { 
+        this.load = false;
+        this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`);
+      } 
     });
+    
   }
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
@@ -196,7 +197,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
     this.load = true;
     this.onReject(`eleccion`);
-
+    console.log(fila)
     let modelo : modelControlCalidad_Extrusion = {
       CcExt_Id: fila.Id > 0 ? fila.Id : 0,
       Turno_Id: fila.Turno,
@@ -228,24 +229,24 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
     if(fila.Id > 0) {
       this.srvCcExtrusion.Put(fila.Id ,modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-      if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
-      else {
-        this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
-        setTimeout(() => { 
-          this.mostrarRegistrosHoy();
-          this.load = false; 
-        }, 500); 
-      }
+        if (esError) this.msjs.mensajeError(`Error`, `No se pudo actualizar la ronda!`);
+        else {
+          this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} actualizada exitosamente!`);
+          setTimeout(() => { 
+            this.mostrarRegistrosHoy();
+            this.load = false; 
+          }, 500); 
+        }  
     } else {
       this.srvCcExtrusion.Post(modelo).subscribe(data => { esError = false; }, error => { esError = true; }); 
-      if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
-      else {
-        this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
-        setTimeout(() => { 
-          this.mostrarRegistrosHoy();
-          this.load = false;
-        }, 500);
-      }
+        if (esError) this.msjs.mensajeError(`Error`, `No se pudo registrar la ronda!`);
+        else {
+          this.msjs.mensajeConfirmacion(`Excelente!`, `Ronda ${fila.Ronda} de la OT N° ${fila.OT} creada correctamente!`);
+          setTimeout(() => { 
+            this.mostrarRegistrosHoy();
+            this.load = false;
+          }, 500);
+        }   
     }
   }
 
@@ -279,4 +280,135 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  exportarExcel(){
+    this.load = true;
+    let datos : any[] = [];
+    let infoDocumento : any = [];
+    let title = "CONTROL DE CALIDAD DE EXTRUSIÓN";
+
+    setTimeout(() => {
+    const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
+    const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
+    for (const item of datos) {
+      const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
+      infoDocumento.push(datos1);
+    }
+    let workbook = new Workbook();
+    const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+    
+    let worksheet = workbook.addWorksheet(title);
+    worksheet.addImage(imageId1, 'A1:C3');
+    let titleRow = worksheet.addRow([]);
+    titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let headerRow1 = worksheet.addRow(header1);
+    headerRow1.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow1.font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    headerRow1.height = 20
+    headerRow1.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ffffff' }
+      }
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+    worksheet.addRow([]);
+    let headerRow2 = worksheet.addRow(header2);
+    headerRow2.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow2.font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    headerRow2.height = 60
+    headerRow2.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ffffff' }
+      }
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+    
+    worksheet.mergeCells('A1:C3');
+    worksheet.mergeCells('D1:P3');
+    worksheet.mergeCells('Q1:R1');
+    worksheet.mergeCells('Q2:R2');
+    worksheet.mergeCells('Q3:R3');
+    worksheet.mergeCells('B5:C5');
+    worksheet.mergeCells('F5:G5');
+    worksheet.mergeCells('H5:R5');
+    worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('H7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
+    worksheet.getCell('I7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
+    worksheet.getCell('J7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
+    worksheet.getCell('B7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('N7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('O7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('P7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('D1').value = title;
+    worksheet.getCell('Q1').value = `Código: FR-AC01`; 
+    worksheet.getCell('Q2').value = `Versión: 03`; 
+    worksheet.getCell('Q3').value = `Fecha: 30/07/2022`; 
+    worksheet.getCell('Q1').font = { name: 'Calibri', family: 4, size: 10 };
+    worksheet.getCell('Q2').font = { name: 'Calibri', family: 4, size: 10 };
+    worksheet.getCell('Q3').font = { name: 'Calibri', family: 4, size: 10 };
+    worksheet.getCell('A1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    worksheet.getCell('D1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    worksheet.getCell('Q1').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    worksheet.getCell('Q2').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    worksheet.getCell('Q3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    worksheet.getCell('H5').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    infoDocumento.forEach(d => {  
+      let row = worksheet.addRow(d);
+      row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      //let qty= row.getCell(7);
+      //let color = 'ADD8E6';
+      //qty.fill = {
+      //  type: 'pattern',
+      //  pattern: 'solid',
+      //  fgColor: { argb: color }
+      //}
+    });
+    worksheet.getColumn(1).width = 10;
+    worksheet.getColumn(2).width = 5;
+    worksheet.getColumn(3).width = 12;
+    worksheet.getColumn(4).width = 25;
+    worksheet.getColumn(5).width = 30;
+    worksheet.getColumn(6).width = 10;
+    worksheet.getColumn(7).width = 10;
+    worksheet.getColumn(8).width = 10;
+    worksheet.getColumn(9).width = 8;
+    worksheet.getColumn(10).width = 8;
+    worksheet.getColumn(11).width = 7;
+    worksheet.getColumn(12).width = 7;
+    worksheet.getColumn(13).width = 7;
+    worksheet.getColumn(14).width = 5;
+    worksheet.getColumn(15).width = 5;
+    worksheet.getColumn(16).width = 5;
+    worksheet.getColumn(17).width = 12;
+    worksheet.getColumn(18).width = 8;
+    worksheet.getColumn(19).width = 8;
+    setTimeout(() => {
+      workbook.xlsx.writeBuffer().then((data) => {
+        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        fs.saveAs(blob, title + `.xlsx`);
+      });
+      this.load = false;
+      this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del ` + title + `!`);
+    }, 1000);
+  }, 1500);
+        
+  }
+
+  cambiarMaquina(){
+    this.srvCcExtrusion.GetRonda(this.maquinas).subscribe(data => {
+
+    }, error => {});
+  }
 }

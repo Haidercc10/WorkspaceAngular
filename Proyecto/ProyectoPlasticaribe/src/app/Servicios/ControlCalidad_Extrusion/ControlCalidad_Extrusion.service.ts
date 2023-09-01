@@ -16,7 +16,7 @@ export class ControlCalidad_ExtrusionService {
 
     Get_Id = (Id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Extrusion/${Id}`);
 
-    GetRonda = (OT: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Extrusion/getRonda/${OT}`);
+    GetRonda = (maquina : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Extrusion/getRonda/${maquina}`);
 
     Get_TodoHoy = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/ControlCalidad_Extrusion/getControlCalidad_ExtrusionHoy/${fecha1}/${fecha2}`);
 

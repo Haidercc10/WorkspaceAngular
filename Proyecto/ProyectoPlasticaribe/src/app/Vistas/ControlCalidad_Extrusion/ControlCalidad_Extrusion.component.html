@@ -38,6 +38,11 @@ editMode="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
                 <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="agregarFila()"></button>
             </div>
+            <!--<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 text-right">
+                <div class="d-grid gap-2 d-md-flex">
+                  <button pButton pRipple label="Exportar excel" icon="pi pi-search" class="p-button-success botonesOpciones" id="exportar" (click)="exportarExcel()"></button>
+                </div>
+            </div>-->
         </div>
     </ng-template>
     <ng-template pTemplate="header">
@@ -113,7 +118,14 @@ editMode="row">
             </td>
             <!--Ronda-->
             <td>
-                {{registro.Ronda}}
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="rondas" appendTo="body" [(ngModel)]="registro.Ronda" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Ronda}}
+                    </ng-template>
+                </p-cellEditor>
             </td>
              <!--Turno-->
             <td>
@@ -129,12 +141,12 @@ editMode="row">
             <!--Maquina-->
             <td>
                 <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      <b>{{registro.Maquina}}</b>
-                  </ng-template>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="maquinas" appendTo="body" [(ngModel)]="registro.Maquina" (onChange)="cambiarMaquina()" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{registro.Maquina}}
+                    </ng-template>
                 </p-cellEditor>
             </td>
             <!--Cliente-->
