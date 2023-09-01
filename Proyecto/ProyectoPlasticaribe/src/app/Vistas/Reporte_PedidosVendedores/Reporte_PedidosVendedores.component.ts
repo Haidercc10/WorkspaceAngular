@@ -1,8 +1,7 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { TreeTable } from 'primeng/treetable';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -89,7 +88,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarPedidosAgrupado(datos_pedidos[i]);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarPedidosAgrupado(datos_pedidos[i]);
+        } else if ([1, 60].includes(this.ValidarRol)) this.llenarPedidosAgrupado(datos_pedidos[i]);
       }
     });
     this.consultarPedidos();
@@ -100,21 +99,12 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     this.load = true;
     this.ArrayDocumento = [];
 
-    this.servicioZeus.GetPedidosAgrupados().subscribe(datos_pedidos => {
-      for (let i = 0; i < datos_pedidos.length; i++) {
-        this.llenarTablaAgrupada(datos_pedidos[i]);
-      }
-    });
-
+    this.servicioZeus.GetPedidosAgrupados().subscribe(datos_pedidos => datos_pedidos.forEach(data => this.llenarTablaAgrupada(data)));
     setTimeout(() => {
-      this.servicioZeus.GetPedidos().subscribe(datos_pedidos => {
-        for (let i = 0; i < datos_pedidos.length; i++) {
-          this.llenarDatosTabla(datos_pedidos[i]);
-          this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
-        }
-      });
+      this.servicioZeus.GetPedidos().subscribe(datos_pedidos => datos_pedidos.forEach(data => this.llenarDatosTabla(data)));
+      this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
     }, 1500);
-    setTimeout(() => { this.load = false; }, 2500);
+    setTimeout(() => this.load = false, 2500);
   }
 
   // Funcion que va llenar el encabezado de los pedidos, este encabezado tendrá la información general de cada uno de los pedidos
@@ -357,11 +347,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
             if(datos_pedidos[i].undMed_Id == 'Kg') datos_pedidos[i].undMed_Id = 'KLS';
             if(datos_pedidos[i].undMed_Id == 'Paquete') datos_pedidos[i].undMed_Id = 'PAQ';
 
-            this.servicioZeus.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => {
-              for (let index = 0; index < dataZeus.length; index++) {
-                info.data.existencias = dataZeus[index].existencias;
-              }
-            });
+            this.servicioZeus.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => dataZeus.forEach(element => info.data.existencias = element.existencias));
             this.ArrayDocumento[j].children.push(info);
             this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
           }
@@ -379,7 +365,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       this.pedidosDetallados();
       this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
     }, 1000);
-    setTimeout(() => { this.load = false; }, 2000);
+    setTimeout(() => this.load = false, 2000);
   }
 
   /** Función que buscara por filtros en la tabla. */
@@ -402,7 +388,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   // Funcion que va a exportar a excel la informacion de los pedidos
   exportarExcel(){
-    if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.')
+    if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.');
     else {
       let datos : any = [];
 
@@ -433,7 +419,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -491,7 +477,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           this.load = false;
         }, 1000);
       }, 1500);
-      setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3000);
+      setTimeout(() => this.Confirmacion('¡Archivo de Excel generado exitosamente!'), 3000);
     }
   }
 
@@ -565,11 +551,11 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
         Creador_Id : dataPedidos.creador_Id,
       }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
-        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
-        setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
-      }, error => { this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+        setTimeout(() => this.cargarPedidosPendientes(), 1000);
+        setTimeout(() => this.cargarPedidosPendientes(), 100);
+      }, () => this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`));
     });
   }
 
@@ -606,11 +592,11 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
         Creador_Id : dataPedidos.creador_Id,
       }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.Confirmacion(`Pedido Nro. ${item} cancelado con exito!`);
-        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
-        setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
-      }, error => { this.mostrarError(`No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
+        setTimeout(() => this.cargarPedidosPendientes(), 1000);
+        setTimeout(() => this.cargarPedidosPendientes(), 100);
+      }, () => this.mostrarError(`No fue posible cancelar el pedido ${item}, por favor, verifique!`));
     });
   }
 
@@ -674,7 +660,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => { this.crearpdf(pedido); }, 1000);
+      setTimeout(() => this.crearpdf(pedido), 1000);
     });
   }
 
@@ -842,7 +828,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -1022,7 +1008,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }

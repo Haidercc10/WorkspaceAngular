@@ -8,7 +8,7 @@ import { ControlCalidad_CorteDobladoService } from 'src/app/Servicios/ControlCal
 import { ControlCalidad_ImpresionService } from 'src/app/Servicios/ControlCalidad_Impresion/ControlCalidad_Impresion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
-import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
+import { defaultStepOptions, ControlCalidad as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-ControlCalidad',

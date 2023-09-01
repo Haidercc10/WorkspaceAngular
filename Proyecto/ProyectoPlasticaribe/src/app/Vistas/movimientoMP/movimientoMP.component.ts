@@ -209,7 +209,7 @@ export class MovimientoMPComponent implements OnInit {
           this.datosPdf.push(info);
         }
         informacionPdf = datos;
-      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
+      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
     } else if (data.Movimiento == 'CRTINTAS') {
       this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -241,7 +241,7 @@ export class MovimientoMPComponent implements OnInit {
           }, 500);
         }
         informacionPdf = datos;
-      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
+      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
     } else if (data.Movimiento == 'DEVMP') {
       this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -276,7 +276,7 @@ export class MovimientoMPComponent implements OnInit {
           }, 500);
         }
         informacionPdf = datos;
-      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
+      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
     } else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') {
       this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
@@ -310,7 +310,7 @@ export class MovimientoMPComponent implements OnInit {
           }, 500);
         }
         informacionPdf = datos;
-      }, () => this.cargando = false, () => this.crearPDF(informacionPdf));
+      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
     }
   }
 

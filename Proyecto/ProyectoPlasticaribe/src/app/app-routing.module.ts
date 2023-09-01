@@ -52,7 +52,6 @@ import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
@@ -90,7 +89,6 @@ export const routes: Routes = [
   {path: 'movimiento-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Mat. Prima'}, component: MovimientoMPComponent},
   // Reportes de materia prima
   {path: 'reporte-Materia-Prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Mat. Prima'}, component: ReporteMateriaPrimaComponent},
-  {path: 'reporte-facturas-remisiones-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Entradas'}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Recuperado'}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Orden Compra'}, component: Reporte_OrdenCompraComponent},
   {path: 'solicitud-materia-prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Materia Prima'}, component: SolicitudMateriaPrimaComponent},

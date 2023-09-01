@@ -87,11 +87,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   // Funcion que va a consultar los pedidos de zeus
   consultarPedidosZeus(){
@@ -111,9 +107,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
 
       const thisRef = this;
-      this.ArrayPedidos.forEach(function(pedido) {
-        thisRef.expandedRows[pedido.id] = true;
-      });
+      this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.id] = true);
     }, 3500);
   }
 
@@ -126,7 +120,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         } else if (this.ValidarRol == 1 || this.ValidarRol == 6 || this.ValidarRol == 60) this.llenarArrayPedidos(datos_pedidos[i], i);
       }
     });
-    setTimeout(() => { this.cargando = false; }, 1500);
+    setTimeout(() => this.cargando = false, 1500);
   }
 
   // Funcion que va a almcanear las columnas que se podrán elegir y que saldrán elegidas desde el principio
@@ -303,12 +297,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       Zeus : 0,
     };
 
-    this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(dataZeus => {
-      for (let index = 0; index < dataZeus.length; index++) {
-        info.existencias = dataZeus[index].existencias;
-      }
-    });
-
+    this.inventarioZeusService.getExistenciasProductos(datos.prod_Id.toString(), datos.undMed_Id).subscribe(data => data.forEach(exi => info.existencias = exi.existencias));
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
     this.ArrayPedidos.sort((a,b) => Number(a.id) - Number(b.id));
@@ -317,10 +306,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   // Funcion que va a calcular el costo total del pedido
   calcularCostoPedido(consecutivo : number) : number {
     let nuevo = this.ArrayPedidos.filter((item) => item.consecutivo == consecutivo);
-    let total : number = 0;
-    for (let i = 0; i < nuevo.length; i++) {
-      total += nuevo[i].cant_Pendiente * nuevo[i].precioUnidad;
-    }
+    let total : number = nuevo.reduce((a,b) => a + (b.cant_Pendiente * b.precioUnidad), 0);
     return total;
   }
 
@@ -347,7 +333,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       worksheet.addRow([]);
       worksheet.addRow([]);
       let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell, number) => {
+      headerRow.eachCell((cell) => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
         cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
       });
@@ -470,15 +456,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
       this.datosExcel = [];
-      if (this.dt.filteredValue != null) {
-        for (let i = 0; i < this.dt.filteredValue.length; i++) {
-          this.datosExcel.push(this.dt.filteredValue[i]);
-        }
-      } else {
-        for (let i = 0; i < this.ArrayPedidos.length; i++) {
-          this.datosExcel.push(this.ArrayPedidos[i]);
-        }
-      }
+      if (this.dt.filteredValue != null) this.datosExcel = this.dt.filteredValue;
+      else this.datosExcel = this.ArrayPedidos;
     }, 400);
   }
 
@@ -550,12 +529,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           setTimeout(() => {
             this.modalEstadosProcesos_OT.modeModal = true;
             this.modalEstadosProcesos_OT.ArrayDocumento = [];
-            for (let i = 0; i < datos_orden.length; i++) {
-              this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
-            }
+            datos_orden.forEach(ot => this.modalEstadosProcesos_OT.llenarArray(ot));
           }, 500);
         } else this.msj.mensajeAdvertencia(`Advertencia`, `¡No hay orden asociada al pedido ${data.consecutivo}!`);
-      }, error => { this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+      }, () => this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`));
     }
   }
 
@@ -599,14 +576,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
               EstProcOT_Pedido : null,
             }
-            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
               this.msj.mensajeConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
               this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
             });
           }
         }
       }
-    }, error => { this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+    }, () => this.msj.mensajeError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`));
 
     this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
@@ -646,7 +623,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
               EstProcOT_Pedido : data.consecutivo,
             }
-            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(() => {
               this.msj.mensajeConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
               this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
             });
@@ -688,14 +665,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
         Creador_Id : dataPedidos.creador_Id,
       }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
         this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.msj.mensajeError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+      }, () => this.msj.mensajeError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`));
     });
   }
 
@@ -720,14 +697,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
         Creador_Id : dataPedidos.creador_Id,
       }
-      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(() => {
         this.msj.mensajeConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
         this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.msj.mensajeError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
+      }, () => this.msj.mensajeError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`));
     });
   }
 
@@ -876,56 +853,85 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => { this.crearpdf(pedido); }, 1000);
+      setTimeout(() => this.crearpdf(pedido), 1000);
     });
   }
 
   // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
   crearpdf(pedido : number){
-    let usuario = this.storage_Nombre;
     this.pedidoExternoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
+        let titulo = `Pedido N° ${datos_pedido[i].id_Pedido}`;
         const pdfDefinicion : any = {
-          info: { title: `Pedido N° ${datos_pedido[i].id_Pedido}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
-            return [
-              '\n',
-              {
-                columns: [
-                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 100, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                margin: [20, 8, 20, 0],
+                columns: [
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_pedido[i].fechaCreacion.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_pedido[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  }
+                ]
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+            ];
+          },
           content : [
-            {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
-                { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
-              ]
-            },
-            '\n \n',
+            { text: `\n Información del Pedido \n`, alignment: 'center', style: 'header' },
+            '\n',
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, 167, 90, 166],
+                widths: [305, 152, 100],
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, false], text: `Comercial`  },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    { border: [false, false, false, false], text: `Fecha de pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
-                    { border: [false, false, false, false], text: `Código` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].consecutivo}` },
+                    { border: [false, false, false, true], text: `Comercial:  ${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`  },
+                    { border: [false, false, false, true], text: `Estado del pedido:  ${datos_pedido[i].estado}` },
+                    { border: [false, false, false, true], text: `Código:  ${datos_pedido[i].consecutivo}` },
                   ],
                 ]
               },
@@ -937,7 +943,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               style: 'tablaCliente',
               table: {
-                widths: [170, 170, 170],
+                widths: [242, 130, 180],
                 style: 'header',
                 body: [
                   [ `ID: ${datos_pedido[i].cliente_Id}`,  `Tipo de ID: ${datos_pedido[i].tipo_Id}`, `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}` ],
@@ -1013,12 +1019,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [40, 177, 40, 30, 51, 50, 98],
+        widths: [40, 177, 40, 50, 61, 50, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -1031,9 +1037,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column]);
-      });
+      columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });
 
@@ -1050,7 +1054,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -1058,7 +1062,5 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   }
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
-  onReject(dato : any) {
-    this.messageService.clear(dato);
-  }
+  onReject = (dato : any) => this.messageService.clear(dato);
 }

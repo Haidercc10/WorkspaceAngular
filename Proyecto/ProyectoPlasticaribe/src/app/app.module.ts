@@ -140,7 +140,6 @@ import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
 import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
@@ -197,7 +196,6 @@ import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
     AsignacionMateriaPrimaComponent,
-    ConsultaFac_Rem_MPComponent,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,

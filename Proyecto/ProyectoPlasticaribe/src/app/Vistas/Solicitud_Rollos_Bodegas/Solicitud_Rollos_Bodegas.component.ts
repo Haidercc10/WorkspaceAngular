@@ -151,11 +151,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
       this.rollosIngresar = [];
       this.consolidadoProductos = [];
 
-      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          this.llenarRollosIngresar(data[i]);
-        }
-      }, err => {
+      this.dtBgRollosService.GetRollosDisponibles(bodega, ot, ruta).subscribe(data => data.forEach(item => this.llenarRollosIngresar(item)), err => {
         this.mensajeService.mensajeError(`¡Error!`, `¡${err.error}!`);
         this.cargando = false;
       });
@@ -330,8 +326,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
         }
         this.informacionPdf.push(info);
       }
-    });
-    setTimeout(() => this.crearPDF(solicitud), 2500);
+    }, null, () => this.crearPDF(solicitud));
   }
 
   // funcion que va a crear un PDF
@@ -492,22 +487,14 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
     });
   }
 
-  sumarTotalKg(data : any){
-    let totalKg = 0;
-    data.forEach(element => {
-      totalKg += element.Cantidad2;
-    });
-    return totalKg;
-  }
+  sumarTotalKg = (data : any) => data.reduce((a, b) => a + b.Cantidad2, 0);
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
   buildTableBody(data : any, columns : any) {
-    var body = [];
-    data.forEach(function(row) {
-      var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+    let body = [];
+    data.forEach((row) => {
+      let dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
 

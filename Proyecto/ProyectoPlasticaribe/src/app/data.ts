@@ -11399,7 +11399,7 @@ export const CertificadoCalidad : Step.StepOptions [] = [
     classes: 'card',
     id: 'none',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Certificado de Calidad!</h4>',
-    text: `<p>¡!</p>`
+    text: `<p>¡En este modulo podemos crear un certificado de calidad para una orden de trabajo!</p>`
   },
   {
     attachTo: {
@@ -11508,4 +11508,86 @@ export const CertificadoCalidad : Step.StepOptions [] = [
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Parametros Cualitativos!</h4>',
     text: `<p>¡Al igual que los parametros cuantitativos, se nos cargarán los parametros cualitativos de la OT, <b>si deseamos cambiar la información de alguno de estos parametros</b>, podemos hacerlo de la misma manera!</p>`
   },
-]
+];
+
+/********************************************************************** CONTROL DE CALIDAD *************************************************************************/
+export const ControlCalidad : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Control de Calidad!</h4>',
+    text: `<p>¡Desde este módulo podemos <b>crear y ver los controles de calidad</b> de las diferentes áreas por las que pasa la una orden de trabajo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Buscar Antiguos!</h4>',
+    text: `<p>¡Aquí podemos <b>seleccionar un rango de fechas</b> para buscar otros controles de calidad que se hayan creado con anterioridad!</p>`
+  },
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Agregar Registro!</h4>',
+    text: `<p>¡Si quieremos agregar un nuevo registro de control de calidad, podemos hacerlo <b>presionando click sobre el botón de 'Nuevo registro'</b> para agregar una fila nueva en la tabla!</p>`
+  },
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar Información!</h4>',
+    text: `<p>Para editar la información de un registro de control de calidad, podemos hacerlo <b>presionando click sobre el botón con el icono '<i class="pi pi-pencil"></i>'</b>
+    y escribir o elegir la nueva información en cada uno de los campos.</p>
+    <br>
+    <p>Luego de editar los cambios podemos <b>guardarlos presionando el botón con el icono '<i class="pi pi-check"></i>'</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
+    text: `<p>¡Con estos filtros podemos <b>buscar por algunos campos</b> de la información de un registro de control de calidad que están en la tabla!</p>`
+  },
+];
