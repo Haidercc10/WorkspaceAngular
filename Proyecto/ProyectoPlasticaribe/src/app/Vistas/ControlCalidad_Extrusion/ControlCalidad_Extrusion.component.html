@@ -48,9 +48,9 @@ editMode="row">
     <ng-template pTemplate="header">
         <tr>
             <th><input pInputText (input)="aplicarfiltro($event, 'OT', 'contains')"></th>
+            <th><input pInputText (input)="aplicarfiltro($event, 'Maquina', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Ronda', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Turno', 'contains')"></th>
-            <th><input pInputText (input)="aplicarfiltro($event, 'Maquina', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
             <th><input pInputText (input)="aplicarfiltro($event, 'Rollo', 'contains')"></th>
@@ -79,9 +79,9 @@ editMode="row">
         </tr>
         <tr>
           <th style="min-width : 100px" pFrozenColumn [frozen]="true" alignFrozen="left">OT</th>
+          <th style="min-width : 60px">Maq.</th>
           <th style="min-width : 60px">Ronda</th>
           <th style="min-width : 60px">Turno</th>
-          <th style="min-width : 60px">Maq.</th>
           <th style="min-width : 200px">Nombre Cliente</th>
           <th style="min-width : 300px">Nombre Referencia</th>
           <th style="min-width : 100px">Rollo</th>
@@ -116,6 +116,30 @@ editMode="row">
                     </ng-template>
                 </p-cellEditor>
             </td>
+             <!--Maquina Guardada-->
+             <td *ngIf="registro.Guardado; else noGuardado" >
+                <p-cellEditor>
+                  <ng-template pTemplate="input" >
+                      <p-inputNumber type="number" [useGrouping]="false" [(ngModel)]="registro.Maquina"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      <b>{{registro.Maquina}}</b>
+                  </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--Maquina no guardada-->
+            <ng-template #noGuardado>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-dropdown [options]="maquinas" appendTo="body" [(ngModel)]="registro.Maquina" [style]="{'width':'100%'}"></p-dropdown>
+                        </ng-template>  
+                        <ng-template pTemplate="output">
+                            <b>{{registro.Maquina}}</b>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+            </ng-template>
             <!--Ronda-->
             <td>
                 <p-cellEditor>
@@ -135,17 +159,6 @@ editMode="row">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{registro.Turno}}
-                    </ng-template>
-                </p-cellEditor>
-            </td>
-            <!--Maquina-->
-            <td>
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <p-dropdown [options]="maquinas" appendTo="body" [(ngModel)]="registro.Maquina" (onChange)="cambiarMaquina()" [style]="{'width':'100%'}"></p-dropdown>
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{registro.Maquina}}
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -303,8 +316,8 @@ editMode="row">
                 </ng-template>
             </p-cellEditor>
             </td>
-             <!--Calibre TB-->
-             <td>
+            <!--Calibre TB-->
+            <td>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-inputNumber type="number" mode="decimal" [maxFractionDigits]="2" [(ngModel)]="registro.CalibreTB"></p-inputNumber>
@@ -313,7 +326,7 @@ editMode="row">
                         {{registro.CalibreTB | number : '1.2-2'}}
                     </ng-template>
                 </p-cellEditor>
-              </td>
+            </td>
             <!--Fecha-->
             <td>
                 <p-cellEditor>

@@ -92,7 +92,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que cargará los registros de las OT a los que se les ha guardado una ronda hoy.
   cargarRegistrosCCExtrusion(datos : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.pigmento_Id);
-
     let info : any = {
       Id : datos.ccExt_Id,
       Ronda : datos.ccExt_Ronda,
@@ -127,12 +126,13 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   //Función que va a consultar la información de la OT a la que desea agregar una ronda.
   consultarOT(datos : any, indexTabla : number){
+    this.maquinas =[];
     this.load = true;
     this.ronda = 0;
     this.srvBagpro.getOtControlCalidadExtrusion(datos.OT, `EXTRUSION`).subscribe(data => {
       if(data.length > 0){
         data.forEach(dato => {
-        if(!this.maquinas.includes(dato.maquina)){
+          if(!this.maquinas.includes(dato.maquina)){
             this.maquinas.push(dato.maquina);
             this.cargarRegistro(data[0], indexTabla);
           }
@@ -144,7 +144,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con la OT N° ${datos.OT}`);
       } 
     });
-    
   }
 
   //Función que cargará la fila con los datos de la OT a la que desea agregar una ronda.
@@ -152,7 +151,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
     let info : any = {
       Id : 0,
-      Ronda : this.ronda, 
+      Ronda : 1, 
       Turno : `DIA`,
       OT : data.ot,
       Maquina : data.maquina, 
@@ -174,6 +173,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       CalibreTB : data.calibre,
       Fecha : this.today,
       Observacion : ``,
+      Guardado : false,
     }
     this.registros[indexTabla] = info;
   }
@@ -298,7 +298,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     
     let worksheet = workbook.addWorksheet(title);
     worksheet.addImage(imageId1, {
-      tl: { col: 0.3, row: 0.45 },
+      tl: { col: 0.1, row: 0.45 },
       ext: { width: 150, height: 40 },
       editAs: 'oneCell'
     });
@@ -332,30 +332,30 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
-    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5'];
+    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5', 'A33:R36'];
     unirCeldas.forEach(cell => worksheet.mergeCells(cell));
+    let alinearWrap : string [] = ['H7', 'I7', 'J7'];
+    alinearWrap.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  });
+    let textoRotado : string [] = ['B7', 'N7', 'O7', 'P7'];
+    textoRotado.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', textRotation: 90 });
+    let textoFormato : string [] = ['Q1', 'Q2', 'Q3', 'A33'];
+    textoFormato.forEach(f => worksheet.getCell(f).font = { name: 'Calibri', family: 4, size: 10, });
     worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell('H7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
-    worksheet.getCell('I7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
-    worksheet.getCell('J7').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  };
-    worksheet.getCell('B7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell('N7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell('O7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell('P7').alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('A33').alignment = { vertical: 'top', horizontal: 'left' };
     worksheet.getCell('D1').value = title;
+    worksheet.getCell('A33').value = `OBSERVACIONES: `;
     worksheet.getCell('Q1').value = `Código: FR-AC01`; 
     worksheet.getCell('Q2').value = `Versión: 03`; 
-    worksheet.getCell('Q3').value = `Fecha: 30/07/2022`; 
-    worksheet.getCell('Q1').font = { name: 'Calibri', family: 4, size: 10 };
-    worksheet.getCell('Q2').font = { name: 'Calibri', family: 4, size: 10 };
-    worksheet.getCell('Q3').font = { name: 'Calibri', family: 4, size: 10 };
-    let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5'];
-    fila1.forEach(f => worksheet.getCell(f).border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      bottom: { style: 'thin' },
-      right: { style: 'thin' }
-    });
+    worksheet.getCell('Q3').value = `Fecha: 30/07/2022`;
+    let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5', 'A33'];
+    fila1.forEach(f => worksheet.getCell(f).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
+    let altoFilas : number[] = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
+    let columna : string[] = ['A', 'B', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
+    for (let index = 8; index < 31; index++) {
+      console.log(columna[index].concat(index.toString()));
+    }
+    
     infoDocumento.forEach(d => {
       let row = worksheet.addRow(d);
       let formatNumber : number [] = [8, 9, 10, 11, 12, 13];
@@ -368,25 +368,24 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       //  fgColor: { argb: color }
       //}
     });
-    worksheet.getColumn(1).width = 10;
-    worksheet.getColumn(2).width = 5;
-    worksheet.getColumn(3).width = 12;
+    worksheet.getColumn(1).width = 9;
+    worksheet.getColumn(2).width = 4;
+    worksheet.getColumn(3).width = 10;
     worksheet.getColumn(4).width = 25;
     worksheet.getColumn(5).width = 30;
     worksheet.getColumn(6).width = 10;
     worksheet.getColumn(7).width = 10;
     worksheet.getColumn(8).width = 10;
-    worksheet.getColumn(9).width = 8;
-    worksheet.getColumn(10).width = 8;
-    worksheet.getColumn(11).width = 7;
-    worksheet.getColumn(12).width = 7;
-    worksheet.getColumn(13).width = 7;
-    worksheet.getColumn(14).width = 5;
-    worksheet.getColumn(15).width = 5;
-    worksheet.getColumn(16).width = 5;
-    worksheet.getColumn(17).width = 12;
+    worksheet.getColumn(9).width = 7;
+    worksheet.getColumn(10).width = 7;
+    worksheet.getColumn(11).width = 6;
+    worksheet.getColumn(12).width = 6;
+    worksheet.getColumn(13).width = 6;
+    worksheet.getColumn(14).width = 4;
+    worksheet.getColumn(15).width = 4;
+    worksheet.getColumn(16).width = 4;
+    worksheet.getColumn(17).width = 8;
     worksheet.getColumn(18).width = 8;
-    worksheet.getColumn(19).width = 8;
     setTimeout(() => {
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -396,11 +395,5 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del ` + title + `!`);
     }, 400);
         
-  }
-
-  cambiarMaquina(){
-    this.srvCcExtrusion.GetRonda(this.maquinas).subscribe(data => {
-
-    }, error => {});
   }
 }
