@@ -33,7 +33,7 @@
             <!-- RANGO FECHAS -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
                 <span class="p-float-label" id="rango-fechas">
-                    <p-calendar formControlName="RangoFechas" id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechasConsulta" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+                    <p-calendar formControlName="RangoFechas" id="rango" inputId="FechaInicial" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
                     <label for="FechaInicial">Rango de Fechas</label>
                 </span>
             </div>
@@ -66,7 +66,7 @@
 
     <!-- TABLA DE COSTOS -->
     <p-table
-        #dt
+        #dt_costos
         dataKey="fecha"
         [value]="comprasRealizadas"
         [resizableColumns]="true"
@@ -79,7 +79,7 @@
         *ngIf="!cargando">
         <ng-template pTemplate="header">
             <tr>
-                <th colspan="8" class="text-center">COMPRAS</th>
+                <th colspan="9" class="text-center">COMPRAS</th>
             </tr>
             <tr>
                 <th class="text-center" pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha</th>
@@ -90,6 +90,7 @@
                 <th class="text-center" pSortableColumn="costoRealMaterial"><p-sortIcon field="costoRealMaterial"></p-sortIcon> CR($)</th>
                 <th class="text-center" pSortableColumn="costoEstandarMaterial"><p-sortIcon field="costoEstandarMaterial"></p-sortIcon> CS($)</th>
                 <th class="text-center" pSortableColumn="variacionPrecio"><p-sortIcon field="variacionPrecio"></p-sortIcon> VP($)</th>
+                <th class="text-center">Ver Kardex</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
@@ -102,6 +103,7 @@
                 <td class="text-center">{{data.costoRealMaterial | number : '1.2-2'}}</td>
                 <td class="text-center">{{data.costoEstandarMaterial | number : '1.2-2'}}</td>
                 <td class="text-center">{{data.variacionPrecio | number : '1.2-2'}}</td>
+                <td class="text-center"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarKardex()"></p-button></td>
             </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -112,8 +114,68 @@
                 <td class="text-center">{{calcularTotalCostoRealMaterial() | number : '1.2-2'}}</td>
                 <td class="text-center">{{calcularTotalCostoEstandarMaterial() | number : '1.2-2'}}</td>
                 <td class="text-center">{{calcularTotalVariacionPrecio() | number : '1.2-2'}}</td>
+                <td></td>
             </tr>
         </ng-template>
     </p-table>
 
 </p-card>
+
+<p-dialog header="KÁRDEX CON DATOS ESTÁNDARES Y REALES" [(visible)]="modalKardex" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+    <div class="p-2">
+        <p-table
+            #dt_kardex
+            rowGroupMode="rowspan" 
+            groupRowsBy="fecha" 
+            sortField="fecha" 
+            sortMode="single"
+            dataKey="fecha"
+            [value]="datosKardex"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-sm p-datatable-gridlines"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            *ngIf="!cargando">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="text-center" rowspan="3">Fecha</th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-center">Entradas</th>
+                    <th colspan="3" class="text-center">Salidas</th>
+                    <th colspan="3" class="text-center">Saldo</th>
+                </tr>
+                <tr>
+                    <th class="text-center">QR(kg)</th>
+                    <th class="text-center">(PS + ∆P = PR)($/kg)</th>
+                    <th class="text-center">(CR = CS + VP)($)</th>
+                    <th class="text-center">(QR y QS)kg</th>
+                    <th class="text-center">PR($/kg)</th>
+                    <th class="text-center">(CR = CS + VQ)($)</th>
+                    <th class="text-center">QR(kg)</th>
+                    <th class="text-center">PR($/kg)</th>
+                    <th class="text-center">CR($)</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-rowgroup="rowgroup" let-rowspan="rowspan">
+                <tr>
+                    <td class="text-center" *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                        <span class="font-bold">{{data.fecha}}</span>
+                    </td>
+                    <td class="text-center">{{data.cantEntrada == 0 ? '' : data.cantEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.precioEntrada == 0 ? '' : data.precioEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.costoEntrada == 0 ? '' : data.costoEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.cantSalida == 0 ? '' : data.cantSalida | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.precioSalida == 0 ? '' : data.precioSalida | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.costoSalida == 0 ? '' : data.costoSalida | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.cantidadFinal == 0 ? '' : data.cantidadFinal | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.precioFinal == 0 ? '' : data.precioFinal | number : '1.2-2'}}</td>
+                    <td class="text-center">{{data.costoFinal == 0 ? '' : data.costoFinal | number : '1.2-2'}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</p-dialog>

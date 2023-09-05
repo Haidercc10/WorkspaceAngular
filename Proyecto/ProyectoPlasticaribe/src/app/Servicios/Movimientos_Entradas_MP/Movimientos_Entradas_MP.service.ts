@@ -16,5 +16,7 @@ export class Movimientos_Entradas_MPService {
 
   GetComprasRealizadas = (fechaInicio : any, fechaFin : any, material : number) : Observable<any []> => this.httpClient.get<any>(`${rutaPlasticaribeAPI}/Movimientros_Entradas_MP/getComprasRealizadas/${fechaInicio}/${fechaFin}/${material}`);
 
+  GetComprasAntiguas = (fecha : any, material : number) : Observable<any []> => this.httpClient.get<any>(`${rutaPlasticaribeAPI}/Movimientros_Entradas_MP/getComprasAntiguas/${fecha}/${material}`);
+
   GetInventarioMateriales = () : Observable<any []> => this.httpClient.get<any>(`${rutaPlasticaribeAPI}/Movimientros_Entradas_MP/getInventarioMateriales`);
 }

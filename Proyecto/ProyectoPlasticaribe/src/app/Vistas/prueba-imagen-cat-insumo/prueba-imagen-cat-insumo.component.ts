@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
@@ -13,6 +14,7 @@ import { AppComponent } from 'src/app/app.component';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
+  table : Table
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -20,9 +22,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean;
   FormFiltros : FormGroup;
-  rangoFechasConsulta : any [] = [];
   materiales : any [] = [];
   comprasRealizadas : any [] = [];
+  modalKardex : boolean = false;
+  datosKardex : any [] = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder  : FormBuilder,
@@ -52,7 +55,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   obtenerMateriales = () => this.movEntradasService.GetInventarioMateriales().subscribe(datos => this.materiales = datos);
 
   // Funcion que va a limpiar el formulario
-  limpiarCampos = () => this.FormFiltros.reset();
+  limpiarCampos() {
+    this.FormFiltros.reset();
+    this.cargando = false;
+  }
 
   // Funcion que va a cambiar el nombre del material en el html
   cambiarNombreMaterial(){
@@ -66,10 +72,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a buscar la información de las compras realizadas
   buscarComprasRealizadas(){
-    if (this.rangoFechasConsulta.length > 1) {
+    if (this.FormFiltros.value.RangoFechas.length > 1) {
       let material : number = this.FormFiltros.value.material;
-      let fechaInicio : any = moment(this.rangoFechasConsulta[0]).format('YYYY-MM-DD');
-      let fechaFin : any = this.rangoFechasConsulta[1] == null ? fechaInicio : moment(this.rangoFechasConsulta[1]).format('YYYY-MM-DD');
+      let fechaInicio : any = moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+      let fechaFin : any = this.FormFiltros.value.RangoFechas[1] == null ? fechaInicio : moment(this.FormFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       if (material != null) {
         this.cargando = true;
         this.comprasRealizadas = [];
@@ -107,4 +113,32 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a calcular el total de la variacion de precio
   calcularTotalVariacionPrecio = () : number => this.comprasRealizadas.reduce((acc, compra) => acc + compra.variacionPrecio, 0);
+
+  // Funcion que va a cargar la información del kardex
+  cargarKardex(){
+    // Inventario inicial
+    this.movEntradasService.GetComprasAntiguas(moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD'), this.FormFiltros.value.material).subscribe(data => {
+      this.cargando = true;
+      this.datosKardex = [];
+      data.forEach(compra => {
+        this.datosKardex.push({
+          fecha : moment().startOf('month').format('YYYY-MM-DD'),
+          cantEntrada : 0,
+          precioEntrada : 0,
+          costoEntrada : 0,
+          cantSalida : 0,
+          precioSalida : 0,
+          costoSalida : 0,
+          cantidadFinal : compra.cantidadCompra,
+          precioFinal : compra.precioReal,
+          costoFinal : compra.costoReal,
+        });
+        this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
+      });
+    }, () => this.msg.mensajeError('No se encontrón información'), () => {
+      this.cargando = false;
+      this.modalKardex = true;
+    });
+    // Entradas de material
+  }
 }
