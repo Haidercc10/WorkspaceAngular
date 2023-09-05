@@ -63,7 +63,7 @@
         [rows]="consumos.length"
         [rowsPerPageOptions]="[10,25,50,100]"
         [rowHover]="true"
-        dataKey="Fecha"
+        dataKey="OT"
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
@@ -91,7 +91,7 @@
             <th pSortableColumn="CantEstandar"><p-sortIcon field="CantEstandar" pTooltip="Cantidad estandar"></p-sortIcon> Cant. Estandar</th>
             <th pSortableColumn="DifCantidad" pTooltip="Diferencial de cantidad"><p-sortIcon field="DifCantidad"></p-sortIcon> Dif. Cantidad</th>
             <th pSortableColumn="PrecioPP" pTooltip="Precio con/sin promedio ponderado"><p-sortIcon field="PrecioPP"></p-sortIcon> Precio PP</th>
-            <th pSortableColumn="ValoracionCantidad"><p-sortIcon field="ValoracionCantidad"></p-sortIcon> Valoracion Cantidad</th>
+            <th pSortableColumn="ValoracionCantidad" pTooltip="Valoración diferencial de cantidad"><p-sortIcon field="ValoracionCantidad"></p-sortIcon> Valor Dif. Cantidad</th>
             <th pSortableColumn="CostoReal"><p-sortIcon field="CostoReal"></p-sortIcon> Costo real</th>
             <th pSortableColumn="CostoEstandar"><p-sortIcon field="CostoEstandar"></p-sortIcon> Costo estandar</th>
             <th> Ver</th>
@@ -105,21 +105,21 @@
             </td>
             <td>{{rowIndex + 1}}</td>
             <td class="text-center"><b>{{item.Fecha}}</b></td>
-            <td>{{item.OT}}</td>
-            <td><b>{{item.CantRequerida}}</b></td>
-            <td>{{item.CantEstandar}}</td>
-            <td class="text-center"><b>{{item.DifCantidad | number: '1.2-2'}}</b></td>
-            <td class="text-center">{{item.PrecioPP}}</td>
-            <td class="text-center"><b>{{item.ValoracionCantidad}}</b></td>
-            <td class="text-center">{{item.CostoReal}}</td>
-            <td class="text-center"><b>{{item.CostoEstandar}}</b></td>
-            <td class="text-center"><p-button id="inactivar" icon="pi pi-file-pdf" (click)="mostrarDetalleConsumo(item.Consecutivo)" styleClass="p-button-rounded p-button-danger"></p-button></td>
+            <td class="text-center">{{item.OT}}</td>
+            <td class="text-center">{{item.CantRequerida | number: '1.2-2'}}</td>
+            <td class="text-center">{{item.CantEstandar | number: '1.2-2'}}</td>
+            <td class="text-center">{{item.DifCantidad | number: '1.2-2'}}</td>
+            <td class="text-center">$ {{item.PrecioPP | number: '1.2-2'}}</td>
+            <td class="text-center">$ {{item.ValoracionCantidad | number: '1.2-2'}}</td>
+            <td class="text-center">$ {{item.CostoReal | number: '1.2-2'}}</td>
+            <td class="text-center">$ {{item.CostoEstandar | number: '1.2-2'}}</td>
+            <td class="text-center"></td>
           </tr>
         </ng-template>
         <!--Tabla 2-->
         <ng-template pTemplate="rowexpansion" let-item>
           <tr>
-            <td colspan="10" id="">
+            <td colspan="12" id="">
               <div class="p-3">
                 <p-table
                   #dt2
