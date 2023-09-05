@@ -368,11 +368,13 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     fila1.forEach(f => worksheet.getCell(f).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
     let altoFilas : number[] = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
     altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
-    let columna : string[] = ['A', 'B', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
-    for (let index = 8; index < 31; index++) {
-      console.log(columna[index].concat(index.toString()));
+    let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
+
+    for (let index = 0; index < columnas.length; index++) {
+      for (let i = 8; i < 32; i++) {
+        worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      }
     }
-    
     infoDocumento.forEach(d => {
       let row = worksheet.addRow(d);
       let formatNumber : number [] = [8, 9, 10, 11, 12, 13];

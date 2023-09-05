@@ -175,6 +175,7 @@ import { AppComponent } from './app.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
 import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
+import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 
 @NgModule({
   declarations: [
@@ -274,6 +275,7 @@ import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.
     ControlCalidad_ExtrusionComponent, 
     ControlCalidad_SelladoComponent,
     ControlCalidadComponent,
+    Informe_ConsumosComponent,
   ],
 
   imports: [
