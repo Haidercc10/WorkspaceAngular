@@ -32,6 +32,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.FormFiltros = this.frmBuilder.group({
       RangoFechas : [],
       material : [],
+      NombreMaterial : [],
     });
   }
 
@@ -52,6 +53,16 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a limpiar el formulario
   limpiarCampos = () => this.FormFiltros.reset();
+
+  // Funcion que va a cambiar el nombre del material en el html
+  cambiarNombreMaterial(){
+    let material : number = this.FormFiltros.value.NombreMaterial;
+    let nombreMaterial : string = this.materiales.find(x => x.id_Materia_Prima == material).nombre_Materia_Prima;
+    this.FormFiltros.patchValue({
+      material : material,
+      NombreMaterial : nombreMaterial,
+    });
+  }
 
   // Funcion que va a buscar la información de las compras realizadas
   buscarComprasRealizadas(){

@@ -41,7 +41,7 @@
             <!-- MATERIALES -->
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
                 <span class="p-float-label">
-                    <input formControlName="material" id="Nombre" list="materiaprima" type="text" pInputText/>
+                    <input formControlName="NombreMaterial" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMaterial()"/>
                     <datalist id="materiaprima">
                         <option value={{item.id_Materia_Prima}} *ngFor="let item of materiales">{{item.nombre_Materia_Prima}}</option>
                     </datalist>
