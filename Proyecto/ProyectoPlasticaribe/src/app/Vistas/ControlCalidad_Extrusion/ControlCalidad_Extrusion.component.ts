@@ -296,13 +296,30 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
     
-    let worksheet = workbook.addWorksheet(title);
+    let worksheet = workbook.addWorksheet(title, {
+      pageSetup:{
+        paperSize: 119, 
+        orientation:'landscape'
+      },
+      // properties:{tabColor:{argb:'FF00FF00'}}
+    });
+    
+    let columasSinBorde : number [] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+    columasSinBorde.forEach(cell => {
+      worksheet.getColumn(cell).border = {
+        top: {style:'thin', color: {argb:'FFFFFF'}},
+        left: { style: 'thin', color: { argb: 'FFFFFF' } },
+        bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
+        right: { style: 'thin', color: { argb: 'FFFFFF' } }
+      };
+    });
+
     worksheet.addImage(imageId1, {
       tl: { col: 0.1, row: 0.45 },
       ext: { width: 150, height: 40 },
       editAs: 'oneCell'
     });
-    let titleRow = worksheet.addRow([]);
+    let titleRow = worksheet.addRow([]);    
     titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
     worksheet.addRow([]);
     worksheet.addRow([]);
