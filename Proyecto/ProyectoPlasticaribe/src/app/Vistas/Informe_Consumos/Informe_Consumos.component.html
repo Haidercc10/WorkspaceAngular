@@ -54,13 +54,13 @@
       <p-table
         *ngIf="!load"
         #dt
-        [value]="consumos"
+        [value]="salidas"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-sm"
         responsiveLayout="scroll"
         [paginator]="true"
-        [rows]="consumos.length"
+        [rows]="salidas.length"
         [rowsPerPageOptions]="[10,25,50,100]"
         [rowHover]="true"
         dataKey="OT"
@@ -79,7 +79,6 @@
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'ValoracionCantidad', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CostoReal', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CostoEstandar', 'contains')"></th>
-            <th></th>
           </tr>
           <!--Encabezado tabla 1-->
           <tr>
@@ -94,7 +93,6 @@
             <th pSortableColumn="ValoracionCantidad" pTooltip="Valoración diferencial de cantidad"><p-sortIcon field="ValoracionCantidad"></p-sortIcon> Valor Dif. Cantidad</th>
             <th pSortableColumn="CostoReal"><p-sortIcon field="CostoReal"></p-sortIcon> Costo real</th>
             <th pSortableColumn="CostoEstandar"><p-sortIcon field="CostoEstandar"></p-sortIcon> Costo estandar</th>
-            <th> Ver</th>
           </tr>
         </ng-template>
         <!--Cuerpo tabla 1-->
@@ -113,17 +111,16 @@
             <td class="text-center">$ {{item.ValoracionCantidad | number: '1.2-2'}}</td>
             <td class="text-center">$ {{item.CostoReal | number: '1.2-2'}}</td>
             <td class="text-center">$ {{item.CostoEstandar | number: '1.2-2'}}</td>
-            <td class="text-center"></td>
           </tr>
         </ng-template>
         <!--Tabla 2-->
         <ng-template pTemplate="rowexpansion" let-item>
           <tr>
-            <td colspan="12" id="">
+            <td colspan="11" id="">
               <div class="p-3">
                 <p-table
                   #dt2
-                  [value]="item.Parametros"
+                  [value]="item.Materiales"
                   dataKey="consecutivo"
                   styleClass="p-datatable-gridlines p-datatable-sm"
                   [scrollable]="true"
@@ -138,14 +135,14 @@
                       <th>Subtotal</th>
                     </tr>
                   </ng-template>
-                  <ng-template pTemplate="body" let-cuantitativos let-rowIndex="rowIndex">
+                  <ng-template pTemplate="body" let-mat let-rowIndex="rowIndex">
                     <tr>
                       <td>{{rowIndex + 1}}</td>
-                      <td>{{cuantitativos.idMaterial}}</td>
-                      <td>{{cuantitativos.nombre}}</td>
-                      <td>{{cuantitativos.cantEntregada | number : '1.2-2'}}</td>
-                      <td>{{cuantitativos.precioReal | number }}</td>
-                      <td>{{cuantitativos.subtotal | number : '1.2-2'}}</td>
+                      <td>{{mat.Material }}</td>
+                      <td>{{mat.NombreMaterial }}</td>
+                      <td>{{mat.CantRequerida | number : '1.2-2'}}</td>
+                      <td>$ {{mat.PrecioPP | number }}</td>
+                      <td>$ {{mat.CostoReal | number : '1.2-2'}}</td>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="emptymessage">

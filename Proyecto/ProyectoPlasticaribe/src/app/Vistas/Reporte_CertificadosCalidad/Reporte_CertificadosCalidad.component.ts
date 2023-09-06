@@ -95,7 +95,6 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
 
   //Cargar las tablas del reporte
   cargarTablas(data : any){
-    
     let info : any = {
       Consecutivo : data.consecutivo,
       Fecha : data.fecha_Registro.replace('T00:00:00', ''),
