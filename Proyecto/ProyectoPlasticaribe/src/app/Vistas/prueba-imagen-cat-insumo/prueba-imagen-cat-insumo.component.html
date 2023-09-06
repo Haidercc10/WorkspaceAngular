@@ -71,7 +71,7 @@
         [value]="comprasRealizadas"
         [resizableColumns]="true"
         columnResizeMode="expand"
-        styleClass="p-datatable-sm p-datatable-gridlines"
+        styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
         responsiveLayout="scroll"
         [rowHover]="true"
         [scrollable]="true"
@@ -98,11 +98,11 @@
                 <td class="text-center">{{data.fecha}}</td>
                 <td class="text-center">{{data.cantComprada | number : '1.2-2'}}</td>
                 <td class="text-center">{{data.precioCompra | number : '1.2-2'}}</td>
-                <td class="text-center">{{data.precioEstandar | number : '1.2-2'}}</td>
-                <td class="text-center">{{data.diffPrecio | number : '1.2-2'}}</td>
+                <td class="text-center azul">{{data.precioEstandar | number : '1.2-2'}}</td>
+                <td class="text-center verde">{{data.diffPrecio | number : '1.2-2'}}</td>
                 <td class="text-center">{{data.costoRealMaterial | number : '1.2-2'}}</td>
-                <td class="text-center">{{data.costoEstandarMaterial | number : '1.2-2'}}</td>
-                <td class="text-center">{{data.variacionPrecio | number : '1.2-2'}}</td>
+                <td class="text-center azul">{{data.costoEstandarMaterial | number : '1.2-2'}}</td>
+                <td class="text-center verde">{{data.variacionPrecio | number : '1.2-2'}}</td>
                 <td class="text-center"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarKardex()"></p-button></td>
             </tr>
         </ng-template>
@@ -118,7 +118,6 @@
             </tr>
         </ng-template>
     </p-table>
-
 </p-card>
 
 <p-dialog header="KÁRDEX CON DATOS ESTÁNDARES Y REALES" [(visible)]="modalKardex" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
@@ -133,7 +132,7 @@
             [value]="datosKardex"
             [resizableColumns]="true"
             columnResizeMode="expand"
-            styleClass="p-datatable-sm p-datatable-gridlines"
+            styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
             responsiveLayout="scroll"
             [rowHover]="true"
             [scrollable]="true"
@@ -144,9 +143,9 @@
                     <th class="text-center" rowspan="3">Fecha</th>
                 </tr>
                 <tr>
-                    <th colspan="3" class="text-center">Entradas</th>
-                    <th colspan="3" class="text-center">Salidas</th>
-                    <th colspan="3" class="text-center">Saldo</th>
+                    <th colspan="3" class="text-center">ENTRADAS</th>
+                    <th colspan="3" class="text-center">SALIDAS</th>
+                    <th colspan="3" class="text-center">SALDO</th>
                 </tr>
                 <tr>
                     <th class="text-center">QR(kg)</th>
@@ -165,15 +164,15 @@
                     <td class="text-center" *ngIf="rowgroup" [attr.rowspan]="rowspan">
                         <span class="font-bold">{{data.fecha}}</span>
                     </td>
-                    <td class="text-center">{{data.cantEntrada == 0 ? '' : data.cantEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.precioEntrada == 0 ? '' : data.precioEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.costoEntrada == 0 ? '' : data.costoEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.cantSalida == 0 ? '' : data.cantSalida | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.precioSalida == 0 ? '' : data.precioSalida | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.costoSalida == 0 ? '' : data.costoSalida | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.cantidadFinal == 0 ? '' : data.cantidadFinal | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.precioFinal == 0 ? '' : data.precioFinal | number : '1.2-2'}}</td>
-                    <td class="text-center">{{data.costoFinal == 0 ? '' : data.costoFinal | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.precioEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.costoSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantidadFinal | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioFinal | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.costoFinal | number : '1.2-2'}}</td>
                 </tr>
             </ng-template>
         </p-table>

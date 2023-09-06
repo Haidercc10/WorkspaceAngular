@@ -177,6 +177,57 @@
       </div>
     </p-tabPanel>
 
+    <!-- Nomina Ingresada -->
+    <p-tabPanel
+      header="Nomina Ingresada"
+      leftIcon="pi pi-wallet"
+      tooltip="Información de la Nómina de Ingresada">
+      <p-table
+        #dt_NominaIngresada
+        [value]="nominaIngresada"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="nominaIngresada.length"
+        [rowsPerPageOptions]="[10,25,50,100,nominaIngresada.length]"
+        [rowHover]="true"        
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th class="text-center" pSortableColumn="fechaRegistro"><p-sortIcon field="fechaRegistro"></p-sortIcon>Fecha Ingreso</th>
+            <th class="text-center">Registrado por</th>
+            <th class="text-center" pSortableColumn="fechaInicio"><p-sortIcon field="fechaInicio"></p-sortIcon>Fecha Inicio Nomina</th>
+            <th class="text-center" pSortableColumn="fechaFin"><p-sortIcon field="fechaFin"></p-sortIcon>Fecha Fin Nomina</th>
+            <th class="text-center" pSortableColumn="valorNomina"><p-sortIcon field="valorNomina"></p-sortIcon>Valor Nomina</th>
+            <th class="text-center" pSortableColumn="tipoNomina"><p-sortIcon field="tipoNomina"></p-sortIcon>Tipo Nomina</th>
+            <th class="text-center">Observación</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowIndex + 1}}</td>
+            <td>{{nomina.fechaRegistro | date:"MM/dd/yyyy"}}</td>
+            <td>{{nomina.registradoPor}}</td>
+            <td>{{nomina.fechaInicio | date:"MM/dd/yyyy"}}</td>
+            <td>{{nomina.fechaFin | date:"MM/dd/yyyy"}}</td>
+            <td>{{nomina.valorNomina | currency : 'USD'}}</td>
+            <td>{{nomina.tipoNomina}}</td>
+            <td>{{nomina.observacion}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Total</td>
+            <td colspan="3" class="text-left">{{calcularTotalNominaIngresada() | currency : 'USD'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-tabPanel>
+
   </p-tabView>
 
   <!-- tabla detallada por operario(s) -->

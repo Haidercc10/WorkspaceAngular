@@ -95,7 +95,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       cantComprada : compra.cantidadCompra,
       precioCompra : compra.precioReal,
       precioEstandar : compra.precioEstandar,
-      diffPrecio : -compra.diferenciaPrecio,
+      diffPrecio : compra.diferenciaPrecio,
       costoRealMaterial : compra.costoReal,
       costoEstandarMaterial : compra.costoEstandar,
       variacionPrecio : compra.variacionPrecio,
@@ -116,29 +116,143 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a cargar la información del kardex
   cargarKardex(){
+    this.cargando = true;
+    this.datosKardex = [];
     // Inventario inicial
     this.movEntradasService.GetComprasAntiguas(moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD'), this.FormFiltros.value.material).subscribe(data => {
-      this.cargando = true;
-      this.datosKardex = [];
+      let cantFinal = 0, costoFinal = 0;
       data.forEach(compra => {
         this.datosKardex.push({
+          Id : this.datosKardex.length + 1,
           fecha : moment().startOf('month').format('YYYY-MM-DD'),
-          cantEntrada : 0,
-          precioEntrada : 0,
-          costoEntrada : 0,
-          cantSalida : 0,
-          precioSalida : 0,
-          costoSalida : 0,
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
           cantidadFinal : compra.cantidadCompra,
           precioFinal : compra.precioReal,
           costoFinal : compra.costoReal,
+          total : false,
+          costosFinales : true,
         });
-        this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
+        cantFinal += compra.cantidadCompra;
+        costoFinal += compra.costoReal;
       });
-    }, () => this.msg.mensajeError('No se encontrón información'), () => {
-      this.cargando = false;
-      this.modalKardex = true;
+      this.datosKardex.push({
+        Id : this.datosKardex.length + 1,
+        fecha : moment().startOf('month').format('YYYY-MM-DD'),
+        cantEntrada : '',
+        precioEntrada : '',
+        costoEntrada : '',
+        cantSalida : '',
+        precioSalida : '',
+        costoSalida : '',
+        cantidadFinal : cantFinal,
+        precioFinal : '',
+        costoFinal : costoFinal,
+        total : true,
+        costosFinales : false,
+      });
+      this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    }, () => {
+      this.datosKardex.push({
+        Id : this.datosKardex.length + 1,
+        fecha : moment().startOf('month').format('YYYY-MM-DD'),
+        cantEntrada : '',
+        precioEntrada : '',
+        costoEntrada : '',
+        cantSalida : '',
+        precioSalida : '',
+        costoSalida : '',
+        cantidadFinal : 0,
+        precioFinal : 0,
+        costoFinal : 0,
+        total : true,
+      });
     });
     // Entradas de material
+    this.comprasRealizadas.forEach(compra => {
+      this.datosKardex.push(
+        {
+          Id : this.datosKardex.length + 1,
+          fecha : compra.fecha.toString().substring(0, 10),
+          cantEntrada : compra.cantComprada,
+          precioEntrada : compra.precioEstandar,
+          costoEntrada : compra.costoEstandarMaterial,
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+          color : 'azul',
+          costosFinales : false,
+        },
+        {
+          Id : this.datosKardex.length + 2,
+          fecha : compra.fecha.toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : compra.diffPrecio,
+          costoEntrada : compra.variacionPrecio,
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+          color : 'verde',
+          costosFinales : false,
+        },
+        {
+          Id : this.datosKardex.length + 3,
+          fecha : compra.fecha.toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : compra.precioCompra,
+          costoEntrada : compra.costoRealMaterial,
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+          costosFinales : false,
+        }
+      );
+    });
+    // Salidas de material
+
+    // Costos Finales
+    let datosCostosFinales = this.datosKardex.filter(item => item.costosFinales);
+    this.comprasRealizadas.forEach((compra) => {
+      datosCostosFinales.push(
+        {
+          Id : this.datosKardex.length + 1,
+          fecha : compra.fecha.toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
+          cantidadFinal : compra.cantComprada,
+          precioFinal : compra.precioCompra,
+          costoFinal : compra.costoRealMaterial,
+          total : false,
+          costosFinales : false,
+        }
+      );
+    });
+
+    this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
+
+    setTimeout(() => {
+      this.cargando = false;
+      this.modalKardex = true;
+    }, 2000);
   }
 }
