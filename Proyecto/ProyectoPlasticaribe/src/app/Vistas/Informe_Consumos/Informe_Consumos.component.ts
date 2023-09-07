@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -27,13 +29,24 @@ export class Informe_ConsumosComponent implements OnInit {
   @ViewChild('dt2') dt2: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente
   salidas : any = []; //Variable que se usará para almacenar los datos de los consumos
   materiales : any = []; //Variable que se usará para almacenar los datos de la materia prima
+  formFiltros : any = []; //Variable que se usará para almacenar los datos del formulario de filtros
+  materiasPrimas : any = []; //Variable que se usará para almacenar los datos de la materia prima
 
   constructor(private AppComponent : AppComponent, 
-              private salidasService : Entradas_Salidas_MPService,) { }
+                private salidasService : Entradas_Salidas_MPService,
+                  private frmBuilder : FormBuilder,
+                    private movEntradasService : Movimientos_Entradas_MPService,) {
+
+    this.formFiltros = this.frmBuilder.group({ 
+      rangoFechas : [],
+      material : null,
+      NombreMaterial : null,
+    });           
+  }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.consultar();
+    this.obtenerMateriales();
   }
 
   //Funcion que se usará para mostrar el tutorial
@@ -47,14 +60,35 @@ export class Informe_ConsumosComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  // Funcion que va a obtener los diferentes materiales
+  obtenerMateriales = () => this.movEntradasService.GetInventarioMateriales().subscribe(datos => this.materiasPrimas = datos);
+
+  // Funcion que va a limpiar el formulario
+  limpiarCampos() {
+    this.formFiltros.reset();
+    this.load = false;
+  }
+
+  // Funcion que va a cambiar el nombre del material en el html
+  cambiarNombreMaterial(){
+    let material : number = this.formFiltros.value.NombreMaterial;
+    let nombreMaterial : string = this.materiasPrimas.find(x => x.id_Materia_Prima == material).nombre_Materia_Prima;
+    //console.log(nombreMaterial)
+    this.formFiltros.patchValue({
+      material : material,
+      NombreMaterial : nombreMaterial,
+    });
+  }
+
   //Función donde se consultarán los consumos por fecha
   consultar(){
     this.load = true;
     this.consumos = [];
-    let fecha1 : any = (this.rangoFechas[0] != undefined && this.rangoFechas[0].length > 0 && this.rangoFechas[0] != null) ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
-    let fecha2 : any = (this.rangoFechas[1] != undefined && this.rangoFechas[1].length > 0 && this.rangoFechas[1] != null) ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
-    console.log(fecha1, fecha2)
-    this.salidasService.GetConsumos(`2023-09-01`, `2023-09-06`).subscribe(data => { 
+    let fecha1 : any = (this.formFiltros.value.rangoFechas[0] != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
+    let fecha2 : any = (this.formFiltros.value.rangoFechas[1] != undefined && this.formFiltros.value.rangoFechas[1].length > 0 && this.formFiltros.value.rangoFechas[1] != null) ? moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
+    let material : number = this.formFiltros.value.material;
+
+    this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
       for(let i = 0; i < data.length; i++){
         this.cargarConsumos(data[i]);
       }
@@ -85,7 +119,6 @@ export class Informe_ConsumosComponent implements OnInit {
 
   //Función que mostrará los detalles de los consumos por fecha y OT.
   mostrarDetalleConsumo(){
-    console.log(this.consumos)
     this.salidas = this.consumos.reduce((acc, item) => {
       let info : any = {
         Fecha : item.Fecha,
@@ -118,7 +151,8 @@ export class Informe_ConsumosComponent implements OnInit {
         let indice = this.salidas.findIndex(x => x.OT == this.consumos[index].OT && x.Fecha == this.consumos[index].Fecha);
         this.salidas[indice].Materiales.push(this.consumos[index]);
       }
+      this.load = false;
     }, 1000);
-    this.load = false;
+    
   }
 }

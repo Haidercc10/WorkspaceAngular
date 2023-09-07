@@ -31,24 +31,45 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-cloud-download"></i> Consultar registros</h4>
   </div>
 
-  <div class="row m-3 g-2 mb-4">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 mr-2">
-      <span class="p-float-label" id="rango-fechas">
-        <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
-        <label for="FechaInicial">Rango de Fechas</label>
-      </span>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3">
-      <div class="d-grid gap-2 d-md-flex">
-        <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultar()"></button>
+  <!--Formulario-->
+  <form [formGroup]="formFiltros">
+    <div class="row m-3 g-2 mb-4">
+
+      <!--Rango de fechas -->
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 mr-2">
+        <span class="p-float-label" id="rango-fechas">
+          <p-calendar id="rango" inputId="FechaInicial" formControlName="rangoFechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+          <label for="FechaInicial">Rango de Fechas</label>
+        </span>
+      </div>
+      
+      <!-- Nombre de material -->
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 col-xxl-4 mr-2">
+        <span class="p-float-label">
+          <input formControlName="NombreMaterial" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMaterial()"/>
+            <datalist id="materiaprima">
+              <option value={{item.id_Materia_Prima}} *ngFor="let item of materiasPrimas">{{item.nombre_Materia_Prima}}</option>
+            </datalist>
+          <label for="Orden">Materia Prima</label>
+        </span>
+      </div>
+
+      <!--Botones-->
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg col-xl col-xxl">
+        <div class="d-grid gap-2 d-md-flex">
+          <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar" (click)="consultar()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 
+  <!--Linea-->
   <div class="mb-4">
     <hr class="colorLinea">
   </div>
 
+  <!--Tabla-->
   <div class="mb-3" *ngIf="!load">
     <div class="row g-3 font-size-14">
       <p-table

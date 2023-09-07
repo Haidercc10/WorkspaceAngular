@@ -65,6 +65,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
+import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
 
 export const routes: Routes = [
 
@@ -189,6 +190,9 @@ export const routes: Routes = [
 
   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
   {path: 'control-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad'}, component: ControlCalidadComponent},
+
+  /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
+  {path: 'costos-caja-menor', canActivate: [VistasPermisosGuard], data: {nombre: 'Costos Caja Menor'}, component: Costos_CajaMenorComponent},
 ]
 
 @NgModule({
