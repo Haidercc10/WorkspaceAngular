@@ -4,6 +4,7 @@ import { VistasPermisosGuard } from './Guards/vistas-permisos.guard';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
+import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
@@ -51,7 +52,6 @@ import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
@@ -64,7 +64,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
-import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 
 export const routes: Routes = [
 
@@ -90,12 +90,12 @@ export const routes: Routes = [
   {path: 'movimiento-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Mat. Prima'}, component: MovimientoMPComponent},
   // Reportes de materia prima
   {path: 'reporte-Materia-Prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Mat. Prima'}, component: ReporteMateriaPrimaComponent},
-  {path: 'reporte-facturas-remisiones-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Entradas'}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Recuperado'}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Orden Compra'}, component: Reporte_OrdenCompraComponent},
   {path: 'solicitud-materia-prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Materia Prima'}, component: SolicitudMateriaPrimaComponent},
   {path: 'reporte-solicitudes-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Materia Prima'}, component: Reporte_SolicitudesMPComponent},
 
+  {path: 'informe-consumos', canActivate: [VistasPermisosGuard], data: {nombre: 'Informe de Consumos'}, component: Informe_ConsumosComponent},
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
   {path: 'preingreso-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Pre Ingreso Extrusión'}, component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion
@@ -183,13 +183,13 @@ export const routes: Routes = [
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
   {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
 
-   /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
-   {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
-   {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
+  /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
+  {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
+  {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
 
-   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-   {path: 'control-calidad-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad Extrusión'}, component: ControlCalidad_ExtrusionComponent},
-  ]
+  /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
+  {path: 'control-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad'}, component: ControlCalidadComponent},
+]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

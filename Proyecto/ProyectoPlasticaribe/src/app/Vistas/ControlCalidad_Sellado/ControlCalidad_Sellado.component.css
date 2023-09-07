@@ -1,15 +1,3 @@
-span{
-  color: #db4149;
-}
-
-.columnaCantidad {
-  background-color: #75baff;
-}
-
-#table td, th{
-  font-size: calc(var(--font-size) * 13px);
-}
-
 p-calendar ::ng-deep span button {
   background-color: var(--rojo);
   border: 0;
@@ -26,4 +14,9 @@ p-calendar ::ng-deep .p-datepicker-header button {
 
 p-calendar ::ng-deep .p-datepicker-header button:hover {
   background: #fff0;
+}
+
+.noEnviados{
+  background-color: rgb(255, 231, 193) !important; 
+  color: #071426 !important;
 }

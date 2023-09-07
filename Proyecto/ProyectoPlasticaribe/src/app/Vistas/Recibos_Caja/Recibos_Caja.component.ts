@@ -56,47 +56,36 @@ export class Recibos_CajaComponent implements OnInit {
     this.fechaFinal = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format().replace('T00:00:00-05:00', 'T23:59:59') : this.fecha;
     this.totalRecibos = 0;
 
-    if (this.fecha == 'Fecha inválida') this.fecha = null;
-    if (this.fechaFinal == 'Fecha inválida') this.fechaFinal = null;
-
-    this.fecha = this.fecha == null ? this.today : this.fecha;
-    this.fechaFinal = this.fechaFinal == null ? this.fecha : this.fechaFinal;
+    this.fecha = this.fecha == 'Fecha inválida' ? this.today : this.fecha;
+    this.fechaFinal = this.fechaFinal == 'Fecha inválida' ? this.fecha : this.fechaFinal;
 
     this.servicioInventarioZeus.GetRecibosCaja(this.fecha, this.fechaFinal).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          this.llenarTabla(data[index]);
-        }
-      } else {
-        this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
-        this.load = false;
-      }
-    });
-    setTimeout(() => { this.load = false; }, 2500);
+      if(data.length > 0) data.forEach(datos => this.llenarTabla(datos));
+      else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de busqueda!`);
+    }, () => this.load = false, () => this.load = false);
   }
 
   //Funció que se encarga de llenar la tabla con los datos de los recibos de caja
   llenarTabla(datos : any) {
-    let info : any = {
-    anoMes: datos.anoMes,
-    fuente: datos.fuente,
-    documento: datos.documento,
-    consecutivo: datos.consecutivo,
-    fechaTransac: datos.fechaTransac,
-    idCliente: datos.idCliente,
-    cliente: datos.cliente,
-    descripcion: datos.descripcion,
-    valor: datos.valor,
-    cuenta: datos.cuenta,
-    idVendedor: datos.idVendedor,
-    vendedor: datos.vendedor,
-    factura: datos.factura,
-    vencimiento: datos.vencimiento,
-    usuario: datos.usuario,
-    fechaRegistro: datos.fechaRegistro.replace('T', ' - '),
-    }
-    this.totalRecibos += info.valor;
-    this.arrayRecibos.push(info)
+    this.arrayRecibos.push({
+      anoMes: datos.anoMes,
+      fuente: datos.fuente,
+      documento: datos.documento,
+      consecutivo: datos.consecutivo,
+      fechaTransac: datos.fechaTransac,
+      idCliente: datos.idCliente,
+      cliente: datos.cliente,
+      descripcion: datos.descripcion,
+      valor: datos.valor,
+      cuenta: datos.cuenta,
+      idVendedor: datos.idVendedor,
+      vendedor: datos.vendedor,
+      factura: datos.factura,
+      vencimiento: datos.vencimiento,
+      usuario: datos.usuario,
+      fechaRegistro: datos.fechaRegistro.replace('T', ' - '),
+    });
+    this.totalRecibos += datos.valor;
   }
 
   //Función que mostrará un tutorial del uso del módulo

@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ConsultaFac_Rem_MPComponent } from './consultaFac_Rem_MP.component';
+import { ControlCalidadComponent } from './ControlCalidad.component';
 
-describe('ConsultaFac_Rem_MPComponent', () => {
-  let component: ConsultaFac_Rem_MPComponent;
-  let fixture: ComponentFixture<ConsultaFac_Rem_MPComponent>;
+describe('ControlCalidadComponent', () => {
+  let component: ControlCalidadComponent;
+  let fixture: ComponentFixture<ControlCalidadComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConsultaFac_Rem_MPComponent ]
+      declarations: [ ControlCalidadComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConsultaFac_Rem_MPComponent);
+    fixture = TestBed.createComponent(ControlCalidadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

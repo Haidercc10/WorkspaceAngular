@@ -90,15 +90,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
         }
         let workbook = new Workbook();
-        //const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
-        //worksheet.addImage(imageId1, 'A1:B3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -120,44 +118,16 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: color2 }
           }
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(5).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(14).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(15).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(17).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(18).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(19).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(20).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(21).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          let formatNumber : number [] = [4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+          formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
         });
+        let tamano60 : number [] = [2, 3, 9];
+        let tamano20 : number [] = [4, 5, 6, 7, 8];
+        let tamano15 : number [] = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+        tamano60.forEach(e => worksheet.getColumn(e).width = 60);
+        tamano20.forEach(e => worksheet.getColumn(e).width = 20);
+        tamano15.forEach(e => worksheet.getColumn(e).width = 15);
         worksheet.getColumn(1).width = 10;
-        worksheet.getColumn(2).width = 60;
-        worksheet.getColumn(3).width = 60;
-        worksheet.getColumn(4).width = 20;
-        worksheet.getColumn(5).width = 20;
-        worksheet.getColumn(6).width = 20;
-        worksheet.getColumn(7).width = 20;
-        worksheet.getColumn(8).width = 20;
-        worksheet.getColumn(9).width = 60;
-        worksheet.getColumn(10).width = 15;
-        worksheet.getColumn(11).width = 15;
-        worksheet.getColumn(12).width = 15;
-        worksheet.getColumn(13).width = 15;
-        worksheet.getColumn(14).width = 15;
-        worksheet.getColumn(15).width = 15;
-        worksheet.getColumn(16).width = 15;
-        worksheet.getColumn(17).width = 15;
-        worksheet.getColumn(18).width = 15;
-        worksheet.getColumn(19).width = 15;
-        worksheet.getColumn(20).width = 15;
-        worksheet.getColumn(21).width = 15;
       setTimeout(() => {
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -215,43 +185,59 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   Diciembre : datos_Inventario[k].diciembre,
                 }
 
-                if (mes == 0) {
-                  this.mesActual = 'Enero';
-                  info.Mes_Actual = datos_Inventario[k].enero;
-                } else if (mes == 1) {
-                  this.mesActual = 'Febrero';
-                  info.Mes_Actual = datos_Inventario[k].febrero;
-                } else if (mes == 2) {
-                  this.mesActual = 'Marzo';
-                  info.Mes_Actual = datos_Inventario[k].marzo;
-                } else if (mes == 3) {
-                  this.mesActual = 'Abril';
-                  info.Mes_Actual = datos_Inventario[k].abril;
-                } else if (mes == 4) {
-                  this.mesActual = 'Mayo';
-                  info.Mes_Actual = datos_Inventario[k].mayo;
-                } else if (mes == 5) {
-                  this.mesActual = 'Junio';
-                  info.Mes_Actual = datos_Inventario[k].junio;
-                } else if (mes == 6) {
-                  this.mesActual = 'Julio';
-                  info.Mes_Actual = datos_Inventario[k].julio;
-                } else if (mes == 7) {
-                  this.mesActual = 'Agosto';
-                  info.Mes_Actual = datos_Inventario[k].agosto;
-                } else if (mes == 8) {
-                  this.mesActual = 'Septiembre';
-                  info.Mes_Actual = datos_Inventario[k].septiembre;
-                } else if (mes == 9) {
-                  this.mesActual = 'Octubre';
-                  info.Mes_Actual = datos_Inventario[k].Octubre;
-                } else if (mes == 10) {
-                  this.mesActual = 'Noviembre';
-                  info.Mes_Actual = datos_Inventario[k].noviembre;
-                } else if (mes == 11) {
-                  this.mesActual = 'Diciembre';
-                  info.Mes_Actual = datos_Inventario[k].diciembre;
+                switch (mes) {
+                  case 0:
+                    this.mesActual = 'Enero';
+                    info.Mes_Actual = datos_Inventario[k].enero;
+                    break;
+                  case 1:
+                    this.mesActual = 'Febrero';
+                    info.Mes_Actual = datos_Inventario[k].febrero;
+                    break;
+                  case 2:
+                    this.mesActual = 'Marzo';
+                    info.Mes_Actual = datos_Inventario[k].marzo;
+                    break;
+                  case 3:
+                    this.mesActual = 'Abril';
+                    info.Mes_Actual = datos_Inventario[k].abril;
+                    break;
+                  case 4:
+                    this.mesActual = 'Mayo';
+                    info.Mes_Actual = datos_Inventario[k].mayo;
+                    break;
+                  case 5:
+                    this.mesActual = 'Junio';
+                    info.Mes_Actual = datos_Inventario[k].junio;
+                    break;
+                  case 6:
+                    this.mesActual = 'Julio';
+                    info.Mes_Actual = datos_Inventario[k].julio;
+                    break;
+                  case 7:
+                    this.mesActual = 'Agosto';
+                    info.Mes_Actual = datos_Inventario[k].agosto;
+                    break;
+                  case 8:
+                    this.mesActual = 'Septiembre';
+                    info.Mes_Actual = datos_Inventario[k].septiembre;
+                    break;
+                  case 9:
+                    this.mesActual = 'Octubre';
+                    info.Mes_Actual = datos_Inventario[k].Octubre;
+                    break;
+                  case 10:
+                    this.mesActual = 'Noviembre';
+                    info.Mes_Actual = datos_Inventario[k].noviembre;
+                    break;
+                  case 11:
+                    this.mesActual = 'Diciembre';
+                    info.Mes_Actual = datos_Inventario[k].diciembre;
+                    break;                
+                  default:
+                    break;
                 }
+
                 this.columnas = [
                   { header: 'Enero', field: 'Enero'},
                   { header: 'Febrero', field: 'Febrero'},
@@ -280,7 +266,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => { this.load = true; }, 3000);
+    setTimeout(() => this.load = true, 3000);
   }
 
   //

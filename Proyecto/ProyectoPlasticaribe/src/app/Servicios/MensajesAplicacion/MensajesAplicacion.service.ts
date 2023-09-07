@@ -7,9 +7,9 @@ export class MensajesAplicacionService {
 
   constructor(private messageService: MessageService,) { }
 
-  mensajeError = (titulo : string, detalles : string) => this.messageService.add({severity:'error', summary: titulo, detail: detalles });
+  mensajeError = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'error', summary: titulo, detail: detalles, life: tiempo });
 
-  mensajeAdvertencia = (titulo : string, detalles : string) => this.messageService.add({severity:'warn', summary: titulo, detail: detalles });
+  mensajeAdvertencia = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'warn', summary: titulo, detail: detalles, life: tiempo });
 
-  mensajeConfirmacion = (titulo : string, detalles : string) => this.messageService.add({severity:'success', summary: titulo, detail: detalles });
+  mensajeConfirmacion = (titulo : string, detalles : string = '', tiempo : number = 3000) => this.messageService.add({severity:'success', summary: titulo, detail: detalles, life: tiempo });
 }

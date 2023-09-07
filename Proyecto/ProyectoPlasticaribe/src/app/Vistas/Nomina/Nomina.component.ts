@@ -11,6 +11,7 @@ import * as fs from 'file-saver';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
+import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
 
 @Component({
   selector: 'app-Nomina',
@@ -37,12 +38,14 @@ export class NominaComponent implements OnInit {
   operario : any = ''; /** Variable que cargará el ID y nombre del operario en cualquiera de los modales. */
   detallesNomina : any [] = []; //Variable que almacenará la información detallada de los rollos pesados o ingresados de un producto y persona en especifico
   detalladoxBultos : any[] = []; /** Variable que cargará en el formato excel la nomina detallada por bultos para cada operario */
+  nominaIngresada : any [] = []; /** Variable que almacenará la información de la nomina de ingresos */
 
   constructor(private AppComponent : AppComponent,
                 private servicioBagPro : BagproService,
                   private msj : MensajesAplicacionService,
                     private mensajes : MessageService,
-                      private shepherdService: ShepherdService) {
+                      private shepherdService: ShepherdService,
+                        private nominaService : Nomina_PlasticaribeService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -173,8 +176,20 @@ export class NominaComponent implements OnInit {
     }, 2000);
   }
 
+  // Consultar nomina ingresada al programa
+  consultarNominaIngresada(){
+    this.nominaIngresada = [];
+    let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
+    let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
+    this.nominaService.GetNominaIngresada(fechaInicial, fechaFinal).subscribe(data => this.nominaIngresada = data);
+  }
+
+  // Funcion que va a calcular el total de la nomina ingresada 
+  calcularTotalNominaIngresada = () : number => this.nominaIngresada.reduce((a,b) => a + b.valorNomina, 0);
+
   /** Función para consultar las nomina de sellado */
   consultarNominas(){
+    this.consultarNominaIngresada();
     this.load = false;
     this.totalNominaSellado = 0;
     this.arraySellado = [];

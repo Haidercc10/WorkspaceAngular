@@ -78,26 +78,19 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
     let fechaFin : any = this.FormFiltros.value.fechaFin;
     let ruta : any = ``;
     
-    if(fechaInicio == `Fecha inválida`) fechaInicio = null;
-    if(fechaFin == `Fecha inválida`) fechaFin = null;
-
-    fechaInicio == null ? fechaInicio = moment().subtract(1, 'M').format('YYYY-MM-DD') : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
-    fechaFin == null ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
+    fechaInicio == `Fecha inválida` ? fechaInicio = moment().subtract(1, 'M').format('YYYY-MM-DD') : fechaInicio = moment(fechaInicio).format('YYYY-MM-DD');
+    fechaFin == `Fecha inválida` ? fechaFin = this.today : fechaFin = moment(fechaFin).format('YYYY-MM-DD');
 
     if(consecutivo != null) ruta += `consec=${consecutivo}`;
     if(ot != null) ruta.length > 0 ? ruta += `&ot=${ot}` : ruta += `ot=${ot}`;
-    if(cliente != null) { ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`; console.log(ruta) }
+    if(cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if(referencia != null) ruta.length > 0 ?  ruta += `&referencia=${referencia}` : ruta += `referencia=${referencia}`;
     ruta.length > 0 ? ruta = `?${ruta}` : null;
 
-    this.srvCertificados.GetCertificados(fechaInicio, fechaFin, ruta).subscribe(data => {
-      if(data.length > 0) {
-        for (let index = 0; index < data.length; index++) {
-          this.cargarTablas(data[index]);
-        }
-      } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados`);
-    });
-    setTimeout(() => { this.load = false; }, 1500);
+    this.srvCertificados.GetCertificados(`2023-08-01`, `2023-08-31`, ruta).subscribe(data => {
+      if(data.length > 0) data.forEach(info => this.cargarTablas(info));
+      else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros con los filtros consultados`);
+    }, () => this.load = false, () => this.load = false);
   }
 
   //Cargar las tablas del reporte
@@ -114,60 +107,22 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
       Parametros2 : []
     }
     this.certificados.push(info);
+    this.parametros2(data);
     
-    let parametrosCuantitativos  : any = [
-      {
-        consecutivo : data.consecutivo,
-        parametro : `Calibre`,
-        unidad : data.unidad_Calibre,
-        nominal : data.nominal_Calibre,
-        tolerancia : data.tolerancia_Calibre,
-        minimo : data.minimo_Calibre, 
-        maximo : data.maximo_Calibre,
-      },
-      {
-        consecutivo : data.consecutivo,
-        parametro : `Ancho Frente`,
-        unidad : data.unidad_AnchoFrente,
-        nominal : data.nominal_AnchoFrente,
-        tolerancia : data.tolerancia_AnchoFrente,
-        minimo : data.minimo_AnchoFrente, 
-        maximo : data.maximo_AnchoFrente,
-      },
-      {
-        consecutivo : data.consecutivo,
-        parametro : `Ancho Fuelle`,
-        unidad : data.unidad_AnchoFuelle,
-        nominal : data.nominal_AnchoFuelle,
-        tolerancia : data.tolerancia_AnchoFuelle,
-        minimo : data.minimo_AnchoFuelle, 
-        maximo : data.maximo_AnchoFuelle,
-      },
-      {
-        consecutivo : data.consecutivo,
-        parametro : `Largo Repetición`,
-        unidad : data.unidad_LargoRepeticion,
-        nominal : data.nominal_LargoRepeticion,
-        tolerancia : data.tolerancia_LargoRepeticion,
-        minimo : data.minimo_LargoRepeticion, 
-        maximo : data.maximo_LargoRepeticion,
-      },
-      {
-        consecutivo : data.consecutivo,
-        parametro : `COF`,
-        unidad : data.unidad_Cof,
-        nominal : data.nominal_Cof,
-        tolerancia : data.tolerancia_Cof,
-        minimo : data.minimo_Cof, 
-        maximo : data.maximo_Cof,
-      },
-    ]
-    //Cargue parametros cuantitativos
-    for (let index = 0; index < parametrosCuantitativos.length; index++) {
-      let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCuantitativos[index].consecutivo);
-      this.certificados[indice].Parametros.push(parametrosCuantitativos[index]);
-    }  
+    this.srvCertificados.GetParametrosCuantitativos(data.consecutivo).subscribe(datos => {
+      for (let indx = 0; indx < this.parametros2(data).length; indx++) {
+        let indice = this.certificados.findIndex(x => x.Consecutivo == this.parametros2(data)[indx].consecutivo);
+        this.certificados[indice].Parametros2.push(this.parametros2(data)[indx]);
+        for (let index = 0; index < datos.length; index++) {
+          let indice = this.certificados.findIndex(x => x.Consecutivo == datos[index].consecutivo);
+          this.certificados[indice].Parametros.push(datos[index]);
+        }
+      } 
+    });
+  }
 
+  //.Función que cargará y retornará los parametros cualitativos del reporte
+  parametros2(data : any) {
     let parametrosCualitativos  : any = [
       {
         consecutivo : data.consecutivo,
@@ -179,12 +134,7 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
         impresion : data.impresion, 
       }
     ];
-
-    //Cargue parametros cualitativos
-    for (let index = 0; index < parametrosCualitativos.length; index++) {
-      let indice = this.certificados.findIndex(x => x.Consecutivo == parametrosCualitativos[index].consecutivo);
-      this.certificados[indice].Parametros2.push(parametrosCualitativos[index]);
-    }
+    return parametrosCualitativos;
   }
 
   //.Limpiar los campos del formulario de filtros

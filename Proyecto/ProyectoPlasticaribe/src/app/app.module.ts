@@ -124,7 +124,6 @@ import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZe
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 import { Reporte_MaquilasComponent } from './Vistas/Reporte_Maquilas/Reporte_Maquilas.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
-import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
@@ -140,7 +139,6 @@ import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
 import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
@@ -175,6 +173,9 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
+import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
+import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 
 @NgModule({
   declarations: [
@@ -195,7 +196,6 @@ import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extru
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
     AsignacionMateriaPrimaComponent,
-    ConsultaFac_Rem_MPComponent,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
     PruebaImagenCatInsumoComponent,
@@ -236,7 +236,6 @@ import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extru
     Reporte_MantenimientoComponent,
     Reporte_DesperdiciosComponent,
     ReportePedidos_ZeusComponent,
-    Reporte_PedidosVendedoresComponent,
     Reporte_FacturacionZeusComponent,
     Orden_MaquilaComponent,
     CrearTerceroComponent,
@@ -273,7 +272,10 @@ import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extru
     Gestion_VistasComponent, 
     Reporte_CertificadosCalidadComponent,
     CertificadoCalidadComponent,
-    ControlCalidad_ExtrusionComponent
+    ControlCalidad_ExtrusionComponent, 
+    ControlCalidad_SelladoComponent,
+    ControlCalidadComponent,
+    Informe_ConsumosComponent,
   ],
 
   imports: [

@@ -9,17 +9,16 @@ import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/C
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsCrearPedidos as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -78,18 +77,17 @@ export class PedidoExternoComponent implements OnInit {
                 private productosServices : ProductoService,
                   private clientesService :ClientesService,
                     private sedesClientesService: SedeClienteService,
-                      private usuarioService: UsuarioService,
-                        private unidadMedidaService : UnidadMedidaService,
-                          private frmBuilderPedExterno : FormBuilder,
-                            private existenciasProductosServices : ExistenciasProductosService,
-                              private PedidoProductosService : PedidoProductosService,
-                                private AppComponent : AppComponent,
-                                  private ClientesProductosService : ClientesProductosService,
-                                    private zeusService : InventarioZeusService,
-                                      private zeusCobtabilidadService : ZeusContabilidadService,
-                                        private messageService: MessageService,
-                                          private shepherdService: ShepherdService,
-                                            private mensajeService : MensajesAplicacionService,) {
+                      private unidadMedidaService : UnidadMedidaService,
+                        private frmBuilderPedExterno : FormBuilder,
+                          private existenciasProductosServices : ExistenciasProductosService,
+                            private PedidoProductosService : PedidoProductosService,
+                              private AppComponent : AppComponent,
+                                private ClientesProductosService : ClientesProductosService,
+                                  private zeusService : InventarioZeusService,
+                                    private zeusCobtabilidadService : ZeusContabilidadService,
+                                      private messageService: MessageService,
+                                        private shepherdService: ShepherdService,
+                                          private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -218,7 +216,7 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que va a buscar el cliente seleccionado
   clienteSeleccionado(){
     let nombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    if (nombre != null && nombre != '' && nombre != undefined){
+    if (![null, '', undefined].includes(nombre)){
       this.clientesService.srvObtenerListaPorNombreCliente(nombre).subscribe(datos => {
         for (let i = 0; i < datos.length; i++) {
           this.FormPedidoExternoClientes.patchValue({
@@ -243,9 +241,7 @@ export class PedidoExternoComponent implements OnInit {
     let clienteBD: any = this.FormPedidoExternoClientes.value.PedClienteId;
     this.sedesClientesService.srvObtenerListaPorCliente(clienteBD).subscribe(datos_sedesClientes => {
       this.sedeCliente = datos_sedesClientes;
-      for (let i = 0; i < datos_sedesClientes.length; i++) {
-        this.ciudad.push(datos_sedesClientes[i].sedeCliente_Ciudad);
-      }
+      datos_sedesClientes.map(sede => sede.sedeCliente_Ciudad).forEach(sede => this.ciudad.push(sede));
 
       if (this.sedeCliente.length <= 1 ) {
         for (const item of this.sedeCliente) {
@@ -280,9 +276,7 @@ export class PedidoExternoComponent implements OnInit {
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     this.sedeCliente = [];
     this.sedesClientesService.GetDireccionesCliente(cliente, ciudad).subscribe(datos_sedesClientes => {
-      for (let i = 0; i < datos_sedesClientes.length; i++) {
-        this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);
-      }
+      datos_sedesClientes.map(sede => sede.sedeCliente_Direccion).forEach(sede => this.sedeCliente.push(sede));
       setTimeout(() => {
         if (this.sedeCliente.length <= 1) {
           for (let i = 0; i < this.sedeCliente.length; i++) {
@@ -312,22 +306,22 @@ export class PedidoExternoComponent implements OnInit {
               let hoy = moment([moment().year(), moment().month(), moment().date()]);
               let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
               if (hoy.diff(fechaDocumento, 'days') >= 70) {
-                this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
+                this.msj.mensajeAdvertencia(`Advertencia`, `¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
                 this.limpiarTodosCampos();
                 break;
               } else this.cargando = false;
             }
-          }, error => {
-            this.mensajeService.mensajeError(`Error`, `¡Error al consultar la cartera del cliente selecionado!`);
+          }, () => {
+            this.msj.mensajeError(`Error`, `¡Error al consultar la cartera del cliente selecionado!`);
             this.limpiarTodosCampos();
           });
         }
-      }, error => {
-        this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al consultar el código del cliente seleccionado!`);
+      }, () => {
+        this.msj.mensajeError(`Error`, `¡Ocurrió un error al consultar el código del cliente seleccionado!`);
         this.cargando = false;
       });
     } else {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
+      this.msj.mensajeAdvertencia(`Advertencia`, `¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
       this.cargando = false;
     }
   }
@@ -336,9 +330,7 @@ export class PedidoExternoComponent implements OnInit {
   productoCliente(){
     this.producto = [];
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
-      for (let index = 0; index < datos_clientesProductos.length; index++) {
-        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => this.producto.push(datos_productos));
-      }
+      datos_clientesProductos.forEach(prod => this.productosServices.srvObtenerListaPorId(prod.prod_Id).subscribe(datos => this.producto.push(datos)));
     });
   }
 
@@ -349,38 +341,31 @@ export class PedidoExternoComponent implements OnInit {
     this.ultimoPrecio = 0;
     let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre;
     if (idProducto == null || idProducto == undefined || idProducto == '') this.productoCliente();
-
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
       if (datos_existencis.length != 0) {
-        for (let i = 0; i < datos_existencis.length; i++) {
-          this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-            for (let j = 0; j < datos_producto.length; j++) {
-              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                this.ultimoPrecio = datos_productoPedido.precioUnidad;
-                this.fechaUltFacuracion = datos_productoPedido.fechaDocumento.replace('T00:00:00', '');
+        datos_existencis.forEach(exis => {
+          this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
+            datos_prod.forEach(prod => {
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(datos_prodPedido => {
+                this.ultimoPrecio = datos_prodPedido.precioUnidad;
+                this.fechaUltFacuracion = datos_prodPedido.fechaDocumento.replace('T00:00:00', '');
               });
-
               setTimeout(() => {
-                this.presentacion.push(datos_producto[j].undMed_Id);
+                this.presentacion.push(prod.undMed_Id);
                 this.FormPedidoExternoProductos.patchValue({
-                  ProdId: datos_producto[j].prod_Id,
-                  ProdNombre: datos_producto[j].prod_Nombre,
-                  ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
-                  ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
+                  ProdId: prod.prod_Id,
+                  ProdNombre: prod.prod_Nombre,
+                  ProdUnidadMedidaCant: prod.undMed_Id,
+                  ProdPrecioUnd: prod.exProd_PrecioVenta.toFixed(2),
                   ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
-                  ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
+                  ProdStock: this.formatonumeros(exis.existencias.toFixed(2)),
                 });
               }, 100);
-            }
+            });
           });
-        }
-      } else if (datos_existencis.length == 0) {
-        this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
-          for (let index = 0; index < datos_undMed.length; index++) {
-            this.presentacion.push(datos_undMed[index].undMed_Id);
-          }
         });
-
+      } else if (datos_existencis.length == 0) {
+        this.unidadMedidaService.srvObtenerLista().subscribe(data => this.presentacion = data.map(und => und.undMed_Id));
         this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
           for (let i = 0; i < datos_producto.length; i++) {
             this.FormPedidoExternoProductos.patchValue({
@@ -399,39 +384,36 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion encargada de buscar un producto por el id del producto
   buscarProductoId(){
+    this.producto = [];
+    this.presentacion = [];
+    this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
     if (idProducto == null || idProducto == undefined || idProducto == 0) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
       if (datos_existencis.length != 0) {
-        for (let i = 0; i < datos_existencis.length; i++) {
-          this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-            for (let j = 0; j < datos_producto.length; j++) {
-              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                this.ultimoPrecio = datos_productoPedido.precioUnidad;
-                this.fechaUltFacuracion = datos_productoPedido.fechaDocumento.replace('T00:00:00', '');
+        datos_existencis.forEach(exis => {
+          this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
+            datos_prod.forEach(prod => {
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), prod.undMed_Id).subscribe(datos_prodPedido => {
+                this.ultimoPrecio = datos_prodPedido.precioUnidad;
+                this.fechaUltFacuracion = datos_prodPedido.fechaDocumento.replace('T00:00:00', '');
               });
-
               setTimeout(() => {
-                this.presentacion.push(datos_producto[j].undMed_Id);
+                this.presentacion.push(prod.undMed_Id);
                 this.FormPedidoExternoProductos.patchValue({
-                  ProdId: datos_producto[j].prod_Id,
-                  ProdNombre: datos_producto[j].prod_Nombre,
-                  ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
-                  ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
-                  ProdUltFacturacion: this.ultimoPrecio,
-                  ProdStock: datos_existencis[i].existencias,
+                  ProdId: prod.prod_Id,
+                  ProdNombre: prod.prod_Nombre,
+                  ProdUnidadMedidaCant: prod.undMed_Id,
+                  ProdPrecioUnd: prod.exProd_PrecioVenta.toFixed(2),
+                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
+                  ProdStock: this.formatonumeros(exis.existencias.toFixed(2)),
                 });
               }, 100);
-            }
+            });
           });
-        }
-      } else if (datos_existencis.length == 0) {
-        this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
-          for (let index = 0; index < datos_undMed.length; index++) {
-            this.presentacion.push(datos_undMed[index].undMed_Id);
-          }
         });
-
+      } else if (datos_existencis.length == 0) {
+        this.unidadMedidaService.srvObtenerLista().subscribe(data => this.presentacion = data.map(und => und.undMed_Id));
         this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
           for (let i = 0; i < datos_producto.length; i++) {
             this.FormPedidoExternoProductos.patchValue({
@@ -439,7 +421,7 @@ export class PedidoExternoComponent implements OnInit {
               ProdNombre: datos_producto[i].prod_Nombre,
               ProdUnidadMedidaCant: '',
               ProdPrecioUnd: 0,
-              ProdUltFacturacion: 0,
+              ProdUltFacturacion: this.ultimoPrecio,
               ProdStock: 0,
             });
           }
@@ -451,7 +433,7 @@ export class PedidoExternoComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios(){
     if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
-    else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de producto");
+    else this.msj.mensajeAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de producto");
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
@@ -467,7 +449,7 @@ export class PedidoExternoComponent implements OnInit {
 
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencias => {
       if (datos_existencias.length == 0) {
-        if (precioProducto >= 1) {
+        if (precioProducto >= 0) {
           let productoExt : any = {
             Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
             Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
@@ -481,7 +463,7 @@ export class PedidoExternoComponent implements OnInit {
           this.ArrayProducto.push(productoExt);
           this.LimpiarCamposProductos();
           this.productoCliente();
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `El precio digitado debe ser mayor a 0`);
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El precio del producto debe ser mayor a 0!`);
       } else if (datos_existencias.length != 0) {
         for (let index = 0; index < datos_existencias.length; index++) {
           if (precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
@@ -499,14 +481,14 @@ export class PedidoExternoComponent implements OnInit {
             this.LimpiarCamposProductos();
             this.productoCliente();
           } else {
-            this.mensajeService.mensajeAdvertencia(`Advertencia`, `El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+            this.msj.mensajeAdvertencia(`Advertencia`, `El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
             this.cargando = false;
           }
         }
       }
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
     });
-    setTimeout(() => { this.cargando = false; }, 500);
+    setTimeout(() => this.cargando = false, 500);
   }
 
   // Funcion que mostrará un modal con la informacion del pedido
@@ -516,7 +498,7 @@ export class PedidoExternoComponent implements OnInit {
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
 
     if (this.FormPedidoExternoClientes.valid) {
-      if (!this.ArrayProducto.length) this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un producto en la tabla.');
+      if (!this.ArrayProducto.length) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un producto en la tabla.');
       else {
         this.messageService.add({
           severity:'warn',
@@ -531,7 +513,7 @@ export class PedidoExternoComponent implements OnInit {
           sticky: true
         });
       }
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡Hay Campos Vacios!');
+    } else this.msj.mensajeAdvertencia(`Advertencia`, '¡Hay Campos Vacios!');
   }
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
@@ -566,13 +548,13 @@ export class PedidoExternoComponent implements OnInit {
             this.limpiarTodosCampos();
             this.productosPedido(data.pedExt_Id);
           }, 2000);
-        }, error => {
-          this.mensajeService.mensajeError(`Error`, '¡No se pudo crear el pedido, por favor intente de nuevo!');
+        }, () => {
+          this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido, por favor intente de nuevo!');
           this.cargando = false;
         });
       }
-    }, error => {
-      this.mensajeService.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
+    }, () => {
+      this.msj.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
       this.cargando = false;
     });
   }
@@ -591,10 +573,8 @@ export class PedidoExternoComponent implements OnInit {
           PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
           PedExtProd_CantidadFacturada : 0,
         }
-        this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
-          this.mensajeService.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
-        }, error => {
-          this.mensajeService.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
+        this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(() => this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`), () => {
+          this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
           this.cargando = false;
         });
       }
@@ -628,20 +608,20 @@ export class PedidoExternoComponent implements OnInit {
             PedExt_PrecioTotalFinal : this.valorfinal,
             PedExt_HoraCreacion : datos.pedExt_Hora,
           }
-          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(_data=> {
+          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(() => {
             this.editarDetallesPedido();
             setTimeout(() => {
-              this.mensajeService.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+              this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
               this.productosPedido(this.pedidoEditar);
               this.limpiarTodosCampos();
             }, 2000);
-          }, error => {
-            this.mensajeService.mensajeError(`Error`, '¡No se pudo editar el pedido, por favor intente de nuevo!');
+          }, () => {
+            this.msj.mensajeError(`Error`, '¡No se pudo editar el pedido, por favor intente de nuevo!');
             this.cargando = false;
           });
         }
-      }, error => {
-        this.mensajeService.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
+      }, () => {
+        this.msj.mensajeError(`Error`, '¡La dirección y la ciudad escogidas no coninciden!');
         this.cargando = false;
       });
     });
@@ -662,8 +642,8 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
             PedExtProd_CantidadFacturada : 0,
           }
-          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => { }, error => {
-            this.mensajeService.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');
+          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(null, () => {
+            this.msj.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');
             this.cargando = false;
           });
         }
@@ -687,56 +667,85 @@ export class PedidoExternoComponent implements OnInit {
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => { this.crearpdf(pedido); }, 1000);
+      setTimeout(() => this.crearpdf(pedido), 1000);
     });
   }
 
   // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
   crearpdf(pedido : number){
-    let usuario = this.storage_Nombre;
     this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
+        let titulo = `Pedido N° ${datos_pedido[i].id_Pedido}`;
         const pdfDefinicion : any = {
-          info: { title: `Pedido N° ${datos_pedido[i].id_Pedido}` },
+          info: { title: titulo },
           pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
-            return [
-              '\n',
-              {
-                columns: [
-                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+          pageMargins : [25, 100, 25, 35],
+          header: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                margin: [20, 8, 20, 0],
+                columns: [
+                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
+                  {
+                    width: 300,
+                    alignment: 'center',
+                    table: {
+                      body: [
+                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                        [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                      ]
+                    },
+                    layout: 'noBorders',
+                    margin: [85, 20],
+                  },
+                  {
+                    width: '*',
+                    alignment: 'center',
+                    margin: [20, 20, 20, 0],
+                    table: {
+                      body: [
+                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_pedido[i].fechaCreacion.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_pedido[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                      ]
+                    },
+                    layout: 'noBorders',
+                  }
+                ]
+              },
+              {
+                margin: [20, 0],
+                table: {
+                  headerRows: 1,
+                  widths: ['*'],
+                  body: [
+                    [
+                      {
+                        border: [false, true, false, false],
+                        text: ''
+                      },
+                    ],
+                  ]
+                },
+                layout: { defaultBorder: false, }
+              },
+            ];
+          },
           content : [
-            {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50 },
-                { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
-              ]
-            },
-            '\n \n',
+            { text: `\n Información del Pedido \n`, alignment: 'center', style: 'header' },
+            '\n',
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, 167, 90, 166],
+                widths: [305, 152, 100],
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, false], text: `Comercial`  },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    { border: [false, false, false, false], text: `Fecha de pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
-                    { border: [false, false, false, false], text: `Código` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].consecutivo}` },
+                    { border: [false, false, false, true], text: `Comercial:  ${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`  },
+                    { border: [false, false, false, true], text: `Estado del pedido:  ${datos_pedido[i].estado}` },
+                    { border: [false, false, false, true], text: `Código:  ${datos_pedido[i].consecutivo}` },
                   ],
                 ]
               },
@@ -748,7 +757,7 @@ export class PedidoExternoComponent implements OnInit {
             {
               style: 'tablaCliente',
               table: {
-                widths: [170, 170, 170],
+                widths: [242, 130, 180],
                 style: 'header',
                 body: [
                   [ `ID: ${datos_pedido[i].cliente_Id}`,  `Tipo de ID: ${datos_pedido[i].tipo_Id}`, `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}` ],
@@ -823,9 +832,7 @@ export class PedidoExternoComponent implements OnInit {
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
     return body;
@@ -836,7 +843,7 @@ export class PedidoExternoComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [40, 177, 40, 30, 51, 50, 98],
+        widths: [40, 177, 40, 50, 61, 50, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
@@ -870,8 +877,8 @@ export class PedidoExternoComponent implements OnInit {
     for (let i = 0; i < item.length; i++) {
       this.valorTotal -= item[i].SubTotal;
       this.ArrayProducto.splice(index, 1);
-      setTimeout(() => { this.ivaDescuento(); }, 200);
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡Se ha quitado el Producto del pedido a crear!');
+      setTimeout(() => this.ivaDescuento(), 200);
+      this.msj.mensajeAdvertencia(`Advertencia`, '¡Se ha quitado el Producto del pedido a crear!');
       this.closeMessage('quitarProducto');
       this.productoEliminado = 0;
     }
@@ -898,7 +905,7 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   // Funcion que eliminará de la base de datos el producto que se haya seleccionado
-  eliminarProductoPedido = () => this.PedidoProductosService.srvEliminar(this.productoEliminado, this.pedidoEditar).subscribe(data => this.quitarProducto());
+  eliminarProductoPedido = () => this.PedidoProductosService.srvEliminar(this.productoEliminado, this.pedidoEditar).subscribe(() => this.quitarProducto());
 
   /** Función para quitar mensaje de elección */
   closeConfirmacion = () => this.messageService.clear('confimacionPedido');

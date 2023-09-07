@@ -140,8 +140,7 @@ export class RegistroComponentComponent implements OnInit {
         this.arrayUsuarios.push(infoUsuarios);
         this.cantidadUsuarios += 1;
       }
-    });
-    setTimeout(() => { this.load = true; }, 1000);
+    }, () => this.load = true, () => this.load = true);
   }
 
   // Funcion que actualizará los usuarios
@@ -167,10 +166,10 @@ export class RegistroComponentComponent implements OnInit {
           Usua_Hora : this.HoraActual,
         }
         this.dialogUsuarios = false;
-        this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => {
+        this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
           this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
           this.cargarUsuarios();
-        }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`); });
+        }, () => this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`));
       }
     });
   }
@@ -225,10 +224,10 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Hora: this.HoraActual
           }
           this.dialogUsuarios = false;
-          this.servicioUsuarios.srvGuardarUsuario(data).subscribe(dataUsuario => {
+          this.servicioUsuarios.srvGuardarUsuario(data).subscribe(() => {
             this.msj.mensajeConfirmacion(`¡Usuairo creado!`, `¡Se ha creado un nuevo usuario!`);
             this.cargarUsuarios();
-          }, error => { this.msj.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
+          }, () => { this.msj.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
         }
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un usuario debe diligenciar todos los campos!`);
@@ -264,10 +263,10 @@ export class RegistroComponentComponent implements OnInit {
           Usua_Hora : dataUsuarios[index].usua_Hora,
         }
         this.dialogUsuarios = false;
-        this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => {
+        this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(() => {
           this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
           this.cargarUsuarios();
-        }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
+        }, () => this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`));
       }
     });
   }
@@ -289,7 +288,7 @@ export class RegistroComponentComponent implements OnInit {
       titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
       worksheet.addRow([]);
       let headerRow = worksheet.addRow(header);
-      headerRow.eachCell((cell, number) => {
+      headerRow.eachCell((cell) => {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
@@ -300,7 +299,6 @@ export class RegistroComponentComponent implements OnInit {
       worksheet.mergeCells('A1:P2');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
       datos.forEach(d => {
-        let row = worksheet.addRow(d);
       });
       worksheet.getColumn(1).width = 12;
       worksheet.getColumn(2).width = 40;
@@ -354,10 +352,10 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Hora : dataUsuarios[index].usua_Hora,
           }
 		      this.dialogUsuarios = false;
-          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {
+          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(() => {
             this.msj.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
             this.cargarUsuarios();
-          }, error => { this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
+          }, () => this.msj.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`));
         }
       });
     }
@@ -433,12 +431,12 @@ export class RegistroComponentComponent implements OnInit {
 
   /** Crea tipo de usuario con el mismo nombre de rol */
   crearTipo_Usuario(tipo_usuario : any) {
-    this.servicioTpUsuarios.Insert(tipo_usuario).subscribe(dataRol => {
+    this.servicioTpUsuarios.Insert(tipo_usuario).subscribe(() => {
       this.msj.mensajeConfirmacion(`¡Se ha creado un tipo de usuario!`, `¡Se creó un tipo de usuario!`);
       this.cargarUsuarios();
       this.formRoles.reset();
       setTimeout(() => { this.cargarRoles(); this.cargarTiposUsuarios();  }, 1000);
-    }, error => { this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el tipo de usuario!`) });
+    }, () => this.msj.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el tipo de usuario!`));
   }
 
   /** Crear areas desde el modal */
@@ -450,11 +448,11 @@ export class RegistroComponentComponent implements OnInit {
         if(dataAreas.length > 0) this.msj.mensajeAdvertencia(`Advertencia`, `¡Ya existe un área con el nombre ${nombreArea}!`);
         else {
           const areas : modelAreas = {area_Id: 0, area_Nombre: nombreArea, area_Descripcion: descripcionArea, }
-          this.servicioAreas.srvGuardar(areas).subscribe(dataArea => {
+          this.servicioAreas.srvGuardar(areas).subscribe(() => {
             this.msj.mensajeConfirmacion(`¡Área creada!`, `¡Se creó un área satisfactoriamente!`);
             this.formAreas.reset();
-            setTimeout(() => { this.cargarAreas(); }, 1000);
-          }, error => { this.msj.mensajeError(`¡Ocurrió un error!`, `¡Ha ocurrido un error al intentar crear una nueva área!`); })
+            setTimeout(() => this.cargarAreas(), 1000);
+          }, () => this.msj.mensajeError(`¡Ocurrió un error!`, `¡Ha ocurrido un error al intentar crear una nueva área!`))
         }
       });
     } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Para poder crear un area debe diligenciar todos los campos!`);
@@ -465,28 +463,14 @@ export class RegistroComponentComponent implements OnInit {
 
   /** Cargar roles al datalist al momento de escribir en el campo nombre del modal*/
   cargarRoles_Like(){
-    this.arrayNombresRoles = [];
     let nombreRol : any = this.formRoles.value.rolNombre;
-    if(nombreRol != null) {
-      this.servicioRoles.likeGetNombre(nombreRol).subscribe(dataRoles => {
-        for (let index = 0; index < dataRoles.length; index++) {
-          this.arrayNombresRoles.push(dataRoles[index]);
-        }
-      });
-    }
+    if(nombreRol != null) this.servicioRoles.likeGetNombre(nombreRol).subscribe(data => this.arrayNombresRoles = data);
   }
 
   /** Cargar areas al datalist al momento de escribir en el campo nombre del modal */
   cargarAreas_Like(){
-    this.arrayNombresAreas = [];
     let nombreArea : any = this.formAreas.value.areaNombre;
-    if(nombreArea != null) {
-      this.servicioAreas.likeGetNombreArea(nombreArea).subscribe(dataRoles => {
-        for (let index = 0; index < dataRoles.length; index++) {
-          this.arrayNombresAreas.push(dataRoles[index]);
-        }
-      });
-    }
+    if(nombreArea != null) this.servicioAreas.likeGetNombreArea(nombreArea).subscribe(data => this.arrayNombresAreas = data);
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -514,7 +498,6 @@ export class RegistroComponentComponent implements OnInit {
         })
       });
     });
-    console.log(this.vistasAplicacion);
   }
 
   // Funcion que va a insertar la información de un rol en la tabla permisos
