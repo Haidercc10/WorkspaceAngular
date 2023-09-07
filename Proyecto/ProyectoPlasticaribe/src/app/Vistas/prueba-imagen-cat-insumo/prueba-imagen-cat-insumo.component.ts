@@ -135,7 +135,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           precioFinal : compra.precioReal,
           costoFinal : compra.costoReal,
           total : false,
-          costosFinales : true,
         });
         cantFinal += compra.cantidadCompra;
         costoFinal += compra.costoReal;
@@ -153,7 +152,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         precioFinal : '',
         costoFinal : costoFinal,
         total : true,
-        costosFinales : false,
       });
       this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
     }, () => {
@@ -189,7 +187,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           costoFinal : '',
           total : false,
           color : 'azul',
-          costosFinales : false,
         },
         {
           Id : this.datosKardex.length + 2,
@@ -205,7 +202,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           costoFinal : '',
           total : false,
           color : 'verde',
-          costosFinales : false,
         },
         {
           Id : this.datosKardex.length + 3,
@@ -220,39 +216,45 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           precioFinal : '',
           costoFinal : '',
           total : false,
-          costosFinales : false,
         }
       );
     });
     // Salidas de material
 
     // Costos Finales
-    let datosCostosFinales = this.datosKardex.filter(item => item.costosFinales);
-    this.comprasRealizadas.forEach((compra) => {
-      datosCostosFinales.push(
-        {
-          Id : this.datosKardex.length + 1,
-          fecha : compra.fecha.toString().substring(0, 10),
-          cantEntrada : '',
-          precioEntrada : '',
-          costoEntrada : '',
-          cantSalida : '',
-          precioSalida : '',
-          costoSalida : '',
-          cantidadFinal : compra.cantComprada,
-          precioFinal : compra.precioCompra,
-          costoFinal : compra.costoRealMaterial,
-          total : false,
-          costosFinales : false,
-        }
-      );
-    });
+    let datosCostosFinales : any [] = [];
+    let fechas : any [] = [];
 
-    this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
-
+    setTimeout(() => {
+      this.datosKardex.forEach((kardex) => !fechas.includes(kardex.fecha) ? fechas.push(kardex.fecha) : null);
+      for (let i = 0; i < fechas.length; i++) {
+        let costoFinal = this.datosKardex.filter(x => x.cantidadFinal != '' && x.precioFinal != '');
+        
+        this.comprasRealizadas.forEach((compra) => {
+          datosCostosFinales.push(
+            {
+              Id : this.datosKardex.length + 1,
+              fecha : compra.fecha.toString().substring(0, 10),
+              cantEntrada : '',
+              precioEntrada : '',
+              costoEntrada : '',
+              cantSalida : '',
+              precioSalida : '',
+              costoSalida : '',
+              cantidadFinal : compra.cantComprada,
+              precioFinal : compra.precioCompra,
+              costoFinal : compra.costoRealMaterial,
+              total : false,
+            }
+          );
+        });
+        
+        this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
+      }     
+    }, 1500);
     setTimeout(() => {
       this.cargando = false;
       this.modalKardex = true;
-    }, 2000);
+    }, 2500);
   }
 }

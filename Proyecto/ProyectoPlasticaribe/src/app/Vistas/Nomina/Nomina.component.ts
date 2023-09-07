@@ -12,6 +12,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
 import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
+import { modelNominaPlasticaribe } from 'src/app/Modelo/modelNominaPlasticaribe';
+import { Tipos_NominaService } from 'src/app/Servicios/Tipos_Nomina/Tipos_Nomina.service';
 
 @Component({
   selector: 'app-Nomina',
@@ -39,18 +41,21 @@ export class NominaComponent implements OnInit {
   detallesNomina : any [] = []; //Variable que almacenará la información detallada de los rollos pesados o ingresados de un producto y persona en especifico
   detalladoxBultos : any[] = []; /** Variable que cargará en el formato excel la nomina detallada por bultos para cada operario */
   nominaIngresada : any [] = []; /** Variable que almacenará la información de la nomina de ingresos */
+  tiposNomina : any [] = []; /** Variable que almacenará la información de los tipos de nomina */
 
   constructor(private AppComponent : AppComponent,
                 private servicioBagPro : BagproService,
                   private msj : MensajesAplicacionService,
                     private mensajes : MessageService,
                       private shepherdService: ShepherdService,
-                        private nominaService : Nomina_PlasticaribeService) {
+                        private nominaService : Nomina_PlasticaribeService,
+                          private tpNominaService : Tipos_NominaService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.obtenerTiposNominas();
   }
 
  //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -176,16 +181,49 @@ export class NominaComponent implements OnInit {
     }, 2000);
   }
 
+  // Funcion que devolverá los diferentes tipos de nominas
+  obtenerTiposNominas = () => this.tpNominaService.Get().subscribe(data => this.tiposNomina = data);
+
   // Consultar nomina ingresada al programa
   consultarNominaIngresada(){
     this.nominaIngresada = [];
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
     this.nominaService.GetNominaIngresada(fechaInicial, fechaFinal).subscribe(data => this.nominaIngresada = data);
+    setTimeout(() => {
+      this.nominaIngresada.forEach(nomina => {
+        nomina.fechaInicio = nomina.fechaInicio.replace('T00:00:00', '');
+        nomina.fechaFin = nomina.fechaFin.replace('T00:00:00', '');
+      });
+    }, 1500);
   }
 
   // Funcion que va a calcular el total de la nomina ingresada 
   calcularTotalNominaIngresada = () : number => this.nominaIngresada.reduce((a,b) => a + b.valorNomina, 0);
+
+  //Actualizará la información de la nomina ingresada
+  actualizarNominaIngresada(data : any){
+    this.nominaService.Get_Id(data.id).subscribe(datos => {
+      this.load = false;
+      let tipoNomina_Id = this.tiposNomina.filter(x => x.tpNomina_Nombre === data.tipoNomina)[0].tpNomina_Id;
+      let modelo : modelNominaPlasticaribe = {
+        Nomina_Id: data.id,
+        Nomina_FechaRegistro: datos.nomina_FechaRegistro,
+        Nomina_HoraRegistro: datos.nomina_HoraRegistro,
+        Usua_Id: datos.usua_Id,
+        Nomina_FechaIncial: data.fechaInicio,
+        Nomina_FechaFinal: data.fechaFin,
+        Nomina_Costo: data.valorNomina,
+        TpNomina_Id: tipoNomina_Id,
+        Nomina_Observacion: (data.observacion).toString().toUpperCase(),
+      }
+      this.nominaService.Put(data.id, modelo).subscribe(() => {
+        this.consultarNominaIngresada();
+        this.msj.mensajeConfirmacion(`¡Se actualizó la nomina con éxito!`);
+        this.load = true;
+      }, () => this.msj.mensajeError(`¡No se pudo actualizar la nomina!`));
+    }, () => this.msj.mensajeError(`¡No se encontró el registro de la nomina a actualizar!`));
+  }
 
   /** Función para consultar las nomina de sellado */
   consultarNominas(){
