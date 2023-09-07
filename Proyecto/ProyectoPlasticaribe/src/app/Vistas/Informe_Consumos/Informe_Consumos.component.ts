@@ -3,6 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -35,7 +36,8 @@ export class Informe_ConsumosComponent implements OnInit {
   constructor(private AppComponent : AppComponent, 
                 private salidasService : Entradas_Salidas_MPService,
                   private frmBuilder : FormBuilder,
-                    private movEntradasService : Movimientos_Entradas_MPService,) {
+                    private movEntradasService : Movimientos_Entradas_MPService,
+                      private msjs : MensajesAplicacionService) {
 
     this.formFiltros = this.frmBuilder.group({ 
       rangoFechas : [],
@@ -82,18 +84,24 @@ export class Informe_ConsumosComponent implements OnInit {
 
   //Función donde se consultarán los consumos por fecha
   consultar(){
-    this.load = true;
     this.consumos = [];
     let fecha1 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
     let fecha2 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[1].length > 0 && this.formFiltros.value.rangoFechas[1] != null) ? moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
     let material : number = this.formFiltros.value.material;
+    let nombreMaterial : number = this.formFiltros.value.NombreMaterial;
 
-    this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
-      for(let i = 0; i < data.length; i++){
-        this.cargarConsumos(data[i]);
-      }
-      setTimeout(() => { this.mostrarDetalleConsumo(); }, 2000);
-    })
+    if(material != null) {
+      this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
+        if(data.length > 0){
+          this.load = true;
+          for(let i = 0; i < data.length; i++){
+            this.cargarConsumos(data[i]);
+          }
+          setTimeout(() => { this.mostrarDetalleConsumo(); }, 2000);
+        } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron consumos del material ${nombreMaterial} en las fechas seleccionadas!`);  
+      });
+    } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un material!`);
+    
   }
 
   //Función que cargará el array de consumos que contendrá todos los consumos del mes.
