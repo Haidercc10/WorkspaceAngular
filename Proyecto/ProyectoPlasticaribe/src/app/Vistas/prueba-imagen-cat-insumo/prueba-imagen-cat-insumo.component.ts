@@ -222,39 +222,80 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     // Salidas de material
 
     // Costos Finales
-    let datosCostosFinales : any [] = [];
-    let fechas : any [] = [];
+    setTimeout(() => this.calcularCostosFinales(), 1500);
 
-    setTimeout(() => {
-      this.datosKardex.forEach((kardex) => !fechas.includes(kardex.fecha) ? fechas.push(kardex.fecha) : null);
-      for (let i = 0; i < fechas.length; i++) {
-        let costoFinal = this.datosKardex.filter(x => x.cantidadFinal != '' && x.precioFinal != '');
-        
-        this.comprasRealizadas.forEach((compra) => {
-          datosCostosFinales.push(
-            {
-              Id : this.datosKardex.length + 1,
-              fecha : compra.fecha.toString().substring(0, 10),
-              cantEntrada : '',
-              precioEntrada : '',
-              costoEntrada : '',
-              cantSalida : '',
-              precioSalida : '',
-              costoSalida : '',
-              cantidadFinal : compra.cantComprada,
-              precioFinal : compra.precioCompra,
-              costoFinal : compra.costoRealMaterial,
-              total : false,
-            }
-          );
-        });
-        
-        this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
-      }     
-    }, 1500);
     setTimeout(() => {
       this.cargando = false;
       this.modalKardex = true;
     }, 2500);
+  }
+
+  calcularCostosFinales() {
+    let datosCostosFinales : any [] = [];
+    let fechas : any [] = [];
+    let copiaKardex : any [] = [...this.datosKardex];
+    copiaKardex.forEach((kardex) => !fechas.includes(kardex.fecha) ? fechas.push(kardex.fecha) : null);
+    fechas.sort();
+    
+    for (let i = 1; i < fechas.length; i++) {
+      let cantFinal : number = 0;
+      let costFinal : number = 0;
+      let costoFinal = copiaKardex.filter(x => x.cantidadFinal != '' && x.precioFinal != '' && x.fecha == fechas[i - 1]);
+      costoFinal.forEach((compra) => {
+        cantFinal += parseFloat(compra.cantidadFinal);
+        costFinal += parseFloat(compra.costoFinal);
+        datosCostosFinales.push({
+            Id : this.datosKardex.length + 1,
+            fecha : fechas[i],
+            cantEntrada : '',
+            precioEntrada : '',
+            costoEntrada : '',
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : compra.cantidadFinal,
+            precioFinal : compra.precioFinal,
+            costoFinal : compra.costoFinal,
+            total : false,
+        });
+      });
+
+      let costosFechas = this.comprasRealizadas.filter(x => x.fecha.toString().substring(0, 10) == fechas[i]);
+      costosFechas.forEach((compra) => {        
+        cantFinal += parseFloat(compra.cantComprada);
+        costFinal += parseFloat(compra.costoRealMaterial);
+        datosCostosFinales.push({
+            Id : this.datosKardex.length + 1,
+            fecha : compra.fecha.toString().substring(0, 10),
+            cantEntrada : '',
+            precioEntrada : '',
+            costoEntrada : '',
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : compra.cantComprada,
+            precioFinal : compra.precioCompra,
+            costoFinal : compra.costoRealMaterial,
+            total : false,
+        });
+      });
+
+      datosCostosFinales.push({
+        Id : this.datosKardex.length + 1,
+        fecha : fechas[i],
+        cantEntrada : '',
+        precioEntrada : '',
+        costoEntrada : '',
+        cantSalida : '',
+        precioSalida : '',
+        costoSalida : '',
+        cantidadFinal : cantFinal,
+        precioFinal : '',
+        costoFinal : costFinal,
+        total : true,
+      });
+      copiaKardex = [copiaKardex, datosCostosFinales].reduce((a,b) => a.concat(b)); 
+    }
+    this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));   
   }
 }
