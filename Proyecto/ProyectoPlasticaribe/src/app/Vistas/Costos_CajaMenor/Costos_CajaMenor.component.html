@@ -24,36 +24,52 @@
 
 <p-card class="font-size-14">
 
+  <!--Ver tutorial-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
   </div>
 
+   <!-- Crear tipo de gasto -->
+   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Tipo de Gasto" icon="pi pi-money-bill" (click)="mostrarModal()" pTooltip="Crea tipos de gastos de caja menor aquí!" tooltipPosition="left"></button>
+  </div>
+
+  <!--Titulo-->
   <div class="mb-5">
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-cloud-download"></i> Ingresar registros</h2>
   </div>
 
-  <form [formGroup]="FormNomina">
+  <!--Formulario-->
+  <form [formGroup]="FormCajaMenor">
     <div class="mb-3" id="formulario">
+
       <div class="row g-4">
         <!-- Fechas -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-float-label" id="rango-fechas">
-            <!-- Rango de Fechas -->
             <p-calendar id="rango" inputId="fechas" formControlName="fechas" selectionMode="range" [showIcon]="true"></p-calendar>
             <label for="fechas">Rango de Fechas</label>
           </span>
         </div>
 
-        <!--Tipo de nómina -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <!--Area Costo-->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="tipoNomina" id="tipoNomina" optionValue="tpNomina_Id" [autoDisplayFirst]="false" [options]="arrayTipoNomina" optionLabel="tpNomina_Nombre"></p-dropdown>
-            <label for="tipoNomina">Tipo costo</label>
+            <p-dropdown formControlName="area" id="area" optionValue="area_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="area_Nombre" [filter]="true" filterBy="area_Nombre" [showClear]="true"></p-dropdown>
+            <label for="area">Área</label>
+          </span>
+        </div>        
+
+        <!--Tipo de nómina -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="tipoCosto" id="tipoCosto" optionValue="tpSal_Id" [autoDisplayFirst]="false" [options]="tiposGastos" optionLabel="tpSal_Nombre" [filter]="true" filterBy="area_Nombre" [showClear]="true"></p-dropdown>
+            <label for="tipoCosto">Tipo costo</label>
           </span>
         </div>
 
         <!--Valor-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="valorTotal" id="valorTotal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="valor">Valor</label>
@@ -61,7 +77,7 @@
         </div>
 
         <!-- Descripción -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-3 col-xxl-4">
           <span class="p-float-label">
             <textarea formControlName="descripcion" [rows]="1" id="descripcion" maxlength="200" pInputTextarea></textarea>
             <label for="descripcion">Descripción</label>
@@ -89,7 +105,7 @@
   </div>
 
   <!-- Tabla de nomina entrante -->
-  <div class="row g-3" id="tabla">
+  <div class="row g-3 font-size-14" id="tabla">
     <div class="table-responsive">
       <p-table
       #dt
@@ -100,29 +116,29 @@
       [paginator]="true"
       [rows]="20"
       [rowHover]="true"
-      [value]="arrayNomina"
+      [value]="arrayGastos"
       [scrollable]="true"
       scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr>
             <th>#</th>
             <th scope="col">Fecha inicial</th>
-            <th scope="col">Fecha final</th>
+            <th scope="col">Área</th>
             <th scope="col">Tipo de costo</th>
             <th scope="col">Valor total</th>
             <th scope="col">Descripción</th>
             <th id="quitar" class="text-center" scope="col" id="quitar">Quitar</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+        <ng-template pTemplate="body" let-cajaMenor let-rowIndex="rowIndex">
           <tr>
             <td>{{rowIndex + 1}}</td>
-            <td>{{nomina.fecha1}}</td>
-            <td>{{nomina.fecha2}}</td>
-            <td>{{nomina.tipoNomina}}</td>
-            <td>{{nomina.valor | number: '1.2-2'}}</td>
-            <td>{{nomina.descripcion}}</td>
-            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(nomina)"></i></td>
+            <td>{{cajaMenor.fecha1}}</td>
+            <td>{{cajaMenor.nombreArea}}</td>
+            <td>{{cajaMenor.nombreTipoCosto}}</td>
+            <td>{{cajaMenor.valor | number: '1.2-2'}}</td>
+            <td>{{cajaMenor.descripcion}}</td>
+            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(cajaMenor)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -140,7 +156,7 @@
     <div class="mb-3" id="botones2">
       <div class="row g-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button id="entrada" pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntradaNomina()"></button>
+          <button id="entrada" pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntrada()"></button>
           <button id="limpiarTodo" pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
         </div>
       </div>
@@ -167,4 +183,11 @@
     </div>
   </ng-template>
 </p-toast>
+
+<!--Modal para crear bopp's genéricos -->
+<p-dialog [(visible)]="modalTiposGastos" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60vw'}" [resizable]="true" header="Crear tipo de Gasto" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-CrearTipoSalida_CajaMenor></app-CrearTipoSalida_CajaMenor>
+  </ng-template>
+</p-dialog>
 

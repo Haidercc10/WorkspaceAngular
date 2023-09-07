@@ -177,6 +177,7 @@ import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
+import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
 
 @NgModule({
   declarations: [
@@ -277,7 +278,8 @@ import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_Caja
     ControlCalidad_SelladoComponent,
     ControlCalidadComponent,
     Informe_ConsumosComponent,
-    Costos_CajaMenorComponent
+    Costos_CajaMenorComponent, 
+    CrearTipoSalida_CajaMenorComponent
   ],
 
   imports: [

@@ -84,7 +84,7 @@ export class Informe_ConsumosComponent implements OnInit {
   consultar(){
     this.load = true;
     this.consumos = [];
-    let fecha1 : any = (this.formFiltros.value.rangoFechas[0] != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
+    let fecha1 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
     let fecha2 : any = (this.formFiltros.value.rangoFechas[1] != undefined && this.formFiltros.value.rangoFechas[1].length > 0 && this.formFiltros.value.rangoFechas[1] != null) ? moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
     let material : number = this.formFiltros.value.material;
 
