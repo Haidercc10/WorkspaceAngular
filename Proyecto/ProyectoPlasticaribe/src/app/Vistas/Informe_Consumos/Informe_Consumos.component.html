@@ -134,6 +134,16 @@
             <td class="text-center">$ {{item.CostoEstandar | number: '1.2-2'}}</td>
           </tr>
         </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="4" class="text-right">Totales</td>
+            <td class="text-center">{{valorCantRequerida() | number : '1.2-2'}}</td>
+            <td colspan="3"></td>
+            <td class="text-center">$ {{valorValoracionCantidad() | number : '1.2-2' }}</td>
+            <td class="text-center">$ {{valorCostoReal() | number : '1.2-2'}}</td>
+            <td class="text-center">$ {{valorCostoEstandar() | number : '1.2-2'}}</td>
+          </tr>
+        </ng-template>
         <!--Tabla 2-->
         <ng-template pTemplate="rowexpansion" let-item>
           <tr>
@@ -173,31 +183,6 @@
                   </ng-template>
                 </p-table>
                 <br>
-                <!--<p-table [value]="item.Parametros2"
-                styleClass="p-datatable-gridlines p-datatable-sm">
-                  <ng-template pTemplate="header">
-                      <tr>
-                          <th>Param. Cualitativo</th>
-                          <th>Material</th>
-                          <th>Resistencia</th>
-                          <th>Sellabilidad</th>
-                          <th>Transparencia</th>
-                          <th>Tratado</th>
-                          <th>Impresión</th>
-                      </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-cualitativo>
-                      <tr>
-                          <td><b>{{ 'Resultado' }}</b></td>
-                          <td>{{ cualitativo.material }}</td>
-                          <td>{{ cualitativo.resistencia }}</td>
-                          <td>{{ cualitativo.sellabilidad }}</td>
-                          <td>{{ cualitativo.transparencia }}</td>
-                          <td>{{ cualitativo.tratado }}</td>
-                          <td>{{ cualitativo.impresion }}</td>
-                      </tr>
-                  </ng-template>
-              </p-table>-->
               </div>
             </td>
           </tr>

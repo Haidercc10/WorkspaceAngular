@@ -85,6 +85,7 @@ export class Informe_ConsumosComponent implements OnInit {
   //Función donde se consultarán los consumos por fecha
   consultar(){
     this.consumos = [];
+    this.salidas = [];
     let fecha1 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
     let fecha2 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[1].length > 0 && this.formFiltros.value.rangoFechas[1] != null) ? moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
     let material : number = this.formFiltros.value.material;
@@ -161,6 +162,17 @@ export class Informe_ConsumosComponent implements OnInit {
       }
       this.load = false;
     }, 1000);
-    
   }
+
+  //Función que calculará la cantidad requerida total de la materia prima en las salidas consultadas.
+  valorCantRequerida = () => this.salidas.reduce((acc, item) => acc + item.CantRequerida, 0);
+
+  //Función que calculará el diferencial de cantidad total de la materia prima en las salidas consultadas.
+  valorValoracionCantidad = () => this.salidas.reduce((acc, item) => acc + item.ValoracionCantidad, 0);
+
+  //Función que calculará el costo real total de la materia prima en las salidas consultadas.
+  valorCostoReal = () => this.salidas.reduce((acc, item) => acc + item.CostoReal, 0);
+
+  //Función que calculará el costo real total de la materia prima en las salidas consultadas.
+  valorCostoEstandar = () => this.salidas.reduce((acc, item) => acc + item.CostoEstandar, 0); 
 }
