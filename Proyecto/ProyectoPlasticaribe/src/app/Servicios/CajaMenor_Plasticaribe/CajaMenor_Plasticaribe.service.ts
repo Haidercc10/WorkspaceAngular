@@ -13,5 +13,7 @@ constructor(private http : HttpClient) { }
 
     Get_Id = (id : number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/CajaMenor_Plasticaribe/${id}`);
 
+    GetRegistrosCajaMenor = (fechaIni, fechaFin, ruta) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/CajaMenor_Plasticaribe/getRegistrosCajaMenor/${fechaIni}/${fechaFin}${ruta}`);
+
     Post = (data : modelCajaMenor_Plasticaribe) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/CajaMenor_Plasticaribe`, data);
 }

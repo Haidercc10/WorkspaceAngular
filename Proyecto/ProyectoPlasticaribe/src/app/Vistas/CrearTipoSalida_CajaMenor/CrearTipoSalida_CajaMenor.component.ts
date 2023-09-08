@@ -14,7 +14,9 @@ import { Costos_CajaMenorComponent } from '../Costos_CajaMenor/Costos_CajaMenor.
   templateUrl: './CrearTipoSalida_CajaMenor.component.html',
   styleUrls: ['./CrearTipoSalida_CajaMenor.component.css']
 })
+
 export class CrearTipoSalida_CajaMenorComponent implements OnInit {
+
   formTipoSalida !: FormGroup;
 
   constructor(private frmBuilder : FormBuilder,
@@ -41,12 +43,11 @@ export class CrearTipoSalida_CajaMenorComponent implements OnInit {
         TpSal_Nombre : (this.formTipoSalida.value.nombre).toString().toUpperCase().trim(),
         TpSal_Descripcion : (this.formTipoSalida.value.descripcion).toString().toUpperCase().trim()
       }
-      this.srvTiposGastos.Post(info).subscribe(datos => {
+      this.srvTiposGastos.Post(info).subscribe(() => {
         this.msjs.mensajeConfirmacion(`¡Confirmación!`, `¡El tipo de salida ha sido creado con éxito!`);
         this.CostosCajaMenor.cargarTiposCostos();
         this.limpiarCampos();
-      });
+      }, () => this.msjs.mensajeError(`Error`, `Error al crear el tipo de salida de caja menor. Por favor, verifique!`));
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Por favor ingrese todos los datos`);
-  }
- 
+  } 
 }
