@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
@@ -24,13 +25,15 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   FormFiltros : FormGroup;
   materiales : any [] = [];
   comprasRealizadas : any [] = [];
+  salidasRealizadas : any [] = [];
   modalKardex : boolean = false;
   datosKardex : any [] = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder  : FormBuilder,
                   private msg : MensajesAplicacionService,
-                    private movEntradasService : Movimientos_Entradas_MPService,) {
+                    private movEntradasService : Movimientos_Entradas_MPService,
+                      private salidasMaterialService : Entradas_Salidas_MPService,) {
                     
     this.FormFiltros = this.frmBuilder.group({
       RangoFechas : [],
@@ -77,8 +80,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       let fechaInicio : any = moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
       let fechaFin : any = this.FormFiltros.value.RangoFechas[1] == null ? fechaInicio : moment(this.FormFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       if (material != null) {
+        this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material).subscribe(data => this.salidasRealizadas = data);
         this.cargando = true;
         this.comprasRealizadas = [];
+        this.salidasRealizadas = [];
           this.movEntradasService.GetComprasRealizadas(fechaInicio, fechaFin, material).subscribe(data => data.forEach(compra => this.llenarTablaComprasRealizadas(compra)), () => {
             this.msg.mensajeError('No se encontró información');
             this.cargando = false;
@@ -220,6 +225,23 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       );
     });
     // Salidas de material
+    this.salidasRealizadas.forEach(salida => {
+      this.datosKardex.push({
+        Id : this.datosKardex.length + 1,
+        fecha : (salida.fecha).toString().substring(0, 10),
+        cantEntrada : '',
+        precioEntrada : '',
+        costoEntrada : '',
+        cantSalida : salida.cantidadSalida,
+        precioSalida : salida.precioReal,
+        costoSalida : salida.costoReal,
+        cantidadFinal : '',
+        precioFinal : '',
+        costoFinal : '',
+        total : false,
+      });
+    });
+    this.calcularSalidas();
 
     // Costos Finales
     setTimeout(() => this.calcularCostosFinales(), 1500);
@@ -230,17 +252,78 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     }, 2500);
   }
 
+  // Funcion que va a calcular los costos finales de las salidas de material
+  calcularSalidas(){
+    let fechas : any [] = [];
+    let datosSalidas : any [] = [];
+    this.salidasRealizadas.forEach((salida) => !fechas.includes(salida.fecha.toString().substring(0, 10)) ? fechas.push(salida.fecha.toString().substring(0, 10)) : null);
+    fechas.sort();
+
+    for (let i = 0; i < fechas.length; i++) {
+      let salidasFechas = this.salidasRealizadas.filter(x => x.fecha.toString().substring(0, 10) == fechas[i]);
+      datosSalidas.push(
+        {
+          Id : this.datosKardex.length + 1,
+          fecha : fechas[i].toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : salidasFechas.reduce((a,b) => a + b.cantidadTotalEstandar, 0),
+          precioSalida : ((salidasFechas.reduce((a,b) => a + b.costoReal, 0)) / (salidasFechas.reduce((a,b) => a + b.cantidadSalida, 0))),
+          costoSalida : salidasFechas.reduce((a,b) => a + b.costoEstandar, 0),
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+          color : 'azul',
+        },
+        {
+          Id : this.datosKardex.length + 1,
+          fecha : fechas[i].toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : (salidasFechas.reduce((a,b) => a + b.cantidadTotalEstandar, 0)) - (salidasFechas.reduce((a,b) => a + b.cantidadSalida, 0)),
+          precioSalida : '',
+          costoSalida : (salidasFechas.reduce((a,b) => a + b.cantidadTotalEstandar, 0)) - (salidasFechas.reduce((a,b) => a + b.cantidadSalida, 0)) * ((salidasFechas.reduce((a,b) => a + b.costoReal, 0)) / (salidasFechas.reduce((a,b) => a + b.cantidadSalida, 0))),
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+          color : 'verde',
+        },
+        {
+          Id : this.datosKardex.length + 1,
+          fecha : fechas[i].toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : salidasFechas.reduce((a,b) => a + b.cantidadSalida, 0),
+          precioSalida : '',
+          costoSalida : (salidasFechas.reduce((a,b) => a + b.costoReal, 0)) ,
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
+          total : false,
+        },
+      )
+    }
+    this.datosKardex = [this.datosKardex, datosSalidas].reduce((a,b) => a.concat(b));
+  }
+
+  // Funcion que va a calcular los costos finales de un material
   calcularCostosFinales() {
     let datosCostosFinales : any [] = [];
     let fechas : any [] = [];
     let copiaKardex : any [] = [...this.datosKardex];
     copiaKardex.forEach((kardex) => !fechas.includes(kardex.fecha) ? fechas.push(kardex.fecha) : null);
     fechas.sort();
-    
+
     for (let i = 1; i < fechas.length; i++) {
       let cantFinal : number = 0;
       let costFinal : number = 0;
       let costoFinal = copiaKardex.filter(x => x.cantidadFinal != '' && x.precioFinal != '' && x.fecha == fechas[i - 1]);
+
       costoFinal.forEach((compra) => {
         cantFinal += parseFloat(compra.cantidadFinal);
         costFinal += parseFloat(compra.costoFinal);
@@ -261,7 +344,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       });
 
       let costosFechas = this.comprasRealizadas.filter(x => x.fecha.toString().substring(0, 10) == fechas[i]);
-      costosFechas.forEach((compra) => {        
+      costosFechas.forEach((compra) => {
         cantFinal += parseFloat(compra.cantComprada);
         costFinal += parseFloat(compra.costoRealMaterial);
         datosCostosFinales.push({
@@ -294,8 +377,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         costoFinal : costFinal,
         total : true,
       });
-      copiaKardex = [copiaKardex, datosCostosFinales].reduce((a,b) => a.concat(b)); 
+
+      copiaKardex = [copiaKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
     }
-    this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));   
+    this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
   }
 }

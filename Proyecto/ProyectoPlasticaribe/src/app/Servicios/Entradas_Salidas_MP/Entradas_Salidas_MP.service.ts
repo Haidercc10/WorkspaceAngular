@@ -8,12 +8,14 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 })
 export class Entradas_Salidas_MPService {
 
-constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
-GetTodo = () : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP`);
+  GetTodo = () : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP`);
 
-GetId = (id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/${id}`);
+  GetId = (id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/${id}`);
 
-GetConsumos = (fechaInicio : any, fechaFin : any, material : any) : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}/${material}`);
+  GetConsumos = (fechaInicio : any, fechaFin : any, material : any) : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}/${material}`);
+
+  GetSalidasRealizadas = (fechaInicio : any, fechaFin : any, material : number) : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/getSalidasRealizadas/${fechaInicio}/${fechaFin}/${material}`);
 
 }
