@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { modelCajaMenor_Plasticaribe } from 'src/app/Modelo/CajaMenor_Plasticaribe';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 @Injectable({
@@ -18,4 +19,5 @@ export class Entradas_Salidas_MPService {
 
   GetSalidasRealizadas = (fechaInicio : any, fechaFin : any, material : number) : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/getSalidasRealizadas/${fechaInicio}/${fechaFin}/${material}`);
 
+  Post = (data : modelCajaMenor_Plasticaribe) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/CajaMenor_Plasticaribe`, data);
 }
