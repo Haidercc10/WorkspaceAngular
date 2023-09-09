@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { co } from '@fullcalendar/core/internal-common';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
@@ -376,7 +375,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
         }
       }
-      setTimeout(() => !this.error ? this.asignacionExitosa() : null, 2500);
+      this.actualizar_MovimientosEntradas();
+      this.crear_Salidas(asigncaion);
+      setTimeout(() => !this.error ? this.asignacionExitosa() : null, 3000);
     }
   }
 
@@ -385,7 +386,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (!this.error && !this.soloTintas && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
     else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
     else if(this.esSolicitud) this.validarEstadoSolicitud();
-    this.LimpiarCampos();
+    setTimeout(() => { this.LimpiarCampos(); }, 1000); 
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
@@ -401,6 +402,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           CatMP_Id : datos_materiaPrima.catMP_Id,
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
+          MatPri_Fecha : datos_materiaPrima.matPri_Fecha,
+          MatPri_Hora : datos_materiaPrima.matPri_Hora,
+          MatPri_PrecioEstandar : datos_materiaPrima.matPri_PrecioEstandar,
         }
         this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(() => { }, () => {
           this.error = true;
@@ -426,8 +430,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           CatMP_Id : datos_tintas.catMP_Id,
           TpBod_Id : datos_tintas.tpBod_Id,
           Tinta_InvInicial : datos_tintas.tinta_InvInicial,
-          Tinta_Fecha : datos_tintas.tinta_FechaIngreso,
+          Tinta_FechaIngreso : datos_tintas.tinta_FechaIngreso,
           Tinta_Hora : datos_tintas.tinta_Hora,
+          Tinta_PrecioEstandar : datos_tintas.tinta_PrecioEstandar,
         }
         this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(() => { }, () => {
           this.error = true;
@@ -598,6 +603,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Función que colocará la información de las entradas de materia prima en el array de entradas disponibles.
   cargar_Entradas(info : any){
+    let salidaReal : number = 0;
     this.srvMovEntradasMP.GetInventarioxMaterial(info.Id).subscribe(data => {
       if (data.length > 0) {
         for (let i = 0; i < data.length; i++) {
@@ -618,26 +624,31 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             Fecha_Entrada: data[i].fecha_Entrada,
             Hora_Entrada: data[i].hora_Entrada,
             Precio_EstandarUnitario: data[i].precio_EstandarUnitario
-          }
-
+          } 
           if(info.Cantidad2 > 0) {
             if(info.Cantidad2 > detalle.Cantidad_Disponible) {
+              salidaReal = detalle.Cantidad_Disponible;
+              info.Cantidad2 -= detalle.Cantidad_Disponible;
               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
               detalle.Cantidad_Disponible = 0;
               detalle.Estado_Id = 5;
-              info.Cantidad2 = info.Cantidad2 - detalle.Cantidad_Asignada;
+              console.log(salidaReal)
             } else if(info.Cantidad2 == detalle.Cantidad_Disponible) {
+              salidaReal = info.Cantidad2;
               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
               detalle.Cantidad_Disponible = 0;
               detalle.Estado_Id = 5;
               info.Cantidad2 = 0;
+              console.log(salidaReal)
             } else if(info.Cantidad2 < detalle.Cantidad_Disponible) {
+              salidaReal = info.Cantidad2;
               detalle.Cantidad_Asignada += info.Cantidad2;
               detalle.Cantidad_Disponible -= info.Cantidad2;
               detalle.Estado_Id = 19;
               info.Cantidad2 = 0;
+              console.log(salidaReal)
             }
-            this.cargar_Salidas(detalle, info);
+            this.cargar_Salidas(detalle, info, salidaReal);
             info.EntradasDisponibles.push(detalle);
           }
         }
@@ -646,14 +657,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Función que colocará la información de la salida de la materia prima en el array de salidas. 
-  cargar_Salidas(detalle : any, info : any){
+  cargar_Salidas(detalle : any, info : any, salidaReal : number){
     let categoria : number = this.FormMateriaPrimaRetirada.value.Categoria;
-    let ot : number = this.FormMateriaPrimaRetirada.value.OTRetiro;
+    let ot : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
 
     let salidas : modelEntradas_Salidas_MP = {
-      Id: 0,
       Id_Entrada: detalle.Id,
-      Tipo_Salida: this.categoriasMP.includes(categoria) ? 'ASIGMP' : 'ASIGTINTA',
+      Tipo_Salida: this.categoriasMP.includes(categoria) ? 'ASIGMP' : 'ASIGTINTAS',
       Codigo_Salida: 0,
       Tipo_Entrada: detalle.Tipo_Entrada,
       Codigo_Entrada: detalle.Codigo_Entrada,
@@ -662,7 +672,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MatPri_Id: detalle.MatPri_Id,
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
-      Cantidad_Salida: detalle.Cantidad_Asignada,
+      Cantidad_Salida: salidaReal,
       Orden_Trabajo: ot
     }
     info.Salidas.push(salidas);
@@ -673,7 +683,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if(this.materiasPrimasSeleccionadas.length > 0) {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
         for (let i = 0; i < this.materiasPrimasSeleccionadas[index].EntradasDisponibles.length; i++) {
-         this.srvMovEntradasMP.Put(this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Id, this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i]).subscribe(data => console.log(data), 
+         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Fecha_Entrada = this.today;
+         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Hora_Entrada = this.hora;
+         this.srvMovEntradasMP.Put(this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Id, this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i]).subscribe(data => {}, 
          error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
         }
       }
@@ -681,11 +693,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Función que creará las salidas de las materias primas seleccionadas.
-  crear_Salidas(){
+  crear_Salidas(asignacionId : number){
     if(this.materiasPrimasSeleccionadas.length > 0) {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
         for (let i = 0; i < this.materiasPrimasSeleccionadas[index].Salidas.length; i++) {
-          this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(data => console.log(data), 
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Codigo_Salida = asignacionId;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Fecha_Registro = this.today;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Hora_Registro = this.hora;
+          this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(data => {}, 
           error => { this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`); });
         }
       }
