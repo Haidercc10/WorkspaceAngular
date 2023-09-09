@@ -72,6 +72,11 @@ export class AuthenticationService {
       this.authenticationContaZeusService.logout();
       this.authenticationBagPro.logout();
       window.location.pathname = '/';
+    }, () => {
+      localStorage.clear();
+      this.storage.clear();
+      this.userSubject.next(null);
+      window.location.pathname = '/';
     });
   }
 }
