@@ -377,6 +377,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
               datosCostosFinales[j].cantidadFinal = cantRestante;
               datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
               break;
+            } else if (cantRestante < 0) {
+              datosCostosFinales.splice(j, 1);
+              datosCostosFinales[j].cantidadFinal += cantRestante;
+              datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
+              break;
             }
           }
         }
