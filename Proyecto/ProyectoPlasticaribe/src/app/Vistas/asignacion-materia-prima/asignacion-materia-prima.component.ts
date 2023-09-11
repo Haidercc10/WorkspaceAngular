@@ -375,8 +375,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
         }
       }
-      this.actualizar_MovimientosEntradas();
-      this.crear_Salidas(asigncaion);
+      //this.actualizar_MovimientosEntradas();
+      //this.crear_Salidas(asigncaion);
       setTimeout(() => !this.error ? this.asignacionExitosa() : null, 3000);
     }
   }

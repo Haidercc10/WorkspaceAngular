@@ -1,5 +1,5 @@
 export interface modeloMovimientos_Entradas_MP {
-  Id : number;
+  Id? : number;
   MatPri_Id : number;
   Tinta_Id : number;
   Bopp_Id : number;

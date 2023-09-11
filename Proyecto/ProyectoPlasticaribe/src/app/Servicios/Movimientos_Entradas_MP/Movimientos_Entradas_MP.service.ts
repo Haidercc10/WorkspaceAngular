@@ -25,4 +25,5 @@ export class Movimientos_Entradas_MPService {
 
   Put = (id : number, data : modeloMovimientos_Entradas_MP) => this.httpClient.put(`${rutaPlasticaribeAPI}/Movimientros_Entradas_MP/${id}`, data);
 
+  Post = (data : modeloMovimientos_Entradas_MP) : Observable<any> => this.httpClient.post(`${rutaPlasticaribeAPI}/Movimientros_Entradas_MP`, data);
 }

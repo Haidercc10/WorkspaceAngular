@@ -3,11 +3,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
 import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
+import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepAsignacionBopp as defaultSteps } from 'src/app/data';
 
@@ -36,6 +40,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   itemSeleccionado : any;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
+  hora : any = moment().format('HH:mm:ss'); //Variable que va a almacenar la hora actual
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -46,7 +51,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                           private bagProService : BagproService,
                             private messageService: MessageService,
                               private shepherdService: ShepherdService,
-                                private msj : MensajesAplicacionService,) {
+                                private msj : MensajesAplicacionService,
+                                  private srvMovEntradasMP : Movimientos_Entradas_MPService,
+                                    private srvMovSalidasMP : Entradas_Salidas_MPService,) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -60,6 +67,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       boppNombre : ['', Validators.required],
       boppSerial: ['', Validators.required],
       boppCantidad : ['', Validators.required],
+      //boppGenerico : [null ],
     });
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -175,6 +183,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     let serial : any = this.FormularioBOPP.value.boppNombre;
     let nuevo : any [] = this.ArrayBOPP.filter((item) => item.bopP_Serial == serial);
     this.FormularioBOPP.patchValue({
+      boppGenerico: nuevo[0].boppGen_Id,
       boppSerial: nuevo[0].bopP_Serial,
       boppNombre: nuevo[0].bopP_Nombre,
       boppCantidad: nuevo[0].bopP_Stock
@@ -196,13 +205,20 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   cargarBOPPTabla(){
     if (this.ArrayBoppPedida.some(x => x.Serial == this.FormularioBOPP.value.boppSerial)) this.msj.mensajeAdvertencia(`Advertencia`, `El rollo ya se encuentra en la tabla!`);
     else {
-      this.ArrayBoppPedida.push({
+      let info : any = {
+        IdBoppGenerico : this.FormularioBOPP.value.boppGenerico,
         Serial : this.FormularioBOPP.value.boppSerial,
         Nombre : this.FormularioBOPP.value.boppNombre,
         Cantidad : this.FormularioBOPP.value.boppCantidad,
         Cantidad2 : this.FormularioBOPP.value.boppCantidad,
-      });
-      this.FormularioBOPP.reset();
+        Cantidad3 : this.FormularioBOPP.value.boppCantidad,
+        EntradasDisponibles : [],
+        Salidas : []
+      }
+      //this.cargar_Entradas(info);
+      this.ArrayBoppPedida.push(info);
+      console.log(this.ArrayBoppPedida);
+      setTimeout(() => { this.FormularioBOPP.reset(); }, 500); 
     }
   }
 
