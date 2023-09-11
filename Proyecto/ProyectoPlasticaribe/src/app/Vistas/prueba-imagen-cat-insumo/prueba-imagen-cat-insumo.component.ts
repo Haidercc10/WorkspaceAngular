@@ -315,6 +315,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a calcular los costos finales de un material
   calcularCostosFinales() {
+    console.clear()
     let datosCostosFinales : any [] = [];
     let fechas : any [] = [];
     let copiaKardex : any [] = [...this.datosKardex];
@@ -378,9 +379,15 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
               datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
               break;
             } else if (cantRestante < 0) {
-              datosCostosFinales.splice(j, 1);
-              datosCostosFinales[j].cantidadFinal += cantRestante;
-              datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
+              let restante : number = cantidadSalida * -1;
+              do {
+                restante = datosCostosFinales.splice(j, 1)[0].cantidadFinal + restante;
+                if ((datosCostosFinales[j].cantidadFinal + restante) > 0) {
+                  datosCostosFinales[j].cantidadFinal += restante;
+                  datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
+                  break;
+                } else continue;
+              } while (restante < 0);
               break;
             }
           }
