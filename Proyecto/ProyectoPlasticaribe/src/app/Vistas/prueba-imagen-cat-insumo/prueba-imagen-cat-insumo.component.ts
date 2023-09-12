@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -196,7 +199,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           color : 'azul',
         },
         {
-          Id : this.datosKardex.length + 2,
+          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 2,
           fecha : compra.fecha.toString().substring(0, 10),
           cantEntrada : '',
           precioEntrada : compra.diffPrecio,
@@ -211,7 +214,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           color : 'verde',
         },
         {
-          Id : this.datosKardex.length + 3,
+          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 3,
           fecha : compra.fecha.toString().substring(0, 10),
           cantEntrada : '',
           precioEntrada : compra.precioCompra,
@@ -249,6 +252,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     setTimeout(() => this.calcularCostosFinales(), 1500);
 
     setTimeout(() => {
+      this.datosKardex.map(x => x.fecha).sort();
       this.cargando = false;
       this.modalKardex = true;
     }, 2500);
@@ -315,7 +319,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a calcular los costos finales de un material
   calcularCostosFinales() {
-    console.clear()
     let datosCostosFinales : any [] = [];
     let fechas : any [] = [];
     let copiaKardex : any [] = [...this.datosKardex];
@@ -384,7 +387,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
                 restante = datosCostosFinales.splice(j, 1)[0].cantidadFinal + restante;
                 if ((datosCostosFinales[j].cantidadFinal + restante) > 0) {
                   datosCostosFinales[j].cantidadFinal += restante;
-                  datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
+                  datosCostosFinales[j].costoFinal = datosCostosFinales[j].precioFinal * datosCostosFinales[j].cantidadFinal;
                   break;
                 } else continue;
               } while (restante < 0);
@@ -415,5 +418,235 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       copiaKardex = [copiaKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
     }
     this.datosKardex = [this.datosKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
+  }
+
+  //Funcion que va a crear el archivo de excel
+  exportarExcel() {
+    this.cargarKardex();
+    let titulo : string = `KARDEX PLASTICARIBE`;
+    let border : any = { top: { style: 'medium' }, left: { style: 'medium' }, bottom: { style: 'medium' }, right: { style: 'medium' } };
+    let headerCompras : string [] = ['Fecha', 'QR(kg)',	'PR($/kg)', 'PS($/kg)',	'∆P($/kg)', 'CR($)', 'CS($)', 'VP ($)'];
+    let headerSalidas : string [] = ['Inicio', 'Orden',	'QR(kg)', 'QS(kg)', '∆Q(kg)', 'PR($/kg)', 'CR($)', 'CS($)', 'VQ ($)'];
+    let workbook = new Workbook();
+    const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+
+    // HOJA 1, ENTRADAS Y SALIDAS DE MATERIAL
+    let worksheet = workbook.addWorksheet(`Costos Detallados`);
+    worksheet.addImage(imageId1, {
+      tl: { col: 0.1, row: 0.40 },
+      ext: { width: 170, height: 45 },
+      editAs: 'oneCell'
+    });
+    let titleRow = worksheet.addRow([titulo]);
+    titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow(['COMPRAS']).eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.border = border;
+    });
+    let headerRowCompras = worksheet.addRow(headerCompras);
+    headerRowCompras.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } };
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = border;
+    });
+    this.llenarTablaCompras().forEach(d => {
+      let row = worksheet.addRow(d);
+      let celdas = [1, 2, 3, 4, 5, 6, 7, 8];
+      celdas.forEach(cell => {
+        row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C6E0B4' } };
+        row.getCell(cell).border = border;
+      });
+    });
+    
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow(['CONSUMOS']).eachCell((cell) => {
+      worksheet.mergeCells(`A${cell.row}`, `I${cell.row}`);
+      worksheet.getCell(`A${cell.row}`).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getCell(`A${cell.row}`).border = border;
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.border = border;
+    });
+    let headerRowSalidas = worksheet.addRow(headerSalidas);
+    headerRowSalidas.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = border;
+    });
+    this.llenarTablaSalidas().forEach(d => {
+      let row = worksheet.addRow(d);
+      let celdas = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      celdas.forEach(cell => {
+        row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C6E0B4' } };
+        row.getCell(cell).border = border;
+      });
+    });
+
+    let unirCeldasHoja : string [] = ['A1:I3', 'A5:H5'];
+    unirCeldasHoja.forEach(cell => worksheet.mergeCells(cell));
+
+    let centrarCeldas : string [] = ['A1', 'A5'];
+    centrarCeldas.forEach(cell =>{
+      worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getCell(cell).border = border;
+    });
+
+    for (let i = 1; i < 10; i++) {
+      worksheet.getColumn(i).width = 20;
+      if (i > 0 && i != 1) worksheet.getColumn(i + 1).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      else if (i == 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+    }
+
+    // HOJA 2, KARDEX DETALLADO
+    let worksheet2 = workbook.addWorksheet(`Kardex`);
+    worksheet2.addImage(imageId1, {
+      tl: { col: 0.1, row: 0.40 },
+      ext: { width: 170, height: 45 },
+      editAs: 'oneCell'
+    });
+    let titleRow2 = worksheet2.addRow([titulo]);
+    titleRow2.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+    
+    worksheet2.addRow([]);
+    worksheet2.addRow([]);
+
+    worksheet2.getCell('A4').value = 'FECHA';
+    worksheet2.getCell('B4').value = 'ENTRADAS';
+    worksheet2.getCell('E4').value = 'SALIDAS';
+    worksheet2.getCell('H4').value = 'SALDOS';
+    
+    worksheet2.getCell('B5').value = 'QR(kg)';
+    worksheet2.getCell('C5').value = '(PS + ∆P = PR)($/kg)';
+    worksheet2.getCell('D5').value = '(CR = CS + VP)($)';
+    
+    worksheet2.getCell('E5').value = '(QR y QS)kg';
+    worksheet2.getCell('F5').value = 'PR($/kg)';
+    worksheet2.getCell('G5').value = '(CR = CS + VQ)($)';
+
+    worksheet2.getCell('H5').value = 'QR(kg)';
+    worksheet2.getCell('I5').value = 'PR($/kg)';
+    worksheet2.getCell('J5').value = 'CR($)';
+    
+    let centrarCeldas2 : string [] = ['A1', 'A4', 'B4', 'B5', 'C5', 'D5', 'E4', 'E5', 'F5', 'G5', 'H4', 'H5', 'I5', 'J5'];
+    centrarCeldas2.forEach(cell =>{
+      worksheet2.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
+      if (cell != 'A1') worksheet2.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD1' } };
+      worksheet2.getCell(cell).border = border;
+    });
+
+    worksheet2.getColumn(1).alignment = { vertical: 'middle', horizontal: 'center' };
+    worksheet2.getColumn(1).eachCell(cell => {
+      console.log(cell);
+    });
+
+    setTimeout(() => {
+      this.llenarTablaKardex().forEach(d => {
+        let row = worksheet2.addRow(d);
+        let celdas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        celdas.forEach(cell => {
+          row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD1' } };
+          row.getCell(cell).border = border;
+        });
+      });
+    }, 2600);
+
+    let unirCeldasHoja2 : string [] = ['A1:J3', 'A4:A5', 'B4:D4', 'E4:G4', 'H4:J4'];
+    unirCeldasHoja2.forEach(cell => worksheet2.mergeCells(cell));
+    for (let i = 1; i < 11; i++) {
+      worksheet2.getColumn(i).width = 20;
+      worksheet2.getColumn(i).numFmt = '""#,##0.00;[Red]\-"$"#,##0.00';
+    }
+
+    setTimeout(() => {
+      workbook.xlsx.writeBuffer().then((data) => {
+        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        fs.saveAs(blob, titulo + `.xlsx`);
+      });
+    }, 3000);
+  }
+
+  // Funcion que va a llenar las entradas y salidas de un material, esta información es la que se va a colocar en el excel
+  llenarTablaCompras() : any [] {
+    let compraRealizada : any [] = [];
+    this.comprasRealizadas.forEach(compra => {
+      compraRealizada.push([
+        compra.fecha.toString().substring(0, 10),
+        compra.cantComprada,
+        compra.precioCompra,
+        compra.precioEstandar,
+        compra.diffPrecio,
+        compra.costoRealMaterial,
+        compra.costoEstandarMaterial,
+        compra.variacionPrecio,
+      ]);
+    });
+    compraRealizada.push([
+      'Totales',
+      compraRealizada.reduce((a, b) => a + b[1], 0),
+      '',
+      '',
+      '',
+      compraRealizada.reduce((a, b) => a + b[5], 0),
+      compraRealizada.reduce((a, b) => a + b[6], 0),
+      compraRealizada.reduce((a, b) => a + b[7], 0),
+    ]);
+    return compraRealizada;
+  }
+
+  llenarTablaSalidas() : any [] {
+    let salidaRealizada : any [] = [];
+    this.salidasRealizadas.forEach(salida => {
+      salidaRealizada.push([
+        salida.fecha.replace('T00:00:00', ''),
+        salida.orden,
+        salida.cantidadSalida,
+        salida.cantidadTotalEstandar,
+        (salida.cantidadSalida) - (salida.cantidadTotalEstandar),
+        salida.precioReal,
+        salida.costoReal,
+        salida.costoEstandar,
+        salida.variacionPrecio
+      ]);
+    });
+    salidaRealizada.push([
+      'Totales',
+      '',
+      salidaRealizada.reduce((a, b) => a + b[2], 0),
+      salidaRealizada.reduce((a, b) => a + b[3], 0),
+      salidaRealizada.reduce((a, b) => a + b[4], 0),
+      '',
+      salidaRealizada.reduce((a, b) => a + b[6], 0),
+      salidaRealizada.reduce((a, b) => a + b[7], 0),
+      salidaRealizada.reduce((a, b) => a + b[8], 0),
+    ]);
+    return salidaRealizada;
+  }
+
+  // Funcion que va a llenar los datos de kardex
+  llenarTablaKardex() : any [] {
+    let data : any [] = [];
+    this.datosKardex.forEach(kardex => {
+      data.push([
+        kardex.fecha,
+        kardex.cantEntrada,
+        kardex.precioEntrada,
+        kardex.costoEntrada,
+        kardex.cantSalida,
+        kardex.precioSalida,
+        kardex.costoSalida,
+        kardex.cantidadFinal,
+        kardex.precioFinal,
+        kardex.costoFinal,
+      ]);
+    });
+    return data;
   }
 }

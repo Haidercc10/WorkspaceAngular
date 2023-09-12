@@ -706,7 +706,7 @@ export class Dashboard_CostosComponent implements OnInit {
 
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-    
+
     // HOJA 1, COSTOS DETALLADOS
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
     worksheet.addImage(imageId1, 'A1:B3');
@@ -721,7 +721,7 @@ export class Dashboard_CostosComponent implements OnInit {
       cell.border = border;
     });
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    
+
     let tituloCostosFab = worksheet.addRow(['Costos Indirectos de Fabricación']);
     tituloCostosFab.eachCell(cell => {
       cell.fill = fill;
@@ -770,7 +770,7 @@ export class Dashboard_CostosComponent implements OnInit {
       worksheet.getColumn(1).width = 15;
       worksheet.getColumn(2).width = 50;
     }
-    
+
     let unirCeldasHoja1 : string [] = ['A1:O3', 'A5:O5', 'A23:O23', 'A69:O69', 'A109:O109', 'A118:O118'];
     unirCeldasHoja1.forEach(cell => worksheet.mergeCells(cell));
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
