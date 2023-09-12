@@ -463,7 +463,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         row.getCell(cell).border = border;
       });
     });
-    
+
     worksheet.addRow([]);
     worksheet.addRow([]);
     worksheet.addRow(['CONSUMOS']).eachCell((cell) => {
@@ -509,7 +509,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let worksheet2 = workbook.addWorksheet(`Kardex`);
     worksheet2.addImage(imageId1, {
       tl: { col: 0.1, row: 0.40 },
-      ext: { width: 170, height: 45 },
+      ext: { width: 220, height: 45 },
       editAs: 'oneCell'
     });
     let titleRow2 = worksheet2.addRow([titulo]);
@@ -538,34 +538,69 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     let centrarCeldas2 : string [] = ['A1', 'A4', 'B4', 'B5', 'C5', 'D5', 'E4', 'E5', 'F5', 'G5', 'H4', 'H5', 'I5', 'J5'];
     centrarCeldas2.forEach(cell =>{
       worksheet2.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet2.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
       if (cell != 'A1') worksheet2.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD1' } };
       worksheet2.getCell(cell).border = border;
     });
 
     worksheet2.getColumn(1).alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet2.getColumn(1).eachCell(cell => {
-      console.log(cell);
-    });
 
+    let unirFechas : any = [];
     setTimeout(() => {
+      let count : number = 0, fecha : string = '';
       this.llenarTablaKardex().forEach(d => {
         let row = worksheet2.addRow(d);
         let celdas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        count ++;
         celdas.forEach(cell => {
           row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD1' } };
-          row.getCell(cell).border = border;
+          if ([1,4,7,10].includes(cell)) row.getCell(cell).border = { right: { style: 'medium' } };
+
+          if (count != this.datosKardex.length) {
+            row.getCell(1).border = { right: { style: 'medium' }, bottom: { style: 'medium' }, };
+            row.getCell(2).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(3).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(4).border = { right: { style: 'medium' }, bottom: { style: 'thin' } };
+            row.getCell(5).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(6).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(7).border = { right: { style: 'medium' }, bottom: { style: 'thin' } };
+            row.getCell(8).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(9).border = { bottom: { style: 'thin' }, right: { style: 'thin' },};
+            row.getCell(10).border = { right: { style: 'medium' }, bottom: { style: 'thin' } };
+          }
+
+          if (count == this.datosKardex.length && ([1,4,7,10].includes(cell))) row.getCell(cell).border = { bottom: { style: 'medium' }, right: { style: 'medium' } };
+          else if (count == this.datosKardex.length && ([2,3,5,6,8,9].includes(cell))) row.getCell(cell).border = { bottom: { style: 'medium' }, right: { style: 'thin' }, };
         });
-      });
+        if (fecha != d[0]) {
+          unirFechas.push(row.number);
+          [1].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, right: { style: 'medium' }, bottom: { style: 'medium' }, });
+          [2].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [3].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [4].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, right: { style: 'medium' }, bottom: { style: 'thin' } });
+          [5].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [6].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [7].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, right: { style: 'medium' }, bottom: { style: 'thin' } });
+          [8].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [9].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, right: { style: 'thin' },});
+          [10].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, right: { style: 'medium' }, bottom: { style: 'thin' } });
+          fecha = d[0];
+        }
+      });      
     }, 2600);
 
     let unirCeldasHoja2 : string [] = ['A1:J3', 'A4:A5', 'B4:D4', 'E4:G4', 'H4:J4'];
     unirCeldasHoja2.forEach(cell => worksheet2.mergeCells(cell));
     for (let i = 1; i < 11; i++) {
       worksheet2.getColumn(i).width = 20;
-      worksheet2.getColumn(i).numFmt = '""#,##0.00;[Red]\-"$"#,##0.00';
+      worksheet2.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
     }
 
     setTimeout(() => {
+      for (let i = 0; i < unirFechas.length; i++) {
+        let celdaFinal : any = unirFechas[i + 1] - 1;
+        worksheet2.mergeCells(`A${unirFechas[i]}:A${Number.isNaN(celdaFinal) ? this.datosKardex.length + 5 : celdaFinal}`);
+      }
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, titulo + `.xlsx`);
