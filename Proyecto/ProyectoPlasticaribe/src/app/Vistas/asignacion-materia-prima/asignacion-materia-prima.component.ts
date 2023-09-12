@@ -251,7 +251,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
               else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
               this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
-              //this.cargar_Entradas(info);
+              this.cargar_Entradas(info);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
               //console.log(this.materiasPrimasSeleccionadas)

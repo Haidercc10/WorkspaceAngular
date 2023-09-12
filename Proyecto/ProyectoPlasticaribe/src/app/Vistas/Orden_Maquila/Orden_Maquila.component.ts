@@ -270,7 +270,6 @@ export class Orden_MaquilaComponent implements OnInit {
             this.cargar_Entradas(info);
             this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrima.value.Id);
             this.materiasPrimasSeleccionadas.push(info);
-            console.log(this.materiasPrimasSeleccionadas)
             this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
             this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
             setTimeout(() => { this.FormMateriaPrima.reset(); }, 1000);
