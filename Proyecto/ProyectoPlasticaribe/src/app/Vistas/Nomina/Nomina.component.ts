@@ -191,10 +191,12 @@ export class NominaComponent implements OnInit {
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
     this.nominaService.GetNominaIngresada(fechaInicial, fechaFinal).subscribe(data => this.nominaIngresada = data);
     setTimeout(() => {
-      this.nominaIngresada.forEach(nomina => {
-        nomina.fechaInicio = nomina.fechaInicio.replace('T00:00:00', '');
-        nomina.fechaFin = nomina.fechaFin.replace('T00:00:00', '');
-      });
+      if (this.nominaIngresada.length > 0) {
+        this.nominaIngresada.forEach(nomina => {
+          nomina.fechaInicio = nomina.fechaInicio.replace('T00:00:00', '');
+          nomina.fechaFin = nomina.fechaFin.replace('T00:00:00', '');
+        });
+      }
     }, 1500);
   }
 
