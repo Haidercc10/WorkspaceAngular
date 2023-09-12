@@ -34,13 +34,15 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
   ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
   boppSeleccionado : any; //Variable que almacenará la informacion del bopp que haya sido selccionado
-  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
+  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten 
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
   itemSeleccionado : any;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
   hora : any = moment().format('HH:mm:ss'); //Variable que va a almacenar la hora actual
+  entradas : any = [];
+  salidas : any = [];
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -67,7 +69,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       boppNombre : ['', Validators.required],
       boppSerial: ['', Validators.required],
       boppCantidad : ['', Validators.required],
-      //boppGenerico : [null ],
+      boppGenerico : [null, Validators.required],
+      boppId : [null, Validators.required],
     });
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -183,6 +186,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     let serial : any = this.FormularioBOPP.value.boppNombre;
     let nuevo : any [] = this.ArrayBOPP.filter((item) => item.bopP_Serial == serial);
     this.FormularioBOPP.patchValue({
+      boppId: nuevo[0].bopP_Id,
       boppGenerico: nuevo[0].boppGen_Id,
       boppSerial: nuevo[0].bopP_Serial,
       boppNombre: nuevo[0].bopP_Nombre,
@@ -206,19 +210,16 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     if (this.ArrayBoppPedida.some(x => x.Serial == this.FormularioBOPP.value.boppSerial)) this.msj.mensajeAdvertencia(`Advertencia`, `El rollo ya se encuentra en la tabla!`);
     else {
       let info : any = {
+        Id : this.FormularioBOPP.value.boppId,
         IdBoppGenerico : this.FormularioBOPP.value.boppGenerico,
         Serial : this.FormularioBOPP.value.boppSerial,
         Nombre : this.FormularioBOPP.value.boppNombre,
         Cantidad : this.FormularioBOPP.value.boppCantidad,
         Cantidad2 : this.FormularioBOPP.value.boppCantidad,
         Cantidad3 : this.FormularioBOPP.value.boppCantidad,
-        EntradasDisponibles : [],
-        Salidas : []
       }
-      //this.cargar_Entradas(info);
       this.ArrayBoppPedida.push(info);
-      console.log(this.ArrayBoppPedida);
-      setTimeout(() => { this.FormularioBOPP.reset(); }, 500); 
+      setTimeout(() => { this.FormularioBOPP.reset(); }, 1000); 
     }
   }
 
@@ -243,7 +244,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       Estado_Id : 13,
       AsigBOPP_Hora : moment().format('H:mm:ss'),
     }
-    this.asignacionBOPPService.srvGuardar(datos).subscribe(data => this.detallesAsginacionBOPP(data.asigBOPP_Id), () => this.msj.mensajeAdvertencia(`Error`, `Se ha producido un error al momento de crear la asignación!`));
+    this.asignacionBOPPService.srvGuardar(datos).subscribe(data => this.detallesAsginacionBOPP(data.asigBOPP_Id), () => this.msj.mensajeError(`Error`, `Se ha producido un error al momento de crear la asignación!`));
   }
 
   // funcion que creará los detalles de la asignacion de rollos
@@ -267,13 +268,16 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 Estado_OrdenTrabajo : 14,
                 TpDoc_Id : documento,
               }
-              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(null, () => this.msj.mensajeAdvertencia(`Error`, `Se ha producido un error al momento de crear la asignación del rollo!`));
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(null, () => this.msj.mensajeError(`Error`, `Se ha producido un error al momento de crear la asignación del rollo!`));
             }
           }
         });
       }
     }
-    setTimeout(() => this.moverBopp(), 5000);
+    setTimeout(() => {
+      this.moverBopp();
+      this.cargar_MovEntradasMP();
+    }, 5000);
   }
 
   //funcion que va a mover el inventario de los rollos
@@ -284,8 +288,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           let cantidad = datos_bopp[j].bopP_Stock - this.ArrayBoppPedida[i].Cantidad2;
           this.boppService.PutInventarioBiorientado(datos_bopp[j].bopP_Id, cantidad).subscribe(() => {
             this.obtenerBOPP();
-            this.msj.mensajeAdvertencia(`Asignación exitosa`,`Se ha creado exitosamente la asignación de rollos!`);
-            this.limpiarTodosLosCampos();
+            this.msj.mensajeConfirmacion(`Asignación exitosa`,`Se ha creado exitosamente la asignación de rollos!`);
+            setTimeout(() => { this.limpiarTodosLosCampos(); }, 2000);
           }, () => this.msj.mensajeError(`Error`, `Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`));
         }
       });
@@ -303,5 +307,93 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
     this.shepherdService.show('Hola')
+  } 
+
+  //Función que actualizara la información de las entradas de materia prima disponibles.
+  cargar_MovEntradasMP(){
+    let salidaReal : number = 0;
+    
+    for (let index = 0; index < this.ArrayBoppPedida.length; index++) {
+      this.ArrayBoppPedida[index].Cantidad3 = this.ArrayBoppPedida[index].Cantidad2;
+      this.srvMovEntradasMP.GetInventarioxMaterial(this.ArrayBoppPedida[index].Id).subscribe(data => {
+        if (data.length > 0) {
+          for (let i = 0; i < data.length; i++) {
+            let detalle : modeloMovimientos_Entradas_MP = {
+              Id: data[index].id,
+              MatPri_Id: data[index].matPri_Id,
+              Tinta_Id: data[index].tinta_Id,
+              Bopp_Id: data[index].bopp_Id,
+              Cantidad_Entrada: data[index].cantidad_Entrada,
+              UndMed_Id: data[index].undMed_Id,
+              Precio_RealUnitario: data[index].precio_RealUnitario,
+              Tipo_Entrada: data[index].tipo_Entrada,
+              Codigo_Entrada: data[index].codigo_Entrada,
+              Estado_Id: data[index].estado_Id,
+              Cantidad_Asignada: data[index].cantidad_Asignada,
+              Cantidad_Disponible: data[index].cantidad_Disponible,
+              Observacion: data[index].observacion,
+              Fecha_Entrada: data[index].fecha_Entrada,
+              Hora_Entrada: data[index].hora_Entrada,
+              Precio_EstandarUnitario: data[index].precio_EstandarUnitario
+            }
+
+            if(this.ArrayBoppPedida[index].Cantidad3 > detalle.Cantidad_Disponible){
+              salidaReal = detalle.Cantidad_Disponible;
+              this.ArrayBoppPedida[index].Cantidad3 -= salidaReal;
+              detalle.Cantidad_Asignada += salidaReal;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+            } else if(this.ArrayBoppPedida[index].Cantidad3 == detalle.Cantidad_Disponible) {
+              salidaReal = this.ArrayBoppPedida[index].Cantidad3;
+              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+              this.ArrayBoppPedida[index].Cantidad3 = 0;
+            } else if(this.ArrayBoppPedida[index].Cantidad3 < detalle.Cantidad_Disponible) {
+              salidaReal = this.ArrayBoppPedida[index].Cantidad3;
+              detalle.Cantidad_Asignada += this.ArrayBoppPedida[index].Cantidad3;
+              detalle.Cantidad_Disponible -= this.ArrayBoppPedida[index].Cantidad3;
+              detalle.Estado_Id = 19;
+              this.ArrayBoppPedida[index].Cantidad3 = 0;
+            }
+            this.actualizar_MovEntradasMP(detalle);
+            this.guardar_Salidas(detalle, salidaReal);
+            break;
+          }
+        }
+      }); 
+    }  
+  }
+
+  //Función que actualizará la información de los movimientos de entrada de la materia prima.
+  actualizar_MovEntradasMP(detalle : any){
+    let esError : boolean = false;
+    this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(data => { esError = false; }, error => { esError = true; });
+    if(esError) this.msj.mensajeError(`Error`, `No fue posible actualizar la información de la entrada de la materia prima, por favor verifique!`); 
+  }
+
+  //Función que colocará la información de la salida de la materia prima en el array de salidas. 
+  guardar_Salidas(info : any, salidaReal : number){
+    let esError : boolean = false;
+    if(this.ordenesTrabajo.length > 0) {
+      for (let i = 0; i < this.ordenesTrabajo.length; i++) {
+        let salidas : modelEntradas_Salidas_MP = {
+          Id_Entrada: info.Id,
+          Tipo_Salida: 'ASIGBOPP', 
+          Codigo_Salida: 0, 
+          Tipo_Entrada: info.Tipo_Entrada, 
+          Codigo_Entrada: info.Codigo_Entrada,
+          Fecha_Registro: this.today,
+          Hora_Registro: this.hora,
+          MatPri_Id: 84, 
+          Tinta_Id: 2001,
+          Bopp_Id: info.Bopp_Id,
+          Cantidad_Salida: (salidaReal / this.ordenesTrabajo.length), 
+          Orden_Trabajo: this.ordenesTrabajo[i].ot,
+        }
+        this.srvMovSalidasMP.Post(salidas).subscribe(data => {esError = false}, error => { esError = true; });
+      }
+      if(esError) this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`);
+    }
   }
 }

@@ -121,7 +121,7 @@
             <i class="pi pi-search"></i>
             <input formControlName="boppNombre" id="boppNombre" list="materiaprima" type="text" pInputText  (change)="BOPPSeleccionado()" required/>
             <datalist id="materiaprima">
-              <option value={{item.bopP_Serial}} *ngFor="let item of ArrayBOPP">{{item.bopP_Nombre}}</option>
+              <option value={{item.bopP_Serial}} *ngFor="let item of ArrayBOPP"><b>{{item.boppGen_Id}}</b> - {{item.bopP_Nombre}}</option>
             </datalist>
             <label for="boppNombre">Rollo</label>
           </span>
