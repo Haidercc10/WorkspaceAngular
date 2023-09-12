@@ -110,6 +110,8 @@ export class Informe_ConsumosComponent implements OnInit {
     let info : any = {
       Fecha : `${datos.fecha.replace('T00:00:00', '')}`,
       OT : datos.ot,
+      Item : datos.item,
+      Referencia : datos.referencia,
       Material : datos.materialRealId,
       NombreMaterial : datos.nombreMaterial,
       CantRequerida : datos.cantidad_Requerida,
@@ -134,6 +136,8 @@ export class Informe_ConsumosComponent implements OnInit {
         Material : item.Material,
         NombreMaterial : item.NombreMaterial,
         OT : item.OT,
+        Item : item.Item,
+        Referencia : item.Referencia,
         CantRequerida : item.CantRequerida,
         CantEstandar : item.CantEstandar,
         DifCantidad : 0,

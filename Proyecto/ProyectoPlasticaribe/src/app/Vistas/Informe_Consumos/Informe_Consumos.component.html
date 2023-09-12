@@ -33,7 +33,7 @@
 
   <!--Formulario-->
   <form [formGroup]="formFiltros">
-    <div class="row m-3 g-2 mb-4">
+    <div class="row m-3 g-4 mb-4">
 
       <!--Rango de fechas -->
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 mr-2">
@@ -93,6 +93,7 @@
             <th colspan="2"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CantRequerida', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CantEstandar', 'contains')"></th>
             <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'DifCantidad', 'contains')"></th>
@@ -107,6 +108,7 @@
             <th>#</th>
             <th pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha</th>
             <th pSortableColumn="OT"><p-sortIcon field="OT"></p-sortIcon> OT</th>
+            <th pSortableColumn="Referencia"><p-sortIcon field="Referencia"></p-sortIcon> Referencia</th>
             <th pSortableColumn="CantRequerida"><p-sortIcon field="CantRequerida" pTooltip="Cantidad requerida"></p-sortIcon> Cant. Requerida</th>
             <th pSortableColumn="CantEstandar"><p-sortIcon field="CantEstandar" pTooltip="Cantidad estandar"></p-sortIcon> Cant. Estandar</th>
             <th pSortableColumn="DifCantidad" pTooltip="Diferencial de cantidad"><p-sortIcon field="DifCantidad"></p-sortIcon> Dif. Cantidad</th>
@@ -125,6 +127,7 @@
             <td>{{rowIndex + 1}}</td>
             <td class="text-center"><b>{{item.Fecha}}</b></td>
             <td class="text-center">{{item.OT}}</td>
+            <td>{{item.Referencia}}</td>
             <td class="text-center">{{item.CantRequerida | number: '1.2-2'}}</td>
             <td class="text-center">{{item.CantEstandar | number: '1.2-2'}}</td>
             <td class="text-center">{{item.DifCantidad | number: '1.2-2'}}</td>
@@ -136,7 +139,7 @@
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="4" class="text-right">Totales</td>
+            <td colspan="5" class="text-right">Totales</td>
             <td class="text-center">{{valorCantRequerida() | number : '1.2-2'}}</td>
             <td colspan="3"></td>
             <td class="text-center">$ {{valorValoracionCantidad() | number : '1.2-2' }}</td>
@@ -147,7 +150,7 @@
         <!--Tabla 2-->
         <ng-template pTemplate="rowexpansion" let-item>
           <tr>
-            <td colspan="11" id="">
+            <td colspan="12" id="">
               <div class="p-3">
                 <p-table
                   #dt2
