@@ -430,7 +430,8 @@ export class AsignacionTintasComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: 0
+      Orden_Trabajo: 0, 
+      Prod_Id : 1,
     }
     info.Salidas.push(salidas);
   }

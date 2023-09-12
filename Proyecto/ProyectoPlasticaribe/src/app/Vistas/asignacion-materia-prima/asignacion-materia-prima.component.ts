@@ -186,7 +186,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             this.infoOrdenTrabajo = [{
               ot : ot,
               cliente : datos_procesos[index].clienteNom,
-              item : datos_procesos[index].clienteItemsNom,
+              item : datos_procesos[index].clienteItems,
+              referencia : datos_procesos[index].clienteItemsNom,
               kg : this.kgOT,
               kgRestante : this.cantRestante,
             }];
@@ -673,7 +674,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: ot
+      Orden_Trabajo: ot, 
+      Prod_Id: this.infoOrdenTrabajo[0].item,
     }
     info.Salidas.push(salidas);
   }

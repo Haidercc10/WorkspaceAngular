@@ -928,7 +928,8 @@ export class Orden_MaquilaComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: consecutivo
+      Orden_Trabajo: consecutivo, 
+      Prod_Id : 1,
     }
     info.Salidas.push(salidas);
   }

@@ -34,7 +34,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
   ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
   boppSeleccionado : any; //Variable que almacenará la informacion del bopp que haya sido selccionado
-  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten 
+  ordenesTrabajo = [ ]; //Variable que almacenará las ordenes de trabajo que se consulten {ot : 121333}, {ot : 121334}, {ot : 121335}
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
   itemSeleccionado : any;
@@ -43,6 +43,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   hora : any = moment().format('HH:mm:ss'); //Variable que va a almacenar la hora actual
   entradas : any = [];
   salidas : any = [];
+  idAsignacion : number;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -63,6 +64,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       AsgBopp_Fecha : [this.today, Validators.required],
       AsgBopp_Observacion: ['', Validators.required],
       AsgBopp_Estado: ['', Validators.required],
+      AsgBopp_Producto: ['', Validators.required],
     });
 
     this.FormularioBOPP = this.FormBuilderBOPP.group({
@@ -129,7 +131,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               cliente : item.clienteNom,
               micras : item.extCalibre,
               ancho : item.ptAnchopt,
-              item : item.clienteItemsNom,
+              item : item.clienteItems,
+              referencia : item.clienteItemsNom,
               kg : item.datosotKg,
             }
             this.ordenesTrabajo.push(infoOT);
@@ -151,7 +154,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 cliente : itemOT.clienteNom,
                 micras : itemOT.extCalibre,
                 ancho : itemOT.ptAnchopt,
-                item : itemOT.clienteItemsNom,
+                item : itemOT.clienteItems,
+                referencia : itemOT.clienteItemsNom,
                 kg : itemOT.datosotKg,
               }
               this.ordenesTrabajo.push(infoOT);
@@ -249,6 +253,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   // funcion que creará los detalles de la asignacion de rollos
   detallesAsginacionBOPP(idAsignacion : any){
+    this.idAsignacion = idAsignacion;
     let documento : string;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
@@ -319,24 +324,24 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         if (data.length > 0) {
           for (let i = 0; i < data.length; i++) {
             let detalle : modeloMovimientos_Entradas_MP = {
-              Id: data[index].id,
-              MatPri_Id: data[index].matPri_Id,
-              Tinta_Id: data[index].tinta_Id,
-              Bopp_Id: data[index].bopp_Id,
-              Cantidad_Entrada: data[index].cantidad_Entrada,
-              UndMed_Id: data[index].undMed_Id,
-              Precio_RealUnitario: data[index].precio_RealUnitario,
-              Tipo_Entrada: data[index].tipo_Entrada,
-              Codigo_Entrada: data[index].codigo_Entrada,
-              Estado_Id: data[index].estado_Id,
-              Cantidad_Asignada: data[index].cantidad_Asignada,
-              Cantidad_Disponible: data[index].cantidad_Disponible,
-              Observacion: data[index].observacion,
-              Fecha_Entrada: data[index].fecha_Entrada,
-              Hora_Entrada: data[index].hora_Entrada,
-              Precio_EstandarUnitario: data[index].precio_EstandarUnitario
+              Id: data[i].id,
+              MatPri_Id: data[i].matPri_Id,
+              Tinta_Id: data[i].tinta_Id,
+              Bopp_Id: data[i].bopp_Id,
+              Cantidad_Entrada: data[i].cantidad_Entrada,
+              UndMed_Id: data[i].undMed_Id,
+              Precio_RealUnitario: data[i].precio_RealUnitario,
+              Tipo_Entrada: data[i].tipo_Entrada,
+              Codigo_Entrada: data[i].codigo_Entrada,
+              Estado_Id: data[i].estado_Id,
+              Cantidad_Asignada: data[i].cantidad_Asignada,
+              Cantidad_Disponible: data[i].cantidad_Disponible,
+              Observacion: data[i].observacion,
+              Fecha_Entrada: data[i].fecha_Entrada,
+              Hora_Entrada: data[i].hora_Entrada,
+              Precio_EstandarUnitario: data[i].precio_EstandarUnitario
             }
-
+            
             if(this.ArrayBoppPedida[index].Cantidad3 > detalle.Cantidad_Disponible){
               salidaReal = detalle.Cantidad_Disponible;
               this.ArrayBoppPedida[index].Cantidad3 -= salidaReal;
@@ -358,7 +363,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             }
             this.actualizar_MovEntradasMP(detalle);
             this.guardar_Salidas(detalle, salidaReal);
-            break;
+            //break;
           }
         }
       }); 
@@ -380,7 +385,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         let salidas : modelEntradas_Salidas_MP = {
           Id_Entrada: info.Id,
           Tipo_Salida: 'ASIGBOPP', 
-          Codigo_Salida: 0, 
+          Codigo_Salida: this.idAsignacion, 
           Tipo_Entrada: info.Tipo_Entrada, 
           Codigo_Entrada: info.Codigo_Entrada,
           Fecha_Registro: this.today,
@@ -390,10 +395,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           Bopp_Id: info.Bopp_Id,
           Cantidad_Salida: (salidaReal / this.ordenesTrabajo.length), 
           Orden_Trabajo: this.ordenesTrabajo[i].ot,
+          Prod_Id : this.ordenesTrabajo[i].item,
         }
         this.srvMovSalidasMP.Post(salidas).subscribe(data => {esError = false}, error => { esError = true; });
       }
-      if(esError) this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`);
     }
+    if(esError) this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`);
   }
 }

@@ -12,4 +12,5 @@ export interface modelEntradas_Salidas_MP {
     Bopp_Id : number;
     Cantidad_Salida : number;
     Orden_Trabajo : number;
+    Prod_Id : number;
 }

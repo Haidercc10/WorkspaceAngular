@@ -91,6 +91,7 @@
             <th scope="col">N°</th>
             <th scope="col">Cliente</th>
             <th scope="col">Item</th>
+            <th scope="col">Referencia</th>
             <th scope="col">Kg Total</th>
             <th scope="col">Kg Restante</th>
         </ng-template>
@@ -99,6 +100,7 @@
             <td>{{ot.ot}}</td>
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
+            <td>{{ot.referencia}}</td>
             <td>{{ot.kg | number}}</td>
             <td [ngClass]="{ 'colorRojo' : ot.kgRestante <= 0 }"><b>{{ot.kgRestante | number}}</b></td>
           </tr>
