@@ -10,6 +10,9 @@ import { environment } from 'src/environments/environment';
 
 export class Vistas_PermisosService {
 
+    
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
     constructor(private http : HttpClient,) { }
 
     Get_Todo = () : Observable<any> => this.http.get(`${this.rutaPlasticaribeAPI}/Vistas_Permisos`);

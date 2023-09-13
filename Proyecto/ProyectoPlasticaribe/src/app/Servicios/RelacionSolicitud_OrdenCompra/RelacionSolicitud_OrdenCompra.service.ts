@@ -6,8 +6,9 @@ import { environment } from 'src/environments/environment';
 @Injectable({ providedIn : 'root' })
 
 export class RelacionSolicitud_OrdenCompraService {
-
-constructor(private http : HttpClient) { }
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
+  constructor(private http : HttpClient) { }
 
   Post = (data : any) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/SolicitudesMP_OrdenesCompra`, data);
 }

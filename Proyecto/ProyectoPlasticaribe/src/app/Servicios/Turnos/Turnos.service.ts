@@ -8,6 +8,8 @@ import { modelTurnos } from '../../Modelo/modelTurnos';
   providedIn: 'root'
 })
 export class TurnosService {
+  
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
 

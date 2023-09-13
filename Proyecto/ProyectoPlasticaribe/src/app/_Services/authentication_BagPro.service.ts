@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User_BagPro } from '../_Models/user_BagPro';
-import { rutaBagPro } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 
@@ -12,7 +12,7 @@ import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.serv
 
 export class authentication_BagPro {
 
-  readonly rutaBagPro = rutaBagPro;
+  readonly rutaBagPro = environment.rutaBagPro;
   private userSubject: BehaviorSubject<User_BagPro | null>;
   public user: Observable<User_BagPro | null>;
   data:any=[];

@@ -7,8 +7,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class Tickets_ResueltosService {
-
-constructor(private http : HttpClient,) { }
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  constructor(private http : HttpClient,) { }
 
   Get = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tickets_Revisados`);
 

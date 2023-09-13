@@ -6,8 +6,9 @@ import { environment } from 'src/environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class TipoSalidas_CajaMenorService {
-
-constructor(private http : HttpClient) { }
+    
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+    constructor(private http : HttpClient) { }
 
     Get_Todo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/TipoSalidas_CajaMenor`);
 

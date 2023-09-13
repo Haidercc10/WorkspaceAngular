@@ -8,7 +8,8 @@ import { modelTiposActivos } from '../../Modelo/modelTiposActivos';
   providedIn: 'root'
 })
 export class Tipo_ActivoService {
-
+  
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   constructor(private http : HttpClient) { }
 
   GetTodo = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Activo');

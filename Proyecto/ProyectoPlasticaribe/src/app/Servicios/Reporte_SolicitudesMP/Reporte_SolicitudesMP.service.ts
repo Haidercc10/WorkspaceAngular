@@ -8,7 +8,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class Reporte_SolicitudesMPService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient) { }
 
   getSolicitudMP = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Solicitud_MateriaPrima`);
