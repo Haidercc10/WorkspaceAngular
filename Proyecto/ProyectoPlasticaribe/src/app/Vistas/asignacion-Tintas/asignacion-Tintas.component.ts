@@ -441,8 +441,6 @@ export class AsignacionTintasComponent implements OnInit {
     if(this.ArrayMateriaPrima.length > 0) {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         for (let i = 0; i < this.ArrayMateriaPrima[index].EntradasDisponibles.length; i++) {
-         this.ArrayMateriaPrima[index].EntradasDisponibles[i].Fecha_Entrada = this.today;
-         this.ArrayMateriaPrima[index].EntradasDisponibles[i].Hora_Entrada = this.hora;
          this.srvMovEntradasMP.Put(this.ArrayMateriaPrima[index].EntradasDisponibles[i].Id, this.ArrayMateriaPrima[index].EntradasDisponibles[i]).subscribe(data => {}, 
          error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
         }
@@ -456,7 +454,6 @@ export class AsignacionTintasComponent implements OnInit {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         for (let i = 0; i < this.ArrayMateriaPrima[index].Salidas.length; i++) {
           this.ArrayMateriaPrima[index].Salidas[i].Codigo_Salida = id;
-          this.ArrayMateriaPrima[index].Salidas[i].Orden_Trabajo = id;
           this.ArrayMateriaPrima[index].Salidas[i].Fecha_Registro = this.today;
           this.ArrayMateriaPrima[index].Salidas[i].Hora_Registro = this.hora;
           this.srvMovSalidasMP.Post(this.ArrayMateriaPrima[index].Salidas[i]).subscribe(data => {}, 

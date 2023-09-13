@@ -859,6 +859,7 @@ export class Orden_MaquilaComponent implements OnInit {
    //Función que colocará la información de las entradas de materia prima en el array de entradas disponibles.
    cargar_Entradas(info : any){
     let salidaReal : number = 0;
+    console.log(info.Id)
     this.srvMovEntradasMP.GetInventarioxMaterial(info.Id).subscribe(data => {
       if (data.length > 0) {
         for (let i = 0; i < data.length; i++) {
@@ -905,6 +906,8 @@ export class Orden_MaquilaComponent implements OnInit {
             }
             this.cargar_Salidas(detalle, info, salidaReal);
             info.EntradasDisponibles.push(detalle);
+            console.log(info.EntradasDisponibles)
+          
           }
         }
       }
@@ -927,7 +930,7 @@ export class Orden_MaquilaComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: consecutivo, 
+      Orden_Trabajo: 0, 
       Prod_Id : 1,
     }
     info.Salidas.push(salidas);
@@ -938,8 +941,6 @@ export class Orden_MaquilaComponent implements OnInit {
     if(this.materiasPrimasSeleccionadas.length > 0) {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
         for (let i = 0; i < this.materiasPrimasSeleccionadas[index].EntradasDisponibles.length; i++) {
-         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Fecha_Entrada = this.today;
-         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Hora_Entrada = this.hora;
          this.srvMovEntradasMP.Put(this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Id, this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i]).subscribe(data => {}, 
          error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
         }
@@ -953,7 +954,6 @@ export class Orden_MaquilaComponent implements OnInit {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
         for (let i = 0; i < this.materiasPrimasSeleccionadas[index].Salidas.length; i++) {
           this.materiasPrimasSeleccionadas[index].Salidas[i].Codigo_Salida = id;
-          this.materiasPrimasSeleccionadas[index].Salidas[i].Orden_Trabajo = id;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Fecha_Registro = this.today;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Hora_Registro = this.hora;
           this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(data => {}, 

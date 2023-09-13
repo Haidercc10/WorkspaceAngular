@@ -254,7 +254,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.cargar_Entradas(info);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
-              //console.log(this.materiasPrimasSeleccionadas)
+              console.log(this.materiasPrimasSeleccionadas)
               setTimeout(() => { this.FormMateriaPrimaRetirada.reset(); }, 500); 
             } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera a la cantidad en stock!`);
           } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar hacia que proceso va la materia prima!`);
@@ -376,8 +376,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
         }
       }
-      //this.actualizar_MovimientosEntradas();
-      //this.crear_Salidas(asigncaion);
+      this.actualizar_MovimientosEntradas();
+      this.crear_Salidas(asigncaion);
       setTimeout(() => !this.error ? this.asignacionExitosa() : null, 3000);
     }
   }
@@ -660,7 +660,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Función que colocará la información de la salida de la materia prima en el array de salidas. 
   cargar_Salidas(detalle : any, info : any, salidaReal : number){
     let categoria : number = this.FormMateriaPrimaRetirada.value.Categoria;
-    let ot : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
 
     let salidas : modelEntradas_Salidas_MP = {
       Id_Entrada: detalle.Id,
@@ -674,8 +673,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: ot, 
-      Prod_Id: this.infoOrdenTrabajo[0].item,
+      Orden_Trabajo: this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].ot, 
+      Prod_Id: this.infoOrdenTrabajo[0] == undefined ? 1 : this.infoOrdenTrabajo[0].item,
     }
     info.Salidas.push(salidas);
   }
@@ -685,8 +684,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if(this.materiasPrimasSeleccionadas.length > 0) {
       for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
         for (let i = 0; i < this.materiasPrimasSeleccionadas[index].EntradasDisponibles.length; i++) {
-         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Fecha_Entrada = this.today;
-         this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Hora_Entrada = this.hora;
          this.srvMovEntradasMP.Put(this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Id, this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i]).subscribe(data => {}, 
          error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
         }
@@ -702,6 +699,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.materiasPrimasSeleccionadas[index].Salidas[i].Codigo_Salida = asignacionId;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Fecha_Registro = this.today;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Hora_Registro = this.hora;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Prod_Id = this.infoOrdenTrabajo[0].item;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Orden_Trabajo = this.infoOrdenTrabajo[0].ot;
           this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(data => {}, 
           error => { this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`); });
         }
