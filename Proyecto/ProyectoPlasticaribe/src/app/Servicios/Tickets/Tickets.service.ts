@@ -7,7 +7,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class TicketsService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient) { }
 
   Get = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tickets`);

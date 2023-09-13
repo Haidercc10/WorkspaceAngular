@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelTipoDevolucion } from '../../Modelo/modelTipoDevolucion';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TipoDevolucionService {
-
+  
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient,) { }
 
   GetTodo = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/');

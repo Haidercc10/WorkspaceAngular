@@ -7,7 +7,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class SrvRollosEliminadosService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient,) { }
   
   srvObtenerListaRollosxOT = (OT : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOT/${OT}`);

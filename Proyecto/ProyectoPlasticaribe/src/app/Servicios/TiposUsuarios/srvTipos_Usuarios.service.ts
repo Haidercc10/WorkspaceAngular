@@ -8,7 +8,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class SrvTipos_UsuariosService {
-
+  
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   constructor(private http : HttpClient) { }
 
   srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Usuario');

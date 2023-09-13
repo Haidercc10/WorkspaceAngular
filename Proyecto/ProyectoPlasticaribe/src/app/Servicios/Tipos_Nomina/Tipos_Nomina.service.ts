@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class Tipos_NominaService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   constructor(private http : HttpClient,) { }
 
   Get = (): Observable<any[]> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tipos_Nomina`);

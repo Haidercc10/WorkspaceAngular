@@ -1,14 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelTratado } from '../../Modelo/modelTratado';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TratadoService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient,) { }
 
   srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Tratados');

@@ -11,7 +11,7 @@ import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.serv
 @Injectable({ providedIn: 'root' })
 
 export class AuthenticationService_InvZeus {
-  readonly rutaZeus = rutaZeus;
+  readonly rutaZeus = environment.rutaZeus;
   private userSubject: BehaviorSubject<User_Inv_Zeus | null>;
   public user: Observable<User_Inv_Zeus | null>;
   data:any=[];

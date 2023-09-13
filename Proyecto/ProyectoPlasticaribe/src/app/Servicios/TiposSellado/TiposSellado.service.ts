@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class TiposSelladoService {
+
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   
   constructor(private http : HttpClient,) { }
 

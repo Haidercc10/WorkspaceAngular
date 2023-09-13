@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class TercerosService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   constructor(private http : HttpClient,) { }
 
   getTodo = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Terceros');

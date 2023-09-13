@@ -8,7 +8,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class Solicitud_Rollos_AreasService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient) { }
 
   GetTodo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Solicitud_Rollos_Areas`);
