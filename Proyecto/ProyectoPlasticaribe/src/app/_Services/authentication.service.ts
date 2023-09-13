@@ -1,24 +1,22 @@
-﻿import { Inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { User } from '../_Models/user';
 import { environment } from 'src/environments/environment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { MovimientosAplicacionService } from '../Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
-import moment from 'moment';
-import { AuthenticationService_InvZeus } from './authentication_InvZeus.service';
-import { authentication_ContaZeus } from './authentication_ContaZeus.service';
-import { authentication_BagPro } from './authentication_BagPro.service';
-import Swal from 'sweetalert2';
 import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
+import { MovimientosAplicacionService } from '../Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import { User } from '../_Models/user';
+import { authentication_BagPro } from './authentication_BagPro.service';
+import { authentication_ContaZeus } from './authentication_ContaZeus.service';
+import { AuthenticationService_InvZeus } from './authentication_InvZeus.service';
 
 @Injectable({ providedIn: 'root' })
 
 export class AuthenticationService {
 
-  readonly this.rutaPlasticaribeAPI = this.rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null>;
   data:any=[];
@@ -46,7 +44,7 @@ export class AuthenticationService {
   }
 
   login(datos : any) {
-    return this.http.post<any>(`${this.this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
+    return this.http.post<any>(`${this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token', this.encriptacion.encrypt(user.token));
       localStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);

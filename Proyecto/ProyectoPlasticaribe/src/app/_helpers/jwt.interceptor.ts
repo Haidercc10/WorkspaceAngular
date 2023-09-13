@@ -14,7 +14,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.encriptacion.decrypt(this.storage.get('Token') == undefined ? '' : this.storage.get('Token'));
-    const isApiUrl = request.url.startsWith(environment.this.rutaPlasticaribeAPI);
+    const isApiUrl = request.url.startsWith(environment.rutaPlasticaribeAPI);
     if (token && isApiUrl) request = request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
     return next.handle(request);
   }
