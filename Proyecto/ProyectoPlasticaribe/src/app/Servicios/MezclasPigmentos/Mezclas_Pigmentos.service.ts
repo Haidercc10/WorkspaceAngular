@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
 import { modelMezPigmento } from '../../Modelo/modelMezPigmento';
 
 @Injectable({
@@ -11,14 +11,14 @@ export class Mezclas_PigmentosService {
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Mezcla_Pigmento');
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Mezcla_Pigmento');
 
-  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
 
-  getMezclasPigmentos = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Mezcla_Pigmento/Nombres_Pigmentos/${nombre}`);
+  getMezclasPigmentos = (nombre : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/Nombres_Pigmentos/${nombre}`);
 
-  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`, data);
+  srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`, data);
 
-  srvGuardar = (data : modelMezPigmento): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Mezcla_Pigmento', data);
+  srvGuardar = (data : modelMezPigmento): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Mezcla_Pigmento', data);
 
 }

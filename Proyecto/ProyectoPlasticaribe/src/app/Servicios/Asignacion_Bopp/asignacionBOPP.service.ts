@@ -8,14 +8,16 @@ import { modelAsignacionBOPP } from '../../Modelo/modelAsignacionBOPP';
 
 export class AsignacionBOPPService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Asignacion_BOPP');
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Asignacion_BOPP');
 
-  srvObtenerListaPorId = (id : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Asignacion_BOPP/${id}`);
+  srvObtenerListaPorId = (id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/${id}`);
 
-  srvObtenerListaUltimoId = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Asignacion_BOPP/ultimoId`);
+  srvObtenerListaUltimoId = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/ultimoId`);
 
-  srvGuardar = (data: modelAsignacionBOPP): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Asignacion_BOPP', data);
+  srvGuardar = (data: modelAsignacionBOPP): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_BOPP', data);
 
 }

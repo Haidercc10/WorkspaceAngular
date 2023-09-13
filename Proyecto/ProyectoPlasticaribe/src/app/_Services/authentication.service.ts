@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User } from '../_Models/user';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MovimientosAplicacionService } from '../Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
 import moment from 'moment';
@@ -18,7 +18,7 @@ import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.serv
 
 export class AuthenticationService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly this.rutaPlasticaribeAPI = this.rutaPlasticaribeAPI;
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null>;
   data:any=[];
@@ -46,7 +46,7 @@ export class AuthenticationService {
   }
 
   login(datos : any) {
-    return this.http.post<any>(`${this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
+    return this.http.post<any>(`${this.this.rutaPlasticaribeAPI}/Authentication/login`, datos).pipe(map(user => {
       this.saveInLocal('Token', this.encriptacion.encrypt(user.token));
       localStorage.setItem('user', this.encriptacion.encrypt(JSON.stringify(user)));
       this.userSubject.next(user);

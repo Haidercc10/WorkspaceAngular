@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -10,5 +10,5 @@ export class TipoIdentificacionService {
 
   constructor(private http : HttpClient,) { }
   
-  srvObtenerLista = () : Observable<any> => this.http.get<any>(rutaPlasticaribeAPI + '/TipoIdentificacions');
+  srvObtenerLista = () : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + '/TipoIdentificacions');
 }

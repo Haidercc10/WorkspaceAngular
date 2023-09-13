@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
 import { modelEntradaRollos } from '../../Modelo/modelEntradaRollos';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class EntradaRollosService {
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerUltimoId = () => this.http.get<any>(rutaPlasticaribeAPI + `/EntradaRollo_Producto/UltumoID`);
+  srvObtenerUltimoId = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/EntradaRollo_Producto/UltumoID`);
 
-  srvGuardar = (data : modelEntradaRollos): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/EntradaRollo_Producto', data);
+  srvGuardar = (data : modelEntradaRollos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/EntradaRollo_Producto', data);
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,15 +10,15 @@ export class VistasFavoritasService {
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaVistas = () => this.http.get<any>(rutaPlasticaribeAPI + '/VistasFavoritas');
+  srvObtenerListaVistas = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/VistasFavoritas');
 
-  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
 
-  getVistasFavUsuario = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/VistasFavoritas/getVistasFavUsuario/${id}`);
+  getVistasFavUsuario = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/VistasFavoritas/getVistasFavUsuario/${id}`);
 
-  updateVistasFavoritas = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`, data);
+  updateVistasFavoritas = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`, data);
 
-  deleteVistasFavoritas = (id:number|String) => this.http.delete(rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
+  deleteVistasFavoritas = (id:number|String) => this.http.delete(this.rutaPlasticaribeAPI + `/VistasFavoritas/${id}`);
 
-  insertVistasFavoritas = (data : any): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/VistasFavoritas', data);
+  insertVistasFavoritas = (data : any): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/VistasFavoritas', data);
 }

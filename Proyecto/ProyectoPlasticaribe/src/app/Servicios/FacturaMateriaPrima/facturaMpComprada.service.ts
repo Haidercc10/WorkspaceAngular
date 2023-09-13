@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
 import { modelFacturaMpCompra } from '../../Modelo/modelFacturaMpComprada';
 
 @Injectable({
@@ -10,8 +10,8 @@ import { modelFacturaMpCompra } from '../../Modelo/modelFacturaMpComprada';
 export class FactuaMpCompradaService {
 
   constructor(private http : HttpClient,) { }
-  UltimoIdFactura = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Factura_Compra/UltimoIdFactura');
+  UltimoIdFactura = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra/UltimoIdFactura');
   
-  srvGuardar = (data : modelFacturaMpCompra): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Factura_Compra', data);
+  srvGuardar = (data : modelFacturaMpCompra): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Factura_Compra', data);
 
 }

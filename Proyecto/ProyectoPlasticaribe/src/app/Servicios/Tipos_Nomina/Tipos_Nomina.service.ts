@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class Tipos_NominaService {
 
   constructor(private http : HttpClient,) { }
 
-  Get = (): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina`);
+  Get = (): Observable<any[]> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tipos_Nomina`);
 
-  GetId = (id : number): Observable<any[]> => this.http.get<any>(`${rutaPlasticaribeAPI}/Tipos_Nomina/${id}`);
+  GetId = (id : number): Observable<any[]> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Tipos_Nomina/${id}`);
 }

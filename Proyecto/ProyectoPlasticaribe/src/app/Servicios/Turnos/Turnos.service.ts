@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelTurnos } from '../../Modelo/modelTurnos';
 
 @Injectable({
@@ -11,13 +11,13 @@ export class TurnosService {
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = () => this.http.get<any>(rutaPlasticaribeAPI + '/Turnos');
+  srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Turnos');
 
-  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Turnos/${dato}`);
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Turnos/${dato}`);
 
-  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Turnos/${id}`, data);
+  srvActualizar = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Turnos/${id}`, data);
 
-  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Turnos/${id}`);
+  srvEliminar = (id:number|string) => this.http.delete(this.rutaPlasticaribeAPI + `/Turnos/${id}`);
 
-  srvGuardar = (data : modelTurnos): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Turnos', data);
+  srvGuardar = (data : modelTurnos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Turnos', data);
 }
