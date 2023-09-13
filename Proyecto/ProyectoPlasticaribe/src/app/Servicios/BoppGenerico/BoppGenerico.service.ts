@@ -9,6 +9,8 @@ import { modelBoppGenerico } from '../../Modelo/modelBoppGenerico';
 })
 export class BoppGenericoService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Bopp_Generico');

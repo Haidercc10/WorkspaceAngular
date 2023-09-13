@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class DetalleOrdenMaquilaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient) { }
 

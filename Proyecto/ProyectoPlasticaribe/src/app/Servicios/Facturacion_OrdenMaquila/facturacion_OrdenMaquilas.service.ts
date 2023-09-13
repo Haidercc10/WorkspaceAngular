@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Facturacion_OrdenMaquilasService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getTodo = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Facturacion_OrdenMaquila');

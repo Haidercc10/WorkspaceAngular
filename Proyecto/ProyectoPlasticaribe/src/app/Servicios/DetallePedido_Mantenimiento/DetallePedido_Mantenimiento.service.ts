@@ -9,32 +9,32 @@ import { environment } from 'src/environments/environment';
 
 export class DetallePedido_MantenimientoService {
 
-  readonly this.rutaPlasticaribeAPI = this.rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 
   GetTodo():Observable<any[]> {
-      return this.http.get<any>(this.this.rutaPlasticaribeAPI + '/DetallePedido_Mantenimiento')
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallePedido_Mantenimiento')
   }
 
   GetPDFPedido(id : any) {
-    return this.http.get<any>(this.this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/getPDFPedido/${id}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/getPDFPedido/${id}`);
   }
 
   GetPedidoxId(id : any):Observable<any[]> {
-    return this.http.get<any>(this.this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/Detalle_PedidoMtto/${id}`)
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/Detalle_PedidoMtto/${id}`)
   }
 
   Put(id:number|String, data:any) {
-    return this.http.put(this.this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/${id}`, data);
   }
 
   Delete(id:number|String) {
-    return this.http.delete(this.this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/${id}`);
   }
 
   Insert(data : modelDtPedidoMantenimiento): Observable<any> {
-    return this.http.post(this.this.rutaPlasticaribeAPI + '/DetallePedido_Mantenimiento', data);
+    return this.http.post(this.rutaPlasticaribeAPI + '/DetallePedido_Mantenimiento', data);
   }
 
 }

@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 
 export class CostosEmpresasService {
 
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
     constructor(private http : HttpClient) { }
 
     GetCostosFacturacion = (anio : number, nomGasto : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Costos_Empresas_Anios/getCostosFacturacion/${anio}/${nomGasto}`);

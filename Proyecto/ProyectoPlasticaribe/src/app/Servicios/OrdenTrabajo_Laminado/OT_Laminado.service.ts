@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelOT_Laminado } from '../../Modelo/modelOT_Laminado';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OT_LaminadoService {
+
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
 

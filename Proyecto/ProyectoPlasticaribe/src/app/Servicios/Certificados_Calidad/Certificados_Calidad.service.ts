@@ -10,7 +10,9 @@ import { environment } from 'src/environments/environment';
 
 export class Certificados_CalidadService {
 
-constructor(private http : HttpClient) { }
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
+    constructor(private http : HttpClient) { }
 
     Get_Todo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Certificados_Calidad`);
 

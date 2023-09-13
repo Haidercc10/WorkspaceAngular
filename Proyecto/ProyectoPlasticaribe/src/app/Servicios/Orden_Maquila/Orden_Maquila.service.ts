@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Orden_MaquilaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   GetUltimoId = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Maquila/GetUltimoId`);

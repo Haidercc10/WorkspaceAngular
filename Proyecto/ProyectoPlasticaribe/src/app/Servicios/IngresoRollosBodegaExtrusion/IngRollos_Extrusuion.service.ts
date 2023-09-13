@@ -9,6 +9,8 @@ import { modelIngRollo_Extrusion } from '../../Modelo/modelIngRollo_Extrusion';
 })
 export class IngRollos_ExtrusuionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   srvGuardar = (data : modelIngRollo_Extrusion): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/IngresoRollos_Extrusion', data);

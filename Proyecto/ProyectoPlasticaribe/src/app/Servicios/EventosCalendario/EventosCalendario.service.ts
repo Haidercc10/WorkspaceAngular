@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class EventosCalendarioService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
 constructor(private http : HttpClient) { }
 
   Get = () : Observable<any[]> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/EventosCalendarios`);

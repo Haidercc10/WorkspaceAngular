@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class ControlCalidad_CorteDobladoService {
 
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
 constructor(private http: HttpClient) { }
 
     Get_Todo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/ControlCalidad_CorteDoblado`);

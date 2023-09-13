@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class ControlCalidad_ImpresionService {
+
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
     
     constructor(private http: HttpClient) { }
 

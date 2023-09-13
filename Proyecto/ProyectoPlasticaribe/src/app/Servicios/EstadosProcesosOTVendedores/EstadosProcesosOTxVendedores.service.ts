@@ -7,6 +7,8 @@ import { environment } from 'src/environments/environment';
 })
 export class EstadosProcesosOTxVendedoresService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   srvObtenerListaPorFechas = (fecha1 : any, fecha2 : any, vendedor : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasVendedor/${fecha1}/${fecha2}/${vendedor}`);

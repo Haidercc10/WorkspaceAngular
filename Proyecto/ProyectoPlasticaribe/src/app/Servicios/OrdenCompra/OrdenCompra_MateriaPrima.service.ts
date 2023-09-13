@@ -9,6 +9,8 @@ import { modelOrdenCompra } from '../../Modelo/modelOrdenCompra';
 })
 export class OrdenCompra_MateriaPrimaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getUltimoId_OrdenCompra = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Compra/GetUltimoId`);

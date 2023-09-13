@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class MantenimientoService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   GetUltimoId = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Mantenimiento/ObtenerUltimoId');

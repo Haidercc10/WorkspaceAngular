@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class OrdenCompra_RemisionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getTodo_OrdenCompra = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Remision_OrdenCompra');

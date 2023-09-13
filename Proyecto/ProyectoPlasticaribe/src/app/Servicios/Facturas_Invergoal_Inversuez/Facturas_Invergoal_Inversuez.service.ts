@@ -9,7 +9,9 @@ import { environment } from 'src/environments/environment';
 })
 export class Facturas_Invergoal_InversuezService {
 
-constructor(private http : HttpClient) { }
+    readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
+    constructor(private http : HttpClient) { }
 
     Get_Facturas = () : Observable<any[]> => this.http.get<any[]>(`${this.rutaPlasticaribeAPI}/Facturas_Invergoal_Inversuez`);
 

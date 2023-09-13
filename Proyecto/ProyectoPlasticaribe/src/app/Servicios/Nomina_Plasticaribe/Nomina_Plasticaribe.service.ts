@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Nomina_PlasticaribeService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   Get_Id = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Nomina_Plasticaribe/${id}`);

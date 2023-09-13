@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Inventario_Mes_ProductosService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Inventario_Mensual_Productos');

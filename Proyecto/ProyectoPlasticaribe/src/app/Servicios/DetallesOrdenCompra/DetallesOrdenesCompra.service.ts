@@ -9,6 +9,8 @@ import { modelDtOrdenCompra } from '../../Modelo/modelDtOrdenCompra';
 })
 export class DetallesOrdenesCompraService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   GetOrdenCompra = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra/${dato}`);

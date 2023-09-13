@@ -9,6 +9,8 @@ import { modelOrdenFactura_Relacion } from '../../Modelo/modelOrdenFactura_Relac
 })
 export class OrdenFactura_RelacionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getTodo_OrdenCompra = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/OrdenesCompras_FacturasCompras');

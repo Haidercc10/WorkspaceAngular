@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Detalle_BodegaRollosService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   GetTodo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_BodegasRollos`);

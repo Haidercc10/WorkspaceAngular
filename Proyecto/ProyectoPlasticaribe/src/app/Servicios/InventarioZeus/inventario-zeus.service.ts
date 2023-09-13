@@ -13,14 +13,14 @@ export class InventarioZeusService {
   constructor(private http : HttpClient) { }
 
   //Crear ruta del api
-  readonly rutaInventarioZeusAPI = rutaZeus;
+  readonly rutaInventarioZeusAPI = environment.rutaZeus;
 
   /************************************************************ ARTICULOS **************************************************************/
   LikeGetClientes(texto : any){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
   }
 
-  GetCliente_Vendedor_LikeNombre = (vendedor : string, nombre : string) : Observable<any> => this.http.get<any>(`${rutaZeus}/Articulos/GetCliente_Vendedor_LikeNombre/${vendedor}/${nombre}`);
+  GetCliente_Vendedor_LikeNombre = (vendedor : string, nombre : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/GetCliente_Vendedor_LikeNombre/${vendedor}/${nombre}`);
 
   LikeGetVendedores(texto: any){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);

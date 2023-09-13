@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelCliente } from '../../Modelo/modelCliente';
 
 @Injectable({
@@ -9,6 +9,8 @@ import { modelCliente } from '../../Modelo/modelCliente';
 })
 
 export class ClientesService {
+
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
 

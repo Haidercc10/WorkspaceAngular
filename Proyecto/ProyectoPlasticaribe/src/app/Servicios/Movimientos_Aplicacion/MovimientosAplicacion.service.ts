@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 })
 export class MovimientosAplicacionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getTodo = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/MovientosAplicacion');

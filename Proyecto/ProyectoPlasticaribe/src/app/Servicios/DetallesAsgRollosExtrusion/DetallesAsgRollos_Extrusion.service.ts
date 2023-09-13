@@ -9,6 +9,8 @@ import { modelDtAsgRollos_Extrusion } from '../../Modelo/modelDtAsgRollos_Extrus
 })
 export class DetallesAsgRollos_ExtrusionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) {}
 
   crearPdf = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPDFUltimoId/${id}`);

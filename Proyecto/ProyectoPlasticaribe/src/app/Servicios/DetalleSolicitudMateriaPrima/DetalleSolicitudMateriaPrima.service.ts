@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class DetalleSolicitudMateriaPrimaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
 constructor(private http : HttpClient) { }
 
   GetInfoSolicitud = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_SolicitudMateriaPrima/getInfoSolicitud/${id}`);

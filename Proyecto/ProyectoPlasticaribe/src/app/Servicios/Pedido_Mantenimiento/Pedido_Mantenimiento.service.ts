@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class Pedido_MantenimientoService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   getUltimoIdPedido = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Pedido_Mantenimiento/getUltimoIdPedido`);

@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 })
 export class Movimientos_Entradas_MPService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private httpClient: HttpClient) { }
 
   GetTodo = () : Observable<any []> => this.httpClient.get<any>(`${this.rutaPlasticaribeAPI}/Movimientros_Entradas_MP`);

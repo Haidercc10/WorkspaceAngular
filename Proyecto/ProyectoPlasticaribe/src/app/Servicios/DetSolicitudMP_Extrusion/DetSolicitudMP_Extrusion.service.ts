@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class DetSolicitudMP_ExtrusionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
   GetId = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetSolicitud_MatPrimaExtrusion/${id}`);

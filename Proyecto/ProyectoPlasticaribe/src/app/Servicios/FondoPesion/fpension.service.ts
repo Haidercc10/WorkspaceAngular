@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { this.rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelFpension } from '../../Modelo/modelFpension';
 
 
@@ -10,30 +10,30 @@ import { modelFpension } from '../../Modelo/modelFpension';
 })
 export class FpensionService {
 
-  readonly this.rutaPlasticaribeAPI = this.rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }
 
 //Metodo buscar lista de Eps
   srvObtenerListaFpension():Observable<any[]> {
-      return this.http.get<any>(this.this.rutaPlasticaribeAPI + '/Fpension')
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Fpension')
   }
 //Metodo agregar Eps
   srvAgregarFpension(data:any) {
-    return this.http.post(this.this.rutaPlasticaribeAPI + '/Fpension', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', data)
   }
 //Metodo actualzar Eps
   srvActualizarFpension(id:number|String, data:any) {
-    return this.http.put(this.this.rutaPlasticaribeAPI + `/Fpension/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Fpension/${id}`, data);
   }
 //Metodo eliminar Eps
   srvEliminarFpension(id:number|String) {
-    return this.http.delete(this.this.rutaPlasticaribeAPI + `/Fpension/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Fpension/${id}`);
   }
 
  srvGuardarvFpension(data : modelFpension): Observable<any> {
-    return this.http.post(this.this.rutaPlasticaribeAPI + '/Fpension', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', data)
    }
 
 }

@@ -9,6 +9,8 @@ import { modelDtIngRollo_Extrusion } from '../../Modelo/modelDtIngRollo_Extrusio
 })
 export class DtIngRollos_ExtrusionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   srvObtenerListaRollosDisponible = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion/getTodosRollosDisponibles');

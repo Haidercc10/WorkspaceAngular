@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 
 export class OrdenTrabajo_Sellado_CorteService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
   getTipoSellado_Formato = (tipoSellado : number, formato : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
