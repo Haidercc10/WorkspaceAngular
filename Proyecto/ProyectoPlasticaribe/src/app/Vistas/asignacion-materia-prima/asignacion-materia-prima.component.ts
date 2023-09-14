@@ -83,7 +83,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
       OTImp : [''],
-      Solicitud : [null],
+      Solicitud : [''],
       FechaRetiro : [this.today, Validators.required],
       Maquina : [null, Validators.required],
       kgOt : [null, Validators.required],
@@ -277,7 +277,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que hará validaciones antes de realizar la asignación
   validarCamposVaciosRetirada(){
-    let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina
+    let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
+    console.log(maquina);
+    console.log(this.FormMateriaPrimaRetiro.value);
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
         if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
@@ -360,11 +362,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         });
         this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
       }
+     setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {        
         this.actualizar_MovimientosEntradas();
         this.crear_Salidas(asigncaion);
         setTimeout(() => this.asignacionExitosa(), 2000);
       }
+     }, 2000);
     }
   }
 
@@ -373,7 +377,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (!this.soloTintas && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
     else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
     else if(this.esSolicitud) this.validarEstadoSolicitud();
-    setTimeout(() => this.LimpiarCampos(), 1000); 
+    setTimeout(() => { this.LimpiarCampos(); }, 1000); 
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
