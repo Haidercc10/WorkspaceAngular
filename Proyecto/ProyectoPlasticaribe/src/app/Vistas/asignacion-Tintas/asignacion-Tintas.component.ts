@@ -40,7 +40,7 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  hora : any = moment().format('HH:mm:ss'); //Variable que se usará para llenar la hora actual
+  hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,

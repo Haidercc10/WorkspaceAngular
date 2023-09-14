@@ -59,7 +59,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   esSolicitud : boolean = false;
   arrayMatPrimas : any =  [];
-  hora : any = moment().format('HH:mm:ss');
+  hora : any = moment().format('H:mm:ss');
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,

@@ -58,7 +58,7 @@ export class Orden_MaquilaComponent implements OnInit {
   llave : string = 'pdf'; /** Variable que se utilizará como palabra clave para cargar el mensaje de Ver Pdf/Quitar MP/Eliminar MP de la tabla*/
   itemSeleccionado : any; /** Variable que tomará diferentes valores, generalmente id para mostrar el pdf o id del item a quitar o eliminar de la tabla. */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  hora : any = moment().format('HH:mm:ss'); //Variable que se usará para llenar la hora actual
+  hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,

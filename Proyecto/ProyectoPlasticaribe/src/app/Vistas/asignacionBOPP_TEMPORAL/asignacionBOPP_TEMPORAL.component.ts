@@ -40,7 +40,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   itemSeleccionado : any;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   kgOT : number; //Variable que va alamacenar la cantidad de kilos que se piden en la orden de trabajo
-  hora : any = moment().format('HH:mm:ss'); //Variable que va a almacenar la hora actual
+  hora : any = moment().format('H:mm:ss'); //Variable que va a almacenar la hora actual
   entradas : any = [];
   salidas : any = [];
   idAsignacion : number;
