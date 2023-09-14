@@ -180,14 +180,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
             this.cantRestante = this.kgOT - datos_asignacion;
-            this.infoOrdenTrabajo = [{
+            let info : any = {
               ot : ot,
               cliente : datos_procesos[index].clienteNom,
               item : datos_procesos[index].clienteItems,
               referencia : datos_procesos[index].clienteItemsNom,
               kg : this.kgOT,
               kgRestante : this.cantRestante,
-            }];
+              cantPedida : datos_procesos[index].datosotKg,
+              und : datos_procesos[index].ptPresentacionNom.trim(),
+            };
+            info.und == 'Kilo' ? info.cantPedida = datos_procesos[index].datosotKg : info.und == 'Unidad' ? info.cantPedida = datos_procesos[index].datoscantBolsa : info.und == 'Paquete' ? datos_procesos[index].datoscantBolsa : info.cantPedida = datos_procesos[index].datosotKg;
+            info.und == 'Kilo' ? info.und = 'Kg' : info.und == 'Unidad' ? info.und = 'Und' : info.und == 'Paquete' ? info.und = 'Paquete' : info.und = 'Kg'
+            this.infoOrdenTrabajo.pop();
+            this.infoOrdenTrabajo.push(info);
           });
           break;
         }
@@ -631,8 +637,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Tinta_Id: detalle.Tinta_Id,
       Bopp_Id: detalle.Bopp_Id,
       Cantidad_Salida: salidaReal,
-      Orden_Trabajo: this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].ot, 
+      Orden_Trabajo: this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].ot,
       Prod_Id: this.infoOrdenTrabajo[0] == undefined ? 1 : this.infoOrdenTrabajo[0].item,
+      Cant_PedidaOT: this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].cantPedida,
+      UndMed_Id: this.infoOrdenTrabajo[0] == undefined ? 'Kg' : this.infoOrdenTrabajo[0].und
     }
     info.Salidas.push(salidas);
   }
@@ -659,6 +667,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.materiasPrimasSeleccionadas[index].Salidas[i].Hora_Registro = this.hora;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Prod_Id = this.infoOrdenTrabajo[0].item;
           this.materiasPrimasSeleccionadas[index].Salidas[i].Orden_Trabajo = this.infoOrdenTrabajo[0].ot;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].Cant_PedidaOT = this.infoOrdenTrabajo[0].cantPedida;
+          this.materiasPrimasSeleccionadas[index].Salidas[i].UndMed_Id = this.infoOrdenTrabajo[0].und;
           this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
         }
       }

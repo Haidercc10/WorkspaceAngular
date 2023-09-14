@@ -425,6 +425,8 @@ export class AsignacionTintasComponent implements OnInit {
       Cantidad_Salida: salidaReal,
       Orden_Trabajo: 0, 
       Prod_Id : 1,
+      Cant_PedidaOT: 0,
+      UndMed_Id: 'N/E'
     }
     info.Salidas.push(salidas);
   }

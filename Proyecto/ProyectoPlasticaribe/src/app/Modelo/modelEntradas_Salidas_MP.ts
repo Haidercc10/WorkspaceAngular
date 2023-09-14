@@ -13,4 +13,6 @@ export interface modelEntradas_Salidas_MP {
     Cantidad_Salida : number;
     Orden_Trabajo : number;
     Prod_Id : number;
+    Cant_PedidaOT : number;
+    UndMed_Id : string;
 }

@@ -134,8 +134,13 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               item : item.clienteItems,
               referencia : item.clienteItemsNom,
               kg : item.datosotKg,
+              cantPedida : 0,
+              und : item.ptPresentacionNom.trim(),
             }
+            infoOT.und == 'Kilo' ? infoOT.cantPedida = item.datosotKg : infoOT.und == 'Unidad' ? infoOT.cantPedida = item.datoscantBolsa : infoOT.und == 'Paquete' ? item.datoscantBolsa : infoOT.cantPedida = item.datosotKg;
+            infoOT.und == 'Kilo' ? infoOT.und = 'Kg' : infoOT.und == 'Unidad' ? infoOT.und = 'Und' : infoOT.und == 'Paquete' ? infoOT.und = 'Paquete' : infoOT.und = 'Kg';
             this.ordenesTrabajo.push(infoOT);
+            console.log(this.ordenesTrabajo)
             this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
             this.cantidadKG = item.datosotKg + this.cantidadKG;
           } else if (item.estado == 4 || item.estado == 1) this.msj.mensajeAdvertencia(`Advertencia`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
@@ -157,7 +162,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 item : itemOT.clienteItems,
                 referencia : itemOT.clienteItemsNom,
                 kg : itemOT.datosotKg,
+                cantPedida : itemOT.datosotKg,
+                und : itemOT.ptPresentacionNom.trim(),
               }
+              infoOT.und == 'Kilo' ? infoOT.cantPedida = itemOT.datosotKg : infoOT.und == 'Unidad' ? infoOT.cantPedida = itemOT.datoscantBolsa : infoOT.und == 'Paquete' ? infoOT.cantPedida = itemOT.datoscantBolsa : infoOT.cantPedida = itemOT.datosotKg;
+              infoOT.und == 'Kilo' ? infoOT.und = 'Kg' : infoOT.und == 'Unidad' ? infoOT.und = 'Und' : infoOT.und == 'Paquete' ? infoOT.und = 'Paquete' : infoOT.und = 'Kg';
               this.ordenesTrabajo.push(infoOT);
               this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
               this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
@@ -392,6 +401,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           Cantidad_Salida: (salidaReal / this.ordenesTrabajo.length), 
           Orden_Trabajo: this.ordenesTrabajo[i].ot,
           Prod_Id : this.ordenesTrabajo[i].item,
+          Cant_PedidaOT: this.ordenesTrabajo[i].cantPedida,
+          UndMed_Id: this.ordenesTrabajo[i].und
         }
         this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`));
       }
