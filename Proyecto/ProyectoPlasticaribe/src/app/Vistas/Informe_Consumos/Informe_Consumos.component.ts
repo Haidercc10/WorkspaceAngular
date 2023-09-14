@@ -86,6 +86,8 @@ export class Informe_ConsumosComponent implements OnInit {
       OT : datos.ot,
       Item : datos.item,
       Referencia : datos.referencia,
+      CantPedidaOT : datos.cantidad_PedidaOT,
+      UndMedida : datos.medida,
       Material : datos.materialRealId,
       NombreMaterial : datos.nombreMaterial,
       CantRequerida : datos.cantidad_Requerida,
@@ -95,6 +97,7 @@ export class Informe_ConsumosComponent implements OnInit {
       ValoracionCantidad : datos.valoracionDCxPR,
       CostoReal : datos.costo_Real,
       CostoEstandar : datos.costo_Estandar,
+      
     }
     this.consumos.push(info);
   }
@@ -112,6 +115,8 @@ export class Informe_ConsumosComponent implements OnInit {
         OT : item.OT,
         Item : item.Item,
         Referencia : item.Referencia,
+        CantPedidaOT : item.CantPedidaOT,
+        UndMedida : item.UndMedida,
         CantRequerida : item.CantRequerida,
         CantEstandar : item.CantEstandar,
         DifCantidad : 0,

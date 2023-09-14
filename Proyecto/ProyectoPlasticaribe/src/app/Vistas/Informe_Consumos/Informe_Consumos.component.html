@@ -23,7 +23,7 @@
       [value]="salidas"
       [resizableColumns]="true"
       columnResizeMode="expand"
-      styleClass="p-datatable-sm"
+      styleClass="p-datatable-sm p-datatable-gridlines"
       responsiveLayout="scroll"
       [paginator]="true"
       [rows]="salidas.length"
@@ -39,6 +39,8 @@
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Fecha', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Referencia', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CantPedidaOT', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'UndMedida', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CantRequerida', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CantEstandar', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'DifCantidad', 'contains')"></th>
@@ -47,6 +49,12 @@
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CostoReal', 'contains')"></th>
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'CostoEstandar', 'contains')"></th>
         </tr>
+        <tr>
+          <th colspan="2"></th>
+          <th></th>
+          <th colspan="4" class="text-center"><b>Información de la Orden de Trabajo </b> </th>
+          <th colspan="7" class="text-center">Información de Consumo</th>
+        </tr>
         <!--Encabezado tabla 1-->
         <tr>
           <th></th>
@@ -54,11 +62,13 @@
           <th pSortableColumn="Fecha"><p-sortIcon field="Fecha"></p-sortIcon> Fecha</th>
           <th pSortableColumn="OT"><p-sortIcon field="OT"></p-sortIcon> OT</th>
           <th pSortableColumn="Referencia"><p-sortIcon field="Referencia"></p-sortIcon> Referencia</th>
+          <th pSortableColumn="CantPedidaOT"><p-sortIcon field="CantPedidaOT"></p-sortIcon> Cant. Pedida</th>
+          <th pSortableColumn="UndMedida"><p-sortIcon field="UndMedida"></p-sortIcon> Medida</th>
           <th pSortableColumn="CantRequerida"><p-sortIcon field="CantRequerida" pTooltip="Cantidad requerida"></p-sortIcon> Cant. Requerida</th>
           <th pSortableColumn="CantEstandar"><p-sortIcon field="CantEstandar" pTooltip="Cantidad estandar"></p-sortIcon> Cant. Estandar</th>
           <th pSortableColumn="DifCantidad" pTooltip="Diferencial de cantidad"><p-sortIcon field="DifCantidad"></p-sortIcon> Dif. Cantidad</th>
           <th pSortableColumn="PrecioPP" pTooltip="Precio con/sin promedio ponderado"><p-sortIcon field="PrecioPP"></p-sortIcon> Precio PP</th>
-          <th pSortableColumn="ValoracionCantidad" pTooltip="Valoración diferencial de cantidad"><p-sortIcon field="ValoracionCantidad"></p-sortIcon> Valor Dif. Cantidad</th>
+          <th pSortableColumn="ValoracionCantidad" pTooltip="Valoración diferencial de cantidad"><p-sortIcon field="ValoracionCantidad"></p-sortIcon> Variación de Cantidad</th>
           <th pSortableColumn="CostoReal"><p-sortIcon field="CostoReal"></p-sortIcon> Costo real</th>
           <th pSortableColumn="CostoEstandar"><p-sortIcon field="CostoEstandar"></p-sortIcon> Costo estandar</th>
         </tr>
@@ -73,6 +83,8 @@
           <td class="text-center"><b>{{item.Fecha}}</b></td>
           <td class="text-center">{{item.OT}}</td>
           <td>{{item.Referencia}}</td>
+          <td class="text-center">{{item.CantPedidaOT | number: '1.2-2'}}</td>
+          <td class="text-center">{{item.UndMedida}}</td>
           <td class="text-center">{{item.CantRequerida | number: '1.2-2'}}</td>
           <td class="text-center">{{item.CantEstandar | number: '1.2-2'}}</td>
           <td class="text-center">{{item.DifCantidad | number: '1.2-2'}}</td>
@@ -84,7 +96,7 @@
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
-          <td colspan="5" class="text-right">Totales</td>
+          <td colspan="7" class="text-right">Totales</td>
           <td class="text-center">{{valorCantRequerida() | number : '1.2-2'}}</td>
           <td colspan="3"></td>
           <td class="text-center">$ {{valorValoracionCantidad() | number : '1.2-2' }}</td>
@@ -95,13 +107,13 @@
       <!--Tabla 2-->
       <ng-template pTemplate="rowexpansion" let-item>
         <tr>
-          <td colspan="12" id="">
+          <td colspan="14" id="">
             <div class="p-3">
               <p-table
                 #dt2
                 [value]="item.Materiales"
                 dataKey="consecutivo"
-                styleClass="p-datatable-gridlines p-datatable-sm"
+                styleClass="p-datatable-sm p-datatable-gridlines"
                 [scrollable]="true"
                 scrollHeight="30rem">
                 <ng-template pTemplate="header">
