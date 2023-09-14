@@ -57,7 +57,7 @@ export class CertificadoCalidadComponent implements OnInit {
       Cantidad : [null, Validators.required],
       Presentacion : [null, Validators.required],
       Fecha_Orden : [null, Validators.required],
-      Observacion : [null],
+      Observacion : ['Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.'],
     });
   }
 
