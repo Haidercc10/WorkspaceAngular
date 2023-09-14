@@ -48,6 +48,8 @@ export class Recetas_ProductosComponent implements OnInit {
                               private tintasService : TintasService,
                                 private boppService : EntradaBOPPService,) {
 
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
     this.FormProductos = this.frmBuilder.group({
       Id : [null, Validators.required],
       Nombre : [null, Validators.required],
@@ -59,14 +61,23 @@ export class Recetas_ProductosComponent implements OnInit {
       Id : [null, Validators.required],
       Nombre : [null, Validators.required],
       Cantidad : [null, Validators.required],
-      Presentacion : [null, Validators.required],
+      Presentacion : ['Kg', Validators.required],
       Categoria : [null, Validators.required],
     });
   }
 
   ngOnInit() {
+    this.lecturaStorage();
+    this.consultarCategorias();
     this.obtenerMateriasPrimas();
     this.obtenerUnidadesMedida();
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   // Funcion que va a limpiar todo el modulo
@@ -74,6 +85,7 @@ export class Recetas_ProductosComponent implements OnInit {
     this.FormMateriales.reset();
     this.FormProductos.reset();
     this.materialesSeleccioados = [];
+    this.cargando = false;
   }
 
   // Funcion que va a limpiar el formulario de materiales
@@ -94,7 +106,7 @@ export class Recetas_ProductosComponent implements OnInit {
   
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
-    let id : number = this.FormMateriales.value.Id;
+    let id : number = this.FormMateriales.value.Nombre;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos => {
       datos.forEach(mp => {
         if (this.categoriasMP.includes(mp.categoria) || this.categoriasTintas.includes(mp.categoria) || this.categoriasBOPP.includes(mp.categoria)) {
@@ -116,44 +128,51 @@ export class Recetas_ProductosComponent implements OnInit {
 
   // Funcion que va a mostrar el nombre del producto
   cambiarNombreProducto(){
-    let id : number = this.FormProductos.value.Nombre;
-    let und : string = this.FormProductos.value.Presentacion;
-    this.FormProductos.patchValue({
-      Id : id,
-      Nombre : this.productos.find(x => x.id == id && x.presentacion == und).nombre,
-      Id_Existencia : this.productos.find(x => x.id == id && x.presentacion == und).id_Existencia,
-    });
+    this.unidadMedida = this.productos.map(x => x.presentacion);
+    setTimeout(() => {
+      let id : number = this.FormProductos.value.Id;
+      let nombre : number = this.FormProductos.value.Nombre;
+      let und : string = this.FormProductos.value.Presentacion;
+      this.FormProductos.patchValue({
+        Id : this.productos.find(x => (x.id == id || x.id == nombre) && x.presentacion == und).id,
+        Nombre : this.productos.find(x => (x.id == id || x.id == nombre) && x.presentacion == und).nombre,
+        Id_Existencia : this.productos.find(x => (x.id == id || x.id == nombre) && x.presentacion == und).id_Existencia,
+      });
+    }, 500);
   }
 
   // Funcion que va a encargarse de agregar los materiales seleccionados
   agregarMateriales(){
-    let categoria : number = this.FormMateriales.value.Categoria;
-    const data : any = {
-      Producto : this.FormProductos.value.Id,
-      Presentacion_Producto : this.FormProductos.value.Presentacion,
-      Existencia_Producto : this.FormProductos.value.Id_Existencia,
-      Material : this.FormMateriales.value.Id,
-      Materia_Prima : 84,
-      Tinta : 2001,
-      Bopp : 1,
-      Nombre : this.FormMateriales.value.Nombre,
-      Cantidad_Minima : this.FormMateriales.value.Cantidad,
-      Presentacion_Material : this.FormMateriales.value.Presentacion,
-    };
-    if (this.categoriasMP.includes(categoria)) data.Materia_Prima = data.Material;
-    else if (this.categoriasTintas.includes(categoria)) data.Tinta = data.Material;
-    else if (this.categoriasBOPP.includes(categoria)) data.Bopp = data.Material;
-    this.materialesSeleccioados.push(data);
+    if (this.FormProductos.valid) {
+      let categoria : number = this.FormMateriales.value.Categoria;
+      const data : any = {
+        Producto : this.FormProductos.value.Id,
+        Presentacion_Producto : this.FormProductos.value.Presentacion,
+        Existencia_Producto : this.FormProductos.value.Id_Existencia,
+        Material : this.FormMateriales.value.Id,
+        Materia_Prima : 84,
+        Tinta : 2001,
+        Bopp : 1,
+        Nombre : this.FormMateriales.value.Nombre,
+        Cantidad_Minima : this.FormMateriales.value.Cantidad,
+        Presentacion_Material : this.FormMateriales.value.Presentacion,
+      };
+      if (this.categoriasMP.includes(categoria)) data.Materia_Prima = data.Material;
+      else if (this.categoriasTintas.includes(categoria)) data.Tinta = data.Material;
+      else if (this.categoriasBOPP.includes(categoria)) data.Bopp = data.Material;
+      this.materialesSeleccioados.push(data);
+      this.limpiarFormMateriales(); 
+      this.FormMateriales.patchValue({ Presentacion : 'Kg', });
+    } else this.msj.mensajeAdvertencia(`¡Debe seleccionar el producto al que se asociará la materia prima!`);
   }
 
   // Funcion que va a encargarse de quitar los materiales seleccionados
-  quitarMateriales(id : number){
-    this.materialesSeleccioados.splice(this.materialesSeleccioados.findIndex(x => x.Material == id), 1);
-  }
+  quitarMateriales = (id : number) => this.materialesSeleccioados.splice(this.materialesSeleccioados.findIndex(x => x.Material == id), 1);
 
   // Funcion que va a encargarse de guardar la información de la receta
   guardarReceta(){
     let count : number = 0;
+    this.cargando = true;
     this.materialesSeleccioados.forEach(material => {
       const data : modelProducto_MatPrima = {
         Prod_Id: material.Producto,
@@ -169,7 +188,10 @@ export class Recetas_ProductosComponent implements OnInit {
       };
       this.prodMaterialesService.Post(data).subscribe(() => {
         count++;
-        if (count == this.materialesSeleccioados.length) this.msj.mensajeConfirmacion('¡Se ha registrado la receta con éxito!');
+        if (count == this.materialesSeleccioados.length) {
+          this.msj.mensajeConfirmacion('¡Se ha registrado la receta con éxito!');
+          this.limpiarTodo();
+        }
       }, () => this.msj.mensajeError('¡No se ha podido registrar la receta!'), () => this.cargando = false);
     });
   }

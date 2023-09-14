@@ -45,6 +45,8 @@ export class MateriaPrimaService {
 
   GetInfoMovimientosEntradas = (codigo : string, tipoMov : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosEntradas/${codigo}/${tipoMov}`);
 
+  GetMateriales_Receta = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/getMateriales_Receta');
+
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
