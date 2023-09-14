@@ -179,6 +179,7 @@ import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Con
 import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
 import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
 import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
+import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 
 @NgModule({
   declarations: [
@@ -281,7 +282,8 @@ import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/K
     Informe_ConsumosComponent,
     Costos_CajaMenorComponent, 
     CrearTipoSalida_CajaMenorComponent,
-    Kardex_MateriasPrimasComponent
+    Kardex_MateriasPrimasComponent,
+    Recetas_ProductosComponent
   ],
 
   imports: [

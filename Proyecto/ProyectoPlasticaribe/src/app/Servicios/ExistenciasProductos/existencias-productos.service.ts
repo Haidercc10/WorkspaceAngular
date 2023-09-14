@@ -21,6 +21,8 @@ export class ExistenciasProductosService {
 
   IdProductoPresentacionInventario = (id : any, presentacion : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacionInventario/${id}/${presentacion}`);
 
+  GetInfoProducto = (producto : string) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/getInfoProducto/${producto}`);
+
   srvActualizar = (id:number|String, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`, datos_Productos);
 
   srvActualizarProductoPresentacion = (prod : any, presentacion : any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionProducto/${prod}/${presentacion}`, datos_Productos);
