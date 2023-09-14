@@ -1,0 +1,36 @@
+<!-- PRODUCTOS -->
+<form [formGroup]="FormProductos">
+  <div class="row g-4">
+      <!-- Id Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+        <span class="p-float-label">
+          <p-inputNumber formControlName="Id" inputId="Id_Producto" [useGrouping]="false" tooltipPosition="top" [required]="true" [readonly]="true"></p-inputNumber>
+          <label for="Id_Producto">Id Producto</label>
+        </span>
+      </div>
+
+      <!-- Nombre Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+        <span class="p-float-label">
+          <input formControlName="Nombre" autocomplete="off" id="Nombre" list="productos" type="text" (keyup)="buscarProductos()" (change)="cambiarNombreProducto()" pInputText required/>
+          <datalist id="productos">
+            <option value={{item.id}} *ngFor="let item of productos">{{item.nombre}}</option>
+          </datalist>
+          <label for="Nombre">Producto</label>
+        </span>
+      </div>
+
+      <!-- Presentación de Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+        <span class="p-float-label">
+          <p-dropdown formControlName="Presentacion" inputId="Presentacion" [autoDisplayFirst]="false" [options]="unidadMedida"></p-dropdown>
+          <label for="Presentacion">Presentación</label>
+        </span>
+      </div>
+  </div>
+</form>
+
+<!-- MATERIAS PRIMAS -->
+<form [formGroup]="FormMateriales">
+
+</form>
