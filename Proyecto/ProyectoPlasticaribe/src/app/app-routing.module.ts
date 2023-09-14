@@ -64,7 +64,6 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
-import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
 import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
 
@@ -97,7 +96,7 @@ export const routes: Routes = [
   {path: 'solicitud-materia-prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Materia Prima'}, component: SolicitudMateriaPrimaComponent},
   {path: 'reporte-solicitudes-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Materia Prima'}, component: Reporte_SolicitudesMPComponent},
 
-  {path: 'kardex-materias-primas', canActivate: [VistasPermisosGuard], data: {nombre: 'Informe de Consumos'}, component: Kardex_MateriasPrimasComponent},
+  {path: 'kardex-materias-primas', canActivate: [VistasPermisosGuard], data: {nombre: 'Kardex Materia Prima'}, component: Kardex_MateriasPrimasComponent},
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
   {path: 'preingreso-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Pre Ingreso Extrusión'}, component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion
