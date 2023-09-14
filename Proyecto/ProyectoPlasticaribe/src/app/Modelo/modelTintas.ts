@@ -11,4 +11,5 @@ export interface modelTintas{
   Tinta_InvInicial : number;
   Tinta_FechaIngreso : any;
   Tinta_Hora : string;
+  Tinta_PrecioEstandar? : number;
 }

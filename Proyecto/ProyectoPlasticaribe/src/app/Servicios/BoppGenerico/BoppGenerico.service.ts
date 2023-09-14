@@ -20,4 +20,6 @@ export class BoppGenericoService {
   obtenerUltimoId = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Bopp_Generico/`);
 
   srvGuardar = (data : modelBoppGenerico): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Bopp_Generico', data);
+
+  PutPrecioEstandar = (id : number, precioEstandar : number) => this.http.put(this.rutaPlasticaribeAPI + `/Bopp_Generico/putPrecioEstandar/${id}/${precioEstandar}`, precioEstandar);
 }
