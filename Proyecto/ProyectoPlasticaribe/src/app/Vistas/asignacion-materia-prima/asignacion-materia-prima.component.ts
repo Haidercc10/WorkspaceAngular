@@ -83,7 +83,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
       OTImp : [''],
-      Solicitud : [''],
+      Solicitud : [null],
       FechaRetiro : [this.today, Validators.required],
       Maquina : [null, Validators.required],
       kgOt : [null, Validators.required],
@@ -320,7 +320,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Usua_Id : this.storage_Id,
       Estado_OrdenTrabajo : 14,
       AsigMp_Hora : moment().format('H:mm:ss'),
-      SolMpExt_Id : this.FormMateriaPrimaRetiro.value.Solicitud == null ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud,
+      SolMpExt_Id : this.FormMateriaPrimaRetiro.value.Solicitud == null || this.FormMateriaPrimaRetiro.value.Solicitud == "" ? 1 : this.FormMateriaPrimaRetiro.value.Solicitud,
     }
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe((datos) => this.obtenerProcesoId(datos.asigMp_Id), () => {
       this.mensajeService.mensajeError(`¡Error!`, `¡Error al crear la asignación de materia prima!`);
