@@ -384,7 +384,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
               break;
             } else if (cantRestante > 0) {
               datosCostosFinales[j].cantidadFinal = cantRestante;
-              datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal))).toFixed(2);
+              datosCostosFinales[j].costoFinal = (parseFloat(datosCostosFinales[j].precioFinal) * (parseFloat(datosCostosFinales[j].cantidadFinal)));
               break;
             } else if (cantRestante < 0) {
               let restante : number = cantidadSalida * -1;
