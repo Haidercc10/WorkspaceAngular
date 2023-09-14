@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -31,13 +31,15 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   salidasRealizadas : any [] = [];
   modalKardex : boolean = false;
   datosKardex : any [] = [];
+  @ViewChild (Informe_ConsumosComponent) informeConsumos : Informe_ConsumosComponent; //Variable que se usará para almacenar la tabla de la vista)
+
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder  : FormBuilder,
                   private msg : MensajesAplicacionService,
                     private movEntradasService : Movimientos_Entradas_MPService,
                       private salidasMaterialService : Entradas_Salidas_MPService,
-                        private informeConsumos : Informe_ConsumosComponent,) {
+                        ) {
                     
     this.FormFiltros = this.frmBuilder.group({
       RangoFechas : [],
