@@ -614,7 +614,7 @@
           </p-table>
         </div>
       </div>
-      </p-tabPanel>
+    </p-tabPanel>
 
   </p-tabView>
 </p-card>
@@ -720,8 +720,16 @@
             </span>
           </div>
 
+          <!-- Precio Estandar -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="PrecioEstandar" inputId="Precio" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+              <label for="Precio">Precio Estandar</label>
+            </span>
+          </div>
+
           <!-- Nombre BOPP Generico -->
-          <div class="col-md-12" *ngIf="esBopp">
+          <div class="col-md-6" *ngIf="esBopp">
             <span class="p-float-label">
               <input formControlName="BoppGenerico" id="BoppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas editar!" [required]="esBopp"/>
               <datalist id="BoppGen">

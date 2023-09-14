@@ -116,6 +116,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Stock : [null, Validators.required],
       UndMed : [null, Validators.required],
       Precio : [null, Validators.required],
+      PrecioEstandar : [null, Validators.required],
       Micras : [null, Validators.required],
       BoppGenerico : [null],
       IdBoppGenerico : [null]
@@ -178,6 +179,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Diferencia : data.diferencia,
         UndCant : data.presentacion,
         PrecioUnd : data.precio,
+        PrecioEstandar : data.precioEstandar,
         SubTotal : data.subTotal,
         Categoria : data.categoria,
         Categoria_Id : data.categoria_Id
@@ -540,7 +542,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Stock : data.Cant,
       UndMed : data.UndCant,
       Precio : data.PrecioUnd,
-      Micras : 0
+      Micras : 0,
+      PrecioEstandar : data.PrecioEstandar,
     });
     if (this.categoriasBOPP.includes(this.FormEdicionMateriaPrima.value.Categoria)){
       this.esBopp = true;
@@ -568,7 +571,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         UndMed_Id: this.FormEdicionMateriaPrima.value.UndMed,
         CatMP_Id: this.FormEdicionMateriaPrima.value.Categoria,
         MatPri_Precio: this.FormEdicionMateriaPrima.value.Precio,
-        TpBod_Id: 4
+        TpBod_Id: 4,
+        MatPri_PrecioEstandar : this.FormEdicionMateriaPrima.value.PrecioEstandar,
       }
       this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
         this.consultarInventario();
@@ -597,6 +601,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           Tinta_InvInicial: data.tinta_InvInicial,
           Tinta_FechaIngreso: data.tinta_FechaIngreso,
           Tinta_Hora: data.tinta_Hora,
+          Tinta_PrecioEstandar : this.FormEdicionMateriaPrima.value.PrecioEstandar,
         }
         this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
           this.consultarInventario();
@@ -635,6 +640,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             BOPP_CodigoDoc: data[i].bopP_CodigoDoc,
             BOPP_TipoDoc: data[i].bopP_TipoDoc,
           }
+          this.servicioBoppGen.PutPrecioEstandar(this.idBoppGenerico, this.FormEdicionMateriaPrima.value.PrecioEstandar).subscribe();
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
             this.consultarInventario();
             this.msj.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);

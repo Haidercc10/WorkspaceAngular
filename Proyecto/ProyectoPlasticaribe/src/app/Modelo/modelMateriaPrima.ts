@@ -7,4 +7,5 @@ export interface modelMateriaPrima{
   CatMP_Id : number;
   MatPri_Precio : number;
   TpBod_Id : number;
+  MatPri_PrecioEstandar? : number;
 }
