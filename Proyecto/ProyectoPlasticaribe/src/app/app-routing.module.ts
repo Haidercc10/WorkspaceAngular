@@ -97,7 +97,7 @@ export const routes: Routes = [
   {path: 'solicitud-materia-prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Materia Prima'}, component: SolicitudMateriaPrimaComponent},
   {path: 'reporte-solicitudes-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Materia Prima'}, component: Reporte_SolicitudesMPComponent},
 
-  {path: 'kardex-materias-primas', canActivate: [VistasPermisosGuard], data: {nombre: 'Informe de Consumos'}, component: Kardex_MateriasPrimasComponent},
+  {path: 'kardex-materias-primas', canActivate: [VistasPermisosGuard], data: {nombre: 'Kardex Materia Prima'}, component: Kardex_MateriasPrimasComponent},
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
   {path: 'preingreso-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Pre Ingreso Extrusión'}, component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion

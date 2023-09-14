@@ -1,5 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild, inject } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
@@ -35,21 +34,12 @@ export class Informe_ConsumosComponent implements OnInit {
   @ViewChild('dt2') dt2: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente
   salidas : any = []; //Variable que se usará para almacenar los datos de los consumos
   materiales : any = []; //Variable que se usará para almacenar los datos de la materia prima
-  formFiltros : any = []; //Variable que se usará para almacenar los datos del formulario de filtros
   materiasPrimas : any = []; //Variable que se usará para almacenar los datos de la materia prima
 
   constructor(private AppComponent : AppComponent, 
                 private salidasService : Entradas_Salidas_MPService,
-                  private frmBuilder : FormBuilder,
-                    private movEntradasService : Movimientos_Entradas_MPService,
-                      private msjs : MensajesAplicacionService) {
-
-    this.formFiltros = this.frmBuilder.group({ 
-      rangoFechas : [],
-      material : null,
-      NombreMaterial : null,
-    });           
-  }
+                  private movEntradasService : Movimientos_Entradas_MPService,
+                    private msjs : MensajesAplicacionService) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -71,21 +61,7 @@ export class Informe_ConsumosComponent implements OnInit {
   obtenerMateriales = () => this.movEntradasService.GetInventarioMateriales().subscribe(datos => this.materiasPrimas = datos);
 
   // Funcion que va a limpiar el formulario
-  limpiarCampos() {
-    this.formFiltros.reset();
-    this.load = false;
-  }
-
-  // Funcion que va a cambiar el nombre del material en el html
-  cambiarNombreMaterial(){
-    let material : number = this.formFiltros.value.NombreMaterial;
-    let nombreMaterial : string = this.materiasPrimas.find(x => x.id_Materia_Prima == material).nombre_Materia_Prima;
-    //console.log(nombreMaterial)
-    this.formFiltros.patchValue({
-      material : material,
-      NombreMaterial : nombreMaterial,
-    });
-  }
+  limpiarCampos = () => this.load = false;
 
   //Función donde se consultarán los consumos por fecha
   consultar(fecha1, fecha2, material, nombreMaterial){
@@ -96,12 +72,9 @@ export class Informe_ConsumosComponent implements OnInit {
       this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
         if(data.length > 0){
           this.load = true;
-          for(let i = 0; i < data.length; i++){
-            this.cargarConsumos(data[i]);
-          }
-          setTimeout(() => { this.mostrarDetalleConsumo(); }, 2000);
+          data.forEach(consumo => this.cargarConsumos(consumo));
         } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron consumos del material ${nombreMaterial} en las fechas seleccionadas!`);  
-      });
+      }, null, () => this.mostrarDetalleConsumo());
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un material!`);
     
   }

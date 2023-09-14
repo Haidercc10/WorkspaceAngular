@@ -18,7 +18,8 @@ import { Informe_ConsumosComponent } from '../Informe_Consumos/Informe_Consumos.
 })
 export class Kardex_MateriasPrimasComponent implements OnInit {
 
-  table : Table
+  @ViewChild('dt_costos') dt_costos: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente
+  @ViewChild(Informe_ConsumosComponent) informeConsumos : Informe_ConsumosComponent; // Tabla que contendrá la información de la tabla inicialmente
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -31,15 +32,12 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   salidasRealizadas : any [] = [];
   modalKardex : boolean = false;
   datosKardex : any [] = [];
-  @ViewChild (Informe_ConsumosComponent) informeConsumos : Informe_ConsumosComponent; //Variable que se usará para almacenar la tabla de la vista)
-
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder  : FormBuilder,
                   private msg : MensajesAplicacionService,
                     private movEntradasService : Movimientos_Entradas_MPService,
-                      private salidasMaterialService : Entradas_Salidas_MPService,
-                        ) {
+                      private salidasMaterialService : Entradas_Salidas_MPService,) {
                     
     this.FormFiltros = this.frmBuilder.group({
       RangoFechas : [],
@@ -68,6 +66,9 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     this.FormFiltros.reset();
     this.cargando = false;
   }
+
+  //Funcion que se usará para aplicar los filtros de la tabla
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt_costos!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a cambiar el nombre del material en el html
   cambiarNombreMaterial(){

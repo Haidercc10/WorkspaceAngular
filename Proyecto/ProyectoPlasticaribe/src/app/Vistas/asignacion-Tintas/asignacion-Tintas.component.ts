@@ -179,8 +179,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.cargar_Entradas(productoExt);
       this.ArrayMateriaPrima.push(productoExt);
-      console.log(this.ArrayMateriaPrima)
-      setTimeout(() => { this.FormMateriaPrima.reset(); }, 1000);
+      setTimeout(() => this.FormMateriaPrima.reset(), 1000);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡La cantidad a asignar no debe superar lo que hay en stock!');
   }
 
@@ -324,13 +323,10 @@ export class AsignacionTintasComponent implements OnInit {
         Tinta_FechaIngreso : datos_tinta.tinta_FechaIngreso,
         Tinta_Hora : datos_tinta.tinta_Hora,
       }
-      this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro completado con exito!`);
-        setTimeout(() => { this.limpiarTodosLosCampos(); }, 800); 
-      }, error => {
+      this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro completado con exito!`), error => {
         this.mensajeService.mensajeError(`¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!`, error.message);
         this.load = true;
-      });
+      }, () => this.limpiarTodosLosCampos());
     }, error => {
       this.mensajeService.mensajeError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message);
       this.load = true;
@@ -392,21 +388,18 @@ export class AsignacionTintasComponent implements OnInit {
               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
               detalle.Cantidad_Disponible = 0;
               detalle.Estado_Id = 5;
-              console.log(salidaReal)
             } else if(info.Cantidad2 == detalle.Cantidad_Disponible) {
               salidaReal = info.Cantidad2;
               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
               detalle.Cantidad_Disponible = 0;
               detalle.Estado_Id = 5;
               info.Cantidad2 = 0;
-              console.log(salidaReal)
             } else if(info.Cantidad2 < detalle.Cantidad_Disponible) {
               salidaReal = info.Cantidad2;
               detalle.Cantidad_Asignada += info.Cantidad2;
               detalle.Cantidad_Disponible -= info.Cantidad2;
               detalle.Estado_Id = 19;
               info.Cantidad2 = 0;
-              console.log(salidaReal)
             }
             this.cargar_Salidas(detalle, info, salidaReal);
             info.EntradasDisponibles.push(detalle);
@@ -441,8 +434,8 @@ export class AsignacionTintasComponent implements OnInit {
     if(this.ArrayMateriaPrima.length > 0) {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         for (let i = 0; i < this.ArrayMateriaPrima[index].EntradasDisponibles.length; i++) {
-         this.srvMovEntradasMP.Put(this.ArrayMateriaPrima[index].EntradasDisponibles[i].Id, this.ArrayMateriaPrima[index].EntradasDisponibles[i]).subscribe(data => {}, 
-         error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
+         this.srvMovEntradasMP.Put(this.ArrayMateriaPrima[index].EntradasDisponibles[i].Id, this.ArrayMateriaPrima[index].EntradasDisponibles[i]).subscribe(null, 
+         () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
         }
       }
     }
@@ -456,8 +449,7 @@ export class AsignacionTintasComponent implements OnInit {
           this.ArrayMateriaPrima[index].Salidas[i].Codigo_Salida = id;
           this.ArrayMateriaPrima[index].Salidas[i].Fecha_Registro = this.today;
           this.ArrayMateriaPrima[index].Salidas[i].Hora_Registro = this.hora;
-          this.srvMovSalidasMP.Post(this.ArrayMateriaPrima[index].Salidas[i]).subscribe(data => {}, 
-          error => { this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`); });
+          this.srvMovSalidasMP.Post(this.ArrayMateriaPrima[index].Salidas[i]).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
         }
       }
     }
@@ -487,8 +479,7 @@ export class AsignacionTintasComponent implements OnInit {
         Hora_Entrada: this.hora,
         Precio_EstandarUnitario: data.tinta_PrecioEstandar
       }
-      this.srvMovEntradasMP.Post(registro).subscribe(data => {}, 
-      error => { this.mensajeService.mensajeError(`Error`, `No fue posible agregar el registro de la creación de tinta en movimientos de entrada MP!`); });
+      this.srvMovEntradasMP.Post(registro).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible agregar el registro de la creación de tinta en movimientos de entrada MP!`));
     });  
   }
 }  
