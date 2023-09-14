@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -7,11 +7,16 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
 
+@Injectable({
+  providedIn: 'root'
+})
+
 @Component({
   selector: 'app-Informe_Consumos',
   templateUrl: './Informe_Consumos.component.html',
   styleUrls: ['./Informe_Consumos.component.css']
 })
+
 export class Informe_ConsumosComponent implements OnInit {
   load : boolean = false; //Variable para controlar la carga de la pagina
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -83,13 +88,9 @@ export class Informe_ConsumosComponent implements OnInit {
   }
 
   //Función donde se consultarán los consumos por fecha
-  consultar(){
+  consultar(fecha1, fecha2, material, nombreMaterial){
     this.consumos = [];
     this.salidas = [];
-    let fecha1 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[0].length > 0 && this.formFiltros.value.rangoFechas[0] != null) ? moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
-    let fecha2 : any = (this.formFiltros.value.rangoFechas != undefined && this.formFiltros.value.rangoFechas[1].length > 0 && this.formFiltros.value.rangoFechas[1] != null) ? moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
-    let material : number = this.formFiltros.value.material;
-    let nombreMaterial : number = this.formFiltros.value.NombreMaterial;
 
     if(material != null) {
       this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
@@ -107,6 +108,7 @@ export class Informe_ConsumosComponent implements OnInit {
 
   //Función que cargará el array de consumos que contendrá todos los consumos del mes.
   cargarConsumos(datos : any){
+    console.log(1)
     let info : any = {
       Fecha : `${datos.fecha.replace('T00:00:00', '')}`,
       OT : datos.ot,
