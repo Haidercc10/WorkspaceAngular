@@ -363,7 +363,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             }
             this.actualizar_MovEntradasMP(detalle);
             this.guardar_Salidas(detalle, salidaReal);
-            //break;
           }
         }
       }); 
@@ -372,14 +371,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   //Función que actualizará la información de los movimientos de entrada de la materia prima.
   actualizar_MovEntradasMP(detalle : any){
-    let esError : boolean = false;
-    this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(data => { esError = false; }, error => { esError = true; });
-    if(esError) this.msj.mensajeError(`Error`, `No fue posible actualizar la información de la entrada de la materia prima, por favor verifique!`); 
+    this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.msj.mensajeError(`Error`, `No fue posible actualizar la información de la entrada de la materia prima, por favor verifique!`));
   }
 
   //Función que colocará la información de la salida de la materia prima en el array de salidas. 
   guardar_Salidas(info : any, salidaReal : number){
-    let esError : boolean = false;
     if(this.ordenesTrabajo.length > 0) {
       for (let i = 0; i < this.ordenesTrabajo.length; i++) {
         let salidas : modelEntradas_Salidas_MP = {
@@ -397,9 +393,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           Orden_Trabajo: this.ordenesTrabajo[i].ot,
           Prod_Id : this.ordenesTrabajo[i].item,
         }
-        this.srvMovSalidasMP.Post(salidas).subscribe(data => {esError = false}, error => { esError = true; });
+        this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`));
       }
     }
-    if(esError) this.msj.mensajeError(`Error`, `No fue posible crear la salida de la BOPP, por favor verifique!`);
   }
 }

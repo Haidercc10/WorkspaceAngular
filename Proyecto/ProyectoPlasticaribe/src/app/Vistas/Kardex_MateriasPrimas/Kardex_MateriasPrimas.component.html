@@ -83,6 +83,17 @@
         <th colspan="9" class="text-center">COMPRAS</th>
       </tr>
       <tr>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cantComprada', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'precioCompra', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'precioEstandar', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'diffPrecio', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costoRealMaterial', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costoEstandarMaterial', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'variacionPrecio', 'contains')"></th>
+        <th class="text-center" rowspan="2">Ver Kardex</th>
+      </tr>
+      <tr>
         <th class="text-center" pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha</th>
         <th class="text-center" pSortableColumn="cantComprada"><p-sortIcon field="cantComprada"></p-sortIcon> Cantidad Entrada</th>
         <th class="text-center" pSortableColumn="precioCompra"><p-sortIcon field="precioCompra"></p-sortIcon> Precio Entrada</th>
@@ -91,7 +102,6 @@
         <th class="text-center" pSortableColumn="costoRealMaterial"><p-sortIcon field="costoRealMaterial"></p-sortIcon> Costo Entrada</th>
         <th class="text-center" pSortableColumn="costoEstandarMaterial"><p-sortIcon field="costoEstandarMaterial"></p-sortIcon> Costo Estandar</th>
         <th class="text-center" pSortableColumn="variacionPrecio"><p-sortIcon field="variacionPrecio"></p-sortIcon> Variación de Precios</th>
-        <th class="text-center">Ver Kardex</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
