@@ -108,7 +108,6 @@ export class Informe_ConsumosComponent implements OnInit {
 
   //Función que cargará el array de consumos que contendrá todos los consumos del mes.
   cargarConsumos(datos : any){
-    console.log(1)
     let info : any = {
       Fecha : `${datos.fecha.replace('T00:00:00', '')}`,
       OT : datos.ot,
