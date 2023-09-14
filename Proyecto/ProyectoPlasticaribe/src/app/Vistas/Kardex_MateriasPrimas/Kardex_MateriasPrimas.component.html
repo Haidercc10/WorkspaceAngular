@@ -1,0 +1,184 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+  
+<!--Espacio para el titulo-->
+<div class="contain">
+    <div class="container-fluid">
+        <div class="mb-4 Titulo">
+            <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" id="nomina"> Informe de Compras</h2>
+        </div>
+        <!--Linea-->
+        <div class="mb-4">
+            <hr class="colorLinea">
+        </div>
+    </div>
+</div>
+
+<p-card>
+
+  <div class="mb-4">
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
+  </div>
+
+  <!-- FILTROS DE BUSQUEDA -->
+  <form [formGroup]="FormFiltros" (ngSubmit)="buscarComprasRealizadas()">
+    <div class="row g-4 mb-4">
+      <!-- RANGO FECHAS -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+        <span class="p-float-label" id="rango-fechas">
+          <p-calendar formControlName="RangoFechas" id="rango" inputId="FechaInicial" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+          <label for="FechaInicial">Rango de Fechas</label>
+        </span>
+    </div>
+
+      <!-- MATERIALES -->
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+        <span class="p-float-label">
+          <input formControlName="NombreMaterial" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMaterial()"/>
+          <datalist id="materiaprima">
+            <option value={{item.id_Materia_Prima}} *ngFor="let item of materiales">{{item.nombre_Materia_Prima}}</option>
+          </datalist>
+          <label for="Orden">Materia Prima</label>
+        </span>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-2">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton label="Exportar Excel" tooltipPosition="bottom" pRipple type="button" icon="pi pi-file-excel" class="p-button-success mr-2" (click)="exportarExcel()"></button>
+      </div>
+    </div>
+  </form>    
+
+  <hr>
+  <div class="mb-4">
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Compras Realizadas</h2>
+  </div>
+
+  <!-- TABLA DE COSTOS -->
+  <p-table
+    #dt_costos
+    dataKey="fecha"
+    [value]="comprasRealizadas"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
+    responsiveLayout="scroll"
+    [rowHover]="true"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    *ngIf="!cargando">
+    <ng-template pTemplate="header">
+      <tr>
+        <th colspan="9" class="text-center">COMPRAS</th>
+      </tr>
+      <tr>
+        <th class="text-center" pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha</th>
+        <th class="text-center" pSortableColumn="cantComprada"><p-sortIcon field="cantComprada"></p-sortIcon> QR(kg)</th>
+        <th class="text-center" pSortableColumn="precioCompra"><p-sortIcon field="precioCompra"></p-sortIcon> PR($/kg)</th>
+        <th class="text-center" pSortableColumn="precioEstandar"><p-sortIcon field="precioEstandar"></p-sortIcon> PS($/kg)</th>
+        <th class="text-center" pSortableColumn="diffPrecio"><p-sortIcon field="diffPrecio"></p-sortIcon> ∆P($/kg)</th>
+        <th class="text-center" pSortableColumn="costoRealMaterial"><p-sortIcon field="costoRealMaterial"></p-sortIcon> CR($)</th>
+        <th class="text-center" pSortableColumn="costoEstandarMaterial"><p-sortIcon field="costoEstandarMaterial"></p-sortIcon> CS($)</th>
+        <th class="text-center" pSortableColumn="variacionPrecio"><p-sortIcon field="variacionPrecio"></p-sortIcon> VP($)</th>
+        <th class="text-center">Ver Kardex</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+      <tr>
+        <td class="text-center">{{data.fecha}}</td>
+        <td class="text-center">{{data.cantComprada | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.precioCompra | number : '1.2-2'}}</td>
+        <td class="text-center azul">{{data.precioEstandar | number : '1.2-2'}}</td>
+        <td class="text-center verde">{{data.diffPrecio | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.costoRealMaterial | number : '1.2-2'}}</td>
+        <td class="text-center azul">{{data.costoEstandarMaterial | number : '1.2-2'}}</td>
+        <td class="text-center verde">{{data.variacionPrecio | number : '1.2-2'}}</td>
+        <td class="text-center"><p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-success" (click)="cargarKardex()"></p-button></td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td class="text-center">Totales</td>
+        <td class="text-center">{{calcularTotalCantidadComprada() | number : '1.2-2'}}</td>
+        <td colspan="3"></td>
+        <td class="text-center">{{calcularTotalCostoRealMaterial() | number : '1.2-2'}}</td>
+        <td class="text-center">{{calcularTotalCostoEstandarMaterial() | number : '1.2-2'}}</td>
+        <td class="text-center">{{calcularTotalVariacionPrecio() | number : '1.2-2'}}</td>
+        <td></td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!--  -->
+  <app-Informe_Consumos></app-Informe_Consumos>
+</p-card>
+
+<p-dialog header="KÁRDEX CON DATOS ESTÁNDARES Y REALES" [(visible)]="modalKardex" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
+    <div class="p-2">
+        <p-table
+            #dt_kardex
+            rowGroupMode="rowspan" 
+            groupRowsBy="fecha" 
+            sortField="fecha" 
+            sortMode="single"
+            dataKey="fecha"
+            [value]="datosKardex"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            *ngIf="!cargando">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="text-center" rowspan="3">Fecha</th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-center">ENTRADAS</th>
+                    <th colspan="3" class="text-center">SALIDAS</th>
+                    <th colspan="3" class="text-center">SALDO</th>
+                </tr>
+                <tr>
+                    <th class="text-center">QR(kg)</th>
+                    <th class="text-center">(PS + ∆P = PR)($/kg)</th>
+                    <th class="text-center">(CR = CS + VP)($)</th>
+                    <th class="text-center">(QR y QS)kg</th>
+                    <th class="text-center">PR($/kg)</th>
+                    <th class="text-center">(CR = CS + VQ)($)</th>
+                    <th class="text-center">QR(kg)</th>
+                    <th class="text-center">PR($/kg)</th>
+                    <th class="text-center">CR($)</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-rowgroup="rowgroup" let-rowspan="rowspan">
+                <tr>
+                    <td class="text-center" *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                        <span class="font-bold">{{data.fecha}}</span>
+                    </td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.precioEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoEntrada | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.cantSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoSalida | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantidadFinal | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioFinal | number : '1.2-2'}}</td>
+                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.costoFinal | number : '1.2-2'}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</p-dialog>
