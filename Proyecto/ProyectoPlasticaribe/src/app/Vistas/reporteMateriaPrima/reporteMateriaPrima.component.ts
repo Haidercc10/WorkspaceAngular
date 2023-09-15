@@ -18,6 +18,10 @@ import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
+import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
+import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -96,6 +100,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   boppsGenericos : any = [];  /** Variable que contendrá los bopp genericos. */
   esBopp : boolean = false; /** Variable que definirá si la materia prima que se está editando es bopp */
   idBoppGenerico : number = 1;
+  materialSeleccionado : any = {};
+  hora : any = moment().format('H:mm:ss');
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
@@ -106,7 +112,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                             private frmBuilder : FormBuilder,
                               private undMedidaService : UnidadMedidaService,
                                 private msj : MensajesAplicacionService,
-                                  private servicioBoppGen : BoppGenericoService) {
+                                  private servicioBoppGen : BoppGenericoService, 
+                                    private srvMovEntradasMP : Movimientos_Entradas_MPService, 
+                                      private srvSalidasMP : Entradas_Salidas_MPService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormEdicionMateriaPrima = this.frmBuilder.group({
       Id : [null, Validators.required],
@@ -114,6 +122,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Categoria : [null, Validators.required],
       Ancho : [null, Validators.required],
       Stock : [null, Validators.required],
+      Stock2 : [null],
       UndMed : [null, Validators.required],
       Precio : [null, Validators.required],
       PrecioEstandar : [null, Validators.required],
@@ -159,7 +168,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data : any){
-    if (data.id != 84 && data.id != 2001 && data.id != 88 && data.id != 89 && data.id != 2072){
+    if (data.id == 2113){
       this.valorTotal = this.valorTotal + data.precio * data.stock;
       this.cantInicial += data.inicial;
       this.cantEntrante += data.entrada;
@@ -176,6 +185,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Entrada : data.entrada,
         Salida : data.salida,
         Cant : data.stock,
+        Cant2 : data.stock,
         Diferencia : data.diferencia,
         UndCant : data.presentacion,
         PrecioUnd : data.precio,
@@ -532,6 +542,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data : any){
+    this.materialSeleccionado = data;
+    console.log(data);
     this.cargarBoppsGenericos();
     this.modalEditarMateriasPrimas = true;
     this.FormEdicionMateriaPrima.patchValue({
@@ -540,6 +552,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       Categoria : data.Categoria_Id,
       Ancho : data.Ancho,
       Stock : data.Cant,
+      Stock2 : data.Cant2,
       UndMed : data.UndCant,
       Precio : data.PrecioUnd,
       Micras : 0,
@@ -575,6 +588,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         MatPri_PrecioEstandar : this.FormEdicionMateriaPrima.value.PrecioEstandar,
       }
       this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(() => {
+        this.crearAjustesMP(info.MatPri_Id, 2001, 1);
         this.consultarInventario();
         this.msj.mensajeConfirmacion(`¡Polietileno Actualizado!`, `¡La materia prima con el nombre '${info.MatPri_Nombre}' ha sido actualizada con exito!`);
         this.modalEditarMateriasPrimas = false;
@@ -604,6 +618,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           Tinta_PrecioEstandar : this.FormEdicionMateriaPrima.value.PrecioEstandar,
         }
         this.tintasService.srvActualizar(info.Tinta_Id, info).subscribe(() => {
+          this.crearAjustesMP(84, info.Tinta_Id, 1);
           this.consultarInventario();
           this.msj.mensajeConfirmacion(`¡Tinta Actualizada!`, `¡La tinta con el nombre '${info.Tinta_Nombre}' ha sido actualizada con exito!`);
           this.modalEditarMateriasPrimas = false;
@@ -642,6 +657,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
           this.servicioBoppGen.PutPrecioEstandar(this.idBoppGenerico, this.FormEdicionMateriaPrima.value.PrecioEstandar).subscribe();
           this.boppService.srvActualizar(info.BOPP_Id, info).subscribe(() => {
+            this.crearAjustesMP(84, 2001, info.BoppGen_Id);
             this.consultarInventario();
             this.msj.mensajeConfirmacion(`¡Biorientado Actualizado!`, `El biorientado con el nombre '${info.BOPP_Nombre}' ha sido actualizado con exito!`);
             this.modalEditarMateriasPrimas = false;
@@ -885,4 +901,106 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.FormEdicionMateriaPrima.patchValue({ BoppGenerico : nuevo[0].boppGen_Nombre, IdBoppGenerico : nuevo[0].boppGen_Id });
   }
 
+  crearAjustesMP(mp1 : number, mp2 : number, mp3 : number){
+    let esError : boolean = false;
+    let cantidad : number = this.FormEdicionMateriaPrima.value.Stock;
+    if(cantidad > this.materialSeleccionado.Cant) this.crearMovEntrada(mp1, mp2, mp3, cantidad);
+    else if(cantidad < this.materialSeleccionado.Cant) {
+      let cantSaliente : number = 0;
+      let nueva : number = (this.materialSeleccionado.Cant - cantidad);
+      this.srvMovEntradasMP.GetInventarioxMaterial(this.materialSeleccionado.Id).subscribe(data => {
+        if(data.length > 0) {
+          data.forEach(element => {
+            if(nueva > 0) {
+              let entradas2 : modeloMovimientos_Entradas_MP = {
+                'Id': element.id,
+                'MatPri_Id': element.matPri_Id,
+                'Tinta_Id': element.tinta_Id,
+                'Bopp_Id': element.bopp_Id,
+                'Cantidad_Entrada': element.cantidad_Entrada,
+                'UndMed_Id': element.undMed_Id,
+                'Precio_RealUnitario': element.precio_RealUnitario,
+                'Tipo_Entrada': element.tipo_Entrada,
+                'Codigo_Entrada': element.codigo_Entrada,
+                'Estado_Id': element.estado_Id,
+                'Cantidad_Asignada': element.cantidad_Asignada,
+                'Cantidad_Disponible': element.cantidad_Disponible,
+                'Observacion': element.observacion,
+                'Fecha_Entrada': element.fecha_Entrada,
+                'Hora_Entrada': element.hora_Entrada,
+                'Precio_EstandarUnitario': element.precio_EstandarUnitario
+              }
+              if(nueva > element.cantidad_Disponible){
+                cantSaliente = entradas2.Cantidad_Disponible; 
+                entradas2.Cantidad_Asignada += cantSaliente; 
+                entradas2.Cantidad_Disponible = (entradas2.Cantidad_Entrada - entradas2.Cantidad_Asignada); 
+                entradas2.Estado_Id = 5;
+                nueva -= cantSaliente;
+              } else if (nueva == element.cantidad_Disponible) {
+                cantSaliente = nueva;
+                entradas2.Cantidad_Asignada += cantSaliente;
+                entradas2.Cantidad_Disponible = (entradas2.Cantidad_Entrada - entradas2.Cantidad_Asignada);
+                entradas2.Estado_Id = 5;
+                nueva = 0;
+              } else if (nueva < element.cantidad_Disponible) {
+                cantSaliente = nueva;
+                entradas2.Cantidad_Asignada += nueva;
+                entradas2.Cantidad_Disponible -= nueva;
+                entradas2.Estado_Id = 19;
+                nueva = 0;
+              }
+              this.srvMovEntradasMP.Put(entradas2.Id, entradas2).subscribe(() => { esError = false; }, error => { esError = true; });
+              console.log(esError);
+              if (!esError) this.crearMovSalida(entradas2, cantSaliente);
+              else this.msj.mensajeError(`Error`, `Error al actualizar movimiento de entrada de materia prima`);
+            }
+          });
+        }
+      }, error => {this.msj.mensajeError(`Error`, `Error al obtener los movimientos de entrada de materia prima`); } );
+      
+    }
+  }
+
+  crearMovEntrada(mp1 : number, mp2 : number, mp3 : number, cantidad : number){
+    let entrada : modeloMovimientos_Entradas_MP = {
+      MatPri_Id: mp1,
+      Tinta_Id: mp2,
+      Bopp_Id: mp3,
+      Cantidad_Entrada: (cantidad - this.materialSeleccionado.Cant),
+      UndMed_Id: 'Kg',
+      Precio_RealUnitario: this.FormEdicionMateriaPrima.value.Precio,
+      Tipo_Entrada: 'AJUSTEMP',
+      Codigo_Entrada: 1,
+      Estado_Id: 19,
+      Cantidad_Asignada: 0,
+      Cantidad_Disponible: (cantidad - this.materialSeleccionado.Cant),
+      Observacion: 'Ajuste de entrada por inventario de materia prima',
+      Fecha_Entrada: this.today,
+      Hora_Entrada: this.hora,
+      Precio_EstandarUnitario: this.FormEdicionMateriaPrima.value.PrecioEstandar,
+    }
+    this.srvMovEntradasMP.Post(entrada).subscribe(data => { }, error => { this.msj.mensajeError(`Error`, `Error al crear movimiento de entrada de materia prima`) });
+  }
+
+  crearMovSalida(entradas2 : any, cantSaliente : number){
+    let salida : modelEntradas_Salidas_MP = {
+      Id: 0,
+      Id_Entrada: entradas2.Id,
+      Tipo_Salida: 'AJUSTEMP',
+      Codigo_Salida: 1,
+      Tipo_Entrada: entradas2.Tipo_Entrada,
+      Codigo_Entrada: entradas2.Codigo_Entrada,
+      Fecha_Registro: this.today,
+      Hora_Registro: this.hora,
+      MatPri_Id: entradas2.MatPri_Id,
+      Tinta_Id: entradas2.Tinta_Id,
+      Bopp_Id: entradas2.Bopp_Id,
+      Cantidad_Salida: cantSaliente,
+      Orden_Trabajo: 0,
+      Prod_Id: 1,
+      Cant_PedidaOT: 0,
+      UndMed_Id: 'N/E',
+    }
+    this.srvSalidasMP.Post(salida).subscribe(data => { }, error => console.log(error));
+  }
 }
