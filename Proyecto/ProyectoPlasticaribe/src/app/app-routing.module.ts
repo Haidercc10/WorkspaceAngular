@@ -31,7 +31,6 @@ import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.c
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
-import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
@@ -75,7 +74,6 @@ export const routes: Routes = [
   {path: '', component: LoginComponentComponent},
   {path: 'home', canActivate: [VistasPermisosGuard], data: {nombre: 'Inicio'}, component: PaginaPrincipalComponent},
   {path: 'Archivos', component: ArchivosComponent},
-  {path: 'recetaProductos', component: Recetas_ProductosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
   {path: 'ocompra-materiaPrima', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Compra'}, component: OcompraComponent},

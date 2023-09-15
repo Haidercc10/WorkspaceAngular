@@ -43,6 +43,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       RangoFechas : [],
       material : [],
       NombreMaterial : [],
+      Producto : [],
     });
   }
 
@@ -84,11 +85,12 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   buscarComprasRealizadas(){
     if (this.FormFiltros.value.RangoFechas.length > 1) {
       let material : number = this.FormFiltros.value.material;
+      let producto : number = this.FormFiltros.value.Producto;
       let fechaInicio : any = moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
       let fechaFin : any = this.FormFiltros.value.RangoFechas[1] == null ? fechaInicio : moment(this.FormFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       if (material != null) {
         this.informeConsumos.consultar(fechaInicio, fechaFin, material, this.FormFiltros.value.NombreMaterial);
-        this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material).subscribe(data => this.salidasRealizadas = data);
+        this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material, producto).subscribe(data => this.salidasRealizadas = data);
         this.cargando = true;
         this.comprasRealizadas = [];
         this.salidasRealizadas = [];
