@@ -3,16 +3,60 @@
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
+  <div class="row m-3">
+    <p-toolbar class="m-3">
+      <div class="row g-3" style="width: 100%;">
+        <div class="col-md-3 m-auto text-center">
+          <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de Busqueda</h4>
+        </div>
+
+        <div class="col-md-9">
+          <!-- FILTROS -->
+          <form [formGroup]="FormFiltros" (ngSubmit)="tiempoExcedido()">
+            <div class="row g-4 mb-3">
+              <!-- CLIENTES -->
+              <div class="col-sm-12 col-md-12 col-lg-4">
+                <span class="p-float-label">
+                  <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" (keyup)="obtenerClientes()" pInputText required/>
+                  <datalist id="clientes">
+                    <option value={{item.cli_Nombre}} *ngFor="let item of clientes">{{item.cli_Nombre}} - {{item.cli_Id}}</option>
+                  </datalist>
+                  <label for="Nombre">Cliente</label>
+                </span>
+              </div>
+        
+              <!-- VENDEDORES -->
+              <div class="col-sm-12 col-md-12 col-lg-4">
+                <span class="p-float-label">
+                  <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true"></p-dropdown>
+                  <label for="Nombre">Vendedor</label>
+                </span>
+              </div>
+        
+              <!-- Botones -->
+              <div class="col-sm-12 col-md-12 col-lg-4">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+                  <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="FormFiltros.reset()"></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </p-toolbar>
+  </div>
+
   <!-- Cards de Costos -->
   <div class="row g-3 text-center fila-1">
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3"></div>
 
-    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 p-3">
+    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
       <p-card id="totalCartera">
-        <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-5">
+        <div [ngClass]="{'header' : !modoSeleccionado, 'header2': modoSeleccionado }" class="mb-3">
           <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Total Cartera</h3>
         </div>
-        <div class="mb-3">
+        <div>
           <h4><b>{{totalCartera | currency : ' COP $'}}</b></h4>
         </div>
       </p-card>
@@ -37,7 +81,21 @@
           [value]="cartera">
           <ng-template pTemplate="header">
             <tr>
-              <th>#</th>
+              <th rowspan="2">#</th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'num_Factura')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'nombre_CLiente')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'id_Fecha')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'fecha_Vencimiento')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'saldo_Cartera')"></th>
+              <th>
+                <p-columnFilter field="nombre_Vendedor" matchMode="contains" [showMenu]="false">
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-dropdown [autoDisplayFirst]="false" appendTo="body" [ngModel]="value" [options]="vendedores" (onChange)="filter($event.value)" [showClear]="true"></p-dropdown>
+                  </ng-template>
+                </p-columnFilter>
+              </th>
+            </tr>
+            <tr>
               <th pSortableColumn="num_Factura"><p-sortIcon field="num_Factura"></p-sortIcon> N° Factura</th>
               <th pSortableColumn="nombre_CLiente"><p-sortIcon field="nombre_CLiente"></p-sortIcon> Cliente</th>
               <th pSortableColumn="id_Fecha"><p-sortIcon field="id_Fecha"></p-sortIcon> Fecha</th>

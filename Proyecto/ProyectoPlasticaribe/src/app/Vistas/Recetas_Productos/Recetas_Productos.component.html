@@ -109,12 +109,12 @@
   scrollHeight="50rem">
     <ng-template pTemplate="header">
       <tr>
-        <td class="text-center">#</td>
-        <td class="text-center">Id</td>
-        <td class="text-center">Nombre</td>
-        <td class="text-center">Cantidad</td>
-        <td class="text-center">Presentación</td>
-        <td class="text-center">Quitar</td>
+        <th class="text-center">#</th>
+        <th class="text-center">Id</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Cantidad</th>
+        <th class="text-center">Presentación</th>
+        <th class="text-center">Quitar</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -122,10 +122,20 @@
         <td>{{rowIndex + 1}}</td>
         <td>{{data.Material}}</td>
         <td>{{data.Nombre}}</td>
-        <td>{{data.Cantidad_Minima}}</td>
+        <td [pEditableColumn]="data.Cantidad_Minima" pEditableColumnField="price" class="cursor">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-inputNumber [(ngModel)]="data.Cantidad_Minima" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{data.Cantidad_Minima | number : '1.2-2'}}
+            </ng-template>
+          </p-cellEditor>
+        </td>
         <td>{{data.Presentacion_Material}}</td>
         <td class="text-center">
-          <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMateriales(data.Material)"></i>
+          <i *ngIf="data.Id_Registro != undefined" class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="eliminarMaterialTabla(data)"></i>
+          <i *ngIf="data.Id_Registro == undefined" class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMaterialTabla(data)"></i>
         </td>
       </tr>
     </ng-template>
@@ -135,7 +145,50 @@
 <!-- Botones -->
 <div class="mb-1" id="botones1">
   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button pButton class="p-button-danger" type="button" label="Guardar" icon="pi pi-check" [disabled]="materialesSeleccioados.length == 0" (click)="guardarReceta()"></button>
+    <button pButton class="p-button-danger" type="button" label="Guardar" icon="pi pi-check" *ngIf="!edicion" [disabled]="materialesSeleccioados.length == 0" (click)="guardarReceta()"></button>
+    <button pButton class="p-button-danger" type="button" label="Actualizar" icon="pi pi-cloud-upload" *ngIf="edicion" [disabled]="materialesSeleccioados.length == 0" (click)="actualizarReceta()"></button>
     <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
   </div>
 </div>
+
+<!-- Mensaje de confirmación para quitar un material de la tabla -->
+<p-toast position="center" key="quitarMaterial" (onClose)="closeMessage('quitarMaterial')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton (click)="quitarMateriales(message.data)" icon="pi pi-check" label="Quitar" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMessage('quitarMaterial')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de confirmación para eliminar un material de la tabla -->
+<p-toast position="center" key="eliminarMaterial" (onClose)="closeMessage('eliminarMaterial')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6">
+          <button type="button" pButton (click)="eliminarReceta(message.data)" icon="pi pi-trash" label="Eliminar" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMessage('eliminarMaterial')" icon="pi pi-times" label="Cancelar" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
