@@ -17,7 +17,7 @@ export class Entradas_Salidas_MPService {
 
   GetId = (id: number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/${id}`);
 
-  GetConsumos = (fechaInicio : any, fechaFin : any, material : any) : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}/${material}`);
+  GetConsumos = (fechaInicio : any, fechaFin : any, material : any, item : any) : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}/${material}/${item}`);
 
   GetSalidasRealizadas = (fechaInicio : any, fechaFin : any, material : number, producto : number) : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/getSalidasRealizadas/${fechaInicio}/${fechaFin}/${material}/${producto}`);
 

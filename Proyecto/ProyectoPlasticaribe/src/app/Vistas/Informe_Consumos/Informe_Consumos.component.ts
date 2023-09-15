@@ -64,12 +64,12 @@ export class Informe_ConsumosComponent implements OnInit {
   limpiarCampos = () => this.load = false;
 
   //Función donde se consultarán los consumos por fecha
-  consultar(fecha1, fecha2, material, nombreMaterial){
+  consultar(fecha1, fecha2, material, nombreMaterial, item){
     this.consumos = [];
     this.salidas = [];
 
     if(material != null) {
-      this.salidasService.GetConsumos(fecha1, fecha2, material).subscribe(data => { 
+      this.salidasService.GetConsumos(fecha1, fecha2, material, item).subscribe(data => { 
         if(data.length > 0){
           this.load = true;
           data.forEach(consumo => this.cargarConsumos(consumo));

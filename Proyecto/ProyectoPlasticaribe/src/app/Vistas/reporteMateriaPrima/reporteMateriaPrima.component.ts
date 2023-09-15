@@ -900,6 +900,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.FormEdicionMateriaPrima.patchValue({ BoppGenerico : nuevo[0].boppGen_Nombre, IdBoppGenerico : nuevo[0].boppGen_Id });
   }
 
+  //Función que creará ajustes de entradas/salidas de materia prima
   crearAjustesMP(mp1 : number, mp2 : number, mp3 : number){
     let esError : boolean = false;
     let cantidad : number = this.FormEdicionMateriaPrima.value.Stock;
@@ -949,7 +950,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 nueva = 0;
               }
               this.srvMovEntradasMP.Put(entradas2.Id, entradas2).subscribe(() => { esError = false; }, error => { esError = true; });
-              console.log(esError);
               if (!esError) this.crearMovSalida(entradas2, cantSaliente);
               else this.msj.mensajeError(`Error`, `Error al actualizar movimiento de entrada de materia prima`);
             }
@@ -960,6 +960,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }
   }
 
+  //Función que creará registros en la tabla movimientos entradas de materia prima cuando se actualice la cantidad de una materia prima.
   crearMovEntrada(mp1 : number, mp2 : number, mp3 : number, cantidad : number){
     let entrada : modeloMovimientos_Entradas_MP = {
       MatPri_Id: mp1,
@@ -981,6 +982,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.srvMovEntradasMP.Post(entrada).subscribe(data => { }, error => { this.msj.mensajeError(`Error`, `Error al crear movimiento de entrada de materia prima`) });
   }
 
+  //Función que creará registros en la tabla entradas salidas de materia prima cuando se actualice la cantidad de una materia prima.
   crearMovSalida(entradas2 : any, cantSaliente : number){
     let salida : modelEntradas_Salidas_MP = {
       Id: 0,

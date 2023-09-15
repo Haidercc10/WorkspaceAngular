@@ -89,7 +89,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       let fechaInicio : any = moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
       let fechaFin : any = this.FormFiltros.value.RangoFechas[1] == null ? fechaInicio : moment(this.FormFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       if (material != null) {
-        this.informeConsumos.consultar(fechaInicio, fechaFin, material, this.FormFiltros.value.NombreMaterial);
+        this.informeConsumos.consultar(fechaInicio, fechaFin, material, this.FormFiltros.value.NombreMaterial, producto);
         this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material, producto).subscribe(data => this.salidasRealizadas = data);
         this.cargando = true;
         this.comprasRealizadas = [];
