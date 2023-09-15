@@ -168,7 +168,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data : any){
-    if (data.id == 2113){
+    if (![2001, 2072, 84, 88, 89].includes(data.id)){
       this.valorTotal = this.valorTotal + data.precio * data.stock;
       this.cantInicial += data.inicial;
       this.cantEntrante += data.entrada;
@@ -543,7 +543,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data : any){
     this.materialSeleccionado = data;
-    console.log(data);
     this.cargarBoppsGenericos();
     this.modalEditarMateriasPrimas = true;
     this.FormEdicionMateriaPrima.patchValue({
