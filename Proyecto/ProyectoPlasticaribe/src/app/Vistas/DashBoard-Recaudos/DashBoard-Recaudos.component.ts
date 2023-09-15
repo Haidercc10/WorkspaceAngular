@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -6,6 +6,10 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { Table } from 'primeng/table';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -14,6 +18,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 })
 export class DashBoardRecaudosComponent implements OnInit {
 
+  @ViewChild('dt1') dt1: Table | undefined;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -25,16 +30,29 @@ export class DashBoardRecaudosComponent implements OnInit {
   carteraAgrupadaVendedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por vendedores
   cartera : any [] = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
   totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
+  vendedores : any [] = []; //Variable que almacenará la información de los vendedores
+  clientes : any [] = []; //Variable que almacenará la información de los clientes
+  FormFiltros : FormGroup;
 
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
-                    private paginaPrincial : PaginaPrincipalComponent,) {
+                    private paginaPrincial : PaginaPrincipalComponent,
+                      private clienteService : ClientesService,
+                        private frmBuilder : FormBuilder,
+                          private vendedorService : UsuarioService,
+                            private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+
+    this.FormFiltros = this.frmBuilder.group({
+      Cliente : [null],
+      Vendedor : [null],
+    });
   }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.obtenerVendedor();
     this.tiempoExcedido();
   }
 
@@ -54,6 +72,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  aplicarfiltro = ($event, data : any, campo : any) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
   recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
 
@@ -61,16 +81,34 @@ export class DashBoardRecaudosComponent implements OnInit {
   tiempoExcedido() {
     if (this.paginaPrincial.recaudos){
       this.consultarCartera();
-      this.recargar();
+      // this.recargar();
     }
   }
 
+  // Funcion que consultará los clientes
+  obtenerClientes = () => this.clienteService.LikeGetCliente(this.FormFiltros.value.Cliente).subscribe(data => this.clientes = data);
+
+  // Funcion que consultará los vendedores
+  obtenerVendedor = () => this.vendedorService.GetVendedores().subscribe(data => this.vendedores = data.map(x => x.usua_Nombre));
+
   // Función que ejecutará las peticiones de la cartera
   consultarCartera(){
-    this.zeusService.GetCarteraAgrupadaClientes().subscribe(data => this.carteraAgrupadaClientes = data);
-    this.zeusService.GetCarteraAgrupadaVendedores().subscribe(data => this.carteraAgrupadaVendedores = data);
-    this.zeusService.GetCartera().subscribe(data => this.totalCartera = data);
-    this.zeusService.GetCarteraTotal().subscribe(data => this.cartera = data);
+    let ruta : string = "";
+    let cliente : string = this.FormFiltros.value.Cliente;
+    let vendedor : string = this.FormFiltros.value.Vendedor;
 
+    this.carteraAgrupadaClientes = [];
+    this.carteraAgrupadaVendedores = [];
+    this.cartera = [];
+    this.totalCartera = 0;
+
+    if (vendedor != null) ruta += `vendedor=${vendedor}`;
+    if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+
+    this.zeusService.GetCarteraAgrupadaClientes(ruta).subscribe(data => this.carteraAgrupadaClientes = data);
+    this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
+    this.zeusService.GetCartera(ruta).subscribe(data => this.totalCartera = data, err => this.msj.mensajeError(`${err.error}`));
+    this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data);
   }
 }
