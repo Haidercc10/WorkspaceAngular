@@ -23,15 +23,19 @@
 
 <p-card>
 
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
   <div class="mb-4">
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
   </div>
 
   <!-- FILTROS DE BUSQUEDA -->
   <form [formGroup]="FormFiltros" (ngSubmit)="buscarComprasRealizadas()">
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4" id="filtros">
       <!-- RANGO FECHAS -->
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="rangoFechas">
         <span class="p-float-label" id="rango-fechas">
           <p-calendar formControlName="RangoFechas" id="rango" inputId="FechaInicial" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
           <label for="FechaInicial">Rango de Fechas</label>
@@ -39,7 +43,7 @@
       </div>
 
       <!-- MATERIALES -->
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="material">
         <span class="p-float-label">
           <input formControlName="NombreMaterial" id="Nombre" list="materiaprima" type="text" pInputText (change)="cambiarNombreMaterial()"/>
           <datalist id="materiaprima">
@@ -50,7 +54,7 @@
       </div>
 
       <!-- Producto -->      
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="producto">
         <span class="p-float-label">
           <input formControlName="Producto" id="Producto" type="text" pInputText/>
           <label for="Producto">Producto</label>
@@ -59,7 +63,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-2">
+    <div class="mb-2" id="botones">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
@@ -74,6 +78,7 @@
   </div>
 
   <!-- TABLA DE COSTOS -->
+  
   <p-table
     #dt_costos
     dataKey="fecha"
@@ -85,7 +90,8 @@
     [rowHover]="true"
     [scrollable]="true"
     scrollHeight="50rem"
-    *ngIf="!cargando">
+    *ngIf="!cargando"
+    id="tablaCompras">
     <ng-template pTemplate="header">
       <tr>
         <th colspan="9" class="text-center">COMPRAS</th>
@@ -99,7 +105,7 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costoRealMaterial', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costoEstandarMaterial', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'variacionPrecio', 'contains')"></th>
-        <th class="text-center" rowspan="2">Ver Kardex</th>
+        <th class="text-center" rowspan="2" id="verKardex">Ver Kardex</th>
       </tr>
       <tr>
         <th class="text-center" pSortableColumn="fecha"><p-sortIcon field="fecha"></p-sortIcon> Fecha</th>

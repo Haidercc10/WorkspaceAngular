@@ -11591,3 +11591,146 @@ export const ControlCalidad : Step.StepOptions [] = [
     text: `<p>¡Con estos filtros podemos <b>buscar por algunos campos</b> de la información de un registro de control de calidad que están en la tabla!</p>`
   },
 ];
+
+/*************************************************************************** KARDEX *******************************************************************************/
+export const stepsKardex : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Kardex de Materias Primas!</h4>',
+    text: `<p>¡Desde este módulo podemos ver el <b>Kardex de un Material</b> que se utiliza para crear un Item (producto)!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
+    text: `<p>¡Con estos <b>filtros podemos buscar</b> la información de los movimientos de un material!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rangoFechas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rangoFechas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rango de Fechas!</h4>',
+    text: `<p>¡Debemos elegir el <b>rango de fechas</b> de los movimientos que queremos ver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#material',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'material',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima!</h4>',
+    text: `<p>¡Debemos <b>elegir la materia prima</b> de la cual queremos ver el Kardex!</p>`
+  },
+  {
+    attachTo: {
+      element: '#producto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'producto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Producto!</h4>',
+    text: `<p>¡Tenemos que <b>colocar el código del producto</b> del cual queremos ver el Kardex!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>¡Con estos botones podemos <b>generar un reporte de los movimientos</b> de un material!</p>
+    <br>
+    <p>1) <b>Consultar</b>: Una vez llenos los filtros podemos <b>consultar</b> los movimientos del material seleccionado.</p>
+    <p>2) <b>Limpiar Todo</b>: Podemos limpiar todos al presionar este botón.</p>
+    <p>3) <b>Exportar a Excel</b>: Con este botón podemos <b>exportar los datos</b> a un archivo de Excel.</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaCompras',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaCompras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Compras!</h4>',
+    text: `<p>¡En esta <b>tabla podemos ver las compras realizadas</b> del material seleccionado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#verKardex',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'verKardex',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Kardex!</h4>',
+    text: `<p>¡Si queremos ver el <b>Kardex</b> en el material podemos hacer click aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaConsumos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaConsumos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Consumos!</h4>',
+    text: `<p>¡En esta tabla <b>podemos ver los consumos realizados</b> del material seleccionado!</p>`
+  },
+];

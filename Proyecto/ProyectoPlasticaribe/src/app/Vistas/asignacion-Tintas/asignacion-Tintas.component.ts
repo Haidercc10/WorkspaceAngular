@@ -194,7 +194,7 @@ export class AsignacionTintasComponent implements OnInit {
   asignarMPCrearTintas(){
     this.onReject('asignacion');
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.load = false;
+      this.load = true;
       let info : modelAsignacionMPxTintas = {
         AsigMPxTinta_Id: 0,
         Tinta_Id: this.FormAsignacionMP.value.Id_Tinta,
@@ -208,7 +208,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.asignacionMPxTintas.srvGuardar(info).subscribe(() => this.obtenerUltimoIdAsignacion(), error => {
         this.mensajeService.mensajeError(`¡Error al registrar la creación de tinta!`, error.message);
-        this.load = true;
+        this.load = false;
       });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
@@ -228,7 +228,7 @@ export class AsignacionTintasComponent implements OnInit {
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(() => {
         }, () => {
           this.mensajeService.mensajeError(`Error`, `¡Error al registrar los detalles de la creación de tinta!`);
-          this.load = true;
+          this.load = false;
         });
       }
       this.moverInventarioMP();
@@ -240,7 +240,7 @@ export class AsignacionTintasComponent implements OnInit {
       this.load = false;
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de asignación!`);
-      this.load = true;
+      this.load = false;
     });
   }
 

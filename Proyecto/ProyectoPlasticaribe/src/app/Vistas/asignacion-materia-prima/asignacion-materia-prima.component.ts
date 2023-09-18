@@ -149,7 +149,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   limpiarCamposMP = () => this.FormMateriaPrimaRetirada.reset();
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => { this.unidadMedida = data });
+  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(data => this.unidadMedida = data);
 
   //Funcion que se encagará de obtener los procesos de la empresa
   obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(data => this.procesos = data.filter((item) => item.proceso_Id != 'TINTAS'));
@@ -256,7 +256,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.cargar_Entradas(info);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
-              console.log(this.materiasPrimasSeleccionadas)
               setTimeout(() => this.FormMateriaPrimaRetirada.reset(), 500); 
             } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera a la cantidad en stock!`);
           } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar hacia que proceso va la materia prima!`);
@@ -279,8 +278,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que hará validaciones antes de realizar la asignación
   validarCamposVaciosRetirada(){
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
-    console.log(maquina);
-    console.log(this.FormMateriaPrimaRetiro.value);
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
         if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
@@ -548,8 +545,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       else if(cantItemsFinalizados < cantItems && cantItemsParciales >= 0) estadoSolicitud = 12;
       else estadoSolicitud = 11;
       this.actualizarEstadoSolicitud(estadoSolicitud);
-    } else {
-
     }
   }
 

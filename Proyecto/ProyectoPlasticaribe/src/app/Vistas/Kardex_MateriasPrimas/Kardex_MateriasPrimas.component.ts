@@ -10,12 +10,15 @@ import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_En
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { Informe_ConsumosComponent } from '../Informe_Consumos/Informe_Consumos.component';
+import { defaultStepOptions, stepsKardex as defaultSteps } from 'src/app/data';
+import { ShepherdService } from 'angular-shepherd';
 
 @Component({
   selector: 'app-Kardex_MateriasPrimas',
   templateUrl: './Kardex_MateriasPrimas.component.html',
   styleUrls: ['./Kardex_MateriasPrimas.component.css']
 })
+
 export class Kardex_MateriasPrimasComponent implements OnInit {
 
   @ViewChild('dt_costos') dt_costos: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente
@@ -37,7 +40,8 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
                 private frmBuilder  : FormBuilder,
                   private msg : MensajesAplicacionService,
                     private movEntradasService : Movimientos_Entradas_MPService,
-                      private salidasMaterialService : Entradas_Salidas_MPService,) {
+                      private salidasMaterialService : Entradas_Salidas_MPService,
+                        private shepherdService : ShepherdService,) {
                     
     this.FormFiltros = this.frmBuilder.group({
       RangoFechas : [],
@@ -57,6 +61,14 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  verTutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   // Funcion que va a obtener los diferentes materiales
