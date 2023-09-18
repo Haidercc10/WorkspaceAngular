@@ -25,6 +25,8 @@ export class Movimientos_Entradas_MPService {
 
   GetInventarioxMaterial = (material : number) : Observable<any []> => this.httpClient.get<any>(`${this.rutaPlasticaribeAPI}/Movimientros_Entradas_MP/getInventarioxMaterial/${material}`);
 
+  getEntradasMP = (ot : number, mp1 : number, mp2 : number, mp3 : number) : Observable<any []> => this.httpClient.get<any>(`${this.rutaPlasticaribeAPI}/Movimientros_Entradas_MP/getEntradasMP/${ot}/${mp1}/${mp2}/${mp3}`);
+
   Put = (id : number, data : modeloMovimientos_Entradas_MP) => this.httpClient.put(`${this.rutaPlasticaribeAPI}/Movimientros_Entradas_MP/${id}`, data);
 
   Post = (data : modeloMovimientos_Entradas_MP) : Observable<any> => this.httpClient.post(`${this.rutaPlasticaribeAPI}/Movimientros_Entradas_MP`, data);

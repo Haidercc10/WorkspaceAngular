@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDevolucionesMp as defaultSteps } from 'src/app/data';
@@ -42,7 +44,8 @@ export class DevolucionesMPComponent implements OnInit {
                           private detallesAsignacionService : DetallesAsignacionService,
                             private boppService : EntradaBOPPService,
                               private shepherdService: ShepherdService,
-                                private mensajeService : MensajesAplicacionService,) {
+                                private mensajeService : MensajesAplicacionService,
+                                  private svcMovEntradas : Movimientos_Entradas_MPService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
@@ -304,5 +307,39 @@ export class DevolucionesMPComponent implements OnInit {
     this.FormDevolucion.patchValue({ ot : '', MpingresoFecha: this.today, MpObservacion : '', });
     this.materiasPrimas = [];
     this.materiasPrimasRetiradas = [];
+  }
+
+  prueba(){
+    let ot : any = this.FormDevolucion.value.ot;
+    
+    this.materiasPrimasRetiradas.forEach(element => {
+      if(element.Id_Bopp == 449) element.Id_Bopp = 1;
+      this.svcMovEntradas.getEntradasMP(ot, element.Id_MateriaPrima, element.Id_Tinta, element.Id_Bopp).subscribe(datos => {
+        if(datos.length > 0) {
+          datos.forEach(x => {
+            let info : modeloMovimientos_Entradas_MP = {
+              Id : x.id,
+              MatPri_Id: x.matPri_Id,
+              Tinta_Id: x.tinta_Id,
+              Bopp_Id: x.bopp_Id,
+              Cantidad_Entrada: x.cantidad_Entrada,
+              UndMed_Id: x.undMed_Id,
+              Precio_RealUnitario: x.precio_RealUnitario,
+              Tipo_Entrada: x.tipo_Entrada,
+              Codigo_Entrada: x.codigo_Entrada,
+              Estado_Id: 19,
+              Cantidad_Asignada: (x.cantidad_Asignada - element.Cantidad_Devuelta),
+              Cantidad_Disponible: (x.cantidad_Disponible + element.Cantidad_Devuelta),
+              Observacion: x.observacion,
+              Fecha_Entrada: x.fecha_Entrada,
+              Hora_Entrada: x.hora_Entrada,
+              Precio_EstandarUnitario: x.precio_EstandarUnitario,
+            }
+            console.log(info);
+            //this.svcMovEntradas.Put(info.Id, info).subscribe(() => { this.mensajeService.mensajeError(`Error`, ``) });
+          });
+        }
+      });
+    })
   }
 }
