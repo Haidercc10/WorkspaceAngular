@@ -106,7 +106,6 @@ export class CalendarioComponent implements OnInit {
       plugins: [dayGridPlugin,timeGridPlugin,interactionPlugin],
       dateClick: this.fechaClick.bind(this),
       eventClick : this.eventoClick.bind(this),
-      // datesSet: ,
       locale: esLocale,
       headerToolbar: {
         start: 'dayGridMonth,timeGridWeek,timeGridDay',
@@ -166,9 +165,7 @@ export class CalendarioComponent implements OnInit {
         this.visibilidadSeleccionada = this.visibilidadSeleccionable.filter(item => item.key == visibilidad[0]);
       } else {
         for (let i = 0; i < this.visibilidadSeleccionable[c].children.length; i++) {
-          if (visibilidad.includes((this.visibilidadSeleccionable[c].children[i].key).toString())) {
-            this.visibilidadSeleccionada.push(this.visibilidadSeleccionable[c].children[i]);
-          }
+          if (visibilidad.includes((this.visibilidadSeleccionable[c].children[i].key).toString())) this.visibilidadSeleccionada.push(this.visibilidadSeleccionable[c].children[i]);
         }
       }
     }
@@ -194,11 +191,7 @@ export class CalendarioComponent implements OnInit {
   crearEvento(){
     let visibilidad : string = '';
     let todos : string = '';
-    this.rolesService.srvObtenerLista().subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        todos += `|${data[i].rolUsu_Id}`
-      }
-    });
+    this.rolesService.srvObtenerLista().subscribe(data => data.forEach(datos => todos += `|${datos.rolUsu_Id}`));
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
         if (this.visibilidadSeleccionada.some(item => item.key == 'A')) {

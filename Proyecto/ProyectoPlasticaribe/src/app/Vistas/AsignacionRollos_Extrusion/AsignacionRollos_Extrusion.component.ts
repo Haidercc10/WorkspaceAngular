@@ -71,11 +71,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -99,10 +95,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   }
 
   // Funcion que se encargará de consultar los procesos
-  obtenerProcesos(){
-    this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter((data) => data.proceso_Id != 'RECUP' && data.proceso_Id != 'TINTAS'));
-  }
-
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter((data) => !['RECUP', 'TINTAS'].includes(data.proceso_Id)));
+  
   // Funcion que va a consultar los rollos
   consultarRollos(){
     let ot : number = this.FormConsultarRollos.value.OT_Id;
@@ -113,13 +107,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     let consulta : number;
     this.rollos = [];
     this.cargando = false;
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      rollos.push(this.rollosInsertar[i].Id);
-    }
-    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
+    this.rollosInsertar.forEach(data => rollos = data.map(x => x.Id));
     setTimeout(() => {
-      if (ot != null && fechaInicial != null && fechaFinal != null) {
+      if (ot != null && fechaInicial != 'Fecha inválida' && fechaFinal != 'Fecha inválida') {
         this.dtIngRollosService.getRollosDisponiblesOT(ot).subscribe(datos_Rollos => {
           consulta = datos_Rollos.length;
           for (let i = 0; i < datos_Rollos.length; i++) {
@@ -403,7 +393,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Proceso_Id : datos_Rollos[j].proceso_Id,
             Prod_Id : datos_Rollos[j].prod_Id,
           }
-          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(() => {}, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el estado de los rollos!`));
+          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el estado de los rollos!`));
         }
       });
     }
@@ -570,8 +560,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.push(info);
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
-      setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, () => {  this.mensajeService.mensajeError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
+      setTimeout(() => this.crearPDF(id), 1200);
+    }, () => this.mensajeService.mensajeError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`));
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -581,7 +571,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
-          dataRow.push(row[column].toString());
+        dataRow.push(row[column].toString());
       });
       body.push(dataRow);
     });

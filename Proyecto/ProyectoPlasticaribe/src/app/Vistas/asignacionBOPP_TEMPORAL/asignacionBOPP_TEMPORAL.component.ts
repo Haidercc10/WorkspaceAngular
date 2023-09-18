@@ -140,7 +140,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             infoOT.und == 'Kilo' ? infoOT.cantPedida = item.datosotKg : infoOT.und == 'Unidad' ? infoOT.cantPedida = item.datoscantBolsa : infoOT.und == 'Paquete' ? item.datoscantBolsa : infoOT.cantPedida = item.datosotKg;
             infoOT.und == 'Kilo' ? infoOT.und = 'Kg' : infoOT.und == 'Unidad' ? infoOT.und = 'Und' : infoOT.und == 'Paquete' ? infoOT.und = 'Paquete' : infoOT.und = 'Kg';
             this.ordenesTrabajo.push(infoOT);
-            console.log(this.ordenesTrabajo)
             this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
             this.cantidadKG = item.datosotKg + this.cantidadKG;
           } else if (item.estado == 4 || item.estado == 1) this.msj.mensajeAdvertencia(`Advertencia`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
@@ -232,7 +231,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         Cantidad3 : this.FormularioBOPP.value.boppCantidad,
       }
       this.ArrayBoppPedida.push(info);
-      setTimeout(() => { this.FormularioBOPP.reset(); }, 1000); 
+      setTimeout(() => this.FormularioBOPP.reset(), 1000); 
     }
   }
 
@@ -303,7 +302,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           this.boppService.PutInventarioBiorientado(datos_bopp[j].bopP_Id, cantidad).subscribe(() => {
             this.obtenerBOPP();
             this.msj.mensajeConfirmacion(`Asignación exitosa`,`Se ha creado exitosamente la asignación de rollos!`);
-            setTimeout(() => { this.limpiarTodosLosCampos(); }, 2000);
+            setTimeout(() => this.limpiarTodosLosCampos(), 2000);
           }, () => this.msj.mensajeError(`Error`, `Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`));
         }
       });
@@ -320,7 +319,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.shepherdService.confirmCancel = false;
     this.shepherdService.addSteps(defaultSteps);
     this.shepherdService.start();
-    this.shepherdService.show('Hola')
   } 
 
   //Función que actualizara la información de las entradas de materia prima disponibles.
