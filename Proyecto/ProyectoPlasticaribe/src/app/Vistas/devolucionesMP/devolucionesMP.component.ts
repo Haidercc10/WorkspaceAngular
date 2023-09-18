@@ -97,6 +97,7 @@ export class DevolucionesMPComponent implements OnInit {
             Cantidad : cantidad,
             Cantidad_Oculta : cantidad,
             Cantidad_Devuelta : 0,
+            Devolucion : 0,
             Unidad_Medida : datos_asignacionMP[i].undMedida,
             Proceso : datos_asignacionMP[i].proceso,
             Proceso_Nombre : datos_asignacionMP[i].nombreProceso,
@@ -197,7 +198,8 @@ export class DevolucionesMPComponent implements OnInit {
       this.moverInventarioMpAgregada();
       this.moverInventarioTintas();
       this.moverInventarioBopp();
-      setTimeout(() => { this.limpiarTodosCampos(); }, 1000);
+      this.actualizarEntradasMP();
+      setTimeout(() => { this.limpiarTodosCampos(); }, 2000);
     }, (20 * this.materiasPrimasRetiradas.length));
   }
 
@@ -309,34 +311,49 @@ export class DevolucionesMPComponent implements OnInit {
     this.materiasPrimasRetiradas = [];
   }
 
-  prueba(){
+  //Función que crea una devolución y actualiza las cantidades de las entradas de material ingresado en los mov. entradas de mat. prima. 
+  actualizarEntradasMP(){
     let ot : any = this.FormDevolucion.value.ot;
+    let dev : number = 0;
     
     this.materiasPrimasRetiradas.forEach(element => {
+      element.Devolucion = element.Cantidad_Devuelta;
       if(element.Id_Bopp == 449) element.Id_Bopp = 1;
+      
       this.svcMovEntradas.getEntradasMP(ot, element.Id_MateriaPrima, element.Id_Tinta, element.Id_Bopp).subscribe(datos => {
         if(datos.length > 0) {
           datos.forEach(x => {
             let info : modeloMovimientos_Entradas_MP = {
-              Id : x.id,
-              MatPri_Id: x.matPri_Id,
-              Tinta_Id: x.tinta_Id,
-              Bopp_Id: x.bopp_Id,
-              Cantidad_Entrada: x.cantidad_Entrada,
-              UndMed_Id: x.undMed_Id,
-              Precio_RealUnitario: x.precio_RealUnitario,
-              Tipo_Entrada: x.tipo_Entrada,
-              Codigo_Entrada: x.codigo_Entrada,
-              Estado_Id: 19,
-              Cantidad_Asignada: (x.cantidad_Asignada - element.Cantidad_Devuelta),
-              Cantidad_Disponible: (x.cantidad_Disponible + element.Cantidad_Devuelta),
-              Observacion: x.observacion,
-              Fecha_Entrada: x.fecha_Entrada,
-              Hora_Entrada: x.hora_Entrada,
-              Precio_EstandarUnitario: x.precio_EstandarUnitario,
+              'Id' : x.id,
+              'MatPri_Id': x.matPri_Id,
+              'Tinta_Id': x.tinta_Id,
+              'Bopp_Id': x.bopp_Id,
+              'Cantidad_Entrada': x.cantidad_Entrada,
+              'UndMed_Id': x.undMed_Id,
+              'Precio_RealUnitario': x.precio_RealUnitario,
+              'Tipo_Entrada': x.tipo_Entrada,
+              'Codigo_Entrada': x.codigo_Entrada,
+              'Estado_Id': 19,
+              'Cantidad_Asignada': x.cantidad_Asignada, 
+              'Cantidad_Disponible': x.cantidad_Disponible, 
+              'Observacion': x.observacion,
+              'Fecha_Entrada': x.fecha_Entrada,
+              'Hora_Entrada': x.hora_Entrada,
+              'Precio_EstandarUnitario': x.precio_EstandarUnitario,
             }
-            console.log(info);
-            //this.svcMovEntradas.Put(info.Id, info).subscribe(() => { this.mensajeService.mensajeError(`Error`, ``) });
+
+            if(element.Devolucion >= info.Cantidad_Asignada) { 
+              dev = info.Cantidad_Asignada; 
+              element.Devolucion -= dev;
+              info.Cantidad_Asignada = 0; 
+              info.Cantidad_Disponible = info.Cantidad_Entrada;
+            } else if(element.Devolucion < info.Cantidad_Asignada) { 
+              info.Cantidad_Asignada -= element.Devolucion; 
+              info.Cantidad_Disponible += element.Devolucion; 
+              dev = 0;
+              element.Devolucion = 0;
+            }
+            this.svcMovEntradas.Put(info.Id, info).subscribe(() => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`) });
           });
         }
       });
