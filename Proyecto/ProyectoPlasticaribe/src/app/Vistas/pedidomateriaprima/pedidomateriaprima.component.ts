@@ -289,7 +289,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   // Funcion que seleccionará y colocará todos los MateriaPrima que se van a insertar
@@ -300,7 +300,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.ArrayMateriaPrima.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   //Funcion que va a quitar lo MateriaPrima que se van a insertar
@@ -310,7 +310,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.arrayOrdenCompra.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.arrayOrdenCompra.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.calcularPrecio();
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
@@ -320,28 +320,12 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.arrayOrdenCompra.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
     this.ArrayMateriaPrima = [];
     this.calcularPrecio();
-    setTimeout(() => { this.load = true; }, 50);
+    setTimeout(() => this.load = true, 50);
   }
 
   // Funcion que va a calcular el precio total de la factura o remision
-  calcularPrecio(){
-    this.valorTotal = 0;
-    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-      if (!this.ArrayMateriaPrima[i].Exits) {
-        this.valorTotal += (this.ArrayMateriaPrima[i].Precio * this.ArrayMateriaPrima[i].Cantidad_Faltante);
-      }
-    }
-  }
-
-  // Funcion que validará la cantidad que se está cambiando
-  validarCantidad(item : any){
-    if (item.Cantidad > item.Cantidad_Oculta) {
-      for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-        if (item.Id == this.ArrayMateriaPrima[i].Id) this.ArrayMateriaPrima[i].Cantidad = this.ArrayMateriaPrima[i].Cantidad_Oculta;
-      }
-      this.mensajeService.mensajeAdvertencia(`Cantidad insuficiente`, `¡La cantidad ${item.Cantidad} no está disponible para la materia prima ${item.Nombre}!`);
-    }
-  }
+  calcularPrecio = () => this.ArrayMateriaPrima.filter((data) => !data.Exits).reduce((a, b) => a + (b.Precio * b.Cantidad_Faltante_Editar), 0);
+  
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
@@ -359,7 +343,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Facco_FechaVencimiento : this.today,
       Facco_Hora : moment().format('H:mm:ss'),
       Prov_Id : this.FormMateriaPrimaFactura.value.proveedor,
-      Facco_ValorTotal : this.valorTotal,
+      Facco_ValorTotal : this.calcularPrecio(),
       Facco_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
       Estado_Id : 13,
       Usua_Id : this.storage_Id,
@@ -396,7 +380,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
           FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
-        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(() => { }, () => {
+        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(null, () => {
           errorConsulta = true;
           this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Error al crear la factura con las materia primas seleccionadas!`);
           this.load = true;
@@ -410,7 +394,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
-            setTimeout(() => { this.limpiarTodosCampos(); }, 1500);
+            setTimeout(() => this.limpiarTodosCampos(), 1500);
           }, 2000);
         }
       }, 3500);
@@ -423,7 +407,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Facco_Id : factura,
     }
-    this.OrdenesFacturasService.insert_OrdenCompra(info).subscribe(() => { }, () => {
+    this.OrdenesFacturasService.insert_OrdenCompra(info).subscribe(null, () => {
       this.mensajeService.mensajeError(`Error`, `¡No se ha creado la relacion entre la factura y la orden de compra!`);
       this.load = true;
     });
@@ -464,7 +448,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             Oc_Observacion : datos_orden.oc_Observacion,
             IVA : datos_orden.iva,
           }
-          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(() => { }, () => {
+          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(null, () => {
             this.mensajeService.mensajeError(`Error`,`¡Error al cambiar el estado de la orden de compra!`);
             this.load = true;
           });
@@ -480,7 +464,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         Rem_Id : rem.remisionId,
         Facco_Id : idFactura,
       }
-      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(() => { }, () => {
+      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(null, () => {
         this.mensajeService.mensajeError(`Error`, `¡Error al añadir la(s) remision(es) a la factura!`);
         this.load = true;
       });
@@ -494,7 +478,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Rem_Codigo : this.FormMateriaPrimaFactura.value.MpRemision,
       Rem_Fecha : this.today,
       Rem_Hora : moment().format('H:mm:ss'),
-      Rem_PrecioEstimado : this.valorTotal,
+      Rem_PrecioEstimado : this.calcularPrecio(),
       Prov_Id : this.FormMateriaPrimaFactura.value.proveedor,
       Estado_Id : 12,
       Usua_Id : this.storage_Id,
@@ -545,7 +529,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
-            setTimeout(() => { this.limpiarTodosCampos(); }, 1500);
+            setTimeout(() => this.limpiarTodosCampos(), 1500);
           }, 2000);
         }
       }, 3500);
@@ -558,7 +542,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Oc_Id : this.FormMateriaPrimaFactura.value.OrdenCompra,
       Rem_Id : idRemision,
     }
-    this.ordenCompraRemisionService.insert_OrdenCompra(info).subscribe(() => { }, () => {
+    this.ordenCompraRemisionService.insert_OrdenCompra(info).subscribe(null, () => {
       this.mensajeService.mensajeError(`Error`, `¡No se ha creado la relacion entre la remisión y la orden de compra!`);
       this.load = true;
     });
@@ -581,7 +565,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           }
 
           this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(() => {
-            this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`)
+            this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro de factura/Remisión creado con exito!`);
             this.load = true;
            }, () => {
             this.mensajeService.mensajeError(`Error`, `¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!`);
@@ -763,7 +747,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         }
         this.mpAgregada.push(items);
       }
-      setTimeout(() => { this.cargarPDF(formulario); }, 2000);
+      setTimeout(() => this.cargarPDF(formulario), 2000);
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la remisión!`);
       this.load = true;
@@ -776,9 +760,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-          dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
     return body;

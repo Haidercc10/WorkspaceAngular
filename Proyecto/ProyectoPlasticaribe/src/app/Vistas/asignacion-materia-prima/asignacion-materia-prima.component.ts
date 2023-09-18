@@ -256,6 +256,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.cargar_Entradas(info);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
+              console.log(this.materiasPrimasSeleccionadas)
               setTimeout(() => this.FormMateriaPrimaRetirada.reset(), 500); 
             } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera a la cantidad en stock!`);
           } else this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡Debe seleccionar hacia que proceso va la materia prima!`);
@@ -362,14 +363,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         });
         this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
       }
-     setTimeout(() => {
+    }
+    setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {        
         this.actualizar_MovimientosEntradas();
         this.crear_Salidas(asigncaion);
         setTimeout(() => this.asignacionExitosa(), 2000);
       }
      }, 2000);
-    }
   }
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien

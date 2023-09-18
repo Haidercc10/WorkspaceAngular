@@ -6,13 +6,13 @@ export const environment = {
   production: false,
 
   //SERVIDOR
-  //rutaPlasticaribeAPI : "http://192.168.0.85:9086/api",
+  rutaPlasticaribeAPI : "http://192.168.0.85:9086/api",
   rutaBagPro : "http://192.168.0.85:9095/api",
   rutaZeus : "http://192.168.0.85:9055/api",
   rutaZeusContabilidad : "http://192.168.0.85:9065/api",
 
   // LOCALES 1
-    rutaPlasticaribeAPI : "http://192.168.0.190:9086/api",
+  // rutaPlasticaribeAPI : "http://192.168.0.190:9086/api",
   // rutaBagPro : "http://192.168.0.190:9095/api",
   // rutaZeus : "http://192.168.0.190:9055/api"
   // rutaZeusContabilidad : "http://192.168.0.190:9065/api"
