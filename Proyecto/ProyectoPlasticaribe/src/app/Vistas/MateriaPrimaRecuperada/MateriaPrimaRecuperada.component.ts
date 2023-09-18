@@ -48,8 +48,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-
   modalMode : boolean = false;
+  
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private unidadMedidaService : UnidadMedidaService,

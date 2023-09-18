@@ -149,60 +149,60 @@
 </p-card>
 
 <p-dialog header="KÁRDEX CON DATOS ESTÁNDARES Y REALES" [(visible)]="modalKardex" [modal]="true" [style]="{ width: '95vw' }" [draggable]="false" [resizable]="false">
-    <div class="p-2">
-        <p-table
-            #dt_kardex
-            rowGroupMode="rowspan" 
-            groupRowsBy="fecha" 
-            sortField="fecha" 
-            sortMode="single"
-            dataKey="fecha"
-            [value]="datosKardex"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
-            responsiveLayout="scroll"
-            [rowHover]="true"
-            [scrollable]="true"
-            scrollHeight="50rem"
-            *ngIf="!cargando">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th class="text-center" rowspan="3">Fecha</th>
-                </tr>
-                <tr>
-                    <th colspan="3" class="text-center">ENTRADAS</th>
-                    <th colspan="3" class="text-center">SALIDAS</th>
-                    <th colspan="3" class="text-center">SALDO</th>
-                </tr>
-                <tr>
-                    <th class="text-center">QR(kg)</th>
-                    <th class="text-center">(PS + ∆P = PR)($/kg)</th>
-                    <th class="text-center">(CR = CS + VP)($)</th>
-                    <th class="text-center">(QR y QS)kg</th>
-                    <th class="text-center">PR($/kg)</th>
-                    <th class="text-center">(CR = CS + VQ)($)</th>
-                    <th class="text-center">QR(kg)</th>
-                    <th class="text-center">PR($/kg)</th>
-                    <th class="text-center">CR($)</th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-rowgroup="rowgroup" let-rowspan="rowspan">
-                <tr>
-                    <td class="text-center" *ngIf="rowgroup" [attr.rowspan]="rowspan">
-                        <span class="font-bold">{{data.fecha}}</span>
-                    </td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.precioEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoEntrada | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.cantSalida | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioSalida | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoSalida | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantidadFinal | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioFinal | number : '1.2-2'}}</td>
-                    <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.costoFinal | number : '1.2-2'}}</td>
-                </tr>
-            </ng-template>
-        </p-table>
-    </div>
+  <div class="p-2">
+    <p-table
+      #dt_kardex
+      rowGroupMode="rowspan" 
+      groupRowsBy="fecha" 
+      sortField="fecha" 
+      sortMode="single"
+      dataKey="fecha"
+      [value]="datosKardex"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      *ngIf="!cargando">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center" rowspan="3">Fecha</th>
+        </tr>
+        <tr>
+          <th colspan="3" class="text-center">ENTRADAS</th>
+          <th colspan="3" class="text-center">SALIDAS</th>
+          <th colspan="3" class="text-center">SALDO</th>
+        </tr>
+        <tr>
+          <th class="text-center">Q<sub>R</sub>(kg)</th>
+          <th class="text-center">(P<sub>R</sub> = <span class="azul">P<sub>S</sub></span> + <span class="verde">∆P</span>)(kg)</th>
+          <th class="text-center">(CR = <span class="azul">CS</span> + <span class="verde">VP</span>)($)</th>
+          <th class="text-center">(Q<sub>R</sub> = <span class="azul">Q<sub>S</sub></span> + <span class="verde">∆Q</span>)kg</th>
+          <th class="text-center">P<sub>R</sub>($/kg)</th>
+          <th class="text-center">(CR = <span class="azul">CS</span> + <span class="verde">VQ</span>)($)</th>
+          <th class="text-center">QR(kg)</th>
+          <th class="text-center">PR($/kg)</th>
+          <th class="text-center">CR($)</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-rowgroup="rowgroup" let-rowspan="rowspan">
+          <tr>
+              <td class="text-center" *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                  <span class="font-bold">{{data.fecha}}</span>
+              </td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantEntrada | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.precioEntrada | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoEntrada | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.cantSalida | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioSalida | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total, 'azul' : data.color == 'azul', 'verde' : data.color == 'verde'}">{{data.costoSalida | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.cantidadFinal | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.precioFinal | number : '1.2-2'}}</td>
+              <td class="text-center" [ngClass]="{'font-bold' : data.total}">{{data.costoFinal | number : '1.2-2'}}</td>
+          </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </p-dialog>

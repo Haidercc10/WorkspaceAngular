@@ -143,14 +143,32 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
 
   // Funcion que va a cargar la información del kardex
   cargarKardex(){
-    this.cargando = true;
-    this.datosKardex = [];
-    // Inventario inicial
-    this.movEntradasService.GetComprasAntiguas(moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD'), this.FormFiltros.value.material).subscribe(data => {
-      let cantFinal = 0, costoFinal = 0;
-      let fecha = '';
-      data.forEach(compra => {
-        fecha = compra.fechaCompra.replace('T00:00:00', '');
+    if (this.FormFiltros.value.RangoFechas != null) {
+      this.cargando = true;
+      this.datosKardex = [];
+      // Inventario inicial
+      this.movEntradasService.GetComprasAntiguas(moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD'), this.FormFiltros.value.material).subscribe(data => {
+        let cantFinal = 0, costoFinal = 0;
+        let fecha = '';
+        data.forEach(compra => {
+          fecha = compra.fechaCompra.replace('T00:00:00', '');
+          this.datosKardex.push({
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+            fecha : fecha,
+            cantEntrada : '',
+            precioEntrada : '',
+            costoEntrada : '',
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : compra.cantidadCompra,
+            precioFinal : compra.precioReal,
+            costoFinal : compra.costoReal,
+            total : false,
+          });
+          cantFinal += compra.cantidadCompra;
+          costoFinal += compra.costoReal;
+        });
         this.datosKardex.push({
           Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
           fecha : fecha,
@@ -160,121 +178,105 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           cantSalida : '',
           precioSalida : '',
           costoSalida : '',
-          cantidadFinal : compra.cantidadCompra,
-          precioFinal : compra.precioReal,
-          costoFinal : compra.costoReal,
+          cantidadFinal : cantFinal,
+          precioFinal : '',
+          costoFinal : costoFinal,
+          total : true,
+        });
+        this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
+      }, () => {
+        this.datosKardex.push({
+          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+          fecha : moment().startOf('month').format('YYYY-MM-DD'),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : '',
+          precioSalida : '',
+          costoSalida : '',
+          cantidadFinal : 0,
+          precioFinal : 0,
+          costoFinal : 0,
+          total : true,
+        });
+      });
+      // Entradas de material
+      this.comprasRealizadas.forEach(compra => {
+        this.datosKardex.push(
+          {
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+            fecha : compra.fecha.toString().substring(0, 10),
+            cantEntrada : compra.cantComprada,
+            precioEntrada : compra.precioEstandar,
+            costoEntrada : compra.costoEstandarMaterial,
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : '',
+            precioFinal : '',
+            costoFinal : '',
+            total : false,
+            color : 'azul',
+          },
+          {
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 2,
+            fecha : compra.fecha.toString().substring(0, 10),
+            cantEntrada : '',
+            precioEntrada : compra.diffPrecio,
+            costoEntrada : compra.variacionPrecio,
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : '',
+            precioFinal : '',
+            costoFinal : '',
+            total : false,
+            color : 'verde',
+          },
+          {
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 3,
+            fecha : compra.fecha.toString().substring(0, 10),
+            cantEntrada : '',
+            precioEntrada : compra.precioCompra,
+            costoEntrada : compra.costoRealMaterial,
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : '',
+            precioFinal : '',
+            costoFinal : '',
+            total : false,
+          }
+        );
+      });
+      // Salidas de material
+      this.salidasRealizadas.forEach(salida => {
+        this.datosKardex.push({
+          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+          fecha : (salida.fecha).toString().substring(0, 10),
+          cantEntrada : '',
+          precioEntrada : '',
+          costoEntrada : '',
+          cantSalida : salida.cantidadSalida,
+          precioSalida : salida.precioReal,
+          costoSalida : salida.costoReal,
+          cantidadFinal : '',
+          precioFinal : '',
+          costoFinal : '',
           total : false,
         });
-        cantFinal += compra.cantidadCompra;
-        costoFinal += compra.costoReal;
       });
-      this.datosKardex.push({
-        Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
-        fecha : fecha,
-        cantEntrada : '',
-        precioEntrada : '',
-        costoEntrada : '',
-        cantSalida : '',
-        precioSalida : '',
-        costoSalida : '',
-        cantidadFinal : cantFinal,
-        precioFinal : '',
-        costoFinal : costoFinal,
-        total : true,
-      });
-      this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
-    }, () => {
-      this.datosKardex.push({
-        Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
-        fecha : moment().startOf('month').format('YYYY-MM-DD'),
-        cantEntrada : '',
-        precioEntrada : '',
-        costoEntrada : '',
-        cantSalida : '',
-        precioSalida : '',
-        costoSalida : '',
-        cantidadFinal : 0,
-        precioFinal : 0,
-        costoFinal : 0,
-        total : true,
-      });
-    });
-    // Entradas de material
-    this.comprasRealizadas.forEach(compra => {
-      this.datosKardex.push(
-        {
-          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
-          fecha : compra.fecha.toString().substring(0, 10),
-          cantEntrada : compra.cantComprada,
-          precioEntrada : compra.precioEstandar,
-          costoEntrada : compra.costoEstandarMaterial,
-          cantSalida : '',
-          precioSalida : '',
-          costoSalida : '',
-          cantidadFinal : '',
-          precioFinal : '',
-          costoFinal : '',
-          total : false,
-          color : 'azul',
-        },
-        {
-          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 2,
-          fecha : compra.fecha.toString().substring(0, 10),
-          cantEntrada : '',
-          precioEntrada : compra.diffPrecio,
-          costoEntrada : compra.variacionPrecio,
-          cantSalida : '',
-          precioSalida : '',
-          costoSalida : '',
-          cantidadFinal : '',
-          precioFinal : '',
-          costoFinal : '',
-          total : false,
-          color : 'verde',
-        },
-        {
-          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 3,
-          fecha : compra.fecha.toString().substring(0, 10),
-          cantEntrada : '',
-          precioEntrada : compra.precioCompra,
-          costoEntrada : compra.costoRealMaterial,
-          cantSalida : '',
-          precioSalida : '',
-          costoSalida : '',
-          cantidadFinal : '',
-          precioFinal : '',
-          costoFinal : '',
-          total : false,
-        }
-      );
-    });
-    // Salidas de material
-    this.salidasRealizadas.forEach(salida => {
-      this.datosKardex.push({
-        Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
-        fecha : (salida.fecha).toString().substring(0, 10),
-        cantEntrada : '',
-        precioEntrada : '',
-        costoEntrada : '',
-        cantSalida : salida.cantidadSalida,
-        precioSalida : salida.precioReal,
-        costoSalida : salida.costoReal,
-        cantidadFinal : '',
-        precioFinal : '',
-        costoFinal : '',
-        total : false,
-      });
-    });
-    this.calcularSalidas();
+      this.calcularSalidas();
 
-    // Costos Finales
-    setTimeout(() => this.calcularCostosFinales(), 1500);
+      // Costos Finales
+      setTimeout(() => this.calcularCostosFinales(), 1500);
 
-    setTimeout(() => {
-      this.datosKardex.map(x => x.fecha).sort();
-      this.cargando = false;
-      this.modalKardex = true;
-    }, 2500);
+      setTimeout(() => {
+        this.datosKardex.map(x => x.fecha).sort();
+        this.cargando = false;
+        this.modalKardex = true;
+      }, 2500);
+    } else this.msg.mensajeAdvertencia(`¡Debe seleccionar un rango de fechas para consultar la información!`);
   }
 
   // Funcion que va a calcular los costos finales de las salidas de material
@@ -520,7 +522,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
 
     for (let i = 1; i < 10; i++) {
       worksheet.getColumn(i).width = 20;
-      if (i > 0 && i != 1) worksheet.getColumn(i + 1).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+      if (i > 0 && i != 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
       else if (i == 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
     }
 
@@ -542,16 +544,77 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     worksheet2.getCell('E4').value = 'SALIDAS';
     worksheet2.getCell('H4').value = 'SALDOS';
     
-    worksheet2.getCell('B5').value = 'QR(kg)';
-    worksheet2.getCell('C5').value = '(PS + ∆P = PR)($/kg)';
-    worksheet2.getCell('D5').value = '(CR = CS + VP)($)';
-    
-    worksheet2.getCell('E5').value = '(QR y QS)kg';
-    worksheet2.getCell('F5').value = 'PR($/kg)';
-    worksheet2.getCell('G5').value = '(CR = CS + VQ)($)';
-
-    worksheet2.getCell('H5').value = 'QR(kg)';
-    worksheet2.getCell('I5').value = 'PR($/kg)';
+    worksheet2.getCell('B5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': 'Q'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': '(kg)'},
+      ]
+    };
+    worksheet2.getCell('C5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': '(P'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' = '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69F'}, 'name': 'Calibri'}, 'text': 'P'},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69f'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'S'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' + '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '22C55E'}, 'name': 'Calibri'}, 'text': '∆'},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '22C55E'}, 'name': 'Calibri'}, 'text': 'P'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ')($/kg)'},
+      ]
+    };
+    worksheet2.getCell('D5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': '(CR = '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69F'}, 'name': 'Calibri'}, 'text': 'CS'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' + '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '22C55E'}, 'name': 'Calibri'}, 'text': 'VP'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': ')($)'},
+      ]
+    };
+    worksheet2.getCell('E5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': '(Q'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' = '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69F'}, 'name': 'Calibri'}, 'text': 'Q'},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69f'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'S'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' + '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '22C55E'}, 'name': 'Calibri'}, 'text': '∆Q'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ')(kg)'},
+      ]
+    };
+    worksheet2.getCell('F5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': 'P'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': '($/kg)'},
+      ]
+    };
+    worksheet2.getCell('G5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': '(CR = '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '69F'}, 'name': 'Calibri'}, 'text': 'CS'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ' + '},
+        {'font': {'bold': true, 'size': 11, 'color': {'argb': '22C55E'}, 'name': 'Calibri'}, 'text': 'VQ'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': ')($)'},
+      ]
+    };
+    worksheet2.getCell('H5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': 'Q'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': '(kg)'},
+      ]
+    };
+    worksheet2.getCell('I5').value = {
+      'richText': [
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri',}, 'text': 'P'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+        {'font': {'bold': true, 'size': 11, 'name': 'Calibri'}, 'text': '($/kg)'},
+      ]
+    };
     worksheet2.getCell('J5').value = 'CR($)';
     
     let centrarCeldas2 : string [] = ['A1', 'A4', 'B4', 'B5', 'C5', 'D5', 'E4', 'E5', 'F5', 'G5', 'H4', 'H5', 'I5', 'J5'];
@@ -620,6 +683,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
         let celdaFinal : any = unirFechas[i + 1] - 1;
         worksheet2.mergeCells(`A${unirFechas[i]}:A${Number.isNaN(celdaFinal) ? this.datosKardex.length + 5 : celdaFinal}`);
       }
+
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, titulo + `.xlsx`);
