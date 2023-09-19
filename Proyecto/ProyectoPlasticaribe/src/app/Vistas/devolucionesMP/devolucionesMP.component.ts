@@ -141,7 +141,7 @@ export class DevolucionesMPComponent implements OnInit {
   seleccionarTodosMateriaPrima(){
     this.load = false;
     this.materiasPrimasRetiradas = [];
-    this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id));
     setTimeout(() => this.load = true, 50);
   }
 
@@ -156,7 +156,7 @@ export class DevolucionesMPComponent implements OnInit {
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
   quitarTodosMateriaPrima(){
     this.load = false;
-    this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id));
     this.materiasPrimas = [];
     setTimeout(() => this.load = true, 50);
   }
@@ -189,9 +189,7 @@ export class DevolucionesMPComponent implements OnInit {
             UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
-          console.log(datosDevolucionMp)
-          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(() => {
-          }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
         }
       }
     });
@@ -200,7 +198,7 @@ export class DevolucionesMPComponent implements OnInit {
       this.moverInventarioTintas();
       this.moverInventarioBopp();
       this.actualizarEntradasMP();
-      setTimeout(() => { this.limpiarTodosCampos(); }, 1000);
+      setTimeout(() => this.limpiarTodosCampos(), 1000);
     }, (20 * this.materiasPrimasRetiradas.length));
   }
 
@@ -356,10 +354,10 @@ export class DevolucionesMPComponent implements OnInit {
               element.Devolucion = 0;
               info.Estado_Id = 19;
             }
-            this.svcMovEntradas.Put(info.Id, info).subscribe(data => {}, error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`) });
+            this.svcMovEntradas.Put(info.Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`));
           });
         }
       });
-    })
+    });
   }
 }

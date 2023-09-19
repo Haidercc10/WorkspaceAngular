@@ -129,17 +129,13 @@ export class DashboardOTComponent implements OnInit {
       this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         this.clientesOrdenesMes = datos_ordenes;
         this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          this.totalOrdenesMes += datos_ordenes[i].cantidad;
-        }
+        this.totalOrdenesMes = datos_ordenes.reduce((a, b) => a + b.cantidad, 0);
       });
 
       this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          this.productosOrdenesMes.push(datos_ordenes[i]);
-          this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
-          this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
+        datos_ordenes.forEach((orden) => this.productosOrdenesMes.push(orden));
+        this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+        this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
       });
 
       this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
@@ -192,11 +188,7 @@ export class DashboardOTComponent implements OnInit {
         }
       });
 
-      this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          this.costoTotalOrdenesMes += datos_ordenes[i].costo;
-        }
-      });
+      this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos => this.costoTotalOrdenesMes = datos.reduce((a, b) => a + b.costo, 0));
 
       this.zeusService.GetClienteFacturadosMes().subscribe(data => this.clientesFacturados = data);
 

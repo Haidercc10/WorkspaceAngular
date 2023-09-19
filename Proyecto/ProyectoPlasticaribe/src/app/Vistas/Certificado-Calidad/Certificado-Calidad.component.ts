@@ -91,6 +91,7 @@ export class CertificadoCalidadComponent implements OnInit {
   // Funcion que va a limpiar todo 
   limpiarTodo() {
     this.FormOrden.reset();
+    this.FormOrden.patchValue({ Observacion : 'Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.' });
     this.llenarMateriales();
     this.parametrosCuantitativos = [];
     this.paramertosCualitativos = [];
@@ -162,7 +163,6 @@ export class CertificadoCalidadComponent implements OnInit {
           Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
         this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(data => {
-          this.FormOrden.patchValue({Observacion : data == null ? '' : data.observacion });
           this.calcularParametrosCuantitativos(data, ot);
           this.llenarParametrosCualitativos(data, ot);
         });

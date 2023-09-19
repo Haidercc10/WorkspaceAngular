@@ -3,8 +3,9 @@ import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PrimeNGConfig } from 'primeng/api';
-import { EmpresaService } from './Servicios/Empresa/empresa.service';
 import { EncriptacionService } from './Servicios/Encriptacion/Encriptacion.service';
 import { User } from './_Models/user';
 import { User_BagPro } from './_Models/user_BagPro';
@@ -14,8 +15,6 @@ import { AuthenticationService } from './_Services/authentication.service';
 import { authentication_BagPro } from './_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
@@ -51,8 +50,8 @@ export class AppComponent implements OnInit{
                         private cookieService: CookieService,
                           private config: PrimeNGConfig,
                             private encriptacion : EncriptacionService,
-                              @Inject(DOCUMENT) private document : Document,
-                                private empresaService : EmpresaService) {
+                              @Inject(DOCUMENT) private document : Document,) {
+                                
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
