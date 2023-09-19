@@ -118,7 +118,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   llenarTablaComprasRealizadas(compra : any){
     this.comprasRealizadas.push({
       Id : 1,
-      fecha : `${compra.fechaCompra.replace('T00:00:00', '')} - ${compra.horaCompra}`,
+      fecha : compra.fechaCompra.replace('T00:00:00', ''),
       cantComprada : compra.cantidadCompra,
       precioCompra : compra.precioReal,
       precioEstandar : compra.precioEstandar,
