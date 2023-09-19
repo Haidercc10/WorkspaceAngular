@@ -165,6 +165,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
             precioFinal : compra.precioReal,
             costoFinal : compra.costoReal,
             total : false,
+            color : '',
           });
           cantFinal += compra.cantidadCompra;
           costoFinal += compra.costoReal;
@@ -182,6 +183,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : '',
           costoFinal : costoFinal,
           total : true,
+          color : '',
         });
         this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
       }, () => {
@@ -198,6 +200,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : 0,
           costoFinal : 0,
           total : true,
+          color : '',
         });
       });
       // Entradas de material
@@ -246,6 +249,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
             precioFinal : '',
             costoFinal : '',
             total : false,
+            color : '',
           }
         );
       });
@@ -264,6 +268,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : '',
           costoFinal : '',
           total : false,
+          color : '',
         });
       });
       this.calcularSalidas();
@@ -332,6 +337,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : '',
           costoFinal : '',
           total : false,
+          color : '',
         },
       )
     }
@@ -367,6 +373,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : compra.precioFinal,
           costoFinal : precioTotalFinal,
           total : false,
+          color : '',
         });
       });
 
@@ -386,6 +393,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           precioFinal : compra.precioCompra,
           costoFinal : compra.costoRealMaterial,
           total : false,
+          color : '',
         });
       });
 
@@ -434,6 +442,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
         precioFinal : '',
         costoFinal : costosFinales.map(x => x.costoFinal).reduce((a,b) => parseFloat(a) + parseFloat(b), 0),
         total : true,
+        color : '',
       });
 
       copiaKardex = [copiaKardex, datosCostosFinales].reduce((a,b) => a.concat(b));
@@ -466,13 +475,38 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     worksheet.addRow([]);
     worksheet.addRow(['COMPRAS']).eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
-      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, bold: true };
       cell.border = border;
     });
     let headerRowCompras = worksheet.addRow(headerCompras);
     headerRowCompras.eachCell((cell) => {
+      if (cell.value == 'QR(kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'Q'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '(kg)'},
+          ]
+        }
+      } else if (cell.value == 'PR($/kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'P'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '($/kg)'},
+          ]
+        }
+      } else if (cell.value == 'PS($/kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'P'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'S'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '($/kg)'},
+          ]
+        }
+      }
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } };
-      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = border;
     });
@@ -492,13 +526,38 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       worksheet.getCell(`A${cell.row}`).alignment = { vertical: 'middle', horizontal: 'center' };
       worksheet.getCell(`A${cell.row}`).border = border;
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
-      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, bold: true };
       cell.border = border;
     });
     let headerRowSalidas = worksheet.addRow(headerSalidas);
     headerRowSalidas.eachCell((cell) => {
+      if (cell.value == 'QR(kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'Q'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '(kg)'},
+          ]
+        }
+      } else if (cell.value == 'QS(kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'Q'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'S'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '(kg)'},
+          ]
+        }
+      } else if (cell.value == 'PR($/kg)'){
+        cell.value = {
+          'richText': [
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri',}, 'text': 'P'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri', 'vertAlign': 'subscript'}, 'text': 'R'},
+            {'font': {'bold': true, 'size': 11, 'color': {'argb': 'F8DE5A'}, 'name': 'Calibri'}, 'text': '($/kg)'},
+          ]
+        }
+      }
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } }
-      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, };
+      cell.font = { name: 'Calibri', family: 4, size: 11, color: { argb: 'F8DE5A' }, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = border;
     });
@@ -522,8 +581,8 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
 
     for (let i = 1; i < 10; i++) {
       worksheet.getColumn(i).width = 20;
-      if (i > 0 && i != 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-      else if (i == 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      if (i > 0 && i != 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Black]\-""#,##0.00';
+      else if (i == 1) worksheet.getColumn(i + 1).numFmt = '""#,##0.00;[Black]\-""#,##0.00';
     }
 
     // HOJA 2, KARDEX DETALLADO
@@ -633,7 +692,13 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       this.llenarTablaKardex().forEach(d => {
         let row = worksheet2.addRow(d);
         let celdas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        let celdasColores = [3,4,5,7];
         count ++;
+        celdasColores.forEach(cell => {
+          if (row.getCell(11).value == 'azul') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, color: { argb: '69F' }  };
+          else if (row.getCell(11).value == 'verde') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, color: { argb: '22C55E' }  };
+          else if (row.getCell(11).value == '') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11,  };
+        });
         celdas.forEach(cell => {
           row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFD1' } };
           if ([1,4,7,10].includes(cell)) row.getCell(cell).border = { right: { style: 'medium' } };
@@ -668,6 +733,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           [10].forEach(cell => row.getCell(cell).border = { top: { style: 'medium' }, right: { style: 'medium' }, bottom: { style: 'thin' } });
           fecha = d[0];
         }
+        row.getCell(11).value = '';
       });      
     }, 2600);
 
@@ -675,7 +741,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     unirCeldasHoja2.forEach(cell => worksheet2.mergeCells(cell));
     for (let i = 1; i < 11; i++) {
       worksheet2.getColumn(i).width = 20;
-      worksheet2.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      worksheet2.getColumn(i).numFmt = '""#,##0.00;\-""#,##0.00';
     }
 
     setTimeout(() => {
@@ -763,6 +829,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
         kardex.cantidadFinal,
         kardex.precioFinal,
         kardex.costoFinal,
+        kardex.color
       ]);
     });
     return data;
