@@ -516,6 +516,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       celdas.forEach(cell => {
         row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C6E0B4' } };
         row.getCell(cell).border = border;
+        if (row.getCell(1).value == 'Totales') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
       });
     });
 
@@ -567,6 +568,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       celdas.forEach(cell => {
         row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C6E0B4' } };
         row.getCell(cell).border = border;
+        if (row.getCell(1).value == 'Totales') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
       });
     });
 
@@ -716,6 +718,8 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
             row.getCell(10).border = { right: { style: 'medium' }, bottom: { style: 'thin' } };
           }
 
+          if (row.getCell(12).value == true) row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
+
           if (count == this.datosKardex.length && ([1,4,7,10].includes(cell))) row.getCell(cell).border = { bottom: { style: 'medium' }, right: { style: 'medium' } };
           else if (count == this.datosKardex.length && ([2,3,5,6,8,9].includes(cell))) row.getCell(cell).border = { bottom: { style: 'medium' }, right: { style: 'thin' }, };
         });
@@ -734,6 +738,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
           fecha = d[0];
         }
         row.getCell(11).value = '';
+        row.getCell(12).value = '';
       });      
     }, 2600);
 
@@ -757,7 +762,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     }, 3000);
   }
 
-  // Funcion que va a llenar las entradas y salidas de un material, esta información es la que se va a colocar en el excel
+  // Funcion que va a llenar las entradas de un material, esta información es la que se va a colocar en el excel
   llenarTablaCompras() : any [] {
     let compraRealizada : any [] = [];
     this.comprasRealizadas.forEach(compra => {
@@ -785,6 +790,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     return compraRealizada;
   }
 
+// Funcion que va a llenar las salidas de un material, esta información es la que se va a colocar en el excel
   llenarTablaSalidas() : any [] {
     let salidaRealizada : any [] = [];
     this.salidasRealizadas.forEach(salida => {
@@ -814,7 +820,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     return salidaRealizada;
   }
 
-  // Funcion que va a llenar los datos de kardex
+  // Funcion que va a llenar los datos de kardex en el archivo excel
   llenarTablaKardex() : any [] {
     let data : any [] = [];
     this.datosKardex.forEach(kardex => {
@@ -829,7 +835,8 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
         kardex.cantidadFinal,
         kardex.precioFinal,
         kardex.costoFinal,
-        kardex.color
+        kardex.color,
+        kardex.total
       ]);
     });
     return data;
