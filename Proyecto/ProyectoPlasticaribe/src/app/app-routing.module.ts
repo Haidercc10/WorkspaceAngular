@@ -66,6 +66,7 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
+import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 
 export const routes: Routes = [
 
@@ -132,6 +133,7 @@ export const routes: Routes = [
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
   {path: 'inventario-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado'}, component : InventarioProductosPBDDComponent},
   {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
+  {path: 'inventario-areas', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},

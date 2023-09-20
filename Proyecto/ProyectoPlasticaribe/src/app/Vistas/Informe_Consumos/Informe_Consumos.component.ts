@@ -126,6 +126,7 @@ export class Informe_ConsumosComponent implements OnInit {
         CostoEstandar : 0,
         Materiales : [],
       }
+
       const objetoEncontrado = acc.find(x => x.OT == info.OT && x.Fecha == info.Fecha);
       if(objetoEncontrado) {
         objetoEncontrado.CantRequerida += info.CantRequerida;
@@ -134,7 +135,11 @@ export class Informe_ConsumosComponent implements OnInit {
         objetoEncontrado.PrecioPP = (objetoEncontrado.CostoReal / objetoEncontrado.CantRequerida);
         objetoEncontrado.ValoracionCantidad = (objetoEncontrado.PrecioPP * objetoEncontrado.DifCantidad);
         objetoEncontrado.CostoEstandar = (info.PrecioPP * info.CantEstandar);
-      } else acc.push(info);
+      } else {
+        info.DifCantidad = (info.CantRequerida - info.CantEstandar);
+        info.CostoEstandar = (info.PrecioPP * info.CantEstandar);
+        acc.push(info);
+      } 
       return acc;
     }, [])
 

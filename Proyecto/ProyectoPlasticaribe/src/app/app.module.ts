@@ -180,6 +180,7 @@ import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_Caja
 import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
 import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
 import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
+import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 
 @NgModule({
   declarations: [
@@ -283,7 +284,8 @@ import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_P
     Costos_CajaMenorComponent, 
     CrearTipoSalida_CajaMenorComponent,
     Kardex_MateriasPrimasComponent,
-    Recetas_ProductosComponent
+    Recetas_ProductosComponent, 
+    Inventario_AreasComponent,
   ],
 
   imports: [

@@ -85,6 +85,7 @@ export class BagproService {
 
   srvObtenerItemsBagproXClienteItem = (codigo : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
 
+  LikeReferencia = (ref : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/likeReferencia/${ref}`);
   /*********************************************************** DESPERDICIO **************************************************************/
 
   srvObtenerListaDespercicios = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/Procdesperdicio');
