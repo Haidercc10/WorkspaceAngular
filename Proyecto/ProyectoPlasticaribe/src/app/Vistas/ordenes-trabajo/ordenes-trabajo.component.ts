@@ -417,7 +417,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
   /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
-  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => item.undMed_Id == 'Cms' || item.undMed_Id == 'Plgs'));
+  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => ['Cms', 'Plgs'].includes(item.undMed_Id)));
 
   //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
   cargarTratadoEnProcesoExtrusion = () => this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => this.tratado = datos_tratado);
@@ -464,16 +464,16 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a obtener los pedidos provenientes de zeus
   pedidosZues(){
     this.pedidosZeusService.GetPedidosAgrupados().subscribe(datos_Pedidos => {
-      for (let i = 0; i < datos_Pedidos.length; i++) {
+      datos_Pedidos.forEach(datos => {
         let data : any =  {
-          "id_Pedido": parseInt(datos_Pedidos[i].consecutivo),
-          "id_Cliente": datos_Pedidos[i],
-          "nombre_Cliente": datos_Pedidos[i].cliente,
-          "cantidad_Productos": 1,
-          "zeus" : true,
+          id_Pedido: parseInt(datos.consecutivo),
+          id_Cliente: datos,
+          nombre_Cliente: datos.cliente,
+          cantidad_Productos: 1,
+          zeus : true,
         }
         this.pedidosSinOT.push(data);
-      }
+      });
     });
   }
 
@@ -813,13 +813,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Funcion que va a calcular el costo total de los productos que tiene el pedido
-  calcularCostoPedido() : number{
-    let total : number = 0;
-    for (let i = 0; i < this.ArrayProducto.length; i++) {
-      total += this.ArrayProducto[i].SubTotal;
-    }
-    return total;
-  }
+  calcularCostoPedido = () : number => this.ArrayProducto.reduce((a,b) => a + b.SubTotal, 0);
 
   // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
   consultarInfoProducto(data : any){
@@ -1013,7 +1007,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             CantidadBulto : data.CantBulto,
             PesoBulto : itemOt.pesoBulto == '' ? itemOt.pesoBulto = 0 : itemOt.pesoBulto = parseFloat(itemOt.pesoBulto),
           });
-          setTimeout(() => { this.calcularDatosOt(data); }, 1000);
+          setTimeout(() => this.calcularDatosOt(data), 1000);
           this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
           this.cargarCombinacionMezclas();
         }
@@ -1038,13 +1032,11 @@ export class OrdenesTrabajoComponent implements OnInit {
       //Calcular Peso de Extrusion
       if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
         largoUnd = 100;
-        if (material == 3) fact = 0.0048;
-        else fact = 0.00468;
+        material == 3 ? fact = 0.0048 : fact = 0.00468;
         this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
       } else {
         largoUnd = 39.3701;
-        if (material == 3) fact = 0.0317;
-        else fact = 0.0302;
+        material == 3 ? fact = 0.0317 : fact = 0.0302;
         this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
       }
       //Calcular Peso Producto y Peso Millar
@@ -1052,12 +1044,10 @@ export class OrdenesTrabajoComponent implements OnInit {
         if (this.ArrayProducto[i].Id == data.Id && this.ArrayProducto[i].UndCant == data.UndCant) {
           //Peso Producto
           if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms'){
-            if (material == 3) fact = 0.0048;
-            else fact = 0.00468;
+            material == 3 ? fact = 0.0048 : fact = 0.00468;
             this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
           } else {
-            if (material == 3) fact = 0.0317;
-            else fact = 0.0302;
+            material == 3 ? fact = 0.0317 : fact = 0.0302;
             this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
           }
           this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
@@ -1082,10 +1072,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (data.CantPaquete / 1000);
             if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
             if (data.CantPaquete == 0) this.valorKg = 0;
-            else {
-              if (data.CantPaquete > 0) this.valorKg = data.PrecioUnd / this.pesoPaquete;
-              else this.valorKg = 0;
-            }
+            else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
           } else if (data.UndCant == 'Und') {
             this.cantidadProducto = data.Cant;
             this.valorProducto = data.PrecioUnd;
@@ -1219,7 +1206,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
-  guardarOt_Extrusion(ordenTrabajo : number) : boolean{
+  guardarOt_Extrusion(ordenTrabajo : number) : boolean {
     let infoOTExt : any = {
       Ot_Id : ordenTrabajo,
       Material_Id : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -1233,7 +1220,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { }, error => {
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(null, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
       return true;
     });
@@ -1268,7 +1255,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { }, error => {
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
           return true;
         });
@@ -1291,7 +1278,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { }, error => {
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(null, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
       return true;
     });
@@ -1320,7 +1307,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
         SelladoCorte_PesoProducto : this.pesoProducto,
       }
-      this.otSelladoCorteService.post(info).subscribe(() => { }, error => {
+      this.otSelladoCorteService.post(info).subscribe(null, error => {
         this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
         return true;
       });
@@ -1358,16 +1345,14 @@ export class OrdenesTrabajoComponent implements OnInit {
           Prod_Peso_Paquete : 0,
           Prod_Peso_Bulto : 0,
         }
-        this.productoService.PutEstadoProducto(producto, info).subscribe(() => { }, error => {
-          this.mensajeService.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error);
-        });
+        this.productoService.PutEstadoProducto(producto, info).subscribe(null, error => this.mensajeService.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
       }
     }, error => this.mensajeService.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
 
   // Funcion que va a cambiar el estado de un cliente a "Activo". El numero '1' corresponde a "Activo"
   cambiarEstadoCliente(cliente : number){
-    this.clienteServise.PutEstadoCliente(cliente, 1).subscribe(() => { }, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
+    this.clienteServise.PutEstadoCliente(cliente, 1).subscribe(null, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -2188,7 +2173,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
           Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
         }
-        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(() => { }, error => {
+        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.error);
           return true;
         });
@@ -2231,7 +2216,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               Tinta7_Id : datos_impresion[j].tinta_Id7,
               Tinta8_Id : datos_impresion[j].tinta_Id8,
             }
-            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(() => { }, error => {
+            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(null, error => {
               this.mensajeService.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
               return true;
             });
@@ -2265,7 +2250,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
           LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
-        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => { }, error => {
+        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.error);
           return true;
         });
@@ -2301,7 +2286,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
           }
-          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => { }, error => {
+          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(null, error => {
             this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
             return true;
           });
@@ -2323,7 +2308,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.cargarMezclaMateria2();
     this.cargarMezclaPigmento2();
     this.cargarMateriales_MatPrima();
-    setTimeout(() => { this.initFormCrearMezclas(); }, 1000);
+    setTimeout(() => this.initFormCrearMezclas(), 1000);
   }
 
   // Función que va a abrir el modal de la creación de materiales
