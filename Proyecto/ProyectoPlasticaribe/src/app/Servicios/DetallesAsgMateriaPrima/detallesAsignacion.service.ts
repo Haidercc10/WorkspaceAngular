@@ -20,6 +20,8 @@ export class DetallesAsignacionService {
   srvObtenerListaPorAsignacionesOT = (ot : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesTotales/${ot}`);
 
   getMateriasPrimasAsignadas = (ot : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/getMateriaPrimaAsignada/${ot}`);
+
+  GetPolietilenoAsignada = (ot : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/getPolietilenoAsignada/${ot}`);
     
   srvGuardar = (data : modelDetallesAsignacion): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data);
   

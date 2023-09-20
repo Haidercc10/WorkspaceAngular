@@ -16,4 +16,6 @@ export class DetalleAsignacion_BOPPService {
 
   srvGuardar = (data: modelDetallesAsignacionBopp): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_BOPP', data);
 
+  GetBiorientadoAsignado = (ot : number) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/getBiorientadoAsignado/${ot}`);
+
 }

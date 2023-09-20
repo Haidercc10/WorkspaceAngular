@@ -189,14 +189,12 @@
     <div class="mb-4" id="tablaMatPrima">
       <div class="row g-3 font-size-14">
         <p-table
-          #dt
+          #dt_mp
           [value]="ArrayMateriaPrima"
           styleClass="p-datatable-gridlines p-datatable-sm"
           responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="15"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos">
+          [scrollable]="true"
+          scrollHeight="20rem">
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">Id</th>
@@ -244,11 +242,7 @@
           #dt
           [value]="ArrayProcesos"
           styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="15"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos">
+          responsiveLayout="scroll">
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">OT</th>

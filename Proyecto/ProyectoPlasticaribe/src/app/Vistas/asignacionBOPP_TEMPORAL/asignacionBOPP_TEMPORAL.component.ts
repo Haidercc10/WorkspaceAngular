@@ -121,56 +121,94 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     let ordenTrabajo : string = this.FormAsignacionBopp.value.AsgBopp_OT;
     if (this.ordenesTrabajo.length == 0) {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
-        for (const item of datos_OT) {
-          this.arrayOT.push(ordenTrabajo);
-          if (item.estado == null || item.estado == '' || item.estado == '0') {
-            let adicional : number = item.datosotKg * 0.02;
-            this.kgOT = item.datosotKg + adicional;
-            const infoOT : any = {
-              ot : item.item,
-              cliente : item.clienteNom,
-              micras : item.extCalibre,
-              ancho : item.ptAnchopt,
-              item : item.clienteItems,
-              referencia : item.clienteItemsNom,
-              kg : item.datosotKg,
-              cantPedida : 0,
-              und : item.ptPresentacionNom.trim(),
-            }
-            infoOT.und == 'Kilo' ? infoOT.cantPedida = item.datosotKg : infoOT.und == 'Unidad' ? infoOT.cantPedida = item.datoscantBolsa : infoOT.und == 'Paquete' ? item.datoscantBolsa : infoOT.cantPedida = item.datosotKg;
-            infoOT.und == 'Kilo' ? infoOT.und = 'Kg' : infoOT.und == 'Unidad' ? infoOT.und = 'Und' : infoOT.und == 'Paquete' ? infoOT.und = 'Paquete' : infoOT.und = 'Kg';
-            this.ordenesTrabajo.push(infoOT);
-            this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
-            this.cantidadKG = item.datosotKg + this.cantidadKG;
-          } else if (item.estado == 4 || item.estado == 1) this.msj.mensajeAdvertencia(`Advertencia`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
-        }
+        this.detallesAsignacionBOPPService.GetBiorientadoAsignado(parseInt(ordenTrabajo)).subscribe(cantidadAsignada => {
+          for (const item of datos_OT) {
+            this.arrayOT.push(ordenTrabajo);
+            if ([null, '', '0'].includes(item.estado)) {
+              let adicional : number = item.datosotKg * 0.02;
+              this.kgOT = item.datosotKg + adicional;
+              const infoOT : any = {
+                ot : item.item,
+                cliente : item.clienteNom,
+                micras : item.extCalibre,
+                ancho : item.ptAnchopt,
+                item : item.clienteItems,
+                referencia : item.clienteItemsNom,
+                kg : item.datosotKg,
+                cantPedida : 0,
+                cantAsignada : cantidadAsignada,
+                und : item.ptPresentacionNom.trim(),
+              }
+              switch (infoOT.und) {
+                case 'Kilo':
+                  infoOT.cantPedida = item.datosotKg;
+                  infoOT.und = 'Kg'
+                  break;
+                case 'Unidad':
+                  infoOT.cantPedida = item.datoscantBolsa;
+                  infoOT.und = 'Und'
+                  break;
+                case 'Paquete':
+                  infoOT.cantPedida = item.datoscantBolsa;
+                  infoOT.und = 'Paquete'
+                  break;
+                default:
+                  infoOT.cantPedida = item.datosotKg;
+                  infoOT.und = 'Kg'
+                  break;
+              }
+              this.ordenesTrabajo.push(infoOT);
+              this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
+              this.cantidadKG += item.datosotKg;
+            } else if ([1,4].includes(item.estado)) this.msj.mensajeAdvertencia(`¡Advertencia!`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
+          }
+        });
       });
     } else {
       if (!this.arrayOT.includes(ordenTrabajo)) {
         this.arrayOT.push(ordenTrabajo);
         this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
-          for (const itemOT of datos_OT) {
-            if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
-              let adicional : number = itemOT.datosotKg * 0.02;
-              this.kgOT = itemOT.datosotKg + adicional;
-              const infoOT : any = {
-                ot : itemOT.item,
-                cliente : itemOT.clienteNom,
-                micras : itemOT.extCalibre,
-                ancho : itemOT.ptAnchopt,
-                item : itemOT.clienteItems,
-                referencia : itemOT.clienteItemsNom,
-                kg : itemOT.datosotKg,
-                cantPedida : itemOT.datosotKg,
-                und : itemOT.ptPresentacionNom.trim(),
-              }
-              infoOT.und == 'Kilo' ? infoOT.cantPedida = itemOT.datosotKg : infoOT.und == 'Unidad' ? infoOT.cantPedida = itemOT.datoscantBolsa : infoOT.und == 'Paquete' ? infoOT.cantPedida = itemOT.datoscantBolsa : infoOT.cantPedida = itemOT.datosotKg;
-              infoOT.und == 'Kilo' ? infoOT.und = 'Kg' : infoOT.und == 'Unidad' ? infoOT.und = 'Und' : infoOT.und == 'Paquete' ? infoOT.und = 'Paquete' : infoOT.und = 'Kg';
-              this.ordenesTrabajo.push(infoOT);
-              this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
-              this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
-            } else if (itemOT.estado == 4 || itemOT.estado == 1) this.msj.mensajeAdvertencia(`¡Advertencia!`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
-          }
+          this.detallesAsignacionBOPPService.GetBiorientadoAsignado(parseInt(ordenTrabajo)).subscribe(cantidadAsignada => {
+            for (const item of datos_OT) {
+              if ([null, '', '0'].includes(item.estado)) {
+                let adicional : number = item.datosotKg * 0.02;
+                this.kgOT = item.datosotKg + adicional;
+                const infoOT : any = {
+                  ot : item.item,
+                  cliente : item.clienteNom,
+                  micras : item.extCalibre,
+                  ancho : item.ptAnchopt,
+                  item : item.clienteItems,
+                  referencia : item.clienteItemsNom,
+                  kg : item.datosotKg,
+                  cantPedida : item.datosotKg,
+                  cantAsignada : cantidadAsignada,
+                  und : item.ptPresentacionNom.trim(),
+                }
+                switch (infoOT.und) {
+                  case 'Kilo':
+                    infoOT.cantPedida = item.datosotKg;
+                    infoOT.und = 'Kg'
+                    break;
+                  case 'Unidad':
+                    infoOT.cantPedida = item.datoscantBolsa;
+                    infoOT.und = 'Und'
+                    break;
+                  case 'Paquete':
+                    infoOT.cantPedida = item.datoscantBolsa;
+                    infoOT.und = 'Paquete'
+                    break;
+                  default:
+                    infoOT.cantPedida = item.datosotKg;
+                    infoOT.und = 'Kg'
+                    break;
+                }
+                this.ordenesTrabajo.push(infoOT);
+                this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
+                this.cantidadKG += item.datosotKg;
+              } else if ([1,4].includes(item.estado)) this.msj.mensajeAdvertencia(`¡Advertencia!`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
+            }
+          });
         });
       } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡La OT ${ordenTrabajo} ya se encuentra en la tabla!`);
     }
@@ -241,9 +279,23 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   // funcion que validará los campos para poder realizar la asignación
   validarAsignacion(){
     if (this.ordenesTrabajo.length > 0){
-      if (this.ArrayBoppPedida.length > 0) this.asignarBOPP();
-      else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar minimo un rollo!`);
+      if (this.ArrayBoppPedida.length > 0) {
+        if (this.validarAsignaciones()) this.asignarBOPP();
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar minimo un rollo!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar minimo una Orden de Trabajo!`);
+  }
+
+  // Funcion que va a validar que todas las asignaciones a cada orden sean correctas
+  validarAsignaciones() : boolean {
+    let valor : boolean;
+    for (let i = 0; i < this.ordenesTrabajo.length; i++) {
+      let asignacion = ((this.ArrayBoppPedida.reduce((a, b) => a + b.Cantidad2, 0)) / this.ordenesTrabajo.length) + this.ordenesTrabajo[i].cantAsignada;
+      if (asignacion > this.ordenesTrabajo[i].kg) {
+        this.msj.mensajeAdvertencia(`Advertencia`, `¡La asignación a la Orden ${this.ordenesTrabajo[i].ot} supera la cantidad pedida!`);
+        return false;
+      } else valor = true;
+    };
+    return valor;
   }
 
   // funcion que creará la asignacion de rollo

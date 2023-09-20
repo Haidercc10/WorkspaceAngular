@@ -142,6 +142,10 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Total Kg de Polietilenos Asignados</td>
+            <td colspan="2">{{calcularTotalMaterialPrima(movimientosPolietilenos) | number : '1.0-2'}}</td>
+          </tr>
           <tr id="pie-t1">
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
@@ -200,6 +204,17 @@
             <td><p-button icon="pi pi-file-pdf" pTooltip="Exportar a PDF" styleClass="p-button-rounded p-button-danger" (onClick)="validarTipoMovimiento(data)"></p-button></td>
           </tr>
         </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Total Kg de Tintas Asignadas</td>
+            <td colspan="2">{{calcularTotalMaterialPrima(movimientosTintas) | number : '1.0-2'}}</td>
+          </tr>
+          <tr id="pie-t1">
+            <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
+            <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>
+            <td colspan="3"></td>
+          </tr>
+        </ng-template>
       </p-table>
     </p-tabPanel>
 
@@ -253,6 +268,10 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Total Kg de Biorientados Asignados</td>
+            <td colspan="2">{{calcularTotalMaterialPrima(movimientosBiorientados) | number : '1.0-2'}}</td>
+          </tr>
           <tr>
             <td colspan="2">Materia Prima Asignada: {{cantAsignada | number : '1.2-2'}}</td>
             <td colspan="2">Materia Prima Restante: {{cantRestante | number : '1.2-2'}}</td>

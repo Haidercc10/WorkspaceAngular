@@ -93,6 +93,7 @@
             <th scope="col">Item</th>
             <th scope="col">Referencia</th>
             <th scope="col">Kg Total</th>
+            <th scope="col">Kg Asignados</th>
             <th scope="col">Kg Restante</th>
         </ng-template>
         <ng-template pTemplate="body" let-ot>
@@ -102,6 +103,7 @@
             <td>{{ot.item}}</td>
             <td>{{ot.referencia}}</td>
             <td>{{ot.kg | number}}</td>
+            <td><b>{{ot.cantAsignada | number}}</b></td>
             <td [ngClass]="{ 'colorRojo' : ot.kgRestante <= 0 }"><b>{{ot.kgRestante | number}}</b></td>
           </tr>
         </ng-template>
