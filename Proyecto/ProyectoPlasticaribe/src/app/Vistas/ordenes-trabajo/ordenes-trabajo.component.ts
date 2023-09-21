@@ -714,22 +714,21 @@ export class OrdenesTrabajoComponent implements OnInit {
         else if (datos[i].presentacion == 'KLS') presentacion = 'Kg';
         else if (datos[i].presentacion == 'PAQ') presentacion = 'Paquete';
         this.sedeClienteService.GetSedeCliente(datos[i].id_Cliente, datos[i].ciudad, datos[i].direccion_Cliente).subscribe(datosSede => {
-          for (let j = 0; j < datosSede.length; j++) {
+          datosSede.forEach(sede => {
             this.FormOrdenTrabajo.reset();
             this.FormOrdenTrabajo.patchValue({
               Pedido_Id: pedido,
               Nombre_Vendedor: datos[i].vendedor,
               OT_FechaCreacion: this.today,
-              Id_Sede_Cliente : datosSede[j].sedeCli_Id,
-              ID_Cliente: datosSede[j].cli_Id,
+              Id_Sede_Cliente : sede.sedeCli_Id,
+              ID_Cliente: sede.cli_Id,
               Nombre_Cliente: datos[i].cliente,
               Ciudad_SedeCliente: datos[i].ciudad,
               Direccion_SedeCliente : datos[i].direccion_Cliente,
               OT_Estado : datos[i].estado == 'Parcialmente Satisfecho' ? datos[i].estado = 12 : datos[i].estado = 11,
               OT_Observacion : datos[i].observacion,
             });
-            break;
-          }
+          });
         });
         this.productoService.GetInfoProducto_Prod_Presentacion(datos[i].id_Producto, presentacion).subscribe(datos_producto => {
           for (let j = 0; j < datos_producto.length; j++) {

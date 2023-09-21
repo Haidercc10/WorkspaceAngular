@@ -280,7 +280,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   validarAsignacion(){
     if (this.ordenesTrabajo.length > 0){
       if (this.ArrayBoppPedida.length > 0) {
-        if (this.validarAsignaciones()) this.asignarBOPP();
+        this.asignarBOPP();
+        // if (this.validarAsignaciones()) this.asignarBOPP();
       } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar minimo un rollo!`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar minimo una Orden de Trabajo!`);
   }

@@ -767,7 +767,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     let compraRealizada : any [] = [];
     this.comprasRealizadas.forEach(compra => {
       compraRealizada.push([
-        compra.fecha.toString().substring(0, 10),
+        moment(compra.fecha).format('DD-MMMM-YYYY'),
         compra.cantComprada,
         compra.precioCompra,
         compra.precioEstandar,
@@ -795,7 +795,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     let salidaRealizada : any [] = [];
     this.salidasRealizadas.forEach(salida => {
       salidaRealizada.push([
-        salida.fecha.replace('T00:00:00', ''),
+        moment(salida.fecha).format('DD-MMMM-YYYY'),
         salida.orden,
         salida.cantidadSalida,
         salida.cantidadTotalEstandar,
@@ -825,7 +825,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
     let data : any [] = [];
     this.datosKardex.forEach(kardex => {
       data.push([
-        kardex.fecha,
+        moment(kardex.fecha).format('DD-MMMM-YYYY'),
         kardex.cantEntrada,
         kardex.precioEntrada,
         kardex.costoEntrada,

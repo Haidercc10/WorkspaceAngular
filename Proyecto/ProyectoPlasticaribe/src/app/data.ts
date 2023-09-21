@@ -8917,6 +8917,21 @@ export const stepsProductos : Step.StepOptions[] = [
   },
   {
     attachTo: {
+      element: '#editar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'editar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Receta!</h4>',
+    text: `<p>¡Presionando este botón podremos crear una receta para un producto!</p>`
+  },
+  {
+    attachTo: {
       element: '#costoTotal',
       on: 'bottom'
     },
@@ -8982,12 +8997,109 @@ export const stepsProductos : Step.StepOptions[] = [
     },
     buttons: [
       builtInButtons.back,
+      builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'nombres',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Titulos de la tabla!</h4>',
     text: `<p>¡En cada uno de los campos en los que aparecen los nombres de las columnas tenemos el siguiente icono '<i class="pi pi-sort-alt"></i>', esto indica que la columnas puede ser ordenada de mayor a menor o de menor a mayor haciendo click sobre este campo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#editarReceta',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'editarReceta',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar o Ver Receta!</h4>',
+    text: `<p>¡Si queremos <b>ver o editar</b> la información de una receta <b>podemos presionar click</b> en el nombre o información del producto!</p>`
+  },
+];
+
+/***************************************************************** RECETAS PRODUCTOS *******************************************************************/
+export const stepsRecetaProductos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Recetas Productos!</h4>',
+    text: `<p>¡Desde este pequeño módulo podemos crear las recetas de los productos, además podemos ver y editar las recetas de los productos que hayamos creado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#productos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'productos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Productos!</h4>',
+    text: `<p>¡Inicialmente debemos seleccionar el producto al que se le creará la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#materiasPrimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'materiasPrimas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas!</h4>',
+    text: `<p>¡Desde aquí podemos seleccionar las materias primas que se van a utilizar en la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaMateriasPrimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaMateriasPrimas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Mat. Primas Seleccionadas!</h4>',
+    text: `<p>¡En esta tabla estarán las materias primas que se han seleccionado para la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>En esta apartado están las acciones que podemos realizar en el módulo.</p>
+    <p><b>Guardar o Editar:</b> Una vez hayamos seleccionado todas las materias primas podemos <b>guardar o editar</b> la receta.</p>
+    <p><b>Limpiar Campos:</b> Podemos limpiar todos los campos para volver a seleccionar el producto.</p>`
   },
 ];
 

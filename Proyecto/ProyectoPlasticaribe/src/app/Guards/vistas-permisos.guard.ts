@@ -9,23 +9,28 @@ import { AuthenticationService } from '../_Services/authentication.service';
 @Injectable({
   providedIn: 'root'
 })
+
 export class VistasPermisosGuard implements CanActivate {
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private vistaPermisosService : Vistas_PermisosService,
                   private authenticationService: AuthenticationService,
                     private encriptacion : EncriptacionService,
-                      private router : Router){ }
+                      private router: Router){ }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const usuario : any = this.authenticationService.userValue;
     if(usuario){
       const ruta = route.data['nombre'];
-      let rol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
-      this.vistaPermisosService.GetPermisos(rol,ruta).toPromise().catch(() => this.router.navigate['/home']);
-      return true;
+      let usuario = parseInt(this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')));
+      if (['Pruebas', 'Vistas'].includes(ruta) && usuario != 123456789) this.router.navigate['/'];
+      else {
+        let rol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
+        this.vistaPermisosService.GetPermisos(rol,ruta).toPromise().catch(() => this.router.navigate['/']);
+        return true;
+      }
     }
-    return this.router.navigate['/'];
+    this.router.navigate['/'];
+    return false;
   }
-  
 }

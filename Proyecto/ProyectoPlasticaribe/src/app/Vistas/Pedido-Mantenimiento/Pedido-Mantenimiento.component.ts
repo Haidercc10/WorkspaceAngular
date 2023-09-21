@@ -46,7 +46,7 @@ export class PedidoMantenimientoComponent implements OnInit {
                         private tipoMantenimientoService : Tipo_MantenimientoService,
                           private messageService: MessageService,
                             private shepherdService: ShepherdService,
-                              private mensajeService : MensajesAplicacionService,) {
+                              private msj : MensajesAplicacionService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormPedidoMantenimiento = this.frmBuilder.group({
@@ -75,7 +75,7 @@ export class PedidoMantenimientoComponent implements OnInit {
   }
 
   // Funcion que cargará los activos
-  obtenerActivos = () => this.activosService.GetTodo().subscribe(datos => this.activos = datos, () => this.mensajeService.mensajeError(`¡No se encontraron activos para realizar el pedido!`, ``));
+  obtenerActivos = () => this.activosService.GetTodo().subscribe(datos => this.activos = datos, () => this.msj.mensajeError(`¡No se encontraron activos para realizar el pedido!`));
 
   // Funcion que obtendrá el id el ultimo pedido creado para saber que consecutivo es el siguiente
   obtenerUlimoId(){
@@ -133,8 +133,8 @@ export class PedidoMantenimientoComponent implements OnInit {
         info.Fecha = moment(this.FormPedidoMantenimiento.value.FechaDaño).format('YYYY-MM-DD');
         this.activosSeleccionados.push(info);
         this.idActivosSeleccionados.push(info.Id);
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que quitará de la tabla de los activos seleccionados
@@ -143,7 +143,7 @@ export class PedidoMantenimientoComponent implements OnInit {
     this.onReject();
     this.activosSeleccionados.splice(this.activosSeleccionados.findIndex(i => i.Id == item.Id), 1);
     this.idActivosSeleccionados.splice(this.idActivosSeleccionados.findIndex(i => i == item.Id), 1);
-    this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha eliminado el activo ${item.Nombre} de la tabla!`);
+    this.msj.mensajeConfirmacion('Confirmación', `Se ha eliminado el activo ${item.Nombre} de la tabla!`);
   }
 
   // Funcion que quitará todos los activos seleccionados para mantenimiento
@@ -151,7 +151,7 @@ export class PedidoMantenimientoComponent implements OnInit {
     this.onReject();
     this.activosSeleccionados = [];
     this.idActivosSeleccionados = [];
-    this.mensajeService.mensajeConfirmacion('Confirmación', `Se han eliminado todos los activos de la tabla!`);
+    this.msj.mensajeConfirmacion('Confirmación', `Se han eliminado todos los activos de la tabla!`);
   }
 
   // Funcion que creará el pedido de mantenimiento de activos
@@ -165,11 +165,11 @@ export class PedidoMantenimientoComponent implements OnInit {
         PedMtto_Observacion : this.FormPedidoMantenimiento.value.Observacion == null ? '' : this.FormPedidoMantenimiento.value.Observacion.toUpperCase(),
       }
       this.pedidoMantenimientoService.Insert(info).subscribe(data => this.buscarUltimoID(data.pedMtto_Id), () => {
-        this.mensajeService.mensajeError(`Error`, '¡Ha ocurrido un error al crear el pedido de mantenimiento!');
+        this.msj.mensajeError(`Error`, '¡Ha ocurrido un error al crear el pedido de mantenimiento!');
         this.cargando = false;
       });
     } else {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar minimo un activo para crear el pedido de mantenimiento!`);
+      this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar minimo un activo para crear el pedido de mantenimiento!`);
       this.cargando = false;
     }
   }
@@ -187,11 +187,11 @@ export class PedidoMantenimientoComponent implements OnInit {
       this.dtPedidoMantenimientoService.Insert(info).subscribe(() => {
         numDatos++;
         if (numDatos == this.activosSeleccionados.length) {
-          this.mensajeService.mensajeConfirmacion('Confirmación', `Se ha creado un Pedido de mantenimiento para ${this.activosSeleccionados.length} activo(s)!`);
+          this.msj.mensajeConfirmacion('Confirmación', `Se ha creado un Pedido de mantenimiento para ${this.activosSeleccionados.length} activo(s)!`);
           this.limpiarTodo();
         }
       }, () => {
-        this.mensajeService.mensajeError(`Error`, `¡Error al almacenar los activos a los que se les hará mantenimientos!`);
+        this.msj.mensajeError(`Error`, `¡Error al almacenar los activos a los que se les hará mantenimientos!`);
         this.cargando = false;
       });
     }

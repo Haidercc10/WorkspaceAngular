@@ -12,6 +12,7 @@ import { Productos_MateriasPrimasService } from 'src/app/Servicios/Productos_Mat
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsRecetaProductos as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Recetas_Productos',
@@ -74,6 +75,14 @@ export class Recetas_ProductosComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerMateriasPrimas();
     this.obtenerUnidadesMedida();
+  }
+
+  tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
