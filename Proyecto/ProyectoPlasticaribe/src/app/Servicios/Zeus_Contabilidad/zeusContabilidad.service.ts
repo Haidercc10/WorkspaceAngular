@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -10,6 +11,9 @@ export class ZeusContabilidadService {
   constructor(private http : HttpClient,) { }
 
   readonly rutaZeusContabilidad = environment.rutaZeusContabilidad;
+
+  /****************************************************************** CLIENTES ******************************************************************************/
+  GetClientes = () : Observable<any> => this.http.get<any>(this.rutaZeusContabilidad + `/Clientes/getClientes`);
 
   /**************************************************************** FACTURAS BU *****************************************************************************/
   GetCarteraClientes = (id : string) => this.http.get<any>(this.rutaZeusContabilidad + `/FacturasBU/getCarteraClientes/${id}`);

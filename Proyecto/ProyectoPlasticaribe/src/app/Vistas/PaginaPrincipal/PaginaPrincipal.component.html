@@ -93,7 +93,8 @@
       <p-tabPanel
         header="Compras"
         leftIcon="pi pi-credit-card"
-        tooltip="Información general sobre las compras de la empresa">
+        tooltip="Información general sobre las compras de la empresa"
+        *ngIf="[1].includes(ValidarRol)">
         <app-Dashboard_Compras *ngIf="compras"></app-Dashboard_Compras>
       </p-tabPanel>
 

@@ -17,9 +17,9 @@
               <!-- CLIENTES -->
               <div class="col-sm-12 col-md-12 col-lg-4">
                 <span class="p-float-label">
-                  <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" (keyup)="obtenerClientes()" pInputText required/>
+                  <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" pInputText required/>
                   <datalist id="clientes">
-                    <option value={{item.cli_Nombre}} *ngFor="let item of clientes">{{item.cli_Nombre}} - {{item.cli_Id}}</option>
+                    <option value={{item.razoncial}} *ngFor="let item of clientes">{{item.razoncial}} - {{item.idcliente}}</option>
                   </datalist>
                   <label for="Nombre">Cliente</label>
                 </span>

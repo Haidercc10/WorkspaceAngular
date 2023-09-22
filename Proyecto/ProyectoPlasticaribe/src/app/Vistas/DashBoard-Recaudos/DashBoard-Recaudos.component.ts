@@ -1,15 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
-import { Table } from 'primeng/table';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -38,10 +37,9 @@ export class DashBoardRecaudosComponent implements OnInit {
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
                     private paginaPrincial : PaginaPrincipalComponent,
-                      private clienteService : ClientesService,
-                        private frmBuilder : FormBuilder,
-                          private vendedorService : UsuarioService,
-                            private msj : MensajesAplicacionService,) {
+                      private frmBuilder : FormBuilder,
+                        private vendedorService : UsuarioService,
+                          private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.frmBuilder.group({
@@ -53,6 +51,7 @@ export class DashBoardRecaudosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerVendedor();
+    this.obtenerClientes();
     this.tiempoExcedido();
   }
 
@@ -86,7 +85,7 @@ export class DashBoardRecaudosComponent implements OnInit {
   }
 
   // Funcion que consultará los clientes
-  obtenerClientes = () => this.clienteService.LikeGetCliente(this.FormFiltros.value.Cliente).subscribe(data => this.clientes = data);
+  obtenerClientes = () => this.zeusService.GetClientes().subscribe(data => this.clientes = data);
 
   // Funcion que consultará los vendedores
   obtenerVendedor = () => this.vendedorService.GetVendedores().subscribe(data => this.vendedores = data.map(x => x.usua_Nombre));
