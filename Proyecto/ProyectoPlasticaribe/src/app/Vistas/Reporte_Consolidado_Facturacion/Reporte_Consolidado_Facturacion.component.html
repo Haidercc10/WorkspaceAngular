@@ -28,60 +28,84 @@
   </div>
 
   <div class="mb-4">
-    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-24"><i class="pi pi-filter"></i> Filtros de búsqueda</h3>
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="font-size-20"><i class="pi pi-filter"></i> Filtros de búsqueda</h3>
   </div>
   <br>
 
   <!-- Formulario para consultar filtros -->
-  <form [formGroup]="formFiltros" id="formularioFiltros">
+  <form [formGroup]="formFiltros" (ngSubmit)="consultarFacturacion()" id="formularioFiltros">
     <div class="mb-3">
       <div class="row g-4">
 
-        <!-- Vendedores -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-3" id="vendedor">
+        <!-- Id Vendedores -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Id_Vendedor">
           <span class="p-float-label">
-            <input formControlName="vendedor" id="Vendedor" [readonly]="ValidarRol == 2" list="vendedores" (keyup)="cargarVendedores()" (change)="seleccionarVendedores()" type="text" pInputText autocomplete="off"/>
+            <input formControlName="Id_Vendedor" id="Id_Vendedor" [readonly]="true" type="text" pInputText autocomplete="off"/>
+            <label for="Id_Vendedor">Id Vendedor</label>
+          </span>
+        </div>
+
+        <!-- Vendedores -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="Vendedor">
+          <span class="p-float-label">
+            <input formControlName="Vendedor" id="Vendedor" [readonly]="ValidarRol == 2" list="vendedores" (change)="llenarVendedor()" type="text" pInputText autocomplete="off"/>
             <datalist id="vendedores">
-              <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
+              <option value={{item.usua_Nombre}} *ngFor="let item of Vendedores">{{item.usua_Nombre}}</option>
             </datalist>
             <label for="Vendedor">Vendedor</label>
           </span>
         </div>
 
-        <!-- Clientes -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="cliente">
+        <!-- Id Cliente -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Id_Cliente">
           <span class="p-float-label">
-            <input formControlName="cliente" id="Cliente" list="clientes" (keyup)="cargarClientes()" autocomplete="off" (change)="seleccionarClientes()" type="text" pInputText/>
+            <input formControlName="Id_Cliente" id="Id_Cliente" [readonly]="true" type="text" pInputText autocomplete="off"/>
+            <label for="Id_Cliente">Id Cliente</label>
+          </span>
+        </div>
+
+        <!-- Clientes -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="Cliente">
+          <span class="p-float-label">
+            <input formControlName="Cliente" id="Cliente" list="clientes" (change)="llenarCliente()" autocomplete="off" type="text" pInputText/>
             <datalist id="clientes">
-              <option value={{item.idcliente}} *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
+              <option value={{item.idcliente}} *ngFor="let item of Clientes">{{item.razoncial}}</option>
             </datalist>
             <label for="Cliente">Cliente</label>
           </span>
         </div>
 
-        <!-- Items -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="producto">
+        <!-- Item -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Item">
           <span class="p-float-label">
-            <input formControlName="item" id="Cliente" list="items" (keyup)="cargarProductos()" autocomplete="off" (change)="seleccionarProductos()" type="text" pInputText/>
-            <datalist id="items">
-              <option value={{valor.codigo}} *ngFor="let valor of arrayItems">{{valor.nombre}}</option>
-            </datalist>
+            <input formControlName="Item" id="Id_Cliente" [readonly]="true" type="text" pInputText autocomplete="off"/>
             <label for="Item">Item</label>
           </span>
         </div>
 
-        <!--Año 1-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl col-xxl" id="anio1">
+        <!-- Referencia -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="Referencia">
           <span class="p-float-label">
-            <p-dropdown formControlName="anio1" inputId="anio1" [options]="arrayAnios"  [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+            <input formControlName="Referencia" id="Cliente" list="Referencias" (keyup)="consultarProductos()" (change)="llenarProducto()" autocomplete="off" type="text" pInputText/>
+            <datalist id="Referencias">
+              <option value={{valor.codigo}} *ngFor="let valor of Items">{{valor.nombre}}</option>
+            </datalist>
+            <label for="Item">Referencia</label>
+          </span>
+        </div>
+
+        <!--Año 1-->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Anio1">
+          <span class="p-float-label">
+            <p-dropdown formControlName="anio1" inputId="anio1" [options]="anos" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
             <label for="anio1">Año Inicial</label>
           </span>
         </div>
 
         <!--Año 2-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl col-xxl" id="anio2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="Anio2">
           <span class="p-float-label">
-            <p-dropdown formControlName="anio2" inputId="anio2" [options]="arrayAnios"  [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="anio2" inputId="anio2" [options]="anos" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
             <label for="anio2">Año Final</label>
           </span>
         </div>
@@ -92,9 +116,9 @@
     <!--Botones-->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones">
-        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarConsolidado()"> </button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
-        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportarExcel()"> </button>
+        <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportarExcel()"></button>
       </div>
     </div>
   </form>
@@ -110,7 +134,7 @@
 
   <div *ngIf="!cargando">
     <p-table #dt
-             [value]="arrayConsolidado"
+             [value]="datosFacturacion"
              rowGroupMode="subheader"
              groupRowsBy="Ano"
              [resizableColumns]="true"
@@ -195,22 +219,17 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="groupfooter" let-consolidado>
-        <tr style="background-color: palegreen;  color: black">
-          <td colspan="16" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
-          <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
-          <ng-template #Filtro>
-            <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
-          </ng-template>
+        <tr class="font-bold" style="background-color: palegreen; color: black">
+          <td colspan="15" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
+          <td class="text-left" colspan="2"><b>{{calcularTotalAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
         </tr>
       </ng-template>
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="16">Totales</td>
-          <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
+          <td>{{calcularTotal() | currency : 'COP $'}}</td>
         </tr>
       </ng-template>
     </p-table>
   </div>
 </p-card>
-
-<br>

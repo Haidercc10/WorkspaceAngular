@@ -193,7 +193,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             };
             info.und == 'Kilo' ? info.cantPedida = datos_procesos[index].datosotKg : info.und == 'Unidad' ? info.cantPedida = datos_procesos[index].datoscantBolsa : info.und == 'Paquete' ? datos_procesos[index].datoscantBolsa : info.cantPedida = datos_procesos[index].datosotKg;
             info.und == 'Kilo' ? info.und = 'Kg' : info.und == 'Unidad' ? info.und = 'Und' : info.und == 'Paquete' ? info.und = 'Paquete' : info.und = 'Kg'
-            this.infoOrdenTrabajo.pop();
+            this.infoOrdenTrabajo = [];
             this.infoOrdenTrabajo.push(info);
           });
           break;

@@ -15,6 +15,8 @@ export class ZeusContabilidadService {
   /****************************************************************** CLIENTES ******************************************************************************/
   GetClientes = () : Observable<any> => this.http.get<any>(this.rutaZeusContabilidad + `/Clientes/getClientes`);
 
+  GetClientes_Vendedor = (vendedor) : Observable<any> => this.http.get<any>(this.rutaZeusContabilidad + `/Clientes/getClientes_Vendedor/${vendedor}`);
+
   /**************************************************************** FACTURAS BU *****************************************************************************/
   GetCarteraClientes = (id : string) => this.http.get<any>(this.rutaZeusContabilidad + `/FacturasBU/getCarteraClientes/${id}`);
 

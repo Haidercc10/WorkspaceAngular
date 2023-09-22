@@ -7,6 +7,8 @@ import moment from 'moment';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
 
@@ -20,38 +22,34 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
-  arrayDocumento : any = []; /** Array para cargar la información que se verá en la vista. */
   cargando : boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
+  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  arrayClientes : any = []; /** Array que contendrá la información de los clientes */
-  arrayItems : any = []; /** Array que contendrá la información de los items */
-  arrayVendedores : any = []; /** Array que contendrá la información de los vendedores */
+  Clientes : any = []; /** Array que contendrá la información de los clientes */
+  Items : any = []; /** Array que contendrá la información de los items */
+  Vendedores : any = []; /** Array que contendrá la información de los vendedores */
   anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
-  arrayAnios : any = []; /** Array que cargará los años desde 2019 hasta el actual  */
-  arrayConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
-  totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
-  totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
-  valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  datosFacturacion : any [] = []; //Variable que tendrá la información del consolidado consultado
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
                   private invetarioZeusService : InventarioZeusService,
+                    private usuariosService : UsuarioService,
                       private shepherdService: ShepherdService,
-                        private msj : MensajesAplicacionService) {
+                        private msj : MensajesAplicacionService,
+                          private contabilidadZeus :  ZeusContabilidadService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
-      vendedor: [null],
-      idvendedor : [null],
-      cliente: [null],
-      idcliente : [null],
-      item: [null],
-      idItem : [null],
+      Vendedor: [null],
+      Id_Vendedor : [null],
+      Cliente: [null],
+      Id_Cliente : [null],
+      Referencia: [null],
+      Item : [null],
       anio1: [null],
       anio2: [null],
     });
@@ -60,7 +58,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cargarAnios();
-    setTimeout(() => { this.llenarCampoVendedorLogueado(); }, 500);
+    this.consultarVendedores();
+    this.consultarClientes();
   }
 
   tutorial(){
@@ -79,194 +78,119 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   }
 
   // Funcion que colocará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  // funcion que va a limpiar todo
+  limpiarTodo(){
+    this.formFiltros.reset();
+    this.consultarVendedores();
+    this.datosFacturacion = [];
+    this.cargando = false;
   }
 
   /** Función para cargar los años en el combobox de años. */
   cargarAnios(){
-    this.arrayAnios = [];
-    for (let index = 2019; index < this.anioActual + 1; index++) {
-      this.arrayAnios.push(index);
+    for (let i = 0; i < this.anos.length; i++) {
+      let num_Mayor : number = Math.max(...this.anos);
+      if (num_Mayor == moment().year()) break;
+      this.anos.push(num_Mayor + 1);
     }
   }
 
-  /** FuncióN para limpiar los campos del formulario */
-  limpiarTodo(){
-    if (this.ValidarRol == 1) {
-      this.formFiltros.reset();
-      this.arrayClientes = [];
-      this.arrayVendedores = [];
-    } else if (this.ValidarRol == 2) {
-      this.formFiltros.patchValue({
-        vendedor: this.formFiltros.value.vendedor,
-        idvendedor : this.formFiltros.value.idvendedor,
-        cliente: null,
-        idcliente : null,
-        item: null,
-        idItem : null,
-        anio1: null,
-        anio2: null,
-      });
-    }
-    this.arrayItems = [];
-  }
-
-  /** llenar el campo del vendedor logueado. */
-  llenarCampoVendedorLogueado(){
-    if (this.ValidarRol == 2) {
-      let vendedor : any = this.storage_Nombre;
-      this.formFiltros.patchValue({ vendedor : vendedor });
-      this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(data => this.arrayVendedores = data);
-      setTimeout(() => { this.seleccionarVendedores(); }, 500);
-    }
-  }
-
-  /** cargar vendedores al datalist que se encuentra en los filtros de busqueda*/
-  cargarVendedores(){
-    let vendedor : any = this.formFiltros.value.vendedor;
-    if(vendedor != null) this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(data => this.arrayVendedores = data);
-  }
-
-  /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
-  cargarClientes(){
-    let cliente : any = this.formFiltros.value.cliente;
-    let vendedor : any = this.ValidarRol == 2 ? this.storage_Id.toString() : this.formFiltros.value.idvendedor;
-
-    if (vendedor.length == 2) vendedor = `0${vendedor}`;
-    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
-
-    if(cliente != null && cliente.length > 2){
-      if(this.formFiltros.value.vendedor == null) {this.invetarioZeusService.LikeGetClientes(cliente).subscribe(data => this.arrayClientes = data);}
-      else { this.invetarioZeusService.GetCliente_Vendedor_LikeNombre(vendedor, cliente).subscribe(data => { this.arrayClientes = data }); }
-    }
-  }
-
-   /** cargar items al datalist que se encuentra en los filtros de busqueda*/
-  cargarProductos(){
-    let item : any = this.formFiltros.value.item;
-    if(this.formFiltros.value.cliente == null) {
-      if(item != null && item.length > 2) this.invetarioZeusService.LikeGetItems(item).subscribe(dataItems => { this.arrayItems = dataItems; });
-    }
-  }
-
-  /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
-  seleccionarVendedores(){
-    let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
-    this.formFiltros.patchValue({ vendedor: nuevo[0].nombvende, idvendedor : nuevo[0].idvende, });
-  }
-
-  /** Al momento de seleccionar un cliente, se cargaran sus items */
-  seleccionarClientes() {
-    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
-    let clienteSeleccionado : any = this.formFiltros.value.cliente;
-    let nuevo : any[] = this.arrayClientes.filter((item) => item.idcliente == clienteSeleccionado);
-
-    if(clienteSeleccionado.match(expresion) != null) {
-      this.formFiltros.patchValue({
-        cliente: nuevo[0].razoncial,
-        idcliente : nuevo[0].idcliente,
-      });
-      this.cargarItemsxClientes(nuevo[0].idcliente);
-    }
-  }
-
-  /** Cargar los items del cliente seleccionado */
-  cargarItemsxClientes = (cliente : any) => this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(data => { this.arrayItems = data });
-
-  /** Funcion que se ejecutará al seleccionar un producto. */
-  seleccionarProductos() {
-    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
-    let itemSeleccionado : any = this.formFiltros.value.item;
-    let nuevo : any[] = this.arrayItems.filter((item) => item.codigo == itemSeleccionado);
-
-    if(itemSeleccionado.match(expresion) != null) {
-      this.formFiltros.setValue({
-        vendedor: this.formFiltros.value.vendedor,
-        idvendedor : this.formFiltros.value.idvendedor,
-        cliente: this.formFiltros.value.cliente,
-        idcliente : this.formFiltros.value.idcliente,
-        item: nuevo[0].nombre,
-        idItem : nuevo[0].codigo,
-        anio1: this.formFiltros.value.anio1,
-        anio2: this.formFiltros.value.anio2,
-      });
-    } else {
-      if (this.formFiltros.value.idcliente != null) this.cargarItemsxClientes(this.formFiltros.value.idcliente);
-      else this.arrayItems = [];
-    }
-  }
-
-  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      if(this.dt.filteredValue != null) {
-        this.totalAnio = false;
-        this.totalConsulta = 0;
-        this.valorTotalConsulta = 0;
-        for (let i = 0; i < this.dt.filteredValue.length; i++) {
-          this.totalConsulta += this.dt.filteredValue[i].SubTotal;
-          this.valorTotalConsulta += this.dt.filteredValue[i].SubTotal;
-        }
-      } else {
-        this.totalAnio = true;
-        for (let index = 0; index < this.arrayConsolidado.length; index++) {
-          this.calcularTotalVendidoAno(this.arrayConsolidado[index].Ano);
-        }
+  // Funcion que va a consultar los vendedores
+  consultarVendedores(){
+    this.usuariosService.GetVendedores().subscribe(data => {
+      if (this.ValidarRol == 1) this.Vendedores = data;
+      if (this.ValidarRol == 2) {
+        this.Vendedores = data.filter(x => x.usua_Id == this.storage_Id);
+        let Id_Vendedor : string = `${this.Vendedores[0].usua_Id}`;
+        if (Id_Vendedor.length == 1) Id_Vendedor = `00${Id_Vendedor}`;
+        else if (Id_Vendedor.length == 2) Id_Vendedor = `0${Id_Vendedor}`;
+        this.formFiltros.patchValue({
+          Vendedor: this.Vendedores[0].usua_Nombre,
+          Id_Vendedor : Id_Vendedor,
+        });
       }
-    }, 500);
-  }
-
-  // Funcion que va a consultar el consolidado de los clientes, productos y vendedores
-  consultarConsolidado(){
-    this.cargando = true;
-    this.arrayConsolidado = [];
-    this.valorTotalConsulta = 0;
-    let ruta : string = '';
-    let anoInicial : number = this.formFiltros.value.anio1;
-    let anoFinal : number = this.formFiltros.value.anio2;
-    let cliente : string = this.formFiltros.value.idcliente;
-    let nombreCliente : any = this.formFiltros.value.cliente;
-    let producto : any = this.formFiltros.value.idItem;
-    let nombreItem : any = this.formFiltros.value.item;
-    let vendedor : any = this.formFiltros.value.idvendedor;
-    let nombreVendedor : any = this.formFiltros.value.vendedor;
-    if (vendedor != null) {
-      if (vendedor.length == 2) vendedor = `0${vendedor}`;
-      else if (vendedor.length == 1) vendedor = `00${vendedor}`;
-    }
-    if (producto != null) producto.toString();
-    if (anoInicial == null) anoInicial = moment().year();
-    if (anoFinal == null) anoFinal = anoInicial;
-
-    if (cliente && nombreCliente && producto && nombreItem && vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (cliente && nombreCliente && producto && nombreItem) ruta = `?producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (cliente && nombreCliente && vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (vendedor && nombreVendedor && producto && nombreItem) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}`;
-    else if (cliente && nombreCliente) ruta = `?cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (producto && nombreItem) ruta = `?producto=${producto}&nombreProducto=${nombreItem}`;
-    else if (vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
-
-    this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
-      if(datos_consolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
-      else {
-        for (let i = 0; i < datos_consolidado.length; i++) {
-          this.llenarConsolidado(datos_consolidado[i], i);
-        }
-      }
-      setTimeout(() => {
-        this.cargando = false;
-        this.calcularSubTotal(anoInicial, anoFinal);
-      }, datos_consolidado.length);
     });
   }
 
+  // Funcion que va a colocar a llenar los campos correspondientes del vendedor
+  llenarVendedor(){
+    let nombre = this.formFiltros.value.Vendedor;
+    let vendedor = this.Vendedores.find(x => x.usua_Nombre == nombre);
+    let Id_Vendedor : string = `${vendedor.usua_Id}`;
+    if (Id_Vendedor.length == 1) Id_Vendedor = `00${Id_Vendedor}`;
+    else if (Id_Vendedor.length == 2) Id_Vendedor = `0${Id_Vendedor}`;
+    this.formFiltros.patchValue({
+      Vendedor: vendedor.usua_Nombre,
+      Id_Vendedor : Id_Vendedor,
+    });
+  }
+
+  // Funcion que va a consultar los clientes
+  consultarClientes(){
+    this.contabilidadZeus.GetClientes().subscribe(data => this.Clientes = data);
+    if (this.ValidarRol == 2) this.Clientes = this.Clientes.filter(x => x.idvende == this.formFiltros.value.Id_Vendedor);
+  }
+
+  // Funcion que va a colocar a llenar los campos correspondientes del cliente
+  llenarCliente(){
+    let nombre = this.formFiltros.value.Cliente;
+    let cliente = this.Clientes.find(x => x.idcliente == nombre);
+    this.formFiltros.patchValue({
+      Cliente: cliente.razoncial,
+      Id_Cliente : cliente.idcliente,
+    });
+  }
+
+  // Funcion que va a consultar los productos segun un se vaya escribiendo el nombre o el codigo del mismo
+  consultarProductos = () => this.invetarioZeusService.LikeGetItems(this.formFiltros.value.Referencia).subscribe(dataItems => this.Items = dataItems);
+
+  // Funcion que va a colocar a llenar los campos correspondientes del producto
+  llenarProducto(){
+    let item = this.formFiltros.value.Referencia;
+    let producto = this.Items.find(x => x.codigo == item);
+    this.formFiltros.patchValue({
+      Item : producto.codigo,
+      Referencia: producto.nombre,
+    });
+  }
+
+  // Funcion que va consultar en la base de datos la infomracion de la facturación
+  consultarFacturacion(){
+    this.cargando = true;
+    this.datosFacturacion = [];
+    
+    let anoInicial : number = this.formFiltros.value.anio1;
+    let anoFinal : number = this.formFiltros.value.anio2;
+    let vendedor = this.formFiltros.value.Id_Vendedor;
+    let nombreVendedor = this.formFiltros.value.Vendedor;
+    let producto = this.formFiltros.value.Item;
+    let nombreItem = this.formFiltros.value.Referencia;
+    let cliente = this.formFiltros.value.Id_Cliente;
+    let nombreCliente = this.formFiltros.value.Cliente;
+    
+    let ruta : string = '';
+
+    if (vendedor != null) ruta += `vendedor=${vendedor}`;
+    if (nombreVendedor != null) ruta.length > 0 ? ruta += `&nombreVendedor=${nombreVendedor}` : ruta += `nombreVendedor=${nombreVendedor}`;
+    if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
+    if (nombreItem != null) ruta.length > 0 ? ruta += `&nombreProducto=${nombreItem}` : ruta += `nombreProducto=${nombreItem}`;
+    if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
+    if (nombreCliente != null) ruta.length > 0 ? ruta += `&nombreCliente=${nombreCliente}` : ruta += `nombreCliente=${nombreCliente}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+
+    if (anoInicial == null) anoInicial = moment().year();
+    if (anoFinal == null) anoFinal = anoInicial;
+
+    this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(data => {
+      if (data.length == 0) this.msj.mensajeAdvertencia('¡No se encontraron resultados de bésqueda con la combinación de filtros seleccionada!');
+      else data.forEach(x => this.llenarConsolidado(x));
+    }, null, () => this.cargando = false);
+  }
+
   // Funcion que va a llenar el array que contendrá la informacion del consolidado
-  llenarConsolidado(data : any, i : any){
+  llenarConsolidado(data : any){
     if (data.mes == 1) data.mes = 'Enero';
     if (data.mes == 2) data.mes = 'Febrero';
     if (data.mes == 3) data.mes = 'Marzo';
@@ -281,7 +205,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (data.mes == 12) data.mes = 'Diciembre';
 
     let info : any = {
-      Id : i,
+      Id : this.datosFacturacion.length == 0 ? 1 : Math.max(...this.datosFacturacion.map(x => x.Id)) + 1,
       Mes : data.mes,
       Ano : `${data.ano}`,
       Id_Cliente : data.id_Cliente,
@@ -297,66 +221,39 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
-    if (info.Devolucion == 0) this.valorTotalConsulta += info.SubTotal;
-    this.arrayConsolidado.push(info);
+    this.datosFacturacion.push(info);
   }
 
-  // Funcion que va a calcular el subtotal real de cada producto
-  calcularSubTotal(anio1 : number, anio2 : number){
-    let items : number [] = [];
-    let nuevo : any [] = [];
-    this.invetarioZeusService.GetDevoluciones(anio1, anio2).subscribe(data => this.valorTotalConsulta -= data);
+  // Funcion que va a calcular y devolver el valor total de la facturación
+  calcularTotal = () => this.datosFacturacion.reduce((acc, item) => acc + item.SubTotal, 0);
 
-    for (let i = 0; i < this.arrayConsolidado.length; i++) {
-      if (!items.includes(this.arrayConsolidado[i].Id)) {
-        nuevo = this.arrayConsolidado.filter((item) =>
-          item.Ano == this.arrayConsolidado[i].Ano
-          && item.Mes == this.arrayConsolidado[i].Mes
-          && item.Id_Cliente == this.arrayConsolidado[i].Id_Cliente
-          && item.Cantidad == 0
-          && item.SubTotal == this.arrayConsolidado[i].SubTotal
-          && item.SubTotalDev > 0
-        );
-        for (let j = 0; j < nuevo.length; j++) {
-          this.arrayConsolidado[nuevo[j].Id].SubTotal = nuevo[j].Devolucion * nuevo[j].Precio;
-          items.push(nuevo[j].Id);
-        }
-      }
-    }
-  }
+  // Funcion que va a calcular y devolver el valor total de lo facturado en un año
+  calcularTotalAno = (ano : number) => this.datosFacturacion.filter(x => x.Ano == ano).reduce((acc, item) => acc + item.SubTotal, 0);
 
-  // Funcion que va a calcular el subtotal de lo vendido en un año
-  calcularTotalVendidoAno(ano : any){
-    let total : number = 0;
-    let nuevo = this.arrayConsolidado.filter((item) => item.Ano == ano);
-    for (let i = 0; i < nuevo.length; i++) {
-      if (nuevo[i].Devolucion == 0) total += nuevo[i].SubTotal;
-      else if (nuevo[i].Devolucion > 0) total -= nuevo[i].SubTotal;
-    }
-    return total;
-  }
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
   exportarExcel(){
-    if (this.arrayConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
+    if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
-        const title = `Consolidado Facturación - ${this.today}`;
+        const title = `Consolidado Facturación - ${moment().format('DD-MM-YYYY')}`;
         const header = ["Mes", "Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Cantidad", "Presentación", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
         let datos : any =[];
-        for (const item of this.arrayConsolidado) {
+        for (const item of this.datosFacturacion) {
           const datos1  : any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
           datos.push(datos1);
         }
         let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${this.today}`);
+        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${moment().format('DD-MM-YYYY')}`);
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
@@ -365,58 +262,20 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          let mes = row.getCell(1);
-          let anio = row.getCell(2);
-          let idCliente = row.getCell(3);
-          let cliente = row.getCell(4);
-          let idProducto = row.getCell(5);
-          let producto = row.getCell(6);
-          let cantidad = row.getCell(7);
-          let presentacion = row.getCell(8);
-          let precio = row.getCell(9);
-          let subTotal = row.getCell(10);
-          let idvendedor = row.getCell(11);
-          let vendedor = row.getCell(12);
-
-          mes.alignment = { horizontal : 'center' };
-          anio.alignment = { horizontal : 'center' };
-          idCliente.alignment = { horizontal : 'center' };
-          cliente.alignment = { horizontal : 'center' };
-          idProducto.alignment = { horizontal : 'center' };
-          producto.alignment = { horizontal : 'center' };
-          cantidad.alignment = { horizontal : 'center' };
-          presentacion.alignment = { horizontal : 'center' };
-          precio.alignment = { horizontal : 'center' };
-          subTotal.alignment = { horizontal : 'center' };
-          idvendedor.alignment = { horizontal : 'center' };
-          vendedor.alignment = { horizontal : 'center' };
-
-          cantidad.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          precio.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          subTotal.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-
-          worksheet.getColumn(1).width = 12;
-          worksheet.getColumn(2).width = 12;
-          worksheet.getColumn(3).width = 15;
-          worksheet.getColumn(4).width = 60;
-          worksheet.getColumn(5).width = 12;
-          worksheet.getColumn(6).width = 50;
-          worksheet.getColumn(7).width = 15;
-          worksheet.getColumn(8).width = 15;
-          worksheet.getColumn(9).width = 15;
-          worksheet.getColumn(10).width = 15;
-          worksheet.getColumn(11).width = 12;
-          worksheet.getColumn(12).width = 50;
+          [2, 7, 9, 10].forEach(n => row.getCell(n).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+          [1, 2, 8, 11].forEach(n => worksheet.getColumn(n).width = 12);
+          [3, 5, 7, 9, 10].forEach(n => worksheet.getColumn(n).width = 15);
+          [4, 6, 12].forEach(n => worksheet.getColumn(n).width = 60);
+          [1, 2].forEach(n => worksheet.getColumn(n).alignment = { horizontal : 'center' });
         });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Consolidado Facturacion - ${this.today}.xlsx`);
+            fs.saveAs(blob, `Consolidado Facturacion - ${moment().format('DD-MM-YYYY')}.xlsx`);
           });
           this.cargando = false;
           this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
         }, 1000);
-
       }, 1500);
     }
   }
