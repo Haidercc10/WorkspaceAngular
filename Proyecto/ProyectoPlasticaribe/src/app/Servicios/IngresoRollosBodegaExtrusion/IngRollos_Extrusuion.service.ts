@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelIngRollo_Extrusion } from '../../Modelo/modelIngRollo_Extrusion';
 
 @Injectable({
@@ -9,7 +9,9 @@ import { modelIngRollo_Extrusion } from '../../Modelo/modelIngRollo_Extrusion';
 })
 export class IngRollos_ExtrusuionService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvGuardar = (data : modelIngRollo_Extrusion): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/IngresoRollos_Extrusion', data);
+  srvGuardar = (data : modelIngRollo_Extrusion): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/IngresoRollos_Extrusion', data);
 }

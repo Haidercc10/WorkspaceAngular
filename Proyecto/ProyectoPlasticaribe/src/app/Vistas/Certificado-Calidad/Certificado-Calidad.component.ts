@@ -57,7 +57,7 @@ export class CertificadoCalidadComponent implements OnInit {
       Cantidad : [null, Validators.required],
       Presentacion : [null, Validators.required],
       Fecha_Orden : [null, Validators.required],
-      Observacion : [null],
+      Observacion : ['Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.'],
     });
   }
 
@@ -91,6 +91,7 @@ export class CertificadoCalidadComponent implements OnInit {
   // Funcion que va a limpiar todo 
   limpiarTodo() {
     this.FormOrden.reset();
+    this.FormOrden.patchValue({ Observacion : 'Las materias primas utilizadas pueden estar en contacto con alimentos, el material se fabrica, empaca y almacena bajo condiciones sanitarias apropiadas para productos alimenticios y se cumple con las regulaciones alimentarias y de salud.' });
     this.llenarMateriales();
     this.parametrosCuantitativos = [];
     this.paramertosCualitativos = [];
@@ -161,10 +162,9 @@ export class CertificadoCalidadComponent implements OnInit {
           Presentacion : ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
           Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
-        this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(data => {
-          this.FormOrden.patchValue({Observacion : data == null ? '' : data.observacion });
-          this.calcularParametrosCuantitativos(data, ot);
-          this.llenarParametrosCualitativos(data, ot);
+        this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
+          this.calcularParametrosCuantitativos(datos, ot);
+          this.llenarParametrosCualitativos(datos, ot);
         });
         this.cargando = false;
       });

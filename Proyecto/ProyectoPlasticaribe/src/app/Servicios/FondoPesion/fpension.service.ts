@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelFpension } from '../../Modelo/modelFpension';
 
 
@@ -10,7 +10,7 @@ import { modelFpension } from '../../Modelo/modelFpension';
 })
 export class FpensionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }

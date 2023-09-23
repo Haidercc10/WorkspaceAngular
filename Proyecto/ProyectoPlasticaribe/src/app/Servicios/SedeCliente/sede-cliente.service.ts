@@ -1,31 +1,32 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelSedesClientes } from '../../Modelo/modelSedesClientes';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SedeClienteService {
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/SedesClientes');
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes');
 
-  srvObtenerListaPorId = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/${id}`);
+  srvObtenerListaPorId = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/${id}`);
 
-  srvObtenerListaPorCliente = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/cliente/${id}`);
+  srvObtenerListaPorCliente = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/cliente/${id}`);
 
-  srvObtenerListaPorNombreCliente = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/clienteNombre/${nombre}`);
+  srvObtenerListaPorNombreCliente = (nombre : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/clienteNombre/${nombre}`);
 
-  srvObtenerListaPorClienteSede = (cliente : any, ciudad : any, direccion : any) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/clienteSede/${cliente}/${ciudad}/${direccion}`);
+  srvObtenerListaPorClienteSede = (cliente : any, ciudad : any, direccion : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/clienteSede/${cliente}/${ciudad}/${direccion}`);
 
-  GetSedesCliente = (cliente : any) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/getSedesCliente/${cliente}`);
+  GetSedesCliente = (cliente : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedesCliente/${cliente}`);
 
-  GetDireccionesCliente = (cliente : number, ciudad : string) => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/getDireccionesCliente/${cliente}/${ciudad}`);
+  GetDireccionesCliente = (cliente : number, ciudad : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getDireccionesCliente/${cliente}/${ciudad}`);
 
-  GetSedeCliente = (cod : string, ciudad : string, direccion : string) : any => this.http.get<any>(rutaPlasticaribeAPI + `/SedesClientes/getSedeCliente/${cod}/${ciudad}/${direccion}`);
+  GetSedeCliente = (cod : string, ciudad : string, direccion : string) : any => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedeCliente/${cod}/${ciudad}/${direccion}`);
 
-  srvGuardar = (data : modelSedesClientes): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/SedesClientes', data);
+  srvGuardar = (data : modelSedesClientes): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/SedesClientes', data);
 }

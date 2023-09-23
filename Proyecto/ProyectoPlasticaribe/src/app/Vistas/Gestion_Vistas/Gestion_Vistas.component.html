@@ -31,6 +31,13 @@
           <p-button id="eliminar-usuario" label="Eliminar" icon="pi pi-trash" [disabled]="true" styleClass="p-button-danger"></p-button>
         </ng-template>
       </ng-template>
+      <ng-template pTemplate="right">
+        <span class="p-float-label mr-2">
+          <input [(ngModel)]="nuevaCategoria" id="nuevaCategoria" type="text" pInputText required pTooltip="Escribe el nombre de una nueva categoria y presiona el botón Crear"/>
+          <label for="vNombre">Categoria</label>
+        </span>
+        <p-button id="nuevo" label="Crear" icon="pi pi-plus" styleClass="p-button-success" (click)="crearCategoria()"></p-button>
+      </ng-template>
     </p-toolbar>
     <!--Tabla-->
     <p-table

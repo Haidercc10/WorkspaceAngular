@@ -495,6 +495,9 @@ export class MovimientoMPComponent implements OnInit {
     };
   }
 
+  // Funcion que va a devolver el valor total de la materia prima asignada
+  calcularTotalMaterialPrima = (data : any) : number => data.reduce((a, b) => a + b.Cantidad, 0);
+
   // Funcion que va a devolver la cantidad total pesada de materia prima asignada
   calcularTotalCantidad = (data : any) : number => data.reduce((a, b) => a + b.cantidad, 0);
 

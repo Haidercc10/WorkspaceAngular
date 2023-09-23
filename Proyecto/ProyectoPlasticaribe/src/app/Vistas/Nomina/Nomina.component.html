@@ -112,7 +112,7 @@
             <ng-template pTemplate="footer">
               <tr>
                 <td colspan="5" class="text-right">Total Nómina Sellado</td>
-                <td id="total">{{totalNominaSellado | number : '1.2-2'}}</td>
+                <td id="total">{{calcularTotalAPagar() | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
             <!--Tabla 2-->
@@ -189,12 +189,10 @@
         columnResizeMode="expand"
         styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
         responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="nominaIngresada.length"
-        [rowsPerPageOptions]="[10,25,50,100,nominaIngresada.length]"
         [rowHover]="true"        
         [scrollable]="true"
-        scrollHeight="50rem">
+        scrollHeight="50rem"
+        editMode="row">
         <ng-template pTemplate="header">
           <tr>
             <th>#</th>
@@ -205,24 +203,77 @@
             <th class="text-center" pSortableColumn="valorNomina"><p-sortIcon field="valorNomina"></p-sortIcon>Valor Nomina</th>
             <th class="text-center" pSortableColumn="tipoNomina"><p-sortIcon field="tipoNomina"></p-sortIcon>Tipo Nomina</th>
             <th class="text-center">Observación</th>
+            <th pFrozenColumn alignFrozen="right" [frozen]="true" colspan="2" *ngIf="ValidarRol == 1">Editar</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
-          <tr>
+        <ng-template pTemplate="body" let-nomina let-editing="editing" let-rowIndex="rowIndex">
+          <tr [pEditableRow]="nomina">
             <td>{{rowIndex + 1}}</td>
             <td>{{nomina.fechaRegistro | date:"MM/dd/yyyy"}}</td>
-            <td>{{nomina.registradoPor}}</td>
-            <td>{{nomina.fechaInicio | date:"MM/dd/yyyy"}}</td>
-            <td>{{nomina.fechaFin | date:"MM/dd/yyyy"}}</td>
-            <td>{{nomina.valorNomina | currency : 'USD'}}</td>
-            <td>{{nomina.tipoNomina}}</td>
-            <td>{{nomina.observacion}}</td>
+            <td>{{nomina.registradoPor}}</td>            
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="nomina.fechaInicio">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{nomina.fechaInicio | date:"MM/dd/yyyy"}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="nomina.fechaFin">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{nomina.fechaFin | date:"MM/dd/yyyy"}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber mode="decimal" [minFractionDigits]="2" [(ngModel)]="nomina.valorNomina"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{nomina.valorNomina | currency : 'USD'}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-dropdown [autoDisplayFirst]="true" [options]="tiposNomina" optionLabel="tpNomina_Nombre" optionValue="tpNomina_Nombre" appendTo="body" [(ngModel)]="nomina.tipoNomina"></p-dropdown>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{nomina.tipoNomina}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="nomina.observacion">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{nomina.observacion}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td pFrozenColumn alignFrozen="right" [frozen]="true" *ngIf="ValidarRol == 1">
+              <div class="flex align-items-center justify-content-center gap-2">
+                <button *ngIf="!editing" pButton pRipple pTooltip="Editar / Agregar Información" type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"></button>
+                <button *ngIf="editing" (click)="actualizarNominaIngresada(nomina)" pButton pRipple pTooltip="Guardar Información" type="button" pSaveEditableRow icon="pi pi-check" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                <button *ngIf="editing" pButton pRipple pTooltip="Cancelar" type="button" pCancelEditableRow icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger"></button>
+              </div>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="5" class="text-right">Total</td>
-            <td colspan="3" class="text-left">{{calcularTotalNominaIngresada() | currency : 'USD'}}</td>
+            <td colspan="4" class="text-left">{{calcularTotalNominaIngresada() | currency : 'USD'}}</td>
           </tr>
         </ng-template>
       </p-table>

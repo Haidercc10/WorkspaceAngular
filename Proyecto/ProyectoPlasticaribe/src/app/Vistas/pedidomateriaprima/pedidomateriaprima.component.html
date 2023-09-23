@@ -162,9 +162,6 @@
         [value]="ArrayMateriaPrima"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10,25,50]"
         [rowHover]="true"
         dataKey="Id"
         [(selection)]="arrayOrdenCompra">
@@ -190,12 +187,12 @@
                   <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{ArrayMateriaPrima.Cantidad_Faltante_Editar | number}}
+                  {{ArrayMateriaPrima.Cantidad_Faltante_Editar | number : '1.2-2'}}
                 </ng-template>
               </p-cellEditor>
             </td>
             <td>{{ArrayMateriaPrima.Medida}}</td>
-            <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number}}</td>
+            <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number : '1.2-2'}}</td>
             <td>
               <p-tableCheckbox id="elegir2" [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
             </td>
@@ -204,7 +201,8 @@
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
             <td colspan="4" class="text-right">Totales</td>
-            <td>{{valorTotal | number}}</td>
+            <td>{{calcularPrecio() | number : '1.2-2'}}</td>
+            <td></td>
           </tr>
         </ng-template>
       </p-table>

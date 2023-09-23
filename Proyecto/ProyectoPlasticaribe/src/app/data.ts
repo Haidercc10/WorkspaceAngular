@@ -8917,6 +8917,21 @@ export const stepsProductos : Step.StepOptions[] = [
   },
   {
     attachTo: {
+      element: '#editar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'editar',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Crear Receta!</h4>',
+    text: `<p>¡Presionando este botón podremos crear una receta para un producto!</p>`
+  },
+  {
+    attachTo: {
       element: '#costoTotal',
       on: 'bottom'
     },
@@ -8982,12 +8997,109 @@ export const stepsProductos : Step.StepOptions[] = [
     },
     buttons: [
       builtInButtons.back,
+      builtInButtons.next,
     ],
     scrollTo: { behavior: 'smooth', block: 'center' },
     classes: 'card',
     id: 'nombres',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Titulos de la tabla!</h4>',
     text: `<p>¡En cada uno de los campos en los que aparecen los nombres de las columnas tenemos el siguiente icono '<i class="pi pi-sort-alt"></i>', esto indica que la columnas puede ser ordenada de mayor a menor o de menor a mayor haciendo click sobre este campo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#editarReceta',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'editarReceta',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Editar o Ver Receta!</h4>',
+    text: `<p>¡Si queremos <b>ver o editar</b> la información de una receta <b>podemos presionar click</b> en el nombre o información del producto!</p>`
+  },
+];
+
+/***************************************************************** RECETAS PRODUCTOS *******************************************************************/
+export const stepsRecetaProductos : Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Recetas Productos!</h4>',
+    text: `<p>¡Desde este pequeño módulo podemos crear las recetas de los productos, además podemos ver y editar las recetas de los productos que hayamos creado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#productos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'productos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Productos!</h4>',
+    text: `<p>¡Inicialmente debemos seleccionar el producto al que se le creará la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#materiasPrimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'materiasPrimas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materias Primas!</h4>',
+    text: `<p>¡Desde aquí podemos seleccionar las materias primas que se van a utilizar en la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaMateriasPrimas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaMateriasPrimas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Mat. Primas Seleccionadas!</h4>',
+    text: `<p>¡En esta tabla estarán las materias primas que se han seleccionado para la receta!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>En esta apartado están las acciones que podemos realizar en el módulo.</p>
+    <p><b>Guardar o Editar:</b> Una vez hayamos seleccionado todas las materias primas podemos <b>guardar o editar</b> la receta.</p>
+    <p><b>Limpiar Campos:</b> Podemos limpiar todos los campos para volver a seleccionar el producto.</p>`
   },
 ];
 
@@ -11510,6 +11622,224 @@ export const CertificadoCalidad : Step.StepOptions [] = [
   },
 ];
 
+export const stepsMov_CertificadosCalidad : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Certificado de Calidad!</h4>',
+    text: `<p>¡En este modulo podemos <b>ver los certificados de calidad</b> que se han creado con anterioridad, podemos <b>ver la información general de cada uno</b> y si queremos ver toda la información, podemos <b>ver el archivo PDF de cada certificado de calidad</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
+    text: `<p>¡Podemos <b>buscar los certificados de calida por los diferentes filtros que aparecen aquí</b>, a continuación se explicarán cada uno de los filtros que podemos aplicar!</p>`
+  },
+  {
+    attachTo: {
+      element: '#consecutivo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'consecutivo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Consecutivo!</h4>',
+    text: `<p>¡Desde aquí podemos colocar el <b>consecutivo</b> del certificado que queremos buscar y ver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#fechaInicio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'fechaInicio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Fecha Inicial!</h4>',
+    text: `<p>¡Si queremos buscar un certificado de calidad por un rango de fechas, podemos <b>colocar la fecha inicial</b> en este campo!</p>
+    <p><b>Nota:</b> <b>Si no colocamos nada en este campo</b>, es decir, lo dejamos vacio, el <b>automaticamente calculará la fecha del mes anterior desde el día actual</b>. 
+    <br>Ejemplo: Si la fecha actual es el 23 de abril, el sistema tomatá la fecha del 23 de marzo.</p>`
+  },
+  {
+    attachTo: {
+      element: '#fechaFinal',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'fechaFinal',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Fecha Final!</h4>',
+    text: `<p>¡Si queremos buscar un certificado de calidad por un rango de fechas, podemos <b>colocar la fecha final</b> en este campo!</p>
+    <p><b>Nota</b>: Si no llenamos el campo el sistema tomará la fecha actual para este mismo.</p>`
+  },
+  {
+    attachTo: {
+      element: '#ordenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'ordenTrabajo',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Orden de Trabajo!</h4>',
+    text: `<p>¡Si quieremos ver los certificados de unas ordenes de trabajo específicas, podemos <b>colocar el número de la orden de trabajo</b> que queremos ver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cliente',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cliente!</h4>',
+    text: `<p>¡Tambien podemos buscar por un cliente, para ello debemos <b>escribir el nombre del cliente</b> y nos irán saliendo recomendaciones de clientes que tienen en su nombre los caracteres que hemos escrito, <b>seleccionamos el que queremos</b> y listo!</p>`
+  },
+  {
+    attachTo: {
+      element: '#referencia',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'referencia',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Referencia!</h4>',
+    text: `<p>¡Al igual que con el cliente, podemos <b>buscar por una referencia</b>. Se pueden buscar de la misma manera que lo hacemos con el cliente!</p>`
+  },
+  {
+    attachTo: {
+      element: '#acciones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'acciones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>Luego de haber llenado (o no) los filtros, podemos realizar algunas siguientes acciones:</p>
+    <p><b>1) Consultar:</b> Si presionamos este botón el sistema empezará a buscar los certificados de calidad que cumplan con los filtros que hemos seleccionado. Para realizar la busqueda podemos presionar click sobre este botón o presionar 'Enter' sobre alguno de los filtros.</p>
+    <p><b>2) Limpiar Campos:</b> Con este botón podemos limpiar los campos de filtros y volver a empezar a buscar.</p>`
+  },
+  {
+    attachTo: {
+      element: '#infoGeneral',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'infoGeneral',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Información General!</h4>',
+    text: `<p>¡En esta tabla estarán apareciendo los certificados de calidad resultantes de la busqueda realizada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#encabezadoTabla',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'encabezadoTabla',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Encabezado de la Tabla!</h4>',
+    text: `<p>¡En este encabezado aparecerán los titulos de cada columna de la tabla y unos campos, en estos campos <b>podemos escribir y filtrar la información que está en la tabla</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#registros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'registros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Registros de la Tabla!</h4>',
+    text: `<p>¡En la tabla estará la <b>información general de los certificados de calidad</b> resultantes de la busqueda realizada!</p>`
+  },
+  {
+    attachTo: {
+      element: '#expandir',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'expandir',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Expandir Información!</h4>',
+    text: `<p>¡Si expandimos la información de un certificado de calidad, podemos ver todos los detalles de este, detalles como los <b>parametros cuantitativos y cualitativos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#pdf',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'pdf',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver PDF!</h4>',
+    text: `<p>¡Finalmente podemos <b>ver el PDF de un certificado de calidad</b> que queramos, solo debemos presionar el botón rojo al final de cada fila de la tabla!</p>`
+  },
+];
+
 /********************************************************************** CONTROL DE CALIDAD *************************************************************************/
 export const ControlCalidad : Step.StepOptions [] = [
   {
@@ -11589,5 +11919,148 @@ export const ControlCalidad : Step.StepOptions [] = [
     id: 'none',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
     text: `<p>¡Con estos filtros podemos <b>buscar por algunos campos</b> de la información de un registro de control de calidad que están en la tabla!</p>`
+  },
+];
+
+/*************************************************************************** KARDEX *******************************************************************************/
+export const stepsKardex : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Kardex de Materias Primas!</h4>',
+    text: `<p>¡Desde este módulo podemos ver el <b>Kardex de un Material</b> que se utiliza para crear un Item (producto)!</p>`
+  },
+  {
+    attachTo: {
+      element: '#filtros',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'filtros',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Filtros de Busqueda!</h4>',
+    text: `<p>¡Con estos <b>filtros podemos buscar</b> la información de los movimientos de un material!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rangoFechas',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rangoFechas',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rango de Fechas!</h4>',
+    text: `<p>¡Debemos elegir el <b>rango de fechas</b> de los movimientos que queremos ver!</p>`
+  },
+  {
+    attachTo: {
+      element: '#material',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'material',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Materia Prima!</h4>',
+    text: `<p>¡Debemos <b>elegir la materia prima</b> de la cual queremos ver el Kardex!</p>`
+  },
+  {
+    attachTo: {
+      element: '#producto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'producto',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Producto!</h4>',
+    text: `<p>¡Tenemos que <b>colocar el código del producto</b> del cual queremos ver el Kardex!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botones',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botones',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Acciones!</h4>',
+    text: `<p>¡Con estos botones podemos <b>generar un reporte de los movimientos</b> de un material!</p>
+    <br>
+    <p>1) <b>Consultar</b>: Una vez llenos los filtros podemos <b>consultar</b> los movimientos del material seleccionado.</p>
+    <p>2) <b>Limpiar Todo</b>: Podemos limpiar todos al presionar este botón.</p>
+    <p>3) <b>Exportar a Excel</b>: Con este botón podemos <b>exportar los datos</b> a un archivo de Excel.</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaCompras',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaCompras',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Compras!</h4>',
+    text: `<p>¡En esta <b>tabla podemos ver las compras realizadas</b> del material seleccionado!</p>`
+  },
+  {
+    attachTo: {
+      element: '#verKardex',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'verKardex',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Ver Kardex!</h4>',
+    text: `<p>¡Si queremos ver el <b>Kardex</b> en el material podemos hacer click aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#tablaConsumos',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'tablaConsumos',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Tabla de Consumos!</h4>',
+    text: `<p>¡En esta tabla <b>podemos ver los consumos realizados</b> del material seleccionado!</p>`
   },
 ];

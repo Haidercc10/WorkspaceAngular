@@ -47,30 +47,6 @@
  */
 import 'zone.js';  // Included with Angular CLI.
 
-/* RUTA PRINCIPAL DE API */
-export let rutaPlasticaribeAPI = "http://192.168.0.85:9086/api"; //Ruta al servidor de la base de datos nuevas
-// export let rutaPlasticaribeAPI = "http://192.168.0.193:9085/api"; //Ruta local del api de prueba.
-//  export let rutaPlasticaribeAPI = "https://localhost:7137/api"; //Ruta local del api de prueba.
-  //  export let rutaPlasticaribeAPI = "http://192.168.0.190:9086/api"; //Ruta al servidor de la base de datos nuevas
-
-/* RUTA PRINCIPAL DE API BAGPRO */
-export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
-//export let rutaBagPro = "https://localhost:7160/api";
-// export let rutaBagPro = "http://192.168.0.193:9095/api"; //Ruta al servidor de la base de datos de BagPro --- PRUEBA LOCAL
-  //  export let rutaBagPro = "http://192.168.0.190:9095/api"; //Ruta al servidor de la base de datos nuevas
-
-
-/* RUTA PRINCIPAL DE API ZEUS */
-  export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
-//export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-//export let rutaZeus = "http://192.168.0.193:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-//  export let rutaZeus = "http://192.168.0.190:9055/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-
-/* RUTA PRINCIPAL API ZEUS CONSTABILIDAD */
- export let rutaZeusContabilidad = "http://192.168.0.85:9065/api"; //Ruta de prueba del API
-// export let rutaZeusContabilidad = "http://192.168.0.190:9065/api"; //Ruta de prueba del API
-//export let rutaZeusContabilidad = "http://localhost:7067/api"; //Ruta de prueba del API
-//export let rutaZeusContabilidad = "http://192.168.0.193:9055/api"; //Ruta de prueba del API
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */

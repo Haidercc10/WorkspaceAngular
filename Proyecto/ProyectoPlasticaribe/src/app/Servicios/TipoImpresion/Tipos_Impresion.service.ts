@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
-import { modelTipoImpresion } from '../../Modelo/modelTipoImpresion';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Tipos_ImpresionService {
-
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = () => this.http.get<any>(rutaPlasticaribeAPI + '/Tipos_Impresion');
+  srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipos_Impresion');
 
 }

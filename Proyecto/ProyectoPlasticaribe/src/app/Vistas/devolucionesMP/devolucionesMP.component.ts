@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDevolucionesMp as defaultSteps } from 'src/app/data';
@@ -42,7 +44,8 @@ export class DevolucionesMPComponent implements OnInit {
                           private detallesAsignacionService : DetallesAsignacionService,
                             private boppService : EntradaBOPPService,
                               private shepherdService: ShepherdService,
-                                private mensajeService : MensajesAplicacionService,) {
+                                private mensajeService : MensajesAplicacionService,
+                                  private svcMovEntradas : Movimientos_Entradas_MPService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
@@ -94,6 +97,7 @@ export class DevolucionesMPComponent implements OnInit {
             Cantidad : cantidad,
             Cantidad_Oculta : cantidad,
             Cantidad_Devuelta : 0,
+            Devolucion : 0,
             Unidad_Medida : datos_asignacionMP[i].undMedida,
             Proceso : datos_asignacionMP[i].proceso,
             Proceso_Nombre : datos_asignacionMP[i].nombreProceso,
@@ -137,7 +141,7 @@ export class DevolucionesMPComponent implements OnInit {
   seleccionarTodosMateriaPrima(){
     this.load = false;
     this.materiasPrimasRetiradas = [];
-    this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id));
     setTimeout(() => this.load = true, 50);
   }
 
@@ -152,7 +156,7 @@ export class DevolucionesMPComponent implements OnInit {
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
   quitarTodosMateriaPrima(){
     this.load = false;
-    this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id));
     this.materiasPrimas = [];
     setTimeout(() => this.load = true, 50);
   }
@@ -185,8 +189,7 @@ export class DevolucionesMPComponent implements OnInit {
             UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
-          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(() => {
-          }, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`));
         }
       }
     });
@@ -194,7 +197,8 @@ export class DevolucionesMPComponent implements OnInit {
       this.moverInventarioMpAgregada();
       this.moverInventarioTintas();
       this.moverInventarioBopp();
-      setTimeout(() => { this.limpiarTodosCampos(); }, 1000);
+      this.actualizarEntradasMP();
+      setTimeout(() => this.limpiarTodosCampos(), 1000);
     }, (20 * this.materiasPrimasRetiradas.length));
   }
 
@@ -304,5 +308,56 @@ export class DevolucionesMPComponent implements OnInit {
     this.FormDevolucion.patchValue({ ot : '', MpingresoFecha: this.today, MpObservacion : '', });
     this.materiasPrimas = [];
     this.materiasPrimasRetiradas = [];
+  }
+
+  //Función que crea una devolución y actualiza las cantidades de las entradas de material ingresado en los mov. entradas de mat. prima. 
+  actualizarEntradasMP(){
+    let ot : any = this.FormDevolucion.value.ot;
+    let dev : number = 0;
+    
+    this.materiasPrimasRetiradas.forEach(element => {
+      element.Devolucion = element.Cantidad_Devuelta;
+      if(element.Id_Bopp == 449) element.Id_Bopp = 1;
+
+      this.svcMovEntradas.getEntradasMP(ot, element.Id_MateriaPrima, element.Id_Tinta, element.Id_Bopp).subscribe(datos => {
+        if(datos.length > 0) {
+          datos.forEach(x => {
+            let info : modeloMovimientos_Entradas_MP = {
+              'Id' : x.id,
+              'MatPri_Id': x.matPri_Id,
+              'Tinta_Id': x.tinta_Id,
+              'Bopp_Id': x.bopp_Id,
+              'Cantidad_Entrada': x.cantidad_Entrada,
+              'UndMed_Id': x.undMed_Id,
+              'Precio_RealUnitario': x.precio_RealUnitario,
+              'Tipo_Entrada': x.tipo_Entrada,
+              'Codigo_Entrada': x.codigo_Entrada,
+              'Estado_Id': x.estado_Id,
+              'Cantidad_Asignada': x.cantidad_Asignada, 
+              'Cantidad_Disponible': x.cantidad_Disponible, 
+              'Observacion': x.observacion,
+              'Fecha_Entrada': x.fecha_Entrada,
+              'Hora_Entrada': x.hora_Entrada,
+              'Precio_EstandarUnitario': x.precio_EstandarUnitario,
+            }
+
+            if(element.Devolucion >= info.Cantidad_Asignada) { 
+              dev = info.Cantidad_Asignada; 
+              element.Devolucion -= dev;
+              info.Cantidad_Asignada = 0; 
+              info.Cantidad_Disponible = info.Cantidad_Entrada;
+              info.Estado_Id = 19;
+            } else if(element.Devolucion < info.Cantidad_Asignada) { 
+              info.Cantidad_Asignada -= element.Devolucion; 
+              info.Cantidad_Disponible += element.Devolucion; 
+              dev = 0;
+              element.Devolucion = 0;
+              info.Estado_Id = 19;
+            }
+            this.svcMovEntradas.Put(info.Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar los movimientos de entrada de materia prima!`));
+          });
+        }
+      });
+    });
   }
 }

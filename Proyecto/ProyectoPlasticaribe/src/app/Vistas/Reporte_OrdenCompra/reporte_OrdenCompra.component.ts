@@ -65,18 +65,14 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a consultar y almacenar los estados que pueden tener las ordenes de compra
   obtenerEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 11 || datos_estados[i].estado_Id == 5 || datos_estados[i].estado_Id == 3 || datos_estados[i].estado_Id == 12) this.estados.push(datos_estados[i]);
-      }
+    this.estadosService.srvObtenerListaEstados().subscribe(datos => {
+      datos.forEach(estados => {
+        if ([11, 5, 3, 12].includes(estados.estado_Id)) this.estados.push(estados);
+      });
     });
   }
 
@@ -106,7 +102,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
 
     this.dtOrdenCompraService.GetOrdenesCompras(fechaincial, fechaFinal, ruta).subscribe(datos_orden => {
       datos_orden.forEach(orden => {
-        this.llenarTabla(orden);
+        if (!this.registrosConsultados.map(x => x.Oc).includes(orden.consecutivo)) this.llenarTabla(orden);
         cantDatos++;
         cantDatos == datos_orden.length ? this.cargando = false : null;
       });
@@ -129,9 +125,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
-  clear(table: Table) {
-    table.clear();
-  }
+  clear = (table: Table) => table.clear();
 
   //Buscar informacion de la orden de compra creada
   buscarinfoOrdenCompra(oc : number){
@@ -164,7 +158,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.generarPDF(oc); }, 2500);
-    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
+    }, () => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -344,7 +338,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
+    }, () => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${oc}!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -353,9 +347,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
     return body;
@@ -371,7 +363,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -429,7 +421,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
           this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
         }
-      }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`); });
+      }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`));
     }
   }
 

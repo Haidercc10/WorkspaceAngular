@@ -92,11 +92,11 @@ export class DashBoard_PedidosComponent implements OnInit {
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus(){
     // Pedidos CLientes
-    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => this.pedidosClientes = datos_pedidos );
+    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => this.pedidosClientes = datos_pedidos);
     // Pedidos Productos
-    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => this.pedidosProductos = datos_pedidos );
+    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => this.pedidosProductos = datos_pedidos);
     //Pedidos Vendedores
-    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => this.pedidosVendedores = datos_pedidos );
+    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => this.pedidosVendedores = datos_pedidos);
     // Pedidos Estados
     this.zeusService.getPedidosEstados().subscribe(datos_pedidos => {
       this.pedidosTotales = [];
@@ -112,11 +112,13 @@ export class DashBoard_PedidosComponent implements OnInit {
       }
 
       this.pedidosEstados = datos_pedidos;
+
       let info = { cantidad : 0, costo: 0 };
       for (const { cantidad, costo } of datos_pedidos) {
         this.cantidadTotalPedidos += cantidad;
         this.costoTotalPedidos += costo;
       }
+
       this.pedidosTotales.push(info);
     });
 
@@ -262,12 +264,12 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.opcionesPedidosProductos = {
       plugins: {
         legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
-          tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
       },
       scales: {
         x: {
           ticks: {
-             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
@@ -323,7 +325,7 @@ export class DashBoard_PedidosComponent implements OnInit {
       scales: {
         x: {
           ticks: {
-             color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
             font: { size: 18 },
             callback: function(value) {
               if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;

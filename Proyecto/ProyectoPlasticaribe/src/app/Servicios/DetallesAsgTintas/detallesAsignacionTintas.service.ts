@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelDetallesAsignacionTintas } from '../../Modelo/modelDetallesAsignacionTintas';
 
 @Injectable({
@@ -9,7 +9,9 @@ import { modelDetallesAsignacionTintas } from '../../Modelo/modelDetallesAsignac
 })
 export class DetallesAsignacionTintasService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvGuardar = (data : modelDetallesAsignacionTintas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetalleAsignacion_Tinta', data);
+  srvGuardar = (data : modelDetallesAsignacionTintas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_Tinta', data);
 }

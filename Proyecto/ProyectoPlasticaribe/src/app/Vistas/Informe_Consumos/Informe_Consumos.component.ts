@@ -1,14 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { AppComponent } from 'src/app/app.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Informe_Consumos',
   templateUrl: './Informe_Consumos.component.html',
   styleUrls: ['./Informe_Consumos.component.css']
 })
+
 export class Informe_ConsumosComponent implements OnInit {
   load : boolean = false; //Variable para controlar la carga de la pagina
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -27,13 +34,16 @@ export class Informe_ConsumosComponent implements OnInit {
   @ViewChild('dt2') dt2: Table | undefined; // Tabla que contendrá la información de la tabla inicialmente
   salidas : any = []; //Variable que se usará para almacenar los datos de los consumos
   materiales : any = []; //Variable que se usará para almacenar los datos de la materia prima
+  materiasPrimas : any = []; //Variable que se usará para almacenar los datos de la materia prima
 
   constructor(private AppComponent : AppComponent, 
-              private salidasService : Entradas_Salidas_MPService,) { }
+                private salidasService : Entradas_Salidas_MPService,
+                  private movEntradasService : Movimientos_Entradas_MPService,
+                    private msjs : MensajesAplicacionService) { }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.consultar();
+    this.obtenerMateriales();
   }
 
   //Funcion que se usará para mostrar el tutorial
@@ -47,19 +57,26 @@ export class Informe_ConsumosComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
+  // Funcion que va a obtener los diferentes materiales
+  obtenerMateriales = () => this.movEntradasService.GetInventarioMateriales().subscribe(datos => this.materiasPrimas = datos);
+
+  // Funcion que va a limpiar el formulario
+  limpiarCampos = () => this.load = false;
+
   //Función donde se consultarán los consumos por fecha
-  consultar(){
-    this.load = true;
+  consultar(fecha1, fecha2, material, nombreMaterial, item){
     this.consumos = [];
-    let fecha1 : any = (this.rangoFechas[0] != undefined && this.rangoFechas[0].length > 0 && this.rangoFechas[0] != null) ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.primerDiaMes; 
-    let fecha2 : any = (this.rangoFechas[1] != undefined && this.rangoFechas[1].length > 0 && this.rangoFechas[1] != null) ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : this.today;
-    console.log(fecha1, fecha2)
-    this.salidasService.GetConsumos(`2023-09-01`, `2023-09-06`).subscribe(data => { 
-      for(let i = 0; i < data.length; i++){
-        this.cargarConsumos(data[i]);
-      }
-      setTimeout(() => { this.mostrarDetalleConsumo(); }, 2000);
-    })
+    this.salidas = [];
+
+    if(material != null) {
+      this.salidasService.GetConsumos(fecha1, fecha2, material, item).subscribe(data => { 
+        if(data.length > 0){
+          this.load = true;
+          data.forEach(consumo => this.cargarConsumos(consumo));
+        } else this.msjs.mensajeAdvertencia(`Advertencia`, `No se encontraron consumos del material ${nombreMaterial} en las fechas seleccionadas!`);  
+      }, null, () => this.mostrarDetalleConsumo());
+    } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un material!`);
+    
   }
 
   //Función que cargará el array de consumos que contendrá todos los consumos del mes.
@@ -67,6 +84,10 @@ export class Informe_ConsumosComponent implements OnInit {
     let info : any = {
       Fecha : `${datos.fecha.replace('T00:00:00', '')}`,
       OT : datos.ot,
+      Item : datos.item,
+      Referencia : datos.referencia,
+      CantPedidaOT : datos.cantidad_PedidaOT,
+      UndMedida : datos.medida,
       Material : datos.materialRealId,
       NombreMaterial : datos.nombreMaterial,
       CantRequerida : datos.cantidad_Requerida,
@@ -76,6 +97,7 @@ export class Informe_ConsumosComponent implements OnInit {
       ValoracionCantidad : datos.valoracionDCxPR,
       CostoReal : datos.costo_Real,
       CostoEstandar : datos.costo_Estandar,
+      
     }
     this.consumos.push(info);
   }
@@ -85,13 +107,16 @@ export class Informe_ConsumosComponent implements OnInit {
 
   //Función que mostrará los detalles de los consumos por fecha y OT.
   mostrarDetalleConsumo(){
-    console.log(this.consumos)
     this.salidas = this.consumos.reduce((acc, item) => {
       let info : any = {
         Fecha : item.Fecha,
         Material : item.Material,
         NombreMaterial : item.NombreMaterial,
         OT : item.OT,
+        Item : item.Item,
+        Referencia : item.Referencia,
+        CantPedidaOT : item.CantPedidaOT,
+        UndMedida : item.UndMedida,
         CantRequerida : item.CantRequerida,
         CantEstandar : item.CantEstandar,
         DifCantidad : 0,
@@ -101,6 +126,7 @@ export class Informe_ConsumosComponent implements OnInit {
         CostoEstandar : 0,
         Materiales : [],
       }
+
       const objetoEncontrado = acc.find(x => x.OT == info.OT && x.Fecha == info.Fecha);
       if(objetoEncontrado) {
         objetoEncontrado.CantRequerida += info.CantRequerida;
@@ -109,7 +135,11 @@ export class Informe_ConsumosComponent implements OnInit {
         objetoEncontrado.PrecioPP = (objetoEncontrado.CostoReal / objetoEncontrado.CantRequerida);
         objetoEncontrado.ValoracionCantidad = (objetoEncontrado.PrecioPP * objetoEncontrado.DifCantidad);
         objetoEncontrado.CostoEstandar = (info.PrecioPP * info.CantEstandar);
-      } else acc.push(info);
+      } else {
+        info.DifCantidad = (info.CantRequerida - info.CantEstandar);
+        info.CostoEstandar = (info.PrecioPP * info.CantEstandar);
+        acc.push(info);
+      } 
       return acc;
     }, [])
 
@@ -118,7 +148,19 @@ export class Informe_ConsumosComponent implements OnInit {
         let indice = this.salidas.findIndex(x => x.OT == this.consumos[index].OT && x.Fecha == this.consumos[index].Fecha);
         this.salidas[indice].Materiales.push(this.consumos[index]);
       }
+      this.load = false;
     }, 1000);
-    this.load = false;
   }
+
+  //Función que calculará la cantidad requerida total de la materia prima en las salidas consultadas.
+  valorCantRequerida = () => this.salidas.reduce((acc, item) => acc + item.CantRequerida, 0);
+
+  //Función que calculará el diferencial de cantidad total de la materia prima en las salidas consultadas.
+  valorValoracionCantidad = () => this.salidas.reduce((acc, item) => acc + item.ValoracionCantidad, 0);
+
+  //Función que calculará el costo real total de la materia prima en las salidas consultadas.
+  valorCostoReal = () => this.salidas.reduce((acc, item) => acc + item.CostoReal, 0);
+
+  //Función que calculará el costo real total de la materia prima en las salidas consultadas.
+  valorCostoEstandar = () => this.salidas.reduce((acc, item) => acc + item.CostoEstandar, 0); 
 }

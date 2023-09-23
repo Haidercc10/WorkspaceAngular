@@ -34,6 +34,7 @@
           <p-toolbar styleClass="mb-4 gap-2">
             <ng-template pTemplate="left">
               <button pButton pRipple id="excel" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+              <button pButton pRipple id="editar" label="Crear Receta" icon="pi pi-plus" title="Crear Receta" class="p-button-danger mx-2" (click)="mostrarModalCrearEditar()"></button>
             </ng-template>
 
             <ng-template pTemplate="right">
@@ -144,7 +145,7 @@
 
             <!--Cuerpo Tabla-->
             <ng-template pTemplate="body" let-ArrayProductoZeus>
-              <tr class="tamanoTextosTabla">
+              <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
                 <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
                 <td>{{ArrayProductoZeus.Cliente}}</td>
                 <td>{{ArrayProductoZeus.Nombre}}</td>
@@ -194,3 +195,7 @@
     </p-card>
   </div>
 </div>
+
+<p-dialog [(visible)]="recetaProducto" [style]="{width: '70vw'}" [resizable]="true" header="Crear y Editar Recetas de Productos" [modal]="true">
+  <app-Recetas_Productos></app-Recetas_Productos>
+</p-dialog>

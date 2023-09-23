@@ -12,6 +12,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, stepsNomina as defaultSteps } from 'src/app/data';
 import { Nomina_PlasticaribeService } from 'src/app/Servicios/Nomina_Plasticaribe/Nomina_Plasticaribe.service';
+import { modelNominaPlasticaribe } from 'src/app/Modelo/modelNominaPlasticaribe';
+import { Tipos_NominaService } from 'src/app/Servicios/Tipos_Nomina/Tipos_Nomina.service';
 
 @Component({
   selector: 'app-Nomina',
@@ -39,18 +41,21 @@ export class NominaComponent implements OnInit {
   detallesNomina : any [] = []; //Variable que almacenará la información detallada de los rollos pesados o ingresados de un producto y persona en especifico
   detalladoxBultos : any[] = []; /** Variable que cargará en el formato excel la nomina detallada por bultos para cada operario */
   nominaIngresada : any [] = []; /** Variable que almacenará la información de la nomina de ingresos */
+  tiposNomina : any [] = []; /** Variable que almacenará la información de los tipos de nomina */
 
   constructor(private AppComponent : AppComponent,
                 private servicioBagPro : BagproService,
                   private msj : MensajesAplicacionService,
                     private mensajes : MessageService,
                       private shepherdService: ShepherdService,
-                        private nominaService : Nomina_PlasticaribeService) {
+                        private nominaService : Nomina_PlasticaribeService,
+                          private tpNominaService : Tipos_NominaService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.obtenerTiposNominas();
   }
 
  //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -176,16 +181,51 @@ export class NominaComponent implements OnInit {
     }, 2000);
   }
 
+  // Funcion que devolverá los diferentes tipos de nominas
+  obtenerTiposNominas = () => this.tpNominaService.Get().subscribe(data => this.tiposNomina = data);
+
   // Consultar nomina ingresada al programa
   consultarNominaIngresada(){
     this.nominaIngresada = [];
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : this.today;
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
     this.nominaService.GetNominaIngresada(fechaInicial, fechaFinal).subscribe(data => this.nominaIngresada = data);
+    setTimeout(() => {
+      if (this.nominaIngresada.length > 0) {
+        this.nominaIngresada.forEach(nomina => {
+          nomina.fechaInicio = nomina.fechaInicio.replace('T00:00:00', '');
+          nomina.fechaFin = nomina.fechaFin.replace('T00:00:00', '');
+        });
+      }
+    }, 1500);
   }
 
   // Funcion que va a calcular el total de la nomina ingresada 
   calcularTotalNominaIngresada = () : number => this.nominaIngresada.reduce((a,b) => a + b.valorNomina, 0);
+
+  //Actualizará la información de la nomina ingresada
+  actualizarNominaIngresada(data : any){
+    this.nominaService.Get_Id(data.id).subscribe(datos => {
+      this.load = false;
+      let tipoNomina_Id = this.tiposNomina.filter(x => x.tpNomina_Nombre === data.tipoNomina)[0].tpNomina_Id;
+      let modelo : modelNominaPlasticaribe = {
+        Nomina_Id: data.id,
+        Nomina_FechaRegistro: datos.nomina_FechaRegistro,
+        Nomina_HoraRegistro: datos.nomina_HoraRegistro,
+        Usua_Id: datos.usua_Id,
+        Nomina_FechaIncial: data.fechaInicio,
+        Nomina_FechaFinal: data.fechaFin,
+        Nomina_Costo: data.valorNomina,
+        TpNomina_Id: tipoNomina_Id,
+        Nomina_Observacion: (data.observacion).toString().toUpperCase(),
+      }
+      this.nominaService.Put(data.id, modelo).subscribe(() => {
+        this.consultarNominaIngresada();
+        this.msj.mensajeConfirmacion(`¡Se actualizó la nomina con éxito!`);
+        this.load = true;
+      }, () => this.msj.mensajeError(`¡No se pudo actualizar la nomina!`));
+    }, () => this.msj.mensajeError(`¡No se encontró el registro de la nomina a actualizar!`));
+  }
 
   /** Función para consultar las nomina de sellado */
   consultarNominas(){
@@ -214,7 +254,7 @@ export class NominaComponent implements OnInit {
         }
       }
     }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`));
-    setTimeout(() => { this.cargarTabla2(fechaInicial, fechaFinal); }, 1500);
+    setTimeout(() => this.cargarTabla2(fechaInicial, fechaFinal), 1500);
   }
 
   /** Función para cargar la tabla de Nómina detallada y calcular el valor total a pagar para cada operario*/
@@ -242,8 +282,8 @@ export class NominaComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => { this.calcularTotalAPagar(); }, 1000);
-    setTimeout(() => { this.load = true; }, 2000);
+    setTimeout(() => this.calcularTotalAPagar(), 1000);
+    setTimeout(() => this.load = true, 2000);
   }
 
   /** Funcion para filtrar busquedas y mostrar datos segun el filtro consultado. */
@@ -287,13 +327,7 @@ export class NominaComponent implements OnInit {
   }
 
   /** Calcular el valor total de la nómina de sellado */
-  calcularTotalAPagar(){
-    let total : number = 0;
-    for (const item of this.arraySellado) {
-      total += item.PagoTotal;
-    }
-    this.totalNominaSellado = total;
-  }
+  calcularTotalAPagar = () => this.arraySellado.reduce((acc, item) => acc + item.PagoTotal, 0);
 
   /** Función para quitar mensaje de elección */
   onReject = () => this.mensajes.clear('msj');
@@ -302,9 +336,8 @@ export class NominaComponent implements OnInit {
   mostrarEleccion(){
     setTimeout(() => {
       if(this.arraySellado.length > 0) {
-        if(this.dt.filteredValue != null) {
-          this.exportarExcel(1);
-        } else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true});
+        if(this.dt.filteredValue != null) this.exportarExcel(1);
+        else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true});
       } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla, verifique!`);
     }, 500);
   }
@@ -312,24 +345,24 @@ export class NominaComponent implements OnInit {
   /** función que contendrá la consulta de cuando se desee exportar a excel la nomina de forma detallada */
   cargarNominaDetallada(fecha1 : any, fecha2 : any){
     this.detalladoxBultos = [];
-      this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
-        for(let index = 0; index < data.length; index++) {
-          let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
-          info.Cedula = parseInt(info.Cedula),
-          info.Referencia = parseInt(info.Referencia),
-          info.Ot = parseInt(info.Ot),
-          info.Bulto = parseInt(info.Bulto),
-          info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', ''),
-          info.Cantidad = parseFloat(info.Cantidad),
-          info.Cantidad_Total = parseFloat(info.Cantidad_Total),
-          info.Peso = parseFloat(info.Peso),
-          info.Precio = parseFloat(info.Precio),
-          info.Valor_Total = parseFloat(info.Valor_Total)
+    this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
+      for(let index = 0; index < data.length; index++) {
+        let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
+        info.Cedula = parseInt(info.Cedula),
+        info.Referencia = parseInt(info.Referencia),
+        info.Ot = parseInt(info.Ot),
+        info.Bulto = parseInt(info.Bulto),
+        info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', ''),
+        info.Cantidad = parseFloat(info.Cantidad),
+        info.Cantidad_Total = parseFloat(info.Cantidad_Total),
+        info.Peso = parseFloat(info.Peso),
+        info.Precio = parseFloat(info.Precio),
+        info.Valor_Total = parseFloat(info.Valor_Total)
 
-          this.detalladoxBultos.push(info);
-          this.detalladoxBultos.sort((a,b) => Number(a.Bulto) - Number(b.Bulto));
-          this.detalladoxBultos.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
-        }
-      });
+        this.detalladoxBultos.push(info);
+        this.detalladoxBultos.sort((a,b) => Number(a.Bulto) - Number(b.Bulto));
+        this.detalladoxBultos.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
+      }
+    });
   }
 }

@@ -102,11 +102,7 @@ export class DesperdicioComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpiará los campos del formulario
   limpiarCampos(){
@@ -294,7 +290,6 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que creará un PDF del desperdicio ingresado
   crearPdf(){
-    let nombre : string = this.AppComponent.storage_Nombre;
     this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
       for (let i = 0; i < datos_desperdicios.length; i++) {
         let titulo : string = `Reporte Merma de Material - ${this.today}`;
@@ -425,9 +420,7 @@ export class DesperdicioComponent implements OnInit {
     var body = [];
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
 

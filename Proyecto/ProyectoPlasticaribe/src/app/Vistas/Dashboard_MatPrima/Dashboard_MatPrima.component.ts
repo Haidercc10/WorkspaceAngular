@@ -167,20 +167,11 @@ export class Dashboard_MatPrimaComponent implements OnInit {
           else if (datos_bopp[i].catMP_Id == 14) this.cantRollosBopa = datos_bopp[i].conteoDescripcion;
           else if (datos_bopp[i].catMP_Id == 15) this.cantRollosPoliester = datos_bopp[i].conteoDescripcion;
         }
-        //this.grafica(this.cantRollosBopp, this.cantRollosBopa, this.cantRollosPoliester);
       });
 
-      this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          this.cantRollosUtilizados += datos_bopp[i].cantidad;
-        }
-      });
+      this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos => this.cantRollosUtilizados = datos.reduce((a,b) => a + b.cantidad, 0));
 
-      this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          this.cantRollosEntrantes += datos_bopp[i].cantidad;
-        }
-      });
+      this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos => this.cantRollosEntrantes = datos.reduce((a,b) => a + b.cantidad, 0));
 
       this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos => {
         for (let index = 0; index < datos.length; index++) {
@@ -199,9 +190,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
         this.tintasCreadas = datos_tintas;
         this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        for (let i = 0; i < datos_tintas.length; i++) {
-          this.cantTintasCreadas += 1;
-        }
+        this.cantTintasCreadas = datos_tintas.length + 1;
       });
 
       this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos => {
@@ -248,7 +237,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función para llamar la grafica de la mat. prima asignada vs extruida*/
   llenarGraficaComparativo(){
-    //this.cargando = false;
     this.ComparativoData = {
       labels: [''],
       datasets: [
@@ -275,19 +263,19 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.arrayBopps = {
       labels: ['BOPP','BOPA','POLIESTER'],
       datasets: [
-          {
-              data: [{id : 'BOPP', nested: {value: cantBopp}}, {id : 'BOPA', nested: {value: cantBopa}}, {id : 'POLIESTER',  nested: {value: cantPoliester}}],
-              backgroundColor: [
-                  "#42A5F5",
-                  "#66BB6A",
-                  "#FFA726"
-              ],
-              hoverBackgroundColor: [
-                  "#64B5F6",
-                  "#81C784",
-                  "#FFB74D"
-              ]
-          }
+        {
+          data: [{id : 'BOPP', nested: {value: cantBopp}}, {id : 'BOPA', nested: {value: cantBopa}}, {id : 'POLIESTER',  nested: {value: cantPoliester}}],
+          backgroundColor: [
+            "#42A5F5",
+            "#66BB6A",
+            "#FFA726"
+          ],
+        hoverBackgroundColor: [
+            "#64B5F6",
+            "#81C784",
+            "#FFB74D"
+          ]
+        }
       ]
     };
     this.chartOptions = {

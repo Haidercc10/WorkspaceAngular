@@ -4,14 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User_Inv_Zeus } from '../_Models/user_Inv_Zeus';
-import { rutaZeus } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
 
 @Injectable({ providedIn: 'root' })
 
 export class AuthenticationService_InvZeus {
-  readonly rutaZeus = rutaZeus;
+  readonly rutaZeus = environment.rutaZeus;
   private userSubject: BehaviorSubject<User_Inv_Zeus | null>;
   public user: Observable<User_Inv_Zeus | null>;
   data:any=[];

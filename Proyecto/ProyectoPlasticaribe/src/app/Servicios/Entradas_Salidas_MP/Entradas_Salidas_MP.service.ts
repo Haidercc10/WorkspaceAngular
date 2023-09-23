@@ -1,19 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Entradas_Salidas_MPService {
 
-constructor(private http : HttpClient) { }
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
-GetTodo = () : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP`);
+  constructor(private http : HttpClient) { }
 
-GetId = (id: number) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/${id}`);
+  GetTodo = () : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP`);
 
-GetConsumos = (fechaInicio : any, fechaFin : any) : Observable<any []> => this.http.get<any>(`${rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}`);
+  GetId = (id: number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/${id}`);
 
+  GetConsumos = (fechaInicio : any, fechaFin : any, material : any, item : any) : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/getConsumos/${fechaInicio}/${fechaFin}/${material}/${item}`);
+
+  GetSalidasRealizadas = (fechaInicio : any, fechaFin : any, material : number, producto : number) : Observable<any []> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP/getSalidasRealizadas/${fechaInicio}/${fechaFin}/${material}/${producto}`);
+
+  Post = (data : modelEntradas_Salidas_MP) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Entradas_Salidas_MP`, data);
 }

@@ -2,14 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelDtPedidoMantenimiento } from 'src/app/Modelo/modelDtPedidoMantenimiento';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({ providedIn: 'root' } )
 
 export class DetallePedido_MantenimientoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelRol } from '../../Modelo/modelRol';
 
 @Injectable({
@@ -9,19 +9,20 @@ import { modelRol } from '../../Modelo/modelRol';
 })
 
 export class RolesService {
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + '/Rol_Usuario');
+  srvObtenerLista = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Rol_Usuario');
 
-  srvObtenerListaPorId = (id : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
+  srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
 
-  getRolxNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRol/${nombre}`);
+  getRolxNombre = (nombre : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRol/${nombre}`);
 
-  likeGetNombre = (nombre : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
+  likeGetNombre = (nombre : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
 
-  srvActualizar = (id:number|String, data:any) => this.http.put(rutaPlasticaribeAPI + `/Rol_Usuario/${id}`, data);
+  srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`, data);
 
-  srvGuardar = (data : modelRol): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Rol_Usuario', data);
+  srvGuardar = (data : modelRol): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data);
 
 }

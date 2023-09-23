@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelAsigProductosFacturas } from '../../Modelo/modelAsigProductosFacturas';
 
 @Injectable({
@@ -9,11 +9,13 @@ import { modelAsigProductosFacturas } from '../../Modelo/modelAsigProductosFactu
 })
 export class AsignacionProductosFacturaService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaPorFactura = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
+  srvObtenerListaPorFactura = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
 
-  srvActualizarFactura = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/ActualizacionFactura/${id}`, data);
+  srvActualizarFactura = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/ActualizacionFactura/${id}`, data);
 
-  srvGuardar = (data : modelAsigProductosFacturas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
+  srvGuardar = (data : modelAsigProductosFacturas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
 }

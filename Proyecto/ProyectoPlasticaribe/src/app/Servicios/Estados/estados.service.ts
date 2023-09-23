@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelEstado } from '../../Modelo/modelEstado';
 
 @Injectable({
@@ -9,11 +9,13 @@ import { modelEstado } from '../../Modelo/modelEstado';
 })
 export class EstadosService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
   
-  srvObtenerListaEstados = () => this.http.get<any>(rutaPlasticaribeAPI + '/Estadoes');
+  srvObtenerListaEstados = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Estadoes');
 
-  srvObtenerListaPorNombreEstado = (nombre : any):Observable<any[]> => this.http.get<any>(rutaPlasticaribeAPI + `/Estadoes/nombreEstado/${nombre}`);
+  srvObtenerListaPorNombreEstado = (nombre : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Estadoes/nombreEstado/${nombre}`);
 }
 
 

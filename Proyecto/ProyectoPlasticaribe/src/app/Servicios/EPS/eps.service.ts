@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelEps } from '../../Modelo/modelEps';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { modelEps } from '../../Modelo/modelEps';
 })
 export class EpsService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }

@@ -1,10 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppComponent} from 'src/app/app.component';
-import { rutaPlasticaribeAPI,  } from 'src/polyfills';
-import { modelCajacompensacion} from '../../Modelo/modelCajacompensacion';
+import { environment } from 'src/environments/environment';
+import { modelCajacompensacion } from '../../Modelo/modelCajacompensacion';
 
 
 @Injectable({
@@ -12,7 +10,7 @@ import { modelCajacompensacion} from '../../Modelo/modelCajacompensacion';
 })
 export class CajacompensacionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,) { }

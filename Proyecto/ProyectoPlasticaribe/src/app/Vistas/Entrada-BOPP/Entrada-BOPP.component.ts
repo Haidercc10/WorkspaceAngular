@@ -113,7 +113,6 @@ export class EntradaBOPPComponent implements OnInit {
     this.getSerialesBOPP();
     this.obtenerProveeedor();
     this.cargarBoppsGenericos();
-    this.FormEntradaBOPP.patchValue({Categoria : 6});
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -250,17 +249,17 @@ export class EntradaBOPPComponent implements OnInit {
   /** Obtener nombres, micras, precios, anchos y seriales más utilizados y cargarlos en los combobox en la vista */
   getNombresBOPP() {
     this.nombresBopp = [];
-    this.entradaBOPPService.getBopp().subscribe(data => {this.nombresBopp = data});
+    this.entradaBOPPService.getBopp().subscribe(data => this.nombresBopp = data);
     this.FormEntradaBOPP.patchValue({ Observacion : this.FormEntradaBOPP.value.Nombre });
   }
 
-  getMicrasBOPP = () => this.entradaBOPPService.getMicras().subscribe(data => {this.micrasBopp = data});
+  getMicrasBOPP = () => this.entradaBOPPService.getMicras().subscribe(data => this.micrasBopp = data);
 
-  getPreciosBOPP = () => this.entradaBOPPService.getPrecios().subscribe(data => {this.preciosBopp = data});
+  getPreciosBOPP = () => this.entradaBOPPService.getPrecios().subscribe(data => this.preciosBopp = data);
 
-  getAnchosBOPP = () => this.entradaBOPPService.getAnchos().subscribe(data => {this.anchosBopp = data});
+  getAnchosBOPP = () => this.entradaBOPPService.getAnchos().subscribe(data => this.anchosBopp = data);
 
-  getSerialesBOPP = () => this.entradaBOPPService.getSeriales().subscribe(data => {this.serialesBopp = data});
+  getSerialesBOPP = () => this.entradaBOPPService.getSeriales().subscribe(data => this.serialesBopp = data);
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
@@ -282,18 +281,10 @@ export class EntradaBOPPComponent implements OnInit {
     let OC : number = this.FormOpcional.value.OrdenCompra;
     /** Facturado */
     this.servicioOC_MatPrimas.getFacturasAsociadasAOC(OC).subscribe(dataFacturada => {
-      if(dataFacturada.length > 0) {
-        for (let indx = 0; indx < dataFacturada.length; indx++) {
-          this.arrayBoppsFacturados.push(dataFacturada[indx].bopp_Id);
-        }
-      }
+      if(dataFacturada.length > 0) this.arrayBoppsFacturados = dataFacturada.map(item => item.bopp_Id);
       /** Remisionado */
       this.servicioOC_MatPrimas.getRemisionesComprasAsociadasAOC(OC).subscribe(dataRemisionada => {
-        if(dataRemisionada.length > 0) {
-          for (let inx = 0; inx < dataRemisionada.length; inx++) {
-            this.arrayBoppsRemisionados.push(dataRemisionada[inx].bopp_Id);
-          }
-        }
+        if(dataRemisionada.length > 0) this.arrayBoppsRemisionados = dataRemisionada.map(item => item.bopp_Id);
         /** Cargar lista de OC */
         this.servicioOC_MatPrimas.getListaOrdenesComprasxId(OC).subscribe(data => {
           if (data.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia` ,`No existe la OC ${OC}, por favor, verifique!`);
@@ -399,9 +390,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   /** Funcion para registrar el máximo ID de la factura */
-  obtenerUltimoIdFacturaCompra() {
-    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos => this.creacionDetalleFactura(datos), () => this.mensajeService.mensajeError(`Error`, `Error al obtener la ultima factura creada!`));
-  }
+  obtenerUltimoIdFacturaCompra = () => this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos => this.creacionDetalleFactura(datos), () => this.mensajeService.mensajeError(`Error`, `Error al obtener la ultima factura creada!`));
 
    /** Funcion para registrar el detalle de la factura */
   creacionDetalleFactura(idUltimafactura : any) {
@@ -416,7 +405,7 @@ export class EntradaBOPPComponent implements OnInit {
         UndMed_Id: this.ArrayBOPP[index].UndCantKg,
         FaccoMatPri_ValorUnitario: this.ArrayBOPP[index].Precio,
       }
-      this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(() => { detalleError = false; }, () => {
+      this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(() => detalleError = false, () => {
         this.mensajeService.mensajeError(`Error`, 'No fue posible registrar el detalle de la factura, verifique!');
         detalleError = true;
       });
@@ -515,12 +504,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   /** Función para obtener el valor total del Bopp a ingresar */
-  obtenerValorTotal(){
-    this.valorTotal = 0;
-    for (let index = 0; index < this.ArrayBOPP.length; index++) {
-      this.valorTotal += parseInt(this.ArrayBOPP[index].Subtotal);
-    }
-  }
+  obtenerValorTotal = () => this.valorTotal = this.ArrayBOPP.reduce((a, b) => a + b.Subtotal, 0);
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = () => this.messageService.clear('bopp');
@@ -535,14 +519,7 @@ export class EntradaBOPPComponent implements OnInit {
   }
 
   /** Función para cargar los nombres de bopps genericos en el campo */
-  cargarBoppsGenericos(){
-    this.boppsGenericos = [];
-    this.servicioBoppGenerico.srvObtenerLista().subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        this.boppsGenericos.push(data[index]);
-      }
-    });
-  }
+  cargarBoppsGenericos = () => this.servicioBoppGenerico.srvObtenerLista().subscribe(data => this.boppsGenericos = data);
 
   /** Función para seleccionar el nombre del bopp en el campo, pero su valor será el Id. */
   seleccionarBoppsGenericos(){

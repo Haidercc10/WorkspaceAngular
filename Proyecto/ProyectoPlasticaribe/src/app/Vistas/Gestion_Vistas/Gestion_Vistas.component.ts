@@ -38,6 +38,7 @@ export class Gestion_VistasComponent implements OnInit {
   nombreVistas : any = []; //.Array que gurardará los nombres de las vistas para evitar que se cree una igual
   modoSeleccionado : boolean; //.Variable que servirá para cambiar estilos en el modo oscuro/claro
   imagenes : any = []; //.Imagenes que se cargarán en la tabla y en los dropdown.
+  nuevaCategoria : string = "";
 
   @ViewChild('op') op: OverlayPanel | undefined;
   
@@ -258,4 +259,11 @@ export class Gestion_VistasComponent implements OnInit {
     return this.totalVistas;
   }
 
+  crearCategoria () {
+    if(this.nuevaCategoria.length > 0) {
+      if(!this.arrayVistas.includes(this.nuevaCategoria)) this.arrayVistas.push(this.nuevaCategoria);
+      else this.msjs.mensajeAdvertencia(`Advertencia`, `La categoria ya existe!`);
+      this.nuevaCategoria = '';
+    } else this.msjs.mensajeAdvertencia(`Advertencia`, `Debe llenar el campo categoria!`);
+  }
 }

@@ -2,8 +2,8 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Inject, Injectable } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
-import { rutaZeus } from 'src/polyfills';
 import { EncriptacionService } from '../Servicios/Encriptacion/Encriptacion.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 
@@ -14,7 +14,7 @@ export class JwtInterceptor_InvZeus implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.encriptacion.decrypt(this.storage.get('Token_Inv_Zeus') == undefined ? '' : this.storage.get('Token_Inv_Zeus'));
-    const isApiUrl = request.url.startsWith(rutaZeus);
+    const isApiUrl = request.url.startsWith(environment.rutaZeus);
     if (token && isApiUrl) request = request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
     return next.handle(request);
   }

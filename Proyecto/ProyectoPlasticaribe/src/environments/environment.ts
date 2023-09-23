@@ -3,7 +3,25 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+
+  //SERVIDOR
+  rutaPlasticaribeAPI : "http://192.168.0.85:9086/api",
+  rutaBagPro : "http://192.168.0.85:9095/api",
+  rutaZeus : "http://192.168.0.85:9055/api",
+  rutaZeusContabilidad : "http://192.168.0.85:9065/api",
+
+  // LOCALES 1
+  // rutaPlasticaribeAPI : "http://192.168.0.190:9086/api",
+  // rutaBagPro : "http://192.168.0.190:9095/api",
+  // rutaZeus : "http://192.168.0.190:9055/api"
+  // rutaZeusContabilidad : "http://192.168.0.190:9065/api"
+
+  // LOCALES 2
+  // rutaPlasticaribeAPI : "http://192.168.0.193:9085/api",
+  // rutaBagPro : "http://192.168.0.193:9095/api",
+  // rutaZeus : "http://192.168.0.193:9075/api",
+  // rutaZeusContabilidad : "http://192.168.0.193:9055/api",
 };
 
 /*
@@ -13,4 +31,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
+// import 'zone.js/plugins/zone-error',  // Included with Angular CLI.

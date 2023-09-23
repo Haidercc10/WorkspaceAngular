@@ -44,13 +44,24 @@
         <button pButton pRipple pTooltip="Consultar Inventario" label="Consultar" icon="pi pi-search" class="p-button-danger ml-2" id="consultar" (click)="consultarInventario()"></button>
       </div>
 
-      <div class="col-md-6 text-right">
-        <!-- Con existencias -->
-        <button pButton pRipple pTooltip="Materias primas con existencias" label="Con Stock" icon="pi pi-eject" class="p-button-warning mr-2" id="con-existencias" (click)="existenciasMayorCero()"></button>
-        <!-- Nueva materias prima -->
-        <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success mr-2" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
-        <!-- Exportar excel -->
-        <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel"class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
+      <div class="col-md-6">
+        <div class="row g-2">
+          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+            <button pButton pRipple pTooltip="Consultar Inventario" label="Buscar" icon="pi pi-search" class="p-button-danger" id="consultar" (click)="consultarInventario()"></button>
+          </div>
+          <!-- Con existencias -->
+          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+            <button pButton pRipple pTooltip="Materias primas con existencias" label="Stock" icon="pi pi-eject" class="p-button-warning" id="con-existencias" (click)="existenciasMayorCero()"></button>
+          </div>
+          <!-- Nueva materias prima -->
+          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+            <button *ngIf="ValidarRol == 1" pButton pRipple id="nuevaMp" label="Crear" id="nuevaMateriaPrima" icon="pi pi-plus" class="p-button-success" ptooltip="Crear nuevo material" (click)="LlamarModalCrearMateriaPrima()"></button>
+          </div>
+          <!-- Exportar excel -->
+          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+            <button pButton pRipple label="Exportar" pTooltip="Exportar a excel" icon="pi pi-file-excel" class="p-button-success" id="exportar1" (click)="exportarExcel(1)"></button>
+          </div>
+        </div>
       </div>
     </div>
   </p-toolbar>
@@ -614,7 +625,7 @@
           </p-table>
         </div>
       </div>
-      </p-tabPanel>
+    </p-tabPanel>
 
   </p-tabView>
 </p-card>
@@ -649,7 +660,7 @@
 </p-dialog>
 
 <!-- Modal Para Editar Materias Primas -->
-<p-dialog [(visible)]="modalEditarMateriasPrimas" [contentStyle]="{'overflow':'visible'}" [style]="{width: '400px'}" [resizable]="true" header="Editar Materias Primas" [modal]="true">
+<p-dialog [(visible)]="modalEditarMateriasPrimas" [style]="{width: '400px'}" [resizable]="true" header="Editar Materias Primas" [modal]="true">
   <ng-template pTemplate="content">
     <br>
     <form [formGroup]="FormEdicionMateriaPrima" (ngSubmit)="editarMateriaPrima()">
@@ -720,8 +731,16 @@
             </span>
           </div>
 
+          <!-- Precio Estandar -->
+          <div class="col-md-6">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="PrecioEstandar" inputId="Precio" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+              <label for="Precio">Precio Estandar</label>
+            </span>
+          </div>
+
           <!-- Nombre BOPP Generico -->
-          <div class="col-md-12" *ngIf="esBopp">
+          <div class="col-md-6" *ngIf="esBopp">
             <span class="p-float-label">
               <input formControlName="BoppGenerico" id="BoppGenerico" list="BoppGen" (change)="seleccionarBoppsGenericos()" autocomplete="off" type="text" pInputText pTooltip="Elige el nombre de bopp genérico por ancho y micras asociado al rollo que deseas editar!" [required]="esBopp"/>
               <datalist id="BoppGen">

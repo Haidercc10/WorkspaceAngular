@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelDtPreEntregaRollos } from '../../Modelo/modelDtPreEntregaRollo';
 
 @Injectable({
@@ -9,19 +9,21 @@ import { modelDtPreEntregaRollos } from '../../Modelo/modelDtPreEntregaRollo';
 })
 export class DtPreEntregaRollosService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvCrearPDF = (ot : number, proceso : string) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf/${ot}/${proceso}`);
+  srvCrearPDF = (ot : number, proceso : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf/${ot}/${proceso}`);
 
-  srvCrearPDF2 = (ot : number, proceso : string) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf2/${ot}/${proceso}`);
+  srvCrearPDF2 = (ot : number, proceso : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf2/${ot}/${proceso}`);
 
-  srvCrearPDFUltimoId = (id : number) => this.http.get<any>(rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/CrearPDFUltimoID/${id}`);
+  srvCrearPDFUltimoId = (id : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/CrearPDFUltimoID/${id}`);
 
-  GetRollos = (data : any []): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho/getRollos', data);
+  GetRollos = (data : any []): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho/getRollos', data);
 
   GetRollos_Ingresar(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollos_Ingresar/${fechaInicial}/${fechaFinal}/${proceso}/${ruta}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollos_Ingresar/${fechaInicial}/${fechaFinal}/${proceso}/${ruta}`);
   }
 
-  srvGuardar = (data : modelDtPreEntregaRollos): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho', data);
+  srvGuardar = (data : modelDtPreEntregaRollos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho', data);
 }

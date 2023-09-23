@@ -71,7 +71,6 @@ export class PedidoExternoComponent implements OnInit {
   pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
   fechaUltFacuracion : any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  arrBirds = [];
 
   constructor(private pedidoproductoService : OpedidoproductoService,
                 private productosServices : ProductoService,
@@ -101,7 +100,7 @@ export class PedidoExternoComponent implements OnInit {
       PedEstadoId: 11,
       PedObservacion: '',
       PedDescuento : 0,
-      PedIva : 0,
+      PedIva : true,
     });
 
     //Datos para la tabla de productos.
@@ -184,19 +183,14 @@ export class PedidoExternoComponent implements OnInit {
     this.valorMenosIva = 0;
     this.valorfinal = 0;
     this.pedidosProductos = [];
+    this.FormPedidoExternoClientes.reset();
     this.FormPedidoExternoClientes.patchValue({
-      PedClienteNombre: null,
-      PedClienteId : null,
-      PedSedeCli_Id: null,
-      ciudad_sede: null,
-      PedUsuarioNombre: null,
-      PedUsuarioId : null,
       PedFechaEnt: this.today,
       PedEstadoId: 11,
-      PedObservacion: null,
       PedDescuento : 0,
-      PedIva : 0,
+      PedIva : true,
     });
+    this.checked = true;
     this.cargando = false;
     this.presentacion = [];
     this.productosPedidos = [];
@@ -206,9 +200,8 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que va a buscar los posibles clientes a los que se les puede hacer el pedido de productos
   buscarClientes(){
     let nombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    if (nombre != null && nombre != '' && nombre != undefined && nombre.length > 3 && this.ValidarRol == 2){
-      this.clientesService.GetClientesVendedores(this.storage_Id, nombre).subscribe(datos => this.cliente = datos);
-    } else this.cliente = [];
+    if (![null, '', undefined].includes(nombre) && nombre.length > 3 && this.ValidarRol == 2) this.clientesService.GetClientesVendedores(this.storage_Id, nombre).subscribe(datos => this.cliente = datos);
+    else this.cliente = [];
     this.ValidarRol == 1 ? this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos => this.cliente = datos) : null;
     setTimeout(() => this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre)), 500);
   }
@@ -218,16 +211,16 @@ export class PedidoExternoComponent implements OnInit {
     let nombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
     if (![null, '', undefined].includes(nombre)){
       this.clientesService.srvObtenerListaPorNombreCliente(nombre).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
+        datos.forEach(cli => {
           this.FormPedidoExternoClientes.patchValue({
-            PedClienteNombre: datos[i].cli_Nombre,
-            PedClienteId : datos[i].cli_Id,
+            PedClienteNombre: cli.cli_Nombre,
+            PedClienteId : cli.cli_Id,
           });
           setTimeout(() => {
             this.ciudadClienteComboBox();
             this.productoCliente();
           }, 100);
-        }
+        });
       });
     }
   }
@@ -241,10 +234,10 @@ export class PedidoExternoComponent implements OnInit {
     let clienteBD: any = this.FormPedidoExternoClientes.value.PedClienteId;
     this.sedesClientesService.srvObtenerListaPorCliente(clienteBD).subscribe(datos_sedesClientes => {
       this.sedeCliente = datos_sedesClientes;
-      datos_sedesClientes.map(sede => sede.sedeCliente_Ciudad).forEach(sede => this.ciudad.push(sede));
+      this.ciudad = datos_sedesClientes.map(sede => sede.sedeCliente_Ciudad);
 
       if (this.sedeCliente.length <= 1 ) {
-        for (const item of this.sedeCliente) {
+        this.sedeCliente.forEach(item => {
           this.sedeCliente = [];
           this.usuarioVende.push(item.usua_Nombre);
           this.sedeCliente.push(item.sedeCliente_Direccion);
@@ -254,7 +247,7 @@ export class PedidoExternoComponent implements OnInit {
             PedUsuarioNombre: item.usua_Nombre,
             PedUsuarioId: item.usua_Id,
           });
-        }
+        });
         this.verificarCartera();
       } else {
         for (const item of this.sedeCliente) {
@@ -296,28 +289,25 @@ export class PedidoExternoComponent implements OnInit {
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     if (direccionSede != null && ciudad != null && clienteNombre != null) {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
-        if (datos_sedeCliente.lengrh == 0) !this.cargando;
         for (let j = 0; j < datos_sedeCliente.length; j++) {
           this.zeusCobtabilidadService.GetCarteraClientes(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
-            if (datos.length == 0) this.cargando = false;
             for (let i = 0; i < datos.length; i++) {
-              let fechaRadicado : any = datos[i].fecha_Radicado;
-              if (datos[i].fecha_Radicado == null) fechaRadicado = datos[i].lapsO_DOC;
+              let fechaRadicado : any = datos[i].fecha_Radicado == null ? datos[i].lapsO_DOC : datos[i].fecha_Radicado;
               let hoy = moment([moment().year(), moment().month(), moment().date()]);
               let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
               if (hoy.diff(fechaDocumento, 'days') >= 70) {
-                this.msj.mensajeAdvertencia(`Advertencia`, `¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
+                this.msj.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
                 this.limpiarTodosCampos();
                 break;
-              } else this.cargando = false;
+              }
             }
           }, () => {
             this.msj.mensajeError(`Error`, `¡Error al consultar la cartera del cliente selecionado!`);
             this.limpiarTodosCampos();
-          });
+          }, () => this.cargando = false);
         }
       }, () => {
-        this.msj.mensajeError(`Error`, `¡Ocurrió un error al consultar el código del cliente seleccionado!`);
+        this.msj.mensajeError(`Error`, `¡Ocurrió un error al consultar el cliente seleccionado!`);
         this.cargando = false;
       });
     } else {
@@ -340,9 +330,9 @@ export class PedidoExternoComponent implements OnInit {
     this.presentacion = [];
     this.ultimoPrecio = 0;
     let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre;
-    if (idProducto == null || idProducto == undefined || idProducto == '') this.productoCliente();
+    if ([null, undefined, ''].includes(idProducto)) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
-      if (datos_existencis.length != 0) {
+      if (datos_existencis.length > 0) {
         datos_existencis.forEach(exis => {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
             datos_prod.forEach(prod => {
@@ -356,9 +346,9 @@ export class PedidoExternoComponent implements OnInit {
                   ProdId: prod.prod_Id,
                   ProdNombre: prod.prod_Nombre,
                   ProdUnidadMedidaCant: prod.undMed_Id,
-                  ProdPrecioUnd: prod.exProd_PrecioVenta.toFixed(2),
-                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
-                  ProdStock: this.formatonumeros(exis.existencias.toFixed(2)),
+                  ProdPrecioUnd: prod.exProd_PrecioVenta,
+                  ProdUltFacturacion: this.ultimoPrecio,
+                  ProdStock: parseFloat(exis.disponibles),
                 });
               }, 100);
             });
@@ -388,9 +378,9 @@ export class PedidoExternoComponent implements OnInit {
     this.presentacion = [];
     this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
-    if (idProducto == null || idProducto == undefined || idProducto == 0) this.productoCliente();
+    if ([null, undefined, 0].includes(idProducto)) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
-      if (datos_existencis.length != 0) {
+      if (datos_existencis.length > 0) {
         datos_existencis.forEach(exis => {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_prod => {
             datos_prod.forEach(prod => {
@@ -404,9 +394,9 @@ export class PedidoExternoComponent implements OnInit {
                   ProdId: prod.prod_Id,
                   ProdNombre: prod.prod_Nombre,
                   ProdUnidadMedidaCant: prod.undMed_Id,
-                  ProdPrecioUnd: prod.exProd_PrecioVenta.toFixed(2),
-                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
-                  ProdStock: this.formatonumeros(exis.existencias.toFixed(2)),
+                  ProdPrecioUnd: prod.exProd_PrecioVenta,
+                  ProdUltFacturacion: this.ultimoPrecio,
+                  ProdStock: exis.existencias,
                 });
               }, 100);
             });
@@ -438,57 +428,28 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que envia la informacion de los productos a la tabla.
   cargarFormProductoEnTablas(_formulario : any){
-    this.cargando = true;
     this.ultimoPrecio = 0;
-    let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
     let precioProducto : number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
     let cantidad : number = this.FormPedidoExternoProductos.value.ProdCantidad;
 
-    this.valorTotal += (precioProducto * cantidad);
-    this.ivaDescuento();
-
-    this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencias => {
-      if (datos_existencias.length == 0) {
-        if (precioProducto >= 0) {
-          let productoExt : any = {
-            Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
-            Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
-            Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
-            UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-            PrecioUnd : precioProducto,
-            Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
-            SubTotal : this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad,
-            FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
-          }
-          this.ArrayProducto.push(productoExt);
-          this.LimpiarCamposProductos();
-          this.productoCliente();
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡El precio del producto debe ser mayor a 0!`);
-      } else if (datos_existencias.length != 0) {
-        for (let index = 0; index < datos_existencias.length; index++) {
-          if (precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
-            let productoExt : any = {
-              Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
-              Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
-              Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
-              UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-              PrecioUnd : precioProducto,
-              Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
-              SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
-              FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
-            }
-            this.ArrayProducto.push(productoExt);
-            this.LimpiarCamposProductos();
-            this.productoCliente();
-          } else {
-            this.msj.mensajeAdvertencia(`Advertencia`, `El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
-            this.cargando = false;
-          }
-        }
+    if (precioProducto > 0 && precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
+      this.valorTotal += (precioProducto * cantidad);
+      this.ivaDescuento();
+      let productoExt : any = {
+        Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
+        Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
+        Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
+        UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+        PrecioUnd : precioProducto,
+        Stock : this.FormPedidoExternoProductos.get('ProdStock').value,
+        SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
+        FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
       }
+      this.ArrayProducto.push(productoExt);
+      this.LimpiarCamposProductos();
+      this.productoCliente();
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
-    });
-    setTimeout(() => this.cargando = false, 500);
+    } else this.msj.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
   }
 
   // Funcion que mostrará un modal con la informacion del pedido
@@ -542,13 +503,7 @@ export class PedidoExternoComponent implements OnInit {
           PedExt_PrecioTotalFinal : this.valorfinal,
           PedExt_HoraCreacion : moment().format('H:mm:ss'),
         }
-        this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
-          this.crearDetallesPedido();
-          setTimeout(() => {
-            this.limpiarTodosCampos();
-            this.productosPedido(data.pedExt_Id);
-          }, 2000);
-        }, () => {
+        this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> this.crearDetallesPedido(data.pedExt_Id), () => {
           this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido, por favor intente de nuevo!');
           this.cargando = false;
         });
@@ -560,25 +515,31 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   // Funcion que creará los detalles del pedido
-  crearDetallesPedido(){
-    this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
-      for (let index = 0; index < this.ArrayProducto.length; index++) {
-        const productosPedidos : any = {
-          Prod_Id: this.ArrayProducto[index].Id,
-          PedExt_Id: dataPedExternos.pedExt_Id,
-          PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
-          UndMed_Id : this.ArrayProducto[index].UndCant,
-          PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
-          PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
-          PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
-          PedExtProd_CantidadFacturada : 0,
-        }
-        this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(() => this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`), () => {
-          this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
-          this.cargando = false;
-        });
+  crearDetallesPedido(id_pedido : number){
+    let count : number = 0;
+    for (let index = 0; index < this.ArrayProducto.length; index++) {
+      const productosPedidos : any = {
+        Prod_Id: this.ArrayProducto[index].Id,
+        PedExt_Id: id_pedido,
+        PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
+        UndMed_Id : this.ArrayProducto[index].UndCant,
+        PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
+        PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
+        PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
+        PedExtProd_CantidadFacturada : 0,
       }
-    });
+      this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(() => {
+        count ++;
+        if (count == this.ArrayProducto.length) {
+          this.limpiarTodosCampos();
+          this.productosPedido(id_pedido);
+          this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
+        }
+      }, () => {
+        this.msj.mensajeError(`Error`, '¡No se pudo crear el pedido correctamente, no se asociarón los productos al encabezado de este mismo!');
+        this.cargando = false;
+      });
+    }
   }
 
   // Funcion que va a editar la información principal del pedido
@@ -608,14 +569,7 @@ export class PedidoExternoComponent implements OnInit {
             PedExt_PrecioTotalFinal : this.valorfinal,
             PedExt_HoraCreacion : datos.pedExt_Hora,
           }
-          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(() => {
-            this.editarDetallesPedido();
-            setTimeout(() => {
-              this.msj.mensajeConfirmacion(`¡Pedido creado exitosamente!`, `¡El pedido fue creado de manera satisfactoria!`);
-              this.productosPedido(this.pedidoEditar);
-              this.limpiarTodosCampos();
-            }, 2000);
-          }, () => {
+          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(() => this.editarDetallesPedido(), () => {
             this.msj.mensajeError(`Error`, '¡No se pudo editar el pedido, por favor intente de nuevo!');
             this.cargando = false;
           });
@@ -629,6 +583,7 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion que va a editar la información de los productos del pedido
   editarDetallesPedido(){
+    let count : number = 0;
     for (let index = 0; index < this.ArrayProducto.length; index++) {
       this.PedidoProductosService.srvObtenerListaPorIdProducto_Pedido(this.ArrayProducto[index].Id, this.pedidoEditar).subscribe(datos => {
         if (datos.length == 0) {
@@ -642,7 +597,14 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
             PedExtProd_CantidadFacturada : 0,
           }
-          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(null, () => {
+          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(() => {
+            count ++;
+            if (count == this.ArrayProducto.length) {
+              this.limpiarTodosCampos();
+              this.productosPedido(this.pedidoEditar);
+              this.msj.mensajeConfirmacion(`¡Pedido Editado exitosamente!`, `¡El pedido fue editado de manera satisfactoria!`);
+            }
+          }, () => {
             this.msj.mensajeError(`Error`, '¡No se pudo Editar el pedido, por favor intente de nuevo!');
             this.cargando = false;
           });
@@ -654,20 +616,20 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que consultará los productos del ultimo pedido creado
   productosPedido(pedido : number){
     this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
-      for (let i = 0; i < datos_pedido.length; i++) {
+      datos_pedido.forEach(data => {
         let info : any = {
-          Id : datos_pedido[i].producto_Id,
-          Nombre : datos_pedido[i].producto,
-          Cantidad : this.formatonumeros(datos_pedido[i].cantidad),
-          Und : datos_pedido[i].presentacion,
-          Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
-          SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
-          "Fecha Entrega" : datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
+          Id : data.producto_Id,
+          Nombre : data.producto,
+          Cantidad : this.formatonumeros(data.cantidad),
+          Und : data.presentacion,
+          Precio : this.formatonumeros(data.precio_Unitario),
+          SubTotal : this.formatonumeros(data.subTotal_Producto),
+          "Fecha Entrega" : data.fecha_Entrega.replace('T00:00:00', ''),
         }
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-      }
-      setTimeout(() => this.crearpdf(pedido), 1000);
+        if (this.productosPedidos.length == datos_pedido.length) this.crearpdf(pedido);
+      });
     });
   }
 

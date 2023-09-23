@@ -129,10 +129,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
     if (data == 1) info = this.carteraAgrupadaProveedores;
     else if (data == 2) info = this.carteraInvergoal;
     else if (data == 3) info = this.carteraInversuez;
-    let total : number = 0;
-    for (const item of info) {
-      total += item.Cartera;
-    }
+    let total : number = info.reduce((acc, item) => acc + item.Cartera, 0);
     this.totalCartera = total;
   }
 

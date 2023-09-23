@@ -1,19 +1,18 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetalleOrdenMaquilaService } from 'src/app/Servicios/DetalleOrdenMaquila/DetalleOrdenMaquila.service';
 import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturacion_OrdenMaquila.ts/DtFacturacion_OrdenMaquila.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
-import { stepsMovMaquilas as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsMovMaquilas as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte_Maquilas',
@@ -49,9 +48,8 @@ export class Reporte_MaquilasComponent implements OnInit {
                       private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private servicioTerceros : TercerosService,
-                            private messageService: MessageService,
-                              private shepherdService: ShepherdService,
-                                private msj : MensajesAplicacionService) {
+                            private shepherdService: ShepherdService,
+                              private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
@@ -91,36 +89,16 @@ export class Reporte_MaquilasComponent implements OnInit {
   }
 
   // Funcion que va a consultar y almacenar los estados que pueden tener los documentos
-  obtenerEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 11 || datos_estados[i].estado_Id == 5 || datos_estados[i].estado_Id == 13 || datos_estados[i].estado_Id == 12) this.estados.push(datos_estados[i]);
-      }
-    });
-  }
+  obtenerEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(datos => this.estados = datos.filter(x => [11,5,13,12].includes(x.estado_Id)));
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Funcion que va a calcular el subtotal de lo vendido en un mes
-  calcularTotalVendidoAno(fecha : any){
-    let total : number = 0;
-    for (let i = 0; i < this.arrayConsolidado.length; i++) {
-      if (this.arrayConsolidado[i].Fecha == fecha) total += this.arrayConsolidado[i].SubTotal;
-    }
-    return total;
-  }
+  calcularTotalVendidoAno = (fecha : any) : number => this.arrayConsolidado.filter(x => x.Fecha == fecha).reduce((a,b) => a + b.SubTotal, 0);
 
   // Funcion que va a calcular el peso de lo vendido en un mes
-  calcularTotalPesado(fecha : any){
-    let total : number = 0;
-    for (let i = 0; i < this.arrayConsolidado.length; i++) {
-      if (this.arrayConsolidado[i].Fecha == fecha) total += this.arrayConsolidado[i].Cantidad;
-    }
-    return total;
-  }
+  calcularTotalPesado = (fecha : any) : number => this.arrayConsolidado.filter(x => x.Fecha == fecha).reduce((a,b) => a + b.Cantidad, 0);
 
   // funcion que va a consultar los filtros utilizados para traer ka informacion
   consultarFiltros(){
@@ -128,6 +106,7 @@ export class Reporte_MaquilasComponent implements OnInit {
     this.arrayConsolidado = [];
     this.valorTotalConsulta = 0;
     this.cargando = true;
+    let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.FormConsultarFiltros.value.estadoDoc;
@@ -135,27 +114,21 @@ export class Reporte_MaquilasComponent implements OnInit {
     let tercero : any = this.FormConsultarFiltros.value.id_tercero
     let ruta : string = '', ruta2 : string = '';
 
-    if (fechaInicial == 'Fecha inválida') fechaInicial = null;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = null;
-    if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
-    if (fechaFinal == null) fechaFinal = fechaInicial;
+    if (fechaInicial == 'Fecha inválida') fechaInicial = fechaMesAnterior;
+    if (fechaFinal == 'Fecha inválida') fechaFinal = moment().format('YYYY-MM-DD');
 
     if (estado != null && codigo != null) ruta = `?doc=${codigo}&estado=${estado}`;
     else if (estado != null) ruta = `?estado=${estado}`;
     else if (codigo != null) ruta = `?doc=${codigo}`;
 
     this.ordenMaquilaService.GetConsultaDocumentos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
-      if(datos.length > 0 ) {
-        for (let i = 0; i < datos.length; i++) {
-          this.llenarTabla(datos[i]);
-        }
-      } else {
+      if(datos.length > 0 ) datos.forEach(data => this.llenarTabla(data));
+      else {
         this.msj.mensajeAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`);
         this.cargando = false;
       }
-
-      setTimeout(() => { this.cargando = false; }, datos.length * 5);
-    }, error => { this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); this.cargando = false; });
+      setTimeout(() => this.cargando = false, datos.length * 5);
+    }, () => this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`), () => this.cargando = false);
 
     if (this.ValidarRol == 1) {
       if (estado != null && codigo != null && tercero != null) ruta2 = `?doc=${codigo}&estado=${estado}&tercero=${tercero}`;
@@ -166,11 +139,13 @@ export class Reporte_MaquilasComponent implements OnInit {
       else if (tercero != null) ruta2 = `?tercero=${tercero}`;
 
       this.ordenMaquilaService.GetConsultaConsolidado(fechaInicial, fechaFinal, ruta2).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
-          this.llenartTablaConsolidado(datos[i]);
-        }
-        setTimeout(() => { this.cargando = false; }, datos.length * 5);
-      }, error => { this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); this.cargando = false; });
+        this.cargando = true;
+        datos.forEach(data => this.llenartTablaConsolidado(data));
+        setTimeout(() => this.cargando = false, datos.length * 5);
+      }, () => {
+        this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`)
+        this.cargando = false;
+      }, () => this.cargando = false);
     }
   }
 
@@ -267,7 +242,7 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.datosPdf.push(info);
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => {this.crearPDF_Facturacion(id); }, 2500);
+      setTimeout(() => this.crearPDF_Facturacion(id), 2500);
     });
   }
 
@@ -483,13 +458,15 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.datosPdf.push(info);
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => {this.crearPDF_Orden(id); }, 2500);
-    }, error => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); this.cargando = false; });
+      setTimeout(() => this.crearPDF_Orden(id), 2500);
+    }, () => {
+      this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`);
+      this.cargando = false;
+    }, () => this.cargando = false);
   }
 
   // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
   crearPDF_Orden(id : number){
-    let nombre : string = this.storage_Nombre;
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         let titulo : string = `Orden de Maquila N° ${datos_orden[i].orden}`;
@@ -664,22 +641,19 @@ export class Reporte_MaquilasComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
     };
   }
 
-  cargarTerceros(){
-    let tercero : any = this.FormConsultarFiltros.value.tercero;
-    this.servicioTerceros.getTerceroLike(tercero).subscribe(data => {this.arrayTerceros = data});
-  }
+  cargarTerceros = () => this.servicioTerceros.getTerceroLike(this.FormConsultarFiltros.value.tercero).subscribe(data => this.arrayTerceros = data);
 
   seleccionarTerceros(){
     let tercero : any = this.FormConsultarFiltros.value.tercero;
     let nuevo : any[] = this.arrayTerceros.filter((item) => item.tercero_Id == tercero);
-    setTimeout(() => { this.FormConsultarFiltros.patchValue({tercero: nuevo[0].tercero_Nombre, id_tercero: nuevo[0].tercero_Id });}, 30);
+    setTimeout(() => this.FormConsultarFiltros.patchValue({tercero: nuevo[0].tercero_Nombre, id_tercero: nuevo[0].tercero_Id }), 30);
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */

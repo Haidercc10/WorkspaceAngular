@@ -1,0 +1,30 @@
+span{
+    color: #db4149;
+  }
+  
+  .columnaCantidad {
+    background-color: #75baff;
+  }
+  
+  #table td, th{
+    font-size: calc(var(--font-size) * 13px);
+  }
+  
+  p-calendar ::ng-deep span button {
+    background-color: var(--rojo);
+    border: 0;
+    transition: all 1s;
+  }
+  
+  p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+    background: var(--rojoHover);
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button:hover {
+    background: #fff0;
+  }
+  

@@ -565,9 +565,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         this.modalProcesos = true;
         setTimeout(() => {
           this.ArrayDatosProcesos = [];
-          for (let index = 0; index < data.length; index++) {
-            this.llenarTablaProcesos(data[index]);
-          }
+          data.forEach(x => this.llenarTablaProcesos(x));
         }, 500);
       } else this.msj.mensajeAdvertencia('Advertencia', `No se ha pesado ningún rollo en la OT N° ${this.otSeleccionada} en el proceso de ${proceso}`);
     });

@@ -8,9 +8,10 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -21,6 +22,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined; //Variable identificadora de la tabla
+  @ViewChild(Recetas_ProductosComponent) receta: Recetas_ProductosComponent | undefined; 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -39,6 +41,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   cantidadDias : number;
   numeroIdProd : number = 0;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  recetaProducto : boolean = false;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
@@ -314,5 +317,16 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       this.load = true;
       this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${nombre} actualizada con éxito!`);
     }, 5500);
+  }
+
+  // Funcion que permitirá mostrar el modal de la creación y edición de la receta
+  mostrarModalCrearEditar(data : any = "") {
+    this.recetaProducto = true;
+    this.receta.limpiarTodo();
+    if (data != "") {
+      this.receta.FormProductos.patchValue({ Nombre : data.Id, });
+      this.receta.buscarProductos();
+      setTimeout(() => this.receta.cambiarNombreProducto(), 500);
+    }
   }
 }

@@ -1,0 +1,315 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 id="nomina" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Costos de Caja Menor</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card class="font-size-14">
+
+  <p-tabView>
+    <p-tabPanel
+      header="Ingresar Registros"
+      leftIcon="pi pi-cloud-upload"
+      tooltip="Desde aquí puede ingresar los registros">
+
+      <!--Ver tutorial-->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+      </div>
+
+      <!-- Crear tipo de gasto -->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Tipo de Gasto" icon="pi pi-money-bill" (click)="mostrarModal()" pTooltip="Crea tipos de gastos de caja menor aquí!" tooltipPosition="left"></button>
+      </div>
+
+      <!--Titulo-->
+      <div class="mb-5">
+        <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-cloud-download"></i> Ingresar registros</h2>
+      </div>
+
+      <!--Formulario-->
+      <form [formGroup]="FormCajaMenor" (ngSubmit)="cargarTabla()">
+        <div class="mb-3" id="formulario">
+
+          <div class="row g-4">
+            <!-- Fechas -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-2">
+              <span class="p-float-label" id="rango-fechas">
+                <p-calendar id="rango" inputId="fechas" formControlName="fechas" selectionMode="range" [showIcon]="true" [required]="true"></p-calendar>
+                <label for="fechas">Rango de Fechas</label>
+              </span>
+            </div>
+
+            <!--Area Costo-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-dropdown formControlName="area" id="area" optionValue="area_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="area_Nombre" [filter]="true" filterBy="area_Nombre" [showClear]="true" [required]="true"></p-dropdown>
+                <label for="area">Área</label>
+              </span>
+            </div>        
+
+            <!--Tipo de nómina -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-dropdown formControlName="tipoCosto" id="tipoCosto" optionValue="tpSal_Id" [autoDisplayFirst]="false" [options]="tiposGastos" optionLabel="tpSal_Nombre" [filter]="true" filterBy="tpSal_Nombre" [showClear]="true" [required]="true"></p-dropdown>
+                <label for="tipoCosto">Tipo costo</label>
+              </span>
+            </div>
+
+            <!--Valor-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valorTotal" id="valorTotal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                <label for="valor">Valor</label>
+              </span>
+            </div>
+
+            <!-- Descripción -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-3 col-xxl-4">
+              <span class="p-float-label">
+                <textarea formControlName="descripcion" [rows]="1" id="descripcion" maxlength="200" pInputTextarea></textarea>
+                <label for="descripcion">Descripción</label>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!--Botones-->
+        <div class="mb-4" id="botones">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" type="submit" label="Agregar registro" icon="pi pi-send"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+          </div>
+        </div>
+      </form>
+
+      <!--Linea-->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="mb-5">
+        <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Tabla de registros</h2>
+      </div>
+
+      <!-- Tabla de nomina entrante -->
+      <div class="row g-3 font-size-14" id="tabla">
+        <div class="table-responsive">
+          <p-table
+          #dt
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [rowHover]="true"
+          [value]="arrayGastos"
+          [scrollable]="true"
+          scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>#</th>
+                <th scope="col">Fecha inicial</th>
+                <th scope="col">Área</th>
+                <th scope="col">Tipo de costo</th>
+                <th scope="col">Valor total</th>
+                <th scope="col">Descripción</th>
+                <th id="quitar" class="text-center" scope="col" id="quitar">Quitar</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-cajaMenor let-rowIndex="rowIndex">
+              <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td>{{cajaMenor.fecha1}}</td>
+                <td>{{cajaMenor.nombreArea}}</td>
+                <td>{{cajaMenor.nombreTipoCosto}}</td>
+                <td>{{cajaMenor.valor | currency : 'COP'}}</td>
+                <td>{{cajaMenor.descripcion}}</td>
+                <td class="text-center"><i class="pi pi-trash cursor" title="Quitar registro" (click)="mostrarEleccion(cajaMenor)"></i></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="4" class="text-right">Totales</td>
+                <td colspan="3" id="total">{{calcularTotal() | currency : 'COP'}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <br>
+      <div>
+        <div class="mb-3" id="botones2">
+          <div class="row g-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button id="entrada" pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntrada()"></button>
+              <button id="limpiarTodo" pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+      
+    <p-tabPanel
+      header="Buscar Registros"
+      leftIcon="pi pi-search"
+      tooltip="Buscar registros anteriores">
+
+      <!--Ver tutorial-->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+      </div>
+
+      <!--Titulo-->
+      <div class="mb-5">
+        <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-cloud-download"></i> Buscar registros</h2>
+      </div>
+
+      <!--Formulario-->
+      <form [formGroup]="FormFiltrosCajaMenor" (ngSubmit)="buscarRegistros()">
+        <div class="mb-3" id="formulario">
+          <div class="row g-4">
+            <!-- Fechas -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-4 col-xxl-4">
+              <span class="p-float-label" id="rango-fechas">
+                <p-calendar id="rango" inputId="fechas" formControlName="Fechas" selectionMode="range" [showIcon]="true" [required]="true"></p-calendar>
+                <label for="fechas">Rango de Fechas</label>
+              </span>
+            </div>
+
+            <!--Area Costo-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-4 col-xxl-4">
+              <span class="p-float-label">
+                <p-dropdown formControlName="Area" id="area" optionValue="area_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="area_Nombre" [filter]="true" filterBy="area_Nombre" [showClear]="true" [required]="true"></p-dropdown>
+                <label for="area">Área</label>
+              </span>
+            </div>        
+
+            <!--Tipo de nómina -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-4 col-xxl-4">
+              <span class="p-float-label">
+                <p-dropdown formControlName="TipoCosto" id="tipoCosto" optionValue="tpSal_Id" [autoDisplayFirst]="false" [options]="tiposGastos" optionLabel="tpSal_Nombre" [filter]="true" filterBy="tpSal_Nombre" [showClear]="true" [required]="true"></p-dropdown>
+                <label for="tipoCosto">Tipo costo</label>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!--Botones-->
+        <div class="mb-4" id="botones">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" type="submit" label="Buscar registro" icon="pi pi-search"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTabBusqueda()"> </button>
+          </div>
+        </div>
+      </form>
+
+      <!--Linea-->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="mb-5">
+        <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-table"></i> Tabla de Registros Encontrados</h2>
+      </div>
+
+      <!-- Tabla de nomina entrante -->
+      <div class="row g-3 font-size-14" id="tabla">
+        <div class="table-responsive">
+          <p-table
+          #dt_CajaMenor
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [rowHover]="true"
+          [value]="registrosCajaMenor"
+          [scrollable]="true"
+          scrollHeight="50rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaRegistro')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'registradoPor')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaSalida')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'area')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'tipoSalida')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'valor')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'descripcion')"></th>
+              </tr>
+              <tr>
+                <th>#</th>
+                <th scope="col" pSortableColumn="fechaRegistro"><p-sortIcon field="fechaRegistro"></p-sortIcon> Fecha Registro</th>
+                <th scope="col" pSortableColumn="registradoPor"><p-sortIcon field="registradoPor"></p-sortIcon> Registrado Por</th>
+                <th scope="col" pSortableColumn="fechaSalida"><p-sortIcon field="fechaSalida"></p-sortIcon> Fecha Salida</th>
+                <th scope="col" pSortableColumn="area"><p-sortIcon field="area"></p-sortIcon> Área</th>
+                <th scope="col" pSortableColumn="tipoSalida"><p-sortIcon field="tipoSalida"></p-sortIcon> Tipo de Salida</th>
+                <th scope="col" pSortableColumn="valor"><p-sortIcon field="valor"></p-sortIcon> Valor Salida</th>
+                <th scope="col" pSortableColumn="descripcion"><p-sortIcon field="descripcion"></p-sortIcon> Observación</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-cajaMenor let-rowIndex="rowIndex">
+              <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td>{{cajaMenor.fechaRegistro | date : 'dd/MM/yyyy'}} {{cajaMenor.horaRegistro}}</td>
+                <td>{{cajaMenor.registradoPor}}</td>
+                <td>{{cajaMenor.fechaSalida | date : 'dd/MM/yyyy'}}</td>
+                <td>{{cajaMenor.area}}</td>
+                <td>{{cajaMenor.tipoSalida}}</td>
+                <td>{{cajaMenor.valor | currency : 'COP $'}}</td>
+                <td>{{cajaMenor.descripcion}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+    </p-tabPanel>
+  </p-tabView>
+</p-card>
+
+<p-toast position="center" key="registro" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-bopp>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="quitarRegistro(bopp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!--Modal para crear bopp's genéricos -->
+<p-dialog [(visible)]="modalTiposGastos" [contentStyle]="{'overflow':'visible'}" [style]="{width: '60vw'}" [resizable]="true" header="Crear tipo de Gasto" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-CrearTipoSalida_CajaMenor></app-CrearTipoSalida_CajaMenor>
+  </ng-template>
+</p-dialog>
+

@@ -4,10 +4,14 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
+import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/CreacionTintas/asignacionMPxTintas.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
+import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
@@ -36,6 +40,7 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  hora : any = moment().format('H:mm:ss'); //Variable que se usará para llenar la hora actual
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -46,7 +51,9 @@ export class AsignacionTintasComponent implements OnInit {
                           private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
                             private messageService: MessageService,
                               private shepherdService: ShepherdService,
-                                private mensajeService : MensajesAplicacionService,)  {
+                                private mensajeService : MensajesAplicacionService,
+                                  private srvMovEntradasMP : Movimientos_Entradas_MPService,
+                                    private srvMovSalidasMP : Entradas_Salidas_MPService)  {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormAsignacionMP = this.frmBuilder.group({
@@ -162,13 +169,17 @@ export class AsignacionTintasComponent implements OnInit {
         Id : idMateriaPrima,
         Nombre : nombreMateriaPrima,
         Cant : cantidad,
+        Cantidad2 : cantidad,
         UndCant : presentacion,
         Stock : stock,
         Materia_Prima : IdMatPrimaReal,
         Tinta : IdTintaReal,
+        EntradasDisponibles : [], 
+        Salidas : [],
       }
+      this.cargar_Entradas(productoExt);
       this.ArrayMateriaPrima.push(productoExt);
-      this.FormMateriaPrima.reset();
+      setTimeout(() => this.FormMateriaPrima.reset(), 1000);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, '¡La cantidad a asignar no debe superar lo que hay en stock!');
   }
 
@@ -183,7 +194,7 @@ export class AsignacionTintasComponent implements OnInit {
   asignarMPCrearTintas(){
     this.onReject('asignacion');
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.load = false;
+      this.load = true;
       let info : modelAsignacionMPxTintas = {
         AsigMPxTinta_Id: 0,
         Tinta_Id: this.FormAsignacionMP.value.Id_Tinta,
@@ -197,7 +208,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.asignacionMPxTintas.srvGuardar(info).subscribe(() => this.obtenerUltimoIdAsignacion(), error => {
         this.mensajeService.mensajeError(`¡Error al registrar la creación de tinta!`, error.message);
-        this.load = true;
+        this.load = false;
       });
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
@@ -217,16 +228,19 @@ export class AsignacionTintasComponent implements OnInit {
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(() => {
         }, () => {
           this.mensajeService.mensajeError(`Error`, `¡Error al registrar los detalles de la creación de tinta!`);
-          this.load = true;
+          this.load = false;
         });
       }
       this.moverInventarioMP();
       this.moverInventarioTintas();
+      this.actualizar_MovimientosEntradas();
+      this.crear_Salidas(datos_asignaciones.asigMPxTinta_Id);
+      this.crearRegistroTinta_MovEntradasMP(datos_asignaciones.asigMPxTinta_Id);
       setTimeout(() => this.sumarInventarioTintas(), 1000);
       this.load = false;
     }, () => {
       this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de asignación!`);
-      this.load = true;
+      this.load = false;
     });
   }
 
@@ -309,13 +323,10 @@ export class AsignacionTintasComponent implements OnInit {
         Tinta_FechaIngreso : datos_tinta.tinta_FechaIngreso,
         Tinta_Hora : datos_tinta.tinta_Hora,
       }
-      this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro completado con exito!`);
-        this.limpiarTodosLosCampos();
-      }, error => {
+      this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro completado con exito!`), error => {
         this.mensajeService.mensajeError(`¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!`, error.message);
         this.load = true;
-      });
+      }, () => this.limpiarTodosLosCampos());
     }, error => {
       this.mensajeService.mensajeError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message);
       this.load = true;
@@ -345,4 +356,133 @@ export class AsignacionTintasComponent implements OnInit {
     this.mpSeleccionada = item;
     this.messageService.add({severity:'warn', key:'mp', summary:'Elección', detail: `¿Está seguro que desea quitar la materia prima ${this.mpSeleccionada.Nombre} de la tabla?`, sticky: true});
   }
-}
+
+  //Función que colocará la información de las entradas de materia prima en el array de entradas disponibles.
+  cargar_Entradas(info : any){
+    let salidaReal : number = 0;
+    this.srvMovEntradasMP.GetInventarioxMaterial(info.Id).subscribe(data => {
+      if (data.length > 0) {
+        for (let i = 0; i < data.length; i++) {
+          let detalle : modeloMovimientos_Entradas_MP = {
+            Id: data[i].id,
+            MatPri_Id: data[i].matPri_Id,
+            Tinta_Id: data[i].tinta_Id,
+            Bopp_Id: data[i].bopp_Id,
+            Cantidad_Entrada: data[i].cantidad_Entrada,
+            UndMed_Id: data[i].undMed_Id,
+            Precio_RealUnitario: data[i].precio_RealUnitario,
+            Tipo_Entrada: data[i].tipo_Entrada,
+            Codigo_Entrada: data[i].codigo_Entrada,
+            Estado_Id: data[i].estado_Id,
+            Cantidad_Asignada: data[i].cantidad_Asignada,
+            Cantidad_Disponible: data[i].cantidad_Disponible,
+            Observacion: data[i].observacion,
+            Fecha_Entrada: data[i].fecha_Entrada,
+            Hora_Entrada: data[i].hora_Entrada,
+            Precio_EstandarUnitario: data[i].precio_EstandarUnitario
+          } 
+          if(info.Cantidad2 > 0) {
+            if(info.Cantidad2 > detalle.Cantidad_Disponible) {
+              salidaReal = detalle.Cantidad_Disponible;
+              info.Cantidad2 -= detalle.Cantidad_Disponible;
+              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+            } else if(info.Cantidad2 == detalle.Cantidad_Disponible) {
+              salidaReal = info.Cantidad2;
+              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+              info.Cantidad2 = 0;
+            } else if(info.Cantidad2 < detalle.Cantidad_Disponible) {
+              salidaReal = info.Cantidad2;
+              detalle.Cantidad_Asignada += info.Cantidad2;
+              detalle.Cantidad_Disponible -= info.Cantidad2;
+              detalle.Estado_Id = 19;
+              info.Cantidad2 = 0;
+            }
+            this.cargar_Salidas(detalle, info, salidaReal);
+            info.EntradasDisponibles.push(detalle);
+          }
+        }
+      }
+    });
+  }
+
+  //Función que colocará la información de la salida de la materia prima en el array de salidas. 
+  cargar_Salidas(detalle : any, info : any, salidaReal : number){
+    let salidas : modelEntradas_Salidas_MP = {
+      Id_Entrada: detalle.Id,
+      Tipo_Salida: 'CRTINTAS',
+      Codigo_Salida: 0,
+      Tipo_Entrada: detalle.Tipo_Entrada,
+      Codigo_Entrada: detalle.Codigo_Entrada,
+      Fecha_Registro: this.today,
+      Hora_Registro: this.hora,
+      MatPri_Id: detalle.MatPri_Id,
+      Tinta_Id: detalle.Tinta_Id,
+      Bopp_Id: detalle.Bopp_Id,
+      Cantidad_Salida: salidaReal,
+      Orden_Trabajo: 0, 
+      Prod_Id : 1,
+      Cant_PedidaOT: 0,
+      UndMed_Id: 'N/E'
+    }
+    info.Salidas.push(salidas);
+  }
+
+  //Función que actualizará los movimientos de entrada de las materias primas seleccionadas.
+  actualizar_MovimientosEntradas(){
+    if(this.ArrayMateriaPrima.length > 0) {
+      for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+        for (let i = 0; i < this.ArrayMateriaPrima[index].EntradasDisponibles.length; i++) {
+         this.srvMovEntradasMP.Put(this.ArrayMateriaPrima[index].EntradasDisponibles[i].Id, this.ArrayMateriaPrima[index].EntradasDisponibles[i]).subscribe(null, 
+         () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+        }
+      }
+    }
+  }
+
+  //Función que creará las salidas de las materias primas seleccionadas.
+  crear_Salidas(id : number){
+    if(this.ArrayMateriaPrima.length > 0) {
+      for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+        for (let i = 0; i < this.ArrayMateriaPrima[index].Salidas.length; i++) {
+          this.ArrayMateriaPrima[index].Salidas[i].Codigo_Salida = id;
+          this.ArrayMateriaPrima[index].Salidas[i].Fecha_Registro = this.today;
+          this.ArrayMateriaPrima[index].Salidas[i].Hora_Registro = this.hora;
+          this.srvMovSalidasMP.Post(this.ArrayMateriaPrima[index].Salidas[i]).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
+        }
+      }
+    }
+  }
+
+  //Función que creará el registro con la cantidad de tinta en movimientos entradas MP
+  crearRegistroTinta_MovEntradasMP(idEntrada : number){
+    let tinta : number = this.FormAsignacionMP.value.Id_Tinta;
+    let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
+    let observacion : string = this.FormAsignacionMP.value.Observacion;
+
+    this.tintasService.srvObtenerListaPorId(tinta).subscribe(data => {
+      let registro : modeloMovimientos_Entradas_MP = {
+        MatPri_Id: 84,
+        Tinta_Id: tinta,
+        Bopp_Id: 1,
+        Cantidad_Entrada: cantidad,
+        UndMed_Id: 'Kg',
+        Precio_RealUnitario: data.tinta_Precio,
+        Tipo_Entrada: 'CRTINTAS',
+        Codigo_Entrada: idEntrada,
+        Estado_Id: 19,
+        Cantidad_Asignada: 0,
+        Cantidad_Disponible: cantidad,
+        Observacion: observacion == null ? "" : observacion,
+        Fecha_Entrada: this.today,
+        Hora_Entrada: this.hora,
+        Precio_EstandarUnitario: data.tinta_PrecioEstandar
+      }
+      this.srvMovEntradasMP.Post(registro).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible agregar el registro de la creación de tinta en movimientos de entrada MP!`));
+    });  
+  }
+}  
+

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI, } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 import { modelPistas } from '../../Modelo/modelPistas';
 
 @Injectable({
@@ -9,15 +9,17 @@ import { modelPistas } from '../../Modelo/modelPistas';
 })
 export class PistasService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient,) { }
 
-  srvObtenerLista = () => this.http.get<any>(rutaPlasticaribeAPI + '/Pistas');
+  srvObtenerLista = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Pistas');
 
-  srvObtenerListaPorId = (dato : any) => this.http.get<any>(rutaPlasticaribeAPI + `/Pistas/${dato}`);
+  srvObtenerListaPorId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Pistas/${dato}`);
 
-  srvActualizar = (id:number|string, data:any) => this.http.put(rutaPlasticaribeAPI + `/Pistas/${id}`, data);
+  srvActualizar = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Pistas/${id}`, data);
 
-  srvEliminar = (id:number|string) => this.http.delete(rutaPlasticaribeAPI + `/Pistas/${id}`);
+  srvEliminar = (id:number|string) => this.http.delete(this.rutaPlasticaribeAPI + `/Pistas/${id}`);
 
-  srvGuardar = (data : modelPistas): Observable<any> => this.http.post(rutaPlasticaribeAPI + '/Pistas', data);
+  srvGuardar = (data : modelPistas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Pistas', data);
 }

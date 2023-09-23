@@ -417,7 +417,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
   /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
-  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => item.undMed_Id == 'Cms' || item.undMed_Id == 'Plgs'));
+  cargarUnidadMedidaEnProcesoExtrusion = () => this.servicioUnidadMedida.srvObtenerLista().subscribe(datos => this.arrayUnidadesMedidas = datos.filter((item) => ['Cms', 'Plgs'].includes(item.undMed_Id)));
 
   //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
   cargarTratadoEnProcesoExtrusion = () => this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => this.tratado = datos_tratado);
@@ -464,16 +464,16 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a obtener los pedidos provenientes de zeus
   pedidosZues(){
     this.pedidosZeusService.GetPedidosAgrupados().subscribe(datos_Pedidos => {
-      for (let i = 0; i < datos_Pedidos.length; i++) {
+      datos_Pedidos.forEach(datos => {
         let data : any =  {
-          "id_Pedido": parseInt(datos_Pedidos[i].consecutivo),
-          "id_Cliente": datos_Pedidos[i],
-          "nombre_Cliente": datos_Pedidos[i].cliente,
-          "cantidad_Productos": 1,
-          "zeus" : true,
+          id_Pedido: parseInt(datos.consecutivo),
+          id_Cliente: datos,
+          nombre_Cliente: datos.cliente,
+          cantidad_Productos: 1,
+          zeus : true,
         }
         this.pedidosSinOT.push(data);
-      }
+      });
     });
   }
 
@@ -714,22 +714,21 @@ export class OrdenesTrabajoComponent implements OnInit {
         else if (datos[i].presentacion == 'KLS') presentacion = 'Kg';
         else if (datos[i].presentacion == 'PAQ') presentacion = 'Paquete';
         this.sedeClienteService.GetSedeCliente(datos[i].id_Cliente, datos[i].ciudad, datos[i].direccion_Cliente).subscribe(datosSede => {
-          for (let j = 0; j < datosSede.length; j++) {
+          datosSede.forEach(sede => {
             this.FormOrdenTrabajo.reset();
             this.FormOrdenTrabajo.patchValue({
               Pedido_Id: pedido,
               Nombre_Vendedor: datos[i].vendedor,
               OT_FechaCreacion: this.today,
-              Id_Sede_Cliente : datosSede[j].sedeCli_Id,
-              ID_Cliente: datosSede[j].cli_Id,
+              Id_Sede_Cliente : sede.sedeCli_Id,
+              ID_Cliente: sede.cli_Id,
               Nombre_Cliente: datos[i].cliente,
               Ciudad_SedeCliente: datos[i].ciudad,
               Direccion_SedeCliente : datos[i].direccion_Cliente,
               OT_Estado : datos[i].estado == 'Parcialmente Satisfecho' ? datos[i].estado = 12 : datos[i].estado = 11,
               OT_Observacion : datos[i].observacion,
             });
-            break;
-          }
+          });
         });
         this.productoService.GetInfoProducto_Prod_Presentacion(datos[i].id_Producto, presentacion).subscribe(datos_producto => {
           for (let j = 0; j < datos_producto.length; j++) {
@@ -813,13 +812,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Funcion que va a calcular el costo total de los productos que tiene el pedido
-  calcularCostoPedido() : number{
-    let total : number = 0;
-    for (let i = 0; i < this.ArrayProducto.length; i++) {
-      total += this.ArrayProducto[i].SubTotal;
-    }
-    return total;
-  }
+  calcularCostoPedido = () : number => this.ArrayProducto.reduce((a,b) => a + b.SubTotal, 0);
 
   // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
   consultarInfoProducto(data : any){
@@ -1013,7 +1006,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             CantidadBulto : data.CantBulto,
             PesoBulto : itemOt.pesoBulto == '' ? itemOt.pesoBulto = 0 : itemOt.pesoBulto = parseFloat(itemOt.pesoBulto),
           });
-          setTimeout(() => { this.calcularDatosOt(data); }, 1000);
+          setTimeout(() => this.calcularDatosOt(data), 1000);
           this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
           this.cargarCombinacionMezclas();
         }
@@ -1038,13 +1031,11 @@ export class OrdenesTrabajoComponent implements OnInit {
       //Calcular Peso de Extrusion
       if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
         largoUnd = 100;
-        if (material == 3) fact = 0.0048;
-        else fact = 0.00468;
+        material == 3 ? fact = 0.0048 : fact = 0.00468;
         this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
       } else {
         largoUnd = 39.3701;
-        if (material == 3) fact = 0.0317;
-        else fact = 0.0302;
+        material == 3 ? fact = 0.0317 : fact = 0.0302;
         this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
       }
       //Calcular Peso Producto y Peso Millar
@@ -1052,12 +1043,10 @@ export class OrdenesTrabajoComponent implements OnInit {
         if (this.ArrayProducto[i].Id == data.Id && this.ArrayProducto[i].UndCant == data.UndCant) {
           //Peso Producto
           if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms'){
-            if (material == 3) fact = 0.0048;
-            else fact = 0.00468;
+            material == 3 ? fact = 0.0048 : fact = 0.00468;
             this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
           } else {
-            if (material == 3) fact = 0.0317;
-            else fact = 0.0302;
+            material == 3 ? fact = 0.0317 : fact = 0.0302;
             this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
           }
           this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
@@ -1082,10 +1071,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (data.CantPaquete / 1000);
             if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
             if (data.CantPaquete == 0) this.valorKg = 0;
-            else {
-              if (data.CantPaquete > 0) this.valorKg = data.PrecioUnd / this.pesoPaquete;
-              else this.valorKg = 0;
-            }
+            else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
           } else if (data.UndCant == 'Und') {
             this.cantidadProducto = data.Cant;
             this.valorProducto = data.PrecioUnd;
@@ -1219,7 +1205,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
-  guardarOt_Extrusion(ordenTrabajo : number) : boolean{
+  guardarOt_Extrusion(ordenTrabajo : number) : boolean {
     let infoOTExt : any = {
       Ot_Id : ordenTrabajo,
       Material_Id : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -1233,7 +1219,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { }, error => {
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(null, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
       return true;
     });
@@ -1268,7 +1254,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { }, error => {
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
           return true;
         });
@@ -1291,7 +1277,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { }, error => {
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(null, error => {
       this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
       return true;
     });
@@ -1320,7 +1306,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
         SelladoCorte_PesoProducto : this.pesoProducto,
       }
-      this.otSelladoCorteService.post(info).subscribe(() => { }, error => {
+      this.otSelladoCorteService.post(info).subscribe(null, error => {
         this.mensajeService.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
         return true;
       });
@@ -1358,16 +1344,14 @@ export class OrdenesTrabajoComponent implements OnInit {
           Prod_Peso_Paquete : 0,
           Prod_Peso_Bulto : 0,
         }
-        this.productoService.PutEstadoProducto(producto, info).subscribe(() => { }, error => {
-          this.mensajeService.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error);
-        });
+        this.productoService.PutEstadoProducto(producto, info).subscribe(null, error => this.mensajeService.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
       }
     }, error => this.mensajeService.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
 
   // Funcion que va a cambiar el estado de un cliente a "Activo". El numero '1' corresponde a "Activo"
   cambiarEstadoCliente(cliente : number){
-    this.clienteServise.PutEstadoCliente(cliente, 1).subscribe(() => { }, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
+    this.clienteServise.PutEstadoCliente(cliente, 1).subscribe(null, error => this.mensajeService.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.error));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -1477,140 +1461,149 @@ export class OrdenesTrabajoComponent implements OnInit {
                 style : '',
                 body : [
                   [
-                    { border: [false, false, false, true], text: `Material`, alignment: 'center', style: 'titulo', },
-                    { border: [false, false, false, true], text: `Cod Producto`, alignment: 'center', style: 'titulo', },
-                    { border: [false, false, false, true], text: `Kilos (Kg)`, alignment: 'center', style: 'titulo', }
-                  ],
-                  [
                     {
-                      border : [false, false, false, true],
                       table : {
-                        widths : ['*'],
+                        widths : [50, '*', 25],
                         style : '',
                         body : [
-                          [ { border : [], text : `CAPA UNICA:`, }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa1}`, }, ],
-                          [ { border : [], text : ``, }, ]
+                          [
+                            { colSpan : 3, text : `CAPA UNICA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                            { }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `(%) Capa: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa1}%`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : ``,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C1_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 2: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C1_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 3: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C1_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 4:`, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C1_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Pigmento 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C1_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, true], text : `Pigmento 2: `, margin: [0, 2]},
+                            { border : [false, false, false, true], text : `${datos_ot[i].p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C1_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, true], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`,margin: [0, 2] }
+                          ],
                         ]
                       }
                     },
                     {
-                      border : [false, false, false, true],
                       table : {
-                        widths : ['*'],
+                        widths : [50, '*', 25],
                         style : '',
                         body : [
-                          [ { border : [], text : `${datos_ot[i].m1C1_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m2C1_nombre}`,  alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m3C1_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m4C1_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p1C1_Nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p2C1_Nombre}`, alignment: 'justify', }, ]
+                          [
+                            { colSpan : 3, text : `CAPA INTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                            { }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `(%) Capa: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa2}%`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : ``,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C2_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 2: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C2_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 3: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C2_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 4:`, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C2_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Pigmento 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C2_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, true], text : `Pigmento 2: `, margin: [0, 2]},
+                            { border : [false, false, false, true], text : `${datos_ot[i].p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C2_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, true], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`,margin: [0, 2] }
+                          ],
                         ]
                       }
                     },
                     {
-                      border : [false, false, false, true],
                       table : {
-                        widths : ['*'],
+                        widths : ['*', '*', 20],
                         style : '',
                         body : [
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`, alignment: 'center', }, ]
+                          [
+                            { colSpan : 3, text : `CAPA EXTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+                            { },
+                            { }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `(%) Capa: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa3}%`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : ``,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C3_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 2: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C3_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 3: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C3_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Material 4:`, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C3_nombre}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, false], text : `Pigmento 1: `, margin: [0, 2]},
+                            { border : [], text : `${datos_ot[i].p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C3_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, false], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`,margin: [0, 2] }
+                          ],
+                          [
+                            { border : [true, false, false, true], text : `Pigmento 2: `, margin: [0, 2]},
+                            { border : [false, false, false, true], text : `${datos_ot[i].p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C3_Nombre.replace('PIGMENTO', 'PIG.')}`, margin: [0, 2]},
+                            { border : [false, false, true, true], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`,margin: [0, 2] }
+                          ],
                         ]
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `CAPA INTERNA:`, }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa2}`, }, ],
-                          [ { border : [], text : ``, }, ]
-                        ]
-                      }
-                    },
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `${datos_ot[i].m1C2_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m2C2_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m3C2_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m4C2_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p1C2_Nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p2C2_Nombre}`, alignment: 'justify', }, ]
-                        ]
-                      }
-                    },
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`, alignment: 'center', }, ]
-                        ]
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `CAPA EXTERNA:`, }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeCapa3}`, }, ],
-                          [ { border : [], text : ``, }, ]
-                        ]
-                      }
-                    },
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `${datos_ot[i].m1C3_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m2C3_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].m3C3_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [],  text : `${datos_ot[i].m4C3_nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p1C3_Nombre}`, alignment: 'justify', }, ],
-                          [ { border : [], text : `${datos_ot[i].p2C3_Nombre}`, alignment: 'justify', }, ]
-                        ]
-                      }
-                    },
-                    {
-                      border : [false, false, false, true],
-                      table : {
-                        widths : ['*'],
-                        style : '',
-                        body : [
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`, alignment: 'center', }, ],
-                          [ { border : [],  text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`, alignment: 'center', }, ],
-                          [ { border : [], text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`, alignment: 'center', }, ]
-                        ]
-                      }
+                      }                      
                     }
                   ],
                 ]
@@ -1618,7 +1611,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               layout: { defaultBorder: false, },
               fontSize: 9,
             },
-            '\n',
+            '\n\n',
             {
               table : {
                 widths : ['*'],
@@ -1641,6 +1634,15 @@ export class OrdenesTrabajoComponent implements OnInit {
                     { border: [false, false, false, false], fillColor: '#eeeeee', text: `Calibre`, alignment: 'center', style : 'subtitulo', },
                     { border: [false, false, false, false], fillColor: '#eeeeee', text: `Peso MT \n(Min/Max)`, alignment: 'center', style : 'subtitulo', },
                     { border: [false, false, false, false], fillColor: '#eeeeee', text: `Tratado`, alignment: 'center', style : 'subtitulo', }
+                  ],
+                  [
+                    {},
+                    {},
+                    {},
+                    {},
+                    {},
+                    {},
+                    {},
                   ],
                   [
                     { border: [false, false, false, false], text: `${datos_ot[i].pigmento_Extrusion}`, alignment: 'center', },
@@ -2170,7 +2172,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
           Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
         }
-        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(() => { }, error => {
+        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.error);
           return true;
         });
@@ -2213,7 +2215,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               Tinta7_Id : datos_impresion[j].tinta_Id7,
               Tinta8_Id : datos_impresion[j].tinta_Id8,
             }
-            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(() => { }, error => {
+            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(null, error => {
               this.mensajeService.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
               return true;
             });
@@ -2247,7 +2249,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
           LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
-        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => { }, error => {
+        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(null, error => {
           this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.error);
           return true;
         });
@@ -2283,7 +2285,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
           }
-          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => { }, error => {
+          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(null, error => {
             this.mensajeService.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
             return true;
           });
@@ -2305,7 +2307,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.cargarMezclaMateria2();
     this.cargarMezclaPigmento2();
     this.cargarMateriales_MatPrima();
-    setTimeout(() => { this.initFormCrearMezclas(); }, 1000);
+    setTimeout(() => this.initFormCrearMezclas(), 1000);
   }
 
   // Función que va a abrir el modal de la creación de materiales

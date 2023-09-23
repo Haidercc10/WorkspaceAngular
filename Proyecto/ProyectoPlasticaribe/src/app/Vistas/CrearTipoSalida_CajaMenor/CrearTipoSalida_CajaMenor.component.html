@@ -1,0 +1,31 @@
+<br>
+<form [formGroup]="formTipoSalida" (ngSubmit)="crearTipoSalida()">
+  <div class="mb-3">
+    <div class="row g-4">
+
+      <!-- Nombre -->
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
+        <span class="p-float-label">
+          <input formControlName="nombre" id="Nombre" type="text" pInputText [required]="true"/>
+          <label for="Nombre">Nombre</label>
+        </span>
+      </div>
+
+      <!-- Ancho -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <span class="p-float-label">
+          <input formControlName="descripcion" inputId="Descripción" type="text" pInputText [required]="true"/>
+          <label for="Descripción">Descripción</label>
+        </span>
+      </div>
+      <!--Botones-->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="submit" label="Crear Bopp Génerico" icon="pi pi-check"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

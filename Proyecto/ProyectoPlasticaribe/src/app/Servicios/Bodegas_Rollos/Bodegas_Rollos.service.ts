@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelBodegasRollos } from 'src/app/Modelo/modelBodegasRollos';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,16 +10,18 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class Bodegas_RollosService {
 
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+
   constructor(private http : HttpClient) { }
 
-  GetTodo = () : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Bodegas_Rollos`);
+  GetTodo = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Bodegas_Rollos`);
 
-  Get_Id = (id : any) : Observable<any> => this.http.get<any>(`${rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`);
+  Get_Id = (id : any) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`);
 
-  Post = (data : modelBodegasRollos) : Observable<any> => this.http.post(`${rutaPlasticaribeAPI}/Bodegas_Rollos`, data);
+  Post = (data : modelBodegasRollos) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Bodegas_Rollos`, data);
 
-  Put = (id : any, data : modelBodegasRollos) : Observable<any> => this.http.put(`${rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`, data);
+  Put = (id : any, data : modelBodegasRollos) : Observable<any> => this.http.put(`${this.rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`, data);
 
-  Delete = (id : any) => this.http.delete(`${rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`);
+  Delete = (id : any) => this.http.delete(`${this.rutaPlasticaribeAPI}/Bodegas_Rollos/${id}`);
 
 }

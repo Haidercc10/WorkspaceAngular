@@ -48,8 +48,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
   mpSeleccionada : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-
   modalMode : boolean = false;
+  
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private unidadMedidaService : UnidadMedidaService,
@@ -111,14 +111,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   LimpiarCampos = () => this.FormMateriaPrimaRecuperada.reset();
 
   // Funcion que se encargará de trar los turnos de la empresa
-  obtenerTurnos(){
-     this.turnos = [];
-     this.turnosService.srvObtenerLista().subscribe(datos_turnos => {
-      for (let i = 0; i < datos_turnos.length; i++) {
-        if (datos_turnos[i].turno_Nombre != 'N/E') this.turnos.push(datos_turnos[i]);
-      }
-     });
-  }
+  obtenerTurnos = () => this.turnosService.srvObtenerLista().subscribe(data => this.turnos = data.filter(x => x.turno_Nombre != 'N/E'));
 
   //Funcion que limpiará los campos de la materia pirma entrante
   limpiarCamposMP = () => this.FormMateriaPrima.reset();
@@ -137,93 +130,52 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   }
 
   //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
-  obtenerNombreCategoriasMp(){
-    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let index = 0; index < datos_categorias.length; index++) {
-        this.nombreCategoriasMP.push(datos_categorias[index].catMP_Nombre);
-      }
-    });
-  }
+  obtenerNombreCategoriasMp = () => this.categoriMpService.srvObtenerLista().subscribe(datos => this.nombreCategoriasMP = datos.map(x => x.catMp_Nombre));
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida(){
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let index = 0; index < datos_unidadesMedida.length; index++) {
-        this.unidadMedida.push(datos_unidadesMedida[index].undMed_Id);
-      }
-    });
-  }
+  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos => this.unidadMedida = datos.map(x => x.undMed_Id));
 
   //Funcion que se encargará de buscary almacenar todos los usuarios
-  obtenerUsuarios(){
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].rolUsu_Id == 3) this.usuarios.push(datos_usuarios[index]);
-      }
-    });
-  }
+  obtenerUsuarios = () => this.usuarioService.srvObtenerListaUsuario().subscribe(datos => this.usuarios = datos.filter(x => x.rolUsu_Id == 3));
 
   //Funcion que traerá la información del usuario seleccionado
   llenarUsuarioSeleccionado(){
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
-    this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
-      this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: datos_usuario.usua_Id, });
-    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`));
+    this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: this.usuarios.find(x => x.usua_Id == usuarioSelccionado).usua_Id, });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarRecuperado(){
     if (this.ArrayMateriaPrima.length == 0) this.mensajeService.mensajeAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla");
     else {
-      let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
-      let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
-      let fecha : any = moment(this.FormMateriaPrimaRecuperada.value.MpingresoFecha).format('YYYY-MM-DD');
-      let turno : any = this.FormMateriaPrimaRecuperada.value.Turno;
-
-      const datosRecuperado : any = {
+      const datosRec : any = {
         RecMp_FechaIngreso : this.today,
         Usua_Id : this.storage_Id,
-        RecMp_Observacion : observacion,
+        RecMp_Observacion : this.FormMateriaPrimaRecuperada.value.MpObservacion,
         Proc_Id : 'RECUP',
-        RecMp_FechaEntrega : fecha,
+        RecMp_FechaEntrega : moment(this.FormMateriaPrimaRecuperada.value.MpingresoFecha).format('YYYY-MM-DD'),
         RecMp_HoraIngreso : moment().format("H:mm:ss"),
         RecMp_Maquina : 0,
-        Turno_Id : turno,
-        Usua_Operador: idUsuario,
+        Turno_Id : this.FormMateriaPrimaRecuperada.value.Turno,
+        Usua_Operador: this.FormMateriaPrimaRecuperada.value.usuarioId,
       }
-
-      this.recuperadoService.srvGuardar(datosRecuperado).subscribe(() => this.obtenerUltimoIdRecuperado(), () => this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`));
+      this.recuperadoService.srvGuardar(datosRec).subscribe((data) => this.obtenerUltimoIdRecuperado(data.recMp_Id), () => this.mensajeService.mensajeError(`Error`, `¡Error al ingresar el peletizado!`));
     }
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
-  obtenerUltimoIdRecuperado(){
-    let idMateriaPrima : number;
-    let cantidadMateriaPrima : number;
-    let presentacionMateriaPrima : string;
-    let tipoRecuperado : string = '1';
-
-    this.recuperadoService.srvObtenerUltimaAsignacion().subscribe(datos_recuperados => {
-      let datos : any = [];
-      datos.push(datos_recuperados);
-      for (let index = 0; index < datos.length; index++) {
-        for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-          idMateriaPrima = this.ArrayMateriaPrima[index].Id;
-          cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
-          presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
-          const datosRecuperadoMp : any = {
-            RecMp_Id : datos[index].recMp_Id,
-            MatPri_Id : idMateriaPrima,
-            RecMatPri_Cantidad : cantidadMateriaPrima,
-            UndMed_Id : presentacionMateriaPrima,
-            TpRecu_Id : tipoRecuperado,
-          }
-          this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(() => {
-          }, () => this.mensajeService.mensajeError(`Error`, `¡Error al registrar la materia prima recuperada!`));
-          this.moverInventarioMpAgregada();
-        }
+  obtenerUltimoIdRecuperado(id : number){
+    this.ArrayMateriaPrima.forEach((data) => {
+      const datosRec : any = {
+        RecMp_Id : id,
+        MatPri_Id : data.Id,
+        RecMatPri_Cantidad : data.Cant,
+        UndMed_Id : data.UndCant,
+        TpRecu_Id : '1',
       }
-    }, () => this.mensajeService.mensajeError(`Error`, `¡Error al consultar el último Id de recuperado!`));
+      this.recuperadoMPService.srvGuardar(datosRec).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `¡Error al registrar la materia prima recuperada!`));
+      this.moverInventarioMpAgregada();
+    });
   }
 
   //Funcion que va a validar la informacion que se ingresa a la tabla
@@ -253,7 +205,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
   moverInventarioMpAgregada(){
-    let error : boolean = false;
+    let count : number = 0;
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id).subscribe(datos_materiaPrima => {
         const datosMP : any = {
@@ -267,15 +219,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(() => {
-          error = false;
+          count++;
+          if (count == this.ArrayMateriaPrima.length) this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Inventario de materia prima actualizado con éxito!`);
           this.limpiarTodosCampos();
         });
-      }, error => {
-        this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
-        error = true;
-      });
+      }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`));
     }
-    if(!error) this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Registro de materia prima recuperada creado con éxito!`);
   }
 
   // Funcion que limpiará todos los campos
@@ -289,10 +238,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   QuitarProductoTabla(formulario : any) {
     formulario = this.mpSeleccionada;
     this.onReject();
-    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-      if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
-      this.mensajeService.mensajeConfirmacion(`Confirmación`,`Se ha quitado la mat. prima ${formulario.Nombre} de la tabla`);
-    }
+    this.ArrayMateriaPrima.splice(this.ArrayMateriaPrima.findIndex(x => x.Id == formulario.Id), 1);
+    this.mensajeService.mensajeConfirmacion(`Confirmación`,`Se ha quitado la mat. prima ${formulario.Nombre} de la tabla`);
   }
 
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
