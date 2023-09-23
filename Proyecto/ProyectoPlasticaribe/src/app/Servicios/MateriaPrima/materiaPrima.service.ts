@@ -23,7 +23,7 @@ export class MateriaPrimaService {
 
   getInfo_MpTintaBopp_Id = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfo_MpTintasBopp_Id/${id}`);
 
-  srvObtenerListaPorId = (id : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
+  srvObtenerListaPorId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
 
   GetMateriasPrimasUtilizadasHoy = (fecha : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMateriasPrimasUtilizadasHoy/${fecha}`);
 
@@ -46,6 +46,8 @@ export class MateriaPrimaService {
   GetInfoMovimientosEntradas = (codigo : string, tipoMov : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosEntradas/${codigo}/${tipoMov}`);
 
   GetMateriales_Receta = () : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/getMateriales_Receta');
+
+  GetPolietilenos = (nombre : any) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getPolietilenos/${nombre}`);
 
   srvAgregar = (data : any) => this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
 

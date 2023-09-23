@@ -133,7 +133,16 @@ export const routes: Routes = [
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
   {path: 'inventario-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado'}, component : InventarioProductosPBDDComponent},
   {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
-  {path: 'inventario-areas', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent},
+  {path: 'inventario-areas',
+    children: [
+      {path: 'materiales',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },
+    ]  
+  },
+  {path: 'inventario-areas',
+    children: [
+      {path: 'items',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },
+      ]  
+  },
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},

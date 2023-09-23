@@ -1,11 +1,12 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -14,11 +15,16 @@ import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
 
+Injectable({
+  providedIn: 'root'
+});
+
 @Component({
   selector: 'app-menuLateral',
   templateUrl: './menuLateral.component.html',
   styleUrls: ['./menuLateral.component.css']
 })
+
 
 export class MenuLateralComponent implements OnInit {
   display : boolean = false;
@@ -44,8 +50,8 @@ export class MenuLateralComponent implements OnInit {
   eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
   position: string = '';
   modoSeleccionado : boolean;
-
   roles : any [] = [];
+  @Input() categoria!: string;
 
   constructor(private AppComponent : AppComponent,
                 private formBuilder : FormBuilder,
@@ -59,7 +65,7 @@ export class MenuLateralComponent implements OnInit {
                                 private mensajeService : MensajesAplicacionService,
                                   private eventosCalService : EventosCalendarioService,
                                     private vistasPermisosService : Vistas_PermisosService,
-                                      private router : Router) {
+                                      private router : Router,) {
 
     this.AppComponent.mostrar();
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -142,11 +148,37 @@ export class MenuLateralComponent implements OnInit {
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
-          if (element.items) element.items.push({ label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, command: () => this.router.navigate([data[i].vp_Ruta]) });
+          if (element.items) {
+            element.items.push(
+            { 
+              label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, 
+              command: () => { 
+                this.router.navigate([data[i].vp_Ruta]);
+                if(element.label == `Materia Prima`) {
+                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
+                } else if (element.label == `Productos`) {
+                    if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]); 
+                }
+              }
+            });
+          } 
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
       });
     });
+  }
+
+  actualizarRutas() {
+    
+  
+    let info : modelVistasPermisos = {
+      Vp_Nombre: '',
+      Vp_Icono_Dock: '',
+      Vp_Icono_Menu: '',
+      Vp_Ruta: '',
+      Vp_Categoria: '',
+      Vp_Id_Roles: ''
+    }
   }
 
   mostrarMenuUsuario = () => this.menuUsuario = true;

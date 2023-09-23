@@ -1,4 +1,3 @@
-
 <app-menuLateral></app-menuLateral>
 <br>
 <app-VistasFavoritas></app-VistasFavoritas>
@@ -25,12 +24,11 @@
 
 <p-card>
 
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Consultar</h4>
+  <div class="mb-5">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> {{subtitulo}}</h4>
   </div>
-
+  <!--Formulario-->
   <form [formGroup]="formulario">
-    <!-- Fila 1 -->
     <div class="mb-4" id="formulario2">
       <div class="row g-4">
 
@@ -43,9 +41,9 @@
         </div>
 
         <!--OT-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="url=='/inventario-areas/items'">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ot" inputId="ot" [useGrouping]="false" (keyup.enter)="consultarOT()"></p-inputNumber>
+            <p-inputNumber formControlName="ot" inputId="ot"  [useGrouping]="false" (keyup.enter)="consultarOT()" pTooltip="Buscar por OT"></p-inputNumber>
             <label for="ot">OT</label>
           </span>
         </div>
@@ -53,19 +51,19 @@
         <!-- Item -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="item" id="item" [useGrouping]="false" [readonly]="true" [required]="true"></p-inputNumber>
-            <label for="item">Item</label>
+            <p-inputNumber formControlName="item" id="item" [useGrouping]="false" (keyup.enter)="consultarItem()" [required]="true" pTooltip="Buscar por {{labels[0]}}"></p-inputNumber>
+            <label for="item">{{labels[0]}}</label>
           </span>
         </div>
 
         <!-- Referencia -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-{{nroFilas2}} col-xl-{{nroFilas2}} col-xxl-{{nroFilas2}}">
           <span class="p-float-label">
-            <input formControlName="referencia" id="Refe" list="ref" autocomplete="off" type="text" pInputText (keyup)="consultarReferencia()" (change)="seleccionarReferencia()" required pTooltip="Además puedes buscar por referencia, sino recuerdas la OT." tooltipPosition="top">
+            <input formControlName="referencia" id="Refe" list="ref" autocomplete="off" type="text" pInputText (keyup)="consultarReferencia()" (change)="seleccionarReferencia()" required pTooltip="Buscar por {{labels[1]}}" tooltipPosition="top">
             <datalist id="ref">
-              <option *ngFor="let item of productos">{{item.referencia}}</option>
+              <option *ngFor="let item of arrayReferencias">{{item.item}} - {{item.referencia}}</option>
             </datalist>
-            <label for="Refe">Referencia</label>
+            <label for="Refe">{{labels[1]}}</label>
           </span>
         </div>
 
@@ -77,7 +75,6 @@
           </span>
         </div>
 
-
         <!-- Precio -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1;">
           <span class="p-float-label">
@@ -87,7 +84,7 @@
         </div>
 
         <!--Procesos-->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1;">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1;">
           <span class="p-float-label">
             <p-dropdown formControlName="proceso" inputId="proceso" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="procesos" optionLabel="proceso_Nombre"></p-dropdown>
             <label for="proceso">Área</label>
@@ -119,13 +116,14 @@
   </div>
 
   <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla con Inventario</h4>
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Inventario por áreas</h4>
   </div>
 
   <!-- Tabla de BOPP entrante -->
-  <div class="row g-3" id="tabla2">
+  <div class="row g-3"  id="tabla2">
     <div class="table-responsive">
       <p-table
+      *ngIf="!load"
       #dt
       [resizableColumns]="true"
       columnResizeMode="expand"
@@ -140,12 +138,12 @@
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">#</th>
-            <th scope="col">OT</th>
-            <th scope="col">Item</th>
-            <th scope="col">Referencia</th>
+            <th  scope="col" *ngIf="url=='/inventario-areas/items'">OT</th>
+            <th scope="col">{{labels[0]}}</th>
+            <th scope="col">{{labels[1]}}</th>
             <th scope="col">Cantidad (Kg)</th>
-            <th *ngIf="ValidarRol == 1;" scope="col">Precio (Kg)</th>
-            <th *ngIf="ValidarRol == 1;" scope="col">Subtotal</th>
+            <th scope="col" *ngIf="ValidarRol == 1;">Precio (Kg)</th>
+            <th scope="col" *ngIf="ValidarRol == 1;">Subtotal</th>
             <th scope="col">Área</th>
             <th scope="col">Observacion</th>
             <th class="text-center" scope="col" id="quitar">Quitar</th>
@@ -154,21 +152,24 @@
         <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
           <tr>
             <td>{{rowIndex + 1}}</td>
-            <td>{{inv.OT}}</td>
-            <td>{{inv.Prod_Id}}</td>
+            <td *ngIf="url=='/inventario-areas/items'">{{inv.OT}}</td>
+            <td *ngIf="url=='/inventario-areas/items'; else materiales;">{{ inv.Prod_Id }}</td>
+            <ng-template #materiales>
+              <td>{{ inv.MatPri_Id }}</td>
+            </ng-template>
             <td>{{inv.Referencia}}</td>
             <td>{{inv.InvStock | number: '1.2-2'}}</td>
             <td *ngIf="ValidarRol == 1;">{{inv.InvPrecio | number: '1.2-2'}}</td>
             <td *ngIf="ValidarRol == 1;">{{inv.Subtotal | number: '1.2-2'}}</td>
             <td>{{inv.Proceso_Id }}</td>
             <td>{{inv.InvObservacion }}</td>
-            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar" (click)="mostrarEleccion(inv)"></i></td>
+            <td class="text-center"><i class="pi pi-trash cursor" pTooltip="Quitar {{labels[1]}}" (click)="mostrarEleccion(inv)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1;">
           <tr>
-            <td colspan="6" class="text-right">Totales</td>
-            <td colspan="5">{{precioTotal() | number: '1.2-2'}} COP</td>
+            <td [colSpan]="url=='/inventario-areas/materiales' ? 5 : 6" class="text-right">Totales</td>
+            <td colspan="4">{{precioTotal() | number: '1.2-2'}} COP</td>
           </tr>
         </ng-template>
       </p-table>
@@ -180,7 +181,7 @@
     <div class="mb-3" id="botones2">
       <div class="row g-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="crearEntrada()"></button>
+          <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="exportarExcel()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
         </div>
       </div>
