@@ -115,11 +115,11 @@ export class Inventario_AreasComponent implements OnInit {
       this.titulo = `Inventario Extrusión`;
     } else if (this.ValidarRol == 8) { 
       this.area = "SELLA";
-      this.titulo = `Inventario Extrusión`;
+      this.titulo = `Inventario Sellado`;
     } else if (this.ValidarRol == 63) { 
       this.area = "ROT";
       this.titulo = `Inventario Rotograbado`;
-    } else if (this.ValidarRol == 62) {
+    } else if (this.ValidarRol == 62 || this.ValidarRol == 4) {
       this.area = "IMP";
       this.titulo = `Inventario Impresión`;
     } else {
@@ -251,8 +251,14 @@ export class Inventario_AreasComponent implements OnInit {
 
   //Función que limpiará los campos del formulario
   limpiarCampos(){
-    this.formulario.reset();
-    this.formulario.patchValue({ cantidad : 0, });
+    this.formulario.patchValue({ 
+      ot : null,
+      item : null,
+      referencia : null,
+      precio : null,
+      observacion : null,
+      cantidad : 0, 
+    });
   }  
 
   //Función que creará la entrada de inventario en la base de datos
@@ -281,6 +287,7 @@ export class Inventario_AreasComponent implements OnInit {
     this.inventario = [];
     this.ordenes_trabajos = [];
     this.polietilenos = [];
+    this.registroSeleccionado = null;
     this.contador = 0;
   }
 

@@ -175,7 +175,7 @@
 
     <!--Impresion-->
     <p-tabPanel
-      *ngIf="[1, 62, 61].includes(ValidarRol)"
+      *ngIf="[1, 62, 61, 4].includes(ValidarRol)"
       header="Impresión"
       leftIcon="pi pi-print"
       tooltip="Información del inventario de Impresión">
@@ -475,7 +475,7 @@
 
     <!--Productos terminados-->
     <p-tabPanel
-      *ngIf="[1, 10, 61].includes(ValidarRol)"
+      *ngIf="[1, 61].includes(ValidarRol)"
       header="Productos Terminados"
       leftIcon="pi pi-verified"
       tooltip="Información del inventario de Productos Terminados">

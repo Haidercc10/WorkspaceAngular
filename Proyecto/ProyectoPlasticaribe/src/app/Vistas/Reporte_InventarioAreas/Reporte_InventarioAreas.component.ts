@@ -217,7 +217,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         unirCeldasHoja = ['A1:B3'];
         unirCeldasHoja.forEach(cell => worksheetTotal.mergeCells(cell));
       }
-      
 
       //HOJA 2, INVENTARIO EXTRUSIÓN
       if([1, 3, 7, 61].includes(this.ValidarRol)) {
@@ -227,6 +226,11 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowExtrusion = worksheetExtrusion.addRow(header);
         this.formatoEncabezado(headerRowExtrusion);
         this.formatoCuerpo(this.calcularInvExtrusion(), worksheetExtrusion);
+        if(this.ValidarRol != 1) {
+          worksheetExtrusion.spliceColumns(6,2);
+          worksheetExtrusion.addRow([]);
+          worksheetExtrusion.getCell('A1').value = tituloExtrusion;
+        } 
       }
 
       // HOJA 3, INVENTARIO ROTOGRABADO
@@ -237,6 +241,11 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowRotograbado = worksheetRotograbado.addRow(header);
         this.formatoEncabezado(headerRowRotograbado);
         this.formatoCuerpo(this.calcularInvRotograbado(), worksheetRotograbado);
+        if(this.ValidarRol != 1) {
+          worksheetRotograbado.spliceColumns(6,2);
+          worksheetRotograbado.addRow([]);
+          worksheetRotograbado.getCell('A1').value = tituloRotograbado;
+        } 
       }
 
       // HOJA 4, INVENTARIO SELLADO
@@ -247,18 +256,27 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowSellado = worksheetSellado.addRow(header);
         this.formatoEncabezado(headerRowSellado);
         this.formatoCuerpo(this.calcularInvSellado(), worksheetSellado);
+        if(this.ValidarRol != 1) {
+          worksheetSellado.spliceColumns(6,2);
+          worksheetSellado.addRow([]);
+          worksheetSellado.getCell('A1').value = tituloSellado;
+        } 
       }
 
       // HOJA 5, INVENTARIO IMPRESION
-      if([1, 62, 61].includes(this.ValidarRol)) {
+      if([1, 62, 61, 4].includes(this.ValidarRol)) {
         let worksheetImpresion = workbook.addWorksheet(`Inventario Impresión`);
         this.formatoTitulos(worksheetImpresion, tituloImpresion, image);
         header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
         let headerRowImpresion = worksheetImpresion.addRow(header);
         this.formatoEncabezado(headerRowImpresion);
         this.formatoCuerpo(this.calcularInvImpresion(), worksheetImpresion);
+        if(this.ValidarRol != 1) {
+          worksheetImpresion.spliceColumns(6,2);
+          worksheetImpresion.addRow([]);
+          worksheetImpresion.getCell('A1').value = tituloImpresion;
+        } 
       }
-      
 
       // HOJA 6, INVENTARIO MATERIA PRIMA
       if([1, 3, 7, 61].includes(this.ValidarRol)) {
@@ -268,6 +286,11 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowMatPrimas = worksheetMateriaPrima.addRow(header);
         this.formatoEncabezado(headerRowMatPrimas);
         this.formatoCuerpo(this.calcularInvMateriasPrimas(), worksheetMateriaPrima);
+        if(this.ValidarRol != 1) {
+          worksheetMateriaPrima.spliceColumns(6,2);
+          worksheetMateriaPrima.addRow([]);
+          worksheetMateriaPrima.getCell('A1').value = tituloMatPrimas;
+        } 
       }
       
       // HOJA 7, INVENTARIO RECICLADOS O RECUPERADOS
@@ -278,8 +301,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowRecuperado = worksheetRecuperado.addRow(header);
         this.formatoEncabezado(headerRowRecuperado);
         this.formatoCuerpo(this.calcularInvRecuperado(), worksheetRecuperado);
+        if(this.ValidarRol != 1) {
+          worksheetRecuperado.spliceColumns(6,2);
+          worksheetRecuperado.addRow([]);
+          worksheetRecuperado.getCell('A1').value = tituloReciclados;
+        } 
       }
-      
 
       // HOJA 8, MATERIALES EN EXTRUSION
       if([1, 3, 7, 61].includes(this.ValidarRol)) {
@@ -289,19 +316,27 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         let headerRowMpExtrusion = worksheetMpExtrusion.addRow(header);
         this.formatoEncabezado(headerRowMpExtrusion);
         this.formatoCuerpo(this.calcularMaterialesExtrusion(), worksheetMpExtrusion);
+        if(this.ValidarRol != 1) {
+          worksheetMpExtrusion.spliceColumns(6,2);
+          worksheetMpExtrusion.addRow([]);
+          worksheetMpExtrusion.getCell('A1').value = tituloMateriales;
+        } 
       }    
       
-
       // HOJA 9, INVENTARIO DE DESPACHO
-      if([1, 10, 61].includes(this.ValidarRol)) {
+      if([1, 61].includes(this.ValidarRol)) {
         let worksheetDespacho = workbook.addWorksheet(`Inventario de Despacho`);
         this.formatoTitulos(worksheetDespacho, tituloPT, image);
         header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
         let headerRowDespacho = worksheetDespacho.addRow(header);
         this.formatoEncabezado(headerRowDespacho);
         this.formatoCuerpo(this.calcularInvDespacho(), worksheetDespacho);
+        if(this.ValidarRol != 1) {
+          worksheetDespacho.spliceColumns(6,2);
+          worksheetDespacho.addRow([]);
+          worksheetDespacho.getCell('A1').value = tituloPT;
+        } 
       }
-
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, `Inventarios_Areas.xlsx`);
@@ -309,8 +344,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.load = false;
     } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos un registro en la tabla!');
   }
-    
-  
 
   // funcion que va a generar los titulos de las hojas de excel
   formatoTitulos(worksheet : any, titulo : string, image? : any){
@@ -355,7 +388,9 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     [1, 2, 3, 5].forEach(cell => worksheet.getColumn(cell).width = 15);
     [6, 7].forEach(cell => worksheet.getColumn(cell).width = 30);
     [4].forEach(cell => worksheet.getColumn(cell).width = 50);
-    let unirCeldasHoja = ['A1:G3'];
+    let unirCeldasHoja : any = [];
+    if([1, 61].includes(this.ValidarRol)) unirCeldasHoja = ['A1:G3'];
+    else unirCeldasHoja = ['A1:E3'];
     unirCeldasHoja.forEach(cell => worksheet.mergeCells(cell));
   }
 
