@@ -124,6 +124,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   aplicarfiltroReciclado = ($event, campo : any, valorCampo : string) => this.dtReciclados!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  // Funcion que va a crear un excel con la información de los inventarios de cada area
   exportarExcel(){
     this.load = true;
     let tituloTotal : string = `INVENTARIO TOTAL`;
@@ -216,6 +217,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.load = false;
   }
 
+  // funcion que va a generar los titulos de las hojas de excel
   formatoTitulos(worksheet : any, titulo : string, image? : any){
     if (worksheet.name != 'Inventario Total') {
       worksheet.addImage(image, {
@@ -233,6 +235,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     if (worksheet.name != 'Inventario Total') worksheet.addRow([]);
   }
 
+  // funcion que va a darle el estilo de los encabezados o titulos de cada columna
   formatoEncabezado(headerRow : any){
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFD5' } };
@@ -242,6 +245,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     });
   }
 
+  // Funcion que va a darle el estilo a cada celda del cuerpo de la tabla
   formatoCuerpo(data : any, worksheet : any){
     data.forEach(d => {
       let row = worksheet.addRow(d);
@@ -260,6 +264,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     unirCeldasHoja.forEach(cell => worksheet.mergeCells(cell));
   }
 
+  // Funcion que va a calcular el total de cada area
   calcularInvTotal() : any [] {
     let datos : any [] = [];
     datos = [
@@ -276,6 +281,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // funcion que va a calcular el total del inventario de extrusion
   calcularInvExtrusion() : any [] {
     let datos : any [] = [];
     this.invExtrusion.forEach(ext => {
@@ -301,6 +307,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de rotograbado
   calcularInvRotograbado() : any [] {
     let datos : any [] = [];
     this.invRotograbado.forEach(ext => {
@@ -326,6 +333,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de sellado
   calcularInvSellado() : any [] {
     let datos : any [] = [];
     this.invSellado.forEach(ext => {
@@ -351,6 +359,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de impresion
   calcularInvImpresion() : any [] {
     let datos : any [] = [];
     this.invImpresion.forEach(ext => {
@@ -376,6 +385,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de materias primas
   calcularInvMateriasPrimas() : any [] {
     let datos : any [] = [];
     this.invMatPrimas.forEach(ext => {
@@ -401,6 +411,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de reciclado
   calcularInvRecuperado() : any [] {
     let datos : any [] = [];
     this.invReciclados.forEach(ext => {
