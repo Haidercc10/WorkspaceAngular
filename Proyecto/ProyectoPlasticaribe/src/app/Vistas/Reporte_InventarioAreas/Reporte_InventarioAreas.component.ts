@@ -55,28 +55,39 @@ export class Reporte_InventarioAreasComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.inventarioMateriasPrimas();
-    this.inventarioProductosTerminados();
-    this.consultarInventario();
+    this.lecturaStorage();
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   verTutorial(){}
 
   //Función que consultará el inventario de todas las areas y lo mostrará en la tabla. 
   consultarInventario(){
-    let fecha1 : any;
-    let fecha2 : any;
-    this.svcInvAreas.GetPorFecha(`2023-09-01`, `2023-09-15`).subscribe(data => {
-      if(data.length > 0) {
-        data.forEach(x => {
-          if(x.id_Area == `EXT` && x.esMaterial == false) this.invExtrusion.push(x);
-          if(x.id_Area == `EXT` && x.esMaterial == true) this.invMateriales.push(x);
-          if(x.id_Area == `ROT`) this.invRotograbado.push(x);
-          if(x.id_Area == `SELLA`) this.invSellado.push(x);
-          if(x.id_Area == `IMP`) this.invImpresion.push(x);
-        });
-      } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información de inventarios en las fechas consultadas!`);
-    });
+    this.load = true;
+    let fecha1 : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : null;
+    let fecha2 : any = this.rangoFechas[1] != undefined && this.rangoFechas[1] != null ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : null;
+    
+    if(fecha1 != null && fecha2 != null) {
+      this.svcInvAreas.GetPorFecha(`2023-09-01`, `2023-09-15`).subscribe(data => {
+        if(data.length > 0) {
+          data.forEach(x => {
+            if(x.id_Area == `EXT` && x.esMaterial == false) this.invExtrusion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial == true) this.invMateriales.push(x);
+            if(x.id_Area == `ROT`) this.invRotograbado.push(x);
+            if(x.id_Area == `SELLA`) this.invSellado.push(x);
+            if(x.id_Area == `IMP`) this.invImpresion.push(x);
+          });
+        } 
+      });
+      this.inventarioMateriasPrimas();
+      this.inventarioProductosTerminados();
+    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `Debe seleccionar un rango de fechas válido!`);
   }
 
   //Función que mostrará el inventario de materias primas y reciclados en la tabla. 
@@ -116,9 +127,10 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             'subtotal' : x.Cantidad * x.Precio,
           }
           this.invPT.push(info);
-        });
-      }, 5000);
-    }, 8000);
+        }) 
+        this.load = false;
+      }, 3000);
+    }, 5000);
   }
 
   //Funciones que calcularán el total de cada inventario.
@@ -136,7 +148,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   calcularTotalReciclados = () => this.invReciclados.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
-  calcularTotalPT = () => this.invProductosTerminados.reduce((acum, valor) => (acum + valor.subtotal), 0);
+  calcularTotalPT = () => this.invPT.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
   //Funciones que permitiran realizar filtros en la tabla.
   aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);

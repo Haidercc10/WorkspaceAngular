@@ -43,7 +43,7 @@
       </div>
 
       <div class="col">
-        <button id="consultar" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar"></button>
+        <button id="consultar" (click)="consultarInventario()" pButton pRipple pTooltip="Llena el campo rango de fechas y consulta aquí." label="Consultar" icon="pi pi-search" class="p-button-danger botonesOpciones" id="consultar"></button>
       </div>
 
       <div class="col justify-content-end text-right">
@@ -52,7 +52,7 @@
     </div>
   </p-toolbar>
 
-  <p-tabView [scrollable]="true" id="tabs">
+  <p-tabView [scrollable]="true" id="tabs" *ngIf="!load">
     <!--Extrusion-->
     <p-tabPanel
       header="Extrusión"
