@@ -7,19 +7,19 @@ export const environment = {
 
   //SERVIDOR
   // rutaPlasticaribeAPI : "http://192.168.0.85:9086/api",
-  //rutaBagPro : "http://192.168.0.85:9095/api",
+  rutaBagPro : "http://192.168.0.85:9095/api",
   rutaZeus : "http://192.168.0.85:9055/api",
   rutaZeusContabilidad : "http://192.168.0.85:9065/api",
 
   // LOCALES 1
-   rutaPlasticaribeAPI : "http://192.168.0.137:9086/api",
-   rutaBagPro : "http://192.168.0.137:9095/api",
+  // rutaPlasticaribeAPI : "http://192.168.0.137:9086/api",
+  // rutaBagPro : "http://192.168.0.137:9095/api",
   // rutaZeus : "http://192.168.0.190:9055/api"
   // rutaZeusContabilidad : "http://192.168.0.190:9065/api"
 
   // LOCALES 2
   // rutaPlasticaribeAPI : "http://192.168.0.193:9085/api",
-  //rutaPlasticaribeAPI : "http://192.168.0.154:9085/api",
+  rutaPlasticaribeAPI : "http://192.168.0.154:9085/api",
   // rutaBagPro : "http://192.168.0.193:9095/api",
   // rutaZeus : "http://192.168.0.193:9075/api",
   // rutaZeusContabilidad : "http://192.168.0.193:9055/api",

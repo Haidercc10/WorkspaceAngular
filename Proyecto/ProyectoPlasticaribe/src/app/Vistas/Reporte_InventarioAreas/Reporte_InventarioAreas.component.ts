@@ -75,7 +75,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
           if(x.id_Area == `SELLA`) this.invSellado.push(x);
           if(x.id_Area == `IMP`) this.invImpresion.push(x);
         });
-        this.exportarExcel();
       } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información de inventarios en las fechas consultadas!`);
     });
   }
@@ -117,8 +116,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             'subtotal' : x.Cantidad * x.Precio,
           }
           this.invPT.push(info);
-          console.log(this.invPT);
-        }) 
+        });
       }, 5000);
     }, 8000);
   }
@@ -168,6 +166,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     let tituloMateriales : string = `MATERIALES EN EXTRUSIÓN`;
     let tituloMatPrimas : string = `INVENTARIO DE MATERIA PRIMA`;
     let tituloReciclados : string = `INVENTARIO DE RECICLADOS`;
+    let tituloPT : string = `INVENTARIO DE PRODUCTOS TERMINADOS`;
     let unirCeldasHoja : string [] = [];
     let header : string [] = [];
 
@@ -250,6 +249,13 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.formatoEncabezado(headerRowMpExtrusion);
     this.formatoCuerpo(this.calcularMaterialesExtrusion(), worksheetMpExtrusion);
 
+    // HOJA 9, INVENTARIO DE DESPACHO
+    let worksheetDespacho = workbook.addWorksheet(`Inventario de Despacho`);
+    this.formatoTitulos(worksheetDespacho, tituloPT, image);
+    header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+    let headerRowDespacho = worksheetDespacho.addRow(header);
+    this.formatoEncabezado(headerRowDespacho);
+    this.formatoCuerpo(this.calcularInvDespacho(), worksheetDespacho);
 
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -500,6 +506,32 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invMateriales.reduce((a,b) => a + b.stock, 0),
       '',
       this.invMateriales.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // 
+  calcularInvDespacho() : any [] {
+    let datos : any [] = [];
+    this.invPT.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invPT.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invPT.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
   }
