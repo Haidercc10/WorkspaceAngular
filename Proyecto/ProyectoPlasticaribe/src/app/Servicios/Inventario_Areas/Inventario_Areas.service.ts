@@ -14,6 +14,8 @@ constructor(private http : HttpClient) { }
 
   GetTodo = () => this.http.get<any>(this.rutaPlasticaribeAPI + '/Inventario_Areas');
 
+  GetPorFecha = (fecha1 : any, fecha2 : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventario_Areas/getInvAreas_Fechas/${fecha1}/${fecha2}`);
+
   GetPorId = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventario_Areas/${dato}`);
 
   Put = (id:number|string, data : modelInventario_Areas) => this.http.put(this.rutaPlasticaribeAPI + `/Inventario_Areas/${id}`, data);

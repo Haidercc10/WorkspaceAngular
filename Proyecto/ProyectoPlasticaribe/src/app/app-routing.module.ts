@@ -67,6 +67,7 @@ import { RegistroComponentComponent } from './Vistas/registro-component/registro
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
+import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
 
 export const routes: Routes = [
 
@@ -134,15 +135,13 @@ export const routes: Routes = [
   {path: 'inventario-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado'}, component : InventarioProductosPBDDComponent},
   {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
   {path: 'inventario-areas',
-    children: [
-      {path: 'materiales',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },
-    ]  
+    children: [{path: 'materiales',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },]  
   },
   {path: 'inventario-areas',
-    children: [
-      {path: 'items',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },
-      ]  
+    children: [{path: 'items',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },]  
   },
+  {path: 'reporte-inv-areas', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte de Inventarios'}, component : Reporte_InventarioAreasComponent},
+  
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},

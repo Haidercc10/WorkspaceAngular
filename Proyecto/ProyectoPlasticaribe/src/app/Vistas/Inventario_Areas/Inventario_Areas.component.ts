@@ -43,14 +43,15 @@ export class Inventario_AreasComponent implements OnInit {
   arrayReferencias : any = []; //Variable que guardará la información de los productos/materias primas
   nroFilas : number = 8; //Variable que guardará el numero de filas que ocupará el campo observación
   nroFilas2 : number = 0; //Variable que guardará el numero de filas que ocupará el campo observación
-  registroSeleccionado : any;
-  contador : number = 0;
-  titulo = `Inventarios Areas`;
-  labels = [];
-  url = ``;
-  soloLectura : boolean = false;
-  polietilenos : any = [];
-  subtitulo : any = ``;
+  registroSeleccionado : any; //Variable que guardará el registro seleccionado de la tabla
+  contador : number = 0; //Variable que aumentará su valor cada vez que ingrese un registro a la tabla. 
+  titulo = `Inventarios Areas`; //Variable que colocará el titulo del módulo
+  labels = []; //Variable que cargará los nombres de los label de id y nombre dependiendo la ruta
+  url = ``; //Variable que guardará la ruta actual
+  polietilenos : any = []; //Variable que guardará el id del polietileno que se está cargando en la tabla
+  subtitulo : any = ``; //Variable que guardará el subtitulo del modulo.
+  urlItems = `/inventario-areas/items`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de items
+  urlMateriales = `/inventario-areas/materiales`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de materias primas
 
   constructor(private AppComponent : AppComponent,
                private frmBuilder : FormBuilder, 
@@ -84,13 +85,13 @@ export class Inventario_AreasComponent implements OnInit {
   }
 
   cargarLabels(url : any) {
-    if(url == `/inventario-areas/materiales`) { this.labels = [`Id`, `Materia Prima`]; this.subtitulo = `Consultar Materiales en Proceso`; } 
-    else if(url == `/inventario-areas/items`) {this.labels = [`Item`, `Referencia`]; this.subtitulo = `Consultar OT/Referencia`; } 
+    if(url == this.urlMateriales) { this.labels = [`Id`, `Materia Prima`]; this.subtitulo = `Consultar Materiales en Proceso`; } 
+    else if(url == this.urlItems) {this.labels = [`Item`, `Referencia`]; this.subtitulo = `Consultar OT/Referencia`; } 
 
-    this.ValidarRol == 1 && url == `/inventario-areas/materiales` ? this.nroFilas = 10 : 
-    this.ValidarRol == 1 && url == `/inventario-areas/items` ? this.nroFilas = 8 :
-    this.ValidarRol != 1 && url == `/inventario-areas/materiales` ? this.nroFilas = 12  : 
-    this.ValidarRol != 1 && url == `/inventario-areas/items` ? this.nroFilas = 10  : this.nroFilas = 8;
+    this.ValidarRol == 1 && url == this.urlMateriales ? this.nroFilas = 10 : 
+    this.ValidarRol == 1 && url == this.urlItems ? this.nroFilas = 8 :
+    this.ValidarRol != 1 && url == this.urlMateriales ? this.nroFilas = 12  : 
+    this.ValidarRol != 1 && url == this.urlItems ? this.nroFilas = 10  : this.nroFilas = 8;
 
     this.ValidarRol == 1 ? this.nroFilas2 = 4 : this.nroFilas2 = 6;
   }
@@ -180,9 +181,9 @@ export class Inventario_AreasComponent implements OnInit {
     let info : modelInventario_Areas = {
       'InvCodigo' : this.contador += 1,
       'OT' : ot,
-      'Prod_Id' : this.url == `/inventario-areas/items` ? id : 1,
+      'Prod_Id' : this.url == this.urlItems ? id : 1,
       'Referencia' : this.formulario.value.referencia,
-      'MatPri_Id' : this.url == `/inventario-areas/materiales` ? id : 84,
+      'MatPri_Id' : this.url == this.urlMateriales ? id : 84,
       'UndMed_Id': 'Kg',
       'InvStock' : cantidad,
       'InvPrecio' : precio,
@@ -194,7 +195,7 @@ export class Inventario_AreasComponent implements OnInit {
       'Usua_Id': this.storage_Id,
       'InvObservacion': this.formulario.value.observacion == null ? '' : this.formulario.value.observacion,
     };
-    if(this.url == `/inventario-areas/items`) {
+    if(this.url == this.urlItems) {
       if(!this.ordenes_trabajos.includes(info.OT)) {
         this.ordenes_trabajos.push(info.OT);
         this.inventario.push(info);
@@ -202,7 +203,7 @@ export class Inventario_AreasComponent implements OnInit {
         if(this.ordenes_trabajos.includes(0)) this.ordenes_trabajos.pop();
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${info.OT} ya existe en la tabla!`);
 
-    } else if (this.url == `/inventario-areas/materiales`) {
+    } else if (this.url == this.urlMateriales) {
       if(!this.polietilenos.includes(info.MatPri_Id)) {
         this.polietilenos.push(info.MatPri_Id);
         this.inventario.push(info);
@@ -275,6 +276,7 @@ export class Inventario_AreasComponent implements OnInit {
     if(this.ValidarRol == 1) this.formulario.reset();
     else {
       this.formulario.patchValue({
+        fecha : null,
         ot : null,
         item : null,
         referencia : null,
@@ -293,17 +295,16 @@ export class Inventario_AreasComponent implements OnInit {
   //Función que consultará las referencias de productos/materias primas por nombre
   consultarReferencia(){
     let referencia : any = this.formulario.value.referencia;
-    if(this.url == `/inventario-areas/items`) {
-      if(referencia != null && referencia.length > 2) this.svcBagPro.LikeReferencia(referencia).subscribe(data => this.arrayReferencias = data);
-    } else if(this.url == `/inventario-areas/materiales`) {
-      if(referencia != null && referencia.length > 2) this.svcMatPrimas.GetPolietilenos(referencia).subscribe(data => this.arrayReferencias = data);
+    if(referencia != null && referencia.length > 2) {
+      if(this.url == this.urlItems) this.svcBagPro.LikeReferencia(referencia).subscribe(data => this.arrayReferencias = data);
+      else if(this.url == this.urlMateriales) this.svcMatPrimas.GetPolietilenos(referencia).subscribe(data => this.arrayReferencias = data);
     }
   }
 
   //Función que consultará las referencias de productos/materias primas por Id
   consultarItem(){
     let item : any = this.formulario.value.item;
-    if(this.url == `/inventario-areas/items`) {
+    if(this.url == this.urlItems) {
       if(item != null) {
         this.load = true;
         this.svcBagPro.srvObtenerItemsBagproXClienteItem(item).subscribe(data => {
@@ -312,7 +313,7 @@ export class Inventario_AreasComponent implements OnInit {
           this.load = false;
         }, error => { this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el item ${item}!`); this.load = false; });
       }
-    } else if(this.url == `/inventario-areas/materiales`) {
+    } else if(this.url == this.urlMateriales) {
       if(item != null) {
         this.load = true;
         this.svcMatPrimas.srvObtenerListaPorId(item).subscribe(data => {
@@ -324,13 +325,13 @@ export class Inventario_AreasComponent implements OnInit {
     }
   }
 
-  //Funcion que seleccionará una referencia y cargará su id y precio 
+  //Funcion que seleccionará una referencia y cargará su id, nombre y precio 
   seleccionarReferencia(){
     let ref : any = [];
-    if(this.url == `/inventario-areas/items`) {
+    if(this.url == this.urlItems) {
       ref = this.arrayReferencias.filter((item) => `${item.item} - ${item.referencia}` == this.formulario.value.referencia);
       this.formulario.patchValue({ item : ref[0].item, referencia : ref[0].referencia, precio : ref[0].precioKg != null ? ref[0].precioKg : 0, cantidad : 0});  
-    } else if(this.url == `/inventario-areas/materiales`) {
+    } else if(this.url == this.urlMateriales) {
       ref = this.arrayReferencias.filter((item) => `${item.item} - ${item.referencia}` == this.formulario.value.referencia);
       this.formulario.patchValue({ item : ref[0].item, referencia : ref[0].referencia, precio : ref[0].precioKg != null ? ref[0].precioKg : 0, cantidad : 0});  
     }
@@ -348,17 +349,8 @@ export class Inventario_AreasComponent implements OnInit {
         let datos : any =[];
         for (const item of this.inventario) {
           const datos1  : any = [item.OT, item.Prod_Id, item.Referencia, item.InvStock, item.InvPrecio, item.Subtotal, item.Proceso_Id, item.InvObservacion];
-          if(this.url == `/inventario-areas/items` && this.ValidarRol == 1) datos1[1] = item.Prod_Id; 
-          else if (this.url == `/inventario-areas/items` && this.ValidarRol != 1) {
-            datos1[1] = item.Prod_Id;
-            delete header[4]; delete header[5]; delete datos1[4]; delete datos1[5]; 
-          }  
-
-          if(this.url == `/inventario-areas/materiales` && this.ValidarRol == 1) datos1[1] = item.MatPri_Id;
-          if(this.url == `/inventario-areas/materiales` && this.ValidarRol != 1) {
-            datos1[1] = item.MatPri_Id;
-            delete header[4]; delete header[5]; delete datos1[4]; delete datos1[5]; 
-          }
+          if(this.url == this.urlItems) datos1[1] = item.Prod_Id;
+          if(this.url == this.urlMateriales) datos1[1] = item.MatPri_Id;
           datos.push(datos1);
         } 
         let workbook = new Workbook();
@@ -377,11 +369,11 @@ export class Inventario_AreasComponent implements OnInit {
         let celdas : any = [4, 5, 6,];
         let columnas : any = [1, 2, 3, 4, 5, 6, 7, 8];
         let medidas : any = [12, 12, 50, 15, 15, 15, 12, 30];
-        if(this.url == `/inventario-areas/items` && this.ValidarRol == 1) worksheet.mergeCells('A1:H2');
-        else if (this.url == `/inventario-areas/items` && this.ValidarRol != 1) worksheet.mergeCells('A1:F2');
+        if(this.url == this.urlItems && this.ValidarRol == 1) worksheet.mergeCells('A1:H2');
+        else if (this.url == this.urlItems && this.ValidarRol != 1) worksheet.mergeCells('A1:F2');
         
-        if(this.url == `/inventario-areas/materiales` && this.ValidarRol == 1) worksheet.mergeCells('A1:H2');
-        else if (this.url == `/inventario-areas/materiales` && this.ValidarRol != 1) worksheet.mergeCells('A1:F2'); 
+        if(this.url == this.urlMateriales && this.ValidarRol == 1) worksheet.mergeCells('A1:H2');
+        else if (this.url == this.urlMateriales && this.ValidarRol != 1) worksheet.mergeCells('A1:F2'); 
         datos.forEach(d => {
           let row = worksheet.addRow(d);
           row.alignment = { horizontal : 'center' }
@@ -389,8 +381,8 @@ export class Inventario_AreasComponent implements OnInit {
           columnas.forEach(c => worksheet.getColumn(c).width = medidas[columnas.indexOf(c)]);
         });
         setTimeout(() => {
-          if (this.url == `/inventario-areas/items` && this.ValidarRol != 1) worksheet.spliceColumns(5, 2); 
-          else if (this.url == `/inventario-areas/materiales` && this.ValidarRol != 1) worksheet.spliceColumns(5, 2);
+          if (this.url == this.urlItems && this.ValidarRol != 1) worksheet.spliceColumns(5, 2); 
+          else if (this.url == this.urlMateriales && this.ValidarRol != 1) worksheet.spliceColumns(5, 2);
           worksheet.addRow([]);
           worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
           worksheet.getCell('A1').font = { name: 'Calibri', family: 4, size: 14, bold: true };
