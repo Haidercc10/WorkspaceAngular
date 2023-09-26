@@ -209,6 +209,14 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.formatoEncabezado(headerRowRecuperado);
     this.formatoCuerpo(this.calcularInvRecuperado(), worksheetRecuperado);
 
+    // HOJA 8, MATERIALES EN EXTRUSION    
+    let worksheetMpExtrusion = workbook.addWorksheet(`Materiales en Extrusión`);
+    this.formatoTitulos(worksheetMpExtrusion, tituloMateriales, image);
+    header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+    let headerRowMpExtrusion = worksheetMpExtrusion.addRow(header);
+    this.formatoEncabezado(headerRowMpExtrusion);
+    this.formatoCuerpo(this.calcularMaterialesExtrusion(), worksheetMpExtrusion);
+
 
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -276,7 +284,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       ['SELLADO', this.calcularTotalSellado()],
       ['ROTOGRABADO', this.calcularTotalRotograbado()],
       ['DESPACHO', 0],
-      ['TOTAL', ],
+      ['TOTAL', this.calcularTotalReciclados() + this.calcularTotalMatPrimas() + this.calcularTotalExtrusion() + this.calcularTotalImpresion() + this.calcularTotalSellado() + this.calcularTotalRotograbado() + 0],
     ];
     return datos;
   }
@@ -433,6 +441,32 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invReciclados.reduce((a,b) => a + b.stock, 0),
       '',
       this.invReciclados.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular el total de los materiales en extrusion
+  calcularMaterialesExtrusion() : any [] {
+    let datos : any [] = [];
+    this.invMateriales.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invMateriales.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invMateriales.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
   }
