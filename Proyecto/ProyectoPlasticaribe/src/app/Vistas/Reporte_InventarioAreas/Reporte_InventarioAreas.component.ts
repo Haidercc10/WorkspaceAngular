@@ -55,9 +55,9 @@ export class Reporte_InventarioAreasComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.consultarInventario();
     this.inventarioMateriasPrimas();
     this.inventarioProductosTerminados();
+    this.consultarInventario();
   }
 
   verTutorial(){}
@@ -157,6 +157,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   aplicarfiltroPT = ($event, campo : any, valorCampo : string) => this.dtPT!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  // Funcion que va a crear un excel con la información de los inventarios de cada area
   exportarExcel(){
     this.load = true;
     let tituloTotal : string = `INVENTARIO TOTAL`;
@@ -165,6 +166,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     let tituloSellado : string = `INVENTARIO SELLADO`;
     let tituloImpresion : string = `INVENTARIO IMPRESIÓN`;
     let tituloMateriales : string = `MATERIALES EN EXTRUSIÓN`;
+    let tituloMatPrimas : string = `INVENTARIO DE MATERIA PRIMA`;
+    let tituloReciclados : string = `INVENTARIO DE RECICLADOS`;
     let unirCeldasHoja : string [] = [];
     let header : string [] = [];
 
@@ -173,17 +176,10 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
     // HOJA 1, INVENTARIO TOTAL
     let worksheetTotal = workbook.addWorksheet(`Inventario Total`);
-    let titleTotal = worksheetTotal.addRow([tituloTotal]);
-    titleTotal.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    this.formatoTitulos(worksheetTotal);
+    this.formatoTitulos(worksheetTotal, tituloTotal);
     header = ['Área', 'Total'];
     let headerRowTotales = worksheetTotal.addRow(header);
-    headerRowTotales.eachCell((cell) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'D5F5E3' } };
-      cell.font = { name: 'Calibri', family: 4, size: 11, bold: true };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      cell.border = { top: { style: 'medium' }, left: { style: 'medium' }, bottom: { style: 'medium' }, right: { style: 'medium' } };
-    });
+    this.formatoEncabezado(headerRowTotales);
     this.calcularInvTotal().forEach(d => {
       let row = worksheetTotal.addRow(d);
       let celdas = [1, 2];
@@ -200,14 +196,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
     //HOJA 2, INVENTARIO EXTRUSIÓN
     let worksheetExtrusion = workbook.addWorksheet(`Inventario Extrusión`);
-    worksheetExtrusion.addImage(image, {
-      tl: { col: 0.1, row: 0.40 },
-      ext: { width: 170, height: 45 },
-      editAs: 'oneCell'
-    });
-    let titleExtrusion = worksheetExtrusion.addRow([tituloExtrusion]);
-    titleExtrusion.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    this.formatoTitulos(worksheetExtrusion);
+    this.formatoTitulos(worksheetExtrusion, tituloExtrusion, image);
     header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
     let headerRowExtrusion = worksheetExtrusion.addRow(header);
     this.formatoEncabezado(headerRowExtrusion);
@@ -215,14 +204,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
     // HOJA 3, INVENTARIO ROTOGRABADO
     let worksheetRotograbado = workbook.addWorksheet(`Inventario Rotograbado`);
-    worksheetRotograbado.addImage(image, {
-      tl: { col: 0.1, row: 0.40 },
-      ext: { width: 170, height: 45 },
-      editAs: 'oneCell'
-    });
-    let titleRotograbado = worksheetRotograbado.addRow([tituloRotograbado]);
-    titleRotograbado.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    this.formatoTitulos(worksheetRotograbado);
+    this.formatoTitulos(worksheetRotograbado, tituloRotograbado, image);
     header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
     let headerRowRotograbado = worksheetRotograbado.addRow(header);
     this.formatoEncabezado(headerRowRotograbado);
@@ -230,14 +212,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
     // HOJA 4, INVENTARIO SELLADO
     let worksheetSellado = workbook.addWorksheet(`Inventario Sellado`);
-    worksheetSellado.addImage(image, {
-      tl: { col: 0.1, row: 0.40 },
-      ext: { width: 170, height: 45 },
-      editAs: 'oneCell'
-    });
-    let titleSellado = worksheetSellado.addRow([tituloSellado]);
-    titleSellado.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    this.formatoTitulos(worksheetSellado);
+    this.formatoTitulos(worksheetSellado, tituloSellado, image);
     header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
     let headerRowSellado = worksheetSellado.addRow(header);
     this.formatoEncabezado(headerRowSellado);
@@ -245,21 +220,29 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
     // HOJA 5, INVENTARIO IMPRESION
     let worksheetImpresion = workbook.addWorksheet(`Inventario Impresión`);
-    worksheetImpresion.addImage(image, {
-      tl: { col: 0.1, row: 0.40 },
-      ext: { width: 170, height: 45 },
-      editAs: 'oneCell'
-    });
-    let titleImpresion = worksheetImpresion.addRow([tituloImpresion]);
-    titleImpresion.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    this.formatoTitulos(worksheetImpresion);
+    this.formatoTitulos(worksheetImpresion, tituloImpresion, image);
     header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
     let headerRowImpresion = worksheetImpresion.addRow(header);
     this.formatoEncabezado(headerRowImpresion);
     this.formatoCuerpo(this.calcularInvImpresion(), worksheetImpresion);
 
-    let worksheetMateriales = workbook.addWorksheet(`Materiales`);
+    // HOJA 6, INVENTARIO MATERIA PRIMA
+    let worksheetMateriaPrima = workbook.addWorksheet(`Inventario Materia Prima`);
+    this.formatoTitulos(worksheetMateriaPrima, tituloMatPrimas, image);
+    header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+    let headerRowMatPrimas = worksheetMateriaPrima.addRow(header);
+    this.formatoEncabezado(headerRowMatPrimas);
+    this.formatoCuerpo(this.calcularInvMateriasPrimas(), worksheetMateriaPrima);
     
+    // HOJA 7, INVENTARIO RECICLADOS O RECUPERADOS
+    let worksheetRecuperado = workbook.addWorksheet(`Inventario Recuperado`);
+    this.formatoTitulos(worksheetRecuperado, tituloReciclados, image);
+    header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+    let headerRowRecuperado = worksheetRecuperado.addRow(header);
+    this.formatoEncabezado(headerRowRecuperado);
+    this.formatoCuerpo(this.calcularInvRecuperado(), worksheetRecuperado);
+
+
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       fs.saveAs(blob, `Inventarios_Areas.xlsx`);
@@ -267,14 +250,25 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.load = false;
   }
 
-  formatoTitulos(worksheet : any){
+  // funcion que va a generar los titulos de las hojas de excel
+  formatoTitulos(worksheet : any, titulo : string, image? : any){
+    if (worksheet.name != 'Inventario Total') {
+      worksheet.addImage(image, {
+        tl: { col: 0.1, row: 0.40 },
+        ext: { width: 170, height: 45 },
+        editAs: 'oneCell'
+      });
+    }
+    let titleImpresion = worksheet.addRow([titulo]);
+    titleImpresion.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
     worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFD5' } };
     worksheet.getCell('A1').border = { top: { style: 'medium' }, left: { style: 'medium' }, bottom: { style: 'medium' }, right: { style: 'medium' } };
     worksheet.addRow([]);
-    worksheet.addRow([]);
+    if (worksheet.name != 'Inventario Total') worksheet.addRow([]);
   }
 
+  // funcion que va a darle el estilo de los encabezados o titulos de cada columna
   formatoEncabezado(headerRow : any){
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFD5' } };
@@ -284,6 +278,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     });
   }
 
+  // Funcion que va a darle el estilo a cada celda del cuerpo de la tabla
   formatoCuerpo(data : any, worksheet : any){
     data.forEach(d => {
       let row = worksheet.addRow(d);
@@ -302,22 +297,24 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     unirCeldasHoja.forEach(cell => worksheet.mergeCells(cell));
   }
 
+  // Funcion que va a calcular el total de cada area
   calcularInvTotal() : any [] {
     let datos : any [] = [];
     datos = [
-      ['RECICLADO', 0],
-      ['MATERIA PRIMA', 0],
-      ['EXTRUSIÓN', this.invExtrusion.reduce((a,b) => a + b.subtotal, 0)],
+      ['RECICLADO', this.calcularTotalReciclados()],
+      ['MATERIA PRIMA', this.calcularTotalMatPrimas()],
+      ['EXTRUSIÓN', this.calcularTotalExtrusion()],
       ['ROLLOS', 0],
-      ['IMPRESIÓN', this.invImpresion.reduce((a,b) => a + b.subtotal, 0)],
-      ['SELLADO', this.invSellado.reduce((a,b) => a + b.subtotal, 0)],
-      ['ROTOGRABADO', this.invRotograbado.reduce((a,b) => a + b.subtotal, 0)],
+      ['IMPRESIÓN', this.calcularTotalImpresion()],
+      ['SELLADO', this.calcularTotalSellado()],
+      ['ROTOGRABADO', this.calcularTotalRotograbado()],
       ['DESPACHO', 0],
-      ['TOTAL', 0],
+      ['TOTAL', ],
     ];
     return datos;
   }
 
+  // funcion que va a calcular el total del inventario de extrusion
   calcularInvExtrusion() : any [] {
     let datos : any [] = [];
     this.invExtrusion.forEach(ext => {
@@ -343,6 +340,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de rotograbado
   calcularInvRotograbado() : any [] {
     let datos : any [] = [];
     this.invRotograbado.forEach(ext => {
@@ -368,6 +366,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de sellado
   calcularInvSellado() : any [] {
     let datos : any [] = [];
     this.invSellado.forEach(ext => {
@@ -393,6 +392,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     return datos;
   }
 
+  // Funcion que va a calcular el total del inventario de impresion
   calcularInvImpresion() : any [] {
     let datos : any [] = [];
     this.invImpresion.forEach(ext => {
@@ -414,6 +414,58 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invImpresion.reduce((a,b) => a + b.stock, 0),
       '',
       this.invImpresion.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular el total del inventario de materias primas
+  calcularInvMateriasPrimas() : any [] {
+    let datos : any [] = [];
+    this.invMatPrimas.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invMatPrimas.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invMatPrimas.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular el total del inventario de reciclado
+  calcularInvRecuperado() : any [] {
+    let datos : any [] = [];
+    this.invReciclados.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invReciclados.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invReciclados.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
   }
