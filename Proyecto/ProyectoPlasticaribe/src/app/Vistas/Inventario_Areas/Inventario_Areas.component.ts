@@ -114,7 +114,7 @@ export class Inventario_AreasComponent implements OnInit {
       this.area = "EXT";
       this.titulo = `Inventario Extrusión`;
     } else if (this.ValidarRol == 8) { 
-      this.area = "EXT";
+      this.area = "SELLA";
       this.titulo = `Inventario Extrusión`;
     } else if (this.ValidarRol == 63) { 
       this.area = "ROT";

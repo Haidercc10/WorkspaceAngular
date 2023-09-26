@@ -55,8 +55,9 @@
   <p-tabView [scrollable]="true" id="tabs" *ngIf="!load">
     <!--Extrusion-->
     <p-tabPanel
+      *ngIf="[1, 3, 7].includes(ValidarRol)"
       header="Extrusión"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-bolt"
       tooltip="Información de los rollos actuales en la bodega de extrusión">
       <p-table
       #dtExt
@@ -114,8 +115,9 @@
 
     <!--Materiales en proceso-->
     <p-tabPanel
+      *ngIf="[1, 3, 7].includes(ValidarRol)"
       header="Materiales en Extrusión"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-sliders-h"
       tooltip="Información de los materiales en proceso de extrusión">
       <p-table
       #dtMat
@@ -173,8 +175,9 @@
 
     <!--Impresion-->
     <p-tabPanel
+      *ngIf="[1, 62].includes(ValidarRol)"
       header="Impresión"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-print"
       tooltip="Información del inventario de Impresión">
       <p-table
       #dtImp
@@ -232,8 +235,9 @@
 
     <!--Rotograbado-->
     <p-tabPanel
+    *ngIf="[1, 63].includes(ValidarRol)"
       header="Rotograbado"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-database"
       tooltip="Información del inventario de Rotograbado">
       <p-table
       #dtRot
@@ -291,6 +295,7 @@
 
     <!--Sellado-->
     <p-tabPanel
+      *ngIf="[1, 8].includes(ValidarRol)"
       header="Sellado"
       leftIcon="pi pi-tags"
       tooltip="Información del inventario de Sellado">
@@ -350,8 +355,9 @@
 
     <!--Mat. Primas-->
     <p-tabPanel
+      *ngIf="[1, 3, 7].includes(ValidarRol)"
       header="Materias Primas"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-box"
       tooltip="Información del inventario de Materias Primas">
       <p-table
       #dtMatPrima
@@ -412,8 +418,9 @@
 
     <!--Reciclados-->
     <p-tabPanel
+      *ngIf="[1, 3, 7].includes(ValidarRol)"
       header="Reciclados"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-slack"
       tooltip="Información del inventario de Reciclados">
       <p-table
       #dtReciclados
@@ -472,10 +479,11 @@
       </p-table>
     </p-tabPanel>
 
-    <!--Despacho-->
+    <!--Productos terminados-->
     <p-tabPanel
+      *ngIf="[1, 10].includes(ValidarRol)"
       header="Productos Terminados"
-      leftIcon="pi pi-tags"
+      leftIcon="pi pi-verified"
       tooltip="Información del inventario de Productos Terminados">
       <p-table
       #dtPT
