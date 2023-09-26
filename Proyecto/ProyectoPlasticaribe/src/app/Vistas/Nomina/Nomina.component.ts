@@ -254,7 +254,7 @@ export class NominaComponent implements OnInit {
         }
       }
     }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron registros en las fechas consultadas`));
-    setTimeout(() => { this.cargarTabla2(fechaInicial, fechaFinal); }, 1500);
+    setTimeout(() => this.cargarTabla2(fechaInicial, fechaFinal), 1500);
   }
 
   /** Función para cargar la tabla de Nómina detallada y calcular el valor total a pagar para cada operario*/
@@ -282,8 +282,8 @@ export class NominaComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => { this.calcularTotalAPagar(); }, 1000);
-    setTimeout(() => { this.load = true; }, 2000);
+    setTimeout(() => this.calcularTotalAPagar(), 1000);
+    setTimeout(() => this.load = true, 2000);
   }
 
   /** Funcion para filtrar busquedas y mostrar datos segun el filtro consultado. */
@@ -327,13 +327,7 @@ export class NominaComponent implements OnInit {
   }
 
   /** Calcular el valor total de la nómina de sellado */
-  calcularTotalAPagar(){
-    let total : number = 0;
-    for (const item of this.arraySellado) {
-      total += item.PagoTotal;
-    }
-    this.totalNominaSellado = total;
-  }
+  calcularTotalAPagar = () => this.arraySellado.reduce((acc, item) => acc + item.PagoTotal, 0);
 
   /** Función para quitar mensaje de elección */
   onReject = () => this.mensajes.clear('msj');
@@ -342,9 +336,8 @@ export class NominaComponent implements OnInit {
   mostrarEleccion(){
     setTimeout(() => {
       if(this.arraySellado.length > 0) {
-        if(this.dt.filteredValue != null) {
-          this.exportarExcel(1);
-        } else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true});
+        if(this.dt.filteredValue != null) this.exportarExcel(1);
+        else this.mensajes.add({severity:'warn', key: 'msj', summary:'Elección', detail: `¿Qué tipo de formato de nómina desea generar?`, sticky: true});
       } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe cargar al menos un registro en la tabla, verifique!`);
     }, 500);
   }
@@ -352,24 +345,24 @@ export class NominaComponent implements OnInit {
   /** función que contendrá la consulta de cuando se desee exportar a excel la nomina de forma detallada */
   cargarNominaDetallada(fecha1 : any, fecha2 : any){
     this.detalladoxBultos = [];
-      this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
-        for(let index = 0; index < data.length; index++) {
-          let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
-          info.Cedula = parseInt(info.Cedula),
-          info.Referencia = parseInt(info.Referencia),
-          info.Ot = parseInt(info.Ot),
-          info.Bulto = parseInt(info.Bulto),
-          info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', ''),
-          info.Cantidad = parseFloat(info.Cantidad),
-          info.Cantidad_Total = parseFloat(info.Cantidad_Total),
-          info.Peso = parseFloat(info.Peso),
-          info.Precio = parseFloat(info.Precio),
-          info.Valor_Total = parseFloat(info.Valor_Total)
+    this.servicioBagPro.GetNominaSelladoDetalladaxBulto(fecha1, fecha2).subscribe(data => {
+      for(let index = 0; index < data.length; index++) {
+        let info : any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
+        info.Cedula = parseInt(info.Cedula),
+        info.Referencia = parseInt(info.Referencia),
+        info.Ot = parseInt(info.Ot),
+        info.Bulto = parseInt(info.Bulto),
+        info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', ''),
+        info.Cantidad = parseFloat(info.Cantidad),
+        info.Cantidad_Total = parseFloat(info.Cantidad_Total),
+        info.Peso = parseFloat(info.Peso),
+        info.Precio = parseFloat(info.Precio),
+        info.Valor_Total = parseFloat(info.Valor_Total)
 
-          this.detalladoxBultos.push(info);
-          this.detalladoxBultos.sort((a,b) => Number(a.Bulto) - Number(b.Bulto));
-          this.detalladoxBultos.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
-        }
-      });
+        this.detalladoxBultos.push(info);
+        this.detalladoxBultos.sort((a,b) => Number(a.Bulto) - Number(b.Bulto));
+        this.detalladoxBultos.sort((a,b) => Number(a.Cedula) - Number(b.Cedula));
+      }
+    });
   }
 }

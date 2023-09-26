@@ -162,9 +162,9 @@ export class CertificadoCalidadComponent implements OnInit {
           Presentacion : ot.ptPresentacionNom == 'Unidad' ? 'Und' : ot.ptPresentacionNom == 'Paquete' ? 'Paquete' : ot.ptPresentacionNom == 'Kilo' ? 'Kg' : ot.ptPresentacionNom == 'Rollo' ? 'Rollo' : '',
           Fecha_Orden : moment(ot.fechaCrea).format('YYYY-MM-DD'),
         });
-        this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(data => {
-          this.calcularParametrosCuantitativos(data, ot);
-          this.llenarParametrosCualitativos(data, ot);
+        this.certCalidadService.GetUltCertificadoItem(parseInt(ot.clienteItems)).subscribe(datos => {
+          this.calcularParametrosCuantitativos(datos, ot);
+          this.llenarParametrosCualitativos(datos, ot);
         });
         this.cargando = false;
       });

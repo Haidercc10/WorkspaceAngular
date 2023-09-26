@@ -112,7 +112,7 @@
             <ng-template pTemplate="footer">
               <tr>
                 <td colspan="5" class="text-right">Total Nómina Sellado</td>
-                <td id="total">{{totalNominaSellado | number : '1.2-2'}}</td>
+                <td id="total">{{calcularTotalAPagar() | number : '1.2-2'}}</td>
               </tr>
             </ng-template>
             <!--Tabla 2-->
@@ -189,9 +189,6 @@
         columnResizeMode="expand"
         styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
         responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="nominaIngresada.length"
-        [rowsPerPageOptions]="[10,25,50,100,nominaIngresada.length]"
         [rowHover]="true"        
         [scrollable]="true"
         scrollHeight="50rem"
