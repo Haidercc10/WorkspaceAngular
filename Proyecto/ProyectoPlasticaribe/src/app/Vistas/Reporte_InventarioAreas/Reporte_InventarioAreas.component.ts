@@ -197,88 +197,110 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       const image = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
 
       // HOJA 1, INVENTARIO TOTAL
-      let worksheetTotal = workbook.addWorksheet(`Inventario Total`);
-      this.formatoTitulos(worksheetTotal, tituloTotal);
-      header = ['Área', 'Total'];
-      let headerRowTotales = worksheetTotal.addRow(header);
-      this.formatoEncabezado(headerRowTotales);
-      this.calcularInvTotal().forEach(d => {
-        let row = worksheetTotal.addRow(d);
-        let celdas = [1, 2];
-        celdas.forEach(cell => {
-          row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EAFAF1' } };
-          row.getCell(cell).border = { top: { style: 'medium' }, left: { style: 'medium' }, bottom: { style: 'medium' }, right: { style: 'medium' } };
-          if (row.getCell(1).value == 'TOTAL') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
-          worksheetTotal.getColumn(cell).numFmt = '""#,##0.00;[Black]\-""#,##0.00';
-          worksheetTotal.getColumn(cell).width = 30;
+      if([1, 61].includes(this.ValidarRol)) {
+        let worksheetTotal = workbook.addWorksheet(`Inventario Total`);
+        this.formatoTitulos(worksheetTotal, tituloTotal);
+        header = ['Área', 'Total'];
+        let headerRowTotales = worksheetTotal.addRow(header);
+        this.formatoEncabezado(headerRowTotales);
+        this.calcularInvTotal().forEach(d => {
+          let row = worksheetTotal.addRow(d);
+          let celdas = [1, 2];
+          celdas.forEach(cell => {
+            row.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EAFAF1' } };
+            row.getCell(cell).border = { top: { style: 'medium' }, left: { style: 'medium' }, bottom: { style: 'medium' }, right: { style: 'medium' } };
+            if (row.getCell(1).value == 'TOTAL') row.getCell(cell).font = { name: 'Calibri', family: 4, size: 11, bold: true };
+            worksheetTotal.getColumn(cell).numFmt = '""#,##0.00;[Black]\-""#,##0.00';
+            worksheetTotal.getColumn(cell).width = 30;
+          });
         });
-      });
-      unirCeldasHoja = ['A1:B3'];
-      unirCeldasHoja.forEach(cell => worksheetTotal.mergeCells(cell));
+        unirCeldasHoja = ['A1:B3'];
+        unirCeldasHoja.forEach(cell => worksheetTotal.mergeCells(cell));
+      }
+      
 
       //HOJA 2, INVENTARIO EXTRUSIÓN
-      let worksheetExtrusion = workbook.addWorksheet(`Inventario Extrusión`);
-      this.formatoTitulos(worksheetExtrusion, tituloExtrusion, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowExtrusion = worksheetExtrusion.addRow(header);
-      this.formatoEncabezado(headerRowExtrusion);
-      this.formatoCuerpo(this.calcularInvExtrusion(), worksheetExtrusion);
+      if([1, 3, 7, 61].includes(this.ValidarRol)) {
+        let worksheetExtrusion = workbook.addWorksheet(`Inventario Extrusión`);
+        this.formatoTitulos(worksheetExtrusion, tituloExtrusion, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowExtrusion = worksheetExtrusion.addRow(header);
+        this.formatoEncabezado(headerRowExtrusion);
+        this.formatoCuerpo(this.calcularInvExtrusion(), worksheetExtrusion);
+      }
 
       // HOJA 3, INVENTARIO ROTOGRABADO
-      let worksheetRotograbado = workbook.addWorksheet(`Inventario Rotograbado`);
-      this.formatoTitulos(worksheetRotograbado, tituloRotograbado, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowRotograbado = worksheetRotograbado.addRow(header);
-      this.formatoEncabezado(headerRowRotograbado);
-      this.formatoCuerpo(this.calcularInvRotograbado(), worksheetRotograbado);
+      if([1, 63, 61].includes(this.ValidarRol)) {
+        let worksheetRotograbado = workbook.addWorksheet(`Inventario Rotograbado`);
+        this.formatoTitulos(worksheetRotograbado, tituloRotograbado, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowRotograbado = worksheetRotograbado.addRow(header);
+        this.formatoEncabezado(headerRowRotograbado);
+        this.formatoCuerpo(this.calcularInvRotograbado(), worksheetRotograbado);
+      }
 
       // HOJA 4, INVENTARIO SELLADO
-      let worksheetSellado = workbook.addWorksheet(`Inventario Sellado`);
-      this.formatoTitulos(worksheetSellado, tituloSellado, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowSellado = worksheetSellado.addRow(header);
-      this.formatoEncabezado(headerRowSellado);
-      this.formatoCuerpo(this.calcularInvSellado(), worksheetSellado);
+      if([1, 8, 61].includes(this.ValidarRol)) {
+        let worksheetSellado = workbook.addWorksheet(`Inventario Sellado`);
+        this.formatoTitulos(worksheetSellado, tituloSellado, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowSellado = worksheetSellado.addRow(header);
+        this.formatoEncabezado(headerRowSellado);
+        this.formatoCuerpo(this.calcularInvSellado(), worksheetSellado);
+      }
 
       // HOJA 5, INVENTARIO IMPRESION
-      let worksheetImpresion = workbook.addWorksheet(`Inventario Impresión`);
-      this.formatoTitulos(worksheetImpresion, tituloImpresion, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowImpresion = worksheetImpresion.addRow(header);
-      this.formatoEncabezado(headerRowImpresion);
-      this.formatoCuerpo(this.calcularInvImpresion(), worksheetImpresion);
+      if([1, 62, 61].includes(this.ValidarRol)) {
+        let worksheetImpresion = workbook.addWorksheet(`Inventario Impresión`);
+        this.formatoTitulos(worksheetImpresion, tituloImpresion, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowImpresion = worksheetImpresion.addRow(header);
+        this.formatoEncabezado(headerRowImpresion);
+        this.formatoCuerpo(this.calcularInvImpresion(), worksheetImpresion);
+      }
+      
 
       // HOJA 6, INVENTARIO MATERIA PRIMA
-      let worksheetMateriaPrima = workbook.addWorksheet(`Inventario Materia Prima`);
-      this.formatoTitulos(worksheetMateriaPrima, tituloMatPrimas, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowMatPrimas = worksheetMateriaPrima.addRow(header);
-      this.formatoEncabezado(headerRowMatPrimas);
-      this.formatoCuerpo(this.calcularInvMateriasPrimas(), worksheetMateriaPrima);
+      if([1, 3, 7, 61].includes(this.ValidarRol)) {
+        let worksheetMateriaPrima = workbook.addWorksheet(`Inventario Materia Prima`);
+        this.formatoTitulos(worksheetMateriaPrima, tituloMatPrimas, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowMatPrimas = worksheetMateriaPrima.addRow(header);
+        this.formatoEncabezado(headerRowMatPrimas);
+        this.formatoCuerpo(this.calcularInvMateriasPrimas(), worksheetMateriaPrima);
+      }
       
       // HOJA 7, INVENTARIO RECICLADOS O RECUPERADOS
-      let worksheetRecuperado = workbook.addWorksheet(`Inventario Recuperado`);
-      this.formatoTitulos(worksheetRecuperado, tituloReciclados, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowRecuperado = worksheetRecuperado.addRow(header);
-      this.formatoEncabezado(headerRowRecuperado);
-      this.formatoCuerpo(this.calcularInvRecuperado(), worksheetRecuperado);
+      if([1, 3, 7, 61].includes(this.ValidarRol)) {
+        let worksheetRecuperado = workbook.addWorksheet(`Inventario Recuperado`);
+        this.formatoTitulos(worksheetRecuperado, tituloReciclados, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowRecuperado = worksheetRecuperado.addRow(header);
+        this.formatoEncabezado(headerRowRecuperado);
+        this.formatoCuerpo(this.calcularInvRecuperado(), worksheetRecuperado);
+      }
+      
 
-      // HOJA 8, MATERIALES EN EXTRUSION    
-      let worksheetMpExtrusion = workbook.addWorksheet(`Materiales en Extrusión`);
-      this.formatoTitulos(worksheetMpExtrusion, tituloMateriales, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowMpExtrusion = worksheetMpExtrusion.addRow(header);
-      this.formatoEncabezado(headerRowMpExtrusion);
-      this.formatoCuerpo(this.calcularMaterialesExtrusion(), worksheetMpExtrusion);
+      // HOJA 8, MATERIALES EN EXTRUSION
+      if([1, 3, 7, 61].includes(this.ValidarRol)) {
+        let worksheetMpExtrusion = workbook.addWorksheet(`Materiales en Extrusión`);
+        this.formatoTitulos(worksheetMpExtrusion, tituloMateriales, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowMpExtrusion = worksheetMpExtrusion.addRow(header);
+        this.formatoEncabezado(headerRowMpExtrusion);
+        this.formatoCuerpo(this.calcularMaterialesExtrusion(), worksheetMpExtrusion);
+      }    
+      
 
       // HOJA 9, INVENTARIO DE DESPACHO
-      let worksheetDespacho = workbook.addWorksheet(`Inventario de Despacho`);
-      this.formatoTitulos(worksheetDespacho, tituloPT, image);
-      header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
-      let headerRowDespacho = worksheetDespacho.addRow(header);
-      this.formatoEncabezado(headerRowDespacho);
-      this.formatoCuerpo(this.calcularInvDespacho(), worksheetDespacho);
+      if([1, 10, 61].includes(this.ValidarRol)) {
+        let worksheetDespacho = workbook.addWorksheet(`Inventario de Despacho`);
+        this.formatoTitulos(worksheetDespacho, tituloPT, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowDespacho = worksheetDespacho.addRow(header);
+        this.formatoEncabezado(headerRowDespacho);
+        this.formatoCuerpo(this.calcularInvDespacho(), worksheetDespacho);
+      }
 
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
