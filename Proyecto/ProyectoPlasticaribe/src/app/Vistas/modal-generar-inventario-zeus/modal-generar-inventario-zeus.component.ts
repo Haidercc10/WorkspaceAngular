@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -12,6 +12,10 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsProductos as defaultSteps } from 'src/app/data';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
+
+@Injectable({
+  providedIn : 'root'
+})
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -269,7 +273,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => this.load = true, 3000);
+    setTimeout(() => { this.load = true; console.log(this.ArrayProductoZeus); }, 3000);
   }
 
   //

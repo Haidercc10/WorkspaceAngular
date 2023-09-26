@@ -8,6 +8,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
+import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -32,6 +33,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   invSellado : any = []; //Variable que guardará el inventario de las sellado
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
+  invProductosTerminados : any = []; //Variable que guardará el inventario de los productos terminados
+  invPT : any = []; //Variable que guardará el inventario de los productos terminados
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
   @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
@@ -40,18 +43,21 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   @ViewChild('dtSella') dtSella: Table | undefined; //Tabla que representa el inventario de sellado
   @ViewChild('dtMatPrima') dtMatPrima: Table | undefined; //Tabla que representa el inventario de materias primas
   @ViewChild('dtReciclados') dtReciclados: Table | undefined; //Tabla que representa el inventario de reciclados
+  @ViewChild('dtPT') dtPT: Table | undefined; //Tabla que representa el inventario de productos terminados 
 
 
   constructor(private AppComponent : AppComponent, 
               private svcInvAreas : Inventario_AreasService,
                 private msj : MensajesAplicacionService, 
-                  private svcMatPrimas : MateriaPrimaService) {
+                  private svcMatPrimas : MateriaPrimaService, 
+                    private invZeus : ModalGenerarInventarioZeusComponent) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.consultarInventario();
     this.inventarioMateriasPrimas();
+    this.inventarioProductosTerminados();
   }
 
   verTutorial(){}
@@ -94,6 +100,29 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     });
   }
 
+  //Función que mostrará el inventario de productos terminados en la tabla. 
+  inventarioProductosTerminados() {
+    this.invZeus.invetarioProductos();
+    setTimeout(() => { 
+      this.invProductosTerminados = this.invZeus.ArrayProductoZeus; 
+      setTimeout(() => { 
+        this.invProductosTerminados.forEach(x => {
+          let info : any = {
+            'fecha_Inventario' : this.today,
+            'ot' :  '',
+            'item' : x.Id,
+            'referencia' : x.Nombre,
+            'stock' : x.Cantidad,
+            'precio' : x.Precio, 
+            'subtotal' : x.Cantidad * x.Precio,
+          }
+          this.invPT.push(info);
+          console.log(this.invPT);
+        }) 
+      }, 5000);
+    }, 8000);
+  }
+
   //Funciones que calcularán el total de cada inventario.
   calcularTotalExtrusion = () => this.invExtrusion.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
@@ -109,6 +138,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   calcularTotalReciclados = () => this.invReciclados.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
+  calcularTotalPT = () => this.invProductosTerminados.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
   //Funciones que permitiran realizar filtros en la tabla.
   aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
@@ -123,6 +154,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   aplicarfiltroMatPrima = ($event, campo : any, valorCampo : string) => this.dtMatPrima!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   aplicarfiltroReciclado = ($event, campo : any, valorCampo : string) => this.dtReciclados!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroPT = ($event, campo : any, valorCampo : string) => this.dtPT!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   exportarExcel(){
     this.load = true;
