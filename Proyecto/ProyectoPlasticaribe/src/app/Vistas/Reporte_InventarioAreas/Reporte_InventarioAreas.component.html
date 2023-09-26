@@ -57,7 +57,7 @@
     <p-tabPanel
       header="Extrusión"
       leftIcon="pi pi-tags"
-      tooltip="Información de los rollos actuales de la bódega de extrusión">
+      tooltip="Información de los rollos actuales en la bodega de extrusión">
       <p-table
       #dtExt
       [resizableColumns]="true"
@@ -84,10 +84,10 @@
           <th>#</th>
           <th scope="col">Fecha Ingreso</th>
           <th scope="col">OT</th>
-          <th scope="col">Id</th>
+          <th scope="col">Item</th>
           <th scope="col">Referencia</th>
           <th scope="col">Cantidad (Kg)</th>
-          <th scope="col">Precio</th>
+          <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
       </ng-template>
@@ -143,10 +143,10 @@
           <th>#</th>
           <th scope="col">Fecha Ingreso</th>
           <th scope="col">OT</th>
-          <th scope="col">Id</th>
+          <th scope="col">Id Material</th>
           <th scope="col">Referencia</th>
           <th scope="col">Cantidad (Kg)</th>
-          <th scope="col">Precio</th>
+          <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
       </ng-template>
@@ -175,7 +175,7 @@
     <p-tabPanel
       header="Impresión"
       leftIcon="pi pi-tags"
-      tooltip="Información del inventario de fin de mes de Impresión">
+      tooltip="Información del inventario de Impresión">
       <p-table
       #dtImp
       [resizableColumns]="true"
@@ -202,10 +202,10 @@
           <th>#</th>
           <th scope="col">Fecha Ingreso</th>
           <th scope="col">OT</th>
-          <th scope="col">Id</th>
+          <th scope="col">Item</th>
           <th scope="col">Referencia</th>
           <th scope="col">Cantidad (Kg)</th>
-          <th scope="col">Precio</th>
+          <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
       </ng-template>
@@ -234,7 +234,7 @@
     <p-tabPanel
       header="Rotograbado"
       leftIcon="pi pi-tags"
-      tooltip="Información del inventario de fin de mes de Rotograbado">
+      tooltip="Información del inventario de Rotograbado">
       <p-table
       #dtRot
       [resizableColumns]="true"
@@ -261,10 +261,10 @@
           <th>#</th>
           <th scope="col">Fecha Ingreso</th>
           <th scope="col">OT</th>
-          <th scope="col">Id</th>
+          <th scope="col">Item</th>
           <th scope="col">Referencia</th>
           <th scope="col">Cantidad (Kg)</th>
-          <th scope="col">Precio</th>
+          <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
       </ng-template>
@@ -293,7 +293,7 @@
     <p-tabPanel
       header="Sellado"
       leftIcon="pi pi-tags"
-      tooltip="Información del inventario de fin de mes de Sellado">
+      tooltip="Información del inventario de Sellado">
       <p-table
       #dtSella
       [resizableColumns]="true"
@@ -320,7 +320,7 @@
           <th>#</th>
           <th scope="col">Fecha Ingreso</th>
           <th scope="col">OT</th>
-          <th scope="col">Id</th>
+          <th scope="col">Item</th>
           <th scope="col">Referencia</th>
           <th scope="col">Cantidad (Kg)</th>
           <th scope="col">Precio (Kg)</th>
@@ -352,7 +352,7 @@
     <p-tabPanel
       header="Materias Primas"
       leftIcon="pi pi-tags"
-      tooltip="Información del inventario de fin de mes de Materias Primas">
+      tooltip="Información del inventario de Materias Primas">
       <p-table
       #dtMatPrima
       [resizableColumns]="true"
@@ -384,7 +384,7 @@
           <th scope="col">OT</th>
           <th scope="col">Id</th>
           <th scope="col">Referencia</th>
-          <th scope="col">Cantidad (Kg)</th>
+          <th scope="col">Stock (Kg)</th>
           <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
@@ -414,7 +414,7 @@
     <p-tabPanel
       header="Reciclados"
       leftIcon="pi pi-tags"
-      tooltip="Información del inventario de fin de mes de Reciclados">
+      tooltip="Información del inventario de  Reciclados">
       <p-table
       #dtReciclados
       [resizableColumns]="true"
@@ -446,7 +446,7 @@
           <th scope="col">OT</th>
           <th scope="col">Id</th>
           <th scope="col">Referencia</th>
-          <th scope="col">Cantidad (Kg)</th>
+          <th scope="col">Stock (Kg)</th>
           <th scope="col">Precio (Kg)</th>
           <th scope="col">Subtotal</th>
         </tr>
@@ -471,5 +471,7 @@
       </ng-template>
       </p-table>
     </p-tabPanel>
+
+    <!--Despacho-->
   </p-tabView>  
 </p-card>
