@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { Inventario_AreasService } from 'src/app/Servicios/Inventario_Areas/Inventario_Areas.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
@@ -21,37 +22,56 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   load : boolean = false;
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   rangoFechas : any = []; //Variable que guardará el rango de fechas seleccionado por el usuario
-  inventario : any = []; //Variable que guardará el inventario de las areas
+  invMatPrimas : any = []; //Variable que guardará el inventario de las areas.
+  invReciclados : any = []; //Variable que guardará el inventario de las areas
   invExtrusion : any = []; //Variable que guardará el inventario de las extrusiones
   invRotograbado : any = []; //Variable que guardará el inventario de las rotograbado
   invSellado : any = []; //Variable que guardará el inventario de las sellado
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
-  totalExtrusion : number = 0; //Variable que guardará el inventario de las extrusiones
-  totalRotograbado : number = 0; //Variable que guardará el inventario de las rotograbado
-  totalSellado : number = 0; //Variable que guardará el inventario de las sellado
-  totalImpresion : number = 0; //Variable que guardará el inventario de las impresion
-  totalMateriales : number = 0; //Variable que guardará el inventario de los materiales
-  @ViewChild('dt1') dt1: Table | undefined;
+  
+  @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
+  @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
+  @ViewChild('dtImp') dtImp: Table | undefined; //Tabla que representa el inventario de impresion
+  @ViewChild('dtRot') dtRot: Table | undefined; //Tabla que representa el inventario de rotograbado
+  @ViewChild('dtSella') dtSella: Table | undefined; //Tabla que representa el inventario de sellado
+  @ViewChild('dtMatPrima') dtMatPrima: Table | undefined; //Tabla que representa el inventario de materias primas
+  @ViewChild('dtReciclados') dtReciclados: Table | undefined; //Tabla que representa el inventario de reciclados
+
 
   constructor(private AppComponent : AppComponent, 
               private svcInvAreas : Inventario_AreasService,
-                private msj : MensajesAplicacionService) {
+                private msj : MensajesAplicacionService, 
+                  private svcMatPrimas : MateriaPrimaService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.consultarInventario();
-    this.calcularTotalExtrusion
+    this.inventarioMateriasPrimas();
+    setTimeout(() => {
+      this.calcularTotalExtrusion();
+      this.calcularTotalMateriales();
+      this.calcularTotalImpresion();
+      this.calcularTotalRotograbado();
+      this.calcularTotalSellado();
+      this.calcularTotalMatPrimas();
+      this.calcularTotalReciclados();
+    }, 2500);
+    
   }
 
   verTutorial(){}
 
+  //Función que consultará el inventario de todas las areas y lo mostrará en la tabla. 
   consultarInventario(){
+    let fecha1 : any;
+    let fecha2 : any;
+    console.log(this.rangoFechas);
+
     this.svcInvAreas.GetPorFecha(`2023-09-01`, `2023-09-15`).subscribe(data => {
       if(data.length > 0) {
         data.forEach(x => {
-          this.inventario.push(x);
           if(x.id_Area == `EXT` && x.esMaterial == false) this.invExtrusion.push(x);
           if(x.id_Area == `EXT` && x.esMaterial == true) this.invMateriales.push(x);
           if(x.id_Area == `ROT`) this.invRotograbado.push(x);
@@ -62,7 +82,53 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     });
   }
 
-  calcularTotalExtrusion () {this.invExtrusion.reduce((acum, valor) => acum + valor.subtotal); } 
+  //Función que mostrará el inventario de materias primas y reciclados en la tabla. 
+  inventarioMateriasPrimas() {
+    this.svcMatPrimas.srvObtenerLista().subscribe(data => {
+      if(data.length > 0) {
+        data.forEach(x => {
+          let info : any = {
+            'fecha_Inventario' : this.today,
+            'ot' :  '',
+            'item' : x.matPri_Id,
+            'referencia' : x.matPri_Nombre,
+            'stock' : x.matPri_Stock,
+            'precio' : x.matPri_Precio, 
+            'subtotal' : x.matPri_Stock * x.matPri_Precio,
+          }
+          x.catMP_Id == 10 ? this.invReciclados.push(info) : this.invMatPrimas.push(info);
+        });
+      } 
+    });
+  }
 
-  aplicarfiltro1 = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  //Funciones que calcularán el total de cada inventario.
+  calcularTotalExtrusion = () => this.invExtrusion.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalRotograbado = () => this.invRotograbado.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalSellado = () => this.invSellado.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalImpresion = () => this.invImpresion.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalMateriales = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalMatPrimas = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalReciclados = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  //Funciones que permitiran realizar filtros en la tabla.
+  aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroMat = ($event, campo : any, valorCampo : string) => this.dtMat!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroImp = ($event, campo : any, valorCampo : string) => this.dtImp!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  
+  aplicarfiltroRot = ($event, campo : any, valorCampo : string) => this.dtRot!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroSella = ($event, campo : any, valorCampo : string) => this.dtSella!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroMatPrima = ($event, campo : any, valorCampo : string) => this.dtMatPrima!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroReciclado = ($event, campo : any, valorCampo : string) => this.dtReciclados!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 }
