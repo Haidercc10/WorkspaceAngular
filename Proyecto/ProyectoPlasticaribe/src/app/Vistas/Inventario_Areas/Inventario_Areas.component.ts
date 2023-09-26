@@ -15,7 +15,7 @@ import { Workbook } from 'exceljs';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 
 @Component({
@@ -85,8 +85,13 @@ export class Inventario_AreasComponent implements OnInit {
   }
 
   cargarLabels(url : any) {
-    if(url == this.urlMateriales) { this.labels = [`Id`, `Materia Prima`]; this.subtitulo = `Consultar Materiales en Proceso`; } 
-    else if(url == this.urlItems) {this.labels = [`Item`, `Referencia`]; this.subtitulo = `Consultar OT/Referencia`; } 
+    if(url == this.urlMateriales) {
+      this.labels = [`Id`, `Materia Prima`];
+      this.subtitulo = `Consultar Materiales en Proceso`;
+    } else if(url == this.urlItems) {
+      this.labels = [`Item`, `Referencia`]; 
+      this.subtitulo = `Consultar OT/Referencia`;
+    } 
 
     this.ValidarRol == 1 && url == this.urlMateriales ? this.nroFilas = 10 : 
     this.ValidarRol == 1 && url == this.urlItems ? this.nroFilas = 8 :
@@ -105,11 +110,22 @@ export class Inventario_AreasComponent implements OnInit {
 
   //Función que cargará el area del usuario logueado
   filtrarArea(){
-    if(this.ValidarRol == 3 || this.ValidarRol ==  7) { this.area = "EXT"; this.titulo = `Inventario Extrusión`; } 
-    else if (this.ValidarRol == 8) { this.area = "SELLA"; this.titulo = `Inventario Sellado`; }
-    else if (this.ValidarRol == 63) { this.area = "ROT"; this.titulo = `Inventario Rotograbado`; }
-    else if (this.ValidarRol == 62) {this.area = "IMP"; this.titulo = `Inventario Impresión`; }  
-    else { this.area = null; this.titulo = `Inventarios Areas`; } 
+    if (this.ValidarRol == 3 || this.ValidarRol ==  7) {
+      this.area = "EXT";
+      this.titulo = `Inventario Extrusión`;
+    } else if (this.ValidarRol == 8) { 
+      this.area = "EXT";
+      this.titulo = `Inventario Extrusión`;
+    } else if (this.ValidarRol == 63) { 
+      this.area = "ROT";
+      this.titulo = `Inventario Rotograbado`;
+    } else if (this.ValidarRol == 62) {
+      this.area = "IMP";
+      this.titulo = `Inventario Impresión`;
+    } else {
+      this.area = null;
+      this.titulo = `Inventarios Areas`;
+    } 
   }
 
   //Función que cargará la información de las materias primas
@@ -125,26 +141,25 @@ export class Inventario_AreasComponent implements OnInit {
         proceso = this.procesos.filter(x => x.proceso_Id == this.area);
         this.formulario.patchValue({ proceso : proceso[0].proceso_Id });
       }
-    }, error => { this.svcMsjs.mensajeError(`Error`, `Error al cargar las areas`) }); 
+    }, () => this.svcMsjs.mensajeError(`Error`, `Error al cargar las areas`)); 
   }
 
   //Función que consultará la OT y cargará item, referencia y precio de dicha orden
   consultarOT(){
     let fecha : any = this.formulario.value.fecha;
     let ot : number = this.formulario.value.ot;
-    if(fecha == null) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Fecha de Inventario"!`);
+    if (fecha == null) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "Fecha de Inventario"!`);
     else {
       if(ot != null) {
         this.load = true;
-        //fecha = moment(fecha).format('YYYY-MM-DD');
         this.svcBagPro.srvObtenerListaClienteOT_Item(this.formulario.value.ot).subscribe(data => { 
-          if(data.length > 0) this.cargarCampos(data[0]);  
+          if (data.length > 0) this.cargarCampos(data[0]);  
           else {
             this.load = false;
             this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
             this.limpiarCampos();
           }
-        }, error => { this.load = false; });
+        }, () => this.load = false);
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar el campo "OT"!`); 
     } 
   }
@@ -169,9 +184,8 @@ export class Inventario_AreasComponent implements OnInit {
     let ot : any = this.formulario.value.ot == null || this.formulario.value.ot == '' ? 0 : this.formulario.value.ot;
     if(this.formulario.valid) {
       if(cantidad > 0) {
-        if(proceso != null) {
-          this.cargarTabla(ot, id, cantidad, precio, proceso);
-        } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso válido!`);
+        if(proceso != null) this.cargarTabla(ot, id, cantidad, precio, proceso);
+        else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso válido!`);
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad no puede ser 0.00, por favor verifique!`);
     } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar los campos vacíos!`);
   }
@@ -196,7 +210,7 @@ export class Inventario_AreasComponent implements OnInit {
       'InvObservacion': this.formulario.value.observacion == null ? '' : this.formulario.value.observacion,
     };
     if(this.url == this.urlItems) {
-      if(!this.ordenes_trabajos.includes(info.OT)) {
+      if (!this.ordenes_trabajos.includes(info.OT)) {
         this.ordenes_trabajos.push(info.OT);
         this.inventario.push(info);
         this.limpiarCampos();
@@ -204,7 +218,7 @@ export class Inventario_AreasComponent implements OnInit {
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${info.OT} ya existe en la tabla!`);
 
     } else if (this.url == this.urlMateriales) {
-      if(!this.polietilenos.includes(info.MatPri_Id)) {
+      if (!this.polietilenos.includes(info.MatPri_Id)) {
         this.polietilenos.push(info.MatPri_Id);
         this.inventario.push(info);
         this.limpiarCampos();
@@ -214,13 +228,7 @@ export class Inventario_AreasComponent implements OnInit {
   }
 
   //Función que calcula el precio total de las referencias de la tabla
-  precioTotal(){
-    let total : number = 0;
-    for (const item of this.inventario) {
-      total += item.InvPrecio * item.InvStock;
-    } 
-    return total;  
-  }
+  precioTotal = () : number => this.inventario.reduce((a,b) => a + (b.InvPrecio * b.InvStock), 0);
 
   //Función que mostrará el mensaje de elección de eliminación de un registro de la tabla
   mostrarEleccion(data : any){
@@ -243,14 +251,8 @@ export class Inventario_AreasComponent implements OnInit {
 
   //Función que limpiará los campos del formulario
   limpiarCampos(){
-    this.formulario.patchValue({
-      ot : null,
-      item : null,
-      referencia : null,
-      cantidad : 0,
-      precio : null,
-      observacion : null,
-    });
+    this.formulario.reset();
+    this.formulario.patchValue({ cantidad : 0, });
   }  
 
   //Función que creará la entrada de inventario en la base de datos
@@ -262,7 +264,7 @@ export class Inventario_AreasComponent implements OnInit {
       x.InvHora_Registro = this.hora;
       x.InvCodigo = 0;
       delete x.Subtotal, x.Referencia;
-      this.svcInventario.Post(x).subscribe(data => { esError = false }, error => { esError = true });
+      this.svcInventario.Post(x).subscribe(() => esError = false, () => esError = true);
     });
     setTimeout(() => {
       this.load = false;
@@ -273,18 +275,8 @@ export class Inventario_AreasComponent implements OnInit {
 
   //Función que limpiará todos los campos del formulario y la tabla
   limpiarTodo() {
-    if(this.ValidarRol == 1) this.formulario.reset();
-    else {
-      this.formulario.patchValue({
-        fecha : null,
-        ot : null,
-        item : null,
-        referencia : null,
-        cantidad : 0,
-        precio : null,
-        observacion : null,
-      });
-    }
+    if (this.ValidarRol == 1) this.formulario.reset();
+    else this.limpiarCampos();
     this.arrayReferencias = [];
     this.inventario = [];
     this.ordenes_trabajos = [];
@@ -311,7 +303,10 @@ export class Inventario_AreasComponent implements OnInit {
           if(data.length != null) this.formulario.patchValue({ item : data[0].clienteItems, referencia : data[0].clienteItemsNom, precio : data[0].datosValorKg != null || data[0].datosValorKg == '' ? data[0].datosValorKg : 0, cantidad : 0 });
           else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El item ${item} no existe!`);
           this.load = false;
-        }, error => { this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el item ${item}!`); this.load = false; });
+        }, () => {
+          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el item ${item}!`);
+          this.load = false;
+        });
       }
     } else if(this.url == this.urlMateriales) {
       if(item != null) {
@@ -320,7 +315,10 @@ export class Inventario_AreasComponent implements OnInit {
           if(typeof(data) == 'object') this.formulario.patchValue({ item : data.matPri_Id, referencia : data.matPri_Nombre, precio : data.matPri_Precio != null || data.matPri_Precio == '' ? data.matPri_Precio : 0, cantidad : 0 });
           else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El Id de material ${item} no existe!`);
           this.load = false;
-        }, error => { this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el Id de material ${item}!`); this.load = false; });
+        }, () => {
+          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el Id de material ${item}!`);
+          this.load = false;
+        });
       }
     }
   }
@@ -336,7 +334,7 @@ export class Inventario_AreasComponent implements OnInit {
       this.formulario.patchValue({ item : ref[0].item, referencia : ref[0].referencia, precio : ref[0].precioKg != null ? ref[0].precioKg : 0, cantidad : 0});  
     }
   }
- 
+
   //Función que exportará a excel el reporte de inventario de áreas
   exportarExcel(){
     if (this.inventario.length == 0) this.svcMsjs.mensajeAdvertencia(`Advertencia`, 'Debe cargar al menos una registro en la tabla.');
@@ -360,7 +358,7 @@ export class Inventario_AreasComponent implements OnInit {
         worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, }
           cell.font = { name: 'Calibri', family: 4, size: 12, bold: true }
