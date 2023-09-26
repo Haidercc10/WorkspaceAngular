@@ -102,14 +102,14 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       let fechaFin : any = this.FormFiltros.value.RangoFechas[1] == null ? fechaInicio : moment(this.FormFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       if (material != null) {
         this.informeConsumos.consultar(fechaInicio, fechaFin, material, this.FormFiltros.value.NombreMaterial, producto);
-        this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material, producto).subscribe(data => this.salidasRealizadas = data);
         this.cargando = true;
         this.comprasRealizadas = [];
         this.salidasRealizadas = [];
-          this.movEntradasService.GetComprasRealizadas(fechaInicio, fechaFin, material).subscribe(data => data.forEach(compra => this.llenarTablaComprasRealizadas(compra)), () => {
-            this.msg.mensajeError('No se encontró información');
-            this.cargando = false;
-          }, () => this.cargando = false);
+        this.salidasMaterialService.GetSalidasRealizadas(fechaInicio, fechaFin, material, producto).subscribe(data => this.salidasRealizadas = data);
+        this.movEntradasService.GetComprasRealizadas(fechaInicio, fechaFin, material).subscribe(data => data.forEach(compra => this.llenarTablaComprasRealizadas(compra)), () => {
+          this.msg.mensajeError('No se encontró información');
+          this.cargando = false;
+        }, () => this.cargando = false);
       } else this.msg.mensajeAdvertencia(`¡Debe seleccionar el material al que se le calcularán los costos!`);
     } else this.msg.mensajeAdvertencia(`¡Debe seleccionar un rango de fechas para consultar la información!`);
   }
