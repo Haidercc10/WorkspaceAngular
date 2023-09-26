@@ -113,9 +113,9 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   calcularTotalMateriales = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
-  calcularTotalMatPrimas = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
+  calcularTotalMatPrimas = () => this.invMatPrimas.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
-  calcularTotalReciclados = () => this.invMateriales.reduce((acum, valor) => (acum + valor.subtotal), 0);
+  calcularTotalReciclados = () => this.invReciclados.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
   //Funciones que permitiran realizar filtros en la tabla.
   aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
