@@ -83,6 +83,23 @@ export class MenuLateralComponent implements OnInit {
     this.abrirModalUsuario();
   }
 
+  /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 
+  materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
+  mostrarMenuLateral() {
+    let ruta : any = this.router.url
+    this.display = true;
+    if([8, 4, 63, 62].includes(this.ValidarRol)) {
+      setTimeout(() => {
+        this.categorias.forEach(x => {
+          if([8, 4, 63, 62].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
+        });
+        document.getElementById(`undefined_header`).click();
+        document.getElementById(`undefined_header`).click();
+        this.router.navigate([ruta]);
+      }, 20);
+    }
+  }
+
   lecturaStorage(){
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
@@ -144,7 +161,7 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  cargarOpcionesMenu(){
+  cargarOpcionesMenu(){ 
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
@@ -164,13 +181,12 @@ export class MenuLateralComponent implements OnInit {
           } 
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
+        if(![1, 3, 7, 61].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1); 
       });
     });
-  }
+  }  
 
   actualizarRutas() {
-    
-  
     let info : modelVistasPermisos = {
       Vp_Nombre: '',
       Vp_Icono_Dock: '',

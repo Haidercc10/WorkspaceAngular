@@ -2,7 +2,7 @@
 <nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
   <div class="container-fluid">
     <p>
-      <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="display = true">
+      <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button (click)="mostrarMenuLateral()">
         <b>          
           <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
             <i class="pi pi-list font-size-18 px-2 py-3"></i>
@@ -33,7 +33,7 @@
     <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
   </div>
   <br>
-  <p-panelMenu [model]="categorias"></p-panelMenu>
+  <p-panelMenu [model]="categorias" #panel id="panel"></p-panelMenu>
 </p-sidebar>
 
 <!-- Menú de Configuraciones -->
