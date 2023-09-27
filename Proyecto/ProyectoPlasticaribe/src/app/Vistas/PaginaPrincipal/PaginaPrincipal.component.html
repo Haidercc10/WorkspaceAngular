@@ -98,6 +98,15 @@
         <app-Dashboard_Compras *ngIf="compras"></app-Dashboard_Compras>
       </p-tabPanel>
 
+      <!-- Producción por Áreas -->
+      <p-tabPanel
+        header="Producción Áreas"
+        leftIcon="pi pi-credit-card"
+        tooltip="Información general sobre la producción en cada una de las áreas de la empresa"
+        *ngIf="[1].includes(ValidarRol)">
+        <app-Dashboard_Areas *ngIf="inventarioAreas"></app-Dashboard_Areas>
+      </p-tabPanel>
+
     </p-tabView>
   </div>
 </div>

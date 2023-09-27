@@ -182,6 +182,7 @@ import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/K
 import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
+import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Areas.component';
 
 @NgModule({
   declarations: [
@@ -287,7 +288,8 @@ import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAre
     Kardex_MateriasPrimasComponent,
     Recetas_ProductosComponent, 
     Inventario_AreasComponent,
-    Reporte_InventarioAreasComponent
+    Reporte_InventarioAreasComponent,
+    Dashboard_AreasComponent,
   ],
 
   imports: [
