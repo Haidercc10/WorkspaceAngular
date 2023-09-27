@@ -75,11 +75,7 @@ export class TicketsComponent implements OnInit {
   enviarTickets(){
     if (this.FormTickets.valid) {
       let imagenes : string = '';
-      if (this.archivoSeleccionado != null) {
-        for (let i = 0; i < this.archivoSeleccionado.length; i++) {
-          imagenes += `${this.archivoSeleccionado[i].name}|`;
-        }
-      }
+      if (this.archivoSeleccionado != null) this.archivoSeleccionado.forEach(img => imagenes += `${img.name}|`);
       let info : any = {
         Ticket_Fecha : moment().format('YYYY-MM-DD'),
         Ticket_Hora : moment().format('H:mm:ss'),

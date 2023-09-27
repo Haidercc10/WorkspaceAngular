@@ -181,7 +181,7 @@ import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_Caj
 import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
 import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
-import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Areas.component';
+import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
 
 @NgModule({
   declarations: [
@@ -287,7 +287,7 @@ import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Are
     Kardex_MateriasPrimasComponent,
     Recetas_ProductosComponent, 
     Inventario_AreasComponent,
-    Dashboard_AreasComponent,
+    Reporte_InventarioAreasComponent
   ],
 
   imports: [

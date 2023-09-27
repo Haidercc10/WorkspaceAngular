@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ControlCalidad_SelladoComponent } from './ControlCalidad_Sellado.component';
+import { Reporte_InventarioAreasComponent } from './Reporte_InventarioAreas.component';
 
-describe('ControlCalidad_SelladoComponent', () => {
-  let component: ControlCalidad_SelladoComponent;
-  let fixture: ComponentFixture<ControlCalidad_SelladoComponent>;
+describe('Reporte_InventarioAreasComponent', () => {
+  let component: Reporte_InventarioAreasComponent;
+  let fixture: ComponentFixture<Reporte_InventarioAreasComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ControlCalidad_SelladoComponent ]
+      declarations: [ Reporte_InventarioAreasComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ControlCalidad_SelladoComponent);
+    fixture = TestBed.createComponent(Reporte_InventarioAreasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
