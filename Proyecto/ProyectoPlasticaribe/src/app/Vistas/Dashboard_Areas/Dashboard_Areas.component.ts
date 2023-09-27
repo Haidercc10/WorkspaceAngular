@@ -1,22 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
-import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Dashboard_Areas',
   templateUrl: './Dashboard_Areas.component.html',
   styleUrls: ['./Dashboard_Areas.component.css']
 })
+
 export class Dashboard_AreasComponent implements OnInit {
 
-  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga  
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
@@ -32,11 +30,10 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaWiketiadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   aniosGraficados : number [] = []; //Variable que va a almacenar los años que se han graficado
 
-  constructor(private AppComponent : AppComponent,
-                private shepherdService: ShepherdService,
-                  private paginaPrincial : PaginaPrincipalComponent,
-                    private bagProService : BagproService,
-                      private msj : MensajesAplicacionService,) { }
+  constructor(private shepherdService: ShepherdService,
+                private paginaPrincial : PaginaPrincipalComponent,
+                  private bagProService : BagproService,
+                    private msj : MensajesAplicacionService,) { }
 
   ngOnInit() {
     this.llenarArrayAnos();
@@ -46,10 +43,12 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que iniciará el tutorial
   tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a llenar el array de años
   llenarArrayAnos(){
@@ -142,23 +141,22 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
-      let proceso : string [] = [];
-      let count : number = 0;
+      let proceso : string [] = [], count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
       proceso.forEach(area => {
         let produccion : any = [
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 1).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 2).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 3).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 4).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 5).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 6).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 7).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 8).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 9).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 10).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 11).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 12).reduce((a, b) => Number(a) + Number(b.producido), 0),
+          this.totalMesArea(datos, 1, area),
+          this.totalMesArea(datos, 2, area),
+          this.totalMesArea(datos, 3, area),
+          this.totalMesArea(datos, 4, area),
+          this.totalMesArea(datos, 5, area),
+          this.totalMesArea(datos, 6, area),
+          this.totalMesArea(datos, 7, area),
+          this.totalMesArea(datos, 8, area),
+          this.totalMesArea(datos, 9, area),
+          this.totalMesArea(datos, 10, area),
+          this.totalMesArea(datos, 11, area),
+          this.totalMesArea(datos, 12, area),
         ];
         this.llenarGraficas(produccion, area);
         count++;
@@ -167,6 +165,9 @@ export class Dashboard_AreasComponent implements OnInit {
       this.aniosGraficados.push(this.anioSeleccionado);
     }, () => this.cargando = false);
   }
+
+  // Funcion que va a devolver el total
+  totalMesArea = (datos : any [], mes : number, area : string) => datos.filter(x => x.area == area && x.anio == this.anioSeleccionado && x.mes == mes).reduce((a, b) => a + b.producido, 0);
 
   // Funcion que se encargará de llenar las graficas
   llenarGraficas(data : any [], area : string){

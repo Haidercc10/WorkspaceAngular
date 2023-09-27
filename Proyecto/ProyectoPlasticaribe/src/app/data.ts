@@ -11496,6 +11496,205 @@ export const stepsDashboardCompras : Step.StepOptions[] = [
   },
 ];
 
+export const stepsDashboarsAreas : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Áreas!</h4>',
+    text: `<p>¡En este dashboard <b>podemos ver los datos de las cantidades producidas por cada una de las áreas</b> de la empresa!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar año!</h4>',
+    text: `<p>¡Si queremos cambiar o graficar un año diferente podemos hacerlo desde aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#seleccionarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar año!</h4>',
+    text: `<p>¡Si queremos cambiar el año <b>podemos desplegar esta lista y seleccionar el año que queramos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesGraficado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesGraficado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Botones de Graficado!</h4>',
+    text: `<p>¡Luego de haber seleccionado un año <b>podemos presionar el botón rojo para ver los datos de la grafica</b>!</p>
+    <p>¡Tambien <b>podemos limpiar todos los datos de la grafica</b> y volver a graficar desde aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#extrusion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'extrusion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Extrusión!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de extrusión</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#impresion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'impresion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Impresión!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de impresión</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rotograbado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rotograbado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rotograbado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de rotograbado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#doblado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'doblado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Doblado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de doblado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#laminado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'laminado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Laminado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de laminado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#corte',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'corte',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Corte!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de corte</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#empaque',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'empaque',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Empaque!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de empaque</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#sellado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'sellado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Sellado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de sellado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#wiketiado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'wiketiado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Wiketiado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de wiketiado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+];
+
 /******************************************************************** CERTIFICADOS DE CALIDAD **********************************************************************/
 export const CertificadoCalidad : Step.StepOptions [] = [
   {
