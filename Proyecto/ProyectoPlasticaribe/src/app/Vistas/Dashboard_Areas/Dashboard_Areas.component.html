@@ -1,0 +1,172 @@
+<div class="fondo">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <!-- Toolbar con Años a escoger -->
+  <div class="row">
+    <div class="col-12">
+      <div class="toolbar m-auto">
+        <p-toolbar id="cambiarAnio">
+          <div class="row g-2 mb-4 justify-content-center align-middle">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 col-xxl-4 m-auto">
+              <h5>¡Elige el año que deseas graficar!</h5>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-8 col-xxl-8">
+              <div class="row m-auto justify-content-center">
+                <div class="p-2 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="seleccionarAnio">
+                  <p-dropdown class="m-auto" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 m-auto" id="botonesGraficado">
+                  <button pButton pTooltip="Graficar" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger mr-2" (click)="validarConsulta()"></button>
+                  <button pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary mr-2" (click)="inicializarGraficas()"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-toolbar>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graficas -->
+  <div class="row g-2">
+    <!-- EXTRUSIÓN -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> EXTRUSIÓN</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaExtrusionProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaExtrusionProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- IMPRESIÓN -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> IMPRESIÓN</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaImpresionProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaImpresionProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- ROGTOGRABADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> ROGTOGRABADO</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaRotograbadoProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaRotograbadoProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- DOBLADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> DOBLADO</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaDobladoProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaDobladoProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- LAMINADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> LAMINADO</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaLaminadoProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaLaminadoProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- CORTE -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> CORTE</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCorteProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaCorteProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- EMPAQUE -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> EMPAQUE</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaEmpaqueProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaEmpaqueProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- SELLADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> SELLADO</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaSelladoProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaSelladoProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+    
+    <!-- WIKETIADO -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+      <p-card>
+        <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> WIKETIADO</h2>
+        <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaWiketiadoProducido" [options]="opcionesGrafica"></p-chart>
+        <p-toolbar *ngIf="!cargando">
+          <div class="row p-2">
+            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaWiketiadoProducido, item) | number : '1.2-2'}}</b></h5>
+            </div>
+          </div>
+        </p-toolbar>
+      </p-card>
+    </div>
+  </div>
+
+</div>
