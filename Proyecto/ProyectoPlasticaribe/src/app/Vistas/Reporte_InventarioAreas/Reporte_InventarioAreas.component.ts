@@ -82,20 +82,27 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     let fecha2 : any = this.rangoFechas[1] != undefined && this.rangoFechas[1] != null ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : null;
     
     if(fecha1 != null && fecha2 != null) {
-      this.svcInvAreas.GetPorFecha(`2023-09-01`, `2023-09-15`).subscribe(data => {
+      this.svcInvAreas.GetPorFecha(fecha1, fecha2).subscribe(data => {
         if(data.length > 0) {
           this.load = true;
           data.forEach(x => {
-            if(x.id_Area == `EXT` && x.esMaterial == false) this.invExtrusion.push(x);
-            if(x.id_Area == `EXT` && x.esMaterial == true) this.invMateriales.push(x);
-            if(x.id_Area == `ROT`) this.invRotograbado.push(x);
-            if(x.id_Area == `SELLA`) this.invSellado.push(x);
-            if(x.id_Area == `IMP`) this.invImpresion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial == false && [1, 3, 7, 61].includes(this.ValidarRol)) this.invExtrusion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial == true && [1, 3, 7, 61].includes(this.ValidarRol)) this.invMateriales.push(x);
+            if(x.id_Area == `ROT` && [1, 63, 61].includes(this.ValidarRol)) this.invRotograbado.push(x);
+            if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
+            if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
-        } 
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas();
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
+          else setTimeout(() => { this.load = false; }, 500); 
+        } else {
+          this.load = true;
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas();
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
+          else setTimeout(() => { this.load = false; }, 500); 
+        }
       });
-      this.inventarioMateriasPrimas();
-      this.inventarioProductosTerminados();
+      
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `Debe seleccionar un rango de fechas válido!`);
   }
 
