@@ -197,19 +197,6 @@ export class MenuLateralComponent implements OnInit {
     }
   }
 
-  actualizarRutas() {
-    
-  
-    let info : modelVistasPermisos = {
-      Vp_Nombre: '',
-      Vp_Icono_Dock: '',
-      Vp_Icono_Menu: '',
-      Vp_Ruta: '',
-      Vp_Categoria: '',
-      Vp_Id_Roles: ''
-    }
-  }
-
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
   abrirModalUsuario(){
