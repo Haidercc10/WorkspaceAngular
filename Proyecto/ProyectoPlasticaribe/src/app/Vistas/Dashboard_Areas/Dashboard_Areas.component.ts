@@ -30,6 +30,16 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaWiketiadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   aniosGraficados : number [] = []; //Variable que va a almacenar los años que se han graficado
 
+  totalAnios_Extrusion : any [] = []; 
+  totalAnios_Impresion : any [] = [];
+  totalAnios_Rotograbado : any [] = [];
+  totalAnios_Doblado : any [] = [];
+  totalAnios_Laminado : any [] = [];
+  totalAnios_Corte : any [] = [];
+  totalAnios_Empaque : any [] = [];
+  totalAnios_Sellado : any [] = [];
+  totalAnios_Wiketiado : any [] = [];
+
   constructor(private shepherdService: ShepherdService,
                 private paginaPrincial : PaginaPrincipalComponent,
                   private bagProService : BagproService,
@@ -62,6 +72,7 @@ export class Dashboard_AreasComponent implements OnInit {
   // Funcion que va a inicializar las variables con la información de las graficas
   inicializarGraficas(){
     this.aniosGraficados = [];
+    this.colocarTotalesProduccion();
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -141,6 +152,7 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
+      this.aniosGraficados.push(this.anioSeleccionado);
       let proceso : string [] = [], count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
       proceso.forEach(area => {
@@ -160,9 +172,11 @@ export class Dashboard_AreasComponent implements OnInit {
         ];
         this.llenarGraficas(produccion, area);
         count++;
-        if (count == proceso.length) setTimeout(() => this.cargando = false, 100);
+        if (count == proceso.length) {
+          this.colocarTotalesProduccion();
+          setTimeout(() => this.cargando = false, 100);
+        }
       });
-      this.aniosGraficados.push(this.anioSeleccionado);
     }, () => this.cargando = false);
   }
 
@@ -193,6 +207,37 @@ export class Dashboard_AreasComponent implements OnInit {
     else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.graficaEmpaqueProducido.datasets.push(info);
     else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.graficaSelladoProducido.datasets.push(info);
     else if (['Wiketiado'].includes(area)) this.graficaWiketiadoProducido.datasets.push(info);
+  }
+
+  // Funcion que va a colocar los totales de producción de cada area en cada año
+  colocarTotalesProduccion(){
+    this.totalAnios_Extrusion = [];
+    this.totalAnios_Impresion = [];
+    this.totalAnios_Rotograbado = [];
+    this.totalAnios_Doblado = [];
+    this.totalAnios_Laminado = [];
+    this.totalAnios_Corte = [];
+    this.totalAnios_Empaque = [];
+    this.totalAnios_Sellado = [];
+    this.totalAnios_Wiketiado = [];
+    const formato = (data : any [], anio : number) : any  => {
+      let resultado = {
+        Anio : anio,
+        Kg : this.calcularKgProducidos(data, anio)
+      }
+      return resultado;
+    }
+    this.aniosGraficados.forEach(anio => {
+      this.totalAnios_Extrusion.push(formato(this.graficaExtrusionProducido, anio));
+      this.totalAnios_Impresion.push(formato(this.graficaImpresionProducido, anio));
+      this.totalAnios_Rotograbado.push(formato(this.graficaRotograbadoProducido, anio));
+      this.totalAnios_Doblado.push(formato(this.graficaDobladoProducido, anio));
+      this.totalAnios_Laminado.push(formato(this.graficaLaminadoProducido, anio));
+      this.totalAnios_Corte.push(formato(this.graficaCorteProducido, anio));
+      this.totalAnios_Empaque.push(formato(this.graficaEmpaqueProducido, anio));
+      this.totalAnios_Sellado.push(formato(this.graficaSelladoProducido, anio));
+      this.totalAnios_Wiketiado.push(formato(this.graficaWiketiadoProducido, anio));
+    });
   }
 
   // Funcion que va a calcular el total de kg producidos en total en un año

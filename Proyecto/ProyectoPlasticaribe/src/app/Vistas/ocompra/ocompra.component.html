@@ -4,7 +4,6 @@
   <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
 
-
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -319,7 +318,7 @@
         <div class="col-6" style="margin-right: 5px;">
           <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-warning"></button>
           <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-          <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarinfoOrdenCompra()" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
+          <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarinfoOrdenCompra(ordenCreada)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>

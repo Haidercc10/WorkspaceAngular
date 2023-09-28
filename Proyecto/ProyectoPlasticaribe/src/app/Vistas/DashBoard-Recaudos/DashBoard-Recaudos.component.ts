@@ -18,6 +18,7 @@ import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.com
 export class DashBoardRecaudosComponent implements OnInit {
 
   @ViewChild('dt1') dt1: Table | undefined;
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga  
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -92,6 +93,7 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   // Función que ejecutará las peticiones de la cartera
   consultarCartera(){
+    this.cargando = true;
     let ruta : string = "";
     let cliente : string = this.FormFiltros.value.Cliente;
     let vendedor : string = this.FormFiltros.value.Vendedor;
@@ -109,5 +111,6 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
     this.zeusService.GetCartera(ruta).subscribe(data => this.totalCartera = data, err => this.msj.mensajeError(`${err.error}`));
     this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data);
+    setTimeout(() => this.cargando = false, 5000);
   }
 }
