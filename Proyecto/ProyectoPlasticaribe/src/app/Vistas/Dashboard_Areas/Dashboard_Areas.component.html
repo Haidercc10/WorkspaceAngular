@@ -34,14 +34,14 @@
   <!-- Graficas -->
   <div class="row g-2">
     <!-- EXTRUSIÓN -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="extrusion">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> EXTRUSIÓN</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaExtrusionProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaExtrusionProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaExtrusionProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -49,14 +49,14 @@
     </div>
     
     <!-- IMPRESIÓN -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="impresion">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> IMPRESIÓN</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaImpresionProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaImpresionProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaImpresionProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -64,14 +64,14 @@
     </div>
     
     <!-- ROGTOGRABADO -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="rotograbado">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> ROGTOGRABADO</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaRotograbadoProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaRotograbadoProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaRotograbadoProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -79,14 +79,14 @@
     </div>
     
     <!-- DOBLADO -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="doblado">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> DOBLADO</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaDobladoProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaDobladoProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaDobladoProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -94,14 +94,14 @@
     </div>
     
     <!-- LAMINADO -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="laminado">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> LAMINADO</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaLaminadoProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaLaminadoProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaLaminadoProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -109,14 +109,14 @@
     </div>
     
     <!-- CORTE -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="corte">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> CORTE</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCorteProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaCorteProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaCorteProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -124,14 +124,14 @@
     </div>
     
     <!-- EMPAQUE -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="empaque">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> EMPAQUE</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaEmpaqueProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaEmpaqueProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaEmpaqueProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -139,14 +139,14 @@
     </div>
     
     <!-- SELLADO -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="sellado">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> SELLADO</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaSelladoProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaSelladoProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaSelladoProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
@@ -154,14 +154,14 @@
     </div>
     
     <!-- WIKETIADO -->
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 py-4 px-2" id="wiketiado">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> WIKETIADO</h2>
         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaWiketiadoProducido" [options]="opcionesGrafica"></p-chart>
         <p-toolbar *ngIf="!cargando">
           <div class="row p-2">
             <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of aniosGraficados">
-              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaWiketiadoProducido, item) | number : '1.2-2'}}</b></h5>
+              <h5>Año: {{item}} Total: <b>{{calcularKgProducidos(graficaWiketiadoProducido, item) | number : '1.2-2'}} Kg</b>.</h5>
             </div>
           </div>
         </p-toolbar>
