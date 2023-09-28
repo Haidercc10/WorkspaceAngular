@@ -215,7 +215,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               MpCantidadRetirada : 0,
               MpUnidadMedidaRetirada: datos_materiaPrima[i].undMedida,
               MpStockRetirada: datos_materiaPrima[i].stock,
-              ProcesoRetiro : '',
+              ProcesoRetiro : this.categoriasMP.includes(datos_materiaPrima[i].categoria) ? 'EXT' : 'IMP',
               Categoria : datos_materiaPrima[i].categoria,
             });
           }
@@ -248,13 +248,18 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 Proceso : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
                 Categoria : this.FormMateriaPrimaRetirada.value.Categoria,
                 Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
-                EntradasDisponibles : [],
-                Salidas : [],
+                //EntradasDisponibles : [],
+                //Salidas : [],
               }
-              if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
-              else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
+              if (this.categoriasTintas.includes(categoria)) {
+                info.Id_Tinta = info.Id; 
+                this.FormMateriaPrimaRetirada.patchValue({ ProcesoRetiro : 'IMP' });
+              } else if (this.categoriasMP.includes(categoria)) {
+                info.Id_Mp = info.Id;
+                this.FormMateriaPrimaRetirada.patchValue({ ProcesoRetiro : 'EXT' });
+              }  
               this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
-              this.cargar_Entradas(info);
+              //this.cargar_Entradas(info);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
               setTimeout(() => this.FormMateriaPrimaRetirada.reset(), 500); 
@@ -328,7 +333,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   // Funcion que se encargará de consultar el Id del proceso y hacer el ingreso de las materia primas asignadas
-  obtenerProcesoId(asigncaion : number){
+  obtenerProcesoId(asignacion : number){
     let count : number = 0;
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
       let idMateriaPrima = this.materiasPrimasSeleccionadas[index].Id;
@@ -336,7 +341,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       let presentacionMateriaPrima = this.materiasPrimasSeleccionadas[index].Und_Medida;
       if (this.materiasPrimasSeleccionadas[index].Id_Mp == 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001) {
         const datosDetallesAsignacionTintas : any = {
-          AsigMp_Id : asigncaion,
+          AsigMp_Id : asignacion,
           Tinta_Id : idMateriaPrima,
           DtAsigTinta_Cantidad : cantidadMateriaPrima,
           UndMed_Id : presentacionMateriaPrima,
@@ -349,7 +354,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
       } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
         const datosDetallesAsignacion : any = {
-          AsigMp_Id : asigncaion,
+          AsigMp_Id : asignacion,
           MatPri_Id : idMateriaPrima,
           DtAsigMp_Cantidad : cantidadMateriaPrima,
           UndMed_Id : presentacionMateriaPrima,
@@ -364,8 +369,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }
     setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {        
-        this.actualizar_MovimientosEntradas();
-        this.crear_Salidas(asigncaion);
+        //this.actualizar_MovimientosEntradas();
+        //this.crear_Salidas(asignacion);
+        this.actualizarMovimientosEntradasMP(asignacion);
         setTimeout(() => this.asignacionExitosa(), 2000);
       }
      }, 2000);
@@ -571,7 +577,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Función que colocará la información de las entradas de materia prima en el array de entradas disponibles.
-  cargar_Entradas(info : any){
+  /*cargar_Entradas(info : any){
     let salidaReal : number = 0;
     this.srvMovEntradasMP.GetInventarioxMaterial(info.Id).subscribe(data => {
       if (data.length > 0) {
@@ -674,5 +680,82 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }
       }
     }
+  }*/
+
+  //Función que actualizará las entradas disponibles
+  actualizarMovimientosEntradasMP(idAsignacion : number){
+   let salidaReal : number = 0;
+   this.materiasPrimasSeleccionadas.forEach(mp => {
+    mp.Cantidad2 = mp.Cantidad;
+    this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).subscribe(data => {
+      if (data.length > 0) {
+        data.forEach(mov => {
+          let detalle : modeloMovimientos_Entradas_MP = {
+            'Id': mov.id,
+            'MatPri_Id': mov.matPri_Id,
+            'Tinta_Id': mov.tinta_Id,
+            'Bopp_Id': mov.bopp_Id,
+            'Cantidad_Entrada': mov.cantidad_Entrada,
+            'UndMed_Id': mov.undMed_Id,
+            'Precio_RealUnitario': mov.precio_RealUnitario,
+            'Tipo_Entrada': mov.tipo_Entrada,
+            'Codigo_Entrada': mov.codigo_Entrada,
+            'Estado_Id': mov.estado_Id,
+            'Cantidad_Asignada': mov.cantidad_Asignada,
+            'Cantidad_Disponible': mov.cantidad_Disponible,
+            'Observacion': mov.observacion,
+            'Fecha_Entrada': mov.fecha_Entrada,
+            'Hora_Entrada': mov.hora_Entrada,
+            'Precio_EstandarUnitario': mov.precio_EstandarUnitario
+          } 
+          if(mp.Cantidad2 > 0) {
+            if(mp.Cantidad2 > detalle.Cantidad_Disponible) {
+              salidaReal = detalle.Cantidad_Disponible;
+              mp.Cantidad2 -= detalle.Cantidad_Disponible;
+              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+            } else if(mp.Cantidad2 == detalle.Cantidad_Disponible) {
+              salidaReal = mp.Cantidad2;
+              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+              detalle.Cantidad_Disponible = 0;
+              detalle.Estado_Id = 5;
+              mp.Cantidad2 = 0;
+            } else if(mp.Cantidad2 < detalle.Cantidad_Disponible) {
+              salidaReal = mp.Cantidad2;
+              detalle.Cantidad_Asignada += mp.Cantidad2;
+              detalle.Cantidad_Disponible -= mp.Cantidad2;
+              detalle.Estado_Id = 19;
+              mp.Cantidad2 = 0;
+            }
+            this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+            this.crearRegistrosSalidasMP(detalle, salidaReal, idAsignacion);
+          }
+        })  
+      }
+    });
+   });
+  }
+
+  //Función que guardará las salidas de material
+  crearRegistrosSalidasMP(detalle : any, salidaReal : number, idAsignacion : number) {
+    let salidas : modelEntradas_Salidas_MP = {
+      'Id_Entrada': detalle.Id,
+      'Tipo_Salida': detalle != 84 && detalle.Bopp_Id == 1 && detalle.Tinta_Id == 2001 ? 'ASIGMP' : 'ASIGTINTAS',
+      'Codigo_Salida': idAsignacion,
+      'Tipo_Entrada': detalle.Tipo_Entrada,
+      'Codigo_Entrada': detalle.Codigo_Entrada,
+      'Fecha_Registro': this.today,
+      'Hora_Registro': this.hora,
+      'MatPri_Id': detalle.MatPri_Id,
+      'Tinta_Id': detalle.Tinta_Id,
+      'Bopp_Id': detalle.Bopp_Id,
+      'Cantidad_Salida': salidaReal,
+      'Orden_Trabajo': this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].ot,
+      'Prod_Id': this.infoOrdenTrabajo[0] == undefined ? 1 : this.infoOrdenTrabajo[0].item,
+      'Cant_PedidaOT': this.infoOrdenTrabajo[0] == undefined ? 0 : this.infoOrdenTrabajo[0].cantPedida,
+      'UndMed_Id': this.infoOrdenTrabajo[0] == undefined ? 'Kg' : this.infoOrdenTrabajo[0].und,
+    }
+    this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
   }
 }
