@@ -261,13 +261,10 @@ export class Orden_MaquilaComponent implements OnInit {
               Und_Medida : this.FormMateriaPrima.value.UndMedida,
               Precio : this.FormMateriaPrima.value.PrecioOculto,
               SubTotal : (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto),
-              EntradasDisponibles : [],
-              Salidas : [],
             }
             if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
             else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
             else if (this.categoriasBOPP.includes(categoria)) info.Id_Bopp = info.Id;
-            this.cargar_Entradas(info);
             this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrima.value.Id);
             this.materiasPrimasSeleccionadas.push(info);
             this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
@@ -383,8 +380,7 @@ export class Orden_MaquilaComponent implements OnInit {
     if(!error) {
       this.itemSeleccionado = id;
       this.mostrarEleccion(`pdf`, id, );
-      this.actualizar_MovimientosEntradas();
-      this.crear_Salidas(id);
+      this.actualizarMovimientosEntradasMP(id);
       setTimeout(() => {this.limpiarTodo(); }, 2000);
     }
   }
@@ -856,112 +852,80 @@ export class Orden_MaquilaComponent implements OnInit {
     this.shepherdService.start();
   }
 
-   //Función que colocará la información de las entradas de materia prima en el array de entradas disponibles.
-   cargar_Entradas(info : any){
+  //Función que actualizará las entradas disponibles
+  actualizarMovimientosEntradasMP(idMaquila : number){
     let salidaReal : number = 0;
-    console.log(info.Id)
-    this.srvMovEntradasMP.GetInventarioxMaterial(info.Id).subscribe(data => {
-      if (data.length > 0) {
-        for (let i = 0; i < data.length; i++) {
-          let detalle : modeloMovimientos_Entradas_MP = {
-            Id: data[i].id,
-            MatPri_Id: data[i].matPri_Id,
-            Tinta_Id: data[i].tinta_Id,
-            Bopp_Id: data[i].bopp_Id,
-            Cantidad_Entrada: data[i].cantidad_Entrada,
-            UndMed_Id: data[i].undMed_Id,
-            Precio_RealUnitario: data[i].precio_RealUnitario,
-            Tipo_Entrada: data[i].tipo_Entrada,
-            Codigo_Entrada: data[i].codigo_Entrada,
-            Estado_Id: data[i].estado_Id,
-            Cantidad_Asignada: data[i].cantidad_Asignada,
-            Cantidad_Disponible: data[i].cantidad_Disponible,
-            Observacion: data[i].observacion,
-            Fecha_Entrada: data[i].fecha_Entrada,
-            Hora_Entrada: data[i].hora_Entrada,
-            Precio_EstandarUnitario: data[i].precio_EstandarUnitario
-          } 
-          if(info.Cantidad2 > 0) {
-            if(info.Cantidad2 > detalle.Cantidad_Disponible) {
-              salidaReal = detalle.Cantidad_Disponible;
-              info.Cantidad2 -= detalle.Cantidad_Disponible;
-              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
-              detalle.Cantidad_Disponible = 0;
-              detalle.Estado_Id = 5;
-              console.log(salidaReal)
-            } else if(info.Cantidad2 == detalle.Cantidad_Disponible) {
-              salidaReal = info.Cantidad2;
-              detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
-              detalle.Cantidad_Disponible = 0;
-              detalle.Estado_Id = 5;
-              info.Cantidad2 = 0;
-              console.log(salidaReal)
-            } else if(info.Cantidad2 < detalle.Cantidad_Disponible) {
-              salidaReal = info.Cantidad2;
-              detalle.Cantidad_Asignada += info.Cantidad2;
-              detalle.Cantidad_Disponible -= info.Cantidad2;
-              detalle.Estado_Id = 19;
-              info.Cantidad2 = 0;
-              console.log(salidaReal)
-            }
-            this.cargar_Salidas(detalle, info, salidaReal);
-            info.EntradasDisponibles.push(detalle);
-            console.log(info.EntradasDisponibles)
-          
-          }
-        }
-      }
+    this.materiasPrimasSeleccionadas.forEach(mp => {
+     mp.Cantidad2 = mp.Cantidad;
+     this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).subscribe(data => {
+       if (data.length > 0) {
+         data.forEach(mov => {
+           let detalle : modeloMovimientos_Entradas_MP = {
+             'Id': mov.id,
+             'MatPri_Id': mov.matPri_Id,
+             'Tinta_Id': mov.tinta_Id,
+             'Bopp_Id': mov.bopp_Id,
+             'Cantidad_Entrada': mov.cantidad_Entrada,
+             'UndMed_Id': mov.undMed_Id,
+             'Precio_RealUnitario': mov.precio_RealUnitario,
+             'Tipo_Entrada': mov.tipo_Entrada,
+             'Codigo_Entrada': mov.codigo_Entrada,
+             'Estado_Id': mov.estado_Id,
+             'Cantidad_Asignada': mov.cantidad_Asignada,
+             'Cantidad_Disponible': mov.cantidad_Disponible,
+             'Observacion': mov.observacion,
+             'Fecha_Entrada': mov.fecha_Entrada,
+             'Hora_Entrada': mov.hora_Entrada,
+             'Precio_EstandarUnitario': mov.precio_EstandarUnitario
+           } 
+           if(mp.Cantidad2 > 0) {
+             if(mp.Cantidad2 > detalle.Cantidad_Disponible) {
+               salidaReal = detalle.Cantidad_Disponible;
+               mp.Cantidad2 -= detalle.Cantidad_Disponible;
+               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+               detalle.Cantidad_Disponible = 0;
+               detalle.Estado_Id = 5;
+             } else if(mp.Cantidad2 == detalle.Cantidad_Disponible) {
+               salidaReal = mp.Cantidad2;
+               detalle.Cantidad_Asignada += detalle.Cantidad_Disponible;
+               detalle.Cantidad_Disponible = 0;
+               detalle.Estado_Id = 5;
+               mp.Cantidad2 = 0;
+             } else if(mp.Cantidad2 < detalle.Cantidad_Disponible) {
+               salidaReal = mp.Cantidad2;
+               detalle.Cantidad_Asignada += mp.Cantidad2;
+               detalle.Cantidad_Disponible -= mp.Cantidad2;
+               detalle.Estado_Id = 19;
+               mp.Cantidad2 = 0;
+             }
+             this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+             this.crearRegistrosSalidasMP(detalle, salidaReal, idMaquila);
+           }
+         })  
+       }
+     });
     });
   }
-
-  //Función que colocará la información de la salida de la materia prima en el array de salidas. 
-  cargar_Salidas(detalle : any, info : any, salidaReal : number){
-    let consecutivo : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
-
+ 
+  //Función que guardará las salidas de material
+  crearRegistrosSalidasMP(detalle : any, salidaReal : number, idMaquila : number) {
     let salidas : modelEntradas_Salidas_MP = {
-      Id_Entrada: detalle.Id,
-      Tipo_Salida: 'OM',
-      Codigo_Salida: consecutivo,
-      Tipo_Entrada: detalle.Tipo_Entrada,
-      Codigo_Entrada: detalle.Codigo_Entrada,
-      Fecha_Registro: this.today,
-      Hora_Registro: this.hora,
-      MatPri_Id: detalle.MatPri_Id,
-      Tinta_Id: detalle.Tinta_Id,
-      Bopp_Id: detalle.Bopp_Id,
-      Cantidad_Salida: salidaReal,
-      Orden_Trabajo: 0, 
-      Prod_Id : 1,
-      Cant_PedidaOT: 0,
-      UndMed_Id: 'N/E'
+     'Id_Entrada': detalle.Id,
+     'Tipo_Salida': 'OM',
+     'Codigo_Salida': idMaquila,
+     'Tipo_Entrada': detalle.Tipo_Entrada,
+     'Codigo_Entrada': detalle.Codigo_Entrada,
+     'Fecha_Registro': this.today,
+     'Hora_Registro': this.hora,
+     'MatPri_Id': detalle.MatPri_Id,
+     'Tinta_Id': detalle.Tinta_Id,
+     'Bopp_Id': detalle.Bopp_Id,
+     'Cantidad_Salida': salidaReal,
+     'Orden_Trabajo': 0,
+     'Prod_Id': 1,
+     'Cant_PedidaOT': 0,
+     'UndMed_Id': 'N/E',
     }
-    info.Salidas.push(salidas);
-  }
-
-  //Función que actualizará los movimientos de entrada de las materias primas seleccionadas.
-  actualizar_MovimientosEntradas(){
-    if(this.materiasPrimasSeleccionadas.length > 0) {
-      for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-        for (let i = 0; i < this.materiasPrimasSeleccionadas[index].EntradasDisponibles.length; i++) {
-         this.srvMovEntradasMP.Put(this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i].Id, this.materiasPrimasSeleccionadas[index].EntradasDisponibles[i]).subscribe(data => {}, 
-         error => { this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`); });
-        }
-      }
-    }
-  }
-
-  //Función que creará las salidas de las materias primas seleccionadas.
-  crear_Salidas(id : number){
-    if(this.materiasPrimasSeleccionadas.length > 0) {
-      for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-        for (let i = 0; i < this.materiasPrimasSeleccionadas[index].Salidas.length; i++) {
-          this.materiasPrimasSeleccionadas[index].Salidas[i].Codigo_Salida = id;
-          this.materiasPrimasSeleccionadas[index].Salidas[i].Fecha_Registro = this.today;
-          this.materiasPrimasSeleccionadas[index].Salidas[i].Hora_Registro = this.hora;
-          this.srvMovSalidasMP.Post(this.materiasPrimasSeleccionadas[index].Salidas[i]).subscribe(data => {}, 
-          error => { this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`); });
-        }
-      }
-    }
+    this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
   }
 }
