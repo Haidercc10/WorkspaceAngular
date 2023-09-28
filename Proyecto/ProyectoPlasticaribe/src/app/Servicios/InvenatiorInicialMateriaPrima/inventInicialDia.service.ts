@@ -21,4 +21,6 @@ export class InventInicialDiaService {
   GetCostoInventarioMateriasPrimas = () : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/getCostoInventarioMateriasPrimas`);
 
   GetCostoInventarioBiorientado = (mes : number, anio : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/getCostoInventarioBiorientado/${mes}/${anio}`);
+
+  getMatPrimasInicioMes = (fechaFin : any) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/InventarioInicialXDia_MatPrima/getMatPrimasInicioMes/${fechaFin}`);
 }

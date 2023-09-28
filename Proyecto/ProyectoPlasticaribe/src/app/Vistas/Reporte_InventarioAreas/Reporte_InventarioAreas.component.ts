@@ -9,6 +9,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
+import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -50,7 +51,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
               private svcInvAreas : Inventario_AreasService,
                 private msj : MensajesAplicacionService, 
                   private svcMatPrimas : MateriaPrimaService, 
-                    private invZeus : ModalGenerarInventarioZeusComponent) {
+                    private invZeus : ModalGenerarInventarioZeusComponent, 
+                      private svcInvInicialMP : InventInicialDiaService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -92,12 +94,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
             if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas();
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
           else setTimeout(() => { this.load = false; }, 500); 
         } else {
           this.load = true;
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas();
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
           else setTimeout(() => { this.load = false; }, 500); 
         }
@@ -106,22 +108,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `Debe seleccionar un rango de fechas válido!`);
   }
 
-  //Función que mostrará el inventario de materias primas y reciclados en la tabla. 
-  inventarioMateriasPrimas() {
-    this.svcMatPrimas.srvObtenerLista().subscribe(data => {
+  //Función que mostrará el inventario de materias primas y reciclados en la tabla dependiendo la fecha final ingresada en el rango. 
+  inventarioMateriasPrimas(fechaFin : any) {
+    this.svcInvInicialMP.getMatPrimasInicioMes(fechaFin).subscribe(data => {
       if(data.length > 0) {
-        data.forEach(x => {
-          let info : any = {
-            'fecha_Inventario' : this.today,
-            'ot' :  '',
-            'item' : x.matPri_Id,
-            'referencia' : x.matPri_Nombre,
-            'stock' : x.matPri_Stock,
-            'precio' : x.matPri_Precio, 
-            'subtotal' : x.matPri_Stock * x.matPri_Precio,
-          }
-          x.catMP_Id == 10 ? this.invReciclados.push(info) : this.invMatPrimas.push(info);
-        });
+        this.invMatPrimas = data.filter(mp => mp.idCategoria != 10);
+        this.invReciclados = data.filter(mp => mp.idCategoria == 10);
       } 
     });
   }
