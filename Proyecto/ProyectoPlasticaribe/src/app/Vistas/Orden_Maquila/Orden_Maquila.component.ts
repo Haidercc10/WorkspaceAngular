@@ -1,26 +1,26 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelDetallesOrdenMaquila } from 'src/app/Modelo/modelDetallesOrdenMaquila';
+import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
 import { modelOrdenMaquila } from 'src/app/Modelo/modelOrdenMaquila';
+import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { DetalleOrdenMaquilaService } from 'src/app/Servicios/DetalleOrdenMaquila/DetalleOrdenMaquila.service';
+import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { stepsOrdenMaquila as defaultSteps, defaultStepOptions } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { Movimientos_Entradas_MPService } from 'src/app/Servicios/Movimientos_Entradas_MP/Movimientos_Entradas_MP.service';
-import { Entradas_Salidas_MPService } from 'src/app/Servicios/Entradas_Salidas_MP/Entradas_Salidas_MP.service';
-import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
-import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
+import { AppComponent } from 'src/app/app.component';
+import { defaultStepOptions, stepsOrdenMaquila as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -46,9 +46,6 @@ export class Orden_MaquilaComponent implements OnInit {
   materiaPrima : any [] = []; //Variable que almacenará las materias primas
   unidadesMedida : any [] = []; //Variable que va a almacenar las unidades de medida
   materiasPrimasSeleccionadas : any [] = []; //Variable que almacenará las materias primas que son escogidas para la orden de compra
-  catidadTotalPeso : number = 0; //Variable que almacenará la sumatoria del peso de todas las materia primas seleccionadas
-  cantidadTotalPrecio : number = 0; //Variable que almacenará la sumatoria del precio de todas las materias primas seleccionadas
-  materiasPrimasSeleccionada_ID : any [] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
   categoriasMP : any [] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
   categoriasTintas : any [] = []; //Variable que almcanará las categorias de la tabla Tintas
   categoriasBOPP : any [] = []; //Variable que almcanará las categorias de la tabla BOPP
@@ -71,7 +68,7 @@ export class Orden_MaquilaComponent implements OnInit {
                               private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                                 private messageService: MessageService,
                                   private shepherdService: ShepherdService,
-                                    private mensajeService : MensajesAplicacionService,
+                                    private msj : MensajesAplicacionService,
                                       private srvMovEntradasMP : Movimientos_Entradas_MPService,
                                         private srvMovSalidasMP : Entradas_Salidas_MPService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -119,19 +116,15 @@ export class Orden_MaquilaComponent implements OnInit {
 
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
-    this.ordenMaquilaService.GetUltimoId().subscribe(datos_ordenCompra => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
-    }, () => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : 1, }); });
+    this.ordenMaquilaService.GetUltimoId().subscribe(num => this.FormOrdenMaquila.patchValue({ConsecutivoOrden : num + 1}), () => this.FormOrdenMaquila.patchValue({ConsecutivoOrden : 1}));
   }
 
   // Funcion que limpiará todos los campos de la vista
   limpiarTodo(){
     this.FormMateriaPrima.reset();
     this.FormOrdenMaquila.reset();
-    this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
     this.cargando = false;
-    this.cantidadTotalPrecio = 0;
-    this.catidadTotalPeso = 0;
     this.edidcionOrdenMaquila = false;
     this.generarConsecutivo();
     this.onReject();
@@ -143,15 +136,15 @@ export class Orden_MaquilaComponent implements OnInit {
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias(){
-    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => { this.categoriasMP = datos; });
-    this.tintasService.GetCategoriasTintas().subscribe(datos => { this.categoriasTintas = datos; });
-    this.boppService.GetCategoriasBOPP().subscribe(datos => { this.categoriasBOPP = datos; });
+    this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => this.categoriasMP = datos);
+    this.tintasService.GetCategoriasTintas().subscribe(datos => this.categoriasTintas = datos);
+    this.boppService.GetCategoriasBOPP().subscribe(datos => this.categoriasBOPP = datos);
   }
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarTercero(){
     let nombre : string = this.FormOrdenMaquila.value.Tercero.trim();
-    if (nombre != '') this.terceroService.getTerceroLike(nombre).subscribe(datos_Terceros => { this.terceros = datos_Terceros; });
+    if (nombre != '') this.terceroService.getTerceroLike(nombre).subscribe(data => this.terceros = data);
   }
 
   // Funcion que le va a cambiar el nombre al proveedor
@@ -172,7 +165,7 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   // Funcion que va a consultar las unidades de medida
-  obtenerUnidadesMedida = () => this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => { this.unidadesMedida = datos_undMedida; });
+  obtenerUnidadesMedida = () => this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => this.unidadesMedida = datos_undMedida);
 
   // Funcion que va a buscar la informacion de una orden de maquila creada
   buscarOrdenMaquila(){
@@ -181,11 +174,8 @@ export class Orden_MaquilaComponent implements OnInit {
       if (datos_Orden.length > 0) {
         this.FormMateriaPrima.reset();
         this.FormOrdenMaquila.reset();
-        this.materiasPrimasSeleccionada_ID = [];
         this.materiasPrimasSeleccionadas = [];
         this.cargando = false;
-        this.cantidadTotalPrecio = 0;
-        this.catidadTotalPeso = 0;
         this.edidcionOrdenMaquila = true;
         for (let i = 0; i < datos_Orden.length; i++) {
           this.FormOrdenMaquila.patchValue({
@@ -216,14 +206,17 @@ export class Orden_MaquilaComponent implements OnInit {
             info.Id = info.Id_Bopp;
             info.Nombre = datos_Orden[i].bopp;
           }
-          this.materiasPrimasSeleccionada_ID.push(info.Id);
           this.materiasPrimasSeleccionadas.push(info);
-          this.catidadTotalPeso += datos_Orden[i].cantidad;
-          this.cantidadTotalPrecio += (datos_Orden[i].cantidad * datos_Orden[i].precio);
         }
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
+      } else this.msj.mensajeAdvertencia(`No se ha encontrado la orden de maquila N° ${id}`);
     });
   }
+
+  // 
+  catidadTotalPeso = () => this.materiasPrimasSeleccionadas.reduce((a,b) => a + b.Cantidad, 0);
+
+  // 
+  cantidadTotalPrecio = () => this.materiasPrimasSeleccionadas.reduce((a,b) => a + b.SubTotal, 0)
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
@@ -240,14 +233,14 @@ export class Orden_MaquilaComponent implements OnInit {
           Stock : datos_materiaPrima[i].stock,
         });
       }
-    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
+    }, () => { this.msj.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
   cargarMateriaPrima(){
     let categoria : number = this.FormMateriaPrima.value.Categoria;
     if (this.FormMateriaPrima.valid){
-      if (!this.materiasPrimasSeleccionada_ID.includes(this.FormMateriaPrima.value.Id)) {
+      if (!this.materiasPrimasSeleccionadas.map(x => x.Id).includes(this.FormMateriaPrima.value.Id)) {
         if (this.FormMateriaPrima.value.Cantidad > 0){
           if (this.FormMateriaPrima.value.Cantidad <= this.FormMateriaPrima.value.Stock) {
             let info : any = {
@@ -265,64 +258,39 @@ export class Orden_MaquilaComponent implements OnInit {
             if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
             else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
             else if (this.categoriasBOPP.includes(categoria)) info.Id_Bopp = info.Id;
-            this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrima.value.Id);
             this.materiasPrimasSeleccionadas.push(info);
-            this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
-            this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
-            setTimeout(() => { this.FormMateriaPrima.reset(); }, 1000);
-          } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad a entegar es superior a la cantidad en stock!`);
-        } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+            this.FormMateriaPrima.reset();
+          } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La cantidad a entegar es superior a la cantidad en stock!`);
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
   quitarMateriaPrima(){
     let data = this.itemSeleccionado;
     this.onReject();
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-        this.materiasPrimasSeleccionadas.splice(i, 1);
-        this.catidadTotalPeso -= data.Cantidad;
-        this.cantidadTotalPrecio -= data.SubTotal;
-        for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-          if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-        }
-        this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
-        this.llave = 'pdf';
-      }
-    }
+    this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex(x => x.Id == data.Id), 1);
+    this.msj.mensajeConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
+    this.llave = 'pdf';
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
   eliminarMateriaPrima(){
     let data = this.itemSeleccionado;
     setTimeout(() => {
-      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
-        if (datos_orden.length > 0) {
-          this.onReject();
-          for (let i = 0; i < datos_orden.length; i++) {
-            this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(() => {
-              for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-                if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-                  this.sumarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
-                  this.sumarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta,this.materiasPrimasSeleccionadas[i].Cantidad );
-                  this.sumarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-                  this.materiasPrimasSeleccionadas.splice(i, 1);
-                  this.catidadTotalPeso -= data.Cantidad;
-                  this.cantidadTotalPrecio -= data.SubTotal;
-                  for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-                    if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-                  }
-                  this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
-                  this.llave = 'pdf';
-                  break;
-                }
-              }
-            }, error => { this.mensajeService.mensajeError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
-          }
-        } else this.quitarMateriaPrima();
-      });
+      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(codigo => {
+        this.dtOrdenMaquilaService.delete(codigo).subscribe(() => {
+          this.materiasPrimasSeleccionadas.filter(x => x.Id == data.Id).forEach(x => {
+            this.sumarMateriaPrima(x.Id_Mp, x.Cantidad);
+            this.sumarTinta(x.Id_Tinta,x.Cantidad);
+            this.sumarBopp(x.Id_Bopp, x.Cantidad);
+            this.quitarMateriaPrima();
+            this.onReject();
+            this.llave = 'pdf';
+          });
+        });
+      }, () => this.quitarMateriaPrima());
     }, 100);
   }
 
@@ -331,17 +299,17 @@ export class Orden_MaquilaComponent implements OnInit {
     if (this.FormOrdenMaquila.valid) {
       if (this.materiasPrimasSeleccionadas.length > 0) {
         !this.edidcionOrdenMaquila ? this.crearOrdenMaquila() : this.editarOrdenMaquila();
-      } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
-    } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
+      } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a crear una Orden de Maquila
   crearOrdenMaquila(){
-    this.cargando = false;
+    this.cargando = true;
     let info : modelOrdenMaquila = {
       Tercero_Id : this.FormOrdenMaquila.value.Id_Tercero,
-      OM_ValorTotal : this.cantidadTotalPrecio,
-      OM_PesoTotal : this.catidadTotalPeso,
+      OM_ValorTotal : this.cantidadTotalPrecio(),
+      OM_PesoTotal : this.catidadTotalPeso(),
       OM_Observacion : this.FormOrdenMaquila.value.Observacion == null ? '' : (this.FormOrdenMaquila.value.Observacion).toUpperCase(),
       TpDoc_Id : 'OM',
       Estado_Id : 11,
@@ -349,51 +317,52 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Fecha : moment().format('YYYY-MM-DD'),
       OM_Hora : moment().format("H:mm:ss"),
     }
-    this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => { this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id); }, () => {
+    this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id), () => {
       this.cargando = false;
-      this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
+      this.msj.mensajeError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
     });
   }
 
   // Funcion que va a crear en la base de datos los detalles de la Orden de Maquila
   crearDtOrdenMaquila(id : number){
-    let error : boolean = false;
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+    let count : number = 0;
+    this.materiasPrimasSeleccionadas.forEach(material => {
       let info : modelDetallesOrdenMaquila = {
         OM_Id : id,
-        MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
-        Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
-        BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
-        DtOM_Cantidad : this.materiasPrimasSeleccionadas[i].Cantidad,
-        UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
-        DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
+        MatPri_Id : material.Id_Mp,
+        Tinta_Id : material.Id_Tinta,
+        BOPP_Id : material.Id_Bopp,
+        DtOM_Cantidad : material.Cantidad,
+        UndMed_Id : material.Und_Medida,
+        DtOM_PrecioUnitario : parseFloat(material.Precio),
       }
-      this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
-      this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
-      this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-      this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; },
-      () => {
+      this.restarMateriaPrima(material.Id_Mp, material.Cantidad);
+      this.restarTinta(material.Id_Tinta, material.Cantidad);
+      this.restarBopp(material.Id_Bopp, material.Cantidad);
+      this.dtOrdenMaquilaService.insert(info).subscribe(() => {
+        count ++;
+        if (count == this.materiasPrimasSeleccionadas.length) {
+          this.itemSeleccionado = id;
+          this.mostrarEleccion(`pdf`, id, );
+          this.actualizarMovimientosEntradasMP(id);
+          setTimeout(() => this.limpiarTodo(), 2000);
+        }
+      }, () => {
         this.cargando = false;
-        this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`);
+        this.msj.mensajeError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`);
       });
-    }
-    if(!error) {
-      this.itemSeleccionado = id;
-      this.mostrarEleccion(`pdf`, id, );
-      this.actualizarMovimientosEntradasMP(id);
-      setTimeout(() => {this.limpiarTodo(); }, 2000);
-    }
+    });
   }
 
   // Funcion que va a editar un orden de maquila
   editarOrdenMaquila(){
-    this.cargando = false;
+    this.cargando = true;
     let id : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
     let info : any = {
       OM_Id : id,
       Tercero_Id : this.FormOrdenMaquila.value.Id_Tercero,
-      OM_ValorTotal : this.cantidadTotalPrecio,
-      OM_PesoTotal : this.catidadTotalPeso,
+      OM_ValorTotal : this.cantidadTotalPrecio(),
+      OM_PesoTotal : this.catidadTotalPeso(),
       OM_Observacion : this.FormOrdenMaquila.value.Observacion == null ? '' : (this.FormOrdenMaquila.value.Observacion).toUpperCase(),
       TpDoc_Id : 'OM',
       Estado_Id : 11,
@@ -401,44 +370,43 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Fecha : moment().format('YYYY-MM-DD'),
       OM_Hora : moment().format("H:mm:ss"),
     }
-    this.ordenMaquilaService.put(id, info).subscribe(() => { this.editarDtOrdenMaquila(); }, () => {
-      this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
+    this.ordenMaquilaService.put(id, info).subscribe(() => this.editarDtOrdenMaquila(), () => {
+      this.cargando = false;
+      this.msj.mensajeError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
     });
   }
 
   // Funcion que va a crear en la base de datos los detalles de la Orden de Maquila
   editarDtOrdenMaquila(){
     let id : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
-    let error : boolean = false;
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(id, this.materiasPrimasSeleccionadas[i].Id).subscribe(datos_orden => {
-        if (datos_orden.length == 0) {
-          let info : modelDetallesOrdenMaquila = {
-            OM_Id : id,
-            MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
-            Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
-            BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
-            DtOM_Cantidad : this.materiasPrimasSeleccionadas[i].Cantidad,
-            UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
-            DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
-          }
-          this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
-          this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
-          this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
-          this.dtOrdenMaquilaService.insert(info).subscribe(() => { error = false; }, () => {
-            this.mensajeService.mensajeError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`);
-            this.cargando = false;
-          });
+    let count : number = 0;
+    this.materiasPrimasSeleccionadas.forEach(material => {
+      count ++;
+      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(id, material.Id).subscribe(null, () => {
+        let info : modelDetallesOrdenMaquila = {
+          OM_Id : id,
+          MatPri_Id : material.Id_Mp,
+          Tinta_Id : material.Id_Tinta,
+          BOPP_Id : material.Id_Bopp,
+          DtOM_Cantidad : material.Cantidad,
+          UndMed_Id : material.Und_Medida,
+          DtOM_PrecioUnitario : parseFloat(material.Precio),
         }
-      }, () => {
-        this.mensajeService.mensajeError(``, ``);
-        error = true;
+        this.restarMateriaPrima(material.Id_Mp, material.Cantidad);
+        this.restarTinta(material.Id_Tinta, material.Cantidad);
+        this.restarBopp(material.Id_Bopp, material.Cantidad);
+        this.dtOrdenMaquilaService.insert(info).subscribe(() => null, () => {
+          this.cargando = false;
+          this.msj.mensajeError(`Error`, `¡Ocurrió un error al editar los detalles de la orden de maquila!`);
+        });
       });
-    }
-    if(!error) setTimeout(() => {
-      this.mostrarEleccion(`edicion`, id);
-      this.limpiarTodo();
-    }, this.materiasPrimasSeleccionadas.length * 10);
+      if (count == this.materiasPrimasSeleccionadas.length) {
+        this.itemSeleccionado = id;
+        this.mostrarEleccion(`pdf`, id);
+        this.actualizarMovimientosEntradasMP(id);
+        setTimeout(() => this.limpiarTodo(), 2000);
+      }
+    });
   }
 
   // Funcion que va a restar del inventario de materia prima
@@ -457,7 +425,7 @@ export class Orden_MaquilaComponent implements OnInit {
           MatPri_Fecha : datos.matPri_Fecha,
           MatPri_Hora : datos.matPri_Hora,
         }
-        this.materiaPrimaService.srvActualizar(id, info).subscribe(() => { });
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario de la materia prima ${datos.matPri_Nombre}!`));
       });
     }
   }
@@ -480,7 +448,7 @@ export class Orden_MaquilaComponent implements OnInit {
           tinta_FechaIngreso : datos.tinta_FechaIngreso,
           tinta_Hora : datos.tinta_Hora,
         }
-        this.tintasService.srvActualizar(id, info).subscribe(() => { });
+        this.tintasService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario de la tinta ${datos.tinta_Nombre}!`));
       });
     }
   }
@@ -510,7 +478,7 @@ export class Orden_MaquilaComponent implements OnInit {
           bopP_CodigoDoc: datos.bopP_CodigoDoc,
           bopP_TipoDoc: datos.bopP_TipoDoc,
         }
-        this.boppService.srvActualizar(id, info).subscribe(() => {  });
+        this.boppService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario del biorientado ${datos.bopP_Descripcion}!`));
       });
     }
   }
@@ -531,7 +499,7 @@ export class Orden_MaquilaComponent implements OnInit {
           MatPri_Fecha : datos.matPri_Fecha,
           MatPri_Hora : datos.matPri_Hora,
         }
-        this.materiaPrimaService.srvActualizar(id, info).subscribe(() => { });
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario de la materia prima ${datos.matPri_Nombre}!`));
       });
     }
   }
@@ -554,7 +522,7 @@ export class Orden_MaquilaComponent implements OnInit {
           tinta_FechaIngreso : datos.tinta_FechaIngreso,
           tinta_Hora : datos.tinta_Hora,
         }
-        this.tintasService.srvActualizar(id, info).subscribe(() => { });
+        this.tintasService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario de la tinta ${datos.tinta_Nombre}!`));
       });
     }
   }
@@ -584,7 +552,7 @@ export class Orden_MaquilaComponent implements OnInit {
           bopP_CodigoDoc: datos.bopP_CodigoDoc,
           bopP_TipoDoc: datos.bopP_TipoDoc,
         }
-        this.boppService.srvActualizar(id, info).subscribe(() => {  });
+        this.boppService.srvActualizar(id, info).subscribe(null, () => this.msj.mensajeError(`¡No se pudo actualizar el inventario del biorientado ${datos.bopP_Descripcion}!`));
       });
     }
   }
@@ -594,6 +562,7 @@ export class Orden_MaquilaComponent implements OnInit {
     this.onReject();
     this.cargando = true;
     this.informacionPDF = [];
+    let count : number = 0;
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_Orden => {
       for (let i = 0; i < datos_Orden.length; i++) {
         let info : any = {
@@ -619,11 +588,12 @@ export class Orden_MaquilaComponent implements OnInit {
         }
         this.informacionPDF.push(info);
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        count++;
+        if (count == datos_Orden.length) this.crearPDF(id);
       }
-      setTimeout(() => {this.crearPDF(id); }, 2500);
     }, () => {
       this.cargando = false;
-      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`);
+      this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`);
     });
   }
 
@@ -774,7 +744,7 @@ export class Orden_MaquilaComponent implements OnInit {
         break;
       }
     }, () => {
-      this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`);
+      this.msj.mensajeError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`);
       this.cargando = false;
     });
   }
@@ -785,9 +755,7 @@ export class Orden_MaquilaComponent implements OnInit {
     body.push(columns);
     data.forEach(function(row) {
       var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
+      columns.forEach((column) => dataRow.push(row[column].toString()));
       body.push(dataRow);
     });
     return body;
@@ -898,7 +866,7 @@ export class Orden_MaquilaComponent implements OnInit {
                detalle.Estado_Id = 19;
                mp.Cantidad2 = 0;
              }
-             this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
+             this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(null, () => this.msj.mensajeError(`Error`, `No fue posible actualizar el movimiento de entrada!`));
              this.crearRegistrosSalidasMP(detalle, salidaReal, idMaquila);
            }
          })  
@@ -926,6 +894,6 @@ export class Orden_MaquilaComponent implements OnInit {
      'Cant_PedidaOT': 0,
      'UndMed_Id': 'N/E',
     }
-    this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
+    this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.msj.mensajeError(`Error`, `No fue posible crear la salida de material!`));
   }
 }

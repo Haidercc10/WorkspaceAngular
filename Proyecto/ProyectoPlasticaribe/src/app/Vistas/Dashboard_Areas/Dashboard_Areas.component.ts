@@ -62,11 +62,10 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que va a llenar el array de años
   llenarArrayAnos(){
-    for (let i = 0; i < this.anios.length; i++) {
-      let num_Mayor : number = Math.max(...this.anios);
-      if (num_Mayor == moment().year()) break;
-      this.anios.push(num_Mayor + 1);
-    }
+    const num_Mayor : number = Math.max(...this.anios);
+    const currentYear = moment().year();
+    const newYears = Array.from({length: currentYear - num_Mayor}, (_, i) => num_Mayor + i + 1);
+    this.anios.push(...newYears);
   }
 
   // Funcion que va a inicializar las variables con la información de las graficas
@@ -220,12 +219,11 @@ export class Dashboard_AreasComponent implements OnInit {
     this.totalAnios_Empaque = [];
     this.totalAnios_Sellado = [];
     this.totalAnios_Wiketiado = [];
-    const formato = (data : any [], anio : number) : any  => {
-      let resultado = {
+    const formato = (data : any [], anio : number) : any => {
+      return {
         Anio : anio,
         Kg : this.calcularKgProducidos(data, anio)
       }
-      return resultado;
     }
     this.aniosGraficados.forEach(anio => {
       this.totalAnios_Extrusion.push(formato(this.graficaExtrusionProducido, anio));
