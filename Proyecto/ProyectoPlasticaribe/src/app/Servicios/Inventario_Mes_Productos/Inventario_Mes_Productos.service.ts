@@ -26,4 +26,7 @@ export class Inventario_Mes_ProductosService {
   srvEliminar = (id:number|string) => this.http.delete(this.rutaPlasticaribeAPI + `/Inventario_Mensual_Productos/${id}`);
 
   srvGuardar = (data : modelPistas): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Inventario_Mensual_Productos', data);
+
+  getInventarioProductoInicioMes = (fechaFin : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Inventario_Mensual_Productos/getInventarioProductoInicioMes/${fechaFin}`);
+  
 }

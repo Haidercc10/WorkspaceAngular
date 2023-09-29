@@ -10,6 +10,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
+import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -52,7 +53,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
                 private msj : MensajesAplicacionService, 
                   private svcMatPrimas : MateriaPrimaService, 
                     private invZeus : ModalGenerarInventarioZeusComponent, 
-                      private svcInvInicialMP : InventInicialDiaService,) {
+                      private svcInvInicialMP : InventInicialDiaService,
+                        private svcInvMensualProductos : Inventario_Mes_ProductosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -95,16 +97,15 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
           if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
-          if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
-          else setTimeout(() => { this.load = false; }, 500); 
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
+          else setTimeout(() => { this.load = false; }, 800); 
         } else {
           this.load = true;
           if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
-          if(this.ValidarRol == 1) this.inventarioProductosTerminados(); 
-          else setTimeout(() => { this.load = false; }, 500); 
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
+          else setTimeout(() => { this.load = false; }, 800); 
         }
       });
-      
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `Debe seleccionar un rango de fechas válido!`);
   }
 
@@ -119,27 +120,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   }
 
   //Función que mostrará el inventario de productos terminados en la tabla. 
-  inventarioProductosTerminados() {
-    this.invZeus.invetarioProductos();
-    setTimeout(() => { 
-      this.invProductosTerminados = this.invZeus.ArrayProductoZeus; 
-      setTimeout(() => { 
-        this.invProductosTerminados.forEach(x => {
-          let info : any = {
-            'fecha_Inventario' : this.today,
-            'ot' :  '',
-            'item' : x.Id,
-            'referencia' : x.Nombre,
-            'stock' : x.Cantidad,
-            'precio' : x.Precio, 
-            'subtotal' : x.Cantidad * x.Precio,
-          }
-          this.invPT.push(info);
-        }) 
-        this.load = false;
-      }, 3000);
-    }, 5000);
-  }
+  inventarioProductosTerminados = (fechaFin : any) => this.svcInvMensualProductos.getInventarioProductoInicioMes(fechaFin).subscribe(data => {this.invPT = data; this.load = false; }, error => { this.load = false; } );
 
   //Funciones que calcularán el total de cada inventario.
   calcularTotalExtrusion = () => this.invExtrusion.reduce((acum, valor) => (acum + valor.subtotal), 0);
