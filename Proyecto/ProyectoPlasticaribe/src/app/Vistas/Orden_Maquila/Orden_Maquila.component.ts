@@ -108,12 +108,8 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
-
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
     this.ordenMaquilaService.GetUltimoId().subscribe(num => this.FormOrdenMaquila.patchValue({ConsecutivoOrden : num + 1}), () => this.FormOrdenMaquila.patchValue({ConsecutivoOrden : 1}));
@@ -380,9 +376,12 @@ export class Orden_MaquilaComponent implements OnInit {
   editarDtOrdenMaquila(){
     let id : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
     let count : number = 0;
+    let materiasPrimas = [...this.materiasPrimasSeleccionadas];
     this.materiasPrimasSeleccionadas.forEach(material => {
       count ++;
-      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(id, material.Id).subscribe(null, () => {
+      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(id, material.Id).subscribe(() => {
+        materiasPrimas.splice(materiasPrimas.findIndex(x => x.Id == material.Id), 1);
+      }, () => {
         let info : modelDetallesOrdenMaquila = {
           OM_Id : id,
           MatPri_Id : material.Id_Mp,
@@ -403,7 +402,7 @@ export class Orden_MaquilaComponent implements OnInit {
       if (count == this.materiasPrimasSeleccionadas.length) {
         this.itemSeleccionado = id;
         this.mostrarEleccion(`pdf`, id);
-        this.actualizarMovimientosEntradasMP(id);
+        this.actualizarMovimientosEntradasMP(id, materiasPrimas);
         setTimeout(() => this.limpiarTodo(), 2000);
       }
     });
@@ -821,9 +820,9 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   //Función que actualizará las entradas disponibles
-  actualizarMovimientosEntradasMP(idMaquila : number){
+  actualizarMovimientosEntradasMP(idMaquila : number, materiasPrimas : any = this.materiasPrimasSeleccionadas){
     let salidaReal : number = 0;
-    this.materiasPrimasSeleccionadas.forEach(mp => {
+    materiasPrimas.forEach(mp => {
      mp.Cantidad2 = mp.Cantidad;
      this.srvMovEntradasMP.GetInventarioxMaterial(mp.Id).subscribe(data => {
        if (data.length > 0) {
