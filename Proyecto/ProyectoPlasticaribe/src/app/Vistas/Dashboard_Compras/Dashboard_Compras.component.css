@@ -1,6 +1,7 @@
 .fondo {
   background-image: linear-gradient(62deg, #d6b7ff 0%, #f2f8c2 100%);
   height: 100%;
+  border-radius: 20px;
 }
 
 .header h3, .header .pi, .rojo {
@@ -163,4 +164,17 @@ p-toolbar ::ng-deep .p-toolbar {
  p-button ::ng-deep .p-button.p-button-icon-only, .p-button.p-button-success {
   width: 2rem;
   padding: 0.20rem 0;
+}
+
+p-card ::ng-deep [class = "p-card p-component"] {
+  border: 3px solid #fefefe00;
+  border-radius: 20px;
+  transition: all 500ms;
+}
+
+p-card ::ng-deep [class = "p-card p-component"]:hover {
+  border: 3px solid #00000008;
+  box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+  width: calc(100% + 0.1%);
+  height: calc(100% + 1%);
 }
