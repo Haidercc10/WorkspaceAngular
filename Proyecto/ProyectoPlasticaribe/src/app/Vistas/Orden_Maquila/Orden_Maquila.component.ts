@@ -297,17 +297,25 @@ export class Orden_MaquilaComponent implements OnInit {
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
   eliminarMateriaPrima(){
     let data = this.itemSeleccionado;
+    console.log(data)
+    console.log(this.FormOrdenMaquila.value.ConsecutivoOrden)
     setTimeout(() => {
       this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
-        if (datos_orden.length > 0) {
+        console.log(datos_orden.toString().length > 0)
+        if (datos_orden.toString().length > 0) {
+          console.log(111)
+          console.log(datos_orden)
           this.onReject();
-          for (let i = 0; i < datos_orden.length; i++) {
-            this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(() => {
+          for (let i = 0; i < 1; i++) {
+            console.log(datos_orden)
+            this.dtOrdenMaquilaService.delete(datos_orden).subscribe(() => {
+              console.log(`Hey`)
               for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
                 if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
                   this.sumarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
                   this.sumarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta,this.materiasPrimasSeleccionadas[i].Cantidad );
                   this.sumarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
+                  this.actualizarMovEntradas_EdicionMaquilas(data);
                   this.materiasPrimasSeleccionadas.splice(i, 1);
                   this.catidadTotalPeso -= data.Cantidad;
                   this.cantidadTotalPrecio -= data.SubTotal;
@@ -321,6 +329,7 @@ export class Orden_MaquilaComponent implements OnInit {
               }
             }, error => { this.mensajeService.mensajeError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
           }
+          
         } else this.quitarMateriaPrima();
       });
     }, 100);
@@ -813,7 +822,7 @@ export class Orden_MaquilaComponent implements OnInit {
   mostrarEleccion(modo : any, item?: any,  mensaje?: any){
     this.llave = modo;
     this.itemSeleccionado = item;
-
+    console.log(this.llave)
     setTimeout(() => {
       if(this.llave == 'pdf') {
         mensaje = `¡Se ha creado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
@@ -837,6 +846,7 @@ export class Orden_MaquilaComponent implements OnInit {
         mensaje = `¡Se ha editado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
         this.messageService.add({severity:'success', key: this.llave, summary: `Confirmación`, detail: mensaje, sticky: true});
       }
+      
     }, 200);
   }
 
@@ -927,5 +937,36 @@ export class Orden_MaquilaComponent implements OnInit {
      'UndMed_Id': 'N/E',
     }
     this.srvMovSalidasMP.Post(salidas).subscribe(null, () => this.mensajeService.mensajeError(`Error`, `No fue posible crear la salida de material!`));
+  }
+
+  //Función que actualizará los materiales de los movimientos de entrada asociados a la salida de material que se esta editando.
+  actualizarMovEntradas_EdicionMaquilas(data : any) {
+    let orden : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
+    this.srvMovEntradasMP.getEntradasxMaquilas(orden, data.Id_Mp, data.Id_Tinta, data.Id_Bopp == 449 ? 1 : data.Id_Bopp).subscribe(data => {
+      if(data.length > 0) {
+        data.forEach(mov => {
+          let detalle : modeloMovimientos_Entradas_MP = {
+            'Id' : mov.id,
+            'MatPri_Id': mov.matPri_Id,
+            'Tinta_Id': mov.tinta_Id,
+            'Bopp_Id': mov.bopp_Id,
+            'Cantidad_Entrada': mov.cantidad_Entrada,
+            'UndMed_Id': mov.undMed_Id,
+            'Precio_RealUnitario': mov.precio_RealUnitario,
+            'Tipo_Entrada': mov.tipo_Entrada,
+            'Codigo_Entrada': mov.codigo_Entrada,
+            'Estado_Id': mov.estado_Id,
+            'Cantidad_Asignada': mov.cantidad_Asignada,
+            'Cantidad_Disponible': mov.cantidad_Disponible,
+            'Observacion': mov.observacion,
+            'Fecha_Entrada': mov.fecha_Entrada,
+            'Hora_Entrada': mov.hora_Entrada,
+            'Precio_EstandarUnitario': mov.precio_EstandarUnitario,
+          }
+          this.srvMovEntradasMP.Put(detalle.Id, detalle).subscribe(data => { }, error => { this.mensajeService.mensajeAdvertencia(`Error`, `No fue posible actualizar los movimientos de entrada asociados a esta salida!`) })
+        });
+      } 
+      
+    });
   }
 }

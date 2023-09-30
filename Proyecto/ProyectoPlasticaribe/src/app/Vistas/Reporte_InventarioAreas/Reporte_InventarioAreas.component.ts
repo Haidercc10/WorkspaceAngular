@@ -4,11 +4,9 @@ import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { Inventario_AreasService } from 'src/app/Servicios/Inventario_Areas/Inventario_Areas.service';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 
@@ -35,7 +33,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   invSellado : any = []; //Variable que guardará el inventario de las sellado
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
-  invProductosTerminados : any = []; //Variable que guardará el inventario de los productos terminados
   invPT : any = []; //Variable que guardará el inventario de los productos terminados
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
@@ -49,12 +46,10 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
 
   constructor(private AppComponent : AppComponent, 
-              private svcInvAreas : Inventario_AreasService,
-                private msj : MensajesAplicacionService, 
-                  private svcMatPrimas : MateriaPrimaService, 
-                    private invZeus : ModalGenerarInventarioZeusComponent, 
-                      private svcInvInicialMP : InventInicialDiaService,
-                        private svcInvMensualProductos : Inventario_Mes_ProductosService) {
+                private svcInvAreas : Inventario_AreasService,
+                  private msj : MensajesAplicacionService, 
+                    private svcInvInicialMP : InventInicialDiaService,
+                      private svcInvMensualProductos : Inventario_Mes_ProductosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -79,7 +74,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.invSellado = [];
     this.invPT = [];
     this.invImpresion = [];
-    this.invProductosTerminados = [];
     this.invMatPrimas = [];
     this.invReciclados = [];
     let fecha1 : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : null;

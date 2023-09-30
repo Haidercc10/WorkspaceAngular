@@ -43,7 +43,7 @@
         <!--OT-->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" *ngIf="url=='/inventario-areas/items'">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ot" inputId="ot"  [useGrouping]="false" (keyup.enter)="consultarOT()" pTooltip="Buscar por OT"></p-inputNumber>
+            <p-inputNumber formControlName="ot" inputId="ot" id="ot" [useGrouping]="false" (keyup.enter)="consultarOT()" pTooltip="Buscar por OT"></p-inputNumber>
             <label for="ot">OT</label>
           </span>
         </div>
@@ -51,7 +51,7 @@
         <!-- Item -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="item" id="item" [useGrouping]="false" (keyup.enter)="consultarItem()" [required]="true" pTooltip="Buscar por {{labels[0]}}"></p-inputNumber>
+            <p-inputNumber formControlName="item" id="item" [useGrouping]="false" (keyup.enter)="consultarItem()" [required]="true" ></p-inputNumber>
             <label for="item">{{labels[0]}}</label>
           </span>
         </div>
