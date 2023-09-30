@@ -274,8 +274,6 @@ export class Orden_MaquilaComponent implements OnInit {
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
   eliminarMateriaPrima(){
     let data = this.itemSeleccionado;
-    console.log(data)
-    console.log(this.FormOrdenMaquila.value.ConsecutivoOrden)
     setTimeout(() => {
       this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(codigo => {
         this.dtOrdenMaquilaService.delete(codigo).subscribe(() => {
