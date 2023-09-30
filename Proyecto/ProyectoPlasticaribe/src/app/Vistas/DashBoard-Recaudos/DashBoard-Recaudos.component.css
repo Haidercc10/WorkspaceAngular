@@ -1,6 +1,7 @@
 .fondo {
   background-image: linear-gradient(62deg, #FDEDEC 0%, #D5F5E3 100%);
   height: 100%;
+  border-radius: 20px;
 }
 
 .fondo2 {
@@ -44,4 +45,17 @@ p-chart ::ng-deep div ::ng-deep canvas {
   display: inline-block;
   width: 100%;
   height: 100%;
+}
+
+p-card ::ng-deep [class = "p-card p-component"] {
+  border: 3px solid #fefefe00;
+  border-radius: 20px;
+  transition: all 500ms;
+}
+
+p-card ::ng-deep [class = "p-card p-component"]:hover {
+  border: 3px solid #00000008;
+  box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+  width: calc(100% + 0.1%);
+  height: calc(100% + 1%);
 }
