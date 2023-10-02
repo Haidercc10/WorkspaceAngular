@@ -26,7 +26,7 @@ export class ClientesService {
 
   srvActualizar = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Clientes/${id}`, data);
 
-  PutEstadoCliente = (id:number|String, estado:any) => this.http.put(this.rutaPlasticaribeAPI + `/Clientes/putEstadoCliente/${id}`, estado);
+  PutEstadoCliente = (id:number|String, estado:any) => this.http.put(this.rutaPlasticaribeAPI + `/Clientes/putEstadoCliente/${id}?estado=${estado}`, estado);
 
   srvEliminar = (id:number|String) => this.http.delete(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
 

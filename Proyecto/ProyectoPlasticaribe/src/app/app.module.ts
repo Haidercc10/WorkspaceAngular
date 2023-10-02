@@ -183,6 +183,7 @@ import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_P
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
 import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Areas.component';
+import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
 
 @NgModule({
   declarations: [
@@ -290,6 +291,7 @@ import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Are
     Inventario_AreasComponent,
     Reporte_InventarioAreasComponent,
     Dashboard_AreasComponent,
+    Orden_TrabajoComponent,
   ],
 
   imports: [

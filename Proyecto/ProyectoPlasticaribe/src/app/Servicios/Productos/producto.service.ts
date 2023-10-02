@@ -13,7 +13,7 @@ export class ProductoService {
 
   constructor(private http : HttpClient,) { }
 
-  srvObtenerListaPorId = (id : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/${id}`);
+  srvObtenerListaPorId = (id : any):Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/${id}`);
 
   obtenerItemsLike = (letras : any): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreItem/${letras}`);
 

@@ -239,16 +239,41 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a calcular la cantidad de materia prima
-  calcularCantMateriaPrima = () : number => this.materiasPrimasSeleccionadas.reduce((a,b) => a + b.Cantidad, 0);
+  calcularCantMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].Cantidad;
+      this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
+    }
+    return total;
+  }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularCostoMateriaPrima = () : number => this.materiasPrimasSeleccionadas.reduce((a,b) => a + b.SubTotal, 0);
+  calcularCostoMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].SubTotal;
+    }
+    return total;
+  }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularIVAMateriaPrima = () : number => this.materiasPrimasSeleccionadas.reduce((a,b) => a + ((b.SubTotal * this.iva) / 100), 0);
+  calcularIVAMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += (this.materiasPrimasSeleccionadas[i].SubTotal * this.iva) / 100;
+    }
+    return total;
+  }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularCostoTotalMateriaPrima = () : number => this.calcularCostoMateriaPrima() + this.calcularIVAMateriaPrima();
+  calcularCostoTotalMateriaPrima() : number{
+    let total : number = 0;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      total += this.materiasPrimasSeleccionadas[i].SubTotal + ((this.materiasPrimasSeleccionadas[i].SubTotal * this.iva) / 100);
+    }
+    return total;
+  }
 
   // Funcion para llamar el modal que crea proveedores
   LlamarModalCrearProveedor = () => this.ModalCrearProveedor = true;
