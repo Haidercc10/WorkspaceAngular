@@ -68,6 +68,7 @@ import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostos
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
+import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
 
 export const routes: Routes = [
 
@@ -115,7 +116,7 @@ export const routes: Routes = [
   {path: 'reporte-despacho', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Despacho'}, component : ReporteDespachoComponent}, // Ingresar Productos
 
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
-  {path: 'ordenes-trabajo', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Trabajo'}, component: OrdenesTrabajoComponent},
+  {path: 'ordenes-trabajo', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Trabajo'}, component: Orden_TrabajoComponent},
   {path: 'reportes-procesos-ot', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Procesos OT'}, component: Reporte_Procesos_OTComponent},
 
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
