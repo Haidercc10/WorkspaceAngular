@@ -450,7 +450,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       Fuelle_Sellado : 0,
       Margen_Sellado : 0,
       PesoMillar : 0,
-      TipoSellado : 1,
+      TipoSellado : 'NO APLICA',
       PrecioDia : 0,
       PrecioNoche : 0,
       CantidadPaquete : 0,
@@ -671,7 +671,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   // Funcion que va a consultar las presentaciones de los productos
-  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.map(x => x.undMed_Id).filter(x => ['Kg', 'Paquete', 'Rollo', 'Und'].includes(x)));
+  consultarPresentaciones = () => this.undService.srvObtenerLista().subscribe(data => this.presentaciones = data.filter(x => ['Kg', 'Paquete', 'Rollo', 'Und'].includes(x.undMed_Id)));
 
   // Funcion que va a consultar los estados que puede tener la orden de trabajo
   consultarEstados = () => this.estadosService.srvObtenerListaEstados().subscribe(data => this.estados = data.filter(x => [3,4].includes(x.tpEstado_Id)));
@@ -689,7 +689,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           OT_Observacion : datos_Ot.observacion,
           Margen : datos_Ot.margen,
           Cantidad : datos_Ot.cantidad_Pedida,
-          Precio : datos_Ot.precio_Unitario,
+          Precio : this.presentacionProducto != 'Kg' ? datos_Ot.precioUnidad : datos_Ot.precioKilo,
         });
         this.FormOrdenTrabajoExtrusion.patchValue({
           Material_Extrusion : datos_Ot.id_Material,
@@ -768,7 +768,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
             this.FormOrdenTrabajo.patchValue({
               OT_Observacion : itemOt.observacion,
               Margen : itemOt.ptMargen,
-              Cantidad : itemOt.datoscantKg,
+              Cantidad : presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa,
               Precio : presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa,
             });
 
@@ -841,7 +841,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
             if (laminadoCapa2 == '1') laminadoCapa2 = 1;
             if (laminadoCapa3 == '1') laminadoCapa3 = 1;
 
-            console.log(this.ArrayProducto)
             this.FormOrdenTrabajoLaminado.patchValue({
               Capa_Laminado1 : parseInt(laminadoCapa1),
               Calibre_Laminado1 : itemOt.lamCalibre1,
@@ -1746,16 +1745,17 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
   guardarOt_Sellado_Corte(ordenTrabajo : number) : boolean {
-    let tipoSellado : number = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : number = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+    let tipoSellado : number = this.FormOrdenTrabajoSellado.value.TipoSellado;
+    let formato : number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
       let info : any = {
         Ot_Id : ordenTrabajo,
         Corte :  this.corte,
         Sellado :  this.sellado,
         Formato_Id : datos.tpProd_Id,
-        SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
-        SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
-        SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
+        SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
         SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
         TpSellado_Id : datos.tpSellado_Id,
         SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
@@ -1770,7 +1770,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
         return true;
       });
-    }, error => this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error));
+    }, error => {
+      this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error);
+      return true;
+    });
     return false;
   }
 
@@ -1845,34 +1848,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           Presentacion : datos_orden[i].id_Presentacion,
           OT_Estado : datos_orden[i].estado_Orden,
           OT_Observacion : datos_orden[i].observacion,
-          Margen : datos_orden[i].ot_MargenAdicional,
+          Margen : datos_orden[i].margen,
+          Precio : datos_orden[i].precio_Producto,
         });
-
-        let productoExt : any = {
-          Id : datos_orden[i].id_Producto,
-          Nombre : datos_orden[i].producto,
-          Ancho : datos_orden[i].selladoCorte_Ancho,
-          Fuelle : datos_orden[i].selladoCorte_Fuelle,
-          Largo : datos_orden[i].selladoCorte_Largo,
-          Cal : datos_orden[i].calibre_Extrusion,
-          Und : datos_orden[i].und_Extrusion,
-          PesoMillar : datos_orden[i].selladoCorte_PesoMillar,
-          Tipo : datos_orden[i].formato_Producto,
-          Material : datos_orden[i].material,
-          Pigmento : datos_orden[i].pigmento_Extrusion,
-          CantPaquete : datos_orden[i].selladoCorte_CantBolsasPaquete,
-          CantBulto : datos_orden[i].selladoCorte_CantBolsasBulto,
-          Cant : datos_orden[i].cantidad_Pedida,
-          Cant_Inicial : datos_orden[i].cantidad_Pedida,
-          UndCant : datos_orden[i].id_Presentacion,
-          TipoSellado : datos_orden[i].tpSellados_Nombre,
-          PrecioUnd : datos_orden[i].precio_Producto,
-          SubTotal : datos_orden[i].precio_Producto * datos_orden[i].cantidad_Pedida,
-          FechaEntrega : datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
-        }
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
-        this.ArrayProducto.push(productoExt);
+        this.buscarInformacionProducto();
 
         this.FormOrdenTrabajoExtrusion.patchValue({
           Material_Extrusion : datos_orden[i].id_Material,
@@ -1914,7 +1895,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           Ancho_Corte : datos_orden[i].selladoCorte_Ancho,
           Largo_Corte : datos_orden[i].selladoCorte_Largo,
           Fuelle_Corte : datos_orden[i].selladoCorte_Fuelle,
-          Margen_Corte : datos_orden[i].margen_Adicional,
+          Margen_Corte : datos_orden[i].margen,
         });
         this.FormOrdenTrabajoSellado.patchValue({
           Formato_Sellado : datos_orden[i].formato_Producto,
@@ -1933,7 +1914,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
         });
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : datos_orden[i].mezcla_Id, });
         this.cargarCombinacionMezclas();
-        this.calcularDatosOt();
+        setTimeout(() => this.calcularDatosOt(), 1000);
       }
     }, error => this.msj.mensajeError(error.error));
   }
@@ -2139,7 +2120,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   actualizarOT_Sellado_Corte(ot : number){
     this.otSelladoCorteService.GetOT_SelladoCorte(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        let tipoSellado : number = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : number = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+        let tipoSellado : any = this.FormOrdenTrabajoSellado.value.TipoSellado;
+        let formato : any = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
         this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
           let info : any = {
             SelladoCorte_Id : datos_ot[i].selladoCorte_Id,
@@ -2147,9 +2129,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
             Corte :  this.corte,
             Sellado :  this.sellado,
             Formato_Id : datos.tpProd_Id,
-            SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
-            SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
-            SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
+            SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+            SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+            SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
             SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
             TpSellado_Id : datos.tpSellado_Id,
             SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
@@ -2158,6 +2140,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
             SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
             SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+            SelladoCorte_PesoProducto : this.pesoProducto,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(null, error => {
             this.msj.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
@@ -2178,9 +2161,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot : number = this.FormOrdenTrabajo.value.OT_Id){
     this.cargando = true;
-    console.log(2)
     this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
-      this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), error => this.msj.mensajeError(error.error));
+      this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), err => this.msj.mensajeError(err.error.errors.orden[0]));
     });
     setTimeout(() => this.cargando = false, 1200);
   }
@@ -2618,7 +2600,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
                         ],
                         [
                           { border : [], text : `Tipo Impresión: `, },
-                          { border : [], text : `${datos_ot[i].tipo_Impresion.toString().trim()}`, }
+                          { border : [], text : `${datos_ot[i].tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot[i].tipo_Impresion.toString().trim()}`, }
                         ],
                         [
                           { border : [], text : `Rodillo N°: `, },

@@ -95,7 +95,7 @@
         <!-- PRESENTACION PRODUCTO -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
           <span class="p-float-label">
-            <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false" [options]="presentaciones" (onChange)="consultarInfoProducto()" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false" [options]="presentaciones" optionLabel="undMed_Nombre" optionValue="undMed_Id" (onChange)="consultarInfoProducto()" [required]="true"></p-dropdown>
             <label for="Estado">Presentación</label>
           </span>
         </div>
@@ -327,7 +327,7 @@
                 <!-- Pigmento -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true"></p-dropdown>
+                    <p-dropdown formControlName="Pigmento_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true"></p-dropdown>
                     <label for="Pigmento">Pigmento</label>
                   </span>
                 </div>
@@ -418,7 +418,7 @@
                   </span>
                 </div>
 
-                  <!-- Psita -->
+                  <!-- Pista -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Pista_Impresion" inputId="Pista" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
