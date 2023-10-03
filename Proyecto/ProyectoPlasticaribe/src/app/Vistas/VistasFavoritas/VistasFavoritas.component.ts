@@ -40,6 +40,7 @@ export class VistasFavoritasComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.llenarVistasDisponibles();
+    this.mostrarVistasFav();
     this.buscarFavoritos();
   }
 
@@ -135,10 +136,8 @@ export class VistasFavoritasComponent implements OnInit {
   // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
   buscarFavoritos(){
     this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(data => {
-      data.forEach(element => {
-        this.vistasFavoritas = [element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5,];
-        setTimeout(() => this.mostrarVistasFav(), 500);
-      });
+      data.forEach(element => this.vistasFavoritas = [element.vistaFav_Num1, element.vistaFav_Num2, element.vistaFav_Num3, element.vistaFav_Num4, element.vistaFav_Num5]);
+      setTimeout(() => this.mostrarVistasFav(), 500);
     }, () => this.msj.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
   }
 

@@ -515,7 +515,7 @@
 </p-dialog>
 
 <!-- Modal que mostrará el reporte de costos -->
-<p-dialog [(visible)]="mostrarModalCostos" [contentStyle]="{'overflow':'visible'}" [draggable]="false" [style]="{width: '95%'}" header="Reporte de costos" [modal]="true" >
+<p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '95%'}" header="Reporte de costos" [modal]="true" >
   <ng-template pTemplate="content">
     <app-reporteCostosOT></app-reporteCostosOT>
   </ng-template>

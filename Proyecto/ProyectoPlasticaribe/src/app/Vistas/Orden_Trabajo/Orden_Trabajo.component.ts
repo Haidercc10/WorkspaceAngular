@@ -1832,6 +1832,8 @@ export class Orden_TrabajoComponent implements OnInit {
         this.laminado = datos_orden[i].laminado;
         this.corte = datos_orden[i].corte;
         this.sellado = datos_orden[i].sellado;
+        this.producto = datos_orden[i].id_Producto;
+        this.presentacionProducto = datos_orden[i].id_Presentacion;
 
         this.FormOrdenTrabajo.patchValue({
           OT_Id: datos_orden[i].numero_Orden,
@@ -1848,10 +1850,8 @@ export class Orden_TrabajoComponent implements OnInit {
           OT_Estado : datos_orden[i].estado_Orden,
           OT_Observacion : datos_orden[i].observacion,
           Margen : datos_orden[i].margen,
-          Precio : datos_orden[i].precio_Producto,
+          Precio : this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
         });
-        this.producto = datos_orden[i].id_Producto;
-        this.presentacionProducto = datos_orden[i].id_Presentacion;
         this.buscarInformacionProducto();
 
         this.FormOrdenTrabajoExtrusion.patchValue({
@@ -1969,7 +1969,7 @@ export class Orden_TrabajoComponent implements OnInit {
           UndMed_Id : this.presentacionProducto,
           Ot_FechaCreacion : datos_Orden.ot_FechaCreacion,
           Ot_Hora : datos_Orden.ot_Hora,
-          Estado_Id : 15,
+          Estado_Id : this.FormOrdenTrabajo.value.OT_Estado,
           Usua_Id : this.storage_Id,
           PedExt_Id : 497,
           Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
