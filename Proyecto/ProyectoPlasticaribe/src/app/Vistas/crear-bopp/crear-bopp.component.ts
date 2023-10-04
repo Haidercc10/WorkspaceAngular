@@ -52,7 +52,7 @@ export class CrearBoppComponent implements OnInit {
   crearBoppGenerico(){
     if (this.FormBopp.valid){
       let info : any = {
-        BoppGen_Nombre : this.FormBopp.value.Nombre,
+        BoppGen_Nombre : (this.FormBopp.value.Nombre).toUpperCase(),
         BoppGen_Ancho : this.FormBopp.value.Ancho,
         BoppGen_Micra : this.FormBopp.value.Micras,
         BoppGen_FechaIngreso : moment().format('YYYY-MM-DD'),

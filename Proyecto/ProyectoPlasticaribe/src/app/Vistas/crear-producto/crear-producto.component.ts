@@ -158,8 +158,8 @@ export class CrearProductoComponent implements OnInit {
   llenarTabla(){
     const datosProductos : any = {
       Prod_Id: this.FormCrearProducto.value.ProduId,
-      Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
-      Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
+      Prod_Nombre: (this.FormCrearProducto.value.ProduNombre).toUpperCase(),
+      Prod_Descripcion: (this.FormCrearProducto.value.ProdDescripcion).toUpperCase(),
       TpProd_Id: this.FormCrearProducto.value.ProduTipo,
       Prod_Peso: 0,
       Prod_Peso_Millar: 0,

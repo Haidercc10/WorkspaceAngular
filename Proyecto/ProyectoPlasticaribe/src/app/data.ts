@@ -7600,6 +7600,119 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
 ];
 
 /******************************************************** ORDENES DE TRABAJO ***************************************************************/
+export const stepsOrdenesTrabajo: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'none',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ordne de Trabajo</h5>`,
+    text: `<p>¡Las ordenes de trabajo son documentos que se crean para la creación de un producto, este documento tendrá todas las especificaciones necesarias sobre como se debe crear el producto!</p>
+    <p>Desde aquí podremos crear, consultar y editar las ordenes de trabajo de manera sencilla y eficiente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formOrdenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'formOrdenTrabajo',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información General</h5>`,
+    text: `<p>Para crear una Orden de Trabajo necesitamos información que debemos colocar en los siguientes campos.</p>`
+  },
+  {
+    attachTo: {
+      element: '#idCliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idCliente',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Id del Cliente</h5>`,
+    text: `<p>Este campo se estará llenando con la información del cliente que se seleccionó. Este campo no es editable y se llena de manera automatica.</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cliente',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cliente</h5>`,
+    text: `<p>Para seleccionar un cliente tenemos que escribir el nombre del mismo, y a medida que escribimos, se muestran los clientes que tengan en su nombre el texto que hemos escrito.</p>
+    <p>Si encontramos el cliente que queremos presionamos click o lo seleccionamos y listo. El campo anterior (Id Cliente) se llenará automaticamente una vez hayamos elegido uno.</p>
+    <p>De igual manera se llenarán de forma automatica los campos de vendedor que estaremos viendo más adelante.</p>
+    <br>
+    <p>Si el cliente no existe, <b>presionaremos el botón de crear cliente</b> que se encuentra en la parte superior de la pantalla. Acontinuación se explicará como se creará el cliente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#crearCliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crearCliente',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Cliente</h5>`,
+    text: `<p></p>`
+  },
+  {
+    attachTo: {
+      element: '#idProducto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idProducto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Item (Id Producto)</h5>`,
+    text: `<p></p>`
+  },
+  {
+    attachTo: {
+      element: '#crearProducto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'crearProducto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Productos</h5>`,
+    text: `<p></p>`
+  },
+];
+
 export const stepsOrdenTrabajo: Step.StepOptions[] = [
   {
     attachTo: {

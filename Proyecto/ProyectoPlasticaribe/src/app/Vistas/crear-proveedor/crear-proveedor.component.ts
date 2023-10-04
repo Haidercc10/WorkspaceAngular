@@ -76,7 +76,7 @@ export class CrearProveedorComponent implements OnInit {
     const datosProveedor : any = {
       Prov_Id : id,
       TipoIdentificacion_Id : tipoId,
-      Prov_Nombre : nombre,
+      Prov_Nombre : nombre.toUpperCase(),
       TpProv_Id : tipoProveedor,
       Prov_Ciudad : ciudad,
       Prov_Telefono : telefono,

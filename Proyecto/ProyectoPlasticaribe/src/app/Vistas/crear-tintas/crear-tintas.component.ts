@@ -54,9 +54,9 @@ export class CrearTintasComponent implements OnInit {
 
     if(this.formularioTintas.valid){
       const datosTintas : modelTintas = {
-        Tinta_Nombre: this.formularioTintas.get('TintaNombre')?.value,
-        Tinta_Descripcion: this.formularioTintas.get('TintaDescripcion')?.value,
-        Tinta_CodigoHexadecimal: this.formularioTintas.get('TintaCodigoHexa')?.value,
+        Tinta_Nombre: (this.formularioTintas.get('TintaNombre')?.value).toUpperCase(),
+        Tinta_Descripcion: (this.formularioTintas.get('TintaDescripcion')?.value).toUpperCase(),
+        Tinta_CodigoHexadecimal: (this.formularioTintas.get('TintaCodigoHexa')?.value).toUpperCase(),
         UndMed_Id: this.formularioTintas.get('TintaUndMedida')?.value,
         Tinta_Precio: this.formularioTintas.get('TintaPrecio')?.value,
         Tinta_Stock: cantidadTinta,

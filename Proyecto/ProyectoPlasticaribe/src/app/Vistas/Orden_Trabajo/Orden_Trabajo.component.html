@@ -23,12 +23,12 @@
 <p-card>
   <!--Ver tutorial-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
   </div>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button pButton class="p-button-danger" type="button" label="Crear Clientes" icon="pi pi-check-circle" (click)="LlamarModalCrearCliente()"> </button>
-    <button pButton class="p-button-danger" type="button" label="Crear productos" icon="pi pi-check-circle" (click)="LlamarModalCrearProducto()"> </button>
+    <button pButton class="p-button-danger" id="crearCliente" type="button" label="Crear Clientes" icon="pi pi-check-circle" (click)="LlamarModalCrearCliente()"> </button>
+    <button pButton class="p-button-danger" id="crearProducto" type="button" label="Crear productos" icon="pi pi-check-circle" (click)="LlamarModalCrearProducto()"> </button>
   </div>
 
   <div class="mb-4">
@@ -36,7 +36,7 @@
     <br>
   </div>
 
-  <form [formGroup]="FormOrdenTrabajo">
+  <form [formGroup]="FormOrdenTrabajo" id="formOrdenTrabajo">
     <div class="mb-3">
       <div class="row g-4">
         <!-- NUMERO ORDEN DE TRABAJO -->
@@ -48,7 +48,7 @@
         </div>
         
         <!-- ID CLIENTE -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2" id="idCliente">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-user"></i>
             <input formControlName="Id_Cliente" type="text" id="orden" pInputText [required]="true" [readonly]="true"/>
@@ -57,15 +57,18 @@
         </div>
 
         <!-- NOMBRE CLIENTE -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-3" id="cliente">
           <span class="p-float-label">
-            <p-dropdown formControlName="Nombre_Cliente" inputId="cliente" [options]="clientes" optionValue="cli_Id" optionLabel="cli_Nombre" [filter]="true" filterBy="cli_Nombre" [showClear]="true" [autoDisplayFirst]="false" (onChange)="clienteSeleccionado()" (onClear)="limpiarCliente()" [required]="true"></p-dropdown>
+            <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off"[required]="true"/>
+            <datalist id="clientes">
+              <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
+            </datalist>
             <label for="cliente">Cliente</label>
           </span>
         </div>
 
         <!-- ID PRODUCTO -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idProducto">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-box"></i>
             <input formControlName="Id_Producto" type="text" id="Id_Producto" (keyup.enter)="buscarProductoPorId()" pInputText [required]="true"/>
@@ -76,9 +79,9 @@
         <!-- NOMBRE PRODUCTO -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText (keyup)="consultarProductos()" (change)="productoSeleccionado()" [required]="true"/>
+            <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText (keyup)="consultarProductos()" (change)="productoSeleccionado()" autocomplete="off"[required]="true"/>
             <datalist id="productos">
-              <option value={{item.prod_Nombre}} *ngFor="let item of productos">{{item.prod_Id}}</option>
+              <option value={{item.prod_Id}} *ngFor="let item of productos">{{item.prod_Nombre}}</option>
             </datalist>
             <label for="Nombre_Producto">Referencia</label>
           </span>
@@ -149,14 +152,6 @@
             <label for="FechaCrea">Fecha Creación</label>
           </span>
         </div>
-
-        <!-- Fecha Estimada Entrega -->
-        <!-- <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-          <span class="p-float-label">
-            <p-calendar formControlName="OT_FechaEntrega" inputId="FechaInicial" [showIcon]="true" [required]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Entrega</label>
-          </span>
-        </div> -->
 
         <!-- Campo Observacion -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-12 col-xxl-12">
@@ -778,7 +773,7 @@
           leftIcon="pi pi-slack" id="mezclas-ot">
           <!--Ver tutorial-->
           <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+            <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="verTutorial2()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
           </div>
 
           <!-- Boton para crear Mezclas -->
@@ -1919,12 +1914,12 @@
 </p-card>
 
 <!-- Modal de crear producto -->
-<p-dialog header="Crear Productos" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
+<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
   <app-crear-producto></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
-<p-dialog header="Crear Clientes" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
+<p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
   <app-crear-clientes></app-crear-clientes>
 </p-dialog>
 

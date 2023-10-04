@@ -36,8 +36,8 @@ export class CrearCategoriasMPComponent implements OnInit {
   registrarCategoriaMP() {
     const CamposCategoriasMP : modelCategoriaMP = {
       CatMP_Id: 0,
-      CatMP_Nombre: this.formCrearCategoriasMP.get('catNombre')?.value,
-      CatMP_Descripcion: this.formCrearCategoriasMP.get('catDescripcion')?.value,
+      CatMP_Nombre: (this.formCrearCategoriasMP.get('catNombre')?.value).toUpperCase(),
+      CatMP_Descripcion: (this.formCrearCategoriasMP.get('catDescripcion')?.value).toUpperCase(),
 
     }
     this.servicioCategoriasMP.srvAgregar(CamposCategoriasMP).subscribe(datosCategoriasMP => {
