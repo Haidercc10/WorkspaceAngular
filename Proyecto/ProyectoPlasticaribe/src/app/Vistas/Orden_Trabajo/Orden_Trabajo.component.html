@@ -58,7 +58,8 @@
 
         <!-- NOMBRE CLIENTE -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-3" id="cliente">
-          <span class="p-float-label">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-users"></i>
             <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off"[required]="true"/>
             <datalist id="clientes">
               <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
@@ -77,8 +78,9 @@
         </div>
 
         <!-- NOMBRE PRODUCTO -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3">
-          <span class="p-float-label">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3" id="producto">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-th-large"></i>
             <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText (keyup)="consultarProductos()" (change)="productoSeleccionado()" autocomplete="off"[required]="true"/>
             <datalist id="productos">
               <option value={{item.prod_Id}} *ngFor="let item of productos">{{item.prod_Nombre}}</option>
@@ -88,7 +90,7 @@
         </div>
 
         <!-- CANTIDAD A FABRICAR -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="cantidadFabricar">
           <span class="p-float-label">
             <p-inputNumber formControlName="Cantidad" mode="decimal" inputId="Cant" [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
             <label for="Cant">Cant. Pedida</label>
@@ -96,7 +98,7 @@
         </div>
 
         <!-- PRESENTACION PRODUCTO -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="presentacion">
           <span class="p-float-label">
             <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false" [options]="presentaciones" optionLabel="undMed_Nombre" optionValue="undMed_Id" (onChange)="consultarInfoProducto()" [required]="true"></p-dropdown>
             <label for="Estado">Presentación</label>
@@ -104,9 +106,9 @@
         </div>
 
         <!-- PRECIO UNITARIO -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="precioUnitario">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Precio" mode="decimal" inputId="Cant" [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
+            <p-inputNumber formControlName="Precio" mode="decimal" prefix="$ " inputId="Cant" [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
             <label for="Cant">Precio Unitario</label>
           </span>
         </div>
@@ -114,7 +116,7 @@
         <!-- MARGEN ADICIONAL -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
+            <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" prefix="% " [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
             <label for="Cant">Margen Adicional</label>
           </span>
         </div>
@@ -131,7 +133,7 @@
         <!-- Nombre Vendedor -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
           <span class="p-float-label">
-            <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+            <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="false" [required]="true" (onChange)="vendedorSeleccionado()"></p-dropdown>
             <label for="Nombre_Vendedor">Vendedor</label>
           </span>
         </div>

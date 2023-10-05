@@ -7668,21 +7668,6 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
   },
   {
     attachTo: {
-      element: '#crearCliente',
-      on: 'bottom'
-    },
-    buttons: [
-      builtInButtons.back,
-      builtInButtons.next,
-    ],
-    classes: '',
-    scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'crearCliente',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Cliente</h5>`,
-    text: `<p></p>`
-  },
-  {
-    attachTo: {
       element: '#idProducto',
       on: 'bottom'
     },
@@ -7694,11 +7679,11 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idProducto',
     title: `<h5 class="tituloRojo" style="margin: auto;">Item (Id Producto)</h5>`,
-    text: `<p></p>`
+    text: `<p>Podemos buscar un producto en base a su código, para hacer esto tenemos escribimos en este campo el codigo del mismo y luego presionamos la tecla 'Enter', al hacer esto se llenará automaticamente el campo siguiente (Producto).</p>`
   },
   {
     attachTo: {
-      element: '#crearProducto',
+      element: '#producto',
       on: 'bottom'
     },
     buttons: [
@@ -7707,9 +7692,57 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     ],
     classes: '',
     scrollTo: { behavior: 'smooth', block: 'center' },
-    id: 'crearProducto',
-    title: `<h5 class="tituloRojo" style="margin: auto;">Crear Productos</h5>`,
-    text: `<p></p>`
+    id: 'producto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Referencia (Producto)</h5>`,
+    text: `<p>Otra forma de buscar un producto es por su referencia (nombre), sí escribimos el nombre del producto en este campo nos irán apareciendo opciones de los productos que tienen en su nombre el texto que hemos escrito.</p>
+    <p>De igual manera que con el campo anterior (Id Producto) una vez se elija una de las opciones se llenará el campo Item automaticamente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadFabricar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cantidadFabricar',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad a Fabricar</h5>`,
+    text: `<p>En este campo podemos colocar la cantidad que queremos fabricar del producto, este campo es editable pero tambien puede llenarse de manera automatica.</p>`
+  },
+  {
+    attachTo: {
+      element: '#presentacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'presentacion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Presentación</h5>`,
+    text: `<p>Debemos elegir una de las opciones de presentación que tenemos, esto nos permitirá buscar las especificaciones que tuvo la última orden de trabajo creada al producto seleccionado.</p>
+    <p>Se buscará la información de la última orden de trabajo creada al producto seleccionado, cuando se encuentre información en los campos Item (Id Producto) y Presentación.
+    Si se encuentra una orden de trabajo creada al producto seleccionado, se cargará en los campos la información de la orden encontrada.</p>`
+  },
+  {
+    attachTo: {
+      element: '#precioUnitario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'precioUnitario',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Precio Unitario</h5>`,
+    text: `<p>En este campo se estará cargad</p>`
   },
 ];
 

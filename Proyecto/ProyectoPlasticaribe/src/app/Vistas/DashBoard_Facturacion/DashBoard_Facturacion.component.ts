@@ -90,8 +90,6 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion(){
-    this.totalFacturadoanio = 0;
-    this.facturadoAnios = [];
     if (this.ValidarRol == 1 || this.ValidarRol == 60) {
       this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
@@ -102,7 +100,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       for (let i = 0; i < 12; i++) {
         let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
         this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
-          if (moment().month() == 8 && this.anoSeleccionado == 2023 && mes == '09') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
+          if (this.anoSeleccionado == 2023 && mes == '09') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
           else this.totalFacturadoanio += datos_facturacion;
         });
       }
