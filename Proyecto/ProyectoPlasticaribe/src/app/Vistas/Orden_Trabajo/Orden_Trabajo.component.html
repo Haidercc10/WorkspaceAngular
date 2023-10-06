@@ -372,7 +372,7 @@
                 <!-- Unidad Medida -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true"></p-dropdown>
+                    <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
                     <label for="UndMedida">Und. Medida</label>
                   </span>
                 </div>
@@ -604,7 +604,7 @@
                 <!-- Formato -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
                     <label for="Formato">Formato</label>
                   </span>
                 </div>
@@ -661,7 +661,7 @@
                 <!-- Formato -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
-                    <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                    <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
                     <label for="Formato">Formato</label>
                   </span>
                 </div>
@@ -704,7 +704,7 @@
                 <!-- Peso Millar -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
                   <span class="p-float-label">
-                    <p-inputNumber formControlName="PesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="PesoMillar" inputId="PesoMillar" [(ngModel)]="ArrayProducto[0].PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="PesoMillar">Peso Millar</label>
                   </span>
                 </div>

@@ -941,10 +941,15 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = true;
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
         this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
-        let data = this.ArrayProducto[0];
         let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte | 0;
-        if (this.corte) margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
-        if (this.sellado) margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
+        if (this.corte) {
+          margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
+          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
+        }
+        if (this.sellado) {
+          margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
+          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+        }
         this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
         if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
           let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
@@ -966,7 +971,7 @@ export class Orden_TrabajoComponent implements OnInit {
           }
           //Calcular Peso Producto y Peso Millar
           for (let i = 0; i < this.ArrayProducto.length; i++) {
-            if (this.ArrayProducto[i].Id == data.Id && this.ArrayProducto[i].UndCant == data.UndCant) {
+            if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
               //Peso Producto
               if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
                 material == 3 ? fact = 0.0048 : fact = 0.00468;
@@ -975,41 +980,41 @@ export class Orden_TrabajoComponent implements OnInit {
                 material == 3 ? fact = 0.0317 : fact = 0.0302;
                 this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
               }
-              this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
+              this.pesoProducto = this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion;
               //Peso Millar
-              this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].Peso_Producto * 1000;
-              if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar / 2;
+              this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
+              if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
 
               //Calcular datos de la ot
-              if (data.UndCant == 'Kg') {
-                this.cantidadProducto = data.Cant;
-                this.margenKg = margen_Adicional * (data.Cant / 100);
-                this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
-                this.valorKg = data.PrecioUnd;
-                this.valorProducto = data.PrecioUnd;
-                this.valorOt = data.Cant * this.valorProducto;
-              } else if (data.UndCant == 'Paquete') {
-                this.cantidadProducto = data.Cant;
-                this.valorProducto = data.PrecioUnd;
-                this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (data.Cant * data.CantPaquete)));
-                this.valorOt = data.Cant * data.PrecioUnd;
-                if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (data.CantPaquete / 1000);
-                if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
-                if (data.CantPaquete == 0) this.valorKg = 0;
-                else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
-              } else if (data.UndCant == 'Und') {
-                this.cantidadProducto = data.Cant;
-                this.valorProducto = data.PrecioUnd;
+              if (this.ArrayProducto[0].UndCant == 'Kg') {
+                this.cantidadProducto = this.ArrayProducto[0].Cant;
+                this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
+                this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
+                this.valorKg = this.ArrayProducto[0].PrecioUnd;
+                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+                this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
+              } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
+                this.cantidadProducto = this.ArrayProducto[0].Cant;
+                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+                this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
+                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
+                this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
+                if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
+                if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
+                if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
+                else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
+              } else if (this.ArrayProducto[0].UndCant == 'Und') {
+                this.cantidadProducto = this.ArrayProducto[0].Cant;
+                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
                 this.valorOt = this.cantidadProducto * this.valorProducto;
-                this.margenKg = (margen_Adicional * ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * data.Cant));
+                this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
+                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
                 if (this.ArrayProducto[i].Peso_Producto > 0) {
                   if (this.valorOt == 0) this.valorOt = 1;
-                  if ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
-                  else this.valorKg = this.valorOt / ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000);
+                  if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
+                  else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
                 } else this.valorOt = 0;
-              } else if (data.UndCant == 'Rollo') {
+              } else if (this.ArrayProducto[0].UndCant == 'Rollo') {
               }
             }
           }
@@ -1022,7 +1027,7 @@ export class Orden_TrabajoComponent implements OnInit {
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas() {
     let simboloPorcentaje: boolean = false;
-    let data: string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    let data : string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
     if (`${data}`.trim() == 'CUSTOM') data = 'NO APLICA MEZCLA';
     simboloPorcentaje = data.includes("%") ? true : false;
     if (simboloPorcentaje) data = data.replace('%', '%25')
