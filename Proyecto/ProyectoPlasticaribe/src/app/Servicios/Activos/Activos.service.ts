@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 export class ActivosService {
 
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  readonly ruta2 = "https://api.currencyapi.com/v3/latest?apikey=cur_live_qote9FFugoTdhF6GVEYXGzTISkYbPTxtAYxLmima"
 
   constructor(private http : HttpClient) { }
 
@@ -50,4 +51,6 @@ export class ActivosService {
     return this.http.post(this.rutaPlasticaribeAPI + '/Activos', data);
   }
 
+  Conversion = (): Observable<any> => this.http.get(this.ruta2);
+  
 }

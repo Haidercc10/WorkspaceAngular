@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -7,6 +8,7 @@ import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
+import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -144,7 +146,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
                                                 private otLaminadoService : OT_LaminadoService,
                                                   private otSelladoCorteService : OrdenTrabajo_Sellado_CorteService,
                                                     private usuarioService : UsuarioService,
-                                                      private messageService: MessageService,) {
+                                                      private messageService: MessageService,
+                                                        private prueba : ActivosService, 
+                                                          private currencyPipe : CurrencyPipe) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -360,6 +364,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.cargarTiposProductos();
     this.cargarTiposSellado();
     this.limpiarCampos();
+    this.prueba.Conversion().subscribe(data => console.log(data));
+    const pesosColombianos = 500000; // Aquí debes reemplazar con el valor en pesos colombianos que deseas convertir
+    const dolares = this.currencyPipe.transform(pesosColombianos, 'USD', 'symbol', '1.2-2');
+    console.log(dolares);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
