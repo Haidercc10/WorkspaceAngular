@@ -26,6 +26,7 @@ export class DashboardOTComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
+  cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
   estadosOrdenes : any [] = [];
   totalOrdenesMes : number = 0; //Variable que va a almacenar la cantidad de ordenes que se ahn hecho en el ultimo mes
@@ -70,7 +71,7 @@ export class DashboardOTComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setTimeout(() => this.tiempoExcedido(), 1000);
+    this.tiempoExcedido();
   }
 
   tutorial(){
@@ -94,8 +95,10 @@ export class DashboardOTComponent implements OnInit {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.ordenTrabajo) {
+      this.cargando = true;
       this.llenarEstadosOrdenes();
       this.recargar();
+      setTimeout(() => this.cargando = false, 100);
     }
   }
 

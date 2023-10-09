@@ -124,7 +124,7 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
 }
 
 .slide-in-fwd-center {
-	animation: slide-in-fwd-center 1s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	animation: slide-in-fwd-center 2s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 @keyframes slide-in-top {

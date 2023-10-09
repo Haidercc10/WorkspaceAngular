@@ -70,3 +70,37 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   width: calc(100% + 0.1%);
   height: calc(100% + 1%);
 }
+
+.swing-in-bottom-fwd {
+	animation: swing-in-bottom-fwd 2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+.swing-in-top-fwd {
+	animation: swing-in-top-fwd 2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+@keyframes swing-in-bottom-fwd {
+  0% {
+    transform: rotateX(100deg);
+    transform-origin: bottom;
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0);
+    transform-origin: bottom;
+    opacity: 1;
+  }
+}
+
+@keyframes swing-in-top-fwd {
+  0% {
+    transform: rotateX(-100deg);
+    transform-origin: top;
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0);
+    transform-origin: top;
+    opacity: 1;
+  }
+}

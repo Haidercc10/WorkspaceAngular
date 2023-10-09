@@ -71,6 +71,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
     let num : number = 0;
     this.cargando = true;
     this.bgRollosService.GetInventarioRollos().subscribe(data => {
+      if (data.length == 0) this.cargando = false;
       for (let i = 0; i < data.length; i++) {
         let info : any = {
           Orden: data[i].bgRollo_OrdenTrabajo,
@@ -92,7 +93,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         num += 1;
         if (num == data.length) this.cargando = false;
       }
-    }, err => this.cargando = false);
+    }, () => this.cargando = false);
   }
 
   // Funcion que va a consultar los detalles de las ordenes de trabajo
@@ -120,7 +121,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
         this.inventarioDetallado.push(info);
         if (num == data.length) this.cargando = false;
       }
-    }, err => this.cargando = false);
+    }, () => this.cargando = false);
   }
 
   // Funcion que va a aplicar un filtro de busqueda a las tablas
@@ -129,17 +130,13 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   // Funcion que va a calcular la cantidad total de kg que hay
   calcularTotalKg(data : any) : number{
     let total : number = 0;
-    for (const item of data) {
-      total += item.Cantidad;
-    }
+    total = data.reduce((a,b) => a + b.Cantidad);
     return total;
   }
 
   calcularTotalRollos(data : any) : number{
     let total : number = 0;
-    for (const item of data) {
-      total += item.Rollos;
-    }
+    total = data.reduce((a,b) => a + b.Rollos);
     return total;
   }
 

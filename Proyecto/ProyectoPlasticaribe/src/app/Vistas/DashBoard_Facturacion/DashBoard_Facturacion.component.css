@@ -124,15 +124,15 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
 }
 
 .roll-in-left {
-	animation: roll-in-left 1s ease-out both;
+	animation: roll-in-left 1.2s ease-out both;
 }
 
 .roll-in-right {
-	animation: roll-in-right 1s ease-out both;
+	animation: roll-in-right 1.2s ease-out both;
 }
 
 .slide-in-elliptic-top-fwd {
-	animation: slide-in-elliptic-top-fwd 1.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	animation: slide-in-elliptic-top-fwd 1.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 @keyframes roll-in-left {
