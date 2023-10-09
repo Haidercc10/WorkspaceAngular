@@ -112,17 +112,17 @@ export class DashboardOTComponent implements OnInit {
 
     if (this.ValidarRol == 1) {
       this.estadosOrdenes = [
-        { Nombre : 'Abierta', Cantidad : 0, Class : 'bg-naranja', },
-        { Nombre : 'Asignada', Cantidad : 0, Class : 'bg-azul', },
-        { Nombre : 'Terminada', Cantidad : 0, Class : 'bg-verde', },
-        { Nombre : 'En proceso', Cantidad : 0, Class : 'bg-amarillo', },
-        { Nombre : 'Anulado', Cantidad : 0, Class : 'bg-rojo', },
-        { Nombre : 'Cerrada', Cantidad : 0, Class : 'bg-verde2', },
+        { Nombre : 'ABIERTA', Cantidad : 0, Class : 'bg-naranja', },
+        { Nombre : 'ASIGNADA', Cantidad : 0, Class : 'bg-azul', },
+        { Nombre : 'TERMINADA', Cantidad : 0, Class : 'bg-verde', },
+        { Nombre : 'EN PROCESO', Cantidad : 0, Class : 'bg-amarillo', },
+        { Nombre : 'ANULADO', Cantidad : 0, Class : 'bg-rojo', },
+        { Nombre : 'CERRADO', Cantidad : 0, Class : 'bg-verde2', },
       ];
 
       this.ordenTrabajoService.GetOrdenesMes_Estados().subscribe(datos_ot => {
         datos_ot.forEach(element => {
-          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;          
+          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;
         });
       });
 

@@ -908,15 +908,15 @@ export class Orden_TrabajoComponent implements OnInit {
             });
             this.FormOrdenTrabajoSellado.patchValue({
               Formato_Sellado: this.ArrayProducto[0].Tipo,
-              Ancho_Sellado: this.ArrayProducto[0].Ancho | 0,
-              Largo_Sellado: this.ArrayProducto[0].Largo | 0,
-              Fuelle_Sellado: this.ArrayProducto[0].Fuelle | 0,
-              Margen_Sellado: itemOt.ptMargen | 0,
-              PesoMillar: this.ArrayProducto[0].PesoMillar | 0,
+              Ancho_Sellado: this.ArrayProducto[0].Ancho,
+              Largo_Sellado: this.ArrayProducto[0].Largo,
+              Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
+              Margen_Sellado: itemOt.ptMargen,
+              PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
-              PrecioDia: itemOt.dia | 0,
-              PrecioNoche: itemOt.noche | 0,
-              CantidadPaquete: this.ArrayProducto[0].CantPaquete | 0,
+              PrecioDia: parseFloat(itemOt.dia),
+              PrecioNoche: parseFloat(itemOt.noche),
+              CantidadPaquete: this.ArrayProducto[0].CantPaquete,
               PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0 : parseFloat(itemOt.pesopaquete),
               CantidadBulto: this.ArrayProducto[0].CantBulto,
               PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0 : parseFloat(itemOt.pesoBulto),
@@ -980,7 +980,7 @@ export class Orden_TrabajoComponent implements OnInit {
                 material == 3 ? fact = 0.0317 : fact = 0.0302;
                 this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
               }
-              this.pesoProducto = this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion;
+              this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
               //Peso Millar
               this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
               if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;

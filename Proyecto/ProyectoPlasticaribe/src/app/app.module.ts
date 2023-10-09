@@ -184,6 +184,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 
 @NgModule({
   declarations: [
@@ -292,6 +293,7 @@ import { AppComponent } from './app.component';
     Reporte_InventarioAreasComponent,
     Dashboard_AreasComponent,
     Orden_TrabajoComponent,
+    Formato_Facturas_VentasComponent,
   ],
 
   imports: [
