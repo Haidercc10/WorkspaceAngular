@@ -656,11 +656,18 @@ export class Orden_TrabajoComponent implements OnInit {
   productoSeleccionado() {
     let id_producto = this.FormOrdenTrabajo.value.Nombre_Producto;
     let producto = this.productos.find(x => x.prod_Id == id_producto);
+    let presentacion : any;
+    this.bagProService.GetPresentacionItem(producto.prod_Id).subscribe(data => {
+      presentacion = `${data.ptPresentacionNom}`;
+      if (presentacion == 'Kilo') presentacion = 'Kg';
+      else if (presentacion == 'Unidad') presentacion = 'Und';
+      this.FormOrdenTrabajo.patchValue({ Presentacion : presentacion, });
+    }, null);
     this.FormOrdenTrabajo.patchValue({
       Id_Producto: producto.prod_Id,
       Nombre_Producto: producto.prod_Nombre,
     });
-    if (this.FormOrdenTrabajo.value.Id_Producto != null && this.FormOrdenTrabajo.value.Presentacion != null) this.consultarInfoProducto();
+    setTimeout(() => this.consultarInfoProducto(), 500);
   }
 
   // 
@@ -677,12 +684,19 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a buscar la información del producto por su ID
   buscarProductoPorId() {
     let id: any = this.FormOrdenTrabajo.value.Id_Producto;
+    let presentacion : any;
+    this.bagProService.GetPresentacionItem(id).subscribe(data => {
+      presentacion = `${data.ptPresentacionNom}`;
+      if (presentacion == 'Kilo') presentacion = 'Kg';
+      else if (presentacion == 'Unidad') presentacion = 'Und';
+      this.FormOrdenTrabajo.patchValue({ Presentacion : presentacion, });
+    }, null);
     this.productoService.srvObtenerListaPorId(id).subscribe(data => {
       this.FormOrdenTrabajo.patchValue({
         Id_Producto: data.prod_Id,
-        Nombre_Producto: data.prod_Nombre,
+        Nombre_Producto: data.prod_Nombre, 
       });
-      if (this.FormOrdenTrabajo.value.Id_Producto != null && this.FormOrdenTrabajo.value.Presentacion != null) this.consultarInfoProducto();
+      setTimeout(() => this.consultarInfoProducto(), 500);
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
   }
 

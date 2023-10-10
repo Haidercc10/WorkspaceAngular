@@ -82,6 +82,8 @@ export class BagproService {
 
   GetOrdenTrabajo = (orden : number) => this.http.get<any>(this.rutaBagPro + `/ClientesOt/getOrdenTrabajo/${orden}`);
 
+  GetPresentacionItem = (item : number) : Observable<any> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/getPresentacionItem/${item}`);
+
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 
   srvObtenerListaClienteOTItems = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');
