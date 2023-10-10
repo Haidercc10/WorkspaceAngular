@@ -704,7 +704,7 @@
                 <!-- Peso Millar -->
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
                   <span class="p-float-label">
-                    <p-inputNumber formControlName="PesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="PesoMillar" [(ngModel)]="pesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                     <label for="PesoMillar">Peso Millar</label>
                   </span>
                 </div>
@@ -1916,12 +1916,12 @@
 </p-card>
 
 <!-- Modal de crear producto -->
-<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
+<p-dialog header="Crear Productos" [(visible)]="ModalCrearProductos" [style]="{width: '80vw'}" [modal]="true" [draggable]="false" (onHide)="ngOnInit()">
   <app-crear-producto></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
-<p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" (onHide)="ngOnInit()">
+<p-dialog header="Crear Clientes" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" [draggable]="false" (onHide)="ngOnInit()">
   <app-crear-clientes></app-crear-clientes>
 </p-dialog>
 

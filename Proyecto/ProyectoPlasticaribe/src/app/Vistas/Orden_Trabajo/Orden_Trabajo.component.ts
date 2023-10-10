@@ -101,6 +101,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoPaquete: number = 0; //Variable que almacenará cuantos kg pesa un paquete
   pesoBulto: number = 0; //Variable que almacenará cuantos kg pesa un bulto
   pesoProducto: number = 0; //Variable que almacenará el peso del producto
+  pesoMillar : number = 0; //Variable que almacenará el peso de un millar
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
 
@@ -997,7 +998,8 @@ export class Orden_TrabajoComponent implements OnInit {
               this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
               //Peso Millar
               this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
-              if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+              if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+              this.pesoMillar = this.ArrayProducto[i].PesoMillar;
 
               //Calcular datos de la ot
               if (this.ArrayProducto[0].UndCant == 'Kg') {
