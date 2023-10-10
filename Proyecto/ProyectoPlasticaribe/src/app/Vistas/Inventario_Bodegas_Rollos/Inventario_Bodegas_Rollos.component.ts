@@ -129,12 +129,14 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
 
   // Funcion que va a calcular la cantidad total de kg que hay
   calcularTotalKg(data : any) : number{
+    if (data.length == 0) return 0;
     let total : number = 0;
     total = data.reduce((a,b) => a + b.Cantidad);
     return total;
   }
 
   calcularTotalRollos(data : any) : number{
+    if (data.length == 0) return 0;
     let total : number = 0;
     total = data.reduce((a,b) => a + b.Rollos);
     return total;
