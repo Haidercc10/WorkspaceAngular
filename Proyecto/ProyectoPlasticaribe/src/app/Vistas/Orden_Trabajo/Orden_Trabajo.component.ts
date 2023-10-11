@@ -929,12 +929,12 @@ export class Orden_TrabajoComponent implements OnInit {
               Margen_Sellado: itemOt.ptMargen,
               PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
-              PrecioDia: parseFloat(itemOt.dia),
-              PrecioNoche: parseFloat(itemOt.noche),
-              CantidadPaquete: this.ArrayProducto[0].CantPaquete,
-              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0 : parseFloat(itemOt.pesopaquete),
-              CantidadBulto: this.ArrayProducto[0].CantBulto,
-              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0 : parseFloat(itemOt.pesoBulto),
+              PrecioDia: parseFloat(itemOt.dia) | 0,
+              PrecioNoche: parseFloat(itemOt.noche) | 0,
+              CantidadPaquete: this.ArrayProducto[0].CantPaquete | 0,
+              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0 : parseFloat(itemOt.pesopaquete) | 0,
+              CantidadBulto: this.ArrayProducto[0].CantBulto | 0,
+              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0 : parseFloat(itemOt.pesoBulto) | 0,
             });
             setTimeout(() => this.calcularDatosOt(), 1000);
             this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
@@ -1650,6 +1650,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Función que va a validar que la información este correcta
   validarDatos() {
+    this.calcularDatosOt();
     if (this.FormOrdenTrabajo.valid) {
       if (!this.extrusion) this.limpiarFormExtrusion();
       if (!this.impresion && !this.rotograbado) this.limpiarFormImpresion();
@@ -1677,7 +1678,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt() {
-    this.calcularDatosOt();
     this.cargando = true;
     let errorExt: boolean = false, errorImp: boolean = false, errorLam: boolean = false, errorSelCor: boolean = false;
     let infoOT: modelOrden_Trabajo = {
@@ -1713,13 +1713,13 @@ export class Orden_TrabajoComponent implements OnInit {
       errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
       setTimeout(() => {
         if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-          this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de trabajo N°${datos_ot.ot_Id}`);
+          this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.ot_Id}`);
           this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
           this.cambiarEstadoProducto(this.producto);
           this.pdfOrdenTrabajo(datos_ot.ot_Id);
           this.limpiarCampos();
         }
-      }, 2000);
+      }, 3000);
     }, error => {
       this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
       this.cargando = false;
@@ -1984,6 +1984,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a validar que si se desee actualizar la orden de trabajo
   validarActualizacionOT() {
+    this.calcularDatosOt();
     if (this.FormOrdenTrabajo.valid) {
       let ot: number = this.FormOrdenTrabajo.value.OT_Id;
       if (!this.extrusion) this.limpiarFormExtrusion();
@@ -2022,7 +2023,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va actualizar con nueva información la orden de trabajo
   editarOrdenTrabajo() {
     if (this.edicionOrdenTrabajo) {
-      this.calcularDatosOt();
+      this.cerrarMensaje();
       this.cargando = true;
       let ot: number = this.FormOrdenTrabajo.value.OT_Id;
       this.ordenTrabajoService.srvObtenerListaPorId(ot).subscribe(datos_Orden => {
@@ -2067,9 +2068,15 @@ export class Orden_TrabajoComponent implements OnInit {
               this.pdfOrdenTrabajo(ot);
               this.limpiarCampos();
             }
-          }, 1500);
-        }, () => this.msj.mensajeError(`¡Error!`, `¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`));
-      }, () => this.msj.mensajeError(`¡Error!`, `No se pudo obtener información de la Orden de Trabajo N° ${ot}`));
+          }, 3000);
+        }, () => {
+          this.msj.mensajeError(`¡Error!`, `¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`);
+          this.cargando = false;
+        });
+      }, () => {
+        this.msj.mensajeError(`¡Error!`, `No se pudo obtener información de la Orden de Trabajo N° ${ot}`);
+        this.cargando = false;
+      });
     }
   }
 

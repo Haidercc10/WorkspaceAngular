@@ -40,5 +40,74 @@ td {
   font-weight: 500;
 }
 
+.whiteBackground {
+  background-color: #FFFFFFF6;
+}
 
+.darBackgroun {
+  background-color: #071426F6;
+}
 
+.descargandoArchivo {
+  z-index: 999;
+  width: 300px;
+  height: 90px;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  border: .3px solid #9a9a9a;
+  border-radius: 20px;
+  transition: all 1s;
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
+.descargandoArchivo:hover {
+  width: 310px;
+  height: 95px;
+}
+
+.descargandoArchivo .header {
+  border-bottom: .3px solid #676767F0;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  transition: all 1s;
+}
+
+.descargandoArchivo h1 {
+  font-size: 1.3rem;
+  color: var(--rojo);
+}
+
+.descargandoArchivo .content {
+  width: 100%;
+}
+
+::ng-deep p-progressspinner .p-progress-spinner {
+  width: 25px;
+  height: 25px;
+}
+
+.nameFile {
+  display: flex;
+}
+
+.whiteBackground .nombreArchivo {
+  font-size: 1em;
+  text-align: center;
+}
+
+.darBackgroun .nombreArchivo {
+  font-size: 1em;
+  text-align: center;
+}
+
+.whiteBackground .nombreArchivo, .whiteBackground .iconoArchivo {
+  color: black;
+}
+
+.darBackgroun .nombreArchivo, .darBackgroun .iconoArchivo {
+  color: white;
+}
