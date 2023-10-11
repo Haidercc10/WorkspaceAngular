@@ -519,13 +519,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ArrayDocumento.push(data);
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));
 
-    if (data.est == 'Abierta') this.catidadOTAbiertas += 1;
-    if (data.est == 'Asignada') this.cantidadOTAsignadas += 1;
-    if (data.est == 'Terminada') this.cantidadOTTerminada += 1;
-    if (data.est == 'En proceso') this.cantidadOTIniciada += 1;
-    if (data.est == 'Anulado') this.cantidadOtAnulada += 1;
-    if (data.est == 'Finalizada') this.cantidadOTFinalizada += 1;
-    if (data.est == 'Cerrada') this.cantidadOTCerrada += 1;
+    if (data.est == 'ABIERTA') this.catidadOTAbiertas += 1;
+    if (data.est == 'ASIGNADA') this.cantidadOTAsignadas += 1;
+    if (data.est == 'TERMINADA') this.cantidadOTTerminada += 1;
+    if (data.est == 'EN PROCESO') this.cantidadOTIniciada += 1;
+    if (data.est == 'ANULADO') this.cantidadOtAnulada += 1;
+    if (data.est == 'FINALIZADA') this.cantidadOTFinalizada += 1;
+    if (data.est == 'CERRADA') this.cantidadOTCerrada += 1;
     this.load = true;
   }
 
@@ -685,12 +685,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       this.ordenesSeleccionadas = [dato];
       this.otInfo = {...dato.ot};
       this.otSeleccionada = dato.ot;
-      if (dato.est == 'Terminada') this.estadoModal = '17';
-      else if (dato.est == 'En proceso') this.estadoModal = '16';
-      else if (dato.est == 'Asignada') this.estadoModal = '14';
-      else if (dato.est == 'Abierta') this.estadoModal = '15';
-      else if (dato.est == 'Anulado') this.estadoModal = '3';
-      else if (dato.est == 'Cerrada') this.estadoModal = '18';
+      if (dato.est == 'TERMINADA') this.estadoModal = '17';
+      else if (dato.est == 'EN PROCESO') this.estadoModal = '16';
+      else if (dato.est == 'ASIGNADA') this.estadoModal = '14';
+      else if (dato.est == 'ABIERTA') this.estadoModal = '15';
+      else if (dato.est == 'ANULADO') this.estadoModal = '3';
+      else if (dato.est == 'CERRADA') this.estadoModal = '18';
     }
     this.modalEstadosOT = true;
   }

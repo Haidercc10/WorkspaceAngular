@@ -575,42 +575,42 @@ export class DashboardOTComponent implements OnInit {
     this.modalEstadosOrdenes = true;
     this.modalEstadosProcesos_OT.modeModal = true;
     this.modalEstadosProcesos_OT.formularioOT.reset()
-    if (estado == 'Abierta') {
+    if (estado == 'ABIERTA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Abiertas y No Iniciadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 15,
       });
-    } else if (estado == 'Asignada') {
+    } else if (estado == 'ASIGNADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Asignadas y No Iniciadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 14,
       });
-    } else if (estado == 'En proceso') {
+    } else if (estado == 'EN PROCESO') {
       this.nombreModalEstados = 'Ordenes de Trabajo En Proceso';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 16,
       });
-    } else if (estado == 'Terminada') {
+    } else if (estado == 'TERMINADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Terminadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 17,
       });
-    } else if (estado == 'Anulado') {
+    } else if (estado == 'ANULADO') {
       this.nombreModalEstados = 'Ordenes de Trabajo Anuladas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 13,
       });
-    } else if (estado == 'Cerrada') {
+    } else if (estado == 'CERRADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Cerradas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
