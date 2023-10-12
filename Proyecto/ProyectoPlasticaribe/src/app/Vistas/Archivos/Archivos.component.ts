@@ -33,9 +33,9 @@ export class ArchivosComponent implements OnInit {
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
   rutaInicial : string; //Variable que va a almacenar la ruta inicial desde la cual se va a mover o copiar el archivo
-  nombreArchivo : string; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
+  nombreArchivo : string = ''; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
   validarArchivo_Carpeta : boolean;
-  descargandoArchivo : boolean = true;
+  descargandoArchivo : boolean = false; //Variable que va a validar si el si se está descargando un archivo o carpeta
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modal : boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
   clave : string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
@@ -193,7 +193,7 @@ export class ArchivosComponent implements OnInit {
    * que se encargará de hacer la peticion al servidor y responderá con un dato blob, este dato se tomará en esta funcion nuevamente y creará  un elemento de tipo a
    * que luego se encargará de realizar la descarga, luego de descargar el archivo este elemento se eliminará
   */
-  descargarArchivos(nombre : string){    
+  descargarArchivos(nombre : string, descargaCarpeta : boolean = false){    
     this.nombreArchivo = nombre;
     this.archivosService.descargarArchivos(nombre, this.nombreCarpeta + "\\").subscribe(data => {
       this.descargandoArchivo = true;
@@ -206,10 +206,13 @@ export class ArchivosComponent implements OnInit {
         a.target = '_blank';
         a.click();
         document.body.removeChild(a);
+        setTimeout(() => {
+          if (descargaCarpeta == true) this.archivosService.eliminarArchivos(`${this.nombreCarpeta}\\${nombre}`).subscribe();
+          this.descargandoArchivo = false;
+          this.nombreArchivo = '';
+          this.mensajeService.mensajeConfirmacion(`¡Descarga Completada!`);
+        }, 2000);
       }
-      this.descargandoArchivo = false;
-      this.nombreArchivo = '';
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
     });
   }
 
@@ -219,25 +222,9 @@ export class ArchivosComponent implements OnInit {
     let carpeta : any = nombre.substring(ultimaRuta, nombre.length + 1);
     carpeta = carpeta.replace('\\', '');
     this.nombreArchivo = carpeta;
+    this.descargandoArchivo = true;    
     this.archivosService.descargarCarpetas(carpeta, nombre).subscribe(data => {
-      this.descargandoArchivo = true;
-      const downloadedFile = new Blob([data.body!], { type: "application/zip" });
-      if (downloadedFile.size != 9){
-        const a = document.createElement('a');
-        document.body.appendChild(a);
-        a.download = carpeta;
-        a.href = URL.createObjectURL(downloadedFile);
-        a.target = '_blank';
-        a.click();
-        document.body.removeChild(a);
-        this.mensajeService.mensajeConfirmacion(`Confirmación`, `La carpeta se descargó exitosamente!`);
-        this.archivosService.eliminarArchivos(`${nombre}.zip`).subscribe(() => {
-          this.mostrarCarpetas(nombre);
-          this.cargarArchivos(nombre);
-          this.descargandoArchivo = false;
-          this.nombreArchivo = '';
-        });
-      }
+      if (data.type != 0) this.descargarArchivos(`${carpeta}.zip`, true);
     });
   }
 

@@ -141,19 +141,19 @@
   </div>
 </p-card>
 
-<div class="descargandoArchivo" [ngClass]="{'whiteBackground' : !modoSeleccionado, 'darBackgroun': modoSeleccionado }" *ngIf="descargandoArchivo">
+<div class="descargandoArchivo" [ngClass]="{'whiteBackground' : !modoSeleccionado, 'darBackgroun': modoSeleccionado, 'slide-in-right' : descargandoArchivo, 'slide-in-left' : !descargandoArchivo}" *ngIf="nombreArchivo != ''">
   <div class="header">
     <div class="text-center tituloDescarga">
       <h1 class="tituloDescarga p-2"><i class="pi pi-download font-size-18"></i> Descargando...</h1>
     </div>
   </div>
   <div class="content">
-    <div class="row px-5 py-2">
+    <div class="row px-3 py-2 g-2">
       <div class="col-2">
         <i class="pi pi-file-export iconoArchivo font-size-20"></i>
       </div>
-      <div class="col-8 nameFile">
-        <p class="nombreArchivo">123456789</p>
+      <div class="col-8 my-2 nameFile">
+        <p class="nombreArchivo">{{nombreArchivo.length > 30 ? (nombreArchivo.substring(0, 20) + '...').trim() : nombreArchivo}} </p>
       </div>
       <div class="col-2 text-center">
         <p-progressSpinner></p-progressSpinner>

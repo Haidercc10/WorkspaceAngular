@@ -6,7 +6,7 @@ import * as CryptoJS from 'crypto-js';
 })
 export class EncriptacionService {
 
-  secretKey = "YourSecretKeyForEncryption&Descryption";
+  secretKey = "ZN+Lvg_)=inW@e&@/?et{XyW?3QbF{(NKn+2+nPgq[;hk8wLpLZppg*ZkRP5wGL?X{Dm9NC*QVVVe.Z[p.Qbd{c={fhGYqCX4WXvmJiGE38NWC?NSAri[8C2";
   constructor() { }
 
   encrypt = (value : string) : string => CryptoJS.AES.encrypt(value, this.secretKey.trim()).toString();
