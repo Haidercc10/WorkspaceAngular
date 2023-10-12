@@ -85,7 +85,7 @@ td {
   width: 100%;
 }
 
-::ng-deep p-progressspinner .p-progress-spinner {
+.descargandoArchivo ::ng-deep p-progressspinner .p-progress-spinner {
   width: 25px;
   height: 25px;
 }

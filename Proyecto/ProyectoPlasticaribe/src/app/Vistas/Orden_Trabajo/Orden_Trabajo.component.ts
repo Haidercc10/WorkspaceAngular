@@ -1679,50 +1679,53 @@ export class Orden_TrabajoComponent implements OnInit {
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt() {
     this.cargando = true;
-    let errorExt: boolean = false, errorImp: boolean = false, errorLam: boolean = false, errorSelCor: boolean = false;
-    let infoOT: modelOrden_Trabajo = {
-      SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
-      Prod_Id: this.producto,
-      UndMed_Id: this.presentacionProducto,
-      Ot_FechaCreacion: this.today,
-      Ot_Hora: moment().format('H:mm:ss'),
-      Estado_Id: 15,
-      Usua_Id: this.storage_Id,
-      PedExt_Id: 497,
-      Ot_Observacion: this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
-      Ot_Cyrel: this.cyrel,
-      Ot_Corte: this.corte,
-      Mezcla_Id: this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-      Extrusion: this.extrusion,
-      Impresion: this.impresion,
-      Rotograbado: this.rotograbado,
-      Laminado: this.laminado,
-      Sellado: this.sellado,
-      Ot_MargenAdicional: this.FormOrdenTrabajo.value.Margen,
-      Ot_CantidadPedida: this.cantidadProducto,
-      Ot_ValorUnidad: this.valorProducto,
-      Ot_PesoNetoKg: this.netoKg,
-      Ot_ValorKg: this.valorKg,
-      Ot_ValorOT: this.valorOt,
-      Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-    }
-    this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
-      errorExt = this.guardarOt_Extrusion(datos_ot.ot_Id);
-      errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
-      errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
-      errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
-      setTimeout(() => {
-        if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-          this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.ot_Id}`);
-          this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-          this.cambiarEstadoProducto(this.producto);
-          this.pdfOrdenTrabajo(datos_ot.ot_Id);
-          this.limpiarCampos();
-        }
-      }, 3000);
-    }, error => {
-      this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
-      this.cargando = false;
+    this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
+      let errorExt: boolean = false, errorImp: boolean = false, errorLam: boolean = false, errorSelCor: boolean = false;
+      let infoOT: modelOrden_Trabajo = {
+        Numero_OT : numero_OT + 1,
+        SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
+        Prod_Id: this.producto,
+        UndMed_Id: this.presentacionProducto,
+        Ot_FechaCreacion: this.today,
+        Ot_Hora: moment().format('H:mm:ss'),
+        Estado_Id: 15,
+        Usua_Id: this.storage_Id,
+        PedExt_Id: 497,
+        Ot_Observacion: this.FormOrdenTrabajo.value.OT_Observacion == null ? '' : (this.FormOrdenTrabajo.value.OT_Observacion).trim().toUpperCase(),
+        Ot_Cyrel: this.cyrel,
+        Ot_Corte: this.corte,
+        Mezcla_Id: this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+        Extrusion: this.extrusion,
+        Impresion: this.impresion,
+        Rotograbado: this.rotograbado,
+        Laminado: this.laminado,
+        Sellado: this.sellado,
+        Ot_MargenAdicional: this.FormOrdenTrabajo.value.Margen,
+        Ot_CantidadPedida: this.cantidadProducto,
+        Ot_ValorUnidad: this.valorProducto,
+        Ot_PesoNetoKg: this.netoKg,
+        Ot_ValorKg: this.valorKg,
+        Ot_ValorOT: this.valorOt,
+        Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+      }
+      this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
+        errorExt = this.guardarOt_Extrusion(datos_ot.ot_Id);
+        errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
+        errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
+        errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
+        setTimeout(() => {
+          if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
+            this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.ot_Id}`);
+            this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
+            this.cambiarEstadoProducto(this.producto);
+            this.pdfOrdenTrabajo(datos_ot.numero_OT);
+            this.limpiarCampos();
+          }
+        }, 4000);
+      }, error => {
+        this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
+        this.cargando = false;
+      });
     });
   }
 
@@ -1887,6 +1890,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.edicionOrdenTrabajo = true;
 
     this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
+      this.cargando = true;
       for (let i = 0; i < datos_orden.length; i++) {
 
         this.cyrel = datos_orden[i].cyrel;
@@ -1926,7 +1930,7 @@ export class Orden_TrabajoComponent implements OnInit {
           Ancho_Extrusion2: datos_orden[i].ancho2_Extrusion,
           Ancho_Extrusion3: datos_orden[i].ancho3_Extrusion,
           Calibre_Extrusion: datos_orden[i].calibre_Extrusion,
-          UnidadMedida_Extrusion: datos_orden[i].und_Extrusion,
+          UnidadMedida_Extrusion: datos_orden[i].und_Extrusion.trim(),
           Tratado_Extrusion: datos_orden[i].id_Tratado,
         });
         this.FormOrdenTrabajoImpresion.patchValue({
@@ -1978,6 +1982,7 @@ export class Orden_TrabajoComponent implements OnInit {
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre, });
         this.cargarCombinacionMezclas();
         setTimeout(() => this.calcularDatosOt(), 1000);
+        this.cargando = false;
       }
     }, error => this.msj.mensajeError(error.error));
   }
@@ -2029,6 +2034,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.ordenTrabajoService.srvObtenerListaPorId(ot).subscribe(datos_Orden => {
         let info: modelOrden_Trabajo = {
           Ot_Id: datos_Orden.ot_Id,
+          Numero_OT : datos_Orden.numero_OT,
           SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
           Prod_Id: this.producto,
           UndMed_Id: this.presentacionProducto,
@@ -2265,7 +2271,7 @@ export class Orden_TrabajoComponent implements OnInit {
             margin: [25, 5],
             style: 'tablaEmpresa',
             table: {
-              widths: [60, '*', 60, '*'],
+              widths: ['10%', '40%', '10%', '40%'],
               style: 'header',
               body: [
                 [

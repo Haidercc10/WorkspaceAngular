@@ -193,9 +193,9 @@ export class ArchivosComponent implements OnInit {
    * que se encargará de hacer la peticion al servidor y responderá con un dato blob, este dato se tomará en esta funcion nuevamente y creará  un elemento de tipo a
    * que luego se encargará de realizar la descarga, luego de descargar el archivo este elemento se eliminará
   */
-  descargarArchivos(nombre : string, descargaCarpeta : boolean = false){    
+  descargarArchivos(nombre : string, descargaCarpeta : boolean = false, carpeta : string = this.nombreCarpeta){
     this.nombreArchivo = nombre;
-    this.archivosService.descargarArchivos(nombre, this.nombreCarpeta + "\\").subscribe(data => {
+    this.archivosService.descargarArchivos(nombre, carpeta + "\\").subscribe(data => {
       this.descargandoArchivo = true;
       const downloadedFile = new Blob([data.body!], { type: data.body! });
       if (downloadedFile.type != ''){
@@ -207,7 +207,7 @@ export class ArchivosComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         setTimeout(() => {
-          if (descargaCarpeta == true) this.archivosService.eliminarArchivos(`${this.nombreCarpeta}\\${nombre}`).subscribe();
+          if (descargaCarpeta == true) this.archivosService.eliminarArchivos(`${carpeta}\\${nombre}`).subscribe();
           this.descargandoArchivo = false;
           this.nombreArchivo = '';
           this.mensajeService.mensajeConfirmacion(`¡Descarga Completada!`);
@@ -217,14 +217,14 @@ export class ArchivosComponent implements OnInit {
   }
 
   // Funcion que va a descargar una carpeta
-  descargarCarpetas(nombre : string){
+  descargarCarpetas(nombre : string = this.nombreCarpeta){
     let ultimaRuta : any = `${nombre.lastIndexOf("\\")}`;
     let carpeta : any = nombre.substring(ultimaRuta, nombre.length + 1);
     carpeta = carpeta.replace('\\', '');
     this.nombreArchivo = carpeta;
     this.descargandoArchivo = true;    
     this.archivosService.descargarCarpetas(carpeta, nombre).subscribe(data => {
-      if (data.type != 0) this.descargarArchivos(`${carpeta}.zip`, true);
+      if (data.type != 0) this.descargarArchivos(`${carpeta}.zip`, true, nombre.substring(0, ultimaRuta));
     });
   }
 

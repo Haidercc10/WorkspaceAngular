@@ -68,7 +68,7 @@
           <tr class="font-size-13">
             <th scope="col" style="width: 65%"><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
             <th scope="col" class="text-center">
-              <p-button id="descargar" pTooltip="Descargar" label="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas(nombreCarpeta)"></p-button>
+              <p-button id="descargar" pTooltip="Descargar" label="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas()"></p-button>
             </th>
             <!--Copiar/Mover-->
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">

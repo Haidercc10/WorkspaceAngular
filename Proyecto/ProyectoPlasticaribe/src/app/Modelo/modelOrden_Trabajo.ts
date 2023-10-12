@@ -1,5 +1,6 @@
 export interface modelOrden_Trabajo {
   Ot_Id? : number;
+  Numero_OT : number;
   SedeCli_Id : number;
   Prod_Id : number;
   UndMed_Id : string;
