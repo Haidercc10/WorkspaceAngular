@@ -75,11 +75,17 @@ import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_E
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { CalendarioComponent } from './Vistas/Calendario/Calendario.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
+import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
+import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
+import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
+import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
 import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.component';
+import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
 import { DashboardOTComponent } from './Vistas/Dashboard-OT/Dashboard-OT.component';
+import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Areas.component';
 import { Dashboard_ComprasComponent } from './Vistas/Dashboard_Compras/Dashboard_Compras.component';
 import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_Costos.component';
 import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
@@ -93,13 +99,16 @@ import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergo
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
 import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
+import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
 import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
 import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
+import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Inventario_Bodegas_RollosComponent } from './Vistas/Inventario_Bodegas_Rollos/Inventario_Bodegas_Rollos.component';
 import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
+import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
 import { Mantenimiento_CamionesComponent } from './Vistas/Mantenimiento_Camiones/Mantenimiento_Camiones.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
@@ -107,11 +116,13 @@ import { Movimientos_MantenimientoComponent } from './Vistas/Movimientos_Manteni
 import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
 import { Orden_MaquilaComponent } from './Vistas/Orden_Maquila/Orden_Maquila.component';
+import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
 import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component';
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
+import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
@@ -121,6 +132,7 @@ import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_Certifica
 import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
+import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 import { Reporte_MaquilasComponent } from './Vistas/Reporte_Maquilas/Reporte_Maquilas.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
@@ -172,17 +184,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
-import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
-import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
-import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
-import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
-import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
-import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
-import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
-import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
-import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
-import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Areas.component';
+import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 
 @NgModule({
   declarations: [
@@ -290,6 +292,8 @@ import { Dashboard_AreasComponent } from './Vistas/Dashboard_Areas/Dashboard_Are
     Inventario_AreasComponent,
     Reporte_InventarioAreasComponent,
     Dashboard_AreasComponent,
+    Orden_TrabajoComponent,
+    Formato_Facturas_VentasComponent,
   ],
 
   imports: [

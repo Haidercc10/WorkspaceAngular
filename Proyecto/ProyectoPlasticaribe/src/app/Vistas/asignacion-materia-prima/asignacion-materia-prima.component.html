@@ -154,7 +154,7 @@
         <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
           <span class="p-float-label">
-            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal"  [showClear]="true" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal" (keyup.enter)="validarCamposVaciosMPRetirada()" [showClear]="true" inputId="Cantidad" [minFractionDigits]="2" pTooltip="Digita la cantidad a asignar y presiona ENTER para añadir el registro a la tabla"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
           </span>
         </div>

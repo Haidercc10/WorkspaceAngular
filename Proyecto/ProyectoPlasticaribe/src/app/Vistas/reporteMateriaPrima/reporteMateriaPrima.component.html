@@ -75,110 +75,60 @@
       *ngIf="ValidarRol != 4">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
+          <!-- Buscador de columnas -->
+          <p-toolbar>
+            <div id="rowToolbar" class="row g-3">
+              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
+                <p-multiSelect
+                [options]="columnas"
+                [(ngModel)]="_columnasSeleccionada"
+                optionLabel="header"
+                selectedItemsLabel="{0} columnas seleccionadas"
+                placeholder="Elige las columnas que quieres ver"
+                pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
+                tooltipPosition="top">
+                </p-multiSelect>
+              </div>
+            </div>
+          </p-toolbar>
           <p-table
             #dt
+            [columns]="_columnasSeleccionada"
             [value]="ArrayMateriaPrima"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="ArrayMateriaPrima.length"
-            [rowsPerPageOptions]="[10,25,50,100,ArrayMateriaPrima.length]"
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
             scrollHeight="50rem">
-            <ng-template pTemplate="header" >
+            <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Micras', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Inicial', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Entrada', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Salida', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Diferencia', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'UndCant', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PrecioUnd', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Categoria', 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
-                <th scope="col" pSortableColumn="Id">ID
-                  <p-sortIcon field="Id"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-                  <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th id="Ancho" pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho
-                  <p-sortIcon field="Ancho"></p-sortIcon>
-                </th>
-                <th id="Micras" pSortableColumn="Micras" pReorderableColumn scope="col">Micras
-                  <p-sortIcon field="Micras"></p-sortIcon>
-                </th>
-                <th id="inicial" pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-                  <p-sortIcon field="Inicial"></p-sortIcon>
-                </th>
-                <th id="entrada" pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-                  <p-sortIcon field="Entrada"></p-sortIcon>
-                </th>
-                <th id="salida" pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-                  <p-sortIcon field="Salida"></p-sortIcon>
-                </th>
-                <th id="stock" pSortableColumn="Cant" pReorderableColumn scope="col">Stock
-                  <p-sortIcon field="Cant"></p-sortIcon>
-                </th>
-                <th id="diferencia" pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-                  <p-sortIcon field="Diferencia"></p-sortIcon>
-                </th>
-                <th scope="col">Medida
-                </th>
-                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
-                  <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                </th>
-                <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
-                  <p-sortIcon field="SubTotal"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-                  <p-sortIcon field="Categoria"></p-sortIcon>
+                <th *ngFor="let col of columns" pSortableColumn="{{col.field}}">
+                  {{col.header}} 
+                  <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
                 <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
                 <td><b>{{rowIndex + 1}}</b></td>
-                <td>{{materiaPrima.Id}}</td>
-                <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Ancho}}</td>
-                <td>{{materiaPrima.Micras | number}}</td>
-                <td>{{materiaPrima.Inicial | number}}</td>
-                <td>{{materiaPrima.Entrada | number}}</td>
-                <td>{{materiaPrima.Salida | number}}</td>
-                <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
-                <td>{{materiaPrima.Diferencia | number}}</td>
-                <td>{{materiaPrima.UndCant}}</td>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <td>{{materiaPrima.PrecioUnd | number}}</td>
-                  <td>{{materiaPrima.SubTotal | number}}</td>
-                </ng-container>
-                <td>{{materiaPrima.Categoria}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(materiaPrima)"></p-button></td>
+                <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
+                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantInicial | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantEntrante | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantSaliente | number}}</td>
                 <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantDiferencia | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
                 <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
@@ -198,104 +148,64 @@
       *ngIf="ValidarRol != 4">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
+          <!-- Buscador de columnas -->
+          <p-toolbar>
+            <div id="rowToolbar" class="row g-3">
+              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
+                <p-multiSelect
+                [options]="columnas"
+                [(ngModel)]="_columnasSeleccionada"
+                optionLabel="header"
+                selectedItemsLabel="{0} columnas seleccionadas"
+                placeholder="Elige las columnas que quieres ver"
+                pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
+                tooltipPosition="top">
+                </p-multiSelect>
+              </div>
+            </div>
+          </p-toolbar>
           <p-table
             #dt_Polientileno
+            [columns]="_columnasSeleccionada"
             [value]="polietilenos"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="polietilenos.length"
-            [rowsPerPageOptions]="[10,25,50,100,polietilenos.length]"
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
             scrollHeight="50rem">
-            <ng-template pTemplate="header">
-              <tr class="font-size-16">
+            <ng-template pTemplate="header" let-columns>
+              <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Nombre', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Inicial', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Entrada', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Salida', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Cant', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Diferencia', 'contains')"></th>
-                <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'UndCant', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'PrecioUnd', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'SubTotal', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Categoria', 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
-                <th scope="col" pSortableColumn="Id">ID
-                  <p-sortIcon field="Id"></p-sortIcon>
+                <th *ngFor="let col of columns" pSortableColumn="{{col.field}}">
+                  {{col.header}} 
+                  <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-                  <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-                  <p-sortIcon field="Inicial"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-                  <p-sortIcon field="Entrada"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-                  <p-sortIcon field="Salida"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock
-                  <p-sortIcon field="Cant"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-                  <p-sortIcon field="Diferencia"></p-sortIcon>
-                </th>
-                <th scope="col">Medida
-                </th>
-                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
-                  <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                </th>
-                <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
-                  <p-sortIcon field="SubTotal"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-                  <p-sortIcon field="Categoria"></p-sortIcon>
-                </th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
-                <td>{{rowIndex + 1}}</td>
-                <td>{{materiaPrima.Id}}</td>
-                <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Inicial | number}}</td>
-                <td>{{materiaPrima.Entrada | number}}</td>
-                <td>{{materiaPrima.Salida | number}}</td>
-                <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
-                <td>{{materiaPrima.Diferencia | number}}</td>
-                <td>{{materiaPrima.UndCant}}</td>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <td>{{materiaPrima.PrecioUnd | number}}</td>
-                  <td>{{materiaPrima.SubTotal | number}}</td>
-                </ng-container>
-                <td>{{materiaPrima.Categoria}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(materiaPrima)"></p-button></td>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
+                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
-              <tr>
-                <td *ngIf="ValidarRol == 1" colspan="3" class="text-right">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantInicialPolietileno | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantEntrantePolietileno | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantSalientePolietileno | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistenciasPolientileno | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantDiferenciaPolietileno | number}}</td>
+              <tr id="totales">
+                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
+                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalPolietileno | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(3)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
               </tr>
             </ng-template>
           </p-table>
@@ -311,104 +221,64 @@
       *ngIf="ValidarRol != 4">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
+          <!-- Buscador de columnas -->
+          <p-toolbar>
+            <div id="rowToolbar" class="row g-3">
+              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
+                <p-multiSelect
+                [options]="columnas"
+                [(ngModel)]="_columnasSeleccionada"
+                optionLabel="header"
+                selectedItemsLabel="{0} columnas seleccionadas"
+                placeholder="Elige las columnas que quieres ver"
+                pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
+                tooltipPosition="top">
+                </p-multiSelect>
+              </div>
+            </div>
+          </p-toolbar>
           <p-table
             #dt_Tintas
+            [columns]="_columnasSeleccionada"
             [value]="tintas"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="tintas.length"
-            [rowsPerPageOptions]="[10,25,50,100,tintas.length]"
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
             scrollHeight="50rem">
-            <ng-template pTemplate="header">
-              <tr class="font-size-16">
+            <ng-template pTemplate="header" let-columns>
+              <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Nombre', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Inicial', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Entrada', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Salida', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Cant', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Diferencia', 'contains')"></th>
-                <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'UndCant', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'PrecioUnd', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'SubTotal', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Categoria', 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
-                <th scope="col" pSortableColumn="Id">ID
-                  <p-sortIcon field="Id"></p-sortIcon>
+                <th *ngFor="let col of columns" pSortableColumn="{{col.field}}">
+                  {{col.header}} 
+                  <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-                  <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-                  <p-sortIcon field="Inicial"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-                  <p-sortIcon field="Entrada"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-                  <p-sortIcon field="Salida"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock
-                  <p-sortIcon field="Cant"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-                  <p-sortIcon field="Diferencia"></p-sortIcon>
-                </th>
-                <th scope="col">Medida
-                </th>
-                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
-                  <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                </th>
-                <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
-                  <p-sortIcon field="SubTotal"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-                  <p-sortIcon field="Categoria"></p-sortIcon>
-                </th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
-                <td>{{rowIndex + 1}}</td>
-                <td>{{materiaPrima.Id}}</td>
-                <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Inicial | number}}</td>
-                <td>{{materiaPrima.Entrada | number}}</td>
-                <td>{{materiaPrima.Salida | number}}</td>
-                <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
-                <td>{{materiaPrima.Diferencia | number}}</td>
-                <td>{{materiaPrima.UndCant}}</td>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <td>{{materiaPrima.PrecioUnd | number}}</td>
-                  <td>{{materiaPrima.SubTotal | number}}</td>
-                </ng-container>
-                <td>{{materiaPrima.Categoria}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(materiaPrima)"></p-button></td>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
+                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
-              <tr>
-                <td *ngIf="ValidarRol == 1" colspan="3" class="text-right">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantInicialTintas | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantEntranteTintas | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantSalienteTintas | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistenciasTintas | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantDiferenciaTintas | number}}</td>
+              <tr id="totales">
+                <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
+                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalTintas | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(4)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
               </tr>
             </ng-template>
           </p-table>
@@ -423,114 +293,64 @@
       tooltip="Información del Inventario de los Polietilenos">
       <div class="mb-3" *ngIf="load">
         <div class="row g-3 font-size-14" id="table">
+          <!-- Buscador de columnas -->
+          <p-toolbar>
+            <div id="rowToolbar" class="row g-3">
+              <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4"id="columnasSeleccionables">
+                <p-multiSelect
+                [options]="columnas"
+                [(ngModel)]="_columnasSeleccionada"
+                optionLabel="header"
+                selectedItemsLabel="{0} columnas seleccionadas"
+                placeholder="Elige las columnas que quieres ver"
+                pTooltip="Elige más columnas y podrás visualizarlas al final de la tabla"
+                tooltipPosition="top">
+                </p-multiSelect>
+              </div>
+            </div>
+          </p-toolbar>
           <p-table
             #dt_Biorientados
+            [columns]="_columnasSeleccionada"
             [value]="biorientados"
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="biorientados.length"
-            [rowsPerPageOptions]="[10,25,50,100,biorientados.length]"
             [rowHover]="true"
             dataKey="Id"
             [scrollable]="true"
             scrollHeight="50rem">
-            <ng-template pTemplate="header">
-              <tr class="font-size-16">
+            <ng-template pTemplate="header" let-columns>
+              <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Nombre', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Ancho', 'contains')"></th>
-                <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Micras', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Inicial', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Entrada', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Salida', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Cant', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Diferencia', 'contains')"></th>
-                <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'UndCant', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'PrecioUnd', 'contains')"></th>
-                <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'SubTotal', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Categoria', 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
                 <th>#</th>
-                <th scope="col" pSortableColumn="Id">ID
-                  <p-sortIcon field="Id"></p-sortIcon>
+                <th *ngFor="let col of columns" pSortableColumn="{{col.field}}">
+                  {{col.header}} 
+                  <p-sortIcon field="{{col.field}}"></p-sortIcon>
                 </th>
-                <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-                  <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th id="Ancho" pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho
-                  <p-sortIcon field="Ancho"></p-sortIcon>
-                </th>
-                <th id="Micras" pSortableColumn="Micras" pReorderableColumn scope="col">Micras
-                  <p-sortIcon field="Micras"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-                  <p-sortIcon field="Inicial"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-                  <p-sortIcon field="Entrada"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-                  <p-sortIcon field="Salida"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock
-                  <p-sortIcon field="Cant"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-                  <p-sortIcon field="Diferencia"></p-sortIcon>
-                </th>
-                <th scope="col">Medida
-                </th>
-                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
-                  <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                </th>
-                <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
-                  <p-sortIcon field="SubTotal"></p-sortIcon>
-                </th>
-                <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-                  <p-sortIcon field="Categoria"></p-sortIcon>
-                </th>
-                <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
+                <th id="editar" *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true">Editar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-materiaPrima let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-data let-rowIndex="rowIndex" let-columns="columns">
               <tr>
-                <td>{{rowIndex + 1}}</td>
-                <td>{{materiaPrima.Id}}</td>
-                <td>{{materiaPrima.Nombre}}</td>
-                <td>{{materiaPrima.Ancho | number}}</td>
-                <td>{{materiaPrima.Micras | number}}</td>
-                <td>{{materiaPrima.Inicial | number}}</td>
-                <td>{{materiaPrima.Entrada | number}}</td>
-                <td>{{materiaPrima.Salida | number}}</td>
-                <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
-                <td>{{materiaPrima.Diferencia | number}}</td>
-                <td>{{materiaPrima.UndCant}}</td>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <td>{{materiaPrima.PrecioUnd | number}}</td>
-                  <td>{{materiaPrima.SubTotal | number}}</td>
-                </ng-container>
-                <td>{{materiaPrima.Categoria}}</td>
-                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(materiaPrima)"></p-button></td>
+                <td><b>{{rowIndex + 1}}</b></td>
+                <td *ngFor="let col of columns">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : data[col.field]}}</td>
+                <td *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"><p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success" (click)="llamarModalEdicionMateriaPrima(data)"></p-button></td>
               </tr>
             </ng-template>
             <ng-template pTemplate="footer">
-              <tr>
+              <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantInicialBiorientado | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantEntranteBiorientado | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantSalienteBiorientado | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistenciasBiorientado | number}}</td>
-                <td *ngIf="ValidarRol == 1">{{cantDiferenciaBiorientado | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotalBiorientado | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(5)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
               </tr>
             </ng-template>
           </p-table>

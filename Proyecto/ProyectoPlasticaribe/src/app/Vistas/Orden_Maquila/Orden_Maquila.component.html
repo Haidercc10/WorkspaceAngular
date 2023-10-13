@@ -200,10 +200,10 @@
         <ng-template pTemplate="footer">
           <tr id="pie1">
             <td colspan="2" class="text-right">Totales</td>
-            <td>{{catidadTotalPeso | number}}</td>
+            <td>{{catidadTotalPeso() | number : '1.2-2'}}</td>
             <td>Kg</td>
             <td></td>
-            <td colspan="2" class="text-left">{{cantidadTotalPrecio | number}}</td>
+            <td colspan="2" class="text-left">{{cantidadTotalPrecio() | number : '1.2-2'}}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -242,7 +242,7 @@
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
           <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima()" icon="pi pi-check" label="Si" class="p-button-warning"></button>
-          <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check" label="Ni" class="p-button-success"></button>
           <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarInfoOrdenMaquila(itemSeleccionado)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
           <button *ngIf="llave == 'edicion'" type="button" pButton (click)="buscarInfoOrdenMaquila(itemSeleccionado)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
         </div>

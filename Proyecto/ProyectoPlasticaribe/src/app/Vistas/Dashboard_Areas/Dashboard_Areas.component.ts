@@ -1,22 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
-import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app/data';
 
 @Component({
   selector: 'app-Dashboard_Areas',
   templateUrl: './Dashboard_Areas.component.html',
   styleUrls: ['./Dashboard_Areas.component.css']
 })
+
 export class Dashboard_AreasComponent implements OnInit {
 
-  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga  
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   anios : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
@@ -32,11 +30,20 @@ export class Dashboard_AreasComponent implements OnInit {
   graficaWiketiadoProducido : any; //Variable que va a almacenar lo producido por el area de wiketiado
   aniosGraficados : number [] = []; //Variable que va a almacenar los años que se han graficado
 
-  constructor(private AppComponent : AppComponent,
-                private shepherdService: ShepherdService,
-                  private paginaPrincial : PaginaPrincipalComponent,
-                    private bagProService : BagproService,
-                      private msj : MensajesAplicacionService,) { }
+  totalAnios_Extrusion : any [] = []; 
+  totalAnios_Impresion : any [] = [];
+  totalAnios_Rotograbado : any [] = [];
+  totalAnios_Doblado : any [] = [];
+  totalAnios_Laminado : any [] = [];
+  totalAnios_Corte : any [] = [];
+  totalAnios_Empaque : any [] = [];
+  totalAnios_Sellado : any [] = [];
+  totalAnios_Wiketiado : any [] = [];
+
+  constructor(private shepherdService: ShepherdService,
+                private paginaPrincial : PaginaPrincipalComponent,
+                  private bagProService : BagproService,
+                    private msj : MensajesAplicacionService,) { }
 
   ngOnInit() {
     this.llenarArrayAnos();
@@ -46,23 +53,25 @@ export class Dashboard_AreasComponent implements OnInit {
 
   // Funcion que iniciará el tutorial
   tutorial(){
+    this.shepherdService.defaultStepOptions = defaultStepOptions;
+    this.shepherdService.modal = true;
+    this.shepherdService.confirmCancel = false;
+    this.shepherdService.addSteps(defaultSteps);
+    this.shepherdService.start();
   }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que va a llenar el array de años
   llenarArrayAnos(){
-    for (let i = 0; i < this.anios.length; i++) {
-      let num_Mayor : number = Math.max(...this.anios);
-      if (num_Mayor == moment().year()) break;
-      this.anios.push(num_Mayor + 1);
-    }
+    const num_Mayor : number = Math.max(...this.anios);
+    const currentYear = moment().year();
+    const newYears = Array.from({length: currentYear - num_Mayor}, (_, i) => num_Mayor + i + 1);
+    this.anios.push(...newYears);
   }
 
   // Funcion que va a inicializar las variables con la información de las graficas
   inicializarGraficas(){
     this.aniosGraficados = [];
+    this.colocarTotalesProduccion();
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -142,31 +151,36 @@ export class Dashboard_AreasComponent implements OnInit {
   consultarInformacion(){
     this.cargando = true;
     this.bagProService.GetProduccionAreas(this.anioSeleccionado).subscribe(datos => {
-      let proceso : string [] = [];
-      let count : number = 0;
+      this.aniosGraficados.push(this.anioSeleccionado);
+      let proceso : string [] = [], count : number = 0;
       datos.forEach(prod => !proceso.includes(prod.area) ? proceso.push(prod.area) : null);
       proceso.forEach(area => {
         let produccion : any = [
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 1).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 2).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 3).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 4).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 5).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 6).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 7).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 8).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 9).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 10).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 11).reduce((a, b) => Number(a) + Number(b.producido), 0),
-          datos.filter(x => x.area == area && x.anio == this.anioSeleccionado  && x.mes == 12).reduce((a, b) => Number(a) + Number(b.producido), 0),
+          this.totalMesArea(datos, 1, area),
+          this.totalMesArea(datos, 2, area),
+          this.totalMesArea(datos, 3, area),
+          this.totalMesArea(datos, 4, area),
+          this.totalMesArea(datos, 5, area),
+          this.totalMesArea(datos, 6, area),
+          this.totalMesArea(datos, 7, area),
+          this.totalMesArea(datos, 8, area),
+          this.totalMesArea(datos, 9, area),
+          this.totalMesArea(datos, 10, area),
+          this.totalMesArea(datos, 11, area),
+          this.totalMesArea(datos, 12, area),
         ];
         this.llenarGraficas(produccion, area);
         count++;
-        if (count == proceso.length) setTimeout(() => this.cargando = false, 100);
+        if (count == proceso.length) {
+          this.colocarTotalesProduccion();
+          setTimeout(() => this.cargando = false, 100);
+        }
       });
-      this.aniosGraficados.push(this.anioSeleccionado);
     }, () => this.cargando = false);
   }
+
+  // Funcion que va a devolver el total
+  totalMesArea = (datos : any [], mes : number, area : string) => datos.filter(x => x.area == area && x.anio == this.anioSeleccionado && x.mes == mes).reduce((a, b) => a + b.producido, 0);
 
   // Funcion que se encargará de llenar las graficas
   llenarGraficas(data : any [], area : string){
@@ -192,6 +206,36 @@ export class Dashboard_AreasComponent implements OnInit {
     else if (['EMPAQUE', 'DESP_EMPAQUE'].includes(area)) this.graficaEmpaqueProducido.datasets.push(info);
     else if (['SELLADO', 'DESP_SELLADO'].includes(area)) this.graficaSelladoProducido.datasets.push(info);
     else if (['Wiketiado'].includes(area)) this.graficaWiketiadoProducido.datasets.push(info);
+  }
+
+  // Funcion que va a colocar los totales de producción de cada area en cada año
+  colocarTotalesProduccion(){
+    this.totalAnios_Extrusion = [];
+    this.totalAnios_Impresion = [];
+    this.totalAnios_Rotograbado = [];
+    this.totalAnios_Doblado = [];
+    this.totalAnios_Laminado = [];
+    this.totalAnios_Corte = [];
+    this.totalAnios_Empaque = [];
+    this.totalAnios_Sellado = [];
+    this.totalAnios_Wiketiado = [];
+    const formato = (data : any [], anio : number) : any => {
+      return {
+        Anio : anio,
+        Kg : this.calcularKgProducidos(data, anio)
+      }
+    }
+    this.aniosGraficados.forEach(anio => {
+      this.totalAnios_Extrusion.push(formato(this.graficaExtrusionProducido, anio));
+      this.totalAnios_Impresion.push(formato(this.graficaImpresionProducido, anio));
+      this.totalAnios_Rotograbado.push(formato(this.graficaRotograbadoProducido, anio));
+      this.totalAnios_Doblado.push(formato(this.graficaDobladoProducido, anio));
+      this.totalAnios_Laminado.push(formato(this.graficaLaminadoProducido, anio));
+      this.totalAnios_Corte.push(formato(this.graficaCorteProducido, anio));
+      this.totalAnios_Empaque.push(formato(this.graficaEmpaqueProducido, anio));
+      this.totalAnios_Sellado.push(formato(this.graficaSelladoProducido, anio));
+      this.totalAnios_Wiketiado.push(formato(this.graficaWiketiadoProducido, anio));
+    });
   }
 
   // Funcion que va a calcular el total de kg producidos en total en un año

@@ -9,7 +9,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo font-size-32">Gestor de Archivos</h2>
+      <h2 class="font-size-32" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Gestor de Archivos</h2>
     </div>
     <!-- Linea -->
     <div class="mb-4">
@@ -57,7 +57,6 @@
         #dt
         id="tabla"
         [value]="ArrayArchivos"
-        [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-sm"
         responsiveLayout="scroll"
@@ -67,19 +66,21 @@
         scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr class="font-size-13">
-            <th scope="col" style="width: 65%" pResizableColumn><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
-            <th scope="col" class="text-center" pResizableColumn>Descargar</th>
+            <th scope="col" style="width: 65%"><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
+            <th scope="col" class="text-center">
+              <p-button id="descargar" pTooltip="Descargar" label="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas()"></p-button>
+            </th>
             <!--Copiar/Mover-->
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
-              <th scope="col" class="text-center" pResizableColumn>Copiar</th>
-              <th scope="col" class="text-center" pResizableColumn>Mover</th>
+              <th scope="col" class="text-center">Copiar</th>
+              <th scope="col" class="text-center">Mover</th>
               <!--Cancelar-->
               <ng-container *ngIf="mover == true || copiar == true">
                 <th scope="col" class="text-center cursor" pTooltip="Si la carpeta no contiene archivos haz clic aquí para pegar" (click)="pegarArchivoCarpeta()">Pegar</th>
-                <th scope="col" class="text-center cursor" pTooltip="Si la carpeta no contiene archivos haz clic aquí para cancelar" (click)="cancelarPegadoArchivoCarpeta()" pResizableColumn>Cancelar</th>
+                <th scope="col" class="text-center cursor" pTooltip="Si la carpeta no contiene archivos haz clic aquí para cancelar" (click)="cancelarPegadoArchivoCarpeta()">Cancelar</th>
               </ng-container>
               <!--Eliminar-->
-              <th scope="col" class="text-center" pResizableColumn>Eliminar</th>
+              <th scope="col" class="text-center">Eliminar</th>
             </ng-container>
           </tr>
         </ng-template>
@@ -93,7 +94,9 @@
             </ng-container>
             <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
               <td style="width: 65%" id="abrirCarpeta" class="cursor" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left"><i class="pi pi-folder"></i> {{archivos.nombre}}</td>
-              <td></td>
+              <td class="text-center">
+                <p-button id="descargar" pTooltip="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas(archivos.ruta)"></p-button>
+              </td>
             </ng-container>
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
               <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
@@ -138,6 +141,27 @@
   </div>
 </p-card>
 
+<div class="descargandoArchivo" [ngClass]="{'whiteBackground' : !modoSeleccionado, 'darBackgroun': modoSeleccionado, 'slide-in-right' : descargandoArchivo, 'slide-in-left' : !descargandoArchivo}" *ngIf="nombreArchivo != ''">
+  <div class="header">
+    <div class="text-center tituloDescarga">
+      <h1 class="tituloDescarga p-2"><i class="pi pi-download font-size-18"></i> Descargando...</h1>
+    </div>
+  </div>
+  <div class="content">
+    <div class="row px-3 py-2 g-2">
+      <div class="col-2">
+        <i class="pi pi-file-export iconoArchivo font-size-20"></i>
+      </div>
+      <div class="col-8 my-2 nameFile">
+        <p class="nombreArchivo">{{nombreArchivo.length > 30 ? (nombreArchivo.substring(0, 20) + '...').trim() : nombreArchivo}} </p>
+      </div>
+      <div class="col-2 text-center">
+        <p-progressSpinner></p-progressSpinner>
+      </div>      
+    </div>
+  </div>
+</div>
+
 <p-toast position="center" key="{{clave}}" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-ruta let-index>
     <div class="flex flex-column" style="flex: 1">
@@ -179,5 +203,3 @@
     </div>
   </ng-template>
 </p-toast>
-
-

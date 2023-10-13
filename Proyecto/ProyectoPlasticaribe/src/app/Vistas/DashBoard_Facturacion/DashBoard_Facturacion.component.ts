@@ -90,15 +90,19 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion(){
-    this.totalFacturadoanio = 0;
-    this.facturadoAnios = [];
     if (this.ValidarRol == 1 || this.ValidarRol == 60) {
       this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => this.totalFacturadoDia = datos_facturacion);
-      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalFacuturadoMes = datos_facturacion);
+      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+        if (moment().month() == 8 && this.anoSeleccionado == 2023) this.totalFacuturadoMes = (datos_facturacion + 6249600 + 12091700);
+        else this.totalFacuturadoMes = datos_facturacion;
+      }); 
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalIvaVentaMes = datos_facturacion);
       for (let i = 0; i < 12; i++) {
         let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
-        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => this.totalFacturadoanio += datos_facturacion);
+        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
+          if (this.anoSeleccionado == 2023 && mes == '09') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
+          else this.totalFacturadoanio += datos_facturacion;
+        });
       }
     }
   }
@@ -121,16 +125,21 @@ export class DashBoard_FacturacionComponent implements OnInit {
             i == 5 ? parseFloat(info.Valor) : costoMeses[5],
             i == 6 ? parseFloat(info.Valor) : costoMeses[6],
             i == 7 ? parseFloat(info.Valor) : costoMeses[7],
-            i == 8 ? parseFloat(info.Valor) : costoMeses[8],
+            i == 8 ? this.anoSeleccionado == 2023 ? (parseFloat(info.Valor) + 6249600 + 12091700) : parseFloat(info.Valor) : costoMeses[8],
             i == 9 ? parseFloat(info.Valor) : costoMeses[9],
             i == 10 ? parseFloat(info.Valor) : costoMeses[10],
             i == 11 ? parseFloat(info.Valor) : costoMeses[11],
           ];
           if (i == 11) this.llenarGraficaFacturacion(costoMeses);
-          let info_Anio : any = { anio: this.anoSeleccionado, costo: parseFloat(info.Valor) };
+          let info_Anio : any = { 
+            anio: this.anoSeleccionado, 
+            costo: (i == 8 && this.anoSeleccionado == 2023) ? (parseFloat(info.Valor) + 6249600 + 12091700) : parseFloat(info.Valor),
+          };
           let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
-          if (index2 != -1) this.facturadoAnios[index2].costo += parseFloat(info.Valor);
-          else this.facturadoAnios.push(info_Anio);
+          if (index2 != -1) {
+            if (i == 8 && this.anoSeleccionado == 2023) this.facturadoAnios[index2].costo += (parseFloat(info.Valor) + 6249600 + 12091700);
+            else this.facturadoAnios[index2].costo += parseFloat(info.Valor);
+          } else this.facturadoAnios.push(info_Anio);
         }
       });
     } else this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);

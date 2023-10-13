@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -38,6 +38,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   @ViewChild('dt_Biorientados') dt_Biorientados: Table | undefined;
   @ViewChild('dt_BoppGenerico') dt_BoppGenerico: Table | undefined;
   @ViewChild('dt_Biorientados2') dt_Biorientados2: Table | undefined;
+  columnas : any [] = []; //Variable que almacenará las columnas de la tabla que no se verá inicialmente pero que se podrá elegir
+  _columnasSeleccionada : any [] = []; //variable que almacenará las columnas de la tabla que han sido seleccionadas
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -255,7 +257,35 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => { this.load = true; }, 2500);
+    setTimeout(() => {
+      this.columnas = [
+        { header: 'ID', field: 'Id', tipo: 'texto'},
+        { header: 'Nombre', field: 'Nombre', tipo: 'texto'},
+        { header: 'Ancho', field: 'Ancho', tipo: 'numero'},
+        { header: 'Micras', field: 'Micras', tipo: 'numero'},
+        { header: 'Inicial', field: 'Inicial', tipo: 'numero'},
+        { header: 'Entrada', field: 'Entrada', tipo: 'numero'},
+        { header: 'Salida', field: 'Salida', tipo: 'numero'},
+        { header: 'Stock', field: 'Cant', tipo: 'numero'},
+        { header: 'Diferencia', field: 'Diferencia', tipo: 'numero'},
+        { header: 'Medida', field: 'UndCant', tipo: 'texto'},
+        { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero'},
+        { header: 'SubTotal', field: 'SubTotal', tipo: 'numero'},
+        { header: 'Categoria', field: 'Categoria', tipo: 'texto'},
+      ];
+      this._columnasSeleccionada = [
+        { header: 'ID', field: 'Id', tipo: 'texto'},
+        { header: 'Nombre', field: 'Nombre', tipo: 'texto'},
+        { header: 'Ancho', field: 'Ancho', tipo: 'numero'},
+        { header: 'Micras', field: 'Micras', tipo: 'numero'},
+        { header: 'Stock', field: 'Cant', tipo: 'numero'},
+        { header: 'Medida', field: 'UndCant', tipo: 'texto'},
+        { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero'},
+        { header: 'SubTotal', field: 'SubTotal', tipo: 'numero'},
+        { header: 'Categoria', field: 'Categoria', tipo: 'texto'},
+      ]
+      this.load = true;
+    }, 2500);
   }
 
   // Funcion que va a mostrar las materias primas con existencias mayor a cero

@@ -3,17 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vistas/Costos_CajaMenor/Costos_CajaMenor.component.spec.ts
-import { Costos_CajaMenorComponent } from './Costos_CajaMenor.component';
-
-describe('Costos_CajaMenorComponent', () => {
-  let component: Costos_CajaMenorComponent;
-  let fixture: ComponentFixture<Costos_CajaMenorComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ Costos_CajaMenorComponent ]
-========
+<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component.spec.ts
 import { CrearTipoSalida_CajaMenorComponent } from './CrearTipoSalida_CajaMenor.component';
 
 describe('CrearTipoSalida_CajaMenorComponent', () => {
@@ -23,17 +13,27 @@ describe('CrearTipoSalida_CajaMenorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ CrearTipoSalida_CajaMenorComponent ]
->>>>>>>> Cambios-Produccion:Proyecto/ProyectoPlasticaribe/src/app/Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component.spec.ts
+========
+import { ControlCalidad_SelladoComponent } from './ControlCalidad_Sellado.component';
+
+describe('ControlCalidad_SelladoComponent', () => {
+  let component: ControlCalidad_SelladoComponent;
+  let fixture: ComponentFixture<ControlCalidad_SelladoComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ ControlCalidad_SelladoComponent ]
+>>>>>>>> master:Proyecto/ProyectoPlasticaribe/src/app/Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component.spec.ts
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vistas/Costos_CajaMenor/Costos_CajaMenor.component.spec.ts
-    fixture = TestBed.createComponent(Costos_CajaMenorComponent);
-========
+<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component.spec.ts
     fixture = TestBed.createComponent(CrearTipoSalida_CajaMenorComponent);
->>>>>>>> Cambios-Produccion:Proyecto/ProyectoPlasticaribe/src/app/Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component.spec.ts
+========
+    fixture = TestBed.createComponent(ControlCalidad_SelladoComponent);
+>>>>>>>> master:Proyecto/ProyectoPlasticaribe/src/app/Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component.spec.ts
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

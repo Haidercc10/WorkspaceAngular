@@ -4,7 +4,6 @@
   <app-VistasFavoritas></app-VistasFavoritas>
 </ng-container>
 
-
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -202,7 +201,7 @@
             <td [pEditableColumn]="materiasPrimas.Cantidad" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="number" [(ngModel)]="materiasPrimas.Cantidad"/>
+                  <p-inputNumber [(ngModel)]="materiasPrimas.Cantidad" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{ materiasPrimas.Cantidad | number : '1.2-2' }}
@@ -214,7 +213,7 @@
             <td [pEditableColumn]="materiasPrimas.Precio" pEditableColumnField="price" class="cursor">
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <input pInputText type="number" [(ngModel)]="materiasPrimas.Precio"/>
+                  <p-inputNumber [(ngModel)]="materiasPrimas.Precio" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{ materiasPrimas.Precio | currency : 'COP $' }}
@@ -254,8 +253,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra || solicitud" (click)="validarDatosOrdenCompra()"></button>
-      <button pButton class="p-button-danger" type="button" label="Editar Orden de Compra" icon="pi pi-pencil" *ngIf="edicionOrdenCompra" (click)="editarOrdenCompra()"></button>
+      <button pButton class="p-button-danger" id="crearOrden" type="button" label="Crear Orden de Compra" icon="pi pi-check" [disabled]="cargando" *ngIf="!edicionOrdenCompra || solicitud" (click)="validarDatosOrdenCompra()"></button>
+      <button pButton class="p-button-danger" type="button" label="Editar Orden de Compra" icon="pi pi-pencil" [disabled]="cargando" *ngIf="edicionOrdenCompra" (click)="editarOrdenCompra()"></button>
       <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>
   </div>
@@ -319,7 +318,7 @@
         <div class="col-6" style="margin-right: 5px;">
           <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-warning"></button>
           <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-          <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarinfoOrdenCompra()" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
+          <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarinfoOrdenCompra(ordenCreada)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
           <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>

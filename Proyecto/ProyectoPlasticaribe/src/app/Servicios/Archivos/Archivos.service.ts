@@ -28,6 +28,11 @@ export class ArchivosService {
     return this.http.request(new HttpRequest('GET', `${this.rutaPlasticaribeAPI}/Archivos/download?file=${file}&filePath=${ruta}`, null, {responseType: 'blob' } ));
   }
 
+  // Funcion que hará una peticion al servidor, le pasará el nombre el nombre de la carpeta para que lo busque y la traiga en formato blob
+  descargarCarpetas(carpeta : any, ruta : any) : Observable<any> {
+    return this.http.request(new HttpRequest('GET', `${this.rutaPlasticaribeAPI}/Archivos/downloadDirectory?filePath=${ruta}&directoy=${carpeta}`, null, {responseType: 'blob' } ));
+  }
+
   // Funcion que devolverá las carpetas que estan en la ruta que se le pase
   mostrarCarpetas(ruta : string) : any{
     return this.http.get(`${this.rutaPlasticaribeAPI}/Archivos/Carpetas?filePath=${ruta}`);

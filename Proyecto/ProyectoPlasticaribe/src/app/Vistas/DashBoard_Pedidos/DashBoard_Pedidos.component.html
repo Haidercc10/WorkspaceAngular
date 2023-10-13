@@ -5,7 +5,7 @@
 
   <!-- Cards de CAntidad de Pedidos -->
   <div class="row g-2 text-center fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
-    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12" id="cantPedidos">
+    <div class="p-3 col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-left" id="cantPedidos">
       <p-card >
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-chart-pie"></i> Cantidad Total de Pedidos</h2>
         <p-toolbar>
@@ -15,7 +15,7 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12" id="pedidosOT">
+    <div class="p-3 col-xxl-8 col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="pedidosOT">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-check-circle"></i> Pedidos con ordenes de trabajo asociadas</h2>
         <p-table
@@ -55,7 +55,7 @@
   </div>
 
   <div class="row g-2 text-center fila-2">
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="pedidosFacturables">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-left" id="pedidosFacturables">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-dollar"></i> Listado de pedidos facturables</h2>
         <p-toolbar>
@@ -97,7 +97,7 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="pedidosClientes">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="pedidosClientes">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-users"></i> Clientes con más pedidos vigentes</h2>
 
@@ -110,7 +110,7 @@
   </div>
 
   <div class="row g-2 text-center fila-3">
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="productosPedidos">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-left" id="productosPedidos">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-box"></i> Productos con más pedidos vigentes</h2>
 
@@ -121,7 +121,7 @@
       </p-card>
     </div>
 
-    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12" id="vendedoresPedidos">
+    <div class="p-3 col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 slide-in-blurred-right" id="vendedoresPedidos">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-briefcase"></i> Vendedores con más pedidos vigentes</h2>
 

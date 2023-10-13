@@ -1,6 +1,7 @@
 .fondo {
   background-image: linear-gradient(62deg, #E8EAF6 0%, #C8E6C9 100%);
   height: 100%;
+  border-radius: 20px;
 }
 
 .fondo2 {
@@ -57,3 +58,49 @@ p-chart ::ng-deep div ::ng-deep canvas {
   margin-bottom: 2%;
 }
 
+p-card ::ng-deep [class = "p-card p-component"] {
+  border: 3px solid #fefefe00;
+  border-radius: 20px;
+  transition: all 500ms;
+}
+
+p-card ::ng-deep [class = "p-card p-component"]:hover {
+  border: 3px solid #00000008;
+  box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+  width: calc(100% + 0.1%);
+  height: calc(100% + 1%);
+}
+
+.swing-in-bottom-fwd {
+	animation: swing-in-bottom-fwd 2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+.swing-in-top-fwd {
+	animation: swing-in-top-fwd 2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+@keyframes swing-in-bottom-fwd {
+  0% {
+    transform: rotateX(100deg);
+    transform-origin: bottom;
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0);
+    transform-origin: bottom;
+    opacity: 1;
+  }
+}
+
+@keyframes swing-in-top-fwd {
+  0% {
+    transform: rotateX(-100deg);
+    transform-origin: top;
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0);
+    transform-origin: top;
+    opacity: 1;
+  }
+}

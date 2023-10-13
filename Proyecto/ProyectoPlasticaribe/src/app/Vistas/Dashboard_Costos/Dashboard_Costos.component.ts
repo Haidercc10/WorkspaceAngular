@@ -167,7 +167,7 @@ export class Dashboard_CostosComponent implements OnInit {
     this.nominaVentasPlasticaribe();
     this.nominaFabricacionPlasticaribe();
     this.informacionMateriasPrimas();
-    setTimeout(() => this.cargando = false, 3000);
+    setTimeout(() => this.cargando = false, 5000);
   }
 
   // Funcion que va a buscar informacion de los costos de fabricacion

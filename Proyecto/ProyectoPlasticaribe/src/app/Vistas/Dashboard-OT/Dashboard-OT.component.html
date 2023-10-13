@@ -4,9 +4,9 @@
   </div>
 
   <!--  -->
-  <div class="row g-2 fila-1" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+  <div class="row g-2 fila-1" *ngIf="(ValidarRol == 1 || ValidarRol == 60) && !cargando">
     <!-- Tabla de Procesos -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="cantProcesos">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="cantProcesos">
       <p-card header="">
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-bolt"></i> Cantidad Producida Por Procesos</h2>
         <br>
@@ -44,7 +44,7 @@
     </div>
 
     <!--Estados de ordenes de trabajo-->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="estadoOrdenes">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="estadoOrdenes">
       <p-card header="">
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sliders-h"></i> Estados de Ordenes de Trabajo</h2>
         <p-table
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Tabla de Cantidad de ordenes y Materiales -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="ordenesCreadas">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-top" id="ordenesCreadas">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-check-square"></i> Ordenes de Trabajo Creadas</h2>
 
@@ -124,10 +124,10 @@
   </div>
 
   <!-- Tablas de Ordenes de Trabajo -->
-  <div class="row g-2 fila-2" *ngIf="ValidarRol == 1">
+  <div class="row g-2 fila-2" *ngIf="(ValidarRol == 1) && !cargando">
 
     <!-- Ranking de Clientes que más han comprado-->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="clientesCompras">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-left" id="clientesCompras">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-dollar"></i> Clientes con más compras en el mes.</h2>
 
@@ -165,7 +165,7 @@
     </div>
 
     <!-- Ranking de Productos que más se han facturado -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="productosCompras">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-fwd-center" id="productosCompras">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-truck"></i> Productos más vendidos en el mes</h2>
 
@@ -200,7 +200,7 @@
     </div>
 
     <!-- Ranking de Vendedores que más se han facturan -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="vendedoresCompras">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-right" id="vendedoresCompras">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-cart-plus"></i> Asesores con más ventas en el mes</h2>
 
@@ -239,10 +239,10 @@
 
   </div>
 
-  <div class="row g-2 fila-3" *ngIf="ValidarRol == 1">
+  <div class="row g-2 fila-3" *ngIf="(ValidarRol == 1) && !cargando">
 
     <!-- Ranking de Clientes -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="RankingClientes">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-bottom" id="RankingClientes">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-chart-line"></i> Ranking de Clientes</h2>
 
@@ -283,7 +283,7 @@
     </div>
 
     <!-- Ranking de Productos -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="RankingProductos">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-bottom" id="RankingProductos">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-sort-numeric-down"></i> Ranking de Productos</h2>
 
@@ -316,7 +316,7 @@
     </div>
 
     <!-- Ranking de Vendedores -->
-    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12" id="RankingVendedores">
+    <div class="p-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 slide-in-bottom" id="RankingVendedores">
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-users"></i> Ranking de Vendedores</h2>
 

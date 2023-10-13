@@ -68,8 +68,8 @@ export class CrearMateriaprimaComponent implements OnInit {
     let precioMateriaPrima : number = this.materiPrima.value.mpValor;
 
     const datosMP : any = {
-      MatPri_Nombre : nombreMateriaPrima,
-      MatPri_Descripcion : descripcionMateriaPrima,
+      MatPri_Nombre : nombreMateriaPrima.toUpperCase(),
+      MatPri_Descripcion : descripcionMateriaPrima.toUpperCase(),
       MatPri_Stock : stockMateriaPrima,
       UndMed_Id : 'Kg',
       CatMP_Id : categoriaMateriaPrima,

@@ -268,11 +268,11 @@ export class NominaComponent implements OnInit {
         info.Cedula = info.Cedula,
         info.Operario = info.Operario,
         info.Cargo = 'Operario Sellado',
-        info.PagoTotal = parseFloat(info.PagoTotal),
-        info.Cantidad = parseFloat(info.Cantidad),
-        info.CantidadTotal = parseFloat(info.CantidadTotal),
-        info.PrecioDia = parseFloat(info.PrecioDia),
-        info.PrecioNoche = parseFloat(info.PrecioNoche),
+        info.PagoTotal = parseFloat(info.PagoTotal.toString().replace(',', '.')),
+        info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
+        info.CantidadTotal = parseFloat(info.CantidadTotal.toString().replace(',', '.')),
+        info.PrecioDia = parseFloat(info.PrecioDia.toString().replace(',', '.')),
+        info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
         info.detalle = [];
 
         array = this.arraySellado.findIndex(item => item.Cedula == info.Cedula);

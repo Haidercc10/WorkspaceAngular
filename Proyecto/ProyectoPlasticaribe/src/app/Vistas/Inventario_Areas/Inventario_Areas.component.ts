@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit  } from '@angular/core';
+import { Component, Injectable, OnInit, AfterViewChecked, ChangeDetectorRef,  } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
@@ -24,7 +24,7 @@ Injectable({
   styleUrls: ['./Inventario_Areas.component.css']
 })
 
-export class Inventario_AreasComponent implements OnInit {
+export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -61,7 +61,8 @@ export class Inventario_AreasComponent implements OnInit {
                       private svcMsjs : MensajesAplicacionService, 
                         private svcInventario : Inventario_AreasService, 
                           private msg : MessageService, 
-                            private router : Router,) {
+                            private router : Router,
+                              private cdRef : ChangeDetectorRef) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formulario = this.frmBuilder.group({
@@ -69,7 +70,7 @@ export class Inventario_AreasComponent implements OnInit {
       ot : [null,],
       item : [null, Validators.required],
       referencia : [null, Validators.required],
-      cantidad : [0, Validators.required],
+      cantidad : [null, Validators.required],
       precio : [null, Validators.required],
       proceso : [null, Validators.required],
       observacion : [null, ],
@@ -82,6 +83,10 @@ export class Inventario_AreasComponent implements OnInit {
     this.cargarProcesos();
     this.url = this.router.url;
     this.cargarLabels(this.url);
+  }
+
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
   }
 
   cargarLabels(url : any) {
@@ -153,7 +158,7 @@ export class Inventario_AreasComponent implements OnInit {
       if(ot != null) {
         this.load = true;
         this.svcBagPro.srvObtenerListaClienteOT_Item(this.formulario.value.ot).subscribe(data => { 
-          if (data.length > 0) this.cargarCampos(data[0]);  
+          if (data.length > 0) this.cargarCamposBagPro(data[0]);  
           else {
             this.load = false;
             this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${ot} no existe!`);
@@ -165,14 +170,34 @@ export class Inventario_AreasComponent implements OnInit {
   }
 
   //Función que cargará la info de la OT en los campos del formulario
-  cargarCampos(data : any) {
+  cargarCamposBagPro(data : any) {
     this.formulario.patchValue({
       item : data.clienteItems,
       referencia : data.clienteItemsNom,
-      cantidad : 0,
-      precio : data.datosValorKg,
+      cantidad : null,
+      precio : data.datosValorKg != null || data.datosValorKg == '' ? data.datosValorKg : 0,
     });
     this.load = false;
+  }
+
+  //Función que cargará la info de las materias primas consultadas por Id en los campos del formulario
+  cargarCamposMateriaPrima(data : any) {
+    this.formulario.patchValue({
+      item : data.matPri_Id,
+      referencia : data.matPri_Nombre,
+      cantidad : null,
+      precio : data.matPri_Precio,
+    });
+  }
+
+   //Función que cargará la info de las materias primas/productos consultadas por referencia en los campos del formulario
+   cargarCamposItemsMateriales(data : any) {
+    this.formulario.patchValue({
+      item : data.item,
+      referencia : data.referencia.trim(),
+      cantidad : null,
+      precio : data.precioKg != null ? data.precioKg : 0,
+    });
   }
 
   //Función que enviará el registro de inventario a la tabla
@@ -216,7 +241,6 @@ export class Inventario_AreasComponent implements OnInit {
         this.limpiarCampos();
         if(this.ordenes_trabajos.includes(0)) this.ordenes_trabajos.pop();
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${info.OT} ya existe en la tabla!`);
-
     } else if (this.url == this.urlMateriales) {
       if (!this.polietilenos.includes(info.MatPri_Id)) {
         this.polietilenos.push(info.MatPri_Id);
@@ -257,7 +281,7 @@ export class Inventario_AreasComponent implements OnInit {
       referencia : null,
       precio : null,
       observacion : null,
-      cantidad : 0, 
+      cantidad : null, 
     });
   }  
 
@@ -307,7 +331,7 @@ export class Inventario_AreasComponent implements OnInit {
       if(item != null) {
         this.load = true;
         this.svcBagPro.srvObtenerItemsBagproXClienteItem(item).subscribe(data => {
-          if(data.length != null) this.formulario.patchValue({ item : data[0].clienteItems, referencia : data[0].clienteItemsNom, precio : data[0].datosValorKg != null || data[0].datosValorKg == '' ? data[0].datosValorKg : 0, cantidad : 0 });
+          if(data.length != null) this.cargarCamposBagPro(data[0]); 
           else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El item ${item} no existe!`);
           this.load = false;
         }, () => {
@@ -319,7 +343,7 @@ export class Inventario_AreasComponent implements OnInit {
       if(item != null) {
         this.load = true;
         this.svcMatPrimas.srvObtenerListaPorId(item).subscribe(data => {
-          if(typeof(data) == 'object') this.formulario.patchValue({ item : data.matPri_Id, referencia : data.matPri_Nombre, precio : data.matPri_Precio != null || data.matPri_Precio == '' ? data.matPri_Precio : 0, cantidad : 0 });
+          if(typeof(data) == 'object') this.cargarCamposMateriaPrima(data);
           else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El Id de material ${item} no existe!`);
           this.load = false;
         }, () => {
@@ -334,11 +358,11 @@ export class Inventario_AreasComponent implements OnInit {
   seleccionarReferencia(){
     let ref : any = [];
     if(this.url == this.urlItems) {
-      ref = this.arrayReferencias.filter((item) => `${item.item} - ${item.referencia}` == this.formulario.value.referencia);
-      this.formulario.patchValue({ item : ref[0].item, referencia : ref[0].referencia, precio : ref[0].precioKg != null ? ref[0].precioKg : 0, cantidad : 0});  
+      ref = this.arrayReferencias.filter((item) => `${item.item} - ${item.referencia.trim()}` == this.formulario.value.referencia);
+      this.cargarCamposItemsMateriales(ref[0]); 
     } else if(this.url == this.urlMateriales) {
       ref = this.arrayReferencias.filter((item) => `${item.item} - ${item.referencia}` == this.formulario.value.referencia);
-      this.formulario.patchValue({ item : ref[0].item, referencia : ref[0].referencia, precio : ref[0].precioKg != null ? ref[0].precioKg : 0, cantidad : 0});  
+      this.cargarCamposItemsMateriales(ref[0]); 
     }
   }
 

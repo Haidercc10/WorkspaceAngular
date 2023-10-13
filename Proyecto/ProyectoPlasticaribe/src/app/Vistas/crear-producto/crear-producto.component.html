@@ -6,8 +6,8 @@
       <!-- ID Producto -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="ProduId" id="Id"  type="text" pInputText required/>
-          <label for="Id">Id</label>
+          <input formControlName="ProduId" id="Id"  type="text" pInputText required readonly/>
+          <label for="Id">Item</label>
         </span>
       </div>
 
@@ -15,68 +15,84 @@
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <span class="p-float-label">
           <input formControlName="ProduNombre" id="Nombre"  type="text" pInputText required/>
-          <label for="Nombre">Nombre</label>
+          <label for="Nombre">Referencia</label>
+        </span>
+      </div>
+
+      <!-- Material -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="ProduMaterial" inputId="Material" [options]="materialProducto" appendTo="body" optionValue="material_Id" optionLabel="material_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="Material">Material Extrusión</label>
+        </span>
+      </div>
+
+      <!-- Pigmento -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="ProduPigmento" inputId="Pigmento" [options]="pigmentoProducto" appendTo="body" optionValue="pigmt_Id" optionLabel="pigmt_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="Pigmento">Pigmento Extrusión</label>
+        </span>
+      </div>
+
+      <!-- Calibre Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-inputNumber formControlName="ProduCalibre" mode="decimal" inputId="Calibre" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+          <label for="Calibre">Calibre Extrusión</label>
+        </span>
+      </div>
+
+      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="ProduUnidadMedidaACF" inputId="Und" [options]="unidadMedida" appendTo="body" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="Und">Und Extrusión</label>
+        </span>
+      </div>
+
+      <!-- Tipo Producto -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="ProduTipo" inputId="TipoProducto" [options]="tipoProducto" appendTo="body" optionValue="tpProd_Id" optionLabel="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="TipoProducto">Formato</label>
+        </span>
+      </div>
+
+      <!-- Tipo Sellado -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-dropdown formControlName="ProduSellado" inputId="TipoSellado" [options]="tiposSellado" appendTo="body" optionValue="tpSellado_Id" optionLabel="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="TipoSellado">Tipo Sellado</label>
         </span>
       </div>
 
       <!-- Ancho Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduAncho" mode="decimal" inputId="Ancho" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Ancho">Ancho</label>
         </span>
       </div>
 
-      <!-- Fuelle Producto - -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduFuelle" mode="decimal" inputId="Fuelle" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Fuelle">Fuelle</label>
-        </span>
-      </div>
-
-      <!-- Calibre Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-inputNumber formControlName="ProduCalibre" mode="decimal" inputId="Calibre" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-          <label for="Calibre">Calibre</label>
-        </span>
-      </div>
-
       <!-- Largo Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduLargo" mode="decimal" inputId="Largo" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="Largo">Largo</label>
         </span>
       </div>
 
-      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+      <!-- Fuelle Producto - -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="ProduUnidadMedidaACF" inputId="Und" [options]="unidadMedida" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Und">Und</label>
-        </span>
-      </div>
-
-      <!-- Tipo Producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduTipo" inputId="TipoProducto" [options]="tipoProducto" optionValue="tpProd_Id" optionLabel="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="TipoProducto">Tipo Producto</label>
-        </span>
-      </div>
-
-      <!-- Tipo Sellado -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduSellado" inputId="TipoSellado" [options]="tiposSellado" optionValue="tpSellado_Id" optionLabel="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="TipoSellado">Tipo Sellado</label>
+          <p-inputNumber formControlName="ProduFuelle" mode="decimal" inputId="Fuelle" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+          <label for="Fuelle">Fuelle</label>
         </span>
       </div>
 
       <!-- Bolsas Por Bulto -- -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduBolsasBulto" mode="decimal" inputId="BolsasBulto" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="BolsasBulto">Bolsas Por Bulto</label>
@@ -84,45 +100,10 @@
       </div>
 
       <!-- Bolsas Por Paquete -- -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="ProduBolsasPaquete" mode="decimal" inputId="BolsasPaquete" [minFractionDigits]="2" [required]="true"></p-inputNumber>
           <label for="BolsasPaquete">Bolsas Por Paquete</label>
-        </span>
-      </div>
-
-      <!-- Material -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduMaterial" inputId="Material" [options]="materialProducto" optionValue="material_Id" optionLabel="material_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Material">Material</label>
-        </span>
-      </div>
-
-      <!-- Pigmento -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <p-dropdown formControlName="ProduPigmento" inputId="Pigmento" [options]="pigmentoProducto" optionValue="pigmt_Id" optionLabel="pigmt_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-          <label for="Pigmento">Pigmento</label>
-        </span>
-      </div>
-
-      <!-- Campo Descripción producto -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
-        <span class="p-float-label">
-          <input formControlName="ProdDescripcion" id="Descripcion"  type="text" pInputText required/>
-          <label for="Descripcion">Descripción</label>
-        </span>
-      </div>
-
-      <!-- Cliente -->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-6 col-xxl-6">
-        <span class="p-float-label">
-          <input formControlName="ClienteNombre" id="Clientes" list="cli"  type="text" pInputText required/>
-          <datalist id="cli">
-            <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
-          </datalist>
-          <label for="Clientes">Cliente</label>
         </span>
       </div>
     </div>
@@ -130,7 +111,7 @@
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton pRipple label="Crear Producto" type="submit" icon="pi pi-check" class="p-button-danger"></button>
+      <button pButton pRipple label="Crear Producto" type="submit" icon="pi pi-check" class="p-button-danger" [disabled]="!FormCrearProducto.valid"></button>
       <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
     </div>
   </div>
@@ -152,7 +133,7 @@
       <!-- Producto -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
-          <input formControlName="ProdId" id="Id"  type="text" pInputText required/>
+          <input formControlName="ProdId" id="Id" type="text" pInputText required/>
           <label for="Id">Id Producto</label>
         </span>
       </div>
@@ -168,7 +149,7 @@
       <!-- Presentacion Producto -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="ProduUnidadMedidaCant" inputId="Und" [options]="unidadMedida" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <p-dropdown formControlName="ProduUnidadMedidaCant" inputId="Und" [options]="presentacionesProductos" appendTo="body" optionValue="undMed_Id" optionLabel="undMed_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Und">Und</label>
         </span>
       </div>
@@ -184,7 +165,7 @@
       <!-- Tipo Moneda -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-2">
         <span class="p-float-label">
-          <p-dropdown formControlName="ProduTipoMoneda" inputId="Moneda" [options]="tipoMoneda" optionValue="tpMoneda_Id" optionLabel="tpMoneda_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <p-dropdown formControlName="ProduTipoMoneda" inputId="Moneda" [options]="tipoMoneda" appendTo="body" optionValue="tpMoneda_Id" optionLabel="tpMoneda_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
           <label for="Moneda">Tipo de Moneda</label>
         </span>
       </div>
@@ -193,7 +174,7 @@
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton pRipple label="Crear Presentación de Producto" type="submit" icon="pi pi-check" class="p-button-danger"></button>
+      <button pButton pRipple label="Crear Presentación de Producto" type="submit" icon="pi pi-check" class="p-button-danger" [disabled]="!FormCrearPresentacionProducto.valid"></button>
       <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCamposPresentacion()"></button>
     </div>
   </div>

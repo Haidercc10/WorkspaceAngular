@@ -54,8 +54,8 @@ export class CrearTerceroComponent implements OnInit {
     let info : modelTercero = {
       Tercero_Id : this.FormCrearTercero.value.Id,
       TipoIdentificacion_Id : this.FormCrearTercero.value.TipoId,
-      Tercero_Nombre : this.FormCrearTercero.value.Nombre,
-      Tercero_Ciudad : this.FormCrearTercero.value.Ciudad,
+      Tercero_Nombre : (this.FormCrearTercero.value.Nombre).toUpperCase(),
+      Tercero_Ciudad : (this.FormCrearTercero.value.Ciudad).toUpperCase(),
       Tercero_Telefono : this.FormCrearTercero.value.Telefono,
       Tercero_Email : this.FormCrearTercero.value.Email,
       Tercero_Fecha : moment().format('YYYY-MM-DD'),

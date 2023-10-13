@@ -4,11 +4,11 @@ import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { Inventario_AreasService } from 'src/app/Servicios/Inventario_Areas/Inventario_Areas.service';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
+import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
+import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -33,7 +33,6 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   invSellado : any = []; //Variable que guardará el inventario de las sellado
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
-  invProductosTerminados : any = []; //Variable que guardará el inventario de los productos terminados
   invPT : any = []; //Variable que guardará el inventario de los productos terminados
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
@@ -47,10 +46,10 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
 
   constructor(private AppComponent : AppComponent, 
-              private svcInvAreas : Inventario_AreasService,
-                private msj : MensajesAplicacionService, 
-                  private svcMatPrimas : MateriaPrimaService, 
-                    private invZeus : ModalGenerarInventarioZeusComponent) {
+                private svcInvAreas : Inventario_AreasService,
+                  private msj : MensajesAplicacionService, 
+                    private svcInvInicialMP : InventInicialDiaService,
+                      private svcInvMensualProductos : Inventario_Mes_ProductosService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -75,72 +74,47 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.invSellado = [];
     this.invPT = [];
     this.invImpresion = [];
-    this.invProductosTerminados = [];
     this.invMatPrimas = [];
     this.invReciclados = [];
     let fecha1 : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : null;
     let fecha2 : any = this.rangoFechas[1] != undefined && this.rangoFechas[1] != null ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : null;
     
     if(fecha1 != null && fecha2 != null) {
-      this.svcInvAreas.GetPorFecha(`2023-09-01`, `2023-09-15`).subscribe(data => {
+      this.svcInvAreas.GetPorFecha(fecha1, fecha2).subscribe(data => {
         if(data.length > 0) {
           this.load = true;
           data.forEach(x => {
-            if(x.id_Area == `EXT` && x.esMaterial == false) this.invExtrusion.push(x);
-            if(x.id_Area == `EXT` && x.esMaterial == true) this.invMateriales.push(x);
-            if(x.id_Area == `ROT`) this.invRotograbado.push(x);
-            if(x.id_Area == `SELLA`) this.invSellado.push(x);
-            if(x.id_Area == `IMP`) this.invImpresion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial == false && [1, 3, 7, 61].includes(this.ValidarRol)) this.invExtrusion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial == true && [1, 3, 7, 61].includes(this.ValidarRol)) this.invMateriales.push(x);
+            if(x.id_Area == `ROT` && [1, 63, 61].includes(this.ValidarRol)) this.invRotograbado.push(x);
+            if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
+            if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
-        } 
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
+          else setTimeout(() => { this.load = false; }, 800); 
+        } else {
+          this.load = true;
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
+          if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
+          else setTimeout(() => { this.load = false; }, 800); 
+        }
       });
-      this.inventarioMateriasPrimas();
-      this.inventarioProductosTerminados();
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `Debe seleccionar un rango de fechas válido!`);
   }
 
-  //Función que mostrará el inventario de materias primas y reciclados en la tabla. 
-  inventarioMateriasPrimas() {
-    this.svcMatPrimas.srvObtenerLista().subscribe(data => {
+  //Función que mostrará el inventario de materias primas y reciclados en la tabla dependiendo la fecha final ingresada en el rango. 
+  inventarioMateriasPrimas(fechaFin : any) {
+    this.svcInvInicialMP.getMatPrimasInicioMes(fechaFin).subscribe(data => {
       if(data.length > 0) {
-        data.forEach(x => {
-          let info : any = {
-            'fecha_Inventario' : this.today,
-            'ot' :  '',
-            'item' : x.matPri_Id,
-            'referencia' : x.matPri_Nombre,
-            'stock' : x.matPri_Stock,
-            'precio' : x.matPri_Precio, 
-            'subtotal' : x.matPri_Stock * x.matPri_Precio,
-          }
-          x.catMP_Id == 10 ? this.invReciclados.push(info) : this.invMatPrimas.push(info);
-        });
+        this.invMatPrimas = data.filter(mp => mp.idCategoria != 10);
+        this.invReciclados = data.filter(mp => mp.idCategoria == 10);
       } 
     });
   }
 
   //Función que mostrará el inventario de productos terminados en la tabla. 
-  inventarioProductosTerminados() {
-    this.invZeus.invetarioProductos();
-    setTimeout(() => { 
-      this.invProductosTerminados = this.invZeus.ArrayProductoZeus; 
-      setTimeout(() => { 
-        this.invProductosTerminados.forEach(x => {
-          let info : any = {
-            'fecha_Inventario' : this.today,
-            'ot' :  '',
-            'item' : x.Id,
-            'referencia' : x.Nombre,
-            'stock' : x.Cantidad,
-            'precio' : x.Precio, 
-            'subtotal' : x.Cantidad * x.Precio,
-          }
-          this.invPT.push(info);
-        }) 
-        this.load = false;
-      }, 3000);
-    }, 5000);
-  }
+  inventarioProductosTerminados = (fechaFin : any) => this.svcInvMensualProductos.getInventarioProductoInicioMes(fechaFin).subscribe(data => {this.invPT = data; this.load = false; }, error => { this.load = false; } );
 
   //Funciones que calcularán el total de cada inventario.
   calcularTotalExtrusion = () => this.invExtrusion.reduce((acum, valor) => (acum + valor.subtotal), 0);

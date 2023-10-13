@@ -380,9 +380,6 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.EditarOrdenCompra.FormMateriaPrima.reset();
       this.EditarOrdenCompra.FormMateriaPrima.patchValue({ iva : 19 });
       this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
-      this.EditarOrdenCompra.catidadTotalPeso = 0;
-      this.EditarOrdenCompra.cantidadTotalPrecio = 0;
-      this.EditarOrdenCompra.materiasPrimasSeleccionada_ID = [];
       this.EditarOrdenCompra.consecutivoOrdenCompra = 0;
       this.EditarOrdenCompra.informacionPDF = [];
       this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
@@ -418,8 +415,6 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             info.Nombre = datos_orden[i].bopp;
           }
           this.EditarOrdenCompra.materiasPrimasSeleccionadas.push(info);
-          this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
-          this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
         }
       }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${numeroOrden}!`));
     }

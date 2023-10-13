@@ -26,6 +26,7 @@ export class DashboardOTComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
+  cargando : boolean = false; //Variable que va a validar si se esta cargando algo o no
 
   estadosOrdenes : any [] = [];
   totalOrdenesMes : number = 0; //Variable que va a almacenar la cantidad de ordenes que se ahn hecho en el ultimo mes
@@ -70,7 +71,7 @@ export class DashboardOTComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    setTimeout(() => this.tiempoExcedido(), 1000);
+    this.tiempoExcedido();
   }
 
   tutorial(){
@@ -94,8 +95,10 @@ export class DashboardOTComponent implements OnInit {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.ordenTrabajo) {
+      this.cargando = true;
       this.llenarEstadosOrdenes();
       this.recargar();
+      setTimeout(() => this.cargando = false, 100);
     }
   }
 
@@ -112,17 +115,17 @@ export class DashboardOTComponent implements OnInit {
 
     if (this.ValidarRol == 1) {
       this.estadosOrdenes = [
-        { Nombre : 'Abierta', Cantidad : 0, Class : 'bg-naranja', },
-        { Nombre : 'Asignada', Cantidad : 0, Class : 'bg-azul', },
-        { Nombre : 'Terminada', Cantidad : 0, Class : 'bg-verde', },
-        { Nombre : 'En proceso', Cantidad : 0, Class : 'bg-amarillo', },
-        { Nombre : 'Anulado', Cantidad : 0, Class : 'bg-rojo', },
-        { Nombre : 'Cerrada', Cantidad : 0, Class : 'bg-verde2', },
+        { Nombre : 'ABIERTA', Cantidad : 0, Class : 'bg-naranja', },
+        { Nombre : 'ASIGNADA', Cantidad : 0, Class : 'bg-azul', },
+        { Nombre : 'TERMINADA', Cantidad : 0, Class : 'bg-verde', },
+        { Nombre : 'EN PROCESO', Cantidad : 0, Class : 'bg-amarillo', },
+        { Nombre : 'ANULADO', Cantidad : 0, Class : 'bg-rojo', },
+        { Nombre : 'CERRADO', Cantidad : 0, Class : 'bg-verde2', },
       ];
 
       this.ordenTrabajoService.GetOrdenesMes_Estados().subscribe(datos_ot => {
         datos_ot.forEach(element => {
-          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;          
+          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;
         });
       });
 
@@ -572,42 +575,42 @@ export class DashboardOTComponent implements OnInit {
     this.modalEstadosOrdenes = true;
     this.modalEstadosProcesos_OT.modeModal = true;
     this.modalEstadosProcesos_OT.formularioOT.reset()
-    if (estado == 'Abierta') {
+    if (estado == 'ABIERTA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Abiertas y No Iniciadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 15,
       });
-    } else if (estado == 'Asignada') {
+    } else if (estado == 'ASIGNADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Asignadas y No Iniciadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 14,
       });
-    } else if (estado == 'En proceso') {
+    } else if (estado == 'EN PROCESO') {
       this.nombreModalEstados = 'Ordenes de Trabajo En Proceso';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 16,
       });
-    } else if (estado == 'Terminada') {
+    } else if (estado == 'TERMINADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Terminadas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 17,
       });
-    } else if (estado == 'Anulado') {
+    } else if (estado == 'ANULADO') {
       this.nombreModalEstados = 'Ordenes de Trabajo Anuladas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,
         fechaFinal : this.today,
         estado : 13,
       });
-    } else if (estado == 'Cerrada') {
+    } else if (estado == 'CERRADA') {
       this.nombreModalEstados = 'Ordenes de Trabajo Cerradas';
       this.modalEstadosProcesos_OT.formularioOT.patchValue({
         fecha: this.primerDiaMes,

@@ -15,6 +15,7 @@ import { defaultStepOptions, stepsArchivos as defaultSteps } from 'src/app/data'
   templateUrl: './Archivos.component.html',
   styleUrls: ['./Archivos.component.css']
 })
+
 export class ArchivosComponent implements OnInit {
 
   public formularioArchivo !: FormGroup;
@@ -32,14 +33,16 @@ export class ArchivosComponent implements OnInit {
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
   rutaInicial : string; //Variable que va a almacenar la ruta inicial desde la cual se va a mover o copiar el archivo
-  nombreArchivo : string; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
+  nombreArchivo : string = ''; //Variable que va a almacenar el nombre del archivo que se quiere mover o copiar
   validarArchivo_Carpeta : boolean;
+  descargandoArchivo : boolean = false; //Variable que va a validar si el si se está descargando un archivo o carpeta
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   modal : boolean = false; /** Variable que servirá para abrir el modal de crear categorias */
   clave : string = ''; /** Palabra clave para mostrar mensajes de elección de eliminación de archivos y carpetas */
   fileSeleccionado : any; /** Archivo/Carpeta seleccionado para ser eliminado */
   rutaSeleccionada : any; /** Ruta del Archivo/Carpeta seleccionado para ser eliminado */
   accionMoverCopiar : number;
+  value: number = 0;
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -187,10 +190,13 @@ export class ArchivosComponent implements OnInit {
   }
 
   /* Funcion que se encargará de pedir el nombre del archivo que se quiere descargar, luego de enviar este nombre a la otra funcion
-  que se encargará de hacer la peticion al servidor y responderá con un dato blob, este dato se tomará en esta funcion nuevamente y creará  un elemento de tipo a
-  que luego se encargará de realizar la descarga, luego de descargar el archivo este elemento se eliminará */
-  descargarArchivos(nombre : string){
-    this.archivosService.descargarArchivos(nombre, this.nombreCarpeta + "\\").subscribe(data => {
+   * que se encargará de hacer la peticion al servidor y responderá con un dato blob, este dato se tomará en esta funcion nuevamente y creará  un elemento de tipo a
+   * que luego se encargará de realizar la descarga, luego de descargar el archivo este elemento se eliminará
+  */
+  descargarArchivos(nombre : string, descargaCarpeta : boolean = false, carpeta : string = this.nombreCarpeta){
+    this.nombreArchivo = nombre;
+    this.archivosService.descargarArchivos(nombre, carpeta + "\\").subscribe(data => {
+      this.descargandoArchivo = true;
       const downloadedFile = new Blob([data.body!], { type: data.body! });
       if (downloadedFile.type != ''){
         const a = document.createElement('a');
@@ -200,8 +206,25 @@ export class ArchivosComponent implements OnInit {
         a.target = '_blank';
         a.click();
         document.body.removeChild(a);
+        setTimeout(() => {
+          if (descargaCarpeta == true) this.archivosService.eliminarArchivos(`${carpeta}\\${nombre}`).subscribe();
+          this.descargandoArchivo = false;
+          this.nombreArchivo = '';
+          this.mensajeService.mensajeConfirmacion(`¡Descarga Completada!`);
+        }, 2000);
       }
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `El archivo se descargó exitosamente!`);
+    });
+  }
+
+  // Funcion que va a descargar una carpeta
+  descargarCarpetas(nombre : string = this.nombreCarpeta){
+    let ultimaRuta : any = `${nombre.lastIndexOf("\\")}`;
+    let carpeta : any = nombre.substring(ultimaRuta, nombre.length + 1);
+    carpeta = carpeta.replace('\\', '');
+    this.nombreArchivo = carpeta;
+    this.descargandoArchivo = true;    
+    this.archivosService.descargarCarpetas(carpeta, nombre).subscribe(data => {
+      if (data.type != 0) this.descargarArchivos(`${carpeta}.zip`, true, nombre.substring(0, ultimaRuta));
     });
   }
 
@@ -249,7 +272,9 @@ export class ArchivosComponent implements OnInit {
     this.clave = '';
   }
 
-  // Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo, ademas de darle valor a la variable que declara el la ruta incial y la que declara el nombre del archivo o carpeta
+  /* Funcion inicial que se encargará de validar si la funcion que se esta haciendo es una copia o un movimiento de un archivo,
+   * ademas de darle valor a la variable que declara el la ruta incial y la que declara el nombre del archivo o carpeta
+  */
   moverArchivoCarpeta(accion : string, ruta : string, nombre : string){
     this.clave = accion;
     setTimeout(() => {
@@ -283,7 +308,9 @@ export class ArchivosComponent implements OnInit {
     this.clave = '';
   }
 
-  // Variable que se encargará de validar una vez mas el proceso que se va a realizar, una copia o un movimiento, luego validará si es un archivo o carpeta y dependiendo de eso llamará a una funcion u otra
+  /* Variable que se encargará de validar una vez mas el proceso que se va a realizar,
+   * una copia o un movimiento, luego validará si es un archivo o carpeta y dependiendo de eso llamará a una funcion u otra
+  */
   pegarArchivoCarpeta(){
     if (this.copiar) {
       if (this.validarArchivo_Carpeta) this.copiarArchivo();

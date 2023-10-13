@@ -105,7 +105,7 @@ export class ClientesComponent implements OnInit {
     const datosClientes : any = {
       Cli_Id: this.FormCrearClientes.value.CliId,
       TipoIdentificacion_Id : this.FormCrearClientes.value.TipoIdCliente,
-      Cli_Nombre: this.FormCrearClientes.value.CliNombre,
+      Cli_Nombre: (this.FormCrearClientes.value.CliNombre).toUpperCase(),
       Cli_Telefono: this.FormCrearClientes.value.CliTelefono,
       Cli_Email: this.FormCrearClientes.value.CliEmail,
       TPCli_Id: this.FormCrearClientes.value.TipoClienteId,
@@ -127,8 +127,8 @@ export class ClientesComponent implements OnInit {
     this.sedesClientesService.GetSedesCliente(this.FormCrearSedeClientes.value.CliId2).subscribe(datos_sedePorID => {
       const datosSedes : any = {
         sedeCli_Id: '',
-        SedeCliente_Ciudad: this.FormCrearSedeClientes.value.SedeCli_Ciudad,
-        SedeCliente_Direccion: this.FormCrearSedeClientes.value.SedeCli_Direccion,
+        SedeCliente_Ciudad: (this.FormCrearSedeClientes.value.SedeCli_Ciudad).toUpperCase(),
+        SedeCliente_Direccion: (this.FormCrearSedeClientes.value.SedeCli_Direccion).toUpperCase(),
         SedeCli_CodPostal: this.FormCrearSedeClientes.value.SedeCli_Postal,
         Cli_Id : this.FormCrearSedeClientes.value.CliId2,
         SedeCli_Fecha : moment().format('YYYY-MM-DD'),

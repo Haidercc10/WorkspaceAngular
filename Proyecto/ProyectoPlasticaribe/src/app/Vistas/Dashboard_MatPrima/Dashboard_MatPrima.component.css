@@ -50,6 +50,7 @@ p-knob ::ng-deep .p-knob-text {
 .fondo {
   background-color: #a5d2ff;
   background-image: linear-gradient(62deg, #a5d2ff 0%, #c7f7ff 100%);
+  border-radius: 20px;
 }
 
 .fondo2 {
@@ -57,3 +58,53 @@ p-knob ::ng-deep .p-knob-text {
   height: 100%;
 }
 
+p-card ::ng-deep [class = "p-card p-component"] {
+  border: 3px solid #fefefe00;
+  border-radius: 20px;
+  transition: all 500ms;
+}
+
+p-card ::ng-deep [class = "p-card p-component"]:hover {
+  border: 3px solid #00000008;
+  box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+  width: calc(100% + 0.1%);
+  height: calc(100% + 1%);
+}
+
+.slide-in-blurred-top {
+	animation: slide-in-blurred-top 1s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+}
+
+.slide-in-blurred-bottom {
+	animation: slide-in-blurred-bottom 1s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+}
+
+@keyframes slide-in-blurred-top {
+  0% {
+    transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+    transform-origin: 50% 0%;
+    filter: blur(40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scaleY(1) scaleX(1);
+    transform-origin: 50% 50%;
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-blurred-bottom {
+  0% {
+    transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
+    transform-origin: 50% 100%;
+    filter: blur(40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scaleY(1) scaleX(1);
+    transform-origin: 50% 50%;
+    filter: blur(0);
+    opacity: 1;
+  }
+}

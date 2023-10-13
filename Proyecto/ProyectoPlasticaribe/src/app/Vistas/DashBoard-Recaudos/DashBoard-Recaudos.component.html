@@ -1,3 +1,10 @@
+<!-- Animacion de Carga -->
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
 <div [ngClass]="{'fondo': !modoSeleccionado, 'fondo2': modoSeleccionado }">
   <div class="d-grid gap-2 d-md-flex justify-content-md-end p-2">
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>

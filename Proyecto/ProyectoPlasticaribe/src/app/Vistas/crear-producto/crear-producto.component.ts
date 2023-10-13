@@ -34,6 +34,7 @@ export class CrearProductoComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   unidadMedida : any [] = []; //Variable que almacemará las unidades de medida
+  presentacionesProductos : any [] = []; //Variable que almacenará las presentaciones de los productos
   tipoProducto : any [] = []; //Variable que almacenará los tipos de productos
   materialProducto : any [] = []; //Variable que almacenará los materiales
   pigmentoProducto : any [] = []; //Variable que almancenará los pigmentos
@@ -48,29 +49,25 @@ export class CrearProductoComponent implements OnInit {
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
                         private existenciasService : ExistenciasProductosService,
-                          private clientesService : ClientesService,
-                            private usuarioService : UsuarioService,
-                              private AppComponent : AppComponent,
-                                private materialService : MaterialProductoService,
-                                  private pigmentoServices : PigmentoProductoService,
-                                    private tipoSelladoService : TiposSelladoService,
-                                      private ClientesProductosService : ClientesProductosService,
-                                        private mensajeService : MensajesAplicacionService,) {
+                          private AppComponent : AppComponent,
+                            private materialService : MaterialProductoService,
+                              private pigmentoServices : PigmentoProductoService,
+                                private tipoSelladoService : TiposSelladoService,
+                                  private mensajeService : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       ProduId:[null, Validators.required],
       ProduNombre: [null, Validators.required],
-      ProduAncho: [null, Validators.required],
-      ProduFuelle: [null, Validators.required],
-      ProduCalibre: [null, Validators.required],
-      ProduLargo : [null, Validators.required],
-      ProduUnidadMedidaACF: [null, Validators.required],
-      ProduTipo: [null, Validators.required],
-      ProduSellado: [null, Validators.required],
-      ProduMaterial: [null, Validators.required],
-      ProduPigmento: [null, Validators.required],
+      ProduAncho: [0, Validators.required],
+      ProduFuelle: [0, Validators.required],
+      ProduCalibre: [0, Validators.required],
+      ProduLargo : [0, Validators.required],
+      ProduUnidadMedidaACF: ['Cms', Validators.required],
+      ProduTipo: [1, Validators.required],
+      ProduSellado: [1, Validators.required],
+      ProduMaterial: [1, Validators.required],
+      ProduPigmento: [1, Validators.required],
       ProdDescripcion: '',
-      ClienteNombre: [null, Validators.required],
       ProduBolsasBulto : 0,
       ProduBolsasPaquete : 0,
     });
@@ -92,7 +89,6 @@ export class CrearProductoComponent implements OnInit {
     this.matrialProductoComboBox();
     this.pigmentoProductocomboBox();
     this.tipoMondedaComboBox();
-    this.clientesComboBox();
     this.tiposSelladoComboBox();
   }
 
@@ -104,12 +100,30 @@ export class CrearProductoComponent implements OnInit {
   }
 
   // Funcion que va a limpiar los campos del formulario de producto
-  LimpiarCampos = () => this.productoService.GetIdUltimoProducto().subscribe(datos => this.FormCrearProducto.patchValue({ ProduId:datos + 1, }));
+  LimpiarCampos() {
+    this.FormCrearProducto.reset();
+    this.productoService.GetIdUltimoProducto().subscribe(datos => {
+      this.FormCrearProducto.patchValue({
+        ProduId:datos + 1,
+        ProduAncho: 0,
+        ProduFuelle: 0,
+        ProduCalibre: 0,
+        ProduLargo : 0,
+        ProduUnidadMedidaACF: 'Cms',
+        ProduTipo: 1,
+        ProduSellado: 1,
+        ProduMaterial: 1,
+        ProduPigmento: 1,
+        ProdDescripcion: '',
+        ProduBolsasBulto : 0,
+        ProduBolsasPaquete : 0,
+      });
+    });
+  }
 
   // Funcion que va a limpiar los campos del formulario de existencias
   LimpiarCamposPresentacion() {
-    this.FormCrearPresentacionProducto.setValue({
-      ProdId:null,
+    this.FormCrearPresentacionProducto.patchValue({
       ProduCantidad: 0,
       ProduUnidadMedidaCant: 'Kg',
       ProduPrecioUnd: 0,
@@ -120,21 +134,13 @@ export class CrearProductoComponent implements OnInit {
   // Funcion que consultará y almacenará los tipos de sellado
   tiposSelladoComboBox = () => this.tipoSelladoService.srvObtenerLista().subscribe(datos_tpSelado => this.tiposSellado = datos_tpSelado);
 
-  // Funcion que consultará y almacenará los clientes
-  clientesComboBox() {
-    this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-      this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
-        for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);
-          else this.cliente.push(datos_clientes[index]);
-          this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
-        }
-      });
+  // Funcion que consultará y almacenará las unidades de medida
+  undMedidaComboBox() {
+    this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
+      this.unidadMedida = datos_undMed.filter(x => ['Plgs', 'Cms'].includes(x.undMed_Id));
+      this.presentacionesProductos = datos_undMed.filter(x => ['Und', 'Paquete', 'Kg', 'Rollo'].includes(x.undMed_Id));
     });
   }
-
-  // Funcion que consultará y almacenará las unidades de medida
-  undMedidaComboBox = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => this.unidadMedida = datos_undMed);
 
   // Funcion que consultará y almacenará los tipos de productos
   tipoProductoComboBox = () => this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => this.tipoProducto = datos_tiposProductos);
@@ -158,8 +164,8 @@ export class CrearProductoComponent implements OnInit {
   llenarTabla(){
     const datosProductos : any = {
       Prod_Id: this.FormCrearProducto.value.ProduId,
-      Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
-      Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
+      Prod_Nombre: (this.FormCrearProducto.value.ProduNombre).toUpperCase(),
+      Prod_Descripcion: (this.FormCrearProducto.value.ProduNombre).toUpperCase(),
       TpProd_Id: this.FormCrearProducto.value.ProduTipo,
       Prod_Peso: 0,
       Prod_Peso_Millar: 0,
@@ -182,18 +188,12 @@ export class CrearProductoComponent implements OnInit {
       Prod_Peso_Paquete : 0,
       Prod_Peso_Bulto : 0,
     };
-    const clienteproducto : any = {
-      Cli_Id: this.FormCrearProducto.value.ClienteNombre,
-      Prod_Id: this.FormCrearProducto.value.ProduId
-    }
     if (this.ValidarRol == 2) datosProductos.Estado_Id = 9;
     else if (this.ValidarRol == 1) datosProductos.Estado_Id = 10;
 
     this.productoService.srvGuardar(datosProductos).subscribe(() => {
-      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(() =>{
-        this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
-        this.LimpiarCampos();
-      }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message));
+      this.mensajeService.mensajeConfirmacion(`¡Producto creado!`, 'Se creó el producto de manera satisfactoria y se asoció al cliente');
+      this.LimpiarCampos();
     }, error => this.mensajeService.mensajeError('¡Ocurrió un error al crear el producto!', error.message));
   }
 

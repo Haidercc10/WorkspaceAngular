@@ -23,7 +23,13 @@ export class Orden_TrabajoService {
 
   srvObtenerListaPdfOTInsertada = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getPdfOTInsertada/${dato}`);
 
+  GetDatosOrden = (orden : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getDatosOrden/${orden}`);
+
+  GetOrdenTrabajo = (orden : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getOrdenTrabajo/${orden}`);
+
   GetInfoUltOT = (producto : number, presentacion : string) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getInfoUltOT/${producto}/${presentacion}`);
+
+  GetUlt_Numero_OT = () : Observable<number> => this.http.get<number>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getUlt_Numero_OT`);
 
   srvActualizar = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`, data);
   

@@ -7600,6 +7600,152 @@ export const stepsFacturacionMaquilas: Step.StepOptions[] = [
 ];
 
 /******************************************************** ORDENES DE TRABAJO ***************************************************************/
+export const stepsOrdenesTrabajo: Step.StepOptions[] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'none',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Ordne de Trabajo</h5>`,
+    text: `<p>¡Las ordenes de trabajo son documentos que se crean para la creación de un producto, este documento tendrá todas las especificaciones necesarias sobre como se debe crear el producto!</p>
+    <p>Desde aquí podremos crear, consultar y editar las ordenes de trabajo de manera sencilla y eficiente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#formOrdenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'formOrdenTrabajo',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Información General</h5>`,
+    text: `<p>Para crear una Orden de Trabajo necesitamos información que debemos colocar en los siguientes campos.</p>`
+  },
+  {
+    attachTo: {
+      element: '#idCliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idCliente',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Id del Cliente</h5>`,
+    text: `<p>Este campo se estará llenando con la información del cliente que se seleccionó. Este campo no es editable y se llena de manera automatica.</p>`
+  },
+  {
+    attachTo: {
+      element: '#cliente',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cliente',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cliente</h5>`,
+    text: `<p>Para seleccionar un cliente tenemos que escribir el nombre del mismo, y a medida que escribimos, se muestran los clientes que tengan en su nombre el texto que hemos escrito.</p>
+    <p>Si encontramos el cliente que queremos presionamos click o lo seleccionamos y listo. El campo anterior (Id Cliente) se llenará automaticamente una vez hayamos elegido uno.</p>
+    <p>De igual manera se llenarán de forma automatica los campos de vendedor que estaremos viendo más adelante.</p>
+    <br>
+    <p>Si el cliente no existe, <b>presionaremos el botón de crear cliente</b> que se encuentra en la parte superior de la pantalla. Acontinuación se explicará como se creará el cliente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#idProducto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idProducto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Item (Id Producto)</h5>`,
+    text: `<p>Podemos buscar un producto en base a su código, para hacer esto tenemos escribimos en este campo el codigo del mismo y luego presionamos la tecla 'Enter', al hacer esto se llenará automaticamente el campo siguiente (Producto).</p>`
+  },
+  {
+    attachTo: {
+      element: '#producto',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'producto',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Referencia (Producto)</h5>`,
+    text: `<p>Otra forma de buscar un producto es por su referencia (nombre), sí escribimos el nombre del producto en este campo nos irán apareciendo opciones de los productos que tienen en su nombre el texto que hemos escrito.</p>
+    <p>De igual manera que con el campo anterior (Id Producto) una vez se elija una de las opciones se llenará el campo Item automaticamente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#cantidadFabricar',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'cantidadFabricar',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Cantidad a Fabricar</h5>`,
+    text: `<p>En este campo podemos colocar la cantidad que queremos fabricar del producto, este campo es editable pero tambien puede llenarse de manera automatica.</p>`
+  },
+  {
+    attachTo: {
+      element: '#presentacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'presentacion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Presentación</h5>`,
+    text: `<p>Debemos elegir una de las opciones de presentación que tenemos, esto nos permitirá buscar las especificaciones que tuvo la última orden de trabajo creada al producto seleccionado.</p>
+    <p>Se buscará la información de la última orden de trabajo creada al producto seleccionado, cuando se encuentre información en los campos Item (Id Producto) y Presentación.
+    Si se encuentra una orden de trabajo creada al producto seleccionado, se cargará en los campos la información de la orden encontrada.</p>`
+  },
+  {
+    attachTo: {
+      element: '#precioUnitario',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'precioUnitario',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Precio Unitario</h5>`,
+    text: `<p>En este campo se estará cargad</p>`
+  },
+];
+
 export const stepsOrdenTrabajo: Step.StepOptions[] = [
   {
     attachTo: {
@@ -11493,6 +11639,205 @@ export const stepsDashboardCompras : Step.StepOptions[] = [
     id: 'graficaCostos',
     title: '<h4 style="margin: auto; color: var(--rojo)">¡Grafica!</h4>',
     text: `<p>¡En esta grafica podremos ver los datos de las <b>compras de la empresa</b>, estos datos podremos verlos por cada uno de los meses!</p>`
+  },
+];
+
+export const stepsDashboarsAreas : Step.StepOptions [] = [
+  {
+    attachTo: {
+      element: '#none',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.cancel,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'none',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Dashboard Áreas!</h4>',
+    text: `<p>¡En este dashboard <b>podemos ver los datos de las cantidades producidas por cada una de las áreas</b> de la empresa!</p>`
+  },
+  {
+    attachTo: {
+      element: '#cambiarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'cambiarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Cambiar año!</h4>',
+    text: `<p>¡Si queremos cambiar o graficar un año diferente podemos hacerlo desde aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#seleccionarAnio',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'seleccionarAnio',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Seleccionar año!</h4>',
+    text: `<p>¡Si queremos cambiar el año <b>podemos desplegar esta lista y seleccionar el año que queramos</b>!</p>`
+  },
+  {
+    attachTo: {
+      element: '#botonesGraficado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'botonesGraficado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Botones de Graficado!</h4>',
+    text: `<p>¡Luego de haber seleccionado un año <b>podemos presionar el botón rojo para ver los datos de la grafica</b>!</p>
+    <p>¡Tambien <b>podemos limpiar todos los datos de la grafica</b> y volver a graficar desde aquí!</p>`
+  },
+  {
+    attachTo: {
+      element: '#extrusion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'extrusion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Extrusión!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de extrusión</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#impresion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'impresion',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Impresión!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de impresión</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#rotograbado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'rotograbado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Rotograbado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de rotograbado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#doblado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'doblado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Doblado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de doblado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#laminado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'laminado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Laminado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de laminado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#corte',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'corte',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Corte!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de corte</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#empaque',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'empaque',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Empaque!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de empaque</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#sellado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'sellado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Sellado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de sellado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
+  },
+  {
+    attachTo: {
+      element: '#wiketiado',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.cancel,
+    ],
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    classes: 'card',
+    id: 'wiketiado',
+    title: '<h4 style="margin: auto; color: var(--rojo)">¡Wiketiado!</h4>',
+    text: `<p>¡En esta sección <b>podemos ver la producción de uno del área de wiketiado</b> en cada uno de los meses, tambien podemos ver los compraciones entre años!</p>`
   },
 ];
 
