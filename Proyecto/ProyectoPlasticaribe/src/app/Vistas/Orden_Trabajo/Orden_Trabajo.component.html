@@ -667,7 +667,7 @@
                 </div>
 
                 <!-- Ancho -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Ancho">Ancho</label>
@@ -675,7 +675,7 @@
                 </div>
 
                 <!-- Largo-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Largo_Sellado" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Largo">Largo</label>
@@ -683,10 +683,34 @@
                 </div>
 
                 <!-- Fuelle-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Fuelle_Sellado" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Fuelle">Fuelle</label>
+                  </span>
+                </div>
+
+                <!-- Etiqueta Ancho -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                  <span class="p-float-label">
+                    <input formControlName="Etiqueta_Ancho_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="etiquetaAncho">Etiqueta Ancho</label>
+                  </span>
+                </div>
+
+                <!-- Etiqueta Largo-->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                  <span class="p-float-label">
+                    <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="Largo">Etiqueta Largo</label>
+                  </span>
+                </div>
+
+                <!-- Etiqueta Fuelle-->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                  <span class="p-float-label">
+                    <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="Fuelle">Etiqueta Fuelle</label>
                   </span>
                 </div>
 

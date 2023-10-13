@@ -225,6 +225,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Ancho_Sellado: [null, Validators.required],
       Largo_Sellado: [null, Validators.required],
       Fuelle_Sellado: [null, Validators.required],
+      Etiqueta_Ancho_Sellado: [null, Validators.required],
+      Etiqueta_Largo_Sellado: [null, Validators.required],
+      Etiqueta_Fuelle_Sellado: [null, Validators.required],
       Margen_Sellado: [null, Validators.required],
       PesoMillar: [0, Validators.required],
       TipoSellado: [0, Validators.required],
@@ -465,11 +468,14 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a limpíar los campos del formulario de sellado
   limpiarFormSellado() {
     this.FormOrdenTrabajoSellado.patchValue({
-      Formato_Sellado: 7,
+      Formato_Sellado: 'SIN FORMATO',
       Ancho_Sellado: 0,
       Largo_Sellado: 0,
       Fuelle_Sellado: 0,
       Margen_Sellado: 0,
+      Etiqueta_Ancho_Sellado : 0,
+      Etiqueta_Largo_Sellado : 0,
+      Etiqueta_Fuelle_Sellado : 0,
       PesoMillar: 0,
       TipoSellado: 'NO APLICA',
       PrecioDia: 0,
@@ -800,6 +806,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Ancho_Sellado: datos_Ot.selladoCorte_Ancho,
           Largo_Sellado: datos_Ot.selladoCorte_Largo,
           Fuelle_Sellado: datos_Ot.selladoCorte_Fuelle,
+          Etiqueta_Ancho_Sellado : datos_Ot.selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Sellado : datos_Ot.selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Sellado : datos_Ot.selladoCorte_Etiqueta_Fuelle,
           Margen_Sellado: datos_Ot.margen,
           PesoMillar: datos_Ot.prod_Peso_Millar,
           TipoSellado: datos_Ot.tpSellados_Nombre,
@@ -808,6 +817,7 @@ export class Orden_TrabajoComponent implements OnInit {
           PrecioDia: datos_Ot.selladoCorte_PrecioSelladoDia,
           PrecioNoche: datos_Ot.selladoCorte_PrecioSelladoNoche,
         });
+        console.log(datos_Ot, this.FormOrdenTrabajoSellado.value)
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
         setTimeout(() => {
           this.cyrel = datos_Ot.cyrel == false ? false : true;
@@ -926,6 +936,9 @@ export class Orden_TrabajoComponent implements OnInit {
               Ancho_Sellado: this.ArrayProducto[0].Ancho,
               Largo_Sellado: this.ArrayProducto[0].Largo,
               Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
+              Etiqueta_Ancho_Sellado : itemOt.etiqueta.trim(),
+              Etiqueta_Largo_Sellado : itemOt.etiquetaLargo.trim(),
+              Etiqueta_Fuelle_Sellado : itemOt.etiquetaFuelle.trim(),
               Margen_Sellado: itemOt.ptMargen,
               PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
@@ -1680,7 +1693,6 @@ export class Orden_TrabajoComponent implements OnInit {
   guardarOt() {
     this.cargando = true;
     this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
-      let errorExt: boolean = false, errorImp: boolean = false, errorLam: boolean = false, errorSelCor: boolean = false;
       let infoOT: modelOrden_Trabajo = {
         Numero_OT : numero_OT + 1,
         SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
@@ -1709,19 +1721,9 @@ export class Orden_TrabajoComponent implements OnInit {
         Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
-        errorExt = this.guardarOt_Extrusion(datos_ot.ot_Id);
-        errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
-        errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
-        errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
-        setTimeout(() => {
-          if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-            this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${datos_ot.ot_Id}`);
-            this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-            this.cambiarEstadoProducto(this.producto);
-            this.pdfOrdenTrabajo(datos_ot.numero_OT);
-            this.limpiarCampos();
-          }
-        }, 4000);
+        let ot : number = datos_ot.ot_Id;
+        let numeroOT : number = datos_ot.numero_OT;
+        this.guardarOt_Extrusion(ot, numeroOT);
       }, error => {
         this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
         this.cargando = false;
@@ -1730,7 +1732,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
-  guardarOt_Extrusion(ordenTrabajo: number): boolean {
+  guardarOt_Extrusion(ordenTrabajo: number, numeroOT : number){
     let infoOTExt: any = {
       Ot_Id: ordenTrabajo,
       Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -1744,15 +1746,13 @@ export class Orden_TrabajoComponent implements OnInit {
       Tratado_Id: this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso: this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(null, error => {
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => this.guardarOt_Impresion(ordenTrabajo, numeroOT), error => {
       this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.error);
-      return true;
     });
-    return false;
   }
 
   //Funcion que va a guardar la informacion de impresion de la orden de trabajo
-  guardarOt_Impresion(ordenTrabajo: number): boolean {
+  guardarOt_Impresion(ordenTrabajo: number, numeroOT : number) {
     let rodilloImpresion: any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
     let pistaImpresion: any = this.FormOrdenTrabajoImpresion.value.Pista_Impresion;
     let tinta1Impresion: any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1;
@@ -1779,17 +1779,15 @@ export class Orden_TrabajoComponent implements OnInit {
           Tinta7_Id: datos_impresion[j].tinta_Id7,
           Tinta8_Id: datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(null, error => {
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => this.guardarOt_Laminado(ordenTrabajo, numeroOT), error => {
           this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
-          return true;
         });
       }
     });
-    return false;
   }
 
   //Funcion que va a guardar la informacion de laminado de la orden de trabajo
-  guardarOt_Laminado(ordenTrabajo: number): boolean {
+  guardarOt_Laminado(ordenTrabajo: number, numeroOT : number) {
     let infoOTLam: any = {
       OT_Id: ordenTrabajo,
       Capa_Id1: this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
@@ -1802,15 +1800,13 @@ export class Orden_TrabajoComponent implements OnInit {
       LamCapa_Cantidad2: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(null, error => {
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => this.guardarOt_Sellado_Corte(ordenTrabajo, numeroOT), error => {
       this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.error);
-      return true;
     });
-    return false;
   }
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
-  guardarOt_Sellado_Corte(ordenTrabajo: number): boolean {
+  guardarOt_Sellado_Corte(ordenTrabajo: number, numeroOT : number) {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
@@ -1822,6 +1818,9 @@ export class Orden_TrabajoComponent implements OnInit {
         SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
         SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
         SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
         SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
         TpSellado_Id: datos.tpSellado_Id,
         SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
@@ -1832,15 +1831,14 @@ export class Orden_TrabajoComponent implements OnInit {
         SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
         SelladoCorte_PesoProducto: this.pesoProducto,
       }
-      this.otSelladoCorteService.post(info).subscribe(null, error => {
-        this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
-        return true;
-      });
-    }, error => {
-      this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error);
-      return true;
-    });
-    return false;
+      this.otSelladoCorteService.post(info).subscribe(() => {
+        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${ordenTrabajo}`);
+        this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
+        this.cambiarEstadoProducto(this.producto);1
+        this.pdfOrdenTrabajo(numeroOT);
+        this.limpiarCampos();
+      }, error => this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error));
+    }, err => this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, err.error));
   }
 
   //Funcion que va a cambiar el estado de un producto a "Activo"
@@ -1969,6 +1967,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Ancho_Sellado: datos_orden[i].selladoCorte_Ancho,
           Largo_Sellado: datos_orden[i].selladoCorte_Largo,
           Fuelle_Sellado: datos_orden[i].selladoCorte_Fuelle,
+          Etiqueta_Ancho_Sellado : datos_orden[i].selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Sellado : datos_orden[i].selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Sellado : datos_orden[i].selladoCorte_Etiqueta_Fuelle,
           Margen_Sellado: datos_orden[i].margen,
           PesoMillar: datos_orden[i].selladoCorte_PesoMillar,
           TipoSellado: datos_orden[i].tpSellados_Nombre,
@@ -2031,7 +2032,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.cerrarMensaje();
       this.cargando = true;
       let ot: number = this.FormOrdenTrabajo.value.OT_Id;
-      this.ordenTrabajoService.srvObtenerListaPorId(ot).subscribe(datos_Orden => {
+      this.ordenTrabajoService.GetDatosOrden(ot).subscribe(datos_Orden => {
         let info: modelOrden_Trabajo = {
           Ot_Id: datos_Orden.ot_Id,
           Numero_OT : datos_Orden.numero_OT,
@@ -2060,21 +2061,10 @@ export class Orden_TrabajoComponent implements OnInit {
           Ot_ValorOT: this.valorOt,
           Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
         }
-        this.ordenTrabajoService.srvActualizar(ot, info).subscribe(() => {
-          let errorExt: boolean, errorImp: boolean, errorLam: boolean, errorSelCor: boolean;
-          errorExt = this.actualizarOt_Extrusion(ot);
-          errorImp = this.actualizarOT_Impresion(ot);
-          errorLam = this.actualizarOT_Laminado(ot);
-          errorSelCor = this.actualizarOT_Sellado_Corte(ot);
-          setTimeout(() => {
-            if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
-              this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
-              this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-              this.cambiarEstadoProducto(this.producto);
-              this.pdfOrdenTrabajo(ot);
-              this.limpiarCampos();
-            }
-          }, 3000);
+        this.ordenTrabajoService.srvActualizar(datos_Orden.ot_Id, info).subscribe(() => {
+          let ot : number = datos_Orden.ot_Id;
+          let numeroOT : number = datos_Orden.numero_OT;
+          this.actualizarOt_Extrusion(ot, numeroOT);
         }, () => {
           this.msj.mensajeError(`¡Error!`, `¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`);
           this.cargando = false;
@@ -2087,7 +2077,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a actualizar la tabla "OT_Extrusion"
-  actualizarOt_Extrusion(ot: number): any {
+  actualizarOt_Extrusion(ot: number, numeroOT : number) {
     this.otExtrusionServie.GetOT_Extrusion(ot).subscribe(datos_extrusion => {
       for (let i = 0; i < datos_extrusion.length; i++) {
         let infoOTExt: any = {
@@ -2104,20 +2094,15 @@ export class Orden_TrabajoComponent implements OnInit {
           Tratado_Id: this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
           Extrusion_Peso: this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
         }
-        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(null, error => {
+        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(() => this.actualizarOT_Impresion(ot, numeroOT), error => {
           this.msj.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.error);
-          return true;
         });
       }
-    }, () => {
-      this.msj.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
-      return true;
-    });
-    return false;
+    }, () => this.msj.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, ''));
   }
 
   // Funcion que va a actualizar la tabla "OT_Impresion"
-  actualizarOT_Impresion(ot: number): any {
+  actualizarOT_Impresion(ot: number, numeroOT : number) {
     this.otImpresionService.GetOT_Impresion(ot).subscribe(datos_Impresion => {
       for (let i = 0; i < datos_Impresion.length; i++) {
         let rodilloImpresion: any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
@@ -2147,25 +2132,17 @@ export class Orden_TrabajoComponent implements OnInit {
               Tinta7_Id: datos_impresion[j].tinta_Id7,
               Tinta8_Id: datos_impresion[j].tinta_Id8,
             }
-            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(null, error => {
+            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(() => this.actualizarOT_Laminado(ot, numeroOT), error => {
               this.msj.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.error);
-              return true;
             });
           }
-        }, () => {
-          this.msj.mensajeError(`¡Error!`, `¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`);
-          return true;
-        });
+        }, () => this.msj.mensajeError(`¡Error!`, `¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`));
       }
-    }, () => {
-      this.msj.mensajeError(`¡Error!`, `¡No se encontró información de la OT N° ${ot}!`);
-      return true;
-    });
-    return false;
+    }, () => this.msj.mensajeError(`¡Error!`, `¡No se encontró información de la OT N° ${ot}!`));
   }
 
   // Funcion que va a a ctualizar la tabla #OT_Laminado
-  actualizarOT_Laminado(ot: number) {
+  actualizarOT_Laminado(ot: number, numeroOT : number) {
     this.otLaminadoService.GetOT_Laminado(ot).subscribe(datos_laminado => {
       for (let i = 0; i < datos_laminado.length; i++) {
         let infoOTLam: any = {
@@ -2181,20 +2158,16 @@ export class Orden_TrabajoComponent implements OnInit {
           LamCapa_Cantidad2: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
           LamCapa_Cantidad3: this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
-        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(null, error => {
+        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => this.actualizarOT_Sellado_Corte(ot, numeroOT), error => {
           this.msj.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.error);
           return true;
         });
       }
-    }, () => {
-      this.msj.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, '');
-      return true;
-    });
-    return false;
+    }, () => this.msj.mensajeError(`¡No se encontró información de la OT N° ${ot}!`, ''));
   }
 
   // Funcion que va a a ctualizar la tabla "OT_Sellado_Corte"
-  actualizarOT_Sellado_Corte(ot: number) {
+  actualizarOT_Sellado_Corte(ot: number, numeroOT : number) {
     this.otSelladoCorteService.GetOT_SelladoCorte(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let tipoSellado: any = this.FormOrdenTrabajoSellado.value.TipoSellado;
@@ -2209,6 +2182,9 @@ export class Orden_TrabajoComponent implements OnInit {
             SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
             SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
             SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+            SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
             SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
             TpSellado_Id: datos.tpSellado_Id,
             SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
@@ -2219,20 +2195,16 @@ export class Orden_TrabajoComponent implements OnInit {
             SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
             SelladoCorte_PesoProducto: this.pesoProducto,
           }
-          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(null, error => {
-            this.msj.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error);
-            return true;
-          });
-        }, error => {
-          this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error);
-          return true;
-        });
+          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => {
+            this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
+            this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
+            this.cambiarEstadoProducto(this.producto);
+            this.pdfOrdenTrabajo(numeroOT);
+            this.limpiarCampos();
+          }, error => this.msj.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.error));
+        }, error => this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.error));
       }
-    }, () => {
-      this.msj.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`);
-      return true;
-    });
-    return false;
+    }, () => this.msj.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`));
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -2770,8 +2742,8 @@ export class Orden_TrabajoComponent implements OnInit {
                         ],
                         [
                           { border: [], colspan: 3, text: `${this.formatonumeros((datos_ot[i].selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
-                          { border: [], colspan: 3, text: `x          ${this.formatonumeros((datos_ot[i].selladoCorte_Largo).toFixed(2))}          x`, alignment: 'center', },
-                          { border: [], colspan: 3, text: `${this.formatonumeros((datos_ot[i].selladoCorte_Fuelle).toFixed(2))}               ${datos_ot[i].und_Extrusion.toString().trim()}`, },
+                          { border: [], colspan: 3, text: `x     ${this.formatonumeros((datos_ot[i].selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
+                          { border: [], colspan: 3, text: `${this.formatonumeros((datos_ot[i].selladoCorte_Fuelle).toFixed(2))}     ${datos_ot[i].und_Extrusion.toString().trim()}`, },
                         ],
                         [
                           { border: [], text: ``, },
