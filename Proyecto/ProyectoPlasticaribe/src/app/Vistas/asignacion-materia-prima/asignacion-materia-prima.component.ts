@@ -293,18 +293,16 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   asignacionMateriaPrima(){
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
-      setTimeout(() => {
-        if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
-        else {
-          if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){
-            this.soloTintas = true;
-            this.crearAsignacion();
-          } else {
-            if (this.ValidarRol != 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
-            else if (this.ValidarRol == 1) this.confirmarAsignacion(idOrdenTrabajo);
-          }
+      if (this.calcularMateriaPrimaAsignada() <= this.cantRestante) this.crearAsignacion();
+      else {
+        if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){
+          this.soloTintas = true;
+          this.crearAsignacion();
+        } else {
+          if (this.ValidarRol != 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
+          else if (this.ValidarRol == 1) this.confirmarAsignacion(idOrdenTrabajo);
         }
-      }, 2000);
+      }
     } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No es posible asignar a la OT ${idOrdenTrabajo}, porque ya se encuentra cerrada!`);
   }
 
@@ -366,8 +364,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }
     setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {        
-        //this.actualizar_MovimientosEntradas();
-        //this.crear_Salidas(asignacion);
         this.actualizarMovimientosEntradasMP(asignacion);
         setTimeout(() => this.asignacionExitosa(), 2000);
       }
@@ -379,7 +375,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (!this.soloTintas && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Asignación creada satisfactoriamente!`);
     else if (this.soloTintas && this.calcularMateriaPrimaAsignada() > this.cantRestante && !this.esSolicitud) this.mensajeService.mensajeConfirmacion(`¡Asignación Creada!`, `Solo se crearon las asignaciones de tintas!`);
     else if(this.esSolicitud) this.validarEstadoSolicitud();
-    setTimeout(() => { this.LimpiarCampos(); }, 1000); 
+    setTimeout(() => this.LimpiarCampos(), 1000); 
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
@@ -439,7 +435,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true});
   }
 
-  confirmarAsignacion = (OT : any) => this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar de todas formas?`, sticky: true});
+  confirmarAsignacion = (OT : any) => this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad de Kg a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar continuar con la asignación?`, sticky: true});
 
   //Buscar informacion de las solicitudes de materia prima creadas
   consultarSolicitudMaterial(){
