@@ -113,6 +113,7 @@ export class EntradaBOPPComponent implements OnInit {
     this.getSerialesBOPP();
     this.obtenerProveeedor();
     this.cargarBoppsGenericos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

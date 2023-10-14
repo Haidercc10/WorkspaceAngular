@@ -72,6 +72,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     this.obtenerActivos();
     this.obtenerTiposMantenimiento();
     this.obtenerEstados();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

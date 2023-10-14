@@ -50,6 +50,7 @@ export class Ingreso_NominaComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cargarTiposNomina();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función que se encarga de leer la información que se almacena en el storage del navegador

@@ -66,6 +66,7 @@ export class Gestion_VistasComponent implements OnInit {
     this.cargarRoles();
     this.iconos2 = iconos;
     this.imagenes = imagenes;
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Función que cargará los roles en el campo del formulario

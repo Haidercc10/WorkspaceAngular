@@ -105,6 +105,7 @@ export class SolicitudMP_ExtrusionComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     this.ultimoConsecutivoSolicitud();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     setTimeout(() => { this.FormMateriaPrimaRetiro.patchValue({ ProcesoRetiro : 'EXT', Solicitud : this.ultimoNroSolicitud, }); }, 3000);
     this.FormMateriaPrimaRetirada.patchValue({ MpUnidadMedidaRetirada : 'Kg' });
   }

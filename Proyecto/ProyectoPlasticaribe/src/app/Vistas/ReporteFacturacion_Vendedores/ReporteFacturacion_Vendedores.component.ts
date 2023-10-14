@@ -50,6 +50,12 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
     this.llenarArrayAnios();
     this.consultarVendedores();
     this.graficarDatos();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   tutorial(){

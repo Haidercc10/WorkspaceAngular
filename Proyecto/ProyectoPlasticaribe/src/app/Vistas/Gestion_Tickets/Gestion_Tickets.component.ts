@@ -48,6 +48,7 @@ export class Gestion_TicketsComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.limpiarTodo();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

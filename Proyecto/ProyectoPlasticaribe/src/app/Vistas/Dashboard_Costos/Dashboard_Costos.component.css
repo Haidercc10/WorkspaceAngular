@@ -176,7 +176,7 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
 
 .fondo {
   --s: 36px; /* control the size */
-  --c1: #000;
+  --c1: #8d8d8d;
   --c2: #d2d3d5;
   --c3: #727c7e;
   

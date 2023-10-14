@@ -81,6 +81,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerBOPP();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

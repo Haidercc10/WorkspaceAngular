@@ -71,6 +71,7 @@ export class Reporte_SolicitudMpExtrusionComponent implements OnInit {
     this.obtenerEstados();
     this.lecturaStorage();
     this.getEstadoSolitudes();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

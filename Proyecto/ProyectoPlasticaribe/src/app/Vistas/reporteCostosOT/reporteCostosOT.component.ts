@@ -114,6 +114,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.lecturaStorage();
     this.cargarEstados();
     this.inhabilitarCampos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

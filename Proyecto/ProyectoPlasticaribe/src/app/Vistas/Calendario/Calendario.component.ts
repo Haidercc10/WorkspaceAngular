@@ -56,6 +56,7 @@ export class CalendarioComponent implements OnInit {
     this.obtenerRoles();
     this.opcionesCalendario();
     this.obtenerEventos('');
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

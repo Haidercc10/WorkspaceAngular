@@ -46,6 +46,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   ngOnInit(): void {
     this.InventarioExistenciaBDNueva();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que calculará cual es la fecha segun los parametros especificados

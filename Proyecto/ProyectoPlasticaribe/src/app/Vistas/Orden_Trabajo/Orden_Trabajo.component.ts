@@ -348,6 +348,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   ngOnInit() {
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.lecturaStorage();
     this.consultarVendedores();
     this.consultarPresentaciones();

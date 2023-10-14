@@ -71,6 +71,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.lecturaStorage();
     this.minDate.setMonth(8);
     this.minDate.setFullYear(2022);
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

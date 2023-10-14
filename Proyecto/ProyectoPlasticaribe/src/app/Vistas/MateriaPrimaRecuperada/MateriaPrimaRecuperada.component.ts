@@ -87,6 +87,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerUsuarios();
     this.obtenerTurnos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

@@ -77,6 +77,12 @@ export class Dashboard_CostosComponent implements OnInit {
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.llenarGraficas();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   tutorial(){

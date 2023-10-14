@@ -64,6 +64,7 @@ export class Solicitud_Rollos_BodegasComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obternerBodegas();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

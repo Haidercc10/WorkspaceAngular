@@ -65,6 +65,7 @@ export class CertificadoCalidadComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerUnidadesMedidas();
     this.llenarMateriales();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

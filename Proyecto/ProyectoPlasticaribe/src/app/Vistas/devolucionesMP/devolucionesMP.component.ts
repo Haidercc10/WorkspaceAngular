@@ -56,6 +56,7 @@ export class DevolucionesMPComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

@@ -82,6 +82,7 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.consultarCategorias();
     this.cargarConsecutivo();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a iniciar el tutorial in-app del componente actual

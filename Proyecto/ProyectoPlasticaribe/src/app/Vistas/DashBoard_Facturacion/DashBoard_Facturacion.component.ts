@@ -54,6 +54,12 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.llenarArrayAnos();
     this.tiempoExcedido();
     this.graficarDatos();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.multiAxisOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.multiAxisOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   tutorial(){

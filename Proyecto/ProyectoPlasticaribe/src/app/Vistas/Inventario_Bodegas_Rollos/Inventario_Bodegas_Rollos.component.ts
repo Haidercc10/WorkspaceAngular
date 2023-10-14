@@ -45,6 +45,7 @@ export class Inventario_Bodegas_RollosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.consultarInventario();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

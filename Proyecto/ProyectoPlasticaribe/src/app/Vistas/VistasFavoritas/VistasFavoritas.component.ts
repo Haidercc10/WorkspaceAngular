@@ -42,6 +42,7 @@ export class VistasFavoritasComponent implements OnInit {
     this.llenarVistasDisponibles();
     this.mostrarVistasFav();
     this.buscarFavoritos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

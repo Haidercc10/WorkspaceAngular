@@ -120,6 +120,7 @@ export class PedidoExternoComponent implements OnInit {
     this.lecturaStorage();
     this.checkboxIva();
     this.buscarClientes();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

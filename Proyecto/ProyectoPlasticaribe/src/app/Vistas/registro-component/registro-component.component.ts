@@ -95,6 +95,7 @@ export class RegistroComponentComponent implements OnInit {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.cargarRoles_Vistas();
     this.cargarVistas();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que crgará las areas

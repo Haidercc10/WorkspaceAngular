@@ -80,6 +80,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   ngOnInit() {
     this.obtenerProcesos();
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

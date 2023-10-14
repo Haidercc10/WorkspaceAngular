@@ -103,6 +103,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.obtenerVendedores();
     this.ObternerFallas();
     this.obtenerEstados();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     setTimeout(() => this.validarVendedor(), 500);
   }
 

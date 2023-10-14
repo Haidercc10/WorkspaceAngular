@@ -140,6 +140,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.consultarInventario();
     this.consultarCategorias();
     this.obtenerUnidadesMedidas();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
