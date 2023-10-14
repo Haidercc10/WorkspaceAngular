@@ -47,13 +47,13 @@ p-chart ::ng-deep div ::ng-deep canvas {
   height: 100%;
 }
 
-p-card ::ng-deep [class = "p-card p-component"] {
+.fila-1 p-card ::ng-deep [class = "p-card p-component"], .fila-3 p-card ::ng-deep [class = "p-card p-component"] {
   border: 3px solid #fefefe00;
   border-radius: 20px;
   transition: all 500ms;
 }
 
-p-card ::ng-deep [class = "p-card p-component"]:hover {
+.fila-1 p-card ::ng-deep [class = "p-card p-component"]:hover, .fila-3 p-card ::ng-deep [class = "p-card p-component"]:hover {
   border: 3px solid #00000008;
   box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
   width: calc(100% + 0.1%);

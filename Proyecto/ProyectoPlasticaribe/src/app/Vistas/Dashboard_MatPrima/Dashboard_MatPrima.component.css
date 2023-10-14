@@ -106,9 +106,9 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
 
 .fondo, .fondo2 {
   --s: 105px; /* control the size */
-  --c1: #7c88b7;
-  --c2: #9ab6cd;
-  --c3: #6c7691;
+  --c1: #6778bb;
+  --c2: #8dccff;
+  --c3: #7790d7;
 
   background:
     conic-gradient(from 75deg,var(--c1)   15deg ,var(--c2) 0 30deg ,#0000 0 180deg,
