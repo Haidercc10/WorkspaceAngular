@@ -50,6 +50,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
   rondas : any = [1, 2, 3]; //Variable que va a contener las rondas de los controles de extrusion
   maquinas : any = []; 
+  //prueba
+  objetoPrueba : any = {};
+  contador = 0;
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -64,7 +67,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.mostrarRegistrosHoy();
-    this.exportarExcel();
+    this.prueba();
+    setTimeout(() => { this.exportarExcel(); }, 1000); 
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -286,11 +290,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let datos : any[] = [];
     let infoDocumento : any = [];
     let title = "CONTROL DE CALIDAD DE EXTRUSIÓN";
-
+    datos = this.registros;
     const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
     const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
     for (const item of datos) {
-      const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
+      const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, 
+      item.Ancho, item.CalMin, item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.CalibreTB, item.CalibreTB];
       infoDocumento.push(datos1);
     }
     let workbook = new Workbook();
@@ -373,20 +378,25 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     for (let index = 0; index < columnas.length; index++) {
       for (let i = 8; i < 32; i++) {
         worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        //console.log(`${columnas[index]}${i}`);
+        //console.log(`${columnas[index]}`);
+        //console.log(index);
+        infoDocumento.forEach(d => {
+          //if (d.Id == i) {
+            worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
+            worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
+            let row = worksheet.getCell(`${columnas[index]}${i}`).value = d[index];
+            //console.log(row)
+          //}
+        });    
       }
     }
-    infoDocumento.forEach(d => {
-      let row = worksheet.addRow(d);
-      let formatNumber : number [] = [8, 9, 10, 11, 12, 13];
-      formatNumber.forEach(f => row.getCell(f).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-      //let qty= row.getCell(7);
-      //let color = 'ADD8E6';
-      //qty.fill = {
-      //  type: 'pattern',
-      //  pattern: 'solid',
-      //  fgColor: { argb: color }
-      //}
-    });
+    //infoDocumento.forEach(d => {
+    //  let row = worksheet.addRow(d);
+    ////  let formatNumber : number [] = [8, 9, 10, 11, 12, 13];
+    ////  formatNumber.forEach(f => row.getCell(f).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    //});
+
     worksheet.getColumn(1).width = 9;
     worksheet.getColumn(2).width = 4;
     worksheet.getColumn(3).width = 10;
@@ -414,5 +424,40 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del ` + title + `!`);
     }, 400);
         
+  }
+
+  prueba(){
+    
+    for (let index = 0; index < 24; index++) {
+      this.objetoPrueba = 
+      {
+        Id: 0,
+        Ronda: 0,
+        Turno: 'DIA',
+        OT: 123456,
+        Maquina: 1,
+        Cliente: 'PRUEBA',
+        Item: 101010,
+        Referencia: 'PRUEBA',
+        Rollo: 123654,
+        Pigmento: 'NATURAL',
+        AnchoTubular: 5.5,
+        PesoMetro: 10,
+        Ancho: 12.3,
+        CalMin: 1,
+        CalMax: 2,
+        CalProm: 1.5,
+        Apariencia: 'OK',
+        Tratado: 'OK',
+        Rasgado: 'NO',
+        TipoBobina: 'TUBULAR',
+        Fecha: '2023-01-10',
+        Observacion: 'PRUEBA',
+        CalibreTB: 150
+      }
+      this.objetoPrueba.Ronda = index; 
+      this.registros.push(this.objetoPrueba);
+    }
+    //console.table(this.registros);
   }
 }
