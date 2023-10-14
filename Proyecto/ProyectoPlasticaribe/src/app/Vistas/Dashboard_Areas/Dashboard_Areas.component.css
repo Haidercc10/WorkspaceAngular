@@ -179,3 +179,20 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   height: calc(100% + 1%);
 }
   
+.fondo {
+  --s: 100px; /* control the size */
+  
+  --c: #99B2B7; /* back color */
+  --c2: #0000;
+  --c3: #0008;
+  --c4: #0004;
+  --c5: #EDC951;
+  background:
+    conic-gradient(at 80% 80%,var(--c) 75%, var(--c2) 0),
+    linear-gradient(135deg,var(--c) calc(40%/3),
+    var(--c2) 0 calc(200%/3),var(--c) 0),
+    conic-gradient(from 45deg at calc(160%/3) calc(80%/3),
+    var(--c3) 135deg, var(--c2) 0 225deg, var(--c4)0)
+    var(--c5); /* cube color */
+  background-size: var(--s) var(--s);
+}
