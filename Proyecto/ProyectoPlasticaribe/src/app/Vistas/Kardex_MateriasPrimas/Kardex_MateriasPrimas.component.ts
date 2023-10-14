@@ -54,6 +54,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerMateriales();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

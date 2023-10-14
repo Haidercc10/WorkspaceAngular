@@ -307,8 +307,8 @@ export class MenuLateralComponent implements OnInit {
   // Funcion que cambiará el tema de la aplicación
   mostrar() {
     let modo = window.localStorage.getItem("theme");
-    if(modo) this.AppComponent.temaSeleccionado = modo == 'dark' ? true : false;
-    this.cambiar(this.AppComponent.temaSeleccionado);
+    if(modo) this.AppComponent.temaSeleccionado = this.modoSeleccionado;
+    this.cambiar(this.modoSeleccionado);
   }
 
   // Funcion que cambiará el tema de la aplicación

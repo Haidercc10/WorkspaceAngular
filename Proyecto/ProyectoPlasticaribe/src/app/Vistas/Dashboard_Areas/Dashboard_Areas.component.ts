@@ -5,6 +5,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app/data';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Dashboard_Areas',
@@ -43,12 +44,21 @@ export class Dashboard_AreasComponent implements OnInit {
   constructor(private shepherdService: ShepherdService,
                 private paginaPrincial : PaginaPrincipalComponent,
                   private bagProService : BagproService,
-                    private msj : MensajesAplicacionService,) { }
+                    private msj : MensajesAplicacionService,
+                      private AppComponent : AppComponent) {
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.validarConsulta();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   // Funcion que iniciará el tutorial
@@ -68,10 +78,7 @@ export class Dashboard_AreasComponent implements OnInit {
     this.anios.push(...newYears);
   }
 
-  // Funcion que va a inicializar las variables con la información de las graficas
-  inicializarGraficas(){
-    this.aniosGraficados = [];
-    this.colocarTotalesProduccion();
+  llenarOpcionesGrafica(){
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -94,13 +101,20 @@ export class Dashboard_AreasComponent implements OnInit {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' },
           min : 0
         },
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
+  }
+
+  // Funcion que va a inicializar las variables con la información de las graficas
+  inicializarGraficas(){
+    this.aniosGraficados = [];
+    this.colocarTotalesProduccion();
+    this.llenarOpcionesGrafica();
     this.graficaExtrusionProducido = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []

@@ -67,6 +67,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerProcesos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     window.onscroll = function() {
       this.scrolly = window.scrollY;
       this.scrollx = window.scrollX;

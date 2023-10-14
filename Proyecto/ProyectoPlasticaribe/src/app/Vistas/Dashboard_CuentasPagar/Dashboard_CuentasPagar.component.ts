@@ -43,6 +43,7 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.tiempoExcedido();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que iniciará el tutorial

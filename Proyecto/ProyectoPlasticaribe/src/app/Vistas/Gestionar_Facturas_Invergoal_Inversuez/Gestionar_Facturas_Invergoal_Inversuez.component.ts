@@ -65,6 +65,7 @@ export class Gestionar_Facturas_Invergoal_InversuezComponent implements OnInit {
     this.cargarProveedores();
     this.cargarEstados();
     this.llenarColumnas();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

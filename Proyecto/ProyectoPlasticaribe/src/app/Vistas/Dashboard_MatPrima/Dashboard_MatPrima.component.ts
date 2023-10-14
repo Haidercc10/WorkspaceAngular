@@ -66,6 +66,12 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   ngOnInit() {
     this.tiempoExcedido();
     this.lecturaStorage();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.ComparativoOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.ComparativoOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   tutorial(){

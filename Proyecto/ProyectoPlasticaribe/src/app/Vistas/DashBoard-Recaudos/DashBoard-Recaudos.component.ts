@@ -54,6 +54,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.obtenerVendedor();
     this.obtenerClientes();
     this.tiempoExcedido();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que iniciará el tutorial

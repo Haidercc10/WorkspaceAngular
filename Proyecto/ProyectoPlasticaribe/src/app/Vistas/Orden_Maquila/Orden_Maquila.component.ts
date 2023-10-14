@@ -97,6 +97,7 @@ export class Orden_MaquilaComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerUnidadesMedida();
     this.generarConsecutivo();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.llave = 'pdf';
   }
 

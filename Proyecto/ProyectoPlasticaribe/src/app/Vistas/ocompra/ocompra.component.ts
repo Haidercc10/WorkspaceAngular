@@ -105,6 +105,7 @@ export class OcompraComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.generarConsecutivo();
     this.consultarCategorias();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

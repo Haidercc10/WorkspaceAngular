@@ -44,6 +44,7 @@ export class Informe_ConsumosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerMateriales();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Funcion que se usará para mostrar el tutorial

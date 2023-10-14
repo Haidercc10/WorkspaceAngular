@@ -72,6 +72,7 @@ export class DashboardOTComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.tiempoExcedido();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

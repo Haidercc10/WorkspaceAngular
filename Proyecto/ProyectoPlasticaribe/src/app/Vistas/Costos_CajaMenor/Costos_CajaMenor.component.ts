@@ -66,6 +66,7 @@ export class Costos_CajaMenorComponent implements OnInit {
     this.lecturaStorage();
     this.cargarTiposCostos();
     this.obtenerAreas();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   //Función que se encarga de leer la información que se almacena en el storage del navegador

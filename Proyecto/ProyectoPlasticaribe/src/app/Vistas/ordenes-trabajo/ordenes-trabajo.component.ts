@@ -344,6 +344,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     this.cargarEstados();
     this.lecturaStorage();
     this.ultimaOT();

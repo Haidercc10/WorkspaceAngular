@@ -68,6 +68,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
     //this.obtenerClientes();
   }
 

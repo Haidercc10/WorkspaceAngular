@@ -46,6 +46,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

@@ -40,13 +40,11 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   nombreGrafica : string;
   graficaPedidosClientes : any;
-  opcionesPedidosClientes : any;
+  opcionesGraficas : any;
 
   graficaPedidosProductos : any;
-  opcionesPedidosProductos : any;
 
   graficaPedidosVendedores : any;
-  opcionesPedidosVendedores : any;
 
   infoTablaModal : any [] = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -62,6 +60,14 @@ export class DashBoard_PedidosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.tiempoExcedido();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGraficas.scales.y1.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   tutorial(){
@@ -207,7 +213,7 @@ export class DashBoard_PedidosComponent implements OnInit {
       ]
     };
 
-    this.opcionesPedidosClientes = {
+    this.opcionesGraficas = {
       stacked: false,
         plugins: {
           legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
@@ -261,39 +267,6 @@ export class DashBoard_PedidosComponent implements OnInit {
         { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#A453FD', ], yAxisID: 'y1', data: costo },
       ]
     };
-    this.opcionesPedidosProductos = {
-      plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
-        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
-        }
-      },
-    };
   }
 
   // Funcion que va a llenar la grafica de los vendedores con mas pedidos
@@ -316,39 +289,6 @@ export class DashBoard_PedidosComponent implements OnInit {
       },
       { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#FFCA28', ], yAxisID: 'y1', data: costo }
     ]
-    };
-    this.opcionesPedidosVendedores = {
-      plugins: {
-        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
-        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 18 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
-        }
-      }
     };
   }
 

@@ -49,6 +49,7 @@ export class ControlCalidadComponent implements OnInit {
   ngOnInit(): void {
     this.lecturaStorage();
     this.consultarDatos()
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial() {

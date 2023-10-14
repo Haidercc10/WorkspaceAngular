@@ -67,6 +67,7 @@ export class ArchivosComponent implements OnInit {
     this.mostrarCarpetas();
     this.obtenerCategorias();
     this.cargarArchivos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

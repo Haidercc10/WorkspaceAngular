@@ -75,6 +75,7 @@ export class Movimientos_SolicitudRollosComponent implements OnInit {
     this.lecturaStorage();
     this.obternerBodegas();
     this.obtenerEstados();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

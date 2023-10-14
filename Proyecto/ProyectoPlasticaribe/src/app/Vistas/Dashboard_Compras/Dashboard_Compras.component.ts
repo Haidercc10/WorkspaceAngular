@@ -49,13 +49,21 @@ export class Dashboard_ComprasComponent implements OnInit {
                   private shepherdService: ShepherdService,
                     private paginaPrincial : PaginaPrincipalComponent,
                       private facturasService : Facturas_Invergoal_InversuezService,
-                        private srvMovItems : InventarioZeusService,) { }
+                        private srvMovItems : InventarioZeusService,) {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    }
 
   ngOnInit() {
     this.llenarArrayAnos();
     this.inicializarGraficas();
     this.lecturaStorage();
     this.validarConsulta();
+    setInterval(() => {
+      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+      this.opcionesGrafica.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.opcionesGrafica.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+    }, 1000);
   }
 
   // Funcion que iniciará el tutorial

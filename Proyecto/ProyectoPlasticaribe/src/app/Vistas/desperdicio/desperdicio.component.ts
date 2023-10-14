@@ -83,6 +83,7 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerMaquinas();
     this.obtenerProcesos();
     this.obtenerMateriales();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

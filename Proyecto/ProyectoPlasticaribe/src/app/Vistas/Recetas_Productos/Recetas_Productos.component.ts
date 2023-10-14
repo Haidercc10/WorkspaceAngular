@@ -75,6 +75,7 @@ export class Recetas_ProductosComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerMateriasPrimas();
     this.obtenerUnidadesMedida();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

@@ -41,6 +41,7 @@ export class TicketsComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.limpiarTodo();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   /** Mostrar tutorial escrito dentro del programa que especificará la funcionalidad de este módulo */

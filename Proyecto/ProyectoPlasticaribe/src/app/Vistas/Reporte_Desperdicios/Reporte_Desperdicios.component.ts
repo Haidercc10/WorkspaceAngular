@@ -62,6 +62,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   ngOnInit() {
     this.cargarMateriales();
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app

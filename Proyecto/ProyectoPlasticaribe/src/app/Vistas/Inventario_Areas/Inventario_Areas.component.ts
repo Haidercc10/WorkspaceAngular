@@ -83,6 +83,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     this.cargarProcesos();
     this.url = this.router.url;
     this.cargarLabels(this.url);
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   ngAfterViewChecked() {

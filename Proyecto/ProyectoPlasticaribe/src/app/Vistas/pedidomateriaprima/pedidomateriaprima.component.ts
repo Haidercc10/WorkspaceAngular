@@ -103,6 +103,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ColumnasTabla();
     this.ColumnasTablaRemisiones();
     this.obtenerProveeedor();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

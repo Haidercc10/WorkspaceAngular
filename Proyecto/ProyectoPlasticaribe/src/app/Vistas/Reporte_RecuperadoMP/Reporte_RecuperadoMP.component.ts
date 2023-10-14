@@ -56,6 +56,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.obtenerTurnos();
     this.obtenerOperarios();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
 
     this.columnas = [
       { header: 'Id Materia Prima', field: 'idMatPrima'},

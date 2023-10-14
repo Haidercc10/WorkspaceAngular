@@ -60,6 +60,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   ngOnInit(): void {
     this.invetarioProductos();
     this.lecturaStorage();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){

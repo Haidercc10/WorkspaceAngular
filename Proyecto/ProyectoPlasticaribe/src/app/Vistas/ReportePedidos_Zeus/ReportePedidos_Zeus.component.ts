@@ -69,6 +69,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.seleccionarColumnas();
     this.consultarPedidosZeus();
     this.consultarPedidos();
+    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
   tutorial(){
