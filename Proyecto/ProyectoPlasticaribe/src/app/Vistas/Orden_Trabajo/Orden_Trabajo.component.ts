@@ -712,30 +712,31 @@ export class Orden_TrabajoComponent implements OnInit {
   buscarInformacionProducto() {
     this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).subscribe(datos_producto => {
       if (datos_producto.length == 0) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
-      for (let j = 0; j < datos_producto.length; j++) {
-        let productoExt: any = {
-          Id: datos_producto[j].produ.prod_Id,
-          Nombre: datos_producto[j].produ.prod_Nombre,
-          Ancho: datos_producto[j].produ.prod_Ancho,
-          Fuelle: datos_producto[j].produ.prod_Fuelle,
-          Largo: datos_producto[j].produ.prod_Largo,
-          Cal: datos_producto[j].produ.prod_Calibre,
-          Und: this.presentacionProducto,
-          Peso_Producto: datos_producto[j].produ.prod_Peso,
-          PesoMillar: datos_producto[j].produ.prod_Peso_Millar,
-          Tipo: datos_producto[j].tipo_Producto,
-          Material: datos_producto[j].material,
-          Pigmento: datos_producto[j].pigmento,
-          CantPaquete: datos_producto[j].produ.prod_CantBolsasPaquete,
-          CantBulto: datos_producto[j].produ.prod_CantBolsasBulto,
-          TipoSellado: datos_producto[j].tipo_Sellado,
-          Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
-          UndCant: this.presentacionProducto,
-          PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : datos_producto[j].precioUnidad,
-        }
-        this.ArrayProducto.push(productoExt);
-      }
+      else datos_producto.forEach(data => this.llenarProducto(data));
     }, () => this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`));
+  }
+
+  llenarProducto(data : any) {
+    this.ArrayProducto.push({
+      Id: data.produ.prod_Id,
+      Nombre: data.produ.prod_Nombre,
+      Ancho: data.produ.prod_Ancho,
+      Fuelle: data.produ.prod_Fuelle,
+      Largo: data.produ.prod_Largo,
+      Cal: data.produ.prod_Calibre,
+      Und: this.presentacionProducto,
+      Peso_Producto: data.produ.prod_Peso,
+      PesoMillar: data.produ.prod_Peso_Millar,
+      Tipo: data.tipo_Producto,
+      Material: data.material,
+      Pigmento: data.pigmento,
+      CantPaquete: data.produ.prod_CantBolsasPaquete,
+      CantBulto: data.produ.prod_CantBolsasBulto,
+      TipoSellado: data.tipo_Sellado,
+      Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
+      UndCant: this.presentacionProducto,
+      PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : data.precioUnidad,
+    });
   }
 
   // Funcion que va a consultar las presentaciones de los productos
@@ -818,7 +819,6 @@ export class Orden_TrabajoComponent implements OnInit {
           PrecioDia: datos_Ot.selladoCorte_PrecioSelladoDia,
           PrecioNoche: datos_Ot.selladoCorte_PrecioSelladoNoche,
         });
-        console.log(datos_Ot, this.FormOrdenTrabajoSellado.value)
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
         setTimeout(() => {
           this.cyrel = datos_Ot.cyrel == false ? false : true;
@@ -869,23 +869,14 @@ export class Orden_TrabajoComponent implements OnInit {
             else if (itemOt.impFlexoNom.trim() == 'FLEXOGRAFIA') impresion = 2;
             else if (itemOt.impFlexoNom.trim() == 'ROTOGRABADO') impresion = 3;
 
-            let tinta1: any = itemOt.impTinta1Nom.trim();
-            let tinta2: any = itemOt.impTinta2Nom.trim();
-            let tinta3: any = itemOt.impTinta3Nom.trim();
-            let tinta4: any = itemOt.impTinta4Nom.trim();
-            let tinta5: any = itemOt.impTinta5Nom.trim();
-            let tinta6: any = itemOt.impTinta6Nom.trim();
-            let tinta7: any = itemOt.impTinta7Nom.trim();
-            let tinta8: any = itemOt.impTinta8Nom.trim();
-
-            if (tinta1 == '') tinta1 = 'NO APLICA';
-            if (tinta2 == '') tinta2 = 'NO APLICA';
-            if (tinta3 == '') tinta3 = 'NO APLICA';
-            if (tinta4 == '') tinta4 = 'NO APLICA';
-            if (tinta5 == '') tinta5 = 'NO APLICA';
-            if (tinta6 == '') tinta6 = 'NO APLICA';
-            if (tinta7 == '') tinta7 = 'NO APLICA';
-            if (tinta8 == '') tinta8 = 'NO APLICA';
+            let tinta1: any = itemOt.impTinta1Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta1Nom.trim();
+            let tinta2: any = itemOt.impTinta2Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta2Nom.trim();
+            let tinta3: any = itemOt.impTinta3Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta3Nom.trim();
+            let tinta4: any = itemOt.impTinta4Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta4Nom.trim();
+            let tinta5: any = itemOt.impTinta5Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta5Nom.trim();
+            let tinta6: any = itemOt.impTinta6Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta6Nom.trim();
+            let tinta7: any = itemOt.impTinta7Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta7Nom.trim();
+            let tinta8: any = itemOt.impTinta8Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta8Nom.trim();
 
             this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1, tinta2, tinta3, tinta4, tinta5, tinta6, tinta7, tinta8).subscribe(datos_impresion => {
               for (let j = 0; j < datos_impresion.length; j++) {
@@ -970,88 +961,100 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = true;
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
         this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
-        let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte | 0;
-        if (this.corte) {
-          margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
-          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
-        }
-        if (this.sellado) {
-          margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
-          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
-        }
-        this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
+        let margen_Adicional = this.calcularMargenAdicional();        
         if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
-          let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
-          let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
-          let ancho3: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
-          let calibre: number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
           let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
           let fact: number = 0;
-          let largoUnd: number = 0;
-          //Calcular Peso de Extrusion
-          if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-            largoUnd = 100;
-            material == 3 ? fact = 0.0048 : fact = 0.00468;
-            this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-          } else {
-            largoUnd = 39.3701;
-            material == 3 ? fact = 0.0317 : fact = 0.0302;
-            this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-          }
-          //Calcular Peso Producto y Peso Millar
+          this.calcularPesoExtrusion(material, fact);
           for (let i = 0; i < this.ArrayProducto.length; i++) {
             if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
-              //Peso Producto
-              if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-                material == 3 ? fact = 0.0048 : fact = 0.00468;
-                this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-              } else {
-                material == 3 ? fact = 0.0317 : fact = 0.0302;
-                this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-              }
-              this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
-              //Peso Millar
-              this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
-              if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
-              this.pesoMillar = this.ArrayProducto[i].PesoMillar;
-
-              //Calcular datos de la ot
-              if (this.ArrayProducto[0].UndCant == 'Kg') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
-                this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
-                this.valorKg = this.ArrayProducto[0].PrecioUnd;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
-              } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
-                this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
-                if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
-                if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
-                if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
-                else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
-              } else if (this.ArrayProducto[0].UndCant == 'Und') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.valorOt = this.cantidadProducto * this.valorProducto;
-                this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
-                if (this.ArrayProducto[i].Peso_Producto > 0) {
-                  if (this.valorOt == 0) this.valorOt = 1;
-                  if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
-                  else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
-                } else this.valorOt = 0;
-              } else if (this.ArrayProducto[0].UndCant == 'Rollo') {
-              }
+              this.calcularPesoProducto(material, fact);
+              this.calcularCostosOT(margen_Adicional);
             }
           }
         } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
         this.cargando = false;
       }
     }, 500);
+  }
+
+  calcularMargenAdicional() : number {
+    let margen_Adicional : number = 0;
+    if (this.sellado) {
+      margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
+      this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+    } else if (this.corte) {
+      margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
+      this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    }
+    this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
+    return margen_Adicional;
+  }
+
+  calcularPesoExtrusion(material : number, fact : number){
+    let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
+    let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
+    let ancho3: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
+    let calibre: number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
+    let largoUnd: number = 0;
+    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
+      largoUnd = 100;
+      material == 3 ? fact = 0.0048 : fact = 0.00468;
+      this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+    } else {
+      largoUnd = 39.3701;
+      material == 3 ? fact = 0.0317 : fact = 0.0302;
+      this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+    }
+  }
+
+  calcularPesoProducto(material : number, fact : number){
+    let i : number = 0;
+    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
+      material == 3 ? fact = 0.0048 : fact = 0.00468;
+      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+    } else {
+      material == 3 ? fact = 0.0317 : fact = 0.0302;
+      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+    }
+    this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
+    //Peso Millar
+    this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
+    if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+    this.pesoMillar = this.ArrayProducto[i].PesoMillar;
+  }
+
+  calcularCostosOT(margen_Adicional : number){
+    let i : number = 0;
+    if (this.ArrayProducto[0].UndCant == 'Kg') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
+      this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
+      this.valorKg = this.ArrayProducto[0].PrecioUnd;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
+    } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
+      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
+      this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
+      if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
+      if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
+      if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
+      else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
+    } else if (this.ArrayProducto[0].UndCant == 'Und') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.valorOt = this.cantidadProducto * this.valorProducto;
+      this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
+      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
+      if (this.ArrayProducto[i].Peso_Producto > 0) {
+        if (this.valorOt == 0) this.valorOt = 1;
+        if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
+        else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
+      } else this.valorOt = 0;
+    }
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla

@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
@@ -22,11 +22,13 @@ Injectable({
 @Component({
   selector: 'app-menuLateral',
   templateUrl: './menuLateral.component.html',
-  styleUrls: ['./menuLateral.component.css']
+  styleUrls: ['./menuLateral.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 
 export class MenuLateralComponent implements OnInit {
+
   display : boolean = false;
   items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);

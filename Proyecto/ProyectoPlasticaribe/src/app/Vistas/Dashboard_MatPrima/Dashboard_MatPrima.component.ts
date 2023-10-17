@@ -86,7 +86,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   /** Función para recargar el tab de materias primas */
-  recargarTab = () => setTimeout(() => this.tiempoExcedido(), 60000);
+  recargarTab = () => setInterval(() => this.tiempoExcedido(), 60000);
 
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){

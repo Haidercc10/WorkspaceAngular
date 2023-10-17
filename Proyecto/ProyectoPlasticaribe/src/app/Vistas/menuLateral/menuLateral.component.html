@@ -1,191 +1,193 @@
-<!-- Navegador Principal -->
-<nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
-  <div class="container-fluid">
-    <p>
-      <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button (click)="mostrarMenuLateral()">
-        <b>          
-          <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
-            <i class="pi pi-list font-size-18 px-2 py-3"></i>
-            Plasti<span class="colorRojo">caribe S.A.S</span>
-          </span>
-        </b>
-      </button>
-    </p>
-    <div class="p-2">
-      <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
-      <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
-      <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
-    </div>
-  </div>
-</nav>
-
-<!-- Boton de Configuración -->
-<div class="botonFlotante">
-  <button type="button" (click)="configuracion()">
-    <i class="pi pi-cog"></i>
-  </button>
-</div>
-
-<!-- Menú Principal -->
-<p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
-  <div class="imagen">
-    <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
-    <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
-  </div>
-  <br>
-  <p-panelMenu [model]="categorias" #panel id="panel"></p-panelMenu>
-</p-sidebar>
-
-<!-- Menú de Configuraciones -->
-<p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
-  <div class="escalabilidad">
-    <div class="mb-2">
-      <h4>Tamaño de Letra</h4>
-      <div class="iconos">
-        <p-button icon="pi pi-minus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="disminuirLetra()"></p-button>
-        <i class="pi pi-circle font-size-16" id="iconoTanamoLetra1"></i>
-        <i class="pi pi-circle font-size-16" id="iconoTanamoLetra2"></i>
-        <i class="pi pi-circle font-size-16" id="iconoTanamoLetra3"></i>
-        <i class="pi pi-circle font-size-16" id="iconoTanamoLetra4"></i>
-        <i class="pi pi-circle font-size-16" id="iconoTanamoLetra5"></i>
-        <p-button icon="pi pi-plus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="aumentarLetra()"></p-button>
+<div>
+  <!-- Navegador Principal -->
+  <nav class="navbar" [ngClass]="{'navbarDark' : modoSeleccionado, 'navbarLigth': !modoSeleccionado}">
+    <div class="container-fluid">
+      <p>
+        <button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" id="botonPlasticaribe" mat-button (click)="mostrarMenuLateral()">
+          <b>          
+            <span class="font-size-18" [ngClass]="{'userDark' : modoSeleccionado, 'userLigth': !modoSeleccionado}">
+              <i class="pi pi-list font-size-18 px-2 py-3"></i>
+              Plasti<span class="colorRojo">caribe S.A.S</span>
+            </span>
+          </b>
+        </button>
+      </p>
+      <div class="p-2">
+        <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
+        <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
+        <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
       </div>
     </div>
+  </nav>
+
+  <!-- Boton de Configuración -->
+  <div class="botonFlotante">
+    <button type="button" (click)="configuracion()">
+      <i class="pi pi-cog"></i>
+    </button>
   </div>
 
-  <hr>
-
-  <div class="modo">
-    <div class="mb-2 switch">
-      <h4>Cambiar Tema</h4>
-      <input type="checkbox" id="darkmode-toggle" (change)="mostrar()" [(ngModel)]="modoSeleccionado"/>
-      <label class="colorMode" for="darkmode-toggle">
-        <svg version="1.1" class="sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="enable-background:new 0 0 496 496;" xml:space="preserve">
-          <rect x="152.994" y="58.921" transform="matrix(0.3827 0.9239 -0.9239 0.3827 168.6176 -118.5145)" width="40.001" height="16"/>
-          <rect x="46.9" y="164.979" transform="matrix(0.9239 0.3827 -0.3827 0.9239 71.29 -12.4346)" width="40.001" height="16"/>
-          <rect x="46.947" y="315.048" transform="matrix(0.9239 -0.3827 0.3827 0.9239 -118.531 50.2116)" width="40.001" height="16"/>
-          <rect x="164.966" y="409.112" transform="matrix(-0.9238 -0.3828 0.3828 -0.9238 168.4872 891.7491)" width="16" height="39.999"/>
-          <rect x="303.031" y="421.036" transform="matrix(-0.3827 -0.9239 0.9239 -0.3827 50.2758 891.6655)" width="40.001" height="16"/>
-          <rect x="409.088" y="315.018" transform="matrix(-0.9239 -0.3827 0.3827 -0.9239 701.898 785.6559)" width="40.001" height="16"/>
-          <rect x="409.054" y="165.011" transform="matrix(-0.9239 0.3827 -0.3827 -0.9239 891.6585 168.6574)" width="40.001" height="16"/>
-          <rect x="315.001" y="46.895" transform="matrix(0.9238 0.3828 -0.3828 0.9238 50.212 -118.5529)" width="16" height="39.999"/>
-          <path d="M248,88c-88.224,0-160,71.776-160,160s71.776,160,160,160s160-71.776,160-160S336.224,88,248,88z M248,392 c-79.4,0-144-64.6-144-144s64.6-144,144-144s144,64.6,144,144S327.4,392,248,392z"/>
-          <rect x="240" width="16" height="72"/>
-          <rect x="62.097" y="90.096" transform="matrix(0.7071 0.7071 -0.7071 0.7071 98.0963 -40.6334)" width="71.999" height="16"/>
-          <rect y="240" width="72" height="16"/>
-          <rect x="90.091" y="361.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 -113.9157 748.643)" width="16" height="71.999"/>
-          <rect x="240" y="424" width="16" height="72"/>
-          <rect x="361.881" y="389.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 397.8562 960.6281)" width="71.999" height="16"/>
-          <rect x="424" y="240" width="72" height="16"/>
-          <rect x="389.911" y="62.091" transform="matrix(0.7071 0.7071 -0.7071 0.7071 185.9067 -252.6357)" width="16" height="71.999"/>
-        </svg>
-        <svg version="1.1" class="moon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 49.739 49.739" style="enable-background:new 0 0 49.739 49.739;" xml:space="preserve">
-          <path d="M25.068,48.889c-9.173,0-18.017-5.06-22.396-13.804C-3.373,23.008,1.164,8.467,13.003,1.979l2.061-1.129l-0.615,2.268 c-1.479,5.459-0.899,11.25,1.633,16.306c2.75,5.493,7.476,9.587,13.305,11.526c5.831,1.939,12.065,1.492,17.559-1.258v0 c0.25-0.125,0.492-0.258,0.734-0.391l2.061-1.13l-0.585,2.252c-1.863,6.873-6.577,12.639-12.933,15.822 C32.639,48.039,28.825,48.888,25.068,48.889z M12.002,4.936c-9.413,6.428-12.756,18.837-7.54,29.253 c5.678,11.34,19.522,15.945,30.864,10.268c5.154-2.582,9.136-7.012,11.181-12.357c-5.632,2.427-11.882,2.702-17.752,0.748 c-6.337-2.108-11.473-6.557-14.463-12.528C11.899,15.541,11.11,10.16,12.002,4.936z"/>
-        </svg>
-      </label>
+  <!-- Menú Principal -->
+  <p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+    <div class="imagen">
+      <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
+      <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
     </div>
-  </div>
-</p-sidebar>
+    <br>
+    <p-panelMenu [model]="categorias" #panel id="panel"></p-panelMenu>
+  </p-sidebar>
 
-<!-- Menú de Usuario -->
-<p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">  
-  <p-accordion class="w-full" [activeIndex]="1">
-    <!-- Editar Usuario -->
-    <p-accordionTab>
-      <ng-template pTemplate="header">
-        <div class="flex align-items-center">
-          <i class="pi pi-user mr-2"></i>
-          <span class="vertical-align-middle">Editar Perfil</span>
+  <!-- Menú de Configuraciones -->
+  <p-sidebar [(visible)]="menuConfiguracion" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+    <div class="escalabilidad">
+      <div class="mb-2">
+        <h4>Tamaño de Letra</h4>
+        <div class="iconos">
+          <p-button icon="pi pi-minus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="disminuirLetra()"></p-button>
+          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra1"></i>
+          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra2"></i>
+          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra3"></i>
+          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra4"></i>
+          <i class="pi pi-circle font-size-16" id="iconoTanamoLetra5"></i>
+          <p-button icon="pi pi-plus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="aumentarLetra()"></p-button>
         </div>
-      </ng-template>
-      <ng-template pTemplate="content">
-        <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
-          <div class="row g-4">
-            <div class="col-12">
-              <span class="p-float-label">
-                <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
-                <label for="usuarioNombre">Nombre Usuario</label>
-              </span>
-            </div>
-    
-            <div class="col 12">
-              <span class="p-float-label">
-                <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
-                <label for="pass">Contraseña</label>
-              </span>
-            </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="modo">
+      <div class="mb-2 switch">
+        <h4>Cambiar Tema</h4>
+        <input type="checkbox" id="darkmode-toggle" (change)="mostrar()" [(ngModel)]="modoSeleccionado"/>
+        <label class="colorMode" for="darkmode-toggle">
+          <svg version="1.1" class="sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="enable-background:new 0 0 496 496;" xml:space="preserve">
+            <rect x="152.994" y="58.921" transform="matrix(0.3827 0.9239 -0.9239 0.3827 168.6176 -118.5145)" width="40.001" height="16"/>
+            <rect x="46.9" y="164.979" transform="matrix(0.9239 0.3827 -0.3827 0.9239 71.29 -12.4346)" width="40.001" height="16"/>
+            <rect x="46.947" y="315.048" transform="matrix(0.9239 -0.3827 0.3827 0.9239 -118.531 50.2116)" width="40.001" height="16"/>
+            <rect x="164.966" y="409.112" transform="matrix(-0.9238 -0.3828 0.3828 -0.9238 168.4872 891.7491)" width="16" height="39.999"/>
+            <rect x="303.031" y="421.036" transform="matrix(-0.3827 -0.9239 0.9239 -0.3827 50.2758 891.6655)" width="40.001" height="16"/>
+            <rect x="409.088" y="315.018" transform="matrix(-0.9239 -0.3827 0.3827 -0.9239 701.898 785.6559)" width="40.001" height="16"/>
+            <rect x="409.054" y="165.011" transform="matrix(-0.9239 0.3827 -0.3827 -0.9239 891.6585 168.6574)" width="40.001" height="16"/>
+            <rect x="315.001" y="46.895" transform="matrix(0.9238 0.3828 -0.3828 0.9238 50.212 -118.5529)" width="16" height="39.999"/>
+            <path d="M248,88c-88.224,0-160,71.776-160,160s71.776,160,160,160s160-71.776,160-160S336.224,88,248,88z M248,392 c-79.4,0-144-64.6-144-144s64.6-144,144-144s144,64.6,144,144S327.4,392,248,392z"/>
+            <rect x="240" width="16" height="72"/>
+            <rect x="62.097" y="90.096" transform="matrix(0.7071 0.7071 -0.7071 0.7071 98.0963 -40.6334)" width="71.999" height="16"/>
+            <rect y="240" width="72" height="16"/>
+            <rect x="90.091" y="361.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 -113.9157 748.643)" width="16" height="71.999"/>
+            <rect x="240" y="424" width="16" height="72"/>
+            <rect x="361.881" y="389.915" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 397.8562 960.6281)" width="71.999" height="16"/>
+            <rect x="424" y="240" width="72" height="16"/>
+            <rect x="389.911" y="62.091" transform="matrix(0.7071 0.7071 -0.7071 0.7071 185.9067 -252.6357)" width="16" height="71.999"/>
+          </svg>
+          <svg version="1.1" class="moon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 49.739 49.739" style="enable-background:new 0 0 49.739 49.739;" xml:space="preserve">
+            <path d="M25.068,48.889c-9.173,0-18.017-5.06-22.396-13.804C-3.373,23.008,1.164,8.467,13.003,1.979l2.061-1.129l-0.615,2.268 c-1.479,5.459-0.899,11.25,1.633,16.306c2.75,5.493,7.476,9.587,13.305,11.526c5.831,1.939,12.065,1.492,17.559-1.258v0 c0.25-0.125,0.492-0.258,0.734-0.391l2.061-1.13l-0.585,2.252c-1.863,6.873-6.577,12.639-12.933,15.822 C32.639,48.039,28.825,48.888,25.068,48.889z M12.002,4.936c-9.413,6.428-12.756,18.837-7.54,29.253 c5.678,11.34,19.522,15.945,30.864,10.268c5.154-2.582,9.136-7.012,11.181-12.357c-5.632,2.427-11.882,2.702-17.752,0.748 c-6.337-2.108-11.473-6.557-14.463-12.528C11.899,15.541,11.11,10.16,12.002,4.936z"/>
+          </svg>
+        </label>
+      </div>
+    </div>
+  </p-sidebar>
+
+  <!-- Menú de Usuario -->
+  <p-sidebar [(visible)]="menuUsuario" position="right" [style]="{maxWidth : '30rem', minWidth : '27rem'}">  
+    <p-accordion class="w-full" [activeIndex]="1">
+      <!-- Editar Usuario -->
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center">
+            <i class="pi pi-user mr-2"></i>
+            <span class="vertical-align-middle">Editar Perfil</span>
           </div>
-    
-          <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
-          </div>
-        </form>
-      </ng-template>
-    </p-accordionTab>
-    <!-- Eventos -->
-    <p-accordionTab>
-      <ng-template pTemplate="header">
-        <div class="flex align-items-center">
-          <i class="pi pi-calendar mr-2"></i>
-          <span class="vertical-align-middle">Eventos</span>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="content">
-        <div class="row eventos mt-2" *ngFor="let item of eventosMes">
-          <div class="col-6">
-            <div class="row calendarioFecha">
-              <div class="col-12 contenido dia d-grid d-md-flex justify-content-md-center">
-                <span>{{item.Dia}}</span>
-                <span>{{item.Mes}}</span>
+        </ng-template>
+        <ng-template pTemplate="content">
+          <form [formGroup]="FormUsuarios" (ngSubmit)="actualizarUsuario()">
+            <div class="row g-4">
+              <div class="col-12">
+                <span class="p-float-label">
+                  <input formControlName="usuNombre" id="usuarioNombre" type="text" pInputText required/>
+                  <label for="usuarioNombre">Nombre Usuario</label>
+                </span>
+              </div>
+      
+              <div class="col 12">
+                <span class="p-float-label">
+                  <p-password formControlName="usuPassword" [feedback]="false" id="pass" [toggleMask]="true"></p-password>
+                  <label for="pass">Contraseña</label>
+                </span>
               </div>
             </div>
+      
+            <div class="mb-4 d-grid gap-2 d-md-flex justify-content-md-center">
+              <button pButton pRipple label="Editar Información" type="submit" icon="pi pi-check" class="p-button-success"></button>
+            </div>
+          </form>
+        </ng-template>
+      </p-accordionTab>
+      <!-- Eventos -->
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center">
+            <i class="pi pi-calendar mr-2"></i>
+            <span class="vertical-align-middle">Eventos</span>
           </div>
-          <div class="col-6 m-auto tituloEvento d-grid d-md-flex justify-content-md-start">
-            <span>{{item.Nombre}}</span>
+        </ng-template>
+        <ng-template pTemplate="content">
+          <div class="row eventos mt-2" *ngFor="let item of eventosMes">
+            <div class="col-6">
+              <div class="row calendarioFecha">
+                <div class="col-12 contenido dia d-grid d-md-flex justify-content-md-center">
+                  <span>{{item.Dia}}</span>
+                  <span>{{item.Mes}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 m-auto tituloEvento d-grid d-md-flex justify-content-md-start">
+              <span>{{item.Nombre}}</span>
+            </div>
           </div>
-        </div>
 
-        <div *ngIf="eventosMes.length == 0">
-          <p class="font-size-20 colorRojo">¡No hay eventos por mostrar!</p>
-        </div>
-      </ng-template>
-    </p-accordionTab>
-    <!-- Cerrar Sesión -->
-    <p-accordionTab (click)="confirm($event)">
-      <ng-template pTemplate="header">
-        <div class="flex align-items-center">
-          <i class="pi pi-fw pi-power-off mr-2"></i>
-          <span class="vertical-align-middle">Cerrar Sesión</span>
-        </div>
-      </ng-template>      
-      <ng-template pTemplate="content">
-        <p-confirmPopup></p-confirmPopup>
-      </ng-template>
-    </p-accordionTab>
-  </p-accordion>
-</p-sidebar>
+          <div *ngIf="eventosMes.length == 0">
+            <p class="font-size-20 colorRojo">¡No hay eventos por mostrar!</p>
+          </div>
+        </ng-template>
+      </p-accordionTab>
+      <!-- Cerrar Sesión -->
+      <p-accordionTab (click)="confirm($event)">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center">
+            <i class="pi pi-fw pi-power-off mr-2"></i>
+            <span class="vertical-align-middle">Cerrar Sesión</span>
+          </div>
+        </ng-template>      
+        <ng-template pTemplate="content">
+          <p-confirmPopup></p-confirmPopup>
+        </ng-template>
+      </p-accordionTab>
+    </p-accordion>
+  </p-sidebar>
 
-<!-- Modal de Calendario -->
-<p-dialog [(visible)]="modalCalendario" [style]="{width: '800px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '400px' }" header="Eventos Calendario" [modal]="true">
-  <ng-template pTemplate="content">
-    <app-Calendario></app-Calendario>
-  </ng-template>
-</p-dialog>
+  <!-- Modal de Calendario -->
+  <p-dialog [(visible)]="modalCalendario" [style]="{width: '800px', margin: 'auto', height: '830px'}" [breakpoints]="{ '960px': '400px' }" header="Eventos Calendario" [modal]="true">
+    <ng-template pTemplate="content">
+      <app-Calendario></app-Calendario>
+    </ng-template>
+  </p-dialog>
 
-<!-- Eventos del Día -->
-<p-dialog [(visible)]="eventosDia" [style]="{width: '800px', margin: 'auto', height: '830px'}" [contentStyle]="{'overflow':'visible'}" [contentStyle]="{'overflow':'visible'}" [modal]="true" [breakpoints]="{ '960px': '400px' }" header="Eventos del Día">
-  <ng-template pTemplate="content">
-    <div class="card flex justify-content-center mb-3" *ngFor="let item of eventosHoy">
-      <p-fieldset legend="{{item.Nombre}}">
-        <p class="p-2 font-size-20">{{item.Descripcion}}</p>
-        <span>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</span>
-      </p-fieldset>
-    </div>
-  </ng-template>
-  <ng-template pTemplate="footer">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-success" type="button" label="No Volver a Mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
-      <button pButton class="p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
-    </div>
-  </ng-template>  
-</p-dialog>
+  <!-- Eventos del Día -->
+  <p-dialog [(visible)]="eventosDia" [style]="{width: '800px', margin: 'auto', height: '830px'}" [contentStyle]="{'overflow':'visible'}" [contentStyle]="{'overflow':'visible'}" [modal]="true" [breakpoints]="{ '960px': '400px' }" header="Eventos del Día">
+    <ng-template pTemplate="content">
+      <div class="card flex justify-content-center mb-3" *ngFor="let item of eventosHoy">
+        <p-fieldset legend="{{item.Nombre}}">
+          <p class="p-2 font-size-20">{{item.Descripcion}}</p>
+          <span>{{item.Fecha_Hora_Inicio}} - {{item.Fecha_Hora_Fin}}</span>
+        </p-fieldset>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-success" type="button" label="No Volver a Mostrar" icon="pi pi-ban" (click)="noMostrarMasDialogoEventosDia('no')"></button>
+        <button pButton class="p-button-secondary" type="button" label="Cerrar" icon="pi pi-times" (click)="noMostrarMasDialogoEventosDia('si')"></button>
+      </div>
+    </ng-template>  
+  </p-dialog>
+</div>

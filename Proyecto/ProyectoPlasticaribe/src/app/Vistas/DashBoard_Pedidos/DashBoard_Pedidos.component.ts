@@ -82,7 +82,7 @@ export class DashBoard_PedidosComponent implements OnInit {
   lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => { this.tiempoExcedido(); }, 60000);
+  recargar = () => setInterval(() => { this.tiempoExcedido(); }, 60000);
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
