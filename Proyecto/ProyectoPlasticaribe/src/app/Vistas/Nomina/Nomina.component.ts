@@ -262,6 +262,7 @@ export class NominaComponent implements OnInit {
   cargarTabla2(fecha1 : any, fecha2 : any){
     let array : any = [];
     this.totalNominaSellado = 0;
+    let count : number = 0;
 
     this.servicioBagPro.GetNominaSelladoAcumuladaItem(fecha1, fecha2).subscribe(data => {
       for(let index = 0; index < data.length; index++) {
@@ -281,10 +282,11 @@ export class NominaComponent implements OnInit {
           this.arraySellado[array].detalle.push(info);
           this.arraySellado[array].PagoTotal += parseFloat(info.PagoTotal);
         }
-      }
+        count++;
+        if (count == data.length) this.load = true;
+      }      
     });
     setTimeout(() => this.calcularTotalAPagar(), 1000);
-    setTimeout(() => this.load = true, 2000);
   }
 
   /** Funcion para filtrar busquedas y mostrar datos segun el filtro consultado. */
