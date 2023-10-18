@@ -174,7 +174,7 @@
   </div>
   <br>
 
-  <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
+  <!-- Formulario de entrada de BOPP -->
   <form [formGroup]="FormEntradaBOPP">
     <!-- Fila 1 -->
     <div class="mb-4" id="formulario2">
@@ -183,9 +183,9 @@
         <!-- Nombre BOPP -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="Nombre" id="Nombre" list="Bopp" autocomplete="off" type="text" pInputText required (change)="getNombresBOPP()"/>
+            <input formControlName="Nombre" id="Nombre" list="Bopp" autocomplete="off" type="text" pInputText required (change)="seleccionarBopp()"/>
             <datalist id="Bopp">
-              <option value={{item}} *ngFor="let item of nombresBopp">{{item}}</option>
+              <option value={{item.nombre}} *ngFor="let item of nombresBopp">{{item.nombre}}</option>
             </datalist>
             <label for="Nombre">Nombre Rollo</label>
           </span>
@@ -194,18 +194,18 @@
         <!-- Serial BOPP -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <p-inputNumber formControlName="serial" id="Serial" list="SerialRollo" [useGrouping]="false" [required]="true" (onInput)="getSerialesBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="serial" id="SerialR" list="SerialRollo" [useGrouping]="false" [required]="true" (change)="getSerialesBOPP()"></p-inputNumber>
             <datalist id="SerialRollo">
-              <option value={{item}} *ngFor="let item of serialesBopp">{{item}}</option>
+              <option value={{item.serial}} *ngFor="let item of serialesBopp">{{item.serial}}</option>
             </datalist>
-            <label for="Serial">Pallet/Serial</label>
+            <label for="SerialR">Pallet/Serial</label>
           </span>
         </div>
 
         <!-- Cantidad de micras -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantidad" id="Micras" [minFractionDigits]="2" [required]="true" (onInput)="getMicrasBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="cantidad" id="Micras" [minFractionDigits]="2" value [required]="true"></p-inputNumber>
             <label for="Micras">Micras µm</label>
           </span>
         </div>
@@ -221,10 +221,7 @@
         <!-- Precio unitario -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="precio" id="Precio" list="PrecioRollo" [minFractionDigits]="2" [required]="true" (onKeyDown)="getPreciosBOPP()"></p-inputNumber>
-            <datalist id="PrecioRollo">
-              <option value={{item}} *ngFor="let item of preciosBopp">{{item}}</option>
-            </datalist>
+            <p-inputNumber formControlName="precio" id="Precio" list="PrecioRollo" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="Precio">Precio Und</label>
           </span>
         </div>
@@ -232,7 +229,7 @@
         <!-- Ancho -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ancho" id="Ancho" list="AnchoRollo" [minFractionDigits]="2" [required]="true" (onInput)="getAnchosBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="ancho" id="Ancho" list="AnchoRollo" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <datalist id="AnchoRollo">
               <option value={{item}} *ngFor="let item of anchosBopp">{{item}}</option>
             </datalist>
@@ -300,49 +297,96 @@
       [rowHover]="true"
       [value]="ArrayBOPP"
       [scrollable]="true"
-      scrollHeight="50rem">
+      scrollHeight="50rem"
+      dataKey="Serial">
         <ng-template pTemplate="header">
           <tr>
-            <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
-            <th id="nombreMateriaPrima" scope="col">Nombre</th>
-            <th id="cantidadMateriaPrima" scope="col">Cantidad (µm)</th>
-            <th id="UnidadMedida" scope="col">Medida</th>
-            <th id="cantidadMateriaPrima" scope="col">Cantidad (Kg)</th>
-            <th id="UnidadMedida" scope="col">Medida</th>
-            <th id="cantidadMateriaPrima" scope="col">Ancho</th>
-            <th id="cantidadMateriaPrima" scope="col">Precio Und</th>
-            <th id="cantidadMateriaPrima" scope="col">Subtotal</th>
-            <th id="cantidadMateriaPrima" scope="col">Categoria</th>
-            <th id="cantidadMateriaPrima" scope="col">Genérico</th>
+            <th scope="col">#</th>
+            <th scope="col">Pallet/Serial</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Micras (µm)</th>
+            <th scope="col">Ancho (Cms)</th>
+            <th scope="col">Cantidad (Kg)</th>
+            <th scope="col">Medida</th>
+            <th scope="col">Precio Und</th>
+            <th scope="col">Subtotal</th>
+            <th scope="col">Categoria</th>
+            <th scope="col">Genérico</th>
             <th id="eliminar" scope="col" id="quitar-rollo">Quitar</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-bopp>
+        <ng-template pTemplate="body" let-bopp let-editing="editing" let-rowIndex="rowIndex">
           <tr>
-            <td id="idMateriaPrima">{{bopp.Serial}}</td>
-            <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.Cant | number: '1.2-2'}}</td>
-            <td id="UnidadMedida">{{bopp.UndCant}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.CantKg | number: '1.2-2'}}</td>
-            <td id="UnidadMedida">{{bopp.UndCantKg}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.Ancho | number: '1.2-2'}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.Precio | number: '1.2-2'}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.Subtotal | number: '1.2-2'}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.Cat}}</td>
-            <td id="cantidadMateriaPrima">{{bopp.NombreBoppGenerico}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Rollo" (click)="mostrarEleccion(bopp)"></i></td>
+            <td>{{rowIndex + 1}}</td>
+            <td>{{bopp.Serial}}</td>
+            <td [pEditableColumn]="bopp.Nombre" pEditableColumnField="Nombre" class="cursor">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="bopp.Nombre" />
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{ bopp.Nombre }}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="bopp.Cant" pEditableColumnField="Cant" class="cursor">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber [minFractionDigits]="2" [required]="true" mode="decimal" [(ngModel)]="bopp.Cant" ></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{ bopp.Cant | number: '1.2-2'}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="bopp.Ancho" pEditableColumnField="Ancho" class="cursor">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <p-inputNumber [minFractionDigits]="2" [required]="true" mode="decimal" [(ngModel)]="bopp.Ancho"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{ bopp.Ancho | number: '1.2-2'}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="bopp.CantKg" pEditableColumnField="CantKg" class="cursor">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <p-inputNumber [minFractionDigits]="2" [required]="true" mode="decimal" [(ngModel)]="bopp.CantKg" (onInput)="calcularValores()"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{ bopp.CantKg | number: '1.2-2'}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{bopp.UndCantKg}}</td>
+            
+            <td [pEditableColumn]="bopp.Precio" pEditableColumnField="Precio" class="cursor" >
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <p-inputNumber [minFractionDigits]="2" [required]="true" mode="decimal" [(ngModel)]="bopp.Precio" (onInput)="calcularValores()"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{ bopp.Precio | number: '1.2-2' }}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{bopp.Subtotal | currency : 'COP $'}}</td>
+            <td>{{bopp.Cat}}</td>
+            <td>{{bopp.NombreBoppGenerico}}</td>
+            <td class="text-center"><i class="pi pi-trash cursor" title="Quitar Rollo" (click)="mostrarEleccion(bopp)"></i></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="8" class="text-right">Totales</td>
-            <td colspan="4">{{valorTotal | number: '1.2-2'}} COP</td>
+            <td colspan="4">{{valorTotal | currency : 'COP $'}} COP</td>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
-
+  <!--Botones de creación de registro-->
   <br>
   <div *ngIf="load">
     <div class="mb-3" id="botones2">
@@ -356,6 +400,7 @@
   </div>
 </p-card>
 
+<!-- Mensaje de confirmación de eliminación -->
 <p-toast position="center" key="bopp" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-bopp>
     <div class="flex flex-column" style="flex: 1">

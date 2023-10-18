@@ -12,6 +12,7 @@ import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pi
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import * as fs from 'file-saver';
+import { info } from 'console';
 
 @Injectable({ 
   providedIn: 'root'
@@ -201,7 +202,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Nombre == fila.Pigmento);
     this.load = true;
     this.onReject(`eleccion`);
-    console.log(fila)
+    
     let modelo : modelControlCalidad_Extrusion = {
       CcExt_Id: fila.Id > 0 ? fila.Id : 0,
       Turno_Id: fila.Turno,
@@ -286,6 +287,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   exportarExcel(){
+    let filasRestantes : number = 0;
     this.load = true;
     let datos : any[] = [];
     let infoDocumento : any = [];
@@ -298,6 +300,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       item.Ancho, item.CalMin, item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.CalibreTB, item.CalibreTB];
       infoDocumento.push(datos1);
     }
+    let tamanoArray : number = infoDocumento.length;
     let workbook = new Workbook();
     const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
     
@@ -354,6 +357,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
+    
     let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5', 'A33:R36'];
     unirCeldas.forEach(cell => worksheet.mergeCells(cell));
     let alinearWrap : string [] = ['H7', 'I7', 'J7'];
@@ -375,27 +379,23 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
     let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
 
+    //for (let index = 0; index < columnas.length; index++) {
+      //for (let i = 8; i < 32; i++) {
+        //worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        //worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
+        //worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
+        //worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8][index];
+      //}
+    //}
+    console.log(tamanoArray)
     for (let index = 0; index < columnas.length; index++) {
-      for (let i = 8; i < 32; i++) {
+      for (let i = 8; i < tamanoArray + 8; i++) {
         worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-        //console.log(`${columnas[index]}${i}`);
-        //console.log(`${columnas[index]}`);
-        //console.log(index);
-        infoDocumento.forEach(d => {
-          //if (d.Id == i) {
-            worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
-            worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
-            let row = worksheet.getCell(`${columnas[index]}${i}`).value = d[index];
-            //console.log(row)
-          //}
-        });    
+        //worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
+        //worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
+        //worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8][index];
       }
     }
-    //infoDocumento.forEach(d => {
-    //  let row = worksheet.addRow(d);
-    ////  let formatNumber : number [] = [8, 9, 10, 11, 12, 13];
-    ////  formatNumber.forEach(f => row.getCell(f).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-    //});
 
     worksheet.getColumn(1).width = 9;
     worksheet.getColumn(2).width = 4;
@@ -427,8 +427,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   }
 
   prueba(){
-    
-    for (let index = 0; index < 24; index++) {
+    for (let index = 0; index < 28; index++) {
       this.objetoPrueba = 
       {
         Id: 0,
@@ -436,10 +435,10 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         Turno: 'DIA',
         OT: 123456,
         Maquina: 1,
-        Cliente: 'PRUEBA',
+        Cliente: 'PRUEBA 1',
         Item: 101010,
-        Referencia: 'PRUEBA',
-        Rollo: 123654,
+        Referencia: 'PRUEBA 2',
+        Rollo: 654,
         Pigmento: 'NATURAL',
         AnchoTubular: 5.5,
         PesoMetro: 10,
@@ -448,11 +447,11 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         CalMax: 2,
         CalProm: 1.5,
         Apariencia: 'OK',
-        Tratado: 'OK',
+        Tratado: 'SI',
         Rasgado: 'NO',
         TipoBobina: 'TUBULAR',
         Fecha: '2023-01-10',
-        Observacion: 'PRUEBA',
+        Observacion: 'PRUEBA 3',
         CalibreTB: 150
       }
       this.objetoPrueba.Ronda = index; 

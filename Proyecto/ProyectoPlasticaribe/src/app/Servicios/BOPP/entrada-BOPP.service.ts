@@ -28,11 +28,7 @@ export class EntradaBOPPService {
   
   getBopp = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getDescripcion');
 
-  getMicras = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getMicras');
-
-  getPrecios = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getPrecios');
-
-  getAnchos = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getAnchos');
+  GetUltimoPrecioBopp = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getUltimoPrecioBopp');ios = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getUltimoPrecioBopp');
 
   getSeriales = ():Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getSeriales');
 

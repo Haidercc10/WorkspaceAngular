@@ -127,6 +127,7 @@ export class DevolucionesMPComponent implements OnInit {
         }
       }, () => this.mensajeService.mensajeError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`));
       this.load = true;
+      console.log(this.materiasPrimas)
     }, 2500);
   }
 
@@ -164,6 +165,7 @@ export class DevolucionesMPComponent implements OnInit {
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarDevolucion(){
+    let esError : boolean = false;
     if (this.materiasPrimasRetiradas.length > 0) {
       const datosDevolucion : any = {
         DevMatPri_OrdenTrabajo : this.FormDevolucion.value.ot,
@@ -172,8 +174,9 @@ export class DevolucionesMPComponent implements OnInit {
         DevMatPri_Motivo : this.FormDevolucion.value.MpObservacion,
         Usua_Id : this.storage_Id,
       }
-      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => this.creacionDevolucionMateriaPrima(), () => this.mensajeService.mensajeError(`Error`, `¡Error al crear la devolución de materia prima!`));
+      this.devolucionService.srvGuardar(datosDevolucion).subscribe(() => { esError = false; } , () => { esError = true; this.mensajeService.mensajeError(`Error`, `¡Error al crear la devolución de materia prima!`)} );
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
+    setTimeout(() => { if (!esError) this.creacionDevolucionMateriaPrima(); }, 100);  
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -200,7 +203,7 @@ export class DevolucionesMPComponent implements OnInit {
       this.moverInventarioBopp();
       this.actualizarEntradasMP();
       setTimeout(() => this.limpiarTodosCampos(), 1000);
-    }, (20 * this.materiasPrimasRetiradas.length));
+    }, (50 * this.materiasPrimasRetiradas.length));
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima devuelta
