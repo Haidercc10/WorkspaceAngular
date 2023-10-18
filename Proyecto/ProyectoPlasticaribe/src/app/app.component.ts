@@ -129,6 +129,7 @@ export class AppComponent implements OnInit{
   //Funcion para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
   inactividad(){
     let t : any;
+    let treintaMinutos : number = 1800000; // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
     window.onload = reiniciarTiempo;
     document.onmousemove = reiniciarTiempo;
     document.onkeypress = reiniciarTiempo;
@@ -152,7 +153,7 @@ export class AppComponent implements OnInit{
       let estadoConexion : boolean = window.navigator.onLine;
       if (window.location.pathname != '/' || !estadoConexion) tiempoExcedido;
       clearTimeout(t);
-      t = setTimeout(tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
+      t = setTimeout(tiempoExcedido, treintaMinutos);
     }
   }
 }

@@ -85,16 +85,19 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
-  /** Función para recargar el tab de materias primas */
-  recargarTab = () => setInterval(() => this.tiempoExcedido(), 60000);
-
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){
     if (this.paginaPrincial.materiaPrima){
       this.cambiarNombreMes();
-      setTimeout(() => { this.materiasPrimas(); }, 1000);
-      this.recargarTab();
-      setTimeout(() => { this.llenarGraficaComparativo(); }, 3000);
+      setTimeout(() => this.materiasPrimas(), 1000);
+      setTimeout(() => this.llenarGraficaComparativo(), 3000);
+      let time = setInterval(() => {
+        if (this.paginaPrincial.materiaPrima) {
+          this.cambiarNombreMes();
+          setTimeout(() => this.materiasPrimas(), 1000);
+          setTimeout(() => this.llenarGraficaComparativo(), 3000);
+        } else clearInterval(time);
+      }, 60000);
     }
   }
 

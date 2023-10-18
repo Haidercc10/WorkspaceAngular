@@ -111,8 +111,3 @@
   </div>
 </div>
 
-<!-- Modal donde se podrá ver algunas graficas -->
-<p-dialog header="{{nombreGrafica}}" [modal]="true"  [contentStyle]="{'overflow':'visible'}"[draggable]="false" [(visible)]="mostrarGrafica" [style]="{width: '150rem'}">
-  <p-chart type="bar" width="100%" height="400px" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
-</p-dialog>
-<br>

@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
+import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
 import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
@@ -218,6 +219,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: [null, Validators.required],
       Fuelle_Corte: [null, Validators.required],
       Margen_Corte: [null, Validators.required],
+      Etiqueta_Ancho_Corte: [null, Validators.required],
+      Etiqueta_Largo_Corte: [null, Validators.required],
+      Etiqueta_Fuelle_Corte: [null, Validators.required],
     });
 
     this.FormOrdenTrabajoSellado = this.frmBuilderPedExterno.group({
@@ -231,12 +235,16 @@ export class Orden_TrabajoComponent implements OnInit {
       Margen_Sellado: [null, Validators.required],
       PesoMillar: [0, Validators.required],
       TipoSellado: [0, Validators.required],
-      PrecioDia: [0, Validators.required],
-      PrecioNoche: [0, Validators.required],
       CantidadPaquete: [0, Validators.required],
       PesoPaquete: [0, Validators.required],
       CantidadBulto: [0, Validators.required],
       PesoBulto: [0, Validators.required],
+      PrecioDia: [0, Validators.required],
+      PrecioNoche: [0, Validators.required],
+      PrecioWiketiadoDia_Mq50: [0, Validators.required],
+      PrecioWiketiadoNoche_Mq50: [0, Validators.required],
+      PrecioWiketiadoDia_Mq9: [0, Validators.required],
+      PrecioWiketiadoNoche_Mq9: [0, Validators.required],
     });
 
     this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
@@ -458,11 +466,14 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a limpiar los campos del formulario de orte
   limpiarFormCorte() {
     this.FormOrdenTrabajoCorte.patchValue({
-      Formato_Corte: 7,
+      Formato_Corte: 'SIN FORMATO',
       Ancho_Corte: 0,
       Largo_Corte: 0,
       Fuelle_Corte: 0,
       Margen_Corte: 0,
+      Etiqueta_Ancho_Corte: 0,
+      Etiqueta_Largo_Corte: 0,
+      Etiqueta_Fuelle_Corte: 0,
     });
   }
 
@@ -479,12 +490,16 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Fuelle_Sellado : 0,
       PesoMillar: 0,
       TipoSellado: 'NO APLICA',
-      PrecioDia: 0,
-      PrecioNoche: 0,
       CantidadPaquete: 0,
       PesoPaquete: 0,
       CantidadBulto: 0,
       PesoBulto: 0,
+      PrecioDia: 0,
+      PrecioNoche: 0,
+      PrecioWiketiadoDia_Mq50: 0,
+      PrecioWiketiadoNoche_Mq50: 0,
+      PrecioWiketiadoDia_Mq9: 0,
+      PrecioWiketiadoNoche_Mq9: 0,
     });
   }
 
@@ -802,6 +817,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Largo_Corte: datos_Ot.selladoCorte_Largo,
           Fuelle_Corte: datos_Ot.selladoCorte_Fuelle,
           Margen_Corte: datos_Ot.margen,
+          Etiqueta_Ancho_Corte: datos_Ot.selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Corte: datos_Ot.selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Corte: datos_Ot.selladoCorte_Etiqueta_Fuelle,
         });
         this.FormOrdenTrabajoSellado.patchValue({
           Formato_Sellado: datos_Ot.formato_Producto,
@@ -818,6 +836,10 @@ export class Orden_TrabajoComponent implements OnInit {
           CantidadBulto: datos_Ot.selladoCorte_CantBolsasBulto,
           PrecioDia: datos_Ot.selladoCorte_PrecioSelladoDia,
           PrecioNoche: datos_Ot.selladoCorte_PrecioSelladoNoche,
+          PrecioWiketiadoDia_Mq50: datos_Ot.selladoCorte_PrecioDia_Wik_Mq50,
+          PrecioWiketiadoNoche_Mq50: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq50,
+          PrecioWiketiadoDia_Mq9: datos_Ot.selladoCorte_PrecioDia_Wik_Mq9,
+          PrecioWiketiadoNoche_Mq9: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq9,
         });
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
         setTimeout(() => {
@@ -840,8 +862,8 @@ export class Orden_TrabajoComponent implements OnInit {
             this.FormOrdenTrabajo.patchValue({
               OT_Observacion: itemOt.observacion,
               Margen: itemOt.ptMargen,
-              Cantidad: presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa | 0,
-              Precio: presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa | 0,
+              Cantidad: presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa || 0,
+              Precio: presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa || 0,
             });
 
             itemOt.extrusion != null ? itemOt.extrusion.trim() == '1' ? this.extrusion = true : this.extrusion = false : 0;
@@ -922,6 +944,9 @@ export class Orden_TrabajoComponent implements OnInit {
               Largo_Corte: this.ArrayProducto[0].Largo,
               Fuelle_Corte: this.ArrayProducto[0].Fuelle,
               Margen_Corte: itemOt.ptMargen,
+              Etiqueta_Ancho_Corte: itemOt.etiqueta.trim(),
+              Etiqueta_Largo_Corte: itemOt.etiquetaLargo.trim(),
+              Etiqueta_Fuelle_Corte: itemOt.etiquetaFuelle.trim(),
             });
             this.FormOrdenTrabajoSellado.patchValue({
               Formato_Sellado: this.ArrayProducto[0].Tipo,
@@ -934,12 +959,16 @@ export class Orden_TrabajoComponent implements OnInit {
               Margen_Sellado: itemOt.ptMargen,
               PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
-              PrecioDia: parseFloat(itemOt.dia) | 0,
-              PrecioNoche: parseFloat(itemOt.noche) | 0,
-              CantidadPaquete: this.ArrayProducto[0].CantPaquete | 0,
-              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0 : parseFloat(itemOt.pesopaquete) | 0,
-              CantidadBulto: this.ArrayProducto[0].CantBulto | 0,
-              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0 : parseFloat(itemOt.pesoBulto) | 0,
+              CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
+              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0.0 : parseFloat(itemOt.pesopaquete) || 0.0,
+              CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
+              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0.0 : parseFloat(itemOt.pesoBulto) || 0.0,
+              PrecioDia: parseFloat(itemOt.dia) || 0.0,
+              PrecioNoche: parseFloat(itemOt.noche) || 0.0,
+              PrecioWiketiadoDia_Mq50: itemOt.wik_Dia_MQ_50 || 0.0,
+              PrecioWiketiadoNoche_Mq50: itemOt.wik_Noche_MQ_50 || 0.00,
+              PrecioWiketiadoDia_Mq9: itemOt.wik_Dia_MQ_9 || 0.0,
+              PrecioWiketiadoNoche_Mq9: itemOt.wik_Noche_MQ_9 || 0.0,
             });
             setTimeout(() => this.calcularDatosOt(), 1000);
             this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
@@ -1814,26 +1843,30 @@ export class Orden_TrabajoComponent implements OnInit {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
-      let info: any = {
-        Ot_Id: ordenTrabajo,
-        Corte: this.corte,
-        Sellado: this.sellado,
-        Formato_Id: datos.tpProd_Id,
-        SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-        SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-        SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-        SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
-        SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-        TpSellado_Id: datos.tpSellado_Id,
-        SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
-        SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-        SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-        SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-        SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-        SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-        SelladoCorte_PesoProducto: this.pesoProducto,
+      let info: modelOrdenTrabajo_SelladoCorte = {
+        Ot_Id : ordenTrabajo,
+        Corte : this.corte,
+        Sellado : this.sellado,
+        Formato_Id : datos.tpProd_Id,
+        SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+        TpSellado_Id : datos.tpSellado_Id,
+        SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+        SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+        SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+        SelladoCorte_PesoProducto : this.pesoProducto,
+        SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+        SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+        SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+        SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+        SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
       }
       this.otSelladoCorteService.post(info).subscribe(() => {
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${ordenTrabajo}`);
@@ -1965,6 +1998,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Largo_Corte: datos_orden[i].selladoCorte_Largo,
           Fuelle_Corte: datos_orden[i].selladoCorte_Fuelle,
           Margen_Corte: datos_orden[i].margen,
+          Etiqueta_Ancho_Corte: datos_orden[i].selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Corte: datos_orden[i].selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Corte: datos_orden[i].selladoCorte_Etiqueta_Fuelle,
         });
         this.FormOrdenTrabajoSellado.patchValue({
           Formato_Sellado: datos_orden[i].formato_Producto,
@@ -1979,10 +2015,14 @@ export class Orden_TrabajoComponent implements OnInit {
           TipoSellado: datos_orden[i].tpSellados_Nombre,
           CantidadPaquete: datos_orden[i].selladoCorte_CantBolsasPaquete,
           CantidadBulto: datos_orden[i].selladoCorte_CantBolsasBulto,
-          PrecioDia: datos_orden[i].selladoCorte_PrecioSelladoDia,
-          PrecioNoche: datos_orden[i].selladoCorte_PrecioSelladoNoche,
           PesoPaquete: datos_orden[i].selladoCorte_PesoBulto,
           PesoBulto: datos_orden[i].selladoCorte_PesoPaquete,
+          PrecioDia: datos_orden[i].selladoCorte_PrecioSelladoDia,
+          PrecioNoche: datos_orden[i].selladoCorte_PrecioSelladoNoche,
+          PrecioWiketiadoDia_Mq50: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq50,
+          PrecioWiketiadoNoche_Mq50: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq50,
+          PrecioWiketiadoDia_Mq9: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq9,
+          PrecioWiketiadoNoche_Mq9: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq9,
         });
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre, });
         this.cargarCombinacionMezclas();
@@ -2177,27 +2217,31 @@ export class Orden_TrabajoComponent implements OnInit {
         let tipoSellado: any = this.FormOrdenTrabajoSellado.value.TipoSellado;
         let formato: any = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
         this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
-          let info: any = {
+          let info: modelOrdenTrabajo_SelladoCorte = {
             SelladoCorte_Id: datos_ot[i].selladoCorte_Id,
-            Ot_Id: ot,
-            Corte: this.corte,
-            Sellado: this.sellado,
-            Formato_Id: datos.tpProd_Id,
-            SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-            SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-            SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-            SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
-            SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-            TpSellado_Id: datos.tpSellado_Id,
-            SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
-            SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-            SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-            SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-            SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-            SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-            SelladoCorte_PesoProducto: this.pesoProducto,
+            Ot_Id : ot,
+            Corte : this.corte,
+            Sellado : this.sellado,
+            Formato_Id : datos.tpProd_Id,
+            SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+            SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+            SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+            SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+            TpSellado_Id : datos.tpSellado_Id,
+            SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+            SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+            SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+            SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+            SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+            SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+            SelladoCorte_PesoProducto : this.pesoProducto,
+            SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+            SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+            SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+            SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+            SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => {
             this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);

@@ -75,14 +75,10 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   aplicarfiltro = ($event, data : any, campo : any) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setInterval(() => this.tiempoExcedido(), 60000);
-
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.recaudos){
       this.consultarCartera();
-      // this.recargar();
     }
   }
 

@@ -81,14 +81,14 @@ export class DashBoard_PedidosComponent implements OnInit {
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
-  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setInterval(() => { this.tiempoExcedido(); }, 60000);
-
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.pedidos) {
       this.pedidosZeus();
-      this.recargar();
+      let time = setInterval(() => {
+        if (this.paginaPrincial.pedidos) this.pedidosZeus();
+        else clearInterval(time);
+      }, 60000);
     }
   }
 
