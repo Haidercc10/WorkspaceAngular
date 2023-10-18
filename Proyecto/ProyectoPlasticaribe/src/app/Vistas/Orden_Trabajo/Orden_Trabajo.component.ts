@@ -629,6 +629,22 @@ export class Orden_TrabajoComponent implements OnInit {
   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
   cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
+  // Funcion que va a validar cuando el campo marcado sea impresión (flexografia)
+  impresionSeleccionada(){
+    if (this.impresion){
+      this.rotograbado = false;
+      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion : 2});
+    }
+  }
+
+  // Funcion que va a validar cuando el campo marcado sea rotograbado
+  rotograbadoSeleccionado(){
+    if (this.rotograbado) {
+      this.impresion = false;
+      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion : 5});
+    }
+  }
+
   // Funcion que va a consultar los vendedores de la empresa
   consultarVendedores() {
     this.usuarioService.GetVendedores().subscribe(data => {
@@ -732,7 +748,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   llenarProducto(data : any) {
-    this.ArrayProducto.push({
+    this.ArrayProducto = [{
       Id: data.produ.prod_Id,
       Nombre: data.produ.prod_Nombre,
       Ancho: data.produ.prod_Ancho,
@@ -751,7 +767,7 @@ export class Orden_TrabajoComponent implements OnInit {
       Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
       UndCant: this.presentacionProducto,
       PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : data.precioUnidad,
-    });
+    }];
   }
 
   // Funcion que va a consultar las presentaciones de los productos
@@ -887,9 +903,8 @@ export class Orden_TrabajoComponent implements OnInit {
               Peso_Extrusion: itemOt.extPeso,
             });
 
-            if (itemOt.impFlexoNom.trim() != 'FLEXOGRAFIA' && itemOt.impFlexoNom.trim() != 'ROTOGRABADO') impresion = 1;
-            else if (itemOt.impFlexoNom.trim() == 'FLEXOGRAFIA') impresion = 2;
-            else if (itemOt.impFlexoNom.trim() == 'ROTOGRABADO') impresion = 3;
+            if (itemOt.impresion == '1') impresion = 2;
+            else if (itemOt.lamiando) impresion = 5;
 
             let tinta1: any = itemOt.impTinta1Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta1Nom.trim();
             let tinta2: any = itemOt.impTinta2Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta2Nom.trim();
@@ -990,6 +1005,7 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = true;
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
         this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
+        this.ArrayProducto[0].UndCant = this.presentacionProducto;
         let margen_Adicional = this.calcularMargenAdicional();        
         if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
           let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
@@ -1048,9 +1064,8 @@ export class Orden_TrabajoComponent implements OnInit {
     }
     this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
     //Peso Millar
-    this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
-    if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
     this.pesoMillar = this.ArrayProducto[i].PesoMillar;
+    if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
   }
 
   calcularCostosOT(margen_Adicional : number){
@@ -1077,7 +1092,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.valorProducto = this.ArrayProducto[0].PrecioUnd;
       this.valorOt = this.cantidadProducto * this.valorProducto;
       this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
+      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
       if (this.ArrayProducto[i].Peso_Producto > 0) {
         if (this.valorOt == 0) this.valorOt = 1;
         if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
@@ -1647,12 +1662,6 @@ export class Orden_TrabajoComponent implements OnInit {
     tintasSeleccionadas = tintasSeleccionadas.filter((item) => typeof (item) == 'string');
     let indice: number = tintasSeleccionadas.indexOf(tinta);
     if (indice != -1) tintasSeleccionadas.splice(indice, 1);
-    if (tinta != 'NO APLICA') {
-      if (tintasSeleccionadas.includes(tinta)) {
-        this.msj.mensajeAdvertencia(`Advertencia`, `La tinta ${tinta} ya se encuentra elegida, por favor seleccione otra!`);
-        this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + posicion)?.setValue('NO APLICA');
-      }
-    }
     for (let index = 1; index < parseInt(posicion); index++) {
       if (tintasSeleccionadas[index - 1].includes('NO APLICA')) {
         this.FormOrdenTrabajoImpresion.get('Tinta_Impresion' + index)?.setValue(tinta);
@@ -1666,16 +1675,12 @@ export class Orden_TrabajoComponent implements OnInit {
   validarLaminado(posicion: number) {
     let campoLaminado: any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
     let laminados: any[] = Object.values(this.FormOrdenTrabajoLaminado.value);
-    let lam1: any = laminados.splice(0, 1); let lam2: any = laminados.splice(2, 1); let lam3: any = laminados.splice(4, 1);
+    let lam1: any = laminados.splice(0, 1); 
+    let lam2: any = laminados.splice(2, 1); 
+    let lam3: any = laminados.splice(4, 1);
     let laminadosCapas: any[] = [...lam1, ...lam2, ...lam3];
     let indice: number = laminadosCapas.indexOf(campoLaminado);
     if (indice != -1) laminadosCapas.splice(indice, 1);
-    if (campoLaminado != 'NO APLICA') {
-      if (laminadosCapas.includes(campoLaminado)) {
-        this.msj.mensajeAdvertencia(`Advertencia`, `El laminado ${this.laminado_capas[campoLaminado - 1].lamCapa_Nombre} ya se encuentra selecionado, por favor elija otro!`);
-        this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.setValue(1);
-      }
-    }
     for (let index = 1; index < posicion; index++) {
       if (laminadosCapas[index - 1].toString().includes('1')) {
         this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + index)?.setValue(campoLaminado);
@@ -1887,17 +1892,17 @@ export class Orden_TrabajoComponent implements OnInit {
           Prod_Nombre: datos[i].prod_Nombre,
           Prod_Descripcion: datos[i].prod_Descripcion,
           TpProd_Id: datos[i].tpProd_Id,
-          Prod_Peso: datos[i].prod_Peso,
-          Prod_Peso_Millar: datos[i].prod_Peso_Millar,
+          Prod_Peso: this.pesoProducto,
+          Prod_Peso_Millar: this.FormOrdenTrabajoSellado.value.PesoMillar,
           UndMedPeso: datos[i].undMedPeso,
-          Prod_Fuelle: datos[i].prod_Fuelle,
-          Prod_Ancho: datos[i].prod_Ancho,
-          Prod_Calibre: datos[i].prod_Calibre,
-          UndMedACF: datos[i].undMedACF,
+          Prod_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+          Prod_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+          Prod_Calibre: this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
+          UndMedACF: this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
           Estado_Id: 10,
-          Prod_Largo: datos[i].prod_Largo,
-          Pigmt_Id: datos[i].pigmt_Id,
-          Material_Id: datos[i].material_Id,
+          Prod_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+          Pigmt_Id: this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
+          Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
           Prod_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
           Prod_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
           TpSellado_Id: datos[i].tpSellado_Id,
@@ -2257,11 +2262,13 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot: number = this.FormOrdenTrabajo.value.OT_Id) {
-    this.cargando = true;
-    this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
-      this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), err => this.msj.mensajeError(err.error.errors.orden[0]));
-    });
-    setTimeout(() => this.cargando = false, 1200);
+    if (ot != null) {
+      this.cargando = true;
+      this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
+        this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => this.msj.mensajeError(`¡No se encontró una Orden con el Numero ${ot}!`));
+      });
+      setTimeout(() => this.cargando = false, 1200);
+    } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo con el Número de un OT para mostrar el PDF de dicha OT!`);
   }
 
   // Funcion que le va a dar el formato al arcivo PDF
