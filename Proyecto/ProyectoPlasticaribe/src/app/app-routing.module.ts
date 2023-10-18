@@ -1,140 +1,64 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { VistasPermisosGuard } from './Guards/vistas-permisos.guard';
-import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
-import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
-import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
-import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
-import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
-import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
-import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
-import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
-import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
-import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
-import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
-import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
-import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
-import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
-import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
-import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
-import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
-import { Inventario_Bodegas_RollosComponent } from './Vistas/Inventario_Bodegas_Rollos/Inventario_Bodegas_Rollos.component';
-import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/Kardex_MateriasPrimas.component';
-import { Mantenimiento_CamionesComponent } from './Vistas/Mantenimiento_Camiones/Mantenimiento_Camiones.component';
-import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
-import { Movimientos_MantenimientoComponent } from './Vistas/Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
-import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
-import { NominaComponent } from './Vistas/Nomina/Nomina.component';
-import { Orden_MaquilaComponent } from './Vistas/Orden_Maquila/Orden_Maquila.component';
-import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component';
-import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
-import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
-import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
-import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
-import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
-import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
-import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
-import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
-import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
-import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
-import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
-import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
-import { Reporte_MaquilasComponent } from './Vistas/Reporte_Maquilas/Reporte_Maquilas.component';
-import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
-import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
-import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
-import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_SolicitudMpExtrusion/Reporte_SolicitudMpExtrusion.component';
-import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
-import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
-import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
-import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
-import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
-import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
-import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
-import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
-import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
-import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
-import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
-import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
-import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
-import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
-import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
-import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabajo.component';
-import { PedidomateriaprimaComponent } from './Vistas/pedidomateriaprima/pedidomateriaprima.component';
-import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
-import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
-import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
-import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { Inventario_AreasComponent } from './Vistas/Inventario_Areas/Inventario_Areas.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
-import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
+import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  {path: 'Login', component: LoginComponentComponent},
+  {path: 'Login', loadChildren: () => import('./Modules/login/login.module').then(m => m.LoginModule)},
   {path: '', component: LoginComponentComponent},
-  {path: 'home', canActivate: [VistasPermisosGuard], data: {nombre: 'Inicio'}, component: PaginaPrincipalComponent},
-  {path: 'Archivos', component: ArchivosComponent},
+  {path: 'home', loadChildren: () => import('./Modules/inicio/inicio.module').then(m => m.InicioModule) },
+  {path: 'Archivos', loadChildren: () => import('./Modules/archivos/archivos.module').then(m => m.ArchivosModule) },
 
   /******************************************************************* Materia Prima ************************************************************************/
-  {path: 'ocompra-materiaPrima', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Compra'}, component: OcompraComponent},
-  {path: 'MateriaPrima', canActivate: [VistasPermisosGuard], data: {nombre: 'Entrada Materia Prima'}, component: PedidomateriaprimaComponent},
-  {path: 'asignacionMP', canActivate: [VistasPermisosGuard], data: {nombre: 'Asignación de Materia Prima'}, component: AsignacionMateriaPrimaComponent},
-  {path: 'mp-recuperada', canActivate: [VistasPermisosGuard], data: {nombre: 'Mat. Prima Recuperada'}, component: MateriaPrimaRecuperadaComponent},
-  {path: 'mp-devoluciones', canActivate: [VistasPermisosGuard], data: {nombre: 'Devolución Materia Prima'}, component: DevolucionesMPComponent},
-  // Tintas
-  {path: 'asignacion-tintas', canActivate: [VistasPermisosGuard], data: {nombre: 'Creación de Tintas'}, component: AsignacionTintasComponent},
-  // BOPP
-  // {path: 'asignacion-bopp', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPPComponent},
-  {path: 'entrada-BOPP', canActivate: [VistasPermisosGuard], data: {nombre: 'Entrada BOPP'}, component: EntradaBOPPComponent},
-  {path: 'AsignacionBOPPTemporal', canActivate: [VistasPermisosGuard], data: {nombre: 'Asignación BOPP'}, component: AsignacionBOPP_TEMPORALComponent},
-  // Movimientos
-  {path: 'movimiento-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Mat. Prima'}, component: MovimientoMPComponent},
-  // Reportes de materia prima
-  {path: 'reporte-Materia-Prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Mat. Prima'}, component: ReporteMateriaPrimaComponent},
-  {path: 'reporte-recuperado-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Recuperado'}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
-  {path: 'reporte-orden-compra', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Orden Compra'}, component: Reporte_OrdenCompraComponent},
-  {path: 'solicitud-materia-prima', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Materia Prima'}, component: SolicitudMateriaPrimaComponent},
-  {path: 'reporte-solicitudes-mp', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Materia Prima'}, component: Reporte_SolicitudesMPComponent},
+  {path: 'ocompra-materiaPrima', loadChildren: () => import('./Modules/orden-compra/orden-compra.module').then(m => m.OrdenCompraModule)},
+  {path: 'MateriaPrima', loadChildren: () => import('./Modules/entrada-materia-prima/entrada-materia-prima.module').then(m => m.EntradaMateriaPrimaModule)},
+  {path: 'asignacionMP', loadChildren: () => import('./Modules/asignacion-materia-prima/asignacion-materia-prima.module').then(m => m.AsignacionMateriaPrimaModule)},
+  {path: 'mp-recuperada', loadChildren: () => import('./Modules/materia-prima-recuperada/materia-prima-recuperada.module').then(m => m.MateriaPrimaRecuperadaModule)},
+  {path: 'mp-devoluciones', loadChildren: () => import('./Modules/devolucion-materias-primas/devolucion-materias-primas.module').then(m => m.DevolucionMateriasPrimasModule)},
+  {path: 'asignacion-tintas', loadChildren: () => import('./Modules/creacion-tintas/creacion-tintas.module').then(m => m.CreacionTintasModule)},
+  {path: 'entrada-BOPP', loadChildren: () => import('./Modules/ingreso-biorientados/ingreso-biorientados.module').then(m => m.IngresoBiorientadosModule)},
+  {path: 'AsignacionBOPPTemporal', loadChildren: () => import('./Modules/asignacion-biorientado/asignacion-biorientado.module').then(m => m.AsignacionBiorientadoModule)},
+  {path: 'movimiento-mp', loadChildren: () => import('./Modules/movimientos-materias-primas/movimientos-materias-primas.module').then(m => m.MovimientosMateriasPrimasModule)},
+  {path: 'reporte-Materia-Prima', loadChildren: () => import('./Modules/inventario-materias-primas/inventario-materias-primas.module').then(m => m.InventarioMateriasPrimasModule)},
+  {path: 'reporte-recuperado-mp', loadChildren: () => import('./Modules/movimientos-recuperado/movimientos-recuperado.module').then(m => m.MovimientosRecuperadoModule)},
+  {path: 'reporte-orden-compra', loadChildren: () => import('./Modules/movimientos-orden-compra/movimientos-orden-compra.module').then(m => m.MovimientosOrdenCompraModule)},
+  {path: 'solicitud-materia-prima', loadChildren: () => import('./Modules/solicitud-materia-prima/solicitud-materia-prima.module').then(m => m.SolicitudMateriaPrimaModule)},
+  {path: 'reporte-solicitudes-mp', loadChildren: () => import('./Modules/mov-solicitud-materia-prima/mov-solicitud-materia-prima.module').then(m => m.MovSolicitudMateriaPrimaModule)},
+  {path: 'kardex-materias-primas', loadChildren: () => import('./Modules/kardex-materia-prima/kardex-materia-prima.module').then(m => m.KardexMateriaPrimaModule)},
 
-  {path: 'kardex-materias-primas', canActivate: [VistasPermisosGuard], data: {nombre: 'Kardex Materia Prima'}, component: Kardex_MateriasPrimasComponent},
   /************************************************************************ DESPACHO ************************************************************************/
-  // Pre ingresos
-  {path: 'preingreso-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Pre Ingreso Extrusión'}, component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion
-  {path: 'preingreso-sellado', canActivate: [VistasPermisosGuard], data: {nombre: 'Pre Ingreso Empaque/Sellado'}, component : PreIngresoRolloSelladoComponent}, // Pre Ingreso rollos sellado
-  // Ingresos
-  {path: 'ingresar-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingresar Rollos Despacho'}, component : Ingresar_ProductosComponent},
-  // Facturacion de rollos
-  {path: 'asignacion-productos-facturas', canActivate: [VistasPermisosGuard], data: {nombre: 'Facturar Rollos'}, component : AsignarProductosFacturasComponent},
-  // Despacho de maercancia
-  {path: 'factura-rollos-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Despachar Mercancia'}, component : RollosAsignadasFacturaComponent},
-  // Devolucion de Rollos
-  {path: 'devolucion-rollos-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Devolución de Rollos'}, component : Devoluciones_Productos_RollosComponent},
-  // Reporte
-  {path: 'reporte-despacho', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Despacho'}, component : ReporteDespachoComponent}, // Ingresar Productos
+  {path: 'preingreso-extrusion', loadChildren: () => import('./Modules/pre-ingreso-extrusion/pre-ingreso-extrusion.module').then(m => m.PreIngresoExtrusionModule)},
+  {path: 'preingreso-sellado', loadChildren: () => import('./Modules/pre-ingreso-sellado/pre-ingreso-sellado.module').then(m => m.PreIngresoSelladoModule)},
+  {path: 'ingresar-productos', loadChildren: () => import('./Modules/ingreso-rollos-despacho/ingreso-rollos-despacho.module').then(m => m.IngresoRollosDespachoModule)},
+  {path: 'asignacion-productos-facturas', loadChildren: () => import('./Modules/facturacion-rollos/facturacion-rollos.module').then(m => m.FacturacionRollosModule)},
+  {path: 'factura-rollos-productos', loadChildren: () => import('./Modules/despachar-rollos/despachar-rollos.module').then(m => m.DespacharRollosModule)},
+  {path: 'devolucion-rollos-productos', loadChildren: () => import('./Modules/devolucion-rollos/devolucion-rollos.module').then(m => m.DevolucionRollosModule)},
+  {path: 'reporte-despacho', loadChildren: () => import('./Modules/movimientos-despacho/movimientos-despacho.module').then(m => m.MovimientosDespachoModule)},
 
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
-  {path: 'ordenes-trabajo', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Trabajo'}, component: Orden_TrabajoComponent},
-  {path: 'reportes-procesos-ot', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Procesos OT'}, component: Reporte_Procesos_OTComponent},
+  {path: 'ordenes-trabajo', loadChildren: () => import('./Modules/orden-trabajo/orden-trabajo.module').then(m => m.OrdenTrabajoModule) },
+  {path: 'reportes-procesos-ot', loadChildren: () => import('./Modules/reporte-procesos-ot/reporte-procesos-ot.module').then(m => m.ReporteProcesosOTModule)},
 
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
-  {path: 'IngresoRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Rollos'}, component : Ingreso_Rollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
-  {path: 'Solicitud-Rollos-Bodegas', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud de Rollos'}, component : Solicitud_Rollos_BodegasComponent}, // Solicitud de Rollos
-  {path: 'Movimientos-Solicitud-Rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos Solicitudes de Rollos'}, component : Movimientos_SolicitudRollosComponent}, // Movimientos de las Solicitudes de Rollos
-  {path: 'Inventario-Bodegas-Rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario de Bodegas'}, component: Inventario_Bodegas_RollosComponent},
+  {path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule)},
+  {path: 'Solicitud-Rollos-Bodegas', loadChildren: () => import('./Modules/solicitud-rollos/solicitud-rollos.module').then(m => m.SolicitudRollosModule)},
+  {path: 'Movimientos-Solicitud-Rollos', loadChildren: () => import('./Modules/movimientos-solicitudes-rollos/movimientos-solicitudes-rollos.module').then(m => m.MovimientosSolicitudesRollosModule)},
+  {path: 'Inventario-Bodegas-Rollos', loadChildren: () => import('./Modules/inventario-bodegas-rollos/inventario-bodegas-rollos.module').then(m => m.InventarioBodegasRollosModule)},
 
   // {path: 'AsignacionRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   // {path: 'ReporteRollos-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
   // {path: 'Inventario-Extrusion', canActivate: [VistasPermisosGuard], data: {expectedRole : [1,5]}, component: Inventario_ExtrusionComponent},
-  {path: 'Eliminar-rollos', canActivate: [VistasPermisosGuard], data: {nombre: 'Eliminar Rollos'}, component : EliminarRollos_ExtrusionComponent}, //Eliminar Rollos de Extrusion
-  {path: 'reporte-rollos-eliminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Rollos Eliminados'}, component :Reporte_RollosDesechosComponent}, /** Reporte de rollos eliminados en extrusión */
-  {path: 'reporte-costos-ot', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte de Costos'}, component: ReporteCostosOTComponent},
+  {path: 'Eliminar-rollos', loadChildren: () => import('./Modules/eliminar-rollos/eliminar-rollos.module').then(m => m.EliminarRollosModule)},
+  {path: 'reporte-rollos-eliminados', loadChildren: () => import('./Modules/mov-rollos-eliminados/mov-rollos-eliminados.module').then(m => m.MovRollosEliminadosModule)},
+  {path: 'reporte-costos-ot', loadChildren: () => import('./Modules/reporte-costos/reporte-costos.module').then(m => m.ReporteCostosModule)},
 
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
-  {path: 'inventario-productos', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado'}, component : InventarioProductosPBDDComponent},
-  {path: 'inventario-productos-terminados', canActivate: [VistasPermisosGuard], data: {nombre: 'Producto Terminado (Zeus)'}, component: ModalGenerarInventarioZeusComponent},
+  {path: 'inventario-productos', loadChildren: () => import('./Modules/inventario-productos/inventario-productos.module').then(m => m.InventarioProductosModule)},
+  {path: 'inventario-productos-terminados', loadChildren: () => import('./Modules/inventario-zeus-productos/inventario-zeus-productos.module').then(m => m.InventarioZeusProductosModule)},
   {path: 'inventario-areas',
     children: [{path: 'materiales',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },]  
   },
@@ -142,68 +66,67 @@ export const routes: Routes = [
     children: [{path: 'items',  canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario Areas'}, component: Inventario_AreasComponent },]  
   },
   {path: 'reporte-inv-areas', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte de Inventarios'}, component : Reporte_InventarioAreasComponent},
-  
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   // {path: 'opedidoproducto', component: OpedidoproductoComponent},
-  {path: 'pedido-externo', canActivate: [VistasPermisosGuard], data: {nombre: 'Crear Pedido'}, component: PedidoExternoComponent},
+  {path: 'pedido-externo', loadChildren: () => import('./Modules/pedido-externo/pedido-externo.module').then(m => m.PedidoExternoModule)},
 
   /***************************************************************** USUARIOS **********************************************************************************/
-  {path: 'registro-usuario', canActivate: [VistasPermisosGuard], data: {nombre: 'Usuarios'}, component: RegistroComponentComponent},
+  {path: 'registro-usuario', loadChildren: () => import('./Modules/registro-usuarios/registro-usuarios.module').then(m => m.RegistroUsuariosModule)},
 
  /*************************************************************************************************************************************************************/
-  {path: 'pruebas', canActivate: [VistasPermisosGuard], data: {nombre: 'Pruebas'}, component: PruebaImagenCatInsumoComponent},
-  {path: 'gestion-vistas', canActivate: [VistasPermisosGuard], data: {nombre: 'Vistas'}, component: Gestion_VistasComponent},
+  {path: 'pruebas', loadChildren: () => import('./Modules/pruebas/pruebas.module').then(m => m.PruebasModule)},
+  {path: 'gestion-vistas', loadChildren: () => import('./Modules/gestion-vistas/gestion-vistas.module').then(m => m.GestionVistasModule)},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
-  {path: 'pedido-mantenimiento', canActivate: [VistasPermisosGuard], data: {nombre: 'Pedido de Mantenimiento de Activos'}, component: PedidoMantenimientoComponent},
-  {path: 'movimientos-mantenimientos', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimiento de Mantenimientos de Activos'}, component: Movimientos_MantenimientoComponent},
-  {path: 'reporte-activos', canActivate: [VistasPermisosGuard], data: {nombre: 'Inventario de Activos'}, component: Reporte_MantenimientoComponent},
-  {path: 'mantenimiento-activos', canActivate: [VistasPermisosGuard], data: {nombre: 'Mantenimiento de Activos'}, component: Mantenimiento_CamionesComponent },
+  {path: 'pedido-mantenimiento', loadChildren: () => import('./Modules/pedido-mantenimiento/pedido-mantenimiento.module').then(m => m.PedidoMantenimientoModule)},
+  {path: 'movimientos-mantenimientos', loadChildren: () => import('./Modules/movimientos-mantenimiento/movimientos-mantenimiento.module').then(m => m.MovimientosMantenimientoModule)},
+  {path: 'reporte-activos', loadChildren: () => import('./Modules/inventario-activos/inventario-activos.module').then(m => m.InventarioActivosModule)},
+  {path: 'mantenimiento-activos', loadChildren: () => import('./Modules/mantenimiento-activos/mantenimiento-activos.module').then(m => m.MantenimientoActivosModule)},
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
-  {path: 'Pedidos-Zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Ver Pedidos'}, component: ReportePedidos_ZeusComponent},
-  {path: 'rpt-facturacion-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Consolidado de Facturación'}, component: Reporte_FacturacionZeusComponent},
+  {path: 'Pedidos-Zeus', loadChildren: () => import('./Modules/pedidos-zeus/pedidos-zeus.module').then(m => m.PedidosZeusModule)},
+  {path: 'rpt-facturacion-zeus', loadChildren: () => import('./Modules/consolidad-facturacion/consolidad-facturacion.module').then(m => m.ConsolidadFacturacionModule)},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
-  {path: 'desperdicio', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingresar Desperdicio'}, component: DesperdicioComponent},
-  {path: 'reporte-desperdicios', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Desperdicio'}, component: Reporte_DesperdiciosComponent },
+  {path: 'desperdicio', loadChildren: () => import('./Modules/desperdicios/desperdicios.module').then(m => m.DesperdiciosModule)},
+  {path: 'reporte-desperdicios', loadChildren: () => import('./Modules/movimientos-desperdicios/movimientos-desperdicios.module').then(m => m.MovimientosDesperdiciosModule)},
 
   /*************************************************************** ORDEN DE MAQUILA **************************************************************************/
-  {path: 'Orden-Maquila', canActivate: [VistasPermisosGuard], data: {nombre: 'Orden de Maquila'}, component: Orden_MaquilaComponent},
-  {path: 'Facturacion-Orden-Maquila', canActivate: [VistasPermisosGuard], data: {nombre: 'Facturar Orden de Maquila'}, component: Facturacion_OrdenMaquilaComponent},
-  {path: 'Reporte-Maquilas', canActivate: [VistasPermisosGuard], data: {nombre: 'Movimientos de Maquilas'}, component: Reporte_MaquilasComponent},
+  {path: 'Orden-Maquila', loadChildren: () => import('./Modules/orden-maquila/orden-maquila.module').then(m => m.OrdenMaquilaModule)},
+  {path: 'Facturacion-Orden-Maquila', loadChildren: () => import('./Modules/facturacion-orden-maquila/facturacion-orden-maquila.module').then(m => m.FacturacionOrdenMaquilaModule)},
+  {path: 'Reporte-Maquilas', loadChildren: () => import('./Modules/movimientos-orden-maquila/movimientos-orden-maquila.module').then(m => m.MovimientosOrdenMaquilaModule)},
 
   /*************************************************************** DASBOARD **************************************************************************/
-  {path: 'Tickets', canActivate: [VistasPermisosGuard], data: {nombre: 'Tickets'}, component: TicketsComponent},
-  {path: 'Gestion-Tickets', canActivate: [VistasPermisosGuard], data: {nombre : 'Gestionar Tickets'}, component: Gestion_TicketsComponent},
+  {path: 'Tickets', loadChildren: () => import('./Modules/tickets/tickets.module').then(m => m.TicketsModule)},
+  {path: 'Gestion-Tickets', loadChildren: () => import('./Modules/gestion-tickets/gestion-tickets.module').then(m => m.GestionTicketsModule)},
 
   /** */
-  {path: 'Reporte-Facturacion', canActivate: [VistasPermisosGuard], data: {nombre: 'Consolidado Facturación 2'}, component: Reporte_Consolidado_FacturacionComponent},
+  {path: 'Reporte-Facturacion', loadChildren: () => import('./Modules/consolidad-facturacion2/consolidad-facturacion2.module').then(m => m.ConsolidadFacturacion2Module)},
 
   /*************************************************************** DASBOARD **************************************************************************/
-  {path: 'nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Nómina'}, component: NominaComponent},
-  {path: 'ingreso-nomina', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Nómina'}, component: Ingreso_NominaComponent},
+  {path: 'nomina', loadChildren: () => import('./Modules/nomina/nomina.module').then(m => m.NominaModule)},
+  {path: 'ingreso-nomina', loadChildren: () => import('./Modules/ingreso-nomina/ingreso-nomina.module').then(m => m.IngresoNominaModule)},
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
-  {path: 'solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Solicitud Material Producción'}, component: SolicitudMP_ExtrusionComponent},
-  {path: 'reporte-solicitud-mp-extrusion', canActivate: [VistasPermisosGuard], data: {nombre: 'Mov. Solicitud Material Producción'}, component: Reporte_SolicitudMpExtrusionComponent},
+  {path: 'solicitud-mp-extrusion', loadChildren: () => import('./Modules/solicitud-mp-extrusion/solicitud-mp-extrusion.module').then(m => m.SolicitudMPExtrusionModule)},
+  {path: 'reporte-solicitud-mp-extrusion', loadChildren: () => import('./Modules/mov-solicitud-mp-extrusion/mov-solicitud-mp-extrusion.module').then(m => m.MovSolicitudMPExtrusionModule)},
 
-  {path: 'facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Ingreso de Facturas'}, component: Facturas_Invergoal_InversuezComponent},
-  {path: 'Gestionar-facturas-invergoal-inversuez', canActivate: [VistasPermisosGuard], data: {nombre: 'Gestion de Facturas'}, component: Gestionar_Facturas_Invergoal_InversuezComponent},
+  {path: 'facturas-invergoal-inversuez', loadChildren: () => import('./Modules/facturas-invergoal-inversuez/facturas-invergoal-inversuez.module').then(m => m.FacturasInvergoalInversuezModule)},
+  {path: 'Gestionar-facturas-invergoal-inversuez', loadChildren: () => import('./Modules/gestion-facturas-invergoal-inversuez/gestion-facturas-invergoal-inversuez.module').then(m => m.GestionFacturasInvergoalInversuezModule)},
 
   /*************************************************************** RECIBOS DE CAJA ZEUS **************************************************************************/
-  {path: 'recibos-caja-zeus', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Recibos de Caja'}, component: Recibos_CajaComponent},
+  {path: 'recibos-caja-zeus', loadChildren: () => import('./Modules/recibos-caja-zeus/recibos-caja-zeus.module').then(m => m.RecibosCajaZeusModule)},
 
   /*************************************************************** CERTIFICADOS DE CALIDAD **************************************************************************/
-  {path: 'rpt-certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Reporte Certificados Calidad'}, component: Reporte_CertificadosCalidadComponent},
-  {path: 'certificados-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Certificados de Calidad'}, component: CertificadoCalidadComponent},
+  {path: 'rpt-certificados-calidad', loadChildren: () => import('./Modules/mov-certificados-calidad/mov-certificados-calidad.module').then(m => m.MovCertificadosCalidadModule)},
+  {path: 'certificados-calidad', loadChildren: () => import('./Modules/certificados-calidad/certificados-calidad.module').then(m => m.CertificadosCalidadModule)},
 
   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-  {path: 'control-calidad', canActivate: [VistasPermisosGuard], data: {nombre: 'Control de Calidad'}, component: ControlCalidadComponent},
+  {path: 'control-calidad', loadChildren: () => import('./Modules/control-calidad/control-calidad.module').then(m => m.ControlCalidadModule)},
 
   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
-  {path: 'costos-caja-menor', canActivate: [VistasPermisosGuard], data: {nombre: 'Costos Caja Menor'}, component: Costos_CajaMenorComponent},
+  {path: 'costos-caja-menor', loadChildren: () => import('./Modules/costos-caja-menor/costos-caja-menor.module').then(m => m.CostosCajaMenorModule)},
 ]
 
 @NgModule({

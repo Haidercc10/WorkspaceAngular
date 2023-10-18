@@ -33,12 +33,6 @@ export class DashBoard_FacturacionComponent implements OnInit {
   totalIvaCompraMes : number = 0; //Varible que almacenará el iva de compra del mes
   totalFacturadoanio : number = 0; //Variable que almacenará lo facturado en todo el año
   facturadoAnios : any[] = []; //variable que almacenará la información de lo facturado por los años
-
-  mostrarGrafica : boolean = false; //Variable que mostrará o no la información graficada
-  nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
-  multiAxisData: any;
-  multiAxisOptions: any;
-  multiAxisPlugins = [ DataLabelsPlugin ];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
 
   constructor(private AppComponent : AppComponent,
@@ -56,9 +50,9 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.graficarDatos();
     setInterval(() => {
       this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-      this.multiAxisOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.multiAxisOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
-      this.multiAxisOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.facturasOptions.plugins.legend.labels.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.facturasOptions.scales.x.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
+      this.facturasOptions.scales.y.ticks.color = this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'];
     }, 1000);
   }
 
@@ -73,15 +67,17 @@ export class DashBoard_FacturacionComponent implements OnInit {
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage = () => this.ValidarRol = this.AppComponent.storage_Rol;
 
-  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
-
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.facturacion) {
       this.facturacionAnio();
       this.facturacion();
-      this.recargar();
+      let time = setInterval(() => {
+        if (this.paginaPrincial.facturacion) {
+          this.facturacionAnio();
+          this.facturacion();
+        } else clearInterval(time);
+      }, 60000);
     }
   }
 

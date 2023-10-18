@@ -90,16 +90,14 @@ export class DashboardOTComponent implements OnInit {
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
-  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar = () => setTimeout(() => this.tiempoExcedido(), 60000);
-
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     if (this.paginaPrincial.ordenTrabajo) {
-      this.cargando = true;
       this.llenarEstadosOrdenes();
-      this.recargar();
-      setTimeout(() => this.cargando = false, 100);
+      let time = setInterval(() => {
+        if (this.paginaPrincial.ordenTrabajo) this.llenarEstadosOrdenes();
+        else clearInterval(time);
+      }, 60000);
     }
   }
 

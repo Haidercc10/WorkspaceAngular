@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
@@ -27,6 +27,7 @@ Injectable({
 
 
 export class MenuLateralComponent implements OnInit {
+
   display : boolean = false;
   items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
@@ -79,6 +80,7 @@ export class MenuLateralComponent implements OnInit {
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
+    this.consultarEventosMes();
     this.CargarCategorias();
     this.abrirModalUsuario();
   }
@@ -186,17 +188,6 @@ export class MenuLateralComponent implements OnInit {
     });
   }  
 
-  actualizarRutas() {
-    let info : modelVistasPermisos = {
-      Vp_Nombre: '',
-      Vp_Icono_Dock: '',
-      Vp_Icono_Menu: '',
-      Vp_Ruta: '',
-      Vp_Categoria: '',
-      Vp_Id_Roles: ''
-    }
-  }
-
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
   abrirModalUsuario(){
@@ -245,7 +236,6 @@ export class MenuLateralComponent implements OnInit {
   // Funcion que consultará los eventos de hoy
   consultarEventosHoy(){
     this.eventosHoy = [];
-    this.eventosMes = [];
     this.eventosCalService.GetEventosDia(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosHoy.push({
@@ -260,6 +250,11 @@ export class MenuLateralComponent implements OnInit {
         else this.eventosDia = true;
       }      
     });
+    
+  }
+
+  consultarEventosMes(){
+    this.eventosMes = [];
     this.eventosCalService.GEtEventosMes(this.storage_Id, this.ValidarRol).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         this.eventosMes.push({

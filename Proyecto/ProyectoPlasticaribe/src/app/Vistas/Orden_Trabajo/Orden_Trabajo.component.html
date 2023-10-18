@@ -599,10 +599,10 @@
           <br>
           <form [formGroup]="FormOrdenTrabajoCorte">
             <div class="mb-3">
-              <div class="row g-3 justify-content-md-center">
+              <div class="row g-4 justify-content-md-center">
 
                 <!-- Formato -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
                   <span class="p-float-label">
                     <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
                     <label for="Formato">Formato</label>
@@ -610,7 +610,7 @@
                 </div>
 
                 <!-- Ancho -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Ancho_Corte" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Ancho">Ancho</label>
@@ -618,7 +618,7 @@
                 </div>
 
                 <!-- Largo-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Largo_Corte" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Largo">Largo</label>
@@ -626,21 +626,45 @@
                 </div>
 
                 <!-- Fuelle-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Fuelle_Corte" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Fuelle">Fuelle</label>
                   </span>
                 </div>
 
-                <!-- Margen -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <!-- Etiqueta Ancho -->
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
                   <span class="p-float-label">
-                    <p-inputNumber formControlName="Margen_Corte" inputId="Margen" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
+                    <input formControlName="Margen_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="etiquetaAncho">Etiqueta Ancho</label>
+                  </span>
+                </div>
+
+                <!-- Etiqueta Largo-->
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                  <span class="p-float-label">
+                    <input formControlName="Etiqueta_Ancho_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="Largo">Etiqueta Largo</label>
+                  </span>
+                </div>
+
+                <!-- Etiqueta Fuelle-->
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                  <span class="p-float-label">
+                    <input formControlName="Etiqueta_Largo_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                    <label for="Fuelle">Etiqueta Fuelle</label>
+                  </span>
+                </div>
+
+                <!-- Margen -->
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="Etiqueta_Fuelle_Corte" inputId="Margen" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
                     <label for="Margen">Margen (%)</label>
                   </span>
                   <div>
-                    <label><b>Margen Kg: </b>{{margenKg | number : '1.2-2'}}</label>
+                    <label><b>Margen Kg: </b>{{margenKg | number}}</label>
                   </div>
                 </div>
               </div>
@@ -656,10 +680,15 @@
           <br>
           <form [formGroup]="FormOrdenTrabajoSellado">
             <div class="mb-3" >
+              <!-- DATOS PRODUCTO TERMINADO -->
+              <div class="mb-4 text-center">
+                <h6 class="tituloRojo">Producto Terminado</h6>
+              </div>
+
               <div class="row g-4 justify-content-md-center">
 
                 <!-- Formato -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
                     <label for="Formato">Formato</label>
@@ -667,7 +696,7 @@
                 </div>
 
                 <!-- Ancho -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Ancho">Ancho</label>
@@ -675,7 +704,7 @@
                 </div>
 
                 <!-- Largo-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Largo_Sellado" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Largo">Largo</label>
@@ -683,7 +712,7 @@
                 </div>
 
                 <!-- Fuelle-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Fuelle_Sellado" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="Fuelle">Fuelle</label>
@@ -691,7 +720,7 @@
                 </div>
 
                 <!-- Etiqueta Ancho -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <input formControlName="Etiqueta_Ancho_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
                     <label for="etiquetaAncho">Etiqueta Ancho</label>
@@ -699,7 +728,7 @@
                 </div>
 
                 <!-- Etiqueta Largo-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
                     <label for="Largo">Etiqueta Largo</label>
@@ -707,7 +736,7 @@
                 </div>
 
                 <!-- Etiqueta Fuelle-->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
                     <label for="Fuelle">Etiqueta Fuelle</label>
@@ -715,7 +744,7 @@
                 </div>
 
                 <!-- Margen -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="Margen_Sellado" inputId="Margen" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
                     <label for="Margen">Margen (%)</label>
@@ -724,9 +753,17 @@
                     <label><b>Margen Kg: </b>{{margenKg | number}}</label>
                   </div>
                 </div>
+              </div>
+
+              <!-- DATOS SELLADO -->
+              <div class="my-4 text-center">
+                <h6 class="tituloRojo">Sellado</h6>
+              </div>
+
+              <div class="row g-4 justify-content-md-center">
 
                 <!-- Peso Millar -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="PesoMillar" [(ngModel)]="pesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
                     <label for="PesoMillar">Peso Millar</label>
@@ -734,31 +771,15 @@
                 </div>
 
                 <!-- Tipo Sellado -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-dropdown formControlName="TipoSellado" inputId="TipoSellado" [options]="tipoSellado" optionLabel="tpSellados_Nombre" optionValue="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                     <label for="TipoSellado">Tipo Sellado</label>
                   </span>
                 </div>
 
-                <!-- Precio Día -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                  <span class="p-float-label">
-                    <p-inputNumber formControlName="PrecioDia" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                    <label for="PrecioDia">Precio Día</label>
-                  </span>
-                </div>
-
-                <!-- Precio Noche -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                  <span class="p-float-label">
-                    <p-inputNumber formControlName="PrecioNoche" inputId="PrecioNoche" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                    <label for="PrecioNoche">Precio Noche</label>
-                  </span>
-                </div>
-
-                <!-- Peso Millar -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <!-- Cantidad Paquete -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="CantidadPaquete">Cantidad Paquete</label>
@@ -766,15 +787,15 @@
                 </div>
 
                 <!-- Peso Paquete -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="PesoPaquete">Peso Paquete</label>
                   </span>
                 </div>
 
-                <!-- Precio Noche -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <!-- Cantidad Bulto -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="CantidadBulto">Cantidad Bulto</label>
@@ -782,10 +803,65 @@
                 </div>
 
                 <!-- Peso Bulto -->
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
                   <span class="p-float-label">
                     <p-inputNumber formControlName="PesoBulto" inputId="PesoBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                     <label for="PesoBulto">Peso Bulto</label>
+                  </span>
+                </div>
+              </div>
+
+              <div class="my-4 text-center">
+                <h6 class="tituloRojo">Precios Producción</h6>
+              </div>
+
+              <!-- PRECIOS SELLADO Y WIKETIADO -->
+              <div class="row g-4 justify-content-md-center">
+                <!-- Precio Sellado Día -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioDia" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioDia">Sellado Día</label>
+                  </span>
+                </div>
+                
+                <!-- Precio Sellado Noche -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioNoche" inputId="PrecioNoche" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioNoche">Sellado Noche</label>
+                  </span>
+                </div>
+                
+                <!-- Precio Wiketiado Día Maquina 50 -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioWiketiadoDia_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioDia">Wik. Día MQ 50</label>
+                  </span>
+                </div>
+                
+                <!-- Precio Wiketiado Noche Maquina 50 -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioDia">Wik. Noche MQ 50</label>
+                  </span>
+                </div>
+                
+                <!-- Precio Wiketiado Día Maquina 9 -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioWiketiadoDia_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioDia">Wik. Día MQ 9</label>
+                  </span>
+                </div>
+                
+                <!-- Precio Wiketiado Día Maquina 50 -->
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                  <span class="p-float-label">
+                    <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                    <label for="PrecioDia">Wik. Noche MQ 9</label>
                   </span>
                 </div>
               </div>

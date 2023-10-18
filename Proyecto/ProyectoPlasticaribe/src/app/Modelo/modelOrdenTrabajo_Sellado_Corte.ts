@@ -1,4 +1,5 @@
 export interface modelOrdenTrabajo_SelladoCorte {
+  SelladoCorte_Id? : number;
   Ot_Id : number;
   Corte : boolean;
   Sellado : boolean;
@@ -14,4 +15,12 @@ export interface modelOrdenTrabajo_SelladoCorte {
   SelladoCorte_CantBolsasBulto : number;
   SelladoCorte_PesoPaquete : number;
   SelladoCorte_PesoBulto : number;
+  SelladoCorte_PesoProducto : number;
+  SelladoCorte_Etiqueta_Ancho : string;
+  SelladoCorte_Etiqueta_Largo : string;
+  SelladoCorte_Etiqueta_Fuelle : string;
+  SelladoCorte_PrecioDia_Wik_Mq50 : number;
+  SelladoCorte_PrecioNoche_Wik_Mq50 : number;
+  SelladoCorte_PrecioDia_Wik_Mq9 : number;
+  SelladoCorte_PrecioNoche_Wik_Mq9 : number;
 }

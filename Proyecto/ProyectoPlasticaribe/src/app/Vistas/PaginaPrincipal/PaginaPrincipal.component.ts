@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
 
 @Injectable({  providedIn: 'root' })
@@ -9,7 +9,7 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./PaginaPrincipal.component.css']
 })
 
-export class PaginaPrincipalComponent implements OnInit {
+export class PaginaPrincipalComponent implements OnInit, OnDestroy {
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -35,6 +35,20 @@ export class PaginaPrincipalComponent implements OnInit {
     if (this.ValidarRol == 3) this.materiaPrima = true;
     if (this.ValidarRol == 61) this.pedidos = true;
     if (this.ValidarRol == 69) this.recaudos = true;
+  }
+
+  ngOnDestroy(): void {
+    this.ordenTrabajo = false;
+    this.facturacion = false;
+    this.materiaPrima = false;
+    this.pedidos= false;
+    this.facturacionVendedores = false;
+    this.recaudos = false;
+    this.cuentasPagar = false;
+    this.gerencia = false;
+    this.costos = false;
+    this.compras = false;
+    this.inventarioAreas = false;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

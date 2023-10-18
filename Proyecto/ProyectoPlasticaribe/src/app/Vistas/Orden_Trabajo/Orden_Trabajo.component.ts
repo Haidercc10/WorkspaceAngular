@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
+import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
 import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
@@ -218,6 +219,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Corte: [null, Validators.required],
       Fuelle_Corte: [null, Validators.required],
       Margen_Corte: [null, Validators.required],
+      Etiqueta_Ancho_Corte: [null, Validators.required],
+      Etiqueta_Largo_Corte: [null, Validators.required],
+      Etiqueta_Fuelle_Corte: [null, Validators.required],
     });
 
     this.FormOrdenTrabajoSellado = this.frmBuilderPedExterno.group({
@@ -231,12 +235,16 @@ export class Orden_TrabajoComponent implements OnInit {
       Margen_Sellado: [null, Validators.required],
       PesoMillar: [0, Validators.required],
       TipoSellado: [0, Validators.required],
-      PrecioDia: [0, Validators.required],
-      PrecioNoche: [0, Validators.required],
       CantidadPaquete: [0, Validators.required],
       PesoPaquete: [0, Validators.required],
       CantidadBulto: [0, Validators.required],
       PesoBulto: [0, Validators.required],
+      PrecioDia: [0, Validators.required],
+      PrecioNoche: [0, Validators.required],
+      PrecioWiketiadoDia_Mq50: [0, Validators.required],
+      PrecioWiketiadoNoche_Mq50: [0, Validators.required],
+      PrecioWiketiadoDia_Mq9: [0, Validators.required],
+      PrecioWiketiadoNoche_Mq9: [0, Validators.required],
     });
 
     this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
@@ -458,11 +466,14 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a limpiar los campos del formulario de orte
   limpiarFormCorte() {
     this.FormOrdenTrabajoCorte.patchValue({
-      Formato_Corte: 7,
+      Formato_Corte: 'SIN FORMATO',
       Ancho_Corte: 0,
       Largo_Corte: 0,
       Fuelle_Corte: 0,
       Margen_Corte: 0,
+      Etiqueta_Ancho_Corte: 0,
+      Etiqueta_Largo_Corte: 0,
+      Etiqueta_Fuelle_Corte: 0,
     });
   }
 
@@ -479,12 +490,16 @@ export class Orden_TrabajoComponent implements OnInit {
       Etiqueta_Fuelle_Sellado : 0,
       PesoMillar: 0,
       TipoSellado: 'NO APLICA',
-      PrecioDia: 0,
-      PrecioNoche: 0,
       CantidadPaquete: 0,
       PesoPaquete: 0,
       CantidadBulto: 0,
       PesoBulto: 0,
+      PrecioDia: 0,
+      PrecioNoche: 0,
+      PrecioWiketiadoDia_Mq50: 0,
+      PrecioWiketiadoNoche_Mq50: 0,
+      PrecioWiketiadoDia_Mq9: 0,
+      PrecioWiketiadoNoche_Mq9: 0,
     });
   }
 
@@ -712,30 +727,31 @@ export class Orden_TrabajoComponent implements OnInit {
   buscarInformacionProducto() {
     this.productoService.GetInfoProducto_Prod_Presentacion(this.producto, this.presentacionProducto).subscribe(datos_producto => {
       if (datos_producto.length == 0) this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`);
-      for (let j = 0; j < datos_producto.length; j++) {
-        let productoExt: any = {
-          Id: datos_producto[j].produ.prod_Id,
-          Nombre: datos_producto[j].produ.prod_Nombre,
-          Ancho: datos_producto[j].produ.prod_Ancho,
-          Fuelle: datos_producto[j].produ.prod_Fuelle,
-          Largo: datos_producto[j].produ.prod_Largo,
-          Cal: datos_producto[j].produ.prod_Calibre,
-          Und: this.presentacionProducto,
-          Peso_Producto: datos_producto[j].produ.prod_Peso,
-          PesoMillar: datos_producto[j].produ.prod_Peso_Millar,
-          Tipo: datos_producto[j].tipo_Producto,
-          Material: datos_producto[j].material,
-          Pigmento: datos_producto[j].pigmento,
-          CantPaquete: datos_producto[j].produ.prod_CantBolsasPaquete,
-          CantBulto: datos_producto[j].produ.prod_CantBolsasBulto,
-          TipoSellado: datos_producto[j].tipo_Sellado,
-          Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
-          UndCant: this.presentacionProducto,
-          PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : datos_producto[j].precioUnidad,
-        }
-        this.ArrayProducto.push(productoExt);
-      }
+      else datos_producto.forEach(data => this.llenarProducto(data));
     }, () => this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`));
+  }
+
+  llenarProducto(data : any) {
+    this.ArrayProducto.push({
+      Id: data.produ.prod_Id,
+      Nombre: data.produ.prod_Nombre,
+      Ancho: data.produ.prod_Ancho,
+      Fuelle: data.produ.prod_Fuelle,
+      Largo: data.produ.prod_Largo,
+      Cal: data.produ.prod_Calibre,
+      Und: this.presentacionProducto,
+      Peso_Producto: data.produ.prod_Peso,
+      PesoMillar: data.produ.prod_Peso_Millar,
+      Tipo: data.tipo_Producto,
+      Material: data.material,
+      Pigmento: data.pigmento,
+      CantPaquete: data.produ.prod_CantBolsasPaquete,
+      CantBulto: data.produ.prod_CantBolsasBulto,
+      TipoSellado: data.tipo_Sellado,
+      Cant: parseFloat(this.FormOrdenTrabajo.value.Cantidad) | 0,
+      UndCant: this.presentacionProducto,
+      PrecioUnd: this.FormOrdenTrabajo.value.Precio != null ? this.FormOrdenTrabajo.value.Precio : data.precioUnidad,
+    });
   }
 
   // Funcion que va a consultar las presentaciones de los productos
@@ -801,6 +817,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Largo_Corte: datos_Ot.selladoCorte_Largo,
           Fuelle_Corte: datos_Ot.selladoCorte_Fuelle,
           Margen_Corte: datos_Ot.margen,
+          Etiqueta_Ancho_Corte: datos_Ot.selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Corte: datos_Ot.selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Corte: datos_Ot.selladoCorte_Etiqueta_Fuelle,
         });
         this.FormOrdenTrabajoSellado.patchValue({
           Formato_Sellado: datos_Ot.formato_Producto,
@@ -817,8 +836,11 @@ export class Orden_TrabajoComponent implements OnInit {
           CantidadBulto: datos_Ot.selladoCorte_CantBolsasBulto,
           PrecioDia: datos_Ot.selladoCorte_PrecioSelladoDia,
           PrecioNoche: datos_Ot.selladoCorte_PrecioSelladoNoche,
+          PrecioWiketiadoDia_Mq50: datos_Ot.selladoCorte_PrecioDia_Wik_Mq50,
+          PrecioWiketiadoNoche_Mq50: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq50,
+          PrecioWiketiadoDia_Mq9: datos_Ot.selladoCorte_PrecioDia_Wik_Mq9,
+          PrecioWiketiadoNoche_Mq9: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq9,
         });
-        console.log(datos_Ot, this.FormOrdenTrabajoSellado.value)
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
         setTimeout(() => {
           this.cyrel = datos_Ot.cyrel == false ? false : true;
@@ -840,8 +862,8 @@ export class Orden_TrabajoComponent implements OnInit {
             this.FormOrdenTrabajo.patchValue({
               OT_Observacion: itemOt.observacion,
               Margen: itemOt.ptMargen,
-              Cantidad: presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa | 0,
-              Precio: presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa | 0,
+              Cantidad: presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa || 0,
+              Precio: presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa || 0,
             });
 
             itemOt.extrusion != null ? itemOt.extrusion.trim() == '1' ? this.extrusion = true : this.extrusion = false : 0;
@@ -869,23 +891,14 @@ export class Orden_TrabajoComponent implements OnInit {
             else if (itemOt.impFlexoNom.trim() == 'FLEXOGRAFIA') impresion = 2;
             else if (itemOt.impFlexoNom.trim() == 'ROTOGRABADO') impresion = 3;
 
-            let tinta1: any = itemOt.impTinta1Nom.trim();
-            let tinta2: any = itemOt.impTinta2Nom.trim();
-            let tinta3: any = itemOt.impTinta3Nom.trim();
-            let tinta4: any = itemOt.impTinta4Nom.trim();
-            let tinta5: any = itemOt.impTinta5Nom.trim();
-            let tinta6: any = itemOt.impTinta6Nom.trim();
-            let tinta7: any = itemOt.impTinta7Nom.trim();
-            let tinta8: any = itemOt.impTinta8Nom.trim();
-
-            if (tinta1 == '') tinta1 = 'NO APLICA';
-            if (tinta2 == '') tinta2 = 'NO APLICA';
-            if (tinta3 == '') tinta3 = 'NO APLICA';
-            if (tinta4 == '') tinta4 = 'NO APLICA';
-            if (tinta5 == '') tinta5 = 'NO APLICA';
-            if (tinta6 == '') tinta6 = 'NO APLICA';
-            if (tinta7 == '') tinta7 = 'NO APLICA';
-            if (tinta8 == '') tinta8 = 'NO APLICA';
+            let tinta1: any = itemOt.impTinta1Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta1Nom.trim();
+            let tinta2: any = itemOt.impTinta2Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta2Nom.trim();
+            let tinta3: any = itemOt.impTinta3Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta3Nom.trim();
+            let tinta4: any = itemOt.impTinta4Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta4Nom.trim();
+            let tinta5: any = itemOt.impTinta5Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta5Nom.trim();
+            let tinta6: any = itemOt.impTinta6Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta6Nom.trim();
+            let tinta7: any = itemOt.impTinta7Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta7Nom.trim();
+            let tinta8: any = itemOt.impTinta8Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta8Nom.trim();
 
             this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1, tinta2, tinta3, tinta4, tinta5, tinta6, tinta7, tinta8).subscribe(datos_impresion => {
               for (let j = 0; j < datos_impresion.length; j++) {
@@ -931,6 +944,9 @@ export class Orden_TrabajoComponent implements OnInit {
               Largo_Corte: this.ArrayProducto[0].Largo,
               Fuelle_Corte: this.ArrayProducto[0].Fuelle,
               Margen_Corte: itemOt.ptMargen,
+              Etiqueta_Ancho_Corte: itemOt.etiqueta.trim(),
+              Etiqueta_Largo_Corte: itemOt.etiquetaLargo.trim(),
+              Etiqueta_Fuelle_Corte: itemOt.etiquetaFuelle.trim(),
             });
             this.FormOrdenTrabajoSellado.patchValue({
               Formato_Sellado: this.ArrayProducto[0].Tipo,
@@ -943,12 +959,16 @@ export class Orden_TrabajoComponent implements OnInit {
               Margen_Sellado: itemOt.ptMargen,
               PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
-              PrecioDia: parseFloat(itemOt.dia) | 0,
-              PrecioNoche: parseFloat(itemOt.noche) | 0,
-              CantidadPaquete: this.ArrayProducto[0].CantPaquete | 0,
-              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0 : parseFloat(itemOt.pesopaquete) | 0,
-              CantidadBulto: this.ArrayProducto[0].CantBulto | 0,
-              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0 : parseFloat(itemOt.pesoBulto) | 0,
+              CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
+              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0.0 : parseFloat(itemOt.pesopaquete) || 0.0,
+              CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
+              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0.0 : parseFloat(itemOt.pesoBulto) || 0.0,
+              PrecioDia: parseFloat(itemOt.dia) || 0.0,
+              PrecioNoche: parseFloat(itemOt.noche) || 0.0,
+              PrecioWiketiadoDia_Mq50: itemOt.wik_Dia_MQ_50 || 0.0,
+              PrecioWiketiadoNoche_Mq50: itemOt.wik_Noche_MQ_50 || 0.00,
+              PrecioWiketiadoDia_Mq9: itemOt.wik_Dia_MQ_9 || 0.0,
+              PrecioWiketiadoNoche_Mq9: itemOt.wik_Noche_MQ_9 || 0.0,
             });
             setTimeout(() => this.calcularDatosOt(), 1000);
             this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
@@ -970,88 +990,100 @@ export class Orden_TrabajoComponent implements OnInit {
         this.cargando = true;
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
         this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
-        let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte | 0;
-        if (this.corte) {
-          margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
-          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
-        }
-        if (this.sellado) {
-          margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
-          this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
-        }
-        this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
+        let margen_Adicional = this.calcularMargenAdicional();        
         if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
-          let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
-          let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
-          let ancho3: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
-          let calibre: number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
           let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
           let fact: number = 0;
-          let largoUnd: number = 0;
-          //Calcular Peso de Extrusion
-          if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-            largoUnd = 100;
-            material == 3 ? fact = 0.0048 : fact = 0.00468;
-            this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-          } else {
-            largoUnd = 39.3701;
-            material == 3 ? fact = 0.0317 : fact = 0.0302;
-            this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-          }
-          //Calcular Peso Producto y Peso Millar
+          this.calcularPesoExtrusion(material, fact);
           for (let i = 0; i < this.ArrayProducto.length; i++) {
             if (this.ArrayProducto[i].Id == this.ArrayProducto[0].Id && this.ArrayProducto[i].UndCant == this.ArrayProducto[0].UndCant) {
-              //Peso Producto
-              if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-                material == 3 ? fact = 0.0048 : fact = 0.00468;
-                this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-              } else {
-                material == 3 ? fact = 0.0317 : fact = 0.0302;
-                this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-              }
-              this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
-              //Peso Millar
-              this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
-              if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
-              this.pesoMillar = this.ArrayProducto[i].PesoMillar;
-
-              //Calcular datos de la ot
-              if (this.ArrayProducto[0].UndCant == 'Kg') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
-                this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
-                this.valorKg = this.ArrayProducto[0].PrecioUnd;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
-              } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
-                this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
-                if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
-                if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
-                if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
-                else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
-              } else if (this.ArrayProducto[0].UndCant == 'Und') {
-                this.cantidadProducto = this.ArrayProducto[0].Cant;
-                this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-                this.valorOt = this.cantidadProducto * this.valorProducto;
-                this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-                this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
-                if (this.ArrayProducto[i].Peso_Producto > 0) {
-                  if (this.valorOt == 0) this.valorOt = 1;
-                  if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
-                  else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
-                } else this.valorOt = 0;
-              } else if (this.ArrayProducto[0].UndCant == 'Rollo') {
-              }
+              this.calcularPesoProducto(material, fact);
+              this.calcularCostosOT(margen_Adicional);
             }
           }
         } else this.msj.mensajeAdvertencia(`Advertencia`, `¡Debe elegir una unidad de medida para extrusión!`);
         this.cargando = false;
       }
     }, 500);
+  }
+
+  calcularMargenAdicional() : number {
+    let margen_Adicional : number = 0;
+    if (this.sellado) {
+      margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
+      this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+    } else if (this.corte) {
+      margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
+      this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    }
+    this.FormOrdenTrabajo.patchValue({ Margen: margen_Adicional });
+    return margen_Adicional;
+  }
+
+  calcularPesoExtrusion(material : number, fact : number){
+    let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
+    let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
+    let ancho3: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
+    let calibre: number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
+    let largoUnd: number = 0;
+    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
+      largoUnd = 100;
+      material == 3 ? fact = 0.0048 : fact = 0.00468;
+      this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+    } else {
+      largoUnd = 39.3701;
+      material == 3 ? fact = 0.0317 : fact = 0.0302;
+      this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion: ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+    }
+  }
+
+  calcularPesoProducto(material : number, fact : number){
+    let i : number = 0;
+    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
+      material == 3 ? fact = 0.0048 : fact = 0.00468;
+      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+    } else {
+      material == 3 ? fact = 0.0317 : fact = 0.0302;
+      this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+    }
+    this.pesoProducto = this.ArrayProducto[i].Peso_Producto;
+    //Peso Millar
+    this.ArrayProducto[i].PesoMillar = this.pesoProducto * 1000;
+    if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
+    this.pesoMillar = this.ArrayProducto[i].PesoMillar;
+  }
+
+  calcularCostosOT(margen_Adicional : number){
+    let i : number = 0;
+    if (this.ArrayProducto[0].UndCant == 'Kg') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
+      this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
+      this.valorKg = this.ArrayProducto[0].PrecioUnd;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
+    } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
+      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
+      this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
+      if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
+      if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
+      if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
+      else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
+    } else if (this.ArrayProducto[0].UndCant == 'Und') {
+      this.cantidadProducto = this.ArrayProducto[0].Cant;
+      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+      this.valorOt = this.cantidadProducto * this.valorProducto;
+      this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
+      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
+      if (this.ArrayProducto[i].Peso_Producto > 0) {
+        if (this.valorOt == 0) this.valorOt = 1;
+        if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
+        else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
+      } else this.valorOt = 0;
+    }
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
@@ -1811,26 +1843,30 @@ export class Orden_TrabajoComponent implements OnInit {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
-      let info: any = {
-        Ot_Id: ordenTrabajo,
-        Corte: this.corte,
-        Sellado: this.sellado,
-        Formato_Id: datos.tpProd_Id,
-        SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-        SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-        SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-        SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
-        SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-        TpSellado_Id: datos.tpSellado_Id,
-        SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
-        SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-        SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-        SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-        SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-        SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-        SelladoCorte_PesoProducto: this.pesoProducto,
+      let info: modelOrdenTrabajo_SelladoCorte = {
+        Ot_Id : ordenTrabajo,
+        Corte : this.corte,
+        Sellado : this.sellado,
+        Formato_Id : datos.tpProd_Id,
+        SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+        TpSellado_Id : datos.tpSellado_Id,
+        SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+        SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+        SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+        SelladoCorte_PesoProducto : this.pesoProducto,
+        SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+        SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+        SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+        SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+        SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
       }
       this.otSelladoCorteService.post(info).subscribe(() => {
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${ordenTrabajo}`);
@@ -1962,6 +1998,9 @@ export class Orden_TrabajoComponent implements OnInit {
           Largo_Corte: datos_orden[i].selladoCorte_Largo,
           Fuelle_Corte: datos_orden[i].selladoCorte_Fuelle,
           Margen_Corte: datos_orden[i].margen,
+          Etiqueta_Ancho_Corte: datos_orden[i].selladoCorte_Etiqueta_Ancho,
+          Etiqueta_Largo_Corte: datos_orden[i].selladoCorte_Etiqueta_Largo,
+          Etiqueta_Fuelle_Corte: datos_orden[i].selladoCorte_Etiqueta_Fuelle,
         });
         this.FormOrdenTrabajoSellado.patchValue({
           Formato_Sellado: datos_orden[i].formato_Producto,
@@ -1976,10 +2015,14 @@ export class Orden_TrabajoComponent implements OnInit {
           TipoSellado: datos_orden[i].tpSellados_Nombre,
           CantidadPaquete: datos_orden[i].selladoCorte_CantBolsasPaquete,
           CantidadBulto: datos_orden[i].selladoCorte_CantBolsasBulto,
-          PrecioDia: datos_orden[i].selladoCorte_PrecioSelladoDia,
-          PrecioNoche: datos_orden[i].selladoCorte_PrecioSelladoNoche,
           PesoPaquete: datos_orden[i].selladoCorte_PesoBulto,
           PesoBulto: datos_orden[i].selladoCorte_PesoPaquete,
+          PrecioDia: datos_orden[i].selladoCorte_PrecioSelladoDia,
+          PrecioNoche: datos_orden[i].selladoCorte_PrecioSelladoNoche,
+          PrecioWiketiadoDia_Mq50: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq50,
+          PrecioWiketiadoNoche_Mq50: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq50,
+          PrecioWiketiadoDia_Mq9: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq9,
+          PrecioWiketiadoNoche_Mq9: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq9,
         });
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre, });
         this.cargarCombinacionMezclas();
@@ -2174,27 +2217,31 @@ export class Orden_TrabajoComponent implements OnInit {
         let tipoSellado: any = this.FormOrdenTrabajoSellado.value.TipoSellado;
         let formato: any = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
         this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
-          let info: any = {
+          let info: modelOrdenTrabajo_SelladoCorte = {
             SelladoCorte_Id: datos_ot[i].selladoCorte_Id,
-            Ot_Id: ot,
-            Corte: this.corte,
-            Sellado: this.sellado,
-            Formato_Id: datos.tpProd_Id,
-            SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-            SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-            SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-            SelladoCorte_Etiqueta_Ancho: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Largo: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Fuelle: `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase(),
-            SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
-            TpSellado_Id: datos.tpSellado_Id,
-            SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
-            SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
-            SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-            SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
-            SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
-            SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
-            SelladoCorte_PesoProducto: this.pesoProducto,
+            Ot_Id : ot,
+            Corte : this.corte,
+            Sellado : this.sellado,
+            Formato_Id : datos.tpProd_Id,
+            SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+            SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+            SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+            SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+            TpSellado_Id : datos.tpSellado_Id,
+            SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+            SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+            SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+            SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+            SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+            SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+            SelladoCorte_PesoProducto : this.pesoProducto,
+            SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+            SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+            SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+            SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+            SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => {
             this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
