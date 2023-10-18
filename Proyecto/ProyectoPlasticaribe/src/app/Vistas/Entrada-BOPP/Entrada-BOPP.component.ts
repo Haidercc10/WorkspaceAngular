@@ -43,7 +43,7 @@ export class EntradaBOPPComponent implements OnInit {
   nombresBopp : any =[]; /** Variable que cargará los nombres de BOPP que más suelen comprarse en la empresa */
   micrasBopp : any =[]; /** Variable que cargará las micras de BOPP que más suelen utilizarse en la empresa */
   anchosBopp : any =[]; /** Variable que cargará los anchos de BOPP que más suelen utilizarse en la empresa */
-  preciosBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
+  precioBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
   serialesBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
   proveedor = []; //Variable que almacenará los diferentes proveedores de materia prima
   public FormOpcional !: FormGroup;
@@ -73,7 +73,7 @@ export class EntradaBOPPComponent implements OnInit {
                                       private messageService: MessageService,
                                         private shepherdService: ShepherdService,
                                           private mensajeService : MensajesAplicacionService,
-                                            private servicioBoppGenerico : BoppGenericoService) {
+                                            private servicioBoppGenerico : BoppGenericoService,) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -107,9 +107,7 @@ export class EntradaBOPPComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerCategorias();
     this.getNombresBOPP();
-    this.getMicrasBOPP();
-    this.getAnchosBOPP();
-    this.getPreciosBOPP();
+    this.getPrecioBOPP();
     this.getSerialesBOPP();
     this.obtenerProveeedor();
     this.cargarBoppsGenericos();
@@ -182,11 +180,18 @@ export class EntradaBOPPComponent implements OnInit {
               IdBoppGenerico : IdGenerico,
               NombreBoppGenerico : nombreGenerico
             }
-            productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
-            this.ArrayBOPP.push(productoExt);
-            this.obtenerValorTotal();
-            this.limpiarCampos();
-            this.load = true;
+            let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == productoExt.IdBoppGenerico);
+            if(index == -1) {
+              this.load = true;
+              this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe elegir un bopp genérico válido`);
+            } else {
+              productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
+              this.ArrayBOPP.push(productoExt);
+              this.calcularValores();
+              this.limpiarCampos();
+              this.getPrecioBOPP();
+              this.load = true;
+            }
           });
         }
       });
@@ -227,6 +232,7 @@ export class EntradaBOPPComponent implements OnInit {
         }
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
           this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
+          this.getPrecioBOPP();
           this.load = true;
         }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
       }
@@ -244,24 +250,30 @@ export class EntradaBOPPComponent implements OnInit {
     data = this.boppSeleccionado;
     this.onReject();
     this.ArrayBOPP.splice(this.ArrayBOPP.findIndex((item) => item.Serial == data.Serial), 1);
-    this.obtenerValorTotal();
+    this.calcularValores();
   }
 
   /** Obtener nombres, micras, precios, anchos y seriales más utilizados y cargarlos en los combobox en la vista */
   getNombresBOPP() {
     this.nombresBopp = [];
-    this.entradaBOPPService.getBopp().subscribe(data => this.nombresBopp = data);
-    this.FormEntradaBOPP.patchValue({ Observacion : this.FormEntradaBOPP.value.Nombre });
+    this.entradaBOPPService.getBopp().subscribe(data => { this.nombresBopp = data });
   }
 
-  getMicrasBOPP = () => this.entradaBOPPService.getMicras().subscribe(data => this.micrasBopp = data);
+  seleccionarBopp(){
+    let nombreElegido : number = this.FormEntradaBOPP.value.Nombre;
+    let nuevo : any [] = this.nombresBopp.filter((item) => item.nombre == nombreElegido);
+    this.FormEntradaBOPP.patchValue({ Observacion: nuevo[0].nombre, cantidad: nuevo[0].micras, });
+  }
 
-  getPreciosBOPP = () => this.entradaBOPPService.getPrecios().subscribe(data => this.preciosBopp = data);
+  getPrecioBOPP () {
+    this.entradaBOPPService.GetUltimoPrecioBopp().subscribe(data => {
+      this.precioBopp = data
+      this.FormEntradaBOPP.patchValue({ precio : this.precioBopp });
+    });
+  } 
 
-  getAnchosBOPP = () => this.entradaBOPPService.getAnchos().subscribe(data => this.anchosBopp = data);
-
-  getSerialesBOPP = () => this.entradaBOPPService.getSeriales().subscribe(data => this.serialesBopp = data);
-
+  getSerialesBOPP = () => this.entradaBOPPService.getSeriales().subscribe(data => this.serialesBopp = data); 
+    
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormOpcional.value.PrvNombre;
@@ -504,9 +516,6 @@ export class EntradaBOPPComponent implements OnInit {
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
-  /** Función para obtener el valor total del Bopp a ingresar */
-  obtenerValorTotal = () => this.valorTotal = this.ArrayBOPP.reduce((a, b) => a + b.Subtotal, 0);
-
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = () => this.messageService.clear('bopp');
 
@@ -532,4 +541,13 @@ export class EntradaBOPPComponent implements OnInit {
 
   /** Función para llamar el modal que contendrá los campos para crear bopp's */
   llamarModalCrearBopp = () => this.modalCrearBopp = true;
+
+  //Función que calculará los valores subtotales y totales de la entrada de bopp
+  calcularValores(){
+    this.valorTotal = 0;
+    for (const item of this.ArrayBOPP) {
+      item.Subtotal = (item.Precio * item.CantKg);
+      this.valorTotal += item.Subtotal;
+    }
+  }
 }
