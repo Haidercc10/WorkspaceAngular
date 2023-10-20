@@ -192,5 +192,23 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
     var(--g3),var(--g3) calc(3*var(--s)) var(--_p),
     var(--g4),var(--g4) calc(3*var(--s)) var(--_p),
     var(--g5) calc(3*var(--s)) 0,var(--g5) 0 var(--_p) var(--c3);
-  background-size: calc(6*var(--s)) calc(2*var(--_p))
+  background-size: calc(6*var(--s)) calc(2*var(--_p));
+}
+
+.costosAnios{
+  justify-content: center;
+  text-align: center;
+  background-color: #d1d1d122;
+  border: 1.9px dashed #8b8b8b;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.costosAniosOscuro{
+  justify-content: center;
+  text-align: center;
+  background-color: #aaa2;
+  border: 1.9px dashed #d7d7d7;
+  border-radius: 10px;
+  margin: 10px;
 }

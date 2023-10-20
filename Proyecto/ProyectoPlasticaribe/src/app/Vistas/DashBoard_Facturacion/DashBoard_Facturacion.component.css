@@ -202,3 +202,19 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
       var(--c2) 0 296.15deg,var(--c1) 0);
   background-size: calc(2*var(--s)) var(--s);
 }
+
+.costosAnios{
+  justify-content: center;
+  background-color: #d1d1d122;
+  border: 1.9px dashed #8b8b8b;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.costosAniosOscuro{
+  justify-content: center;
+  background-color: #aaa2;
+  border: 1.9px dashed #d7d7d7;
+  border-radius: 10px;
+  margin: 10px;
+}

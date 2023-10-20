@@ -799,7 +799,7 @@ export class Orden_TrabajoComponent implements OnInit {
           Ancho_Extrusion2: datos_Ot.ancho2_Extrusion,
           Ancho_Extrusion3: datos_Ot.ancho3_Extrusion,
           Calibre_Extrusion: datos_Ot.calibre_Extrusion,
-          UnidadMedida_Extrusion: datos_Ot.und_Extrusion,
+          UnidadMedida_Extrusion: datos_Ot.und_Extrusion.trim(),
           Tratado_Extrusion: datos_Ot.id_Tratado,
           Peso_Extrusion: datos_Ot.peso_Extrusion,
         });
@@ -959,18 +959,18 @@ export class Orden_TrabajoComponent implements OnInit {
               Largo_Corte: this.ArrayProducto[0].Largo,
               Fuelle_Corte: this.ArrayProducto[0].Fuelle,
               Margen_Corte: itemOt.ptMargen,
-              Etiqueta_Ancho_Corte: itemOt.etiqueta.trim(),
-              Etiqueta_Largo_Corte: itemOt.etiquetaLargo.trim(),
-              Etiqueta_Fuelle_Corte: itemOt.etiquetaFuelle.trim(),
+              Etiqueta_Ancho_Corte: itemOt.etiqueta != null ? itemOt.etiqueta.trim() : '0',
+              Etiqueta_Largo_Corte: itemOt.etiquetaLargo != null ? itemOt.etiquetaLargo.trim() : '0',
+              Etiqueta_Fuelle_Corte: itemOt.etiquetaFuelle != null ? itemOt.etiquetaFuelle.trim() : '0',
             });
             this.FormOrdenTrabajoSellado.patchValue({
               Formato_Sellado: this.ArrayProducto[0].Tipo,
               Ancho_Sellado: this.ArrayProducto[0].Ancho,
               Largo_Sellado: this.ArrayProducto[0].Largo,
               Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
-              Etiqueta_Ancho_Sellado : itemOt.etiqueta.trim(),
-              Etiqueta_Largo_Sellado : itemOt.etiquetaLargo.trim(),
-              Etiqueta_Fuelle_Sellado : itemOt.etiquetaFuelle.trim(),
+              Etiqueta_Ancho_Sellado : itemOt.etiqueta != null ? itemOt.etiqueta.trim() : '0',
+              Etiqueta_Largo_Sellado : itemOt.etiquetaLargo != null ? itemOt.etiquetaLargo.trim() : '0',
+              Etiqueta_Fuelle_Sellado : itemOt.etiquetaFuelle != null ? itemOt.etiquetaFuelle.trim() : '0',
               Margen_Sellado: itemOt.ptMargen,
               PesoMillar: this.ArrayProducto[0].PesoMillar,
               TipoSellado: this.ArrayProducto[0].TipoSellado,
@@ -1155,7 +1155,7 @@ export class Orden_TrabajoComponent implements OnInit {
           PorcentajeMezclaPigmentoP1_Capa2: datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
           MezclaPigmento1_Capa3: datos_mezcla.mezPigmto_Id1xCapa3,
           PorcentajeMezclaPigmentoP1_Capa3: datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
-          MezclaPigmentoP2_Capa1: datos_mezcla.mezPigmto_Id1xCapa1,
+          MezclaPigmentoP2_Capa1: datos_mezcla.mezPigmto_Id2xCapa1,
           PorcentajeMezclaPigmentoP2_Capa1: datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
           MezclaPigmentoP2_Capa2: datos_mezcla.mezPigmto_Id2xCapa2,
           PorcentajeMezclaPigmentoP2_Capa2: datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
@@ -1731,8 +1731,10 @@ export class Orden_TrabajoComponent implements OnInit {
   guardarOt() {
     this.cargando = true;
     this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
+      let numeroOrden : number = numero_OT + 1;
+      if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
       let infoOT: modelOrden_Trabajo = {
-        Numero_OT : numero_OT + 1,
+        Numero_OT : numeroOrden,
         SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
         Prod_Id: this.producto,
         UndMed_Id: this.presentacionProducto,
@@ -1876,9 +1878,9 @@ export class Orden_TrabajoComponent implements OnInit {
       this.otSelladoCorteService.post(info).subscribe(() => {
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${ordenTrabajo}`);
         this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
-        this.cambiarEstadoProducto(this.producto);1
-        this.pdfOrdenTrabajo(numeroOT);
+        this.cambiarEstadoProducto(this.producto);
         this.limpiarCampos();
+        this.pdfOrdenTrabajo(numeroOT);
       }, error => this.msj.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.error));
     }, err => this.msj.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, err.error));
   }
@@ -1928,9 +1930,10 @@ export class Orden_TrabajoComponent implements OnInit {
     let numeroOT: number = this.FormOrdenTrabajo.value.OT_Id;
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
+    this.cargando = true;
+    this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
 
     this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
-      this.cargando = true;
       for (let i = 0; i < datos_orden.length; i++) {
 
         this.cyrel = datos_orden[i].cyrel;
@@ -2034,7 +2037,10 @@ export class Orden_TrabajoComponent implements OnInit {
         setTimeout(() => this.calcularDatosOt(), 1000);
         this.cargando = false;
       }
-    }, error => this.msj.mensajeError(error.error));
+    }, error => {
+      this.msj.mensajeError(error.error);
+      this.cargando = false;
+    });
   }
 
   // Funcion que va a validar que si se desee actualizar la orden de trabajo
@@ -2262,13 +2268,18 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot: number = this.FormOrdenTrabajo.value.OT_Id) {
+    this.cargando = true;
     if (ot != null) {
-      this.cargando = true;
       this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
-        this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => this.msj.mensajeError(`¡No se encontró una Orden con el Numero ${ot}!`));
+        this.bagProService.GetOrdenTrabajo(ot).subscribe(datos_ot => this.formatoPDF(datos_ot), () => {
+          this.msj.mensajeError(`¡No se encontró una Orden con el Numero ${ot}!`);
+          this.cargando = false;
+        });
       });
-      setTimeout(() => this.cargando = false, 1200);
-    } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo con el Número de un OT para mostrar el PDF de dicha OT!`);
+    } else {
+      this.msj.mensajeAdvertencia(`¡Debe llenar el campo con el Número de un OT para mostrar el PDF de dicha OT!`);
+      this.cargando = false;
+    }
   }
 
   // Funcion que le va a dar el formato al arcivo PDF
@@ -2881,6 +2892,7 @@ export class Orden_TrabajoComponent implements OnInit {
       }
       const pdf = pdfMake.createPdf(pdfDefinicion);
       pdf.open();
+      this.cargando = false;
     }
   }
 }

@@ -188,21 +188,39 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
         });
         this.datosKardex.sort((a, b) => a.fecha.localeCompare(b.fecha));
       }, () => {
-        this.datosKardex.push({
-          Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
-          fecha : moment().startOf('month').format('YYYY-MM-DD'),
-          cantEntrada : '',
-          precioEntrada : '',
-          costoEntrada : '',
-          cantSalida : '',
-          precioSalida : '',
-          costoSalida : '',
-          cantidadFinal : 0,
-          precioFinal : 0,
-          costoFinal : 0,
-          total : true,
-          color : '',
-        });
+        if (moment().format('YYYY-MM-DD') < moment(this.FormFiltros.value.RangoFechas[0]).format('YYYY-MM-DD')) {
+          this.datosKardex.push({
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+            fecha : moment().startOf('month').format('YYYY-MM-DD'),
+            cantEntrada : '',
+            precioEntrada : '',
+            costoEntrada : '',
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : 0,
+            precioFinal : 0,
+            costoFinal : 0,
+            total : true,
+            color : '',
+          });
+        } else {
+          this.datosKardex.push({
+            Id : this.datosKardex.length == 0 ? 1 : Math.max(...this.datosKardex.map(x => x.Id)) + 1,
+            fecha : this.comprasRealizadas[0].fecha,
+            cantEntrada : '',
+            precioEntrada : '',
+            costoEntrada : '',
+            cantSalida : '',
+            precioSalida : '',
+            costoSalida : '',
+            cantidadFinal : this.comprasRealizadas[0].cantComprada,
+            precioFinal : this.comprasRealizadas[0].precioCompra,
+            costoFinal : this.comprasRealizadas[0].costoRealMaterial,
+            total : true,
+            color : '',
+          });
+        }
       });
       // Entradas de material
       this.comprasRealizadas.forEach(compra => {
@@ -275,7 +293,7 @@ export class Kardex_MateriasPrimasComponent implements OnInit {
       this.calcularSalidas();
 
       // Costos Finales
-      setTimeout(() => this.calcularCostosFinales(), 1500);
+      setTimeout(() => this.calcularCostosFinales(), 2000);
 
       setTimeout(() => {
         this.datosKardex.map(x => x.fecha).sort();

@@ -21,8 +21,6 @@ export class Orden_TrabajoService {
 
   srvObtenerListaNumeroPedido = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/NumeroPedido/${dato}`);
 
-  srvObtenerListaPdfOTInsertada = (dato : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getPdfOTInsertada/${dato}`);
-
   GetDatosOrden = (orden : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getDatosOrden/${orden}`);
 
   GetOrdenTrabajo = (orden : number) => this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getOrdenTrabajo/${orden}`);

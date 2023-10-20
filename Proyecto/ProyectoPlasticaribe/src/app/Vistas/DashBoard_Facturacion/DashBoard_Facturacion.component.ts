@@ -74,7 +74,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.facturacion();
       let time = setInterval(() => {
         if (this.paginaPrincial.facturacion) {
-          this.facturacionAnio();
+          this.facturacionAnio(true);
           this.facturacion();
         } else clearInterval(time);
       }, 60000);
@@ -110,7 +110,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   }
 
   // Funcion que va a consultar la facturación por año
-  facturacionAnio(){
+  facturacionAnio(autoRecarga?){
     let index : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
     if (index == -1) {
       this.cargando = true;
@@ -144,7 +144,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
           } else this.facturadoAnios.push(info_Anio);
         }
       });
-    } else this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``);
+    } else !autoRecarga ? this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``) : null;
   }
 
   // funcion que llenará el array con las opciones de la grafica

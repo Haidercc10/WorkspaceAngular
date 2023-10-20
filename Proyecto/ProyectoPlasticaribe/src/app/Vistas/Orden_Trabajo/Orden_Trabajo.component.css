@@ -45,11 +45,6 @@ p-calendar ::ng-deep span button span {
   width: 100%;
 }
 
-p-tabview ::ng-deep li ::ng-deep .p-tabview-nav-link {
-  color: var(--rojo) !important;
-  border: none !important;
-}
-
 p-divider ::ng-deep span {
   color: white !important;
   background-color: var(--rojo);

@@ -44,13 +44,18 @@
             <p-card>
                 <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}" class="mb-3"><i class="pi pi-chart-line"></i> Facturación</h2>
                 <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaFacturacion" [options]="opcionesGrafica"></p-chart>
-                <p-toolbar>
-                    <div class="row p-2">
-                      <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of facturadoAnios">
-                        <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                <div class="row p-2">
+                    <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of facturadoAnios">
+                      <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                        <div class="col-md-12">
+                          <h5>{{item.anio}}</h5>
+                        </div>
+                        <div class="col-md-12">
+                          <h5>{{item.costo | number : '1.2-2'}}</h5>
+                        </div>
                       </div>
                     </div>
-                </p-toolbar>
+                </div>
             </p-card>
         </div>
 
@@ -71,39 +76,54 @@
                         header="Plasticaribe SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCuentas_Pagar_Plasticaribe" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of cuentas_Pagar_Anios_Plasticaribe">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of cuentas_Pagar_Anios_Plasticaribe">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
+                              </div>
                             </div>
-                            </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
 
                     <p-tabPanel
                         header="Invergoal SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCuentas_Pagar_Invergoal" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of cuentas_Pagar_Anios_Invergoal">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of cuentas_Pagar_Anios_Invergoal">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
+                              </div>
                             </div>
-                            </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
 
                     <p-tabPanel
                         header="Inversuez SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCuentas_Pagar_Inversuez" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                            <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of cuentas_Pagar_Anios_Inversuez">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of cuentas_Pagar_Anios_Inversuez">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
+                              </div>
                             </div>
-                            </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
                 </p-tabView>
             </p-card>
@@ -118,39 +138,54 @@
                         header="Plasticaribe SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Plasticaribe" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Plasticaribe">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of compras_Anios_Plasticaribe">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
                               </div>
                             </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
 
                     <p-tabPanel
                         header="Invergoal SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Invergoal" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Invergoal">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of compras_Anios_Invergoal">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
                               </div>
                             </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
 
                     <p-tabPanel
                         header="Inversuez SAS"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaCompras_Inversuez" [options]="opcionesGrafica"></p-chart>
-                          <p-toolbar>
-                            <div class="row p-2">
-                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of compras_Anios_Inversuez">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of compras_Anios_Inversuez">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
                               </div>
                             </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
                 </p-tabView>
             </p-card>
@@ -165,26 +200,36 @@
                         header="Inventario Materia Prima"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaInventario_MatPrima" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of inventarioMatPrima_Anios">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of inventarioMatPrima_Anios">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
                               </div>
                             </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
 
                     <p-tabPanel
                         header="Inventario Producto Terminado"
                         leftIcon="pi pi-sliders-h">
                         <p-chart *ngIf="!cargando" type="line" width="100%" height="500px" [data]="graficaInventario_Productos" [options]="opcionesGrafica"></p-chart>
-                        <p-toolbar>
-                            <div class="row p-2">
-                              <div class="col-xs-12 col-sm-12 col-md-4 p-2" *ngFor="let item of inventarioProductos_Anios">
-                                <h5>Año: {{item.anio}} Total: <b>{{item.costo | number : '1.2-2'}}</b></h5>
+                        <div class="row p-2">
+                            <div class="col-xs-12 col-sm-12 col-md-4" *ngFor="let item of inventarioProductos_Anios">
+                              <div [ngClass]="{'costosAnios': !modoSeleccionado, 'costosAniosOscuro': modoSeleccionado}" class="row py-2">
+                                <div class="col-md-12">
+                                  <h5>{{item.anio}}</h5>
+                                </div>
+                                <div class="col-md-12">
+                                  <h5>{{item.costo | number : '1.2-2'}}</h5>
+                                </div>
                               </div>
                             </div>
-                        </p-toolbar>
+                        </div>
                     </p-tabPanel>
                 </p-tabView>
             </p-card>

@@ -1358,7 +1358,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot : number = this.FormOrdenTrabajo.value.OT_Id){
     let usuario : string = this.AppComponent.storage_Nombre;
-    this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
+    this.ordenTrabajoService.GetOrdenTrabajo(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let titulo : string = `${datos_ot[i].numero_Orden}`;
         const pdfDefinicion : any = {
@@ -1952,7 +1952,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
 
-    this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(numeroOT).subscribe(datos_orden => {
+    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
 
         this.checkedCyrel = datos_orden[i].cyrel;

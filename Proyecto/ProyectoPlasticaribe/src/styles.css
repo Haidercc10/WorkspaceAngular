@@ -218,6 +218,80 @@ html, body {
   width: 100%;
 }
 
+.p-inputtext:enabled:focus{
+  box-shadow: 0 0 0 0.2rem #febfbf;
+  border-color: #f63b3b;
+}
+
+.p-inputtext:enabled:hover {
+  border-color: #f63b3b;
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+  box-shadow: 0 0 0 0.2rem #febfbf;
+  border-color: #f63b3b;
+}
+
+.p-dropdown:not(.p-disabled):hover {
+  border-color: #f63b3b;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+  color: #d81d1d;
+  background: #ffefef;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+  border-color: #f63b3b;
+  background: #f63b3b;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: #f63b3b;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+  box-shadow: 0 0 0 0.2rem #febfbf;
+  border-color: #f63b3b;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+  border-color: #d81d1d;
+  background: #d81d1d;
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight {
+  border-color: #f63b3b;
+  background: #f63b3b;
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight:not(.p-disabled):hover {
+  border-color: #d81d1d;
+  background: #d81d1d;
+}
+
+.p-radiobutton .p-radiobutton-box:not(.p-disabled).p-focus {
+  box-shadow: 0 0 0 0.2rem #febfbf;
+  border-color: #f63b3b;
+}
+
+.p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
+  border-color: #f63b3b;
+}
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-color: #fd9393;
+  color: var(--rojo);
+}
+
+.p-tabview .p-tabview-nav-btn.p-link {
+  color: #f63b3b;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+  box-shadow: inset 0 0 0 0.2rem #febfbf;
+}
+
 p-dropdown .p-dropdown, p-inputnumber, p-inputnumber span, p-inputnumber input, p-calendar, p-calendar span {
   display: flex;
   width: 100%;

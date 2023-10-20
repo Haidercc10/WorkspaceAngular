@@ -130,3 +130,21 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   repeating-linear-gradient(135deg,#464545 0 12.5%,#a19e9e 0 25%);
   background-size: calc(4*var(--s)) calc(4*var(--s))
 }
+
+.costosAnios{
+  justify-content: center;
+  text-align: center;
+  background-color: #d1d1d122;
+  border: 1.9px dashed #8b8b8b;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.costosAniosOscuro{
+  justify-content: center;
+  text-align: center;
+  background-color: #aaa2;
+  border: 1.9px dashed #d7d7d7;
+  border-radius: 10px;
+  margin: 10px;
+}
