@@ -500,11 +500,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           break;
         }
         for (let i = 0; i < datos_pedido.length; i++) {
-          this.modalPedidoExterno.valorTotal = datos_pedido[i].valor_Total;
           this.modalPedidoExterno.iva = datos_pedido[i].iva;
           if (datos_pedido[i].iva > 0) this.modalPedidoExterno.checked = true;
           this.modalPedidoExterno.descuento = datos_pedido[i].descuento;
-          this.modalPedidoExterno.ivaDescuento();
           let productoExt : any = {
             Id : datos_pedido[i].id_Producto,
             Nombre : datos_pedido[i].producto,

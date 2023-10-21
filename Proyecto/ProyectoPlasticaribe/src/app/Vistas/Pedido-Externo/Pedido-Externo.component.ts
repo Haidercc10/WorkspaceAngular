@@ -40,7 +40,7 @@ export class PedidoExternoComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  today : any = new Date(); //Variable que se usará para llenar la fecha actual
   cargando : boolean = false; //Variable que va a servir para mostrar o no la imagen de carga
   Ide : number | undefined; //Variable para almacenar el ID del producto que está en la tabla y se va a editar
   id_pedido : number; //Variable que almacenará el ID del pedido que se va a mostrar
@@ -57,12 +57,8 @@ export class PedidoExternoComponent implements OnInit {
   usuarioVende=[] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
   pedidosProductos = []; //Variable que se va a almacenar los pedidos consultados
   ArrayProducto : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
-  valorTotal : number = 0; //Variable que guardará el valor total del pedido
   descuento : number = 0; //Variable que guardará el valor en porcentaje del descuento hecho al cliente
-  valorMenosDescuento : number = 0; //Variable que tendrá el valor del de la venta menos el descuento
   iva : number = 0; //Variable que gusrdará la cantidad de iva sobre la venta
-  valorMenosIva : number = 0; //Variable que tendrá el valor del de la venta menos el iva
-  valorfinal : number = 0; //VAlor final menos em iva y el descuento
   productoEliminado : number; //Variable que tendrá el id de un producto que se va a eliminar de la base de datos o de un pedido nuevo
   ultimoPrecio : number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
   checked = true; //Variable que va a almancenar la información de si el pedido lleva iva o no
@@ -96,7 +92,7 @@ export class PedidoExternoComponent implements OnInit {
       ciudad_sede: [null, Validators.required],
       PedUsuarioId: [null, Validators.required],
       PedUsuarioNombre: [null, Validators.required],
-      PedFechaEnt: this.today,
+      PedFechaEnt: moment(this.today).format('YYYY-MM-DD'),
       PedEstadoId: 11,
       PedObservacion: '',
       PedDescuento : 0,
@@ -144,25 +140,7 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
   checkboxIva(){
     if (this.checked) this.iva = 19;
-    else {
-      this.iva = 0;
-      this.valorMenosIva = 0;
-      this.valorfinal -= this.valorfinal;
-    }
-    this.ivaDescuento();
-  }
-
-  //Funcion que validar si cambia uno de los input se muestre la misma informacion en la parde abajo de la tabla
-  ivaDescuento(){
-    if (this.valorTotal == 0) {
-      this.valorMenosDescuento = 0;
-      this.valorMenosIva = 0;
-      this.valorfinal = 0;
-    } else {
-      this.valorMenosDescuento = (this.valorTotal * this.descuento) / 100;
-      this.valorMenosIva = (this.valorTotal * this.iva) / 100;
-      this.valorfinal = this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
-    }
+    else this.iva = 0;
   }
 
   //Cargar modal de crear producto
@@ -177,16 +155,12 @@ export class PedidoExternoComponent implements OnInit {
   //Funcion que limpiará TODOS los campos de la vista de pedidos
   limpiarTodosCampos(){
     this.ArrayProducto = [];
-    this.valorTotal = 0;
     this.descuento = 0;
-    this.valorMenosDescuento = 0;
     this.iva = 19;
-    this.valorMenosIva = 0;
-    this.valorfinal = 0;
     this.pedidosProductos = [];
     this.FormPedidoExternoClientes.reset();
     this.FormPedidoExternoClientes.patchValue({
-      PedFechaEnt: this.today,
+      PedFechaEnt: moment(this.today).format('YYYY-MM-DD'),
       PedEstadoId: 11,
       PedDescuento : 0,
       PedIva : true,
@@ -431,17 +405,14 @@ export class PedidoExternoComponent implements OnInit {
   cargarFormProductoEnTablas(_formulario : any){
     this.ultimoPrecio = 0;
     let precioProducto : number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
-    let cantidad : number = this.FormPedidoExternoProductos.value.ProdCantidad;
 
     if (precioProducto > 0 && precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
-      this.valorTotal += (precioProducto * cantidad);
-      this.ivaDescuento();
       let productoExt : any = {
         Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
         Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
         Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
         UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-        PrecioUnd : precioProducto,
+        PrecioUnd : this.FormPedidoExternoProductos.value.ProdPrecioUnd,
         Stock : this.FormPedidoExternoProductos.get('ProdStock').value,
         SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
         FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
@@ -451,6 +422,34 @@ export class PedidoExternoComponent implements OnInit {
       this.productoCliente();
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
     } else this.msj.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
+  }
+
+  // Funcion que va a retornar el valor total del pedido
+  valorTotalPedido() : number{
+    let valorTotal : number = 0;
+    valorTotal = this.ArrayProducto.reduce((a,b) => a + b.SubTotal, 0);
+    return valorTotal;
+  }
+
+  // Funcion que va a retornar el valor total mas iva
+  valorTotalMasIvaPedido() : number{
+    let valorFinal : number = 0;
+    valorFinal = (this.valorTotalPedido() * this.iva) / 100;
+    return valorFinal;
+  }
+
+  // Funcion que va a retornar el valor total menos el descuento
+  valorTotalMenosDescuentoPedido(){
+    let valorFinal : number = 0;
+    valorFinal = (this.valorTotalPedido() * this.descuento) / 100;
+    return valorFinal;
+  }
+
+  // Funcion que va a retornar el valor final del pedido
+  valorFinalPedido() : number{
+    let valorFinal : number = 0;
+    valorFinal = this.valorTotalPedido() - this.valorTotalMenosDescuentoPedido() + this.valorTotalMasIvaPedido();
+    return valorFinal;
   }
 
   // Funcion que mostrará un modal con la informacion del pedido
@@ -471,7 +470,7 @@ export class PedidoExternoComponent implements OnInit {
           `<b>Ciudad:</b> ${ciudad} <br>` +
           `<b>Direccion:</b> ${direccionSede} <br>` +
           `<b>Iva:</b> ${this.iva}% <b>Descuento:</b> ${this.formatonumeros(this.descuento.toFixed(2))}% <br>` +
-          `<b>Valor del Pedido</b> ${this.formatonumeros(this.valorfinal.toFixed(2))}<br>`,
+          `<b>Valor del Pedido</b> ${this.formatonumeros(this.valorFinalPedido().toFixed(2))}<br>`,
           sticky: true
         });
       }
@@ -489,7 +488,7 @@ export class PedidoExternoComponent implements OnInit {
     this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
       for (let i = 0; i < datos_sedeCliente.length; i++) {
         const camposPedido : any = {
-          PedExt_FechaCreacion: this.today,
+          PedExt_FechaCreacion: moment(this.today).format('YYYY-MM-DD'),
           PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
           Empresa_Id: 800188732,
           PedExt_Codigo: 0,
@@ -497,11 +496,11 @@ export class PedidoExternoComponent implements OnInit {
           Usua_Id: datos_sedeCliente[i].usua_Id,
           Estado_Id: 11,
           PedExt_Observacion: observacion.toUpperCase(),
-          PedExt_PrecioTotal: this.valorTotal,
+          PedExt_PrecioTotal: this.valorTotalPedido(),
           Creador_Id: this.storage_Id,
           PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
           PedExt_Iva: this.iva,
-          PedExt_PrecioTotalFinal : this.valorfinal,
+          PedExt_PrecioTotalFinal : this.valorFinalPedido(),
           PedExt_HoraCreacion : moment().format('H:mm:ss'),
         }
         this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> this.crearDetallesPedido(data.pedExt_Id), () => {
@@ -563,11 +562,11 @@ export class PedidoExternoComponent implements OnInit {
             Usua_Id: datos_sedeCliente[i].usua_Id,
             Estado_Id: 11,
             PedExt_Observacion: observacion.toUpperCase(),
-            PedExt_PrecioTotal: this.valorTotal,
+            PedExt_PrecioTotal: this.valorTotalPedido(),
             Creador_Id: datos.creador_Id,
             PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
             PedExt_Iva: this.iva,
-            PedExt_PrecioTotalFinal : this.valorfinal,
+            PedExt_PrecioTotalFinal : this.valorFinalPedido(),
             PedExt_HoraCreacion : datos.pedExt_Hora,
           }
           this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(() => this.editarDetallesPedido(), () => {
@@ -619,8 +618,8 @@ export class PedidoExternoComponent implements OnInit {
     this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       datos_pedido.forEach(data => {
         let info : any = {
-          Id : data.producto_Id,
-          Nombre : data.producto,
+          Item : data.producto_Id,
+          Referencia : data.producto,
           Cantidad : this.formatonumeros(data.cantidad),
           Und : data.presentacion,
           Precio : this.formatonumeros(data.precio_Unitario),
@@ -732,7 +731,7 @@ export class PedidoExternoComponent implements OnInit {
               fontSize: 9,
             },
             { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
-            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
+            this.table(this.productosPedidos, ['Item', 'Referencia', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
             {
               style: 'tablaTotales',
               table: {
@@ -838,9 +837,7 @@ export class PedidoExternoComponent implements OnInit {
     let item : any [] = this.ArrayProducto.filter((a) => a.Id == this.productoEliminado);
     let index : number = this.ArrayProducto.findIndex((b) => b.Id == this.productoEliminado);
     for (let i = 0; i < item.length; i++) {
-      this.valorTotal -= item[i].SubTotal;
       this.ArrayProducto.splice(index, 1);
-      setTimeout(() => this.ivaDescuento(), 200);
       this.msj.mensajeAdvertencia(`Advertencia`, '¡Se ha quitado el Producto del pedido a crear!');
       this.closeMessage('quitarProducto');
       this.productoEliminado = 0;

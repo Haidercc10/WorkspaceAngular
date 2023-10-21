@@ -177,7 +177,7 @@
             <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
@@ -250,7 +250,7 @@
             <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltroTintas($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>
@@ -322,7 +322,7 @@
             <ng-template pTemplate="header" let-columns>
               <tr class="font-size-16" id="filtros">
                 <th></th>
-                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+                <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, col.field, 'contains')"></th>
                 <th *ngIf="ValidarRol == 1" pFrozenColumn alignFrozen="right" [frozen]="true"></th>
               </tr>
               <tr>

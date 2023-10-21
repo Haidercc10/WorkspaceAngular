@@ -318,6 +318,7 @@ export class MovimientoMPComponent implements OnInit {
   // Funcion que va a crear un PDF
   crearPDF(data : any){
     for (let i = 0; i < data.length; i++) {
+      let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
       const pdfDefinicion : any = {
         info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
         pageSize: { width: 630, height: 760 },
@@ -337,6 +338,10 @@ export class MovimientoMPComponent implements OnInit {
                       [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
                       [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
                       [{text: `${data[i].tipo_Movimiento} N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
+                      [{
+                        text: movimientoOrdenesTrabajo.includes(data[i].movimiento) ? `Orden de Trabajo N° ${data[i].codigo}` : data[i].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[i].codigo).toUpperCase()}` : '',
+                        bold: true, alignment: 'center', fontSize: 10
+                      }],
                     ]
                   },
                   layout: 'noBorders',

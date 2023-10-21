@@ -116,16 +116,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          let qty = row.getCell(5);
-          let stock = row.getCell(6);
-          let color2 = 'FFFFFF'
-
-          if (+stock.value < +qty) color2 = 'FF837B';
-          stock.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: color2 }
-          }
           let formatNumber : number [] = [4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
           formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
         });

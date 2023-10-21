@@ -35,7 +35,7 @@
   </ng-container>
 
   <!-- Inicio titulo -->
-  <div class="mb-4">
+  <div class="my-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-plus-circle"></i> Crear Pedido</h4>
   </div>
   <br>
@@ -84,7 +84,7 @@
         <!-- Descuento -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="descuento">
           <span class="p-float-label">
-            <p-inputNumber formControlName="PedDescuento" mode="decimal" inputId="Descuento" [minFractionDigits]="2" (onBlur)="ivaDescuento()" [(ngModel)]="descuento"></p-inputNumber>
+            <p-inputNumber formControlName="PedDescuento" mode="decimal" inputId="Descuento" [minFractionDigits]="2" [min]="0" [max]="100" [(ngModel)]="descuento"></p-inputNumber>
             <label for="Descuento">(%) Descuento</label>
           </span>
         </div>
@@ -119,7 +119,7 @@
   </div>
   <br>
 
-  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off" id="formulario2">
+  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off" id="formulario2" (ngSubmit)="validarCamposVacios()">
     <div class="mb-3">
       <div class="row g-4">
 
@@ -147,7 +147,7 @@
         <!-- Cantidad Pedida -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="cantidad">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ProdCantidad" mode="decimal" inputId="Cant" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="ProdCantidad" mode="decimal" [min]="1" inputId="Cant" [minFractionDigits]="2"></p-inputNumber>
             <label for="Cant">Cant. Pedida</label>
           </span>
         </div>
@@ -163,7 +163,7 @@
         <!-- Precio Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" [min]="FormPedidoExternoProductos.value.ProdUltFacturacion" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
             <label for="Precio">Precio Und.</label>
           </span>
         </div>
@@ -171,7 +171,7 @@
         <!-- Fecha Entrega Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="fecha">
           <span class="p-float-label">
-            <p-calendar formControlName="ProdFechaEnt" inputId="FechaEntrega" [showIcon]="true"></p-calendar>
+            <p-calendar formControlName="ProdFechaEnt" inputId="FechaEntrega" [minDate]="today" [showIcon]="true"></p-calendar>
             <label for="FechaEntrega">Fecha Entrega</label>
           </span>
         </div>
@@ -200,15 +200,15 @@
         </div>
       </div>
     </div>
-  </form>
 
-  <!-- Inicio botones -->
-  <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" id="agregar" type="button" label="Agregar Producto" icon="pi pi-send" (click)="validarCamposVacios()"> </button>
-      <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
+    <!-- Inicio botones -->
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" id="agregar" type="submit" label="Agregar Producto" icon="pi pi-send" [disabled]="!FormPedidoExternoProductos.valid"> </button>
+        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
+      </div>
     </div>
-  </div>
+  </form>
 
   <div class="mb-4">
     <hr class="Linea">
@@ -271,37 +271,37 @@
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Valor total" icon="pi pi-dollar"></p-chip>
-          <label class="text-center" for="">${{valorTotal | number}}</label>
+          <label class="text-center" for="">${{valorTotalPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Descuento" icon="pi pi-percentage"></p-chip>
-          <label class="text-center" for="">{{descuento | number}}%</label>
+          <label class="text-center" for="">{{descuento | number : '1.2-2'}}%</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Subtotal menos Dcto" pTooltip="Subtotal descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
-          <label class="text-center" for="">${{valorMenosDescuento | number}}</label>
+          <label class="text-center" for="">${{valorTotalMenosDescuentoPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="IVA" icon="pi pi-percentage"></p-chip>
-          <label class="text-center" for="">{{iva | number}}%</label>
+          <label class="text-center" for="">{{iva | number : '1.2-2'}}%</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Subtotal Iva" icon="pi pi-money-bill"></p-chip>
-          <label class="text-center" for="">${{valorMenosIva | number}}</label>
+          <label class="text-center" for="">${{valorTotalMasIvaPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
           <p-chip label="Total" icon="pi pi-shopping-cart"></p-chip>
-          <label class="text-center" for="">${{valorfinal | number}}</label>
+          <label class="text-center" for="">${{valorFinalPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
     </div>
@@ -309,8 +309,8 @@
 
   <div class="mb-4">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Crear Pedido"  *ngIf="!modalMode && !cargando" icon="pi pi-check" (click)="confirmarPedido()"> </button>
-    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode && !cargando" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Crear Pedido"  *ngIf="!modalMode" [disabled]="!FormPedidoExternoClientes.valid || ArrayProducto.length == 0" icon="pi pi-check" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-danger" id="crearPedido" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode" [disabled]="!FormPedidoExternoClientes.valid || ArrayProducto.length == 0" (click)="confirmarPedido()"> </button>
     <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
@@ -318,7 +318,7 @@
 
 <!-- Modal de crear producto -->
 <p-dialog header="Crear Productos" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" >
-    <app-crear-producto></app-crear-producto>
+  <app-crear-producto></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
