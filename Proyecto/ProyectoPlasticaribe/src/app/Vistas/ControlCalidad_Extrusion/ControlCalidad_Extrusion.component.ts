@@ -69,7 +69,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.cargarPigmentos();
     this.mostrarRegistrosHoy();
     this.prueba();
-    setTimeout(() => { this.exportarExcel(); }, 1000); 
+    //setTimeout(() => { this.exportarExcel(); }, 1000); 
+    this.generarFormatoExcel();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -286,148 +287,8 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  exportarExcel(){
-    let filasRestantes : number = 0;
-    this.load = true;
-    let datos : any[] = [];
-    let infoDocumento : any = [];
-    let title = "CONTROL DE CALIDAD DE EXTRUSIÓN";
-    datos = this.registros;
-    const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
-    const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
-    for (const item of datos) {
-      const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, 
-      item.Ancho, item.CalMin, item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.CalibreTB, item.CalibreTB];
-      infoDocumento.push(datos1);
-    }
-    let tamanoArray : number = infoDocumento.length;
-    let workbook = new Workbook();
-    const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-    
-    let worksheet = workbook.addWorksheet(title, {
-      pageSetup:{
-        paperSize: 119, 
-        orientation:'landscape'
-      },
-      // properties:{tabColor:{argb:'FF00FF00'}}
-    });
-    
-    let columasSinBorde : number [] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-    columasSinBorde.forEach(cell => {
-      worksheet.getColumn(cell).border = {
-        top: {style:'thin', color: {argb:'FFFFFF'}},
-        left: { style: 'thin', color: { argb: 'FFFFFF' } },
-        bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
-        right: { style: 'thin', color: { argb: 'FFFFFF' } }
-      };
-    });
-
-    worksheet.addImage(imageId1, {
-      tl: { col: 0.1, row: 0.45 },
-      ext: { width: 150, height: 40 },
-      editAs: 'oneCell'
-    });
-    let titleRow = worksheet.addRow([]);    
-    titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
-    worksheet.addRow([]);
-    worksheet.addRow([]);
-    worksheet.addRow([]);
-    let headerRow1 = worksheet.addRow(header1);
-    headerRow1.alignment = { vertical: 'middle', horizontal: 'center' };
-    headerRow1.font = { name: 'Calibri', family: 4, size: 10, bold: true };
-    headerRow1.height = 20
-    headerRow1.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'ffffff' }
-      }
-      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-    });
-    worksheet.addRow([]);
-    let headerRow2 = worksheet.addRow(header2);
-    headerRow2.alignment = { vertical: 'middle', horizontal: 'center' };
-    headerRow2.font = { name: 'Calibri', family: 4, size: 10, bold: true };
-    headerRow2.height = 60
-    headerRow2.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'ffffff' }
-      }
-      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-    });
-    
-    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5', 'A33:R36'];
-    unirCeldas.forEach(cell => worksheet.mergeCells(cell));
-    let alinearWrap : string [] = ['H7', 'I7', 'J7'];
-    alinearWrap.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  });
-    let textoRotado : string [] = ['B7', 'N7', 'O7', 'P7'];
-    textoRotado.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', textRotation: 90 });
-    let textoFormato : string [] = ['Q1', 'Q2', 'Q3', 'A33'];
-    textoFormato.forEach(f => worksheet.getCell(f).font = { name: 'Calibri', family: 4, size: 10, });
-    worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell('A33').alignment = { vertical: 'top', horizontal: 'left' };
-    worksheet.getCell('D1').value = title;
-    worksheet.getCell('A33').value = `OBSERVACIONES: `;
-    worksheet.getCell('Q1').value = `Código: FR-AC01`; 
-    worksheet.getCell('Q2').value = `Versión: 03`; 
-    worksheet.getCell('Q3').value = `Fecha: 30/07/2022`;
-    let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5', 'A33'];
-    fila1.forEach(f => worksheet.getCell(f).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
-    let altoFilas : number[] = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
-    altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
-    let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
-
-    //for (let index = 0; index < columnas.length; index++) {
-      //for (let i = 8; i < 32; i++) {
-        //worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-        //worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
-        //worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
-        //worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8][index];
-      //}
-    //}
-    console.log(tamanoArray)
-    for (let index = 0; index < columnas.length; index++) {
-      for (let i = 8; i < tamanoArray + 8; i++) {
-        worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-        //worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
-        //worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
-        //worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8][index];
-      }
-    }
-
-    worksheet.getColumn(1).width = 9;
-    worksheet.getColumn(2).width = 4;
-    worksheet.getColumn(3).width = 10;
-    worksheet.getColumn(4).width = 25;
-    worksheet.getColumn(5).width = 30;
-    worksheet.getColumn(6).width = 10;
-    worksheet.getColumn(7).width = 10;
-    worksheet.getColumn(8).width = 10;
-    worksheet.getColumn(9).width = 7;
-    worksheet.getColumn(10).width = 7;
-    worksheet.getColumn(11).width = 6;
-    worksheet.getColumn(12).width = 6;
-    worksheet.getColumn(13).width = 6;
-    worksheet.getColumn(14).width = 4;
-    worksheet.getColumn(15).width = 4;
-    worksheet.getColumn(16).width = 4;
-    worksheet.getColumn(17).width = 8;
-    worksheet.getColumn(18).width = 8;
-    setTimeout(() => {
-      workbook.xlsx.writeBuffer().then((data) => {
-        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
-      });
-      this.load = false;
-      this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información del ` + title + `!`);
-    }, 400);
-        
-  }
-
   prueba(){
-    for (let index = 0; index < 28; index++) {
+    for (let index = 0; index < 50; index++) {
       this.objetoPrueba = 
       {
         Id: 0,
@@ -458,5 +319,144 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       this.registros.push(this.objetoPrueba);
     }
     //console.table(this.registros);
+  }
+
+  generarFormatoExcel(){
+    this.load = true;
+    let tamanoArray : number = this.registros.length;
+    let filasRestantes : number = this.registros.length;
+    let filasTomadas : number = 0;
+    let contadorHojas : number = 0;
+    let workbook : any = new Workbook();
+
+    for (let index = 0; index < tamanoArray; index + 24) {
+      if(filasRestantes > 0 && filasRestantes > 24) {
+        this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+        filasRestantes -= 24;
+        filasTomadas += 24;
+      } else if(filasRestantes > 0 && filasRestantes < 24) {
+        this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+        filasTomadas += filasRestantes;
+        filasRestantes -= filasRestantes;
+      } else if(filasRestantes == 0) break;
+    }
+    setTimeout(() => {
+      workbook.xlsx.writeBuffer().then((data) => {
+        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
+       });
+      this.load = false;
+      this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
+    }, 400);  
+  }
+
+  // funcion que va a generar las hojas del formato y su nombre
+  crearHojasExcel(workbook : any, filasRestantes : number, filasTomadas : number, contadorHojas){
+    let worksheet = workbook.addWorksheet(`Hoja ` + `${contadorHojas}`, { pageSetup : { paperSize: 119,  orientation:'landscape'}, });
+    const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
+    worksheet.addImage(imageId1, { tl: { col: 0.1, row: 0.45 }, ext: { width: 150, height: 40 }, editAs: 'oneCell' });
+    this.formatoExcel(worksheet, filasRestantes, filasTomadas);
+  }
+
+  formatoExcel(worksheet : any, filasRestantes : number, filasTomadas : number){
+    let datos : any[] = [];
+    let infoDocumento : any = [];
+    let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
+    datos = this.registros;
+
+    //Información
+    for (const item of datos) {
+      const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, 
+      item.Ancho, item.CalMin, item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.CalibreTB, item.CalibreTB];
+      infoDocumento.push(datos1);
+    }
+
+    //Titulos y ajustes del formato.
+    this.headersExcel(worksheet);
+    this.ajustesHojaExcel(worksheet);
+
+    //Cargue de datos al excel.
+    for (let index = 0; index < columnas.length; index++) {
+      for (let i = 8; i < 32; i++) {
+        worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
+        if(filasRestantes > 0 && filasRestantes >= 24) {
+          worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
+        } else if(filasRestantes > 0 && filasRestantes < 24) { 
+          if(infoDocumento[i - 8 + filasTomadas] != undefined) {
+            worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
+          }
+        }  
+      }
+    }
+
+    //Ajuste del tamaño de las columnas
+    let arrayColumnas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+    let arrayTamanoColumnas = [9, 4, 10, 25, 30, 10, 10, 10, 7, 7, 6, 6, 6, 4, 4, 4, 8, 8];
+    arrayColumnas.forEach(ac => worksheet.getColumn(ac).width = arrayTamanoColumnas[ac - 1]);
+  }
+
+  headersExcel(worksheet : any) {
+    const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
+    const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
+    
+    let titleRow = worksheet.addRow([]);    
+    titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+
+    let headerRow1 = worksheet.addRow(header1);
+    headerRow1.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow1.font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    headerRow1.height = 20
+    headerRow1.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ffffff' }
+      }
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+
+    worksheet.addRow([]);
+
+    let headerRow2 = worksheet.addRow(header2);
+    headerRow2.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow2.font = { name: 'Calibri', family: 4, size: 10, bold: true };
+    headerRow2.height = 60
+    headerRow2.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ffffff' }
+      }
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+  }
+
+  // Funcion que va a darle el estilo a cada celda del cuerpo de la tabla
+  ajustesHojaExcel(worksheet : any) {
+    let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5', 'A33:R36'];
+    let alinearWrap : string [] = ['H7', 'I7', 'J7'];
+    let textoRotado : string [] = ['B7', 'N7', 'O7', 'P7'];
+    let textoFormato : string [] = ['Q1', 'Q2', 'Q3', 'A33'];
+    let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5', 'A33'];
+    let altoFilas : number[] = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+
+    unirCeldas.forEach(cell => worksheet.mergeCells(cell));
+    alinearWrap.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  });
+    textoRotado.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', textRotation: 90 });
+    textoFormato.forEach(f => worksheet.getCell(f).font = { name: 'Calibri', family: 4, size: 10, });
+    worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
+    worksheet.getCell('A33').alignment = { vertical: 'top', horizontal: 'left' };
+    worksheet.getCell('D1').value = "CONTROL DE CALIDAD DE EXTRUSIÓN";
+    worksheet.getCell('A33').value = `OBSERVACIONES: `;
+    worksheet.getCell('Q1').value = `Código: FR-AC01`; 
+    worksheet.getCell('Q2').value = `Versión: 03`; 
+    worksheet.getCell('Q3').value = `Fecha: 30/07/2022`;
+    fila1.forEach(f => worksheet.getCell(f).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
+    altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
   }
 }
