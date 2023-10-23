@@ -264,15 +264,15 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         { header: 'Nombre', field: 'Nombre', tipo: 'texto'},
         { header: 'Ancho', field: 'Ancho', tipo: 'numero'},
         { header: 'Micras', field: 'Micras', tipo: 'numero'},
-        { header: 'Inicial', field: 'Inicial', tipo: 'numero'},
-        { header: 'Entrada', field: 'Entrada', tipo: 'numero'},
-        { header: 'Salida', field: 'Salida', tipo: 'numero'},
         { header: 'Stock', field: 'Cant', tipo: 'numero'},
-        { header: 'Diferencia', field: 'Diferencia', tipo: 'numero'},
         { header: 'Medida', field: 'UndCant', tipo: 'texto'},
         { header: 'Precio Und', field: 'PrecioUnd', tipo: 'numero'},
         { header: 'SubTotal', field: 'SubTotal', tipo: 'numero'},
         { header: 'Categoria', field: 'Categoria', tipo: 'texto'},
+        { header: 'Inicial', field: 'Inicial', tipo: 'numero'},
+        { header: 'Entrada', field: 'Entrada', tipo: 'numero'},
+        { header: 'Salida', field: 'Salida', tipo: 'numero'},
+        { header: 'Diferencia', field: 'Diferencia', tipo: 'numero'},
       ];
       this._columnasSeleccionada = [
         { header: 'ID', field: 'Id', tipo: 'texto'},
@@ -335,6 +335,18 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       }
     }, 500);
+  }
+
+  cantidadExistencias(data : any){
+    let total : number = 0;
+    total = data.reduce((a,b) => a + b.Cant, 0);
+    return total;
+  }
+
+  valorTotalExistencia(data : any){
+    let total : number = 0;
+    total = data.reduce((a,b) => a + (b.Cant * b.PrecioUnd), 0);
+    return total;
   }
 
   // Funcion que va a filtrar la información de la tabla e polietilenos
