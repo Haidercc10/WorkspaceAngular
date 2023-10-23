@@ -288,7 +288,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   prueba(){
-    for (let index = 0; index < 50; index++) {
+    for (let index = 0; index < 5; index++) {
       this.objetoPrueba = 
       {
         Id: 0,
@@ -315,39 +315,42 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         Observacion: 'PRUEBA 3',
         CalibreTB: 150
       }
-      this.objetoPrueba.Ronda = index; 
+      this.objetoPrueba.Ronda = index++; 
       this.registros.push(this.objetoPrueba);
     }
     //console.table(this.registros);
   }
 
+  //Función que generará el formato excel dependiendo la cantidad de registros que tenga la tabla
   generarFormatoExcel(){
-    this.load = true;
-    let tamanoArray : number = this.registros.length;
-    let filasRestantes : number = this.registros.length;
-    let filasTomadas : number = 0;
-    let contadorHojas : number = 0;
-    let workbook : any = new Workbook();
+    if(this.registros.lenght > 0) {
+      this.load = true;
+      let filasRestantes : number = this.registros.length;
+      let filasTomadas : number = 0;
+      let contadorHojas : number = 0;
+      let workbook : any = new Workbook();
 
-    for (let index = 0; index < tamanoArray; index + 24) {
-      if(filasRestantes > 0 && filasRestantes > 24) {
-        this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
-        filasRestantes -= 24;
-        filasTomadas += 24;
-      } else if(filasRestantes > 0 && filasRestantes < 24) {
-        this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
-        filasTomadas += filasRestantes;
-        filasRestantes -= filasRestantes;
-      } else if(filasRestantes == 0) break;
-    }
-    setTimeout(() => {
-      workbook.xlsx.writeBuffer().then((data) => {
-        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
-       });
-      this.load = false;
-      this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
-    }, 400);  
+      for (let index = 0; index < this.registros.length; index + 24) {
+        if(filasRestantes > 0 && filasRestantes > 24) {
+          this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+          filasRestantes -= 24;
+          filasTomadas += 24;
+        } else if(filasRestantes > 0 && filasRestantes < 24) {
+          this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+          filasTomadas += filasRestantes;
+          filasRestantes -= filasRestantes;
+        } else if(filasRestantes == 0) break;
+      }
+      setTimeout(() => {
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
+        });
+        this.load = false;
+        this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
+      }, 400);
+    } else this.msjs.mensajeAdvertencia(`Advertencia`, `No hay registros para exportar!`);
+
   }
 
   // funcion que va a generar las hojas del formato y su nombre
@@ -358,16 +361,16 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.formatoExcel(worksheet, filasRestantes, filasTomadas);
   }
 
+  //Función que mostrará el cargue de datos al formato excel
   formatoExcel(worksheet : any, filasRestantes : number, filasTomadas : number){
     let datos : any[] = [];
     let infoDocumento : any = [];
     let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
     datos = this.registros;
-
     //Información
     for (const item of datos) {
-      const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, 
-      item.Ancho, item.CalMin, item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.CalibreTB, item.CalibreTB];
+      const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, item.Ancho, item.CalMin,
+      item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.TipoBobina == 'TUBULAR' ? item.CalibreTB : 0, item.TipoBobina == 'LAMINA' ? item.CalibreTB : 0];
       infoDocumento.push(datos1);
     }
 
@@ -381,9 +384,9 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
         worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
-        if(filasRestantes > 0 && filasRestantes >= 24) {
+        if(filasRestantes > 0 && filasRestantes > 24) {
           worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
-        } else if(filasRestantes > 0 && filasRestantes < 24) { 
+        } else if(filasRestantes > 0 && filasRestantes <= 24) { 
           if(infoDocumento[i - 8 + filasTomadas] != undefined) {
             worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
           }
@@ -397,11 +400,12 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     arrayColumnas.forEach(ac => worksheet.getColumn(ac).width = arrayTamanoColumnas[ac - 1]);
   }
 
+  // Funcion que va a darle el estilo a cada celda del encabezado de la tabla
   headersExcel(worksheet : any) {
     const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
     const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
-    
     let titleRow = worksheet.addRow([]);    
+    
     titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
     worksheet.addRow([]);
     worksheet.addRow([]);
@@ -412,26 +416,16 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     headerRow1.font = { name: 'Calibri', family: 4, size: 10, bold: true };
     headerRow1.height = 20
     headerRow1.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'ffffff' }
-      }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ffffff' } }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
-
     worksheet.addRow([]);
-
     let headerRow2 = worksheet.addRow(header2);
     headerRow2.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow2.font = { name: 'Calibri', family: 4, size: 10, bold: true };
     headerRow2.height = 60
     headerRow2.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'ffffff' }
-      }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ffffff' } }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     });
   }
