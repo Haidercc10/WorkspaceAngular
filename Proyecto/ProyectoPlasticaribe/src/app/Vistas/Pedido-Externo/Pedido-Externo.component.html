@@ -100,7 +100,8 @@
         <!-- Iva -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="iva">
           <div class="field-checkbox" style="padding: 5%;">
-            <p-checkbox formControlName="PedIva" [(ngModel)]="checked" label="Iva (%)" (click)="checkboxIva()" [binary]="true"></p-checkbox>
+            <p-checkbox formControlName="PedIva" [(ngModel)]="checked" (click)="checkboxIva()" [binary]="true" inputId="iva"></p-checkbox>
+            <label for="iva"><p-chip label="IVA" icon="pi pi-percentage"></p-chip></label>
           </div>
         </div>
 

@@ -32,9 +32,11 @@ export class Dashboard_GeneralComponent implements OnInit {
   graficaCuentas_Pagar_Plasticaribe : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de plasticaribe
   graficaCuentas_Pagar_Invergoal : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de invergoal
   graficaCuentas_Pagar_Inversuez : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de inversuez
+  graficaCuentas_Pagar_Totales : any; //Variable que va a almacenar los datos que van a aparecer en las cuentas por pagar de plasticaribe, invergoal y inversuez
   graficaCompras_Plasticaribe : any; //Variable que va a almacenar los datos que van a aparecere en las compras de plasticaribe
   graficaCompras_Invergoal : any; //Variable que va a almacenar los datos que van a aparecer en las compras de invergoal
   graficaCompras_Inversuez : any; //Variable que va a almacenar los datos que van a aparecer en las compras de inversuez
+  graficaCompras_Totales : any; //Variable que va a almacenar los datos que van a aparecer en las compras de plasticaribe, invergoal y inversuez
   graficaInventario_MatPrima : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de materia prima
   graficaInventario_Productos : any; //Variable que va a almacenar los datos que van a aparecer en el inventario de productos
 
@@ -43,9 +45,11 @@ export class Dashboard_GeneralComponent implements OnInit {
   cuentas_Pagar_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de plasticaribe
   cuentas_Pagar_Anios_Invergoal : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de invergoal
   cuentas_Pagar_Anios_Inversuez : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de inversuez
+  cuentas_Pagar_Totales : any [] = []; //Funcion que va a almacenar los costos de año a año de las cuentas por pagar de plasticaribe, invergoal y inversuez
   compras_Anios_Plasticaribe : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de plasticaribe
   compras_Anios_Invergoal : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de invergoal
   compras_Anios_Inversuez : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de inversuez
+  compras_Totales : any [] = []; //Funcion que va a almacenar los costos de año a año de las compras de plasticaribe, invergoal y inversuez
   inventarioMatPrima_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de materia prima
   inventarioProductos_Anios : any [] = []; //Funcion que va a almacenar los costos de año a año del inventario de productos
 
@@ -104,9 +108,11 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.cuentas_Pagar_Anios_Plasticaribe = [];
     this.cuentas_Pagar_Anios_Invergoal = [];
     this.cuentas_Pagar_Anios_Inversuez = [];
+    this.cuentas_Pagar_Totales = [];
     this.compras_Anios_Plasticaribe = [];
     this.compras_Anios_Invergoal = [];
     this.compras_Anios_Inversuez = [];
+    this.compras_Totales = [];
     this.inventarioMatPrima_Anios = [];
     this.inventarioProductos_Anios = [];
 
@@ -195,6 +201,11 @@ export class Dashboard_GeneralComponent implements OnInit {
       datasets: []
     };
 
+    this.graficaCuentas_Pagar_Totales = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
     this.graficaCompras_Plasticaribe = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
@@ -206,6 +217,11 @@ export class Dashboard_GeneralComponent implements OnInit {
     };
 
     this.graficaCompras_Inversuez = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+
+    this.graficaCompras_Totales = {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
@@ -231,6 +247,7 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.BuscarDatosGrafica_Compras('0');
     this.BuscarDatosGrafica_Compras('900362200');
     this.BuscarDatosGrafica_Compras('900458314');
+    this.dotsGraficaComprasTotales();
     this.BuscarDatosGraficaInventario_MatPrima();
     this.BuscarDatosGraficaInventario_Producto();
     setTimeout(() => this.cargando = false, 5000);
@@ -345,9 +362,31 @@ export class Dashboard_GeneralComponent implements OnInit {
       let costoMeses_Plasticaribe : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       let costoMeses_Invergoal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       let costoMeses_Inversuez : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+      let costoMeses_Totales : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
       this.zeusContabilidad.GetCostosProveedores_Mes_Mes(this.anioSeleccionado.toString(), '220505').subscribe(dato => {
         dato.forEach(mes => {
           let numMes = mes.periodo.trim().substring(4, 6);
+
+          costoMeses_Totales = [
+            numMes == '01' ? costoMeses_Totales[0] -= mes.costo : costoMeses_Totales[0],
+            numMes == '02' ? costoMeses_Totales[1] -= mes.costo : costoMeses_Totales[1],
+            numMes == '03' ? costoMeses_Totales[2] -= mes.costo : costoMeses_Totales[2],
+            numMes == '04' ? costoMeses_Totales[3] -= mes.costo : costoMeses_Totales[3],
+            numMes == '05' ? costoMeses_Totales[4] -= mes.costo : costoMeses_Totales[4],
+            numMes == '06' ? costoMeses_Totales[5] -= mes.costo : costoMeses_Totales[5],
+            numMes == '07' ? costoMeses_Totales[6] -= mes.costo : costoMeses_Totales[6],
+            numMes == '08' ? costoMeses_Totales[7] -= mes.costo : costoMeses_Totales[7],
+            numMes == '09' ? costoMeses_Totales[8] -= mes.costo : costoMeses_Totales[8],
+            numMes == '10' ? costoMeses_Totales[9] -= mes.costo : costoMeses_Totales[9],
+            numMes == '11' ? costoMeses_Totales[10] -= mes.costo : costoMeses_Totales[10],
+            numMes == '12' ? costoMeses_Totales[11] -= mes.costo : costoMeses_Totales[11],
+          ];
+
+          let info_total : any = { anio: this.anioSeleccionado, costo : 0 - mes.costo };
+          let index_total : number = this.cuentas_Pagar_Totales.findIndex(item => item.anio == this.anioSeleccionado);
+          if (index_total != -1) this.cuentas_Pagar_Totales[index_total].costo += (0 - mes.costo);
+          else this.cuentas_Pagar_Totales.push(info_total);
+
           if (mes.empresa == 'Plasticaribe SAS') {
             costoMeses_Plasticaribe = [
               numMes == '01' ? 0 - mes.costo : costoMeses_Plasticaribe[0],
@@ -413,6 +452,7 @@ export class Dashboard_GeneralComponent implements OnInit {
         this.llenarGraficaCuentas_Pagar_Plasticaribe(costoMeses_Plasticaribe);
         this.llenarGraficaCuentas_Pagar_Invergoal(costoMeses_Invergoal);
         this.llenarGraficaCuentas_Pagar_Inversuez(costoMeses_Inversuez);
+        this.llenarGraficaCuentas_Pagar_Totales(costoMeses_Totales);
       });
     }
   }
@@ -468,6 +508,22 @@ export class Dashboard_GeneralComponent implements OnInit {
     });
   }
 
+  llenarGraficaCuentas_Pagar_Totales(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaCuentas_Pagar_Totales.datasets.push({
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
+
   //.Función que consultará las facturas de papel, Si en zeus hay algunas que contengan el mismo código de factura, se les excluirá el costo.
   consultarFacturasNoHabilitadas = () => this.srvFacturasGoalSuez.GetFacturasPapelIngresadas(this.anioSeleccionado).subscribe(data => this.facturasNoHabilitadas = data);
 
@@ -504,6 +560,36 @@ export class Dashboard_GeneralComponent implements OnInit {
         let info : any = {anio : this.anioSeleccionado, costo: data.reduce((a, b) => a + b.costo, 0)}
         this.compras_Anios_Inversuez.push(info);
       } else null;
+    });
+  }
+
+  dotsGraficaComprasTotales(){
+    let empresas : string [] = ['0', '900362200', '900458314'];
+    let costoTotal : number [] = [0,0,0,0,0,0,0,0,0,0,0,0];
+    let count : number = 0;
+    empresas.forEach(empresa => {
+      this.zeusContabilidad.GetCostos_Compras_Mes_Mes(this.facturasNoHabilitadas, `${this.anioSeleccionado}`, empresa).subscribe(data => {
+        costoTotal = [
+          costoTotal[0] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}01`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[1] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}02`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[2] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}03`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[3] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}04`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[4] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}05`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[5] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}06`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[6] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}07`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[7] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}08`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[8] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}09`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[9] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}10`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[10] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}11`).reduce((a, b) => a + b.costo, 0)),
+          costoTotal[11] += (data.filter(prov => prov.periodo.trim() == `${this.anioSeleccionado}12`).reduce((a, b) => a + b.costo, 0)),
+        ];
+        count++;
+        if(count == empresas.length) {
+          this.llenarGrafica_Compras_Totales(costoTotal);
+          let info : any = {anio : this.anioSeleccionado, costo: costoTotal.reduce((a, b) => a + b, 0)}
+          this.compras_Totales.push(info);
+        }
+      });
     });
   }
 
@@ -545,6 +631,23 @@ export class Dashboard_GeneralComponent implements OnInit {
   llenarGrafica_Compras_Inversuez(data){
     let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
     this.graficaCompras_Inversuez.datasets.push({
+      label: `Año ${this.anioSeleccionado}`,
+      data: data,
+      yAxisID: 'y',
+      borderColor: color.substring(0, 4),
+      backgroundColor: color.substring(0, 4) + "2",
+      pointStyle: 'rectRot',
+      pointRadius: 10,
+      pointHoverRadius: 15,
+      fill : true,
+      tension: 0.3
+    });
+  }
+
+  // 
+  llenarGrafica_Compras_Totales(data){
+    let color : string = "#"+((1<<24)*Math.random()|0).toString(16);
+    this.graficaCompras_Totales.datasets.push({
       label: `Año ${this.anioSeleccionado}`,
       data: data,
       yAxisID: 'y',

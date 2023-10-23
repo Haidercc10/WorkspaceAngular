@@ -54,13 +54,15 @@ p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expande
   -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
   -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
   box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
-}
-
-.navbar {
   padding: 15px 10px;
   border: none;
   border-radius: 0;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
 }
 
 .navbarDark {
@@ -110,14 +112,6 @@ p-panelmenu ::ng-deep div a:active > a, p-panelmenu ::ng-deep div a[aria-expande
   cursor: pointer;
   font-size: calc(var(--font-size) * 20px);
   margin-left: 10%;
-}
-
-.navbar {
-  position: sticky;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 5;
 }
 
 .switch p-inputswitch {

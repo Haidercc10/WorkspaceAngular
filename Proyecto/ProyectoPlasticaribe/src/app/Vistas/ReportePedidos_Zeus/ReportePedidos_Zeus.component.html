@@ -71,7 +71,10 @@
       [expandedRowKeys]="expandedRows"
       sortField="id_color"
       [sortOrder]="1"
-      id="tablaPedidos">
+      id="tablaPedidos"
+      [paginator]="true"
+      [rows]="20"
+      [rowsPerPageOptions]="[10, 25, 50, 100, ArrayPedidos.length]">
       <!-- Buscador de columnas -->
       <ng-template pTemplate="caption">
         <p-multiSelect

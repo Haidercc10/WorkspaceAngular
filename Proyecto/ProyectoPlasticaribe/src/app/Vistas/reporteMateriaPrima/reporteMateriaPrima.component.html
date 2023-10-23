@@ -126,9 +126,9 @@
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(ArrayMateriaPrima) | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(ArrayMateriaPrima) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
                 <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
               </tr>
@@ -199,11 +199,11 @@
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(polietilenos) | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(polietilenos) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(3)"></button></td>
               </tr>
             </ng-template>
           </p-table>
@@ -272,11 +272,11 @@
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(tintas) | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(tintas) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(4)"></button></td>
               </tr>
             </ng-template>
           </p-table>
@@ -344,11 +344,11 @@
             <ng-template pTemplate="footer">
               <tr id="totales">
                 <td colspan="5" class="text-right" *ngIf="ValidarRol == 1">Totales</td>
-                <td *ngIf="ValidarRol == 1">{{cantExistencias | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{cantidadExistencias(biorientados) | number}}</td>
                 <td *ngIf="ValidarRol == 1" colspan="2" class="text-left">{{'Kg'}}</td>
-                <td *ngIf="ValidarRol == 1">{{valorTotal | number}}</td>
+                <td *ngIf="ValidarRol == 1">{{valorTotalExistencia(biorientados) | number}}</td>
                 <td *ngIf="ValidarRol == 1">COP</td>
-                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(2)"></button></td>
+                <td [colSpan]="ValidarRol == 1 ? 1 : 14" class="text-center"><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" id="exportar3" (click)="exportarExcel(5)"></button></td>
               </tr>
             </ng-template>
           </p-table>
