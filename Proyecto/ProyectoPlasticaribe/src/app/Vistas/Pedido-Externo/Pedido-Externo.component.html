@@ -49,7 +49,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="cliente">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="PedClienteNombre" id="PedClienteNombre" list="clientes" type="text" pInputText (keyup)="buscarClientes()" (change)="clienteSeleccionado()" required/>
+            <input formControlName="PedClienteNombre" id="PedClienteNombre" list="clientes" type="text" autocomplete="off" pInputText (keyup)="buscarClientes()" (change)="clienteSeleccionado()" required/>
             <datalist id="clientes">
               <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Id}}</option>
             </datalist>
@@ -128,7 +128,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="item">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="ProdId" id="ProdId" type="text" pInputText (keyup)="buscarProductoId()" required/>
+            <input formControlName="ProdId" id="ProdId" type="text" pInputText (keyup)="buscarProducto(FormPedidoExternoProductos.value.ProdId)" required/>
             <label for="ProdId">Item</label>
           </span>
         </div>
@@ -137,11 +137,11 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" id="referencia">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="ProdNombre" id="ProdNombre" list="producto" type="text" pInputText (change)="buscarProducto()" required/>
+            <input formControlName="ProdNombre" id="ProdNombre" list="producto" type="text" pInputText (change)="buscarProducto(FormPedidoExternoProductos.value.ProdNombre)" required/>
             <datalist id="producto">
               <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
             </datalist>
-            <label for="ProdNombre">Refeencia</label>
+            <label for="ProdNombre">Referencia</label>
           </span>
         </div>
 
@@ -164,8 +164,8 @@
         <!-- Precio Producto -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="precio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" [min]="FormPedidoExternoProductos.value.ProdUltFacturacion" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
-            <label for="Precio">Precio Und.</label>
+            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" [min]="ultimoPrecio" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Precio">Precio Unitario</label>
           </span>
         </div>
 
@@ -188,7 +188,7 @@
         <!-- Ultima venta -->
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2" id="ultPrecio">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ProdUltFacturacion" mode="decimal" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="ProdUltFacturacion" mode="decimal" [(ngModel)]="ultimoPrecio" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
             <label for="Precio">Ultimo Precio Facturado</label>
           </span>
         </div>
@@ -318,12 +318,12 @@
 </p-card>
 
 <!-- Modal de crear producto -->
-<p-dialog header="Crear Productos" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" >
+<p-dialog header="Crear Productos" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearProductos" [style]="{width: '80%'}" [modal]="true" *ngIf="ValidarRol == 1">
   <app-crear-producto></app-crear-producto>
 </p-dialog>
 
 <!-- Modal de crear clientes -->
-<p-dialog header="Crear Clientes" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" >
+<p-dialog header="Crear Clientes" [contentStyle]="{'overflow':'visible'}" [(visible)]="ModalCrearCliente" [style]="{width: '80%'}" [modal]="true" *ngIf="ValidarRol == 1">
   <app-crear-clientes></app-crear-clientes>
 </p-dialog>
 

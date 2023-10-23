@@ -60,3 +60,13 @@ p-dialog ::ng-deep .p-dialog-title {
   text-align: center;
 }
 
+#costosPedidos .row {
+  transition: all 500ms;
+}
+
+#costosPedidos .row:hover {
+  cursor: pointer;
+  box-shadow: 0 0 20px 5px #d81d1d68;
+  border-radius: 10px;
+  padding: 0 5px;
+}

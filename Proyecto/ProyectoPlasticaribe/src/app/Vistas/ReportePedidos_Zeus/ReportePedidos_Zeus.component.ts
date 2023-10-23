@@ -106,7 +106,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     setTimeout(() => {
       this.cargando = false;
       this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
-
       const thisRef = this;
       this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.id] = true);
     }, 3500);
