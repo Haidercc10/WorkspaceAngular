@@ -460,4 +460,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       }
     }
   }
+
+  //Función que se ejecutará al presionar la tecla TAB
+  presionarTab = ($event) => ($event.keyCode == 9) ? this.infoOT() : null;
 }
