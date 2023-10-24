@@ -12,11 +12,12 @@
 }
 
 html, body {
-  font-family: sans-serif;
   font-size: calc(var(--font-size) * 16px);
 }
 
 .TitulosTabla {
+  font-family: sans-serif;
+  font-weight: 200;
   font-size: calc(var(--font-size) * 16px);
 }
 
