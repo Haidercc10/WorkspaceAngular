@@ -50,10 +50,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   @ViewChild('dtExtrusion') dtExtrusion: Table | undefined;
   rangoFechas : any = []; //Variable que va a contener los rangos de fechas de los controles de extrusion
   rondas : any = [1, 2, 3]; //Variable que va a contener las rondas de los controles de extrusion
-  maquinas : any = []; 
-  //prueba
-  objetoPrueba : any = {};
-  contador = 0;
+  maquinas : any = []; //Variable que guardará las maquinas desde las que se pesó una OT.
 
   constructor(private AppComponent : AppComponent, 
                 private srvBagpro : BagproService, 
@@ -68,9 +65,6 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.lecturaStorage(); 
     this.cargarPigmentos();
     this.mostrarRegistrosHoy();
-    this.prueba();
-    //setTimeout(() => { this.exportarExcel(); }, 1000); 
-    this.generarFormatoExcel();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -99,30 +93,30 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   cargarRegistrosCCExtrusion(datos : any) {
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == datos.pigmento_Id);
     let info : any = {
-      Id : datos.ccExt_Id,
-      Ronda : datos.ccExt_Ronda,
-      Turno : datos.turno_Id,
-      OT : datos.ccExt_OT,
-      Maquina : datos.ccExt_Maquina,
-      Cliente : datos.ccExt_Cliente,
-      Item : datos.prod_Id,
-      Referencia : datos.referencia,
-      Rollo : datos.ccExt_Rollo,
-      Pigmento : pigmento[0].pigmt_Nombre,
-      AnchoTubular : datos.ccExt_AnchoTubular,
-      PesoMetro : datos.ccExt_PesoMetro,
-      Ancho : datos.ccExt_Ancho,
-      CalMin : datos.ccExt_CalibreMin,
-      CalMax : datos.ccExt_CalibreMax,
-      CalProm : datos.ccExt_CalibreProm,
-      Apariencia : datos.ccExt_Apariencia,
-      Tratado : datos.ccExt_Tratado,
-      Rasgado : datos.ccExt_Rasgado,
-      TipoBobina : datos.ccExt_TipoBobina,
-      Fecha : datos.ccExt_Fecha.replace('T00:00:00', ''),
-      Observacion : datos.ccExt_Observacion,
-      CalibreTB : datos.ccExt_CalibreTB,
-      Guardado : true,
+      'Id' : datos.ccExt_Id,
+      'Ronda' : datos.ccExt_Ronda,
+      'Turno' : datos.turno_Id,
+      'OT' : datos.ccExt_OT,
+      'Maquina' : datos.ccExt_Maquina,
+      'Cliente' : datos.ccExt_Cliente,
+      'Item' : datos.prod_Id,
+      'Referencia' : datos.referencia,
+      'Rollo' : datos.ccExt_Rollo,
+      'Pigmento' : pigmento[0].pigmt_Nombre,
+      'AnchoTubular' : datos.ccExt_AnchoTubular,
+      'PesoMetro' : datos.ccExt_PesoMetro,
+      'Ancho' : datos.ccExt_Ancho,
+      'CalMin' : datos.ccExt_CalibreMin,
+      'CalMax' : datos.ccExt_CalibreMax,
+      'CalProm' : datos.ccExt_CalibreProm,
+      'Apariencia' : datos.ccExt_Apariencia,
+      'Tratado' : datos.ccExt_Tratado,
+      'Rasgado' : datos.ccExt_Rasgado,
+      'TipoBobina' : datos.ccExt_TipoBobina,
+      'Fecha' : datos.ccExt_Fecha.replace('T00:00:00', ''),
+      'Observacion' : datos.ccExt_Observacion,
+      'CalibreTB' : datos.ccExt_CalibreTB,
+      'Guardado' : true,
     }
     this.registros.push(info);
     this.registros.sort((a, b) => a.Ronda - b.Ronda);
@@ -156,30 +150,30 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   cargarRegistro(data : any, indexTabla : number){
     let pigmento : any = this.pigmentos.filter(pigmento => pigmento.pigmt_Id == data.pigmentoId);
     let info : any = {
-      Id : 0,
-      Ronda : 1, 
-      Turno : `DIA`,
-      OT : data.ot,
-      Maquina : data.maquina, 
-      Cliente : data.cliente,
-      Item : data.item,
-      Referencia : data.referencia,
-      Rollo : data.rollo,
-      Pigmento : pigmento[0].pigmt_Nombre,
-      AnchoTubular : data.ancho,
-      PesoMetro : 0,
-      Ancho : data.ancho,
-      CalMin : 0,
-      CalMax : 0,
-      CalProm : 0,
-      Apariencia : `No`,
-      Tratado : data.tratadoId == `2` ? `No` : `Si`,
-      Rasgado : `No`,
-      TipoBobina : `TUBULAR`,
-      CalibreTB : data.calibre,
-      Fecha : this.today,
-      Observacion : ``,
-      Guardado : false,
+      'Id' : 0,
+      'Ronda' : 1, 
+      'Turno' : `DIA`,
+      'OT' : data.ot,
+      'Maquina' : data.maquina, 
+      'Cliente' : data.cliente,
+      'Item' : data.item,
+      'Referencia' : data.referencia,
+      'Rollo' : data.rollo,
+      'Pigmento' : pigmento[0].pigmt_Nombre,
+      'AnchoTubular' : data.ancho,
+      'PesoMetro' : 0,
+      'Ancho' : data.ancho,
+      'CalMin' : 0,
+      'CalMax' : 0,
+      'CalProm' : 0,
+      'Apariencia' : `No`,
+      'Tratado' : data.tratadoId == `2` ? `No` : `Si`,
+      'Rasgado' : `No`,
+      'TipoBobina' : `TUBULAR`,
+      'CalibreTB' : data.calibre,
+      'Fecha' : this.today,
+      'Observacion' : ``,
+      'Guardado' : false,
     }
     this.registros[indexTabla] = info;
   }
@@ -205,32 +199,32 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     this.onReject(`eleccion`);
     
     let modelo : modelControlCalidad_Extrusion = {
-      CcExt_Id: fila.Id > 0 ? fila.Id : 0,
-      Turno_Id: fila.Turno,
-      Usua_Id: this.storage_Id,
-      CcExt_Maquina: fila.Maquina,
-      CcExt_Ronda: fila.Ronda,
-      CcExt_OT: fila.OT,
-      CcExt_Cliente: fila.Cliente,
-      Prod_Id: fila.Item,
-      Referencia: fila.Referencia,
-      CcExt_Rollo: fila.Rollo,
-      Pigmento_Id: pigmento[0].pigmt_Id,
-      CcExt_AnchoTubular: fila.AnchoTubular,
-      CcExt_PesoMetro: fila.PesoMetro,
-      CcExt_Ancho: fila.Ancho,
-      UndMed_Id: `Cms`,
-      CcExt_CalibreMax: fila.CalMax,
-      CcExt_CalibreMin: fila.CalMin,
-      CcExt_CalibreProm: fila.CalProm,
-      CcExt_Apariencia: fila.Apariencia,
-      CcExt_Tratado: fila.Tratado,
-      CcExt_Rasgado: fila.Rasgado,
-      CcExt_TipoBobina: fila.TipoBobina,
-      CcExt_Fecha: this.today,
-      CcExt_Hora: this.hora,
-      CcExt_Observacion: fila.Observacion,
-      CcExt_CalibreTB: fila.CalibreTB,
+      'CcExt_Id': fila.Id > 0 ? fila.Id : 0,
+      'Turno_Id': fila.Turno,
+      'Usua_Id': this.storage_Id,
+      'CcExt_Maquina': fila.Maquina,
+      'CcExt_Ronda': fila.Ronda,
+      'CcExt_OT': fila.OT,
+      'CcExt_Cliente': fila.Cliente,
+      'Prod_Id': fila.Item,
+      'Referencia': fila.Referencia,
+      'CcExt_Rollo': fila.Rollo,
+      'Pigmento_Id': pigmento[0].pigmt_Id,
+      'CcExt_AnchoTubular': fila.AnchoTubular,
+      'CcExt_PesoMetro': fila.PesoMetro,
+      'CcExt_Ancho': fila.Ancho,
+      'UndMed_Id': `Cms`,
+      'CcExt_CalibreMax': fila.CalMax,
+      'CcExt_CalibreMin': fila.CalMin,
+      'CcExt_CalibreProm': fila.CalProm,
+      'CcExt_Apariencia': fila.Apariencia,
+      'CcExt_Tratado': fila.Tratado,
+      'CcExt_Rasgado': fila.Rasgado,
+      'CcExt_TipoBobina': fila.TipoBobina,
+      'CcExt_Fecha': this.today,
+      'CcExt_Hora': this.hora,
+      'CcExt_Observacion': fila.Observacion,
+      'CcExt_CalibreTB': fila.CalibreTB,
     }
 
     if(fila.Id > 0) {
@@ -287,56 +281,23 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   //Función que se encarga de filtrar la información de la tabla
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtExtrusion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  prueba(){
-    for (let index = 0; index < 5; index++) {
-      this.objetoPrueba = 
-      {
-        Id: 0,
-        Ronda: 0,
-        Turno: 'DIA',
-        OT: 123456,
-        Maquina: 1,
-        Cliente: 'PRUEBA 1',
-        Item: 101010,
-        Referencia: 'PRUEBA 2',
-        Rollo: 654,
-        Pigmento: 'NATURAL',
-        AnchoTubular: 5.5,
-        PesoMetro: 10,
-        Ancho: 12.3,
-        CalMin: 1,
-        CalMax: 2,
-        CalProm: 1.5,
-        Apariencia: 'OK',
-        Tratado: 'SI',
-        Rasgado: 'NO',
-        TipoBobina: 'TUBULAR',
-        Fecha: '2023-01-10',
-        Observacion: 'PRUEBA 3',
-        CalibreTB: 150
-      }
-      this.objetoPrueba.Ronda = index++; 
-      this.registros.push(this.objetoPrueba);
-    }
-    //console.table(this.registros);
-  }
-
   //Función que generará el formato excel dependiendo la cantidad de registros que tenga la tabla
   generarFormatoExcel(){
-    if(this.registros.lenght > 0) {
+    if(this.registros.length > 0) {
       this.load = true;
       let filasRestantes : number = this.registros.length;
       let filasTomadas : number = 0;
       let contadorHojas : number = 0;
       let workbook : any = new Workbook();
-
+      let title : any = `FR-AC01 Control de calidad de extrusión`
+      
       for (let index = 0; index < this.registros.length; index + 24) {
         if(filasRestantes > 0 && filasRestantes > 24) {
-          this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+          this.crearHojasExcel(workbook, filasTomadas, contadorHojas += 1);
           filasRestantes -= 24;
           filasTomadas += 24;
         } else if(filasRestantes > 0 && filasRestantes < 24) {
-          this.crearHojasExcel(workbook, filasRestantes, filasTomadas, contadorHojas += 1);
+          this.crearHojasExcel(workbook, filasTomadas, contadorHojas += 1);
           filasTomadas += filasRestantes;
           filasRestantes -= filasRestantes;
         } else if(filasRestantes == 0) break;
@@ -344,25 +305,24 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
       setTimeout(() => {
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          fs.saveAs(blob, 'FR-AC01 Control de calidad de extrusión' + `.xlsx`);
+          fs.saveAs(blob, title + ` - ` + this.today + `.xlsx`);
         });
         this.load = false;
         this.msjs.mensajeConfirmacion(`¡Información Exportada!`, `¡Se ha creado un archivo de Excel con la información!`);
       }, 400);
     } else this.msjs.mensajeAdvertencia(`Advertencia`, `No hay registros para exportar!`);
-
   }
 
   // funcion que va a generar las hojas del formato y su nombre
-  crearHojasExcel(workbook : any, filasRestantes : number, filasTomadas : number, contadorHojas){
+  crearHojasExcel(workbook : any, filasTomadas : number, contadorHojas){
     let worksheet = workbook.addWorksheet(`Hoja ` + `${contadorHojas}`, { pageSetup : { paperSize: 119,  orientation:'landscape'}, });
     const imageId1 = workbook.addImage({ base64: logoParaPdf, extension: 'png', });
     worksheet.addImage(imageId1, { tl: { col: 0.1, row: 0.45 }, ext: { width: 150, height: 40 }, editAs: 'oneCell' });
-    this.formatoExcel(worksheet, filasRestantes, filasTomadas);
+    this.formatoExcel(worksheet, filasTomadas);
   }
 
   //Función que mostrará el cargue de datos al formato excel
-  formatoExcel(worksheet : any, filasRestantes : number, filasTomadas : number){
+  formatoExcel(worksheet : any, ft : number){
     let datos : any[] = [];
     let infoDocumento : any = [];
     let columnas : string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R' ];
@@ -370,7 +330,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     //Información
     for (const item of datos) {
       const datos1  : any = [item.Maquina, item.Ronda, item.OT, item.Cliente, item.Referencia, item.Rollo, item.Pigmento, item.AnchoTubular, item.PesoMetro, item.Ancho, item.CalMin,
-      item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.TipoBobina == 'TUBULAR' ? item.CalibreTB : 0, item.TipoBobina == 'LAMINA' ? item.CalibreTB : 0];
+      item.CalMax, item.CalProm, item.Apariencia, item.Tratado, item.Rasgado, item.TipoBobina == 'TUBULAR' ? item.CalibreTB : 'N/A', item.TipoBobina == 'LAMINA' ? item.CalibreTB : 'N/A'];
       infoDocumento.push(datos1);
     }
 
@@ -384,13 +344,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
         worksheet.getCell(`${columnas[index]}${i}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         worksheet.getCell(`${columnas[index]}${i}`).alignment = { vertical: 'middle', horizontal: 'center' };
         worksheet.getCell(`${columnas[index]}${i}`).font = { name: 'Calibri', family: 4, size: 10, };
-        if(filasRestantes > 0 && filasRestantes > 24) {
-          worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
-        } else if(filasRestantes > 0 && filasRestantes <= 24) { 
-          if(infoDocumento[i - 8 + filasTomadas] != undefined) {
-            worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + filasTomadas][index];
-          }
-        }  
+        if(infoDocumento[i - 8 + ft] != undefined) worksheet.getCell(`${columnas[index]}${i}`).value = infoDocumento[i - 8 + ft][index];  
       }
     }
 
@@ -403,7 +357,7 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
   // Funcion que va a darle el estilo a cada celda del encabezado de la tabla
   headersExcel(worksheet : any) {
     const header1 = ["FECHA", "", "", "TURNO", "", "NOMBRE INSPECTOR", ""]
-    const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "MIN", "MAX", "PROM", "APARIENCIA", "TRATADO", "RASGADO", "TUBULAR", "LAMINA"]
+    const header2 = ["MAQUINA", "RONDA", "OT", "CLIENTE", "REFERENCIA", "N° ROLLO", "PIGMENTO", "ANCHO TUBULAR", "PESO METRO (g)", "ANCHO (cm)", "CAL. MIN", "CAL. MAX", "CAL. PROM", "APARIENCIA", "TRATADO", "RASGADO", "BOB. TUBULAR", "BOB. LAMINA"]
     let titleRow = worksheet.addRow([]);    
     
     titleRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
@@ -432,12 +386,14 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
 
   // Funcion que va a darle el estilo a cada celda del cuerpo de la tabla
   ajustesHojaExcel(worksheet : any) {
+    let titulo : string = `CONTROL DE CALIDAD DE EXTRUSIÓN`;
     let unirCeldas : string [] = ['A1:C3', 'D1:P3', 'Q1:R1', 'Q2:R2', 'Q3:R3', 'B5:C5', 'F5:G5', 'H5:R5', 'A33:R36'];
-    let alinearWrap : string [] = ['H7', 'I7', 'J7'];
+    let alinearWrap : string [] = ['H7', 'I7', 'J7', 'K7', 'L7', 'M7', 'Q7', 'R7'];
     let textoRotado : string [] = ['B7', 'N7', 'O7', 'P7'];
     let textoFormato : string [] = ['Q1', 'Q2', 'Q3', 'A33'];
     let fila1 : string [] = ['A1', 'D1', 'Q1', 'Q2', 'Q3', 'H5', 'A33'];
     let altoFilas : number[] = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    let filaEncabezado : any = ['B5', 'E5', 'H5']
 
     unirCeldas.forEach(cell => worksheet.mergeCells(cell));
     alinearWrap.forEach(cell => worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true  });
@@ -445,12 +401,19 @@ export class ControlCalidad_ExtrusionComponent implements OnInit {
     textoFormato.forEach(f => worksheet.getCell(f).font = { name: 'Calibri', family: 4, size: 10, });
     worksheet.getCell('D1').alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.getCell('A33').alignment = { vertical: 'top', horizontal: 'left' };
-    worksheet.getCell('D1').value = "CONTROL DE CALIDAD DE EXTRUSIÓN";
+    worksheet.getCell('D1').value = titulo;
     worksheet.getCell('A33').value = `OBSERVACIONES: `;
     worksheet.getCell('Q1').value = `Código: FR-AC01`; 
     worksheet.getCell('Q2').value = `Versión: 03`; 
     worksheet.getCell('Q3').value = `Fecha: 30/07/2022`;
+    worksheet.getCell('B5').value = this.today; 
+    worksheet.getCell('E5').value = this.hora > '18:00:00' ? 'NOCHE' : 'DIA'; 
+    worksheet.getCell('H5').value = this.AppComponent.storage_Nombre;
+    filaEncabezado.forEach(f => worksheet.getCell(f).font = { name: 'Calibri', family: 4, size: 10, bold: false });
     fila1.forEach(f => worksheet.getCell(f).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
     altoFilas.forEach(row => { worksheet.getRow(row).height = 23  });
   }
+
+  // Funcion que va a consultar la OT cuando se presiona la tecla TAB
+  presionarTab = ($event, registro : any, index : number) => ($event.keyCode == 9) ? this.consultarOT(registro, index) : null;
 }

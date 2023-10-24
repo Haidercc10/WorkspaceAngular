@@ -34,13 +34,13 @@ responsiveLayout="scroll"
 scrollHeight="50rem"
 editMode="row">
     <ng-template pTemplate="caption">
-        <div class="row g-4 p-3">
+        <div class="row g-4 p-3 espacioMedio">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
                 <button pButton pRipple label="Nuevo Registro" icon="pi pi-plus" class="p-button-success" (click)="agregarFila()"></button>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3 text-right">
-                <div class="d-grid gap-2 d-md-flex">
-                  <button pButton pRipple label="Exportar excel" icon="pi pi-search" class="p-button-success botonesOpciones" id="exportar"></button>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-3 col-xxl-3">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button pButton pRipple label="Exportar excel" icon="pi pi-file-excel" class="p-button-success" id="exportar" (click)="generarFormatoExcel()"></button>
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@ editMode="row">
              <td pFrozenColumn [frozen]="true" alignFrozen="left" style="z-index: 50;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <p-inputNumber  type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
+                        <p-inputNumber  type="number" [useGrouping]="false" [(ngModel)]="registro.OT" pAutoFocus [autofocus]="true" (onKeyDown)="presionarTab($event, registro, ri)" (keyup.enter)="consultarOT(registro, ri)"></p-inputNumber>
                     </ng-template>
                     <ng-template pTemplate="output">
                         <i *ngIf="!registro.Guardado" class="pi pi-exclamation-circle cursor font-size-16" pTooltip="No se ha guardado esta información" pBadge severity="danger"></i>

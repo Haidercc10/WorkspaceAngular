@@ -21,3 +21,7 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
   background-color: rgb(255, 231, 193) !important; 
   color: #071426 !important;
 }
+
+.espacioMedio {
+  justify-content: space-between;
+}
