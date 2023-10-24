@@ -55,3 +55,13 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   text-align: center;
   color: var(--rojo);
 }
+
+.costosFinales {
+  transition: all 200ms;
+}
+
+.costosFinales:hover {
+  box-shadow: 0 0 20px 5px #d81d1d68;
+  border-radius: 10px;
+  padding: 5px;
+}

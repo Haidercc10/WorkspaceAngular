@@ -65,11 +65,6 @@ a:hover {
   width: 100%;
 }
 
-p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
-  display: flex;
-  width: 100%;
-}
-
 p-calendar ::ng-deep span button {
   background-color: var(--rojo);
   border: 0;
@@ -92,28 +87,8 @@ p-calendar ::ng-deep span button span {
   display: block;
 }
 
-p-dropdown {
-  margin: 0;
-}
-
-p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
-  width: 100%;
-}
-
 p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
   width: 100%;
-}
-
-p-multiSelect {
-  margin: 0;
-}
-
-p-multiSelect ::ng-deep div {
-  width: 100%;
-}
-
-p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
-  min-width: none !important;
 }
 
 ::ng-deep .p-card {
@@ -127,7 +102,7 @@ p-multiselect ::ng-deep p-overlay ::ng-deep .p-overlay {
   margin-bottom: 1%;
 }
 
-::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+::ng-deep .p-inputnumber-input {
   display: flex;
   width: 100%;
 }

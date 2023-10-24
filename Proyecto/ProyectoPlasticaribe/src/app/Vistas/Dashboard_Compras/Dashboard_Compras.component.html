@@ -44,7 +44,7 @@
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i class="pi pi-users"></i> Proveedores</h2>
 
         <!-- Plasticaribe -->
-        <p-tabView [scrollable]="true" (onChange)="comprasEmpresa($event.index + 1)" id="empresas">
+        <p-tabView (onChange)="comprasEmpresa($event.index + 1)" id="empresas">
           <p-tabPanel
             header="PLASTICARIBE SAS"
             leftIcon="pi pi-th-large">

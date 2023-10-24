@@ -224,11 +224,7 @@ export class ReporteCostosOTComponent implements OnInit {
             }
           });
           this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
-            if (datos_asignacionMP.length != 0){
-              for (let j = 0; j < datos_asignacionMP.length; j++) {
-                this.llenarTablaMPAsignada(datos_asignacionMP[j]);
-              }
-            }
+            if (datos_asignacionMP.length != 0) datos_asignacionMP.forEach(asg => this.llenarTablaMPAsignada(asg));
           });
         }
         this.consultaProceso(ot);

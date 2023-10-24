@@ -97,18 +97,6 @@ p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
   width: 100%;
 }
 
-p-dropdown {
-  margin: 0;
-}
-
-p-dropdown ::ng-deep div, p-dropdown ::ng-deep div ::ng-deep span {
-  width: 100%;
-}
-
-button {
-  width: 30px;
-}
-
 p-card ::ng-deep [class = "p-card p-component"] {
   border: 3px solid #fefefe00;
   border-radius: 20px;

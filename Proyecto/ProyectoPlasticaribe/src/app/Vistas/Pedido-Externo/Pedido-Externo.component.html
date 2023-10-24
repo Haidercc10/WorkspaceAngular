@@ -283,7 +283,7 @@
       </div>
       <div class="mb-3">
         <div class="row g-3">
-          <p-chip label="Subtotal menos Dcto" pTooltip="Subtotal descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
+          <p-chip label="SubTotal Descuento" pTooltip="Subtotal descuento" tooltipPosition="top" icon="pi pi-wallet"></p-chip>
           <label class="text-center" for="">${{valorTotalMenosDescuentoPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
@@ -295,13 +295,13 @@
       </div>
       <div class="mb-3">
         <div class="row g-3">
-          <p-chip label="Subtotal Iva" icon="pi pi-money-bill"></p-chip>
+          <p-chip label="SubTotal Iva" icon="pi pi-money-bill"></p-chip>
           <label class="text-center" for="">${{valorTotalMasIvaPedido() | number : '1.2-2'}}</label>
         </div>
       </div>
       <div class="mb-3">
         <div class="row g-3">
-          <p-chip label="Total" icon="pi pi-shopping-cart"></p-chip>
+          <p-chip label="Costo Final" icon="pi pi-shopping-cart"></p-chip>
           <label class="text-center" for="">${{valorFinalPedido() | number : '1.2-2'}}</label>
         </div>
       </div>

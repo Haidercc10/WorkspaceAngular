@@ -28,13 +28,12 @@
   </div>
 
   <!-- Menú Principal -->
-  <p-sidebar [(visible)]="display" id="sidebar" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+  <p-sidebar [(visible)]="display" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
     <div class="imagen">
-      <img *ngIf="!modoSeleccionado" src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
-      <img *ngIf="modoSeleccionado" src="assets/Logo-Plasticaribe/logo.png" alt="Plasticaribe S.A.S">
+      <img [src]="!modoSeleccionado ? 'assets/PLASTICARIBE_logo.png' : 'assets/Logo-Plasticaribe/logo.png'" alt="Plasticaribe S.A.S">
     </div>
     <br>
-    <p-panelMenu [model]="categorias" #panel id="panel"></p-panelMenu>
+    <p-panelMenu [model]="categorias"></p-panelMenu>
   </p-sidebar>
 
   <!-- Menú de Configuraciones -->
@@ -43,13 +42,13 @@
       <div class="mb-2">
         <h4>Tamaño de Letra</h4>
         <div class="iconos">
-          <p-button icon="pi pi-minus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="disminuirLetra()"></p-button>
+          <button pButton pRipple type="button" icon="pi pi-minus" class="p-button-danger p-button-text" (click)="disminuirLetra()"></button>
           <i class="pi pi-circle font-size-16" id="iconoTanamoLetra1"></i>
           <i class="pi pi-circle font-size-16" id="iconoTanamoLetra2"></i>
           <i class="pi pi-circle font-size-16" id="iconoTanamoLetra3"></i>
           <i class="pi pi-circle font-size-16" id="iconoTanamoLetra4"></i>
           <i class="pi pi-circle font-size-16" id="iconoTanamoLetra5"></i>
-          <p-button icon="pi pi-plus" styleClass="p-button-rounded p-button-danger p-button-text" (click)="aumentarLetra()"></p-button>
+          <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-danger p-button-text" (click)="aumentarLetra()"></button>
         </div>
       </div>
     </div>

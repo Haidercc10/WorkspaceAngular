@@ -1,12 +1,11 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { modelVistasPermisos } from 'src/app/Modelo/modelVistasPermisos';
 import { EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';

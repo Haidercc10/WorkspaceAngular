@@ -247,38 +247,38 @@
       </div>
 
       <!-- Tabs de Procesos -->
-      <p-tabView [scrollable]="true" id="datos-ot" class="justify-content-md-center">
+      <p-tabView id="datos-ot" class="justify-content-md-center">
         <!-- Datos OT -->
         <p-tabPanel
           header="Datos OT"
           leftIcon="pi pi-calculator"
           tooltip="Información de costos de la orden de trabajo">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center">
-            <div class="mb-3">
+            <div class="mb-3 costosFinales">
               <div class="row g-3">
                 <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
                 <label for="">{{cantidadProducto | number : '1.2-2'}}</label>
               </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 costosFinales">
               <div class="row g-3">
                 <p-chip  id="valor1" label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
                 <label for="">${{valorProducto | number : '1.2-2'}}</label>
               </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 costosFinales">
               <div class="row g-3">
                 <p-chip id="neto1" label="Neto Kg" icon="pi pi-th-large"></p-chip>
                 <label for="">{{netoKg | number : '1.2-2'}}</label>
               </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 costosFinales">
               <div  class="row g-3">
                 <p-chip id="valor-kg" label="Valor Kg" icon="pi pi-money-bill"></p-chip>
                 <label for="">${{valorKg | number : '1.2-2'}}</label>
               </div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 costosFinales">
               <div class="row g-3">
                 <p-chip id="valor-ot" label="Valor OT" icon="pi pi-wallet"></p-chip>
                 <label for="">${{valorOt | number : '1.2-2'}}</label>

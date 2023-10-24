@@ -289,11 +289,6 @@ p-password ::ng-deep .p-password, p-password ::ng-deep .p-inputtext {
   width: 100%;
 }
 
-::ng-deep .p-inputtext {
-  display: flex;
-  width: 100%;
-}
-
 p-dialog ::ng-deep div .p-dialog-title {
   color: var(--rojo);
   align-items: center;

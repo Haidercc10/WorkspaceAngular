@@ -426,7 +426,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   llenarArrayExcel(datos : any, arrayDatos : any){
     this.cargando = true;
     for (let i = 0; i < datos.length; i++) {
-      const datos1 : any = [
+      arrayDatos.push([
         datos[i].consecutivo,
         datos[i].cliente,
         datos[i].producto,
@@ -446,8 +446,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         datos[i].OT,
         datos[i].Proceso_OT,
         datos[i].Estado_OT,
-      ];
-      arrayDatos.push(datos1);
+      ]);
     }
   }
 
@@ -455,7 +454,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => {
-      this.datosExcel = [];
       if (this.dt.filteredValue != null) this.datosExcel = this.dt.filteredValue;
       else this.datosExcel = this.ArrayPedidos;
     }, 400);
@@ -491,9 +489,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           this.modalPedidoExterno.pedidoEditar = data.consecutivo;
           this.modalPedidoExterno.clienteSeleccionado();
           setTimeout(() => {
-            this.modalPedidoExterno.FormPedidoExternoClientes.patchValue({
-              ciudad_sede: datos_pedido[i].ciudad,
-            });
+            this.modalPedidoExterno.FormPedidoExternoClientes.patchValue({ ciudad_sede: datos_pedido[i].ciudad, });
             this.modalPedidoExterno.llenarDireccionCliente();
           }, 500);
           break;
@@ -629,16 +625,23 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
       }
     });
-    setTimeout(() => { this.consultarPedidos(); }, 1000);
+    setTimeout(() => this.consultarPedidos(), 1000);
   }
 
   // Funcion que mostrará un mensaje de confirmación para aceptar un pedido o no
   mostrarEleccion(item : any, eleccion : any){
     let mensaje : string = "";
     this.itemSeleccionado = item;
-    if (eleccion == 'aceptar') { this.onReject('aceptar'); this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
-    if(eleccion == 'cancelar') { this.onReject('cancelar'); this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
-
+    if (eleccion == 'aceptar') {
+      this.onReject('aceptar');
+      this.onReject('cancelar');
+      mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`;
+    }
+    if(eleccion == 'cancelar') {
+      this.onReject('cancelar');
+      this.onReject('aceptar');
+      mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`;
+    }
     this.messageService.add({severity:'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true});
   }
 

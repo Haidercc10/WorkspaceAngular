@@ -2,17 +2,17 @@ import Step from 'shepherd.js/src/types/step';
 
 export const builtInButtons = {
   cancel: {
-    classes: 'p-button p-button-secondary mr-2',
+    classes: 'botonGris mr-2',
     text:  `<i class="pi pi-times mr-2"></i> <b> Cerrar</b>`,
     type: 'cancel',
   },
   next: {
-    classes: 'p-button p-button-danger',
+    classes: 'botonRojo',
     text:  `<i class="pi pi-arrow-right mr-2"></i> <b> Siguiente</b>`,
     type: 'next'
   },
   back: {
-    classes: 'p-button p-button-secondary',
+    classes: 'botonGris',
     text: '<i class="pi pi-arrow-left mr-2"></i> <b> Atrás</b>',
     type: 'back'
   },

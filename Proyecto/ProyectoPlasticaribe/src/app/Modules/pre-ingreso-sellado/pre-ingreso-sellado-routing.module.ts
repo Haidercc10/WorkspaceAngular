@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [VistasPermisosGuard], 
-    data: {nombre: 'Pre Ingreso Empaque/Sellado'}, 
+    data: {nombre: 'Pre Ingreso Empaque Sellado'}, 
     component : PreIngresoRolloSelladoComponent
   }
 ];
