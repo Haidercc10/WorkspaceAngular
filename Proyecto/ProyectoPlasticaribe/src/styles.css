@@ -435,7 +435,7 @@ p-avatar div span {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -448,4 +448,5 @@ p-avatar div span {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #f43e4d;
+  width: 300px;
 }

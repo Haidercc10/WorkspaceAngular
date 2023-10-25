@@ -1,6 +1,8 @@
-::ng-deep .surface-ground {
-  background: url("/assets/Background/plastic-industry.jpeg") no-repeat center !important;
-  min-height: 100%;
+.fondo {
+  margin-top: -80px;
+  background: url("/assets/Background/plastic-industry.jpeg") no-repeat center;
+  height: 100%;
+  min-height: 100vh;
   background-size: cover;
   background-attachment: fixed;
 }

@@ -66,9 +66,24 @@
         scrollHeight="50rem">
         <ng-template pTemplate="header">
           <tr class="font-size-13">
-            <th scope="col" style="width: 65%"><p-button id="minimizar" icon="pi pi-arrow-left" (click)="regresarCarpetaAnterior()" styleClass="p-button-rounded p-button-danger mr-2"></p-button>{{ruta}} <i class="pi pi-folder-open"></i></th>
-            <th scope="col" class="text-center">
-              <p-button id="descargar" pTooltip="Descargar" label="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas()"></p-button>
+            <th scope="col" style="width: 65%">
+              <div class="row">
+                <div class="col-sm-12 col-md-2">
+                  <button class="buttonBack" (click)="regresarCarpetaAnterior()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconBack"><path d="M459.5 440.6c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29V96c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4L288 214.3V256v41.7L459.5 440.6zM256 352V256 128 96c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4l-192 160C4.2 237.5 0 246.5 0 256s4.2 18.5 11.5 24.6l192 160c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29V352z"/></svg>
+                  </button>
+                </div>
+                <div class="col-sm-12 col-md m-auto">
+                  <span>{{ruta}}</span>
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="text-center justify-content-center">
+              <button class="buttonDownload" (click)="descargarCarpetas()">
+                <svg class="svgIcon" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg" class="svgIconDownload">
+                  <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+                </svg>
+              </button>
             </th>
             <!--Copiar/Mover-->
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
@@ -86,51 +101,127 @@
         </ng-template>
         <ng-template pTemplate="body" let-archivos>
           <tr class="font-size-13">
+            <!-- ABRIR Y DESCARGAR -->
             <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
-              <td style="width: 65%"><i id="margen" class="pi pi-file" ></i> {{archivos.nombre}}</td>
+              <td style="width: 65%">
+                <div class="row">
+                  <div class="col-md-2">
+                    <button class="file" (click)="descargarArchivos(archivos.nombre)">
+                      <div class="container_file">
+                        <div class="corner"></div>
+                        <div class="line line_1"></div>
+                        <div class="lines">
+                          <div class="line line_2"></div>
+                          <div class="line line_2_1"></div>
+                        </div>
+                        <div class="lines">
+                          <div class="line line_3"></div>
+                          <div class="line line_3_1"></div>
+                        </div>
+                        <div class="lines">
+                          <div class="line line_4"></div>
+                          <div class="line line_4_1"></div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div class="col-md m-auto">
+                    <span>{{archivos.nombre}}</span>                  
+                  </div>
+                </div>
+              </td>
               <td class="text-center">
-                <p-button id="descargar" pTooltip="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarArchivos(archivos.nombre)"></p-button>
+                <button class="buttonDownload" (click)="descargarArchivos(archivos.nombre)">
+                  <svg class="svgIcon" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg" class="svgIconDownload">
+                    <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+                  </svg>
+                </button>
               </td>
             </ng-container>
             <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
-              <td style="width: 65%" id="abrirCarpeta" class="cursor" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left"><i class="pi pi-folder"></i> {{archivos.nombre}}</td>
+              <td style="width: 65%" id="abrirCarpeta" class="cursor carpeta" (click)="abrirCarpeta(archivos.nombre)" pTooltip="Haz clic para abrir la carpeta" tooltipPosition="left">
+                <div class="row">
+                  <div class="col-md-2 justify-content-center">
+                    <button class="button" (click)="abrirCarpeta(archivos.nombre)">
+                      <div class="container">
+                        <div class="folder folder_one"></div>
+                        <div class="folder folder_two"></div>
+                        <div class="folder folder_three"></div>
+                        <div class="folder folder_four"></div>
+                      </div>
+                      <div class="active_line"></div>
+                    </button>
+                  </div>
+
+                  <div class="col-md m-auto">
+                    <span>{{archivos.nombre}}</span>
+                  </div>
+                </div>
+              </td>
               <td class="text-center">
-                <p-button id="descargar" pTooltip="Descargar" icon="pi pi-cloud-download" styleClass="p-button-rounded p-button-success" (click)="descargarCarpetas(archivos.ruta)"></p-button>
+                <button class="buttonDownload" (click)="descargarCarpetas(archivos.ruta)">
+                  <svg class="svgIcon" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg" class="svgIconDownload">
+                    <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+                  </svg>
+                </button>
               </td>
             </ng-container>
+
+            <!-- COPIARM, MOVER, PEGAR Y ELIMINAR -->
             <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1">
               <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonCopiar" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svgIconCopiar"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16l140.1 0L400 115.9V320c0 8.8-7.2 16-16 16zM192 384H384c35.3 0 64-28.7 64-64V115.9c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                  </button>
                 </td>
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonMove" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconMove"><path d="M352 96l64 0c17.7 0 32 14.3 32 32l0 256c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0c53 0 96-43 96-96l0-256c0-53-43-96-96-96l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32zm-9.4 182.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L242.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg>
+                  </button>
                 </td>
               </ng-container>
               <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
                 <td class="text-center">
-                  <p-button id="copiar" icon="pi pi-copy" styleClass="p-button-rounded p-button-info" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)" pTooltip="Copiar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonCopiar" (click)="moverArchivoCarpeta('copiar', archivos.ruta, archivos.nombre)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svgIconCopiar"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16l140.1 0L400 115.9V320c0 8.8-7.2 16-16 16zM192 384H384c35.3 0 64-28.7 64-64V115.9c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                  </button>
                 </td>
                 <td class="text-center">
-                  <p-button id="mover" icon="pi pi-arrow-right-arrow-left" styleClass="p-button-rounded p-button-warning" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)" pTooltip="Mover Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonMove" (click)="moverArchivoCarpeta('mover', archivos.ruta, archivos.nombre)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconMove"><path d="M352 96l64 0c17.7 0 32 14.3 32 32l0 256c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0c53 0 96-43 96-96l0-256c0-53-43-96-96-96l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32zm-9.4 182.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L242.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg>
+                  </button>
                 </td>
               </ng-container>
+
+              <!-- PEGAR -->
               <ng-container *ngIf="mover == true || copiar == true">
                 <td class="text-center">
-                  <p-button id="pegar" icon="pi pi-clone" styleClass="p-button-rounded p-button-help" (click)="pegarArchivoCarpeta()" pTooltip="Pegar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonPaste" (click)="pegarArchivoCarpeta()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconPaste"><path d="M80 96v16c0 17.7 14.3 32 32 32h60.8c16.6-28.7 47.6-48 83.2-48h62c-7.1-27.6-32.2-48-62-48H215.4C211.6 20.9 188.2 0 160 0s-51.6 20.9-55.4 48H64C28.7 48 0 76.7 0 112V384c0 35.3 28.7 64 64 64h96V400H64c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H80zm64-40a16 16 0 1 1 32 0 16 16 0 1 1 -32 0zM256 464c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H384v48c0 17.7 14.3 32 32 32h48V448c0 8.8-7.2 16-16 16H256zm192 48c35.3 0 64-28.7 64-64V227.9c0-12.7-5.1-24.9-14.1-33.9l-51.9-51.9c-9-9-21.2-14.1-33.9-14.1H256c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H448z"/></svg>
+                  </button>
                 </td>
                 <td class="text-center">
-                  <p-button id="cancelar" icon="pi pi-times" styleClass="p-button-rounded p-button-secondary" (click)="cancelarPegadoArchivoCarpeta()" pTooltip="Cancelar" tooltipPosition="left"></p-button>
+                  <button class="buttonCancel" (click)="cancelarPegadoArchivoCarpeta()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconCancel"><path d="M367.2 412.5L99.5 144.8C77.1 176.1 64 214.5 64 256c0 106 86 192 192 192c41.5 0 79.9-13.1 111.2-35.5zm45.3-45.3C434.9 335.9 448 297.5 448 256c0-106-86-192-192-192c-41.5 0-79.9 13.1-111.2 35.5L412.5 367.2zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/></svg>
+                  </button>
                 </td>
               </ng-container>
+
+              <!-- ELIMINAR -->
               <ng-container *ngIf="archivos.archivoCarpeta == 'archivo';">
                 <td class="text-center">
-                  <p-button id="minimizar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-archivo')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonDelete" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-archivo')">
+                    <svg viewBox="0 0 448 512" class="svgIconDelete"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+                  </button>
                 </td>
               </ng-container>
               <ng-container *ngIf="archivos.archivoCarpeta == 'carpeta';">
                 <td class="text-center">
-                  <p-button id="eliminar" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-carpeta')" pTooltip="Eliminar Archivo/Carpeta" tooltipPosition="left"></p-button>
+                  <button class="buttonDelete" (click)="mostrarEleccion1(archivos.ruta, archivos, 'd-carpeta')">
+                    <svg viewBox="0 0 448 512" class="svgIconDelete"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+                  </button>
                 </td>
               </ng-container>
             </ng-container>

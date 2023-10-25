@@ -52,6 +52,7 @@ export class MenuLateralComponent implements OnInit {
   modoSeleccionado : boolean;
   roles : any [] = [];
   @Input() categoria!: string;
+  cargando : boolean = false;
 
   constructor(private AppComponent : AppComponent,
                 private formBuilder : FormBuilder,
@@ -142,6 +143,7 @@ export class MenuLateralComponent implements OnInit {
 
   CargarCategorias(){
     this.vistasPermisosService.GetCategoriasMenu(this.ValidarRol).subscribe(data => {
+      this.cargando = true;
       this.categorias = [];
       for (let i = 0; i < data.length; i++){
         data[i].split('|').forEach(element => {
@@ -161,6 +163,7 @@ export class MenuLateralComponent implements OnInit {
   }
 
   cargarOpcionesMenu(){ 
+    let count : number = 0;
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
@@ -181,6 +184,8 @@ export class MenuLateralComponent implements OnInit {
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
         if(![1, 3, 7, 61].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1); 
+        count++;
+        if (count == this.categorias.length) this.cargando = false;
       });
     });
   }  

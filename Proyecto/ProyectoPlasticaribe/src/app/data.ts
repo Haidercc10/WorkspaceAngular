@@ -7614,7 +7614,9 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'none',
     title: `<h5 class="tituloRojo" style="margin: auto;">Ordne de Trabajo</h5>`,
-    text: `<p>¡Las ordenes de trabajo son documentos que se crean para la creación de un producto, este documento tendrá todas las especificaciones necesarias sobre como se debe crear el producto!</p>
+    text: `<p>¡Las <b style="color: var(--rojo)">OT</b> o <b style="color: var(--rojo)">Ordenes de Trabajo</b> son documentos que se crean para la producción de un producto.
+    Este documento tendrá todas las especificaciones necesarias sobre como debe ser la producción, los áreas por las que deberá pasar, etc..!</p>
+
     <p>Desde aquí podremos crear, consultar y editar las ordenes de trabajo de manera sencilla y eficiente.</p>`
   },
   {
@@ -7630,7 +7632,7 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'formOrdenTrabajo',
     title: `<h5 class="tituloRojo" style="margin: auto;">Información General</h5>`,
-    text: `<p>Para crear una Orden de Trabajo necesitamos información que debemos colocar en los siguientes campos.</p>`
+    text: `<p>Para empezar a crear una <b style="color: var(--rojo)">Orden de Trabajo</b> necesitamos diligenciar los datos que se explicarán acontinuación.</p>`
   },
   {
     attachTo: {
@@ -7645,7 +7647,9 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idCliente',
     title: `<h5 class="tituloRojo" style="margin: auto;">Id del Cliente</h5>`,
-    text: `<p>Este campo se estará llenando con la información del cliente que se seleccionó. Este campo no es editable y se llena de manera automatica.</p>`
+    text: `<p>Este campo <b style="color: var(--rojo)">se llenará</b> con la información del cliente que se seleccionó.</p>
+    <p>Este campo <b style="color: var(--rojo)">no es editable</b>. 
+    Una vez hayamos seleccionado un cliente en el campo que sigue acontinuación se llenará este mismo de manera automatica.</p>`
   },
   {
     attachTo: {
@@ -7660,11 +7664,14 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'cliente',
     title: `<h5 class="tituloRojo" style="margin: auto;">Cliente</h5>`,
-    text: `<p>Para seleccionar un cliente tenemos que escribir el nombre del mismo, y a medida que escribimos, se muestran los clientes que tengan en su nombre el texto que hemos escrito.</p>
-    <p>Si encontramos el cliente que queremos presionamos click o lo seleccionamos y listo. El campo anterior (Id Cliente) se llenará automaticamente una vez hayamos elegido uno.</p>
+    text: `<p>Para seleccionar un cliente <b style="color: var(--rojo)">tenemos que escribir el nombre</b> del mismo, y a medida que escribimos, 
+    se muestran los clientes que tengan en su nombre el texto que hemos escrito.</p>
+    <p>Si encontramos el cliente que queremos <b style="color: var(--rojo)">presionamos click o lo seleccionamos y listo</b>. 
+    El campo anterior (Id Cliente) se llenará automaticamente una vez hayamos elegido uno.</p>
     <p>De igual manera se llenarán de forma automatica los campos de vendedor que estaremos viendo más adelante.</p>
     <br>
-    <p>Si el cliente no existe, <b>presionaremos el botón de crear cliente</b> que se encuentra en la parte superior de la pantalla. Acontinuación se explicará como se creará el cliente.</p>`
+    <p>Si el cliente no existe, <b>presionaremos el botón de crear cliente</b> que se encuentra en la parte superior de la pantalla. 
+    Acontinuación se explicará como se creará el cliente.</p>`
   },
   {
     attachTo: {
@@ -7679,7 +7686,12 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'idProducto',
     title: `<h5 class="tituloRojo" style="margin: auto;">Item (Id Producto)</h5>`,
-    text: `<p>Podemos buscar un producto en base a su código, para hacer esto tenemos escribimos en este campo el codigo del mismo y luego presionamos la tecla 'Enter', al hacer esto se llenará automaticamente el campo siguiente (Producto).</p>`
+    text: `<p>Tenemos 2 opciones al momento de seleccionar el producto al que se le hará la orden de trabajo, a continuación se explicará la primera opción.</p>
+    <p>En este se podrá escribir el código del producto que queremos y presionar <b>Enter</b>, una vez hagamos esto se llenará el campo <b>Referencia</b> automaticamente
+    lo cual indica que el producto existe y se le puede crear una OT de lo contrario aparecerá un mensaje diciendo que le producto seleccionado no existe.</p>
+    <p>Otra de las cosas que se harán un vez se busque el producto es llenar la mayoria de campos de toda la orden de trabajo. Esto lo hace porque busca la ultima OT
+    que se haya creado a este mismo Item y llena los campos con esa misma información.</p>
+    <p>Para ver la segunda opción debes seguir el tutorial.</p>`
   },
   {
     attachTo: {
@@ -7694,8 +7706,11 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'producto',
     title: `<h5 class="tituloRojo" style="margin: auto;">Referencia (Producto)</h5>`,
-    text: `<p>Otra forma de buscar un producto es por su referencia (nombre), sí escribimos el nombre del producto en este campo nos irán apareciendo opciones de los productos que tienen en su nombre el texto que hemos escrito.</p>
-    <p>De igual manera que con el campo anterior (Id Producto) una vez se elija una de las opciones se llenará el campo Item automaticamente.</p>`
+    text: `<p>La segunda opción que tenemos para buscar un produto es mediante este campo, tenemos que escribir el nombre del producto que queremos y nos saldrán
+    en una lista los productos que tienen en su nombre el texto que hemos escrito.</p>
+    <p>Si encontramos el producto deseado procedemos a presionar click sobre este y listo, lo habremos seleccionado.</p>
+    <p> Al igual que en el campo Item, cuando se seleccione el producto se buscará y se llenarán la mayoria de campos de toda la orden de trabajo.
+    Esto lo hace porque busca la ultima OT que se haya creado a este mismo Item y llena los campos con esa misma información.</p>`
   },
   {
     attachTo: {
@@ -7742,7 +7757,8 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'precioUnitario',
     title: `<h5 class="tituloRojo" style="margin: auto;">Precio Unitario</h5>`,
-    text: `<p>En este campo se estará cargad</p>`
+    text: `<p>En este campo debemos colocar el precio unitario del producto, al igual que campos anteriores, 
+    este se podrá llenar automaticamente cuando se busque un producto y al producto se le haya hecho minimos 1 OT.</p>`
   },
   {
     attachTo: {
@@ -7908,7 +7924,7 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     scrollTo: { behavior: 'smooth', block: 'center' },
     id: 'datosExtrusion',
     title: `<h5 class="tituloRojo" style="margin: auto;">Datos Extrusión</h5>`,
-    text: `<p>Una vez hayamos seleccionado o habilitado la casilla de extrusión se añadirá un nuevo </p>`
+    text: `<p>Una vez hayamos seleccionado o habilitado la casilla de extrusión se añadirá un nuevo tab desde el cual podremos </p>`
   },
 ];
 

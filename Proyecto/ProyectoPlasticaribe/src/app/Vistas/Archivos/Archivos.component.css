@@ -153,3 +153,364 @@ td {
     opacity: 0;
   }
 }
+
+/*================================================ CARPETA ================================================*/
+.button {
+  margin: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.3em;
+  height: 5.3em;
+  border: none;
+  border-radius: .4em;
+  background: rgba(235, 252, 254, 0.8);
+}
+
+.container {
+  position: relative;
+  width: 3.5em;
+  height: 3.1em;
+  background: none;
+  overflow: hidden;
+}
+
+.folder {
+  content: '';
+  position: absolute;
+  box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+}
+
+.folder_one {
+  bottom: 0;
+  width: 100%;
+  height: 88%;
+  border-radius: 3px;
+  border-top: 2px solid rgb(206, 167, 39);
+  background-color: rgb(252, 212, 80);
+  background: linear-gradient(
+    -35deg,
+    rgb(238, 194, 47) 5%,
+    rgb(255, 223, 118));
+}
+
+.folder_two {
+  top: 5%;
+  width: 38%;
+  height: 19%;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  background-color: rgb(206, 167, 39);
+  box-shadow: 0 1px 5px -2px rgba(0, 0, 0, .5);
+}
+
+.folder_two::before {
+  content: '';
+  position: absolute;
+  display: inline;
+  left: 88%;
+  width: 0;
+  height: 0;
+  border-left: 7px solid rgb(206, 167, 39);
+  border-top: .3em solid transparent;
+  border-bottom: .3em solid transparent;
+  background-color: rgb(206, 167, 39);
+}
+
+.folder_three {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: .5em;
+  bottom: 0;
+  width: 2.5em;
+  height: .9em;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(
+    -35deg,
+    rgb(25, 102, 218),
+    rgb(109, 165, 249));
+  box-shadow: 0 0 5px rgba(0, 0, 0, .4);
+}
+
+.folder_four {
+  left: 1em;
+  bottom: .3em;
+  width: 1.5em;
+  height: .18em;
+  border-radius: 1em;
+  background-color: rgb(20, 77, 163);
+  box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+}
+
+.active_line {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: .9em;
+  height: .4em;
+  background-color: #999;
+  border: none;
+  border-radius: 1em;
+  transition: all .15s linear;
+}
+
+.button:active .active_line,
+.button:focus .active_line {
+  width: 2.3em;
+  background-color: rgb(41, 126, 255);
+}
+
+.button:hover .container {
+  animation: wow 1s forwards;
+}
+
+@keyframes wow {
+  20% {
+    scale: .8;
+  }
+  30% {
+    scale: 1;
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  65% {
+    transform: translateY(4px);
+  }
+  80% {
+    transform: translateY(0);
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/*================================================ ARCHIVO ================================================*/
+.file {
+  margin: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.3em;
+  height: 5.3em;
+  border: none;
+  border-radius: .4em;
+  background: rgba(235, 252, 254, 0.8);
+}
+
+.container_file {
+  position: relative;
+  width: 3.5em;
+  height: 4em;
+  background: none;
+  overflow: hidden;
+  background-color: #add9ff;
+  transition-duration: 1s;
+  border-radius: 5px;
+}
+
+.container_file:hover {
+  animation: wow 1s forwards;
+}
+
+.corner {
+  width: 20px;
+  height: 20px;
+  background-image: linear-gradient(45deg, #96ceff 50%, #EbFcFecc 0%);
+  border-left: 0.5px solid #0005;
+  border-bottom: 0.5px solid #0005;
+  margin-left: 20px;
+  border-radius: 0 0 0 5px;
+  position: absolute;
+  z-index: 55;
+}
+
+.line {
+  background-color: rgba(235, 252, 254, 0.8);
+  height: 3px;
+  border-radius: 10px;
+  margin-top: 4px;
+  margin-left: 5px;
+  border-radius: 10px;
+  background-color: #0009;
+}
+
+.lines {
+  display: flex;
+  margin-right: 5px;
+}
+
+.line_1 {
+  margin-top: 15px;
+  width: 70%;
+  margin-right: 5px;
+}
+
+.line_2, .line_4 {
+  width: 20%;
+}
+
+.line_2_1, .line_4_1 {
+  width: 50%;
+}
+
+.line_3 {
+  width: 50%;
+}
+
+.line_3_1 {
+  width: 20%;
+}
+
+/*================================================ DESCARGAR, COPIAR, MOVER, PEGAR, CANCELAR, ELIMINAR ================================================*/
+.buttonBack, .buttonCopiar, .buttonMove, .buttonPaste, .buttonCancel, .buttonDelete, .buttonDownload {
+  margin: auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #0000;
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition-duration: .3s;
+  overflow: hidden;
+  position: relative;
+}
+
+.svgIconBack, .svgIconCopiar, .svgIconMove, .svgIconPaste, .svgIconCancel, .svgIconDelete, .svgIconDownload {
+  width: 12px;
+  transition-duration: .3s;
+}
+
+.buttonBack:hover, .buttonCopiar:hover, .buttonMove:hover, .buttonPaste:hover, .buttonCancel:hover, .buttonDelete:hover, .buttonDownload:hover {
+  width: 140px;
+  border-radius: 50px;
+  transition-duration: .3s;
+  align-items: center;
+}
+
+.buttonBack:hover .svgIconBack, .buttonCopiar:hover .svgIconCopiar, .buttonMove:hover .svgIconMove, .buttonPaste:hover .svgIconPaste, .buttonCancel:hover .svgIconCancel, .buttonDelete:hover .svgIconDelete, .buttonDownload:hover .svgIconDownload {
+  width: 50px;
+  transition-duration: .3s;
+  transform: translateY(60%);
+}
+
+.buttonBack:before, .buttonCopiar:before, .buttonMove:before, .buttonPaste:before, .buttonCancel:before, .buttonDelete:before, .buttonDownload:before {
+  position: absolute;
+  top: -20px;
+  color: white;
+  transition-duration: .3s;
+  font-size: 2px;
+}
+
+.buttonBack:hover:before, .buttonCopiar:hover:before, .buttonMove:hover:before, .buttonPaste:hover:before, .buttonCancel:hover:before, .buttonDelete:hover:before, .buttonDownload:hover:before {
+  font-size: 13px;
+  opacity: 1;
+  transform: translateY(30px);
+  transition-duration: .3s;
+}
+
+.buttonBack:hover .svgIconBack path,
+.buttonCopiar:hover .svgIconCopiar path, 
+.buttonMove:hover .svgIconMove path,
+.buttonPaste:hover .svgIconPaste path,
+.buttonCancel:hover .svgIconCancel path,
+.buttonDelete:hover .svgIconDelete path, 
+.buttonDownload:hover .svgIconDownload path {
+  fill: white;
+}
+
+/*================================================ DESCARGAR ================================================*/
+.svgIconDownload path {
+  fill: #22C55E;
+}
+
+.buttonDownload:before {
+  content: "Descargar";
+}
+
+.buttonDownload:hover {
+  background-color: #22C55E;
+}
+
+/*================================================ COPIAR ================================================*/
+.svgIconCopiar path {
+  fill: #3B82F6;
+}
+
+.buttonCopiar:before {
+  content: "Copiar";
+}
+
+.buttonCopiar:hover {
+  background-color: #3B82F6;
+}
+
+/*================================================ MOVER ================================================*/
+.svgIconMove path {
+  fill: #F59E0E;
+}
+
+.buttonMove:before {
+  content: "Mover";
+}
+
+.buttonMove:hover {
+  background-color: #F59E0E;
+}
+
+/*================================================ PEGAR ================================================*/
+.svgIconPaste path {
+  fill: #A855F7;
+}
+
+.buttonPaste:before {
+  content: "Pegar";
+}
+
+.buttonPaste:hover {
+  background-color: #A855F7;
+}
+
+/*================================================ CANCELAR ================================================*/
+.svgIconCancel path {
+  fill: #64748b;
+}
+
+.buttonCancel:before {
+  content: "Cancelar";
+}
+
+.buttonCancel:hover {
+  background-color: #64748b;
+}
+
+/*================================================ ELIMINAR ================================================*/
+.svgIconBack, .svgIconDelete path {
+  fill: var(--rojo);
+}
+
+.buttonDelete:before {
+  content: "Eliminar";
+}
+
+.buttonBack:hover, .buttonDelete:hover {
+  background-color: rgb(255, 69, 69);
+}
+
+/*================================================ REGRESAR ================================================*/
+.buttonBack{
+  margin: 0;
+}
+
+.buttonBack:before {
+  content: "Regresar";
+}
