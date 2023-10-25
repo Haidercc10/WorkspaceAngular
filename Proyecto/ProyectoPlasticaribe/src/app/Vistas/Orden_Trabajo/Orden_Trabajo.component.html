@@ -114,7 +114,7 @@
         </div>
 
         <!-- MARGEN ADICIONAL -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="margenAdicional">
           <span class="p-float-label">
             <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" prefix="% " [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
             <label for="Cant">Margen Adicional</label>
@@ -122,7 +122,7 @@
         </div>
         
         <!-- ID Vendedor -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="idVendedor">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-user"></i>
             <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true" [readonly]="true"/>
@@ -131,7 +131,7 @@
         </div>
 
         <!-- Nombre Vendedor -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4" id="vendedor">
           <span class="p-float-label">
             <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="false" [required]="true" (onChange)="vendedorSeleccionado()"></p-dropdown>
             <label for="Nombre_Vendedor">Vendedor</label>
@@ -139,7 +139,7 @@
         </div>
 
         <!-- ESTADO DE LA ORDEN -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="estadoOrden">
           <span class="p-float-label">
             <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados" optionLabel="estado_Nombre" optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
             <label for="Estado">Estado OT</label>
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Fecha creacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2" id="fechaCreacion">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-calendar"></i>
             <input formControlName="OT_FechaCreacion" id="FechaCrea" type="text" pInputText [readOnly]="true" [required]="true"/>
@@ -156,7 +156,7 @@
         </div>
 
         <!-- Campo Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-12 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-12 col-xxl-12" id="observacion">
           <span class="p-float-label">
             <textarea formControlName="OT_Observacion" [rows]="1" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -252,7 +252,8 @@
         <p-tabPanel
           header="Datos OT"
           leftIcon="pi pi-calculator"
-          tooltip="Información de costos de la orden de trabajo">
+          tooltip="Información de costos de la orden de trabajo"
+          id="datosOrdenTrabajo">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center">
             <div class="mb-3 costosFinales">
               <div class="row g-3">
@@ -291,7 +292,8 @@
         <p-tabPanel
           header="Extrusión"
           leftIcon="pi pi-bolt"
-          *ngIf="extrusion">
+          *ngIf="extrusion"
+          id="datosExtrusion">
           <br>
           <form [formGroup]="FormOrdenTrabajoExtrusion">
             <div class="mb-3">

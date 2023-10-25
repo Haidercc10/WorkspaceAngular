@@ -7744,6 +7744,172 @@ export const stepsOrdenesTrabajo: Step.StepOptions[] = [
     title: `<h5 class="tituloRojo" style="margin: auto;">Precio Unitario</h5>`,
     text: `<p>En este campo se estará cargad</p>`
   },
+  {
+    attachTo: {
+      element: '#margenAdicional',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'margenAdicional',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Margen Adicional</h5>`,
+    text: `<p>En este campo estará saliendo un número entre el 0 y el 100, 
+    este número <b>representará el porcentaje adicional que se debe fabricar</b>. 
+    <br>
+    Este porcentaje adicional se mide respecto a la cantidad pedida, es decir, si piden <b style="color: var(--rojo)">100</b> unidades de un producto 
+    y en este campo se encuentra el número <b style="color: var(--rojo)">10</b> significa que se deberá sumar un 
+    <b style="color: var(--rojo)">10%</b> a las 100 unidades que se pidieron en principio.</p>    
+    <p>Este campo <b>no es editable</b>, pero la cantidad de margen <b>se puede modificar desde los apartados</b> de <b style="color: var(--rojo)">Corte</b> y
+    <b style="color: var(--rojo)">Sellado</b>.</p>`
+  },
+  {
+    attachTo: {
+      element: '#idVendedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'idVendedor',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Código Vendedor</h5>`,
+    text: `<p>Cada uno de los vendedores es identificado por un código, este código es el que estará apareciendo en este campo.
+    Una vez se haya seleccionado un cliente o un vendedor (en el campo que sigue) se colocará el código correspondiente aquí.</p>`
+  },
+  {
+    attachTo: {
+      element: '#vendedor',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'vendedor',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Nombre Vendedor</h5>`,
+    text: `<p>En este campo podemos seleccionar el nombre del vendedor. Tambien se llenará automaticamente una vez se seleccione un cliente.</p>`
+  },
+  {
+    attachTo: {
+      element: '#estadoOrden',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'estadoOrden',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Estado de la Orden</h5>`,
+    text: `<p>En este campo estará apareciendo el estado de la orden de trabajo, tambien podemos seleccionar un estado para editar la orden de trabajo.</p>`
+  },
+  {
+    attachTo: {
+      element: '#fechaCreacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'fechaCreacion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Fecha Creación</h5>`,
+    text: `<p>Este campo siempre estará lleno con la fecha actual, 
+    o se llenará con la información de la fecha en que se creó la orden de trabajo en caso de que se consulte una.</p>`
+  },
+  {
+    attachTo: {
+      element: '#observacion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'observacion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Observación</h5>`,
+    text: `<p>En este campo se podrá colocar una observación a la orden de trabajo</p>`
+  },
+  {
+    attachTo: {
+      element: '#check',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'check',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Seleccionables</h5>`,
+    text: `<p>Desde aquí se pueden seleccionar los puntos o procesos por los que pasará el producto en el proceso de producción.</p>`
+  },
+  {
+    attachTo: {
+      element: '#datos-ot',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'datos-ot',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Datos de Orden</h5>`,
+    text: `<p>En este apartado podemos seleccionar o llenar los datos del proceso del producción del producto</p>`
+  },
+  {
+    attachTo: {
+      element: '#datosOrdenTrabajo',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'datosOrdenTrabajo',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Datos Generales de la OT</h5>`,
+    text: `<p>En este tab estaremos viendo los siguiente datos de la Orden de trabajo:</p>
+    <ol>
+      <li>Cantidad a Producir.</li>
+      <li>Valor Unitario.</li>
+      <li>Peso Neto o Peso Total de la Orden de Trabajo.</li>
+      <li>Valor del Kilogramo. Si la presentación del producto es Kg este precio debe ser al precio unitario.</li>
+      <li>Valor total de la Orden de Trabajo.</li>
+    </ol>`
+  },
+  {
+    attachTo: {
+      element: '#datosExtrusion',
+      on: 'bottom'
+    },
+    buttons: [
+      builtInButtons.back,
+      builtInButtons.next,
+    ],
+    classes: '',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    id: 'datosExtrusion',
+    title: `<h5 class="tituloRojo" style="margin: auto;">Datos Extrusión</h5>`,
+    text: `<p>Una vez hayamos seleccionado o habilitado la casilla de extrusión se añadirá un nuevo </p>`
+  },
 ];
 
 export const stepsOrdenTrabajo: Step.StepOptions[] = [

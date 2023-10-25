@@ -28,12 +28,12 @@
   </div>
 
   <!-- Menú Principal -->
-  <p-sidebar [(visible)]="display" [style]="{maxWidth : '30rem', minWidth : '27rem'}">
+  <p-sidebar [(visible)]="display" [style]="{width : '30rem'}">
     <div class="imagen">
       <img [src]="!modoSeleccionado ? 'assets/PLASTICARIBE_logo.png' : 'assets/Logo-Plasticaribe/logo.png'" alt="Plasticaribe S.A.S">
     </div>
     <br>
-    <p-panelMenu [model]="categorias"></p-panelMenu>
+    <p-panelMenu [model]="categorias" [style]="{color : modoSeleccionado ?  'white' : 'black'}"></p-panelMenu>
   </p-sidebar>
 
   <!-- Menú de Configuraciones -->
