@@ -52,6 +52,7 @@ export class MenuLateralComponent implements OnInit {
   modoSeleccionado : boolean;
   roles : any [] = [];
   @Input() categoria!: string;
+  load : boolean = false;
 
   constructor(private AppComponent : AppComponent,
                 private formBuilder : FormBuilder,
@@ -87,17 +88,25 @@ export class MenuLateralComponent implements OnInit {
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 
   materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
   mostrarMenuLateral() {
-    let ruta : any = this.router.url
+    this.load = true;
+    let ruta : any = this.router.url;
     this.display = true;
     if([8, 4, 63, 62].includes(this.ValidarRol)) {
+      console.log(this.categorias)
       setTimeout(() => {
         this.categorias.forEach(x => {
           if([8, 4, 63, 62].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
         });
-        document.getElementById(`undefined_header`).click();
-        document.getElementById(`undefined_header`).click();
+        document.getElementById(`pn_id_12_1_header`).click();
+        document.getElementById("pn_id_12_1_header").click();
         this.router.navigate([ruta]);
+        this.load = false;
       }, 20);
+    } else {
+      setTimeout(() => { 
+        document.getElementById(`pn_id_136_2_header`).click(); 
+        document.getElementById(`pn_id_136_2_header`).click();
+      }, 10);
     }
   }
 
