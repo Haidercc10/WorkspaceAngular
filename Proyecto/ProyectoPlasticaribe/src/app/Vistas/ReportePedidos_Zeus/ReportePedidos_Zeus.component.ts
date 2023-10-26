@@ -18,6 +18,7 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
 import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -52,6 +53,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   arrayPedidosIndividuales : any = [];
   datosExcel : any [] = []; //VAriable que almcanerá la informacion que se verá en el archivo de excel
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  modalExportarPDF : boolean = false;
+  informacionPDF : any [] = [];
+  vendedores : any [] = [];
+  clientes : any [] = [];
+  clienteSeleccionado : any;
+  vendedorSeleccionado : any;
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -60,7 +67,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                       private pedidoExternoService : OpedidoproductoService,
                         private estadosProcesos_OTService : EstadosProcesos_OTService,
                           private shepherdService: ShepherdService,
-                            private msj : MensajesAplicacionService) {
+                            private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -104,6 +111,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
     });
     setTimeout(() => {
+      this.getClientes();
+      this.getVendedores();
       this.cargando = false;
       this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
       const thisRef = this;
@@ -158,7 +167,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       id_color : 4,
       color : 'blanco',
       consecutivo : datos.consecutivo,
+      nitCliente : datos.id_Cliente,
       cliente: datos.cliente,
+      ciudad : datos.ciudad,
       producto: datos.producto,
       id_Producto: datos.id_Producto,
       cant_Pedida: datos.cant_Pedida.toFixed(2),
@@ -168,6 +179,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       presentacion: datos.presentacion,
       estado: datos.estado,
       vendedor: datos.vendedor,
+      idVendedor: datos.id_Vendedor,
       precioUnidad : datos.precioUnidad.toFixed(2),
       orden_Compra_CLiente: datos.orden_Compra_CLiente,
       costo_Cant_Pendiente: datos.costo_Cant_Pendiente.toFixed(2),
@@ -1064,4 +1076,383 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = (dato : any) => this.messageService.clear(dato);
+
+  // 
+  eleccionClienteVendedore(num : number){
+    if (num == 1) this.vendedorSeleccionado = null;
+    else if (num == 2) this.clienteSeleccionado = null;
+  }
+
+  formatoPDF(){
+    this.cargando = true;
+    this.modalExportarPDF = false;
+    this.informacionPDF = this.ArrayPedidos.filter(x => x.Zeus == 1);
+    if (this.clienteSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.nitCliente == this.clienteSeleccionado && x.Zeus == 1);
+    if (this.vendedorSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
+
+    let today : any = moment().format('YYYY-MM-DD');
+    let hour : any = moment().format('HH:mm:ss');
+    let vendedores = this.getVendedores(this.informacionPDF);
+
+    const pdfDefinicion : any = {
+      info: { title: 'Pedidos de Ventas' },
+      pageOrientation: 'landscape',
+      pageSize: 'LETTER',
+      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+      pageMargins : [25, 100, 25, 35],
+      header: function(currentPage : any, pageCount : any) {
+        return [
+          {
+            margin: [20, 8, 20, 0],
+            columns: [
+              { image : logoParaPdf, width : 150, height : 30, margin: [20, 25, 80, 25] },
+              {
+                width: '*',
+                alignment: 'center',
+                table: {
+                  body: [
+                    [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                    [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                    [{text: 'Pedidos de Ventas', bold: true, alignment: 'center', fontSize: 10}],
+                  ]
+                },
+                layout: 'noBorders',
+                margin: [180, 20, 0, 20],
+              },
+              {
+                width: '*',
+                alignment: 'center',
+                margin: [180, 20, 20, 0],
+                table: {
+                  body: [
+                    [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                  ]
+                },
+                layout: 'noBorders',
+              }
+            ]
+          },
+          {
+            margin: [20, 0],
+            table: {
+              headerRows: 1,
+              widths: ['*'],
+              body: [
+                [
+                  {
+                    border: [false, true, false, false],
+                    text: ''
+                  },
+                ],
+              ]
+            },
+            layout: { defaultBorder: false, }
+          },
+        ];
+      },
+      content : this.pedidosVendedores(vendedores),
+    }
+    setTimeout(() => {
+      pdfMake.createPdf(pdfDefinicion).open();
+      this.clienteSeleccionado = null;
+      this.vendedorSeleccionado = null;
+      this.getVendedores();
+      this.cargando = false;
+      this.consultarPedidosZeus();
+      this.consultarPedidos();
+    }, 3000);
+  }
+
+  pedidosVendedores(vedendores : any){
+    let data : any = [];
+    for (let i = 0; i < vedendores.length; i++) {
+      data.push([
+        {
+          margin: [15, 5],
+          text: `${vedendores[i].id} - ${vedendores[i].nombre}`,
+          bold: true,
+          fontSize: 12,
+          alignment: 'left'
+        },
+        this.clientesVendedor(vedendores[i].id),
+      ]);
+    }
+    data.push([
+      {
+        margin: 5,
+        table: {
+          widths : ['100%'],
+          body: [
+            [
+              {
+                margin: 10,
+                border: [true, true, true, true],
+                alignment: 'right',
+                fontSize: 11,
+                bold: true,
+                text: `Total Pedidos: ${this.formatonumeros((this.subTotalPedidos()))}`
+              }
+            ]
+          ],
+        }
+      },
+    ]);
+    return data;
+  }
+
+  clientesVendedor(vendedor : number){
+    let clientes : any [] = this.informacionPDF.filter(x => x.idVendedor == vendedor);
+    let clientesIncluidos : any [] = [];
+    let data : any = [];
+    for (let i = 0; i < clientes.length; i++) {
+      if (!clientesIncluidos.includes(clientes[i].nitCliente)) {
+        clientesIncluidos.push(clientes[i].nitCliente);
+        data.push([
+          {
+            margin: 5,
+            table: {
+              widths : ['20%', '50%', '30%'],
+              body: this.pedidoClientes(clientes[i]),
+            },
+            fontSize: 10,
+          }
+        ]);
+      }   
+    }
+    return data;
+  }
+
+  pedidoClientes(pedido){
+    let pedidos : any [] = this.informacionPDF.filter(x => x.nitCliente == pedido.nitCliente);
+    let pedidosIncluidos : any [] = [];
+    let data : any = [
+      [
+        {
+          border: [true, true, false, true],
+          text: `${pedido.nitCliente}`,
+          fillColor: '#ccc',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `${pedido.cliente}`,
+          fillColor: '#ccc',
+          bold: true
+        },
+        {
+          border: [false, true, true, true],
+          text: `${pedido.ciudad}`,
+          fillColor: '#ccc',
+          bold: true
+        },
+      ],
+    ];
+    for (let i = 0; i < pedidos.length; i++) {
+      if (!pedidosIncluidos.includes(pedidos[i].consecutivo)) {
+        pedidosIncluidos.push(pedidos[i].consecutivo);
+        data.push([
+          {
+            margin: 5,
+            colSpan: 3,
+            border: [true, false, true, false],
+            table: {
+              widths : ['10%', '10%', '40%', '20%', '20%'],
+              body: this.infoPedido(pedidos[i])
+            }
+          },
+          {},
+          {},
+        ])
+      }
+    }
+    data.push([
+      {
+        margin: 5,
+        colSpan: 3,
+        alignment: 'right',
+        fontSize: 11,
+        bold: true,
+        border: [false, true, false, false],
+        text: `Total Cliente: ${this.formatonumeros((this.subTotalPedidosCliente(pedido.nitCliente)))}`
+      },
+      {},
+      {}
+    ]);
+    return data;
+  }
+
+  infoPedido(pedido){
+    let items : any [] = this.informacionPDF.filter(x => x.consecutivo == pedido.consecutivo);
+    let data : any = [
+      [
+        {
+          text: `PV ${pedido.consecutivo}`,
+          bold: true,
+          border: [true, true, false, true],
+          fontSize: 9
+        },
+        {
+          text: `${pedido.fecha_Creacion}`,
+          bold: true,
+          border: [false, true, false, true],
+          fontSize: 9
+        },
+        {
+          text: `${pedido.cliente}`,
+          bold: true,
+          border: [false, true, false, true],
+          fontSize: 9
+        },
+        {
+          text: `Orden Compra: ${pedido.orden_Compra_CLiente}`,
+          bold: true,
+          border: [false, true, false, true],
+          fontSize: 9
+        },
+        {
+          text: `Fecha Entrega: ${pedido.fecha_Entrega}`,
+          bold: true,
+          border: [false, true, true, true],
+          fontSize: 9
+        },
+      ]
+    ];
+    for (let i = 0; i < items.length; i++) {
+      data.push([
+        {
+          colSpan: 5,
+          border: [false, false, false, false],
+          table: {
+            widths: ['5%', '25%', '10%', '10%', '10%', '10%', '10%', '10%', '10%'],
+            body: this.itemsPedido(pedido)
+          },
+          layout: { defaultBorder: false, },
+          fontSize: 8,
+        },
+        {},
+        {},
+        {},
+        {}
+      ]);
+      break;
+    }
+    return data;
+  }
+
+  itemsPedido(pedido){
+    let items : any [] = this.informacionPDF.filter(x => x.consecutivo == pedido.consecutivo);
+    let data : any = [
+      [
+        {
+          border: [true, true, false, true],
+          text: `Item`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Referencia`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Presentación`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Pedida`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Facturada`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Pendiente`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Disponible`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, false, true],
+          text: `Precio Unitario`,
+          fillColor: '#ddd',
+          bold: true
+        },
+        {
+          border: [false, true, true, true],
+          text: `SubTotal`,
+          fillColor: '#ddd',
+          bold: true
+        },                                
+      ],
+    ];
+    for (let i = 0; i < items.length; i++) {
+      data.push([
+        { text: `${items[i].id_Producto}`, },
+        { text: `${items[i].producto}`, },
+        { text: `${items[i].presentacion}`, },
+        { text: `${this.formatonumeros((items[i].cant_Pedida))}`, },
+        { text: `${this.formatonumeros((items[i].cant_Pendiente))}`, },
+        { text: `${this.formatonumeros((items[i].cant_Facturada))}`, },
+        { text: `${this.formatonumeros((items[i].existencias))}`, },
+        { text: `${this.formatonumeros((items[i].precioUnidad))}`, },
+        { text: `${this.formatonumeros((items[i].costo_Cant_Pendiente))}`, },
+      ]);
+    }
+    return data;
+  }
+
+  subTotalPedidosCliente(cliente){
+    let total : number = 0;
+    total = this.informacionPDF.filter(x => x.nitCliente == cliente).reduce((a, b) => a + parseFloat(b.costo_Cant_Pendiente), 0);
+    return total;
+  }
+
+  subTotalPedidos(){
+    let total : number = 0;
+    total = this.informacionPDF.reduce((a, b) => a + parseFloat(b.costo_Cant_Pendiente), 0);
+    return total;
+  }
+
+  getVendedores(infoPedidos = this.ArrayPedidos) : any [] {
+    let vendedores : any [] = [];
+    infoPedidos.forEach(pedido => {
+      if (vendedores.map(x => x.nombre).indexOf(pedido.vendedor) == -1) {
+        vendedores.push({
+          id : pedido.idVendedor,
+          nombre : pedido.vendedor
+        });
+      }
+    });
+    this.vendedores = vendedores;
+    return vendedores;
+  }
+
+  getClientes() {
+    let clientes : any [] = [];
+    this.ArrayPedidos.forEach(pedido => {
+      if (clientes.map(x => x.id).indexOf(pedido.nitCliente) == -1) {
+        clientes.push({
+          id : pedido.nitCliente,
+          nombre : `${pedido.cliente} - ${pedido.ciudad}`
+        });
+      }
+    });
+    this.clientes = clientes;
+  }
 }

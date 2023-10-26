@@ -312,11 +312,6 @@ p-dropdown ol, p-dropdown ul {
   padding-left: 0;
 }
 
-p-dropdown {
-  display: grid;
-  width: 100%;
-}
-
 p-table p-dropdown {
   display: contents;
 }

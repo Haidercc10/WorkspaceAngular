@@ -257,8 +257,7 @@ td {
   transition: all .15s linear;
 }
 
-.button:active .active_line,
-.button:focus .active_line {
+.button:hover .active_line {
   width: 2.3em;
   background-color: rgb(41, 126, 255);
 }
