@@ -81,6 +81,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
-
+  pdfFacturaDetallada(){
+    
+  }
 
 }
