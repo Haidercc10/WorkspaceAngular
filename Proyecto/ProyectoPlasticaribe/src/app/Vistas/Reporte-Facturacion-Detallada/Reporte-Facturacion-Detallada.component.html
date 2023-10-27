@@ -1,0 +1,73 @@
+<app-menuLateral></app-menuLateral>
+<br>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Facturación Detallada</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="mb-4">
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
+  </div>
+
+  <form [formGroup]="formFiltros" (ngSubmit)="buscarFacturacion()">
+    <div class="row my-3 g-4">
+      <!-- RANGO DE FECHAS -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-calendar formControlName="rangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
+          <label for="fecha">Rango de Fechas</label>
+        </span>
+      </div>
+
+      <!-- VENDEDOR -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="vendedor" inputId="vendedores" [autoDisplayFirst]="false" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <label for="vendedores">Vendedores</label>
+        </span>
+      </div>
+
+      <!-- CLIENTE -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="cliente" id="clientes" [editable]="true" optionValue="cli_Id" optionLabel="cli_Nombre" [options]="clientes" (keyup)="obtenerClientes()" appendTo="body"></p-dropdown>
+          <label for="clientes">Clientes</label>
+        </span>        
+      </div>
+
+      <!-- PRODUCTO -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="producto" id="productos" [editable]="true" optionValue="prod_Id" optionLabel="prod_Nombre" [options]="productos" (keyup)="obtenerProductos()" appendTo="body"></p-dropdown>
+          <label for="productos">Referencias</label>
+        </span> 
+      </div>
+    </div>
+
+    <div class="my-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="submit" label="Buscar Facturas" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="formatoPDF()"></button>
+      </div>
+    </div>
+  </form>
+
+</p-card>

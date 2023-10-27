@@ -127,6 +127,9 @@ export const routes: Routes = [
 
   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
   {path: 'costos-caja-menor', loadChildren: () => import('./Modules/costos-caja-menor/costos-caja-menor.module').then(m => m.CostosCajaMenorModule)},
+
+  /** */
+  {path: 'facturacion-detallada', loadChildren: () => import('./Modules/reporte-facturacion-detallada/reporte-facturacion-detallada.module').then(m => m.ReporteFacturacionDetalladaModule)},
 ]
 
 @NgModule({
