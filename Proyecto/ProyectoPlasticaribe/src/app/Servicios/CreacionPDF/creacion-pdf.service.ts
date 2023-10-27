@@ -11,7 +11,7 @@ export class CreacionPdfService {
 
     constructor() { }
 
-    formatoPDF(titulo, content : any){
+    formatoPDF(titulo : string, content : any, headerAdicional : any = {}){
         let today : any = moment().format('YYYY-MM-DD');
         let hour : any = moment().format('HH:mm:ss');
         const pdfDefinicion : any = {
@@ -19,39 +19,40 @@ export class CreacionPdfService {
           pageOrientation: 'portrait',
           pageSize: 'LETTER',
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 100, 25, 35],
-          header: this.headerPDF(today, hour),
+          pageMargins : [25, 110, 25, 35],
+          header: this.headerPDF(today, hour, titulo, headerAdicional),
           content : content,
         }
         setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
     }
     
-    private headerPDF(today, hour){
+    private headerPDF(today, hour, titulo, headerAdicional){
         return (currentPage : any, pageCount : any) => {
             return [
-            {
-                margin: [20, 8, 20, 0],
-                columns: [
-                { image : logoParaPdf, width : 150, height : 30, margin: [20, 25, 80, 10] },
-                this.empresaFechaHoraTituloPDF(),
-                this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
-                ]
-            },
-            this.lineaHeaderFooterPDF([false, true, false, false]),
+                {
+                    margin: [20, 8, 20, 0],
+                    columns: [
+                        { image : logoParaPdf, width : 150, height : 30, margin: [20, 25, 80, 10] },
+                        this.empresaFechaHoraTituloPDF(titulo),
+                        this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
+                    ]
+                },
+                this.lineaHeaderFooterPDF([false, true, false, false]),
+                headerAdicional,
             ];
         }
     }
 
-    private empresaFechaHoraTituloPDF(){
+    private empresaFechaHoraTituloPDF(titulo : string){
         return {
             width: '*',
             alignment: 'center',
             table: {
-            body: [
-                [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
-                [{text: 'Pedidos de Ventas', bold: true, alignment: 'center', fontSize: 10}],
-            ]
+                body: [
+                    [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
+                    [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
+                    [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
+                ]
             },
             layout: 'noBorders',
             margin: [80, 20, 0, 10],
@@ -64,11 +65,11 @@ export class CreacionPdfService {
             alignment: 'center',
             margin: [100, 20, 20, 0],
             table: {
-            body: [
-                [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-            ]
+                body: [
+                    [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                    [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+                ]
             },
             layout: 'noBorders',
         }
@@ -78,11 +79,11 @@ export class CreacionPdfService {
         return {
             margin: [20, 0],
             table: {
-            headerRows: 1,
-            widths: ['*'],
-            body: [
-                [{ border: borders, text: '' }],
-            ]
+                headerRows: 1,
+                widths: ['*'],
+                body: [
+                    [{ border: borders, text: '' }],
+                ]
             },
             layout: { defaultBorder: false, }
         }
