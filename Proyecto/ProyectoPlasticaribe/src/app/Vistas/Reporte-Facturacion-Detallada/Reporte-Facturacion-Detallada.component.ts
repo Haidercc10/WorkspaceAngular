@@ -70,13 +70,14 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     this.cargando = true;
     this.dataPDF = this.dataFacturacion;
     let contentPDf : any [] = [];
-    this.pdfService.formatoPDF(contentPDf);
+    let titulo = 'Informe de Ventas';
+    this.pdfService.formatoPDF(titulo, contentPDf);
     this.cargando = false;
   }
 
   pdfFacturaConsolidad(){
     let data : any;
-    
+
     return data;
   }
 

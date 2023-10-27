@@ -11,11 +11,11 @@ export class CreacionPdfService {
 
     constructor() { }
 
-    formatoPDF(content : any){
+    formatoPDF(titulo, content : any){
         let today : any = moment().format('YYYY-MM-DD');
         let hour : any = moment().format('HH:mm:ss');
         const pdfDefinicion : any = {
-          info: { title: 'Pedidos de Ventas' },
+          info: { title: titulo },
           pageOrientation: 'portrait',
           pageSize: 'LETTER',
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
