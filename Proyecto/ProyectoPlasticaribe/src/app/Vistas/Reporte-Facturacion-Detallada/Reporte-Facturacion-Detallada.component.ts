@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -9,7 +8,6 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte-Facturacion-Detallada',
@@ -32,17 +30,18 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
                   private zeusService : InventarioZeusService,
-                    private clientesService : ClientesService,
-                      private productosService : ProductoService,
-                        private vendedorService : UsuarioService,
-                          private pdfService : CreacionPdfService,
-                            private msj : MensajesAplicacionService) {
+                    private productosService : ProductoService,
+                      private vendedorService : UsuarioService,
+                        private pdfService : CreacionPdfService,
+                          private msj : MensajesAplicacionService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
       rangoFechas : [null],
+      idCliente : [null],
       cliente : [null],
       vendedor : [null],
+      idProducto : [null],
       producto : [null]
     });
   }
@@ -60,7 +59,23 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   obtenerClientes(){
     let nombre : string = this.formFiltros.value.cliente;
-    this.clientesService.LikeGetCliente(nombre).subscribe(resp => this.clientes = resp);
+    this.zeusService.LikeGetClientes(nombre).subscribe(resp => this.clientes = resp);
+  }
+
+  clienteSeleccionado(){
+    let cliente : any = this.formFiltros.value.cliente;
+    this.formFiltros.patchValue({
+      idCliente : cliente,
+      cliente : this.clientes.find(x => x.idcliente == cliente).razoncial
+    });
+  }
+
+  productoSeleccionado(){
+    let producto : any = this.formFiltros.value.producto;
+    this.formFiltros.patchValue({
+      idProducto : producto,
+      producto : this.productos.find(x => x.prod_Id == producto).prod_Nombre
+    });
   }
 
   obtenerProductos(){
@@ -70,23 +85,31 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   buscarFacturacion(){
     if (this.formFiltros.value.rangoFechas) {
+      this.dataFacturacion = [];
       this.cargando = true;
       let fechaInicial : any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
-      let cliente : any = this.formFiltros.value.cliente;
-      let vendedor : any = this.formFiltros.value.vendedor;
-      let producto : any = this.formFiltros.value.producto;
-      let ruta : string = ``;
 
-      if (cliente != null) ruta += `cliente=${cliente}`;
-      if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
-      if (producto != null) ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`;
-      if (ruta.length > 0) ruta = `?${ruta}`;
-
-      this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, ruta).subscribe(res => this.llenarDatosFacturas(res));
-      this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, ruta).subscribe(res => this.llenarDatosDevoluciones(res));
-      this.cargando = false;
+      this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosFacturas(res));
+      this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosDevoluciones(res));
+      setTimeout(() => this.cargando = false, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
+  }
+
+  validarParametrosConsulta(factura : boolean){
+    let cliente : any = this.formFiltros.value.idCliente;
+    let vendedor : string = this.formFiltros.value.vendedor;
+    let producto : any = this.formFiltros.value.idProducto;
+    let ruta : string = ``;
+    
+    if (`vendedor`.length == 2) vendedor = `0${vendedor}`;
+    else if (`vendedor`.length == 1) vendedor = `00${vendedor}`;
+
+    if (cliente != null) ruta += `cliente=${cliente}`;
+    if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
+    if (factura && producto != null) ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+    return ruta;
   }
 
   llenarDatosFacturas(facturas : any []){
@@ -108,6 +131,30 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
   }
+
+  tableFacturas(){
+    return this.dataFacturacion.filter(x => x.recibo != 'DEVOLUCIÓN');
+  }
+
+  tableDevoluciones(){
+    return this.dataFacturacion.filter(x => x.recibo == 'DEVOLUCIÓN');
+  }
+
+  totalFacturas(){
+    let total : number = 0;
+    this.dataFacturacion.forEach(fac => {
+      if (fac.recibo != 'DEVOLUCIÓN') total += fac.suma;
+    });
+    return total;
+  }
+
+  totalDevoluciones(){
+    let total : number = 0;
+    this.dataFacturacion.forEach(fac => {
+      if (fac.recibo == 'DEVOLUCIÓN') total += fac.suma;
+    });
+    return total;
+  }
   
   formatoPDF(){
     this.cargando = true;
@@ -117,7 +164,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let contentPDf : any [] = this.pdfFacturaConsolidad(this.dataPDF);
     let titulo = 'Informe de Ventas';
     this.pdfService.formatoPDF(titulo, contentPDf, headerAdicional);
-    this.cargando = false;
+    setTimeout(() => this.cargando = false, 3000);
   }
 
   headerAdicional(){
@@ -128,7 +175,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         fontSize: 10,
         bold: true,
         table: {
-          widths: ['10%', '15%', '35%', '20%', '20%'],
+          widths: ['10%', '15%', '45%', '15%', '15%'],
           body: [
             [
               { text: `Fecha`, alignment: 'center',  fillColor: '#ccc', border: [true, true, false, true] },
@@ -152,7 +199,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         fontSize: 8,
         border: [true, false, true, false],
         table: {
-          widths : ['10%', '15%', '35%', '20%', '20%'],
+          dontBreakRows: true,
+          widths : ['10%', '15%', '45%', '15%', '15%'],
           body: this.facturas(datos)
         }
       },
@@ -167,8 +215,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         { text: moment(datos[i].fecha).format('YYYY-MM-DD'), margin: 5, border: [false, false, false, false], alignment: 'center', },
         { text: datos[i].factura, margin: 5, border: [false, false, false, false], alignment: 'center', },
         { text: datos[i].cliente, margin: 5, border: [false, false, false, false], alignment: 'left', },
-        { text: `$ ${this.formatonumeros(datos[i].suma)}`, margin: 5, border: [false, false, false, false], alignment: 'right', },
-        { text: datos[i].recibo, margin: 5, border: [false, false, false, false], alignment: 'center', },
+        { text: `$ ${this.formatonumeros(datos[i].suma)}`, margin: 5, border: [false, false, false, false], alignment: 'right', bold: true },
+        { text: datos[i].recibo, margin: 5, border: [false, false, false, false], alignment: 'center', bold: true },
       ]);
     }
     data.push([
