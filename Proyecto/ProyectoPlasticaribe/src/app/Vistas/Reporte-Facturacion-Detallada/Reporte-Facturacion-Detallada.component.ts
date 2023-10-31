@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { info } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
@@ -28,6 +29,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   vendedores : any [] = [];
   clientes : any [] = [];
   productos : any [] = [];
+  infoPdf : any[] = [];
+  infoDevoluciones : any[] = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -85,6 +88,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
       this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, ruta).subscribe(res => this.llenarDatosFacturas(res));
       this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, ruta).subscribe(res => this.llenarDatosDevoluciones(res));
+      this.cargarFacturacionDetallada(fechaInicial, fechaFinal, ruta);
       this.cargando = false;
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
   }
@@ -193,4 +197,187 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return total;
   }
 
+  cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
+    this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
+      this.infoPdf = resp;
+      this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ruta).subscribe(devoluciones => {
+        devoluciones.forEach(dv => {
+          this.infoPdf.push({
+            idVendedor : dv.idvende,
+            vendedor : '',
+            cliente : dv.descritra,
+            fecha : dv.fechatra,
+            factura : dv.numefac,
+            factura2 : 'DV',
+            item : '',
+            referencia : '',
+            presentacion : '',
+            cantidad : 1,
+            precio : (-(dv.valortra)),
+            valorTotal : (-(dv.valortra)),
+          })
+        })
+      }); 
+      this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
+    });
+  }
+
+  headerItems(){
+    let data : any = [];
+    data.push([
+      {
+        margin: [5, 0],
+        fontSize: 8,
+        bold: true,
+        table: {
+          widths: ['12%', '8%', '8%', '39%', '5%', '8%', '10%', '10%'],
+          body: [
+            [
+              { text: `Fecha`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Factura`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Item`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Referencia`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Und`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Cant.`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Precio`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+              { text: `Subtotal`, alignment: 'left',  fillColor: '#ccc', border: [false, false, false, false] },
+            ]
+          ]
+        }
+      }
+    ]);
+    return data;
+  }
+
+  getVendedores(informacion : any[]){
+    let vendedores : any = [];
+    let titulo = `Facturación Detallada x Dia`;
+    informacion.forEach(inf => { 
+      if(vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
+        vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
+      }
+    });
+    this.vendedores = vendedores;
+    this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {});
+  }
+
+  tablaVendedores(vendedores : any) {
+    let data : any = [];
+    for (let index = 0; index < vendedores.length; index++) {
+      data.push([{
+        margin: [10, 10],
+          fontSize: 10,
+          bold: true,
+          table: {
+            dontBreakRows : true,
+            widths: ['100%'],
+            body: this.llenarTabla(vendedores[index])
+          }
+      }]);
+      data.push([
+        { margin: [10, 0, 10, 3], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Total Vendedor: $ ${this.formatonumeros((this.subTotalVendedor(vendedores[index].id)))}`, },
+      ], 
+      [
+        { margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total Devoluciones: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },
+      ]);
+    }
+    return data;
+  }
+
+  llenarTabla(vendedores : any) {
+    let array : any[] = [];
+    array.push(
+        [
+          { text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, 
+        ], 
+    )
+    array.push([this.getClientesVendedor(vendedores)]);
+    return array;
+  }
+  
+  getClientesVendedor(vendedores : any){
+    let data : any = [];
+    let clientes : any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);  
+    let clientesVendedor : any[] = [];
+    for (let index = 0; index < clientes.length; index++) {
+      if(!clientesVendedor.includes(clientes[index].cliente)){
+        clientesVendedor.push(clientes[index].cliente);
+        data.push(this.tablaClientesVendedor(clientes[index]));
+      }
+    }
+    return data;
+  }
+
+  tablaClientesVendedor(clientes : any) {
+    let data : any[] = [];
+    data.push({
+      margin: [0, 5, 0, 5],
+        fontSize: 9,
+        bold: true,
+        colSpan : 2,
+        table: {
+          dontBreakRows : true,
+          widths: ['100%'],
+          body: [
+            [
+              { text: `FV${clientes.factura} - ${clientes.cliente}`, alignment: 'left', border: [true, true, true, true] }, 
+            ],
+          ], 
+        }  
+    });
+    data.push(this.getItemsClientesVendedor(clientes))
+    return data;
+  }
+
+  getItemsClientesVendedor(clientes : any){
+    let data : any = [];
+    let items : any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente);
+    data.push(this.headerItems());
+    for (let index = 0; index < items.length; index++) {
+      data.push(this.tablaItemsClientesVendedor(items[index]));
+    }
+    return data;
+  }
+
+  tablaItemsClientesVendedor(items : any){  
+    return {
+     margin: [0, 0],
+       fontSize: 8,
+       bold: false,
+       table: {
+         widths: ['12%', '8%', '8%', '39%', '5%', '8%', '10%', '10%'],
+         body: [
+           [
+             { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
+             { text: `${items.factura2}`, alignment: items.factura2 == `DV` ? `center` : `left`, border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
+             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false] }, 
+             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false] }, 
+             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false] }, 
+             { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
+             { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
+             { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`},
+           ],
+         ],
+       }  
+    } 
+  }
+
+  total(){
+    let total : number = 0;
+    total = this.infoPdf.reduce((a,b) => a + b.valorTotal, 0);
+    console.log(total);
+  }
+
+  subTotalVendedor(vendedor : any){
+    let subtotal : number = 0;
+    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal > 0).reduce((a,b) => a + b.valorTotal, 0);
+    return subtotal;
+  }
+
+  subTotalDevolucionesVendedor(vendedor : any){
+    let subtotal : number = 0;
+    subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal < 0).reduce((a,b) => a + b.valorTotal, 0);
+    return subtotal;
+  }
+  
 }

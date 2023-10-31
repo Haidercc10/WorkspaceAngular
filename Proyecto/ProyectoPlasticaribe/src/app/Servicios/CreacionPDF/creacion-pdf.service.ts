@@ -19,7 +19,7 @@ export class CreacionPdfService {
           pageOrientation: 'portrait',
           pageSize: 'LETTER',
           watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 110, 25, 35],
+          pageMargins : [25, 100, 25, 35],
           header: this.headerPDF(today, hour, titulo, headerAdicional),
           content : content,
         }
