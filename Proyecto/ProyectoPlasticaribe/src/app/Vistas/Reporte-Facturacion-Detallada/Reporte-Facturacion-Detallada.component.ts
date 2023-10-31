@@ -122,8 +122,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let producto : any = this.formFiltros.value.idProducto;
     let ruta : string = ``;
 
-    if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
-    else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
+    if (`vendedor`.length == 2) vendedor = `0${vendedor}`;
+    else if (`vendedor`.length == 1) vendedor = `00${vendedor}`;
 
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
