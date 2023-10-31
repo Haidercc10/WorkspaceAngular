@@ -4,6 +4,7 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetalleOrdenMaquilaService } from 'src/app/Servicios/DetalleOrdenMaquila/DetalleOrdenMaquila.service';
 import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturacion_OrdenMaquila.ts/DtFacturacion_OrdenMaquila.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -49,7 +50,8 @@ export class Reporte_MaquilasComponent implements OnInit {
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private servicioTerceros : TercerosService,
                             private shepherdService: ShepherdService,
-                              private msj : MensajesAplicacionService) {
+                              private msj : MensajesAplicacionService,
+                                private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
@@ -106,48 +108,35 @@ export class Reporte_MaquilasComponent implements OnInit {
     this.registrosConsultados = [];
     this.arrayConsolidado = [];
     this.valorTotalConsulta = 0;
-    this.cargando = true;
     let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
-    let estado : any = this.FormConsultarFiltros.value.estadoDoc;
-    let codigo : any = this.FormConsultarFiltros.value.Documento;
-    let tercero : any = this.FormConsultarFiltros.value.id_tercero
-    let ruta : string = '', ruta2 : string = '';
+    let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
 
-    if (fechaInicial == 'Fecha inválida') fechaInicial = fechaMesAnterior;
-    if (fechaFinal == 'Fecha inválida') fechaFinal = moment().format('YYYY-MM-DD');
-
-    if (estado != null && codigo != null) ruta = `?doc=${codigo}&estado=${estado}`;
-    else if (estado != null) ruta = `?estado=${estado}`;
-    else if (codigo != null) ruta = `?doc=${codigo}`;
-
-    this.ordenMaquilaService.GetConsultaDocumentos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
+    this.ordenMaquilaService.GetConsultaDocumentos(fechaInicial, fechaFinal, this.validarParametrosConsultas(false)).subscribe(datos => {
+      this.cargando = true;
       if(datos.length > 0 ) datos.forEach(data => this.llenarTabla(data));
-      else {
-        this.msj.mensajeAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`);
-        this.cargando = false;
-      }
-      setTimeout(() => this.cargando = false, datos.length * 5);
+      else this.msj.mensajeAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`);
     }, () => this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`), () => this.cargando = false);
 
     if (this.ValidarRol == 1) {
-      if (estado != null && codigo != null && tercero != null) ruta2 = `?doc=${codigo}&estado=${estado}&tercero=${tercero}`;
-      else if (estado != null && tercero != null) ruta2 = `?estado=${estado}&tercero=${tercero}`;
-      else if (codigo != null && tercero != null) ruta2 = `?doc=${codigo}&tercero=${tercero}`;
-      else if (estado != null) ruta2 = `?estado=${estado}`;
-      else if (codigo != null) ruta2 = `?doc=${codigo}`;
-      else if (tercero != null) ruta2 = `?tercero=${tercero}`;
-
-      this.ordenMaquilaService.GetConsultaConsolidado(fechaInicial, fechaFinal, ruta2).subscribe(datos => {
+      this.ordenMaquilaService.GetConsultaConsolidado(fechaInicial, fechaFinal, this.validarParametrosConsultas(true)).subscribe(datos => {
         this.cargando = true;
         datos.forEach(data => this.llenartTablaConsolidado(data));
-        setTimeout(() => this.cargando = false, datos.length * 5);
-      }, () => {
-        this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`)
-        this.cargando = false;
-      }, () => this.cargando = false);
+      }, () => this.msj.mensajeError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`), () => this.cargando = false);
     }
+  }
+
+  validarParametrosConsultas(facturacion : boolean) : string {
+    let estado : any = this.FormConsultarFiltros.value.estadoDoc;
+    let codigo : any = this.FormConsultarFiltros.value.Documento;
+    let tercero : any = this.FormConsultarFiltros.value.id_tercero
+    let ruta : string = '';
+
+    if (codigo != null) ruta += `doc=${codigo}`;
+    if (estado != null) ruta.length > 0 ? ruta += `&estado=${estado}` : ruta += `estado=${estado}`;
+    if (facturacion && tercero != null) ruta.length > 0 ? ruta += `&tercero=${tercero}` : ruta += `tercero=${tercero}`;
+    if (ruta.length > 0) ruta = `?${ruta}`;
+    return ruta;
   }
 
   // funcion que va a llenar la tabla con la informacion de cada documento
@@ -167,33 +156,10 @@ export class Reporte_MaquilasComponent implements OnInit {
 
   // Funcion que va a llenar la tabla del consolidado de facturación de ordenes de maquilas
   llenartTablaConsolidado(data : any) {
-    if (data.mes == 1) data.mes = 'Enero';
-    if (data.mes == 2) data.mes = 'Febrero';
-    if (data.mes == 3) data.mes = 'Marzo';
-    if (data.mes == 4) data.mes = 'Abril';
-    if (data.mes == 5) data.mes = 'Mayo';
-    if (data.mes == 6) data.mes = 'Junio';
-    if (data.mes == 7) data.mes = 'Julio';
-    if (data.mes == 8) data.mes = 'Agosto';
-    if (data.mes == 9) data.mes = 'Septiembre';
-    if (data.mes == 10) data.mes = 'Octubre';
-    if (data.mes == 11) data.mes = 'Noviembre';
-    if (data.mes == 12) data.mes = 'Diciembre';
-
-    let mp_Id : number, mp : string;
-
-    if (data.materiaPrima_Id != 84) {
-      mp = data.materiaPrima;
-      mp_Id = data.materiaPrima_Id
-    } else if (data.tinta_Id != 2001) {
-      mp = data.tinta;
-      mp_Id = data.tinta_Id;
-    } else if (data.bopp_Id != 449) {
-      mp = data.bopp;
-      mp_Id = data.bopp_Id;
-    }
-
-    let info : any = {
+    data.mes = this.cambiarNumeroMes_NombreMes(data.mes);
+    let mp_Id : number = this.colocarIdMateriaPrima(data);
+    let mp : string = this.colocarNombreMateriaPrima(data);
+    this.arrayConsolidado.push({
       Fecha : `${data.anio} - ${data.mes}`,
       Tercero : data.tercero,
       MateriaPrima_Id : mp_Id,
@@ -202,10 +168,70 @@ export class Reporte_MaquilasComponent implements OnInit {
       Presentacion : data.presentacion,
       Precio : data.precio,
       SubTotal : data.subTotal,
-    }
+    });
     this.pesoTotal += data.cantidad;
     this.valorTotalConsulta += data.subTotal;
-    this.arrayConsolidado.push(info);
+  }
+
+  cambiarNumeroMes_NombreMes(mes : number) : string {
+    let nombreMes : string;
+    switch (mes) {
+      case 1:
+        nombreMes = `Enero`;
+        break;
+      case 2:
+        nombreMes = `Febrero`;
+        break;
+      case 3:
+        nombreMes = `Marzo`;
+        break;
+      case 4:
+        nombreMes = `Abril`;
+        break;
+      case 5:
+        nombreMes = `Mayo`;
+        break;
+      case 6:
+        nombreMes = `Junio`;
+        break;
+      case 7:
+        nombreMes = `Julio`;
+        break;
+      case 8:
+        nombreMes = `Agosto`;
+        break;
+      case 9:
+        nombreMes = `Septiembre`;
+        break;
+      case 10:
+        nombreMes = `Octubre`;
+        break;
+      case 11:
+        nombreMes = `Noviembre`;
+        break;
+      case 12:
+        nombreMes = `Diciembre`;
+        break;
+      default:
+        break;
+    }
+    return nombreMes;
+  }
+
+  colocarIdMateriaPrima(data) : number {
+    let id : number;
+    if (data.materiaPrima_Id != 84) id = data.materiaPrima_Id;
+    else if (data.tinta_Id != 2001) id = data.tinta_Id;
+    else if (data.bopp_Id != 449) id = data.bopp_Id;
+    return id;
+  }
+
+  colocarNombreMateriaPrima(data) : string {
+    let nombre : string;
+    if (data.materiaPrima_Id != 84) nombre = data.materiaPrima;
+    else if (data.tinta_Id != 2001) nombre = data.tinta;
+    else if (data.bopp_Id != 449) nombre = data.bopp;
+    return nombre
   }
 
   // Funion que validará el tipo de documento que es para crear el PDF
@@ -217,6 +243,7 @@ export class Reporte_MaquilasComponent implements OnInit {
 
   // Funcion que va a consultar la información de la factura o remisión que se acaba de crear
   buscarFacturacion(id : number){
+    let count : number = 0;
     this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
       for (let i = 0; i < datos_facturacion.length; i++) {
         let info : any = {
@@ -242,8 +269,9 @@ export class Reporte_MaquilasComponent implements OnInit {
         }
         this.datosPdf.push(info);
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        count++;
+        if (count == datos_facturacion.length) this.crearPDF_Facturacion(id);
       }
-      setTimeout(() => this.crearPDF_Facturacion(id), 2500);
     });
   }
 
@@ -431,9 +459,10 @@ export class Reporte_MaquilasComponent implements OnInit {
 
   // Funcion que va a consultar la información de la factura o remisión que se acaba de crear
   buscarOrden(id : number){
-    this.cargando = true;
+    let count : number = 0;
     this.datosPdf = [];
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_Orden => {
+      this.cargando = true;
       for (let i = 0; i < datos_Orden.length; i++) {
         let info : any = {
           Id : 0,
@@ -458,12 +487,10 @@ export class Reporte_MaquilasComponent implements OnInit {
         }
         this.datosPdf.push(info);
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        count++;
+        if (count == datos_Orden.length) this.generarPDF(datos_Orden[i]);
       }
-      setTimeout(() => this.crearPDF_Orden(id), 2500);
-    }, () => {
-      this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`);
-      this.cargando = false;
-    }, () => this.cargando = false);
+    }, () => this.msj.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`), () => this.cargando = false);
   }
 
   // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
@@ -618,6 +645,69 @@ export class Reporte_MaquilasComponent implements OnInit {
     });
   }
 
+  generarPDF(data : any){
+    let titulo : string = `Orden de Maquila N° ${data.orden}`;
+    let content : any = [
+      this.tituloTerceroPDF(),
+      this.datosTerceroPdf(data),
+      this.tituloMateriasPrimasPdf(),
+      this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Und Medida', 'Precio', 'SubTotal']),
+      this.totalesPdf(data),
+      this.observacionesPdf(data)
+    ];
+    this.creacionPDFService.formatoPDF(titulo, content);
+    setTimeout(() => this.cargando = false, 3000);
+  }
+
+  tituloTerceroPDF(){
+    return {
+      text: `Información detallada del Tercero \n \n`,
+      alignment: 'center',
+      style: 'header'
+    };
+  }
+
+  datosTerceroPdf(data : any){
+    return {
+      style: 'tablaCliente',
+      table: {
+        widths: ['40%', '30%', '30%'],
+        style: 'header',
+        body: [
+          [`Nombre: ${data.tercero}`, `ID: ${data.tercero_Id}`, `Tipo de ID: ${data.tipo_Id}`],
+          [`Telefono: ${data.telefono_Tercero}`, `Ciudad: ${data.ciudad_Tercero}`, `E-mail: ${data.correo_Tercero}`],
+        ]
+      },
+      layout: 'lightHorizontalLines',
+      fontSize: 9,
+    }
+  }
+
+  tituloMateriasPrimasPdf(){
+    return {
+      text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+      alignment: 'center',
+      style: 'header'
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: ['10%', '40%', '15%', '10%', '10%', '15%'],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data : any, columns : any) {
     var body = [];
@@ -632,21 +722,40 @@ export class Reporte_MaquilasComponent implements OnInit {
     return body;
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  totalesPdf(data : any){
     return {
+      style: 'tablaTotales',
       table: {
-        headerRows: 1,
-        widths: [50, 217, 50, 50, 60, 98],
-        body: this.buildTableBody(data, columns),
+        widths: ['40%', '10%', '15%', '10%', '10%', '15%'],
+        style: 'header',
+        body: [
+          [
+            '',
+            {border: [true, false, true, true], text: `Peso Total`},
+            {border: [false, false, true, true], text: `${this.formatonumeros(data.peso_Total)}`},
+            '',
+            {border: [true, false, true, true], text: `Valor Total`},
+            {border: [false, false, true, true], text: `$${this.formatonumeros(data.valor_Total)}`},
+          ],
+        ]
       },
+      layout: {defaultBorder: false},
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
     };
+  }
+
+  observacionesPdf(data : any){
+    return {
+      margin: [0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: `${data.observacion ? data.observacion.toString().trim() : ''}` }]
+        ]
+      },
+      fontSize: 9,
+    }
   }
 
   cargarTerceros = () => this.servicioTerceros.getTerceroLike(this.FormConsultarFiltros.value.tercero).subscribe(data => this.arrayTerceros = data);

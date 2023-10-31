@@ -9,6 +9,7 @@ import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeu
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -40,7 +41,8 @@ export class DashBoardRecaudosComponent implements OnInit {
                     private paginaPrincial : PaginaPrincipalComponent,
                       private frmBuilder : FormBuilder,
                         private vendedorService : UsuarioService,
-                          private msj : MensajesAplicacionService,) {
+                          private msj : MensajesAplicacionService,
+                            private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.frmBuilder.group({
@@ -109,5 +111,172 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.zeusService.GetCartera(ruta).subscribe(data => this.totalCartera = data, err => this.msj.mensajeError(`${err.error}`));
     this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data);
     setTimeout(() => this.cargando = false, 5000);
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+
+  generarPDF(){
+    this.cargando = true;
+    let t = setInterval(() => {
+      if (this.cartera.length > 0) {
+        let titulo : string = "Recaudos";
+        let content : any [] = this.contenidoPDF();
+        this.creacionPDFService.formatoPDF(titulo, content);
+        clearInterval(t);
+        setTimeout(() => this.cargando = false, 3000);
+      }
+    }, 1000);
+  }
+
+  contenidoPDF(){
+    let data : any [] = [];
+    let vendedores : any [] = this.obtenerVendedoresCartera();
+    for (let i = 0; i < vendedores.length; i++) {
+      data.push([
+        {
+          margin: [15, 5],
+          text: `${vendedores[i].id} - ${vendedores[i].nombre}`,
+          bold: true,
+          fontSize: 12,
+          alignment: 'left'
+        },
+        this.clientesVendedorPdf(vendedores[i].id),
+      ]);
+    }
+    data.push(this.totalCarteraPdf());
+    return data;
+  }
+
+  clientesVendedorPdf(vendedor : string){
+    let clientes : any [] = this.cartera.filter(x => x.id_Vendedor == vendedor);
+    clientes.sort((a,b) => a.nombre_CLiente.localeCompare(b.nombre_CLiente));
+    let clientesIncluidos : any [] = [];
+    let data : any [] = [];
+    for (let i = 0; i < clientes.length; i++) {
+      if (!clientesIncluidos.includes(clientes[i].id_Cliente)) {
+        clientesIncluidos.push(clientes[i].id_Cliente);
+        data.push({
+          margin: [20, 5],
+          fontSize: 10,
+          table: {
+            widths: [100, 300, 100],
+            body: this.facturasClientes(clientes[i])
+          }
+        });
+      }
+    }
+    return data;
+  }
+
+  facturasClientes(cliente){
+    let facturas : any [] = this.cartera.filter(x => x.id_Cliente == cliente.id_Cliente);
+    facturas.sort((a,b) => a.id_Fecha.localeCompare(b.id_Fecha));
+    let data : any [] = [];
+    data.push(this.informacionClientePDF(cliente));
+    data.push([
+      {
+        margin: 5,
+        colSpan: 3,
+        border: [true, false, true, true],
+        table: {
+          fontSize: 8,
+          dontBreakRows: true,
+          widths : ['20%', '20%', '20%', '20%', '20%'],
+          body: this.datosFacturasPdf(facturas)
+        }
+      },
+      {},
+      {}
+    ]);
+    data.push(this.totalClientePdf(facturas));
+    return data;
+  }
+
+  informacionClientePDF(cliente) {
+    return [
+      { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: `${cliente.nombre_CLiente}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, true, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true },
+    ]
+  }
+
+  datosFacturasPdf(facturas){
+    let data : any [] = [];
+    data.push(this.titulosFacturasPdf());
+    for (let i = 0; i < facturas.length; i++) {
+      data.push([
+        { border: [true, true, false, true], fontSize: 8, text: `${facturas[i].num_Factura}`, alignment: 'center' },
+        { border: [false, true, false, true], fontSize: 8, text: `${facturas[i].id_Fecha}`, alignment: 'center' },
+        { border: [false, true, false, true], fontSize: 8, text: `${facturas[i].fecha_Vencimiento}`, alignment: 'center' },
+        { border: [false, true, false, true], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldo_Cartera).toFixed(2))}`, alignment: 'right' },
+        { border: [false, true, true, true], fontSize: 8, text: `${facturas[i].plazo_De_Pago}`, alignment: 'center' },
+      ]);
+    }
+    return data;
+  }
+
+  titulosFacturasPdf(){
+    return [
+      { border: [true, true, false, true], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, true, false, true], text: `Fecha`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, true, false, true], text: `Fecha Vence`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, true, false, true], text: `Cartera`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, true, true, true], text: `Plazo de Pago`, fillColor: '#ccc', bold: true, alignment: 'center' },
+    ];
+  }
+
+  totalClientePdf(facturas){
+    let total = facturas.reduce((a,b) => a + b.saldo_Cartera, 0)
+    return [
+      {
+        margin: [5, 5, 5, 15],
+        colSpan: 3,
+        alignment: 'right',
+        fontSize: 11,
+        bold: true,
+        border: [false, true, false, false],
+        text: `Total Cliente: $ ${this.formatonumeros((total).toFixed(2))}`,
+      },
+      {},
+      {}
+    ]
+  }
+
+  totalCarteraPdf(){
+    return [
+      {
+        margin: [20, 5],
+        table: {
+          widths : [518],
+          body: [
+            [
+              {
+                margin: 10,
+                border: [true, true, true, true],
+                alignment: 'right',
+                fontSize: 11,
+                bold: true,
+                text: `Total Cartera: $ ${this.formatonumeros((this.totalCartera))}`
+              }
+            ]
+          ],
+        }
+      },
+    ]
+  }
+
+  obtenerVendedoresCartera(){
+    let vendedores : any [] = [];
+    this.cartera.forEach(factura => {
+      if (!vendedores.map(x => x.nombre).includes(factura.nombre_Vendedor)) {
+        vendedores.push({
+          id : factura.id_Vendedor,
+          nombre : factura.nombre_Vendedor
+        });
+      }
+    });
+    vendedores.sort((a,b) => a.id - b.id);
+    return vendedores;
   }
 }

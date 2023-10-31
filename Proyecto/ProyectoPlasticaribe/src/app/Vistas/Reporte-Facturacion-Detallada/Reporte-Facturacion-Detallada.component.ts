@@ -149,7 +149,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         factura: dev.numefac,
         cliente: dev.descritra,
         recibo: `DEVOLUCIÓN`,
-        suma: (-(dev.valortra))
+        suma: (dev.valortra)
       });
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
@@ -253,7 +253,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       ]);
     }
     data.push([
-      { colSpan: 4, border: [false, true, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalFacturacion()))}`, },
+      { colSpan: 4, border: [false, true, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalFacturacion().toFixed(2)))}`, },
       {},
       {},
       {},

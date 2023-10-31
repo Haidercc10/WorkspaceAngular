@@ -1,25 +1,24 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
+import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { RelacionSolicitud_OrdenCompraService } from 'src/app/Servicios/RelacionSolicitud_OrdenCompra/RelacionSolicitud_OrdenCompra.service';
+import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenesCompra as defaultSteps } from 'src/app/data';
-import { ShepherdService } from 'angular-shepherd';
-import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
-import { RelacionSolicitud_OrdenCompraService } from 'src/app/Servicios/RelacionSolicitud_OrdenCompra/RelacionSolicitud_OrdenCompra.service';
-import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
-import { SolicitudMateriaPrimaService } from 'src/app/Servicios/SolicitudMateriaPrima/SolicitudMateriaPrima.service';
-import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
-import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -77,7 +76,8 @@ export class OcompraComponent implements OnInit {
                                     private solicitudMpService : SolicitudMateriaPrimaService,
                                       private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
                                         private relacionSolOcService : RelacionSolicitud_OrdenCompraService,
-                                          private mensajeService : MensajesAplicacionService,) {
+                                          private mensajeService : MensajesAplicacionService,
+                                            private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -523,6 +523,7 @@ export class OcompraComponent implements OnInit {
     this.onReject();
     this.cargando = true;
     setTimeout(() => {
+      this.ordenCreada = orden;
       this.dtOrdenCompraService.GetOrdenCompra(orden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
           let info : any = {
@@ -549,189 +550,97 @@ export class OcompraComponent implements OnInit {
           this.informacionPDF.push(info);
           this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
-        this.generarPDF();
+        this.crearPDF();
       }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
     }, 100);
   }
 
-  // Funcion que se encargará de poner la informcaion en el PDF y generarlo
-  generarPDF(){
+  crearPDF(){
     this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         let titulo : string = `Orden de Compra N° ${datos_orden[i].consecutivo}`;
-        const pdfDefinicion : any = {
-          info: { title: titulo},
-          pageSize: { width: 630, height: 760 },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 130, 25, 35],
-          header: function(currentPage : any, pageCount : any) {
-            return [
-              {
-                margin: [20, 8, 20, 0],
-                columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-                  {
-                    width: 300,
-                    alignment: 'center',
-                    table: {
-                      body: [
-                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                        [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
-                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
-                      ]
-                    },
-                    layout: 'noBorders',
-                    margin: [85, 20],
-                  },
-                  {
-                    width: '*',
-                    alignment: 'center',
-                    margin: [20, 20, 20, 0],
-                    table: {
-                      body: [
-                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].fecha.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_orden[i].usuario, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      ]
-                    },
-                    layout: 'noBorders',
-                  }
-                ]
-              },
-              {
-                margin: [20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      {
-                        border: [false, true, false, false],
-                        text: ''
-                      },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-            ];
-          },
-          content : [
-            {
-              text: `\n Información detallada del Proveedor \n \n`,
-              alignment: 'center',
-              style: 'header'
-            },
-            {
-              style: 'tablaCliente',
-              table: {
-                widths: [210,171, 171],
-                style: 'header',
-                body: [
-                  [
-                    {text: `Nombre: ${datos_orden[i].proveedor}`, bold: true},
-                    `ID: ${datos_orden[i].proveedor_Id}`,
-                    `Tipo de ID: ${datos_orden[i].tipo_Id}`,
-                  ],
-                  [
-                    `Telefono: ${datos_orden[i].telefono_Proveedor}`,
-                    `Ciudad: ${datos_orden[i].ciudad_Proveedor}`,
-                    `Tipo de Proveedor: ${datos_orden[i].tipo_Proveedor}`
-                  ],
-                  [
-                    `E-mail: ${datos_orden[i].correo_Proveedor}`,
-                    '',
-                    ''
-                  ]
-                ]
-              },
-              layout: 'lightHorizontalLines',
-              fontSize: 9,
-            },
-            {
-              text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-              alignment: 'center',
-              style: 'header'
-            },
-
-            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Precio', 'SubTotal']),
-
-            {
-              style: 'tablaTotales',
-              table: {
-                widths: [217, '*', 50, '*', 60, 98],
-                style: 'header',
-                body: [
-                  [
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `Peso Total`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros((datos_orden[i].peso_Total).toFixed(2))}`
-                    },
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `Subtotal`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `$${this.formatonumeros((datos_orden[i].valor_Total).toFixed(2))}`
-                    },
-                  ],
-                  [
-                    '',
-                    '',
-                    '',
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `IVA ${datos_orden[i].iva}%`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `$${this.formatonumeros(((datos_orden[i].valor_Total * datos_orden[i].iva) / 100).toFixed(2))}`
-                    },
-                  ],
-                  [
-                    '',
-                    '',
-                    '',
-                    '',
-                    {
-                      border: [true, false, true, true],
-                      text: `Valor Total`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `$${this.formatonumeros((datos_orden[i].valor_Total + ((datos_orden[i].valor_Total * datos_orden[i].iva) / 100)).toFixed(2))}`
-                    },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 8,
-            },
-            {
-              text: `\n \nObservación sobre la Orden: \n ${datos_orden[i].observacion}\n`,
-              style: 'header',
-            }
-          ],
-          styles: {
-            header: { fontSize: 10, bold: true },
-            titulo: { fontSize: 20, bold: true }
-          }
-        }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
-        this.cargando = false;
+        let content : any [] = this.contenidoPDF(datos_orden[i]);
+        this.creacionPDFService.formatoPDF(titulo, content);
+        setTimeout(() => this.cargando = false, 3000);
         break;
       }
-    }, () => { this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${this.ordenCreada}!`); });
+    }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${this.ordenCreada}!`));
+  }
+
+  contenidoPDF(datos_orden){
+    let data : any [] = [];
+    data.push(this.informacionProveedorPDF());
+    data.push(this.datosProveedorPDF(datos_orden));
+    data.push(this.informacionMateriaPrimaPDF());
+    data.push(this.datosMateriasPrimasPDF());
+    data.push(this.totalesPDF(datos_orden));
+    data.push(this.observacionPDF(datos_orden));
+    return data;
+  }
+
+  informacionProveedorPDF(){
+    return {
+      text: `\n Información detallada del Proveedor \n \n`,
+      alignment: 'center',
+      fontSize: 10,
+      bold: true
+    };
+  }
+
+  datosProveedorPDF(datos_orden){
+    return {
+      table: {
+        widths: ['50%', '20%', '30%'],
+        body: [
+          [
+            {text: `Nombre: ${datos_orden.proveedor}`},
+            {text: `ID: ${datos_orden.proveedor_Id}`},
+            {text: `Tipo de ID: ${datos_orden.tipo_Id}`},
+          ],
+          [
+            {text: `Telefono: ${datos_orden.telefono_Proveedor}`},
+            {text: `Ciudad: ${datos_orden.ciudad_Proveedor}`},
+            {text: `Tipo de Proveedor: ${datos_orden.tipo_Proveedor}`}
+          ],
+          [
+            {text:`E-mail: ${datos_orden.correo_Proveedor}`},
+            {},
+            {}
+          ]
+        ]
+      },
+      layout: 'lightHorizontalLines',
+      fontSize: 9,
+    }
+  }
+
+  informacionMateriaPrimaPDF(){
+    return {
+      text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+      alignment: 'center',
+      style: 'header'
+    }
+  }
+
+  datosMateriasPrimasPDF(){
+    return this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Precio', 'SubTotal'])
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: ['10%', '45%', '10%', '10%', '10%', '15%'],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -748,21 +657,55 @@ export class OcompraComponent implements OnInit {
     return body;
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  totalesPDF(datos_orden){
     return {
       table: {
-        headerRows: 1,
-        widths: [50, 217, 50, 50, 60, 98],
-        body: this.buildTableBody(data, columns),
+        widths: ['45%', '10%', '10%', '10%', '10%', '15%'],
+        style: 'header',
+        body: [
+          [
+            '',
+            {border: [true, false, true, true], text: `Peso Total`},
+            {border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`},
+            '',
+            {border: [true, false, true, true], text: `Subtotal`},
+            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            {border: [true, false, true, true], text: `IVA ${datos_orden.iva}%`},
+            {border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`},
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            {border: [true, false, true, true], text: `Valor Total`},
+            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total + ((datos_orden.valor_Total * datos_orden.iva) / 100)).toFixed(2))}`},
+          ],
+        ]
       },
+      layout: { defaultBorder: false, },
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
+    }
+  }
+
+  observacionPDF(datos_orden){
+    return {
+      margin: [0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: `${datos_orden.observacion.toString().trim()}` }]
+        ]
+      },
+      fontSize: 9,
+    }
   }
 
   /** Actualizar Precio de la materia prima al momento de crear la OC*/

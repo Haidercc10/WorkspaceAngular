@@ -2,11 +2,11 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetalleSolicitudMateriaPrimaService } from 'src/app/Servicios/DetalleSolicitudMateriaPrima/DetalleSolicitudMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -15,7 +15,6 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsSolicitudMateriaPrima as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +58,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
                               private boppService : EntradaBOPPService,
                                 private solicitudService : SolicitudMateriaPrimaService,
                                   private dtSolicitudService : DetalleSolicitudMateriaPrimaService,
-                                    private msj : MensajesAplicacionService ) {
+                                    private msj : MensajesAplicacionService,
+                                      private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formSolicitud = this.frmBuilder.group({
@@ -379,8 +379,8 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     this.informacionPDF = [];
     if (solicitud_Id == 0) solicitud_Id = this.formSolicitud.value.Id_Solicitud;
     if (solicitud_Id) {
-      this.cargando = true;
       this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
+      this.cargando = true;
         for (let i = 0; i < data.length; i++) {
           let info : any = {
             Id : 0,
@@ -406,128 +406,61 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
           this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
         }
         setTimeout(() => this.crearPDF(solicitud_Id), 1000);
-      }, error => { this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`); this.cargando = false;});
+      }, error => this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`));
     } else this.msj.mensajeAdvertencia(`Advertencia`, `¡La inforamción que ha digitado no es valida, debe digitar solo números sin caracteres especiales!`);
   }
 
   // Funcion que va a crear un pdf de la solicitud creada o editada
   crearPDF(solicitud_Id : number){
-    let nombre : string = this.storage_Nombre;
-    this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        const pdfDefinicion : any = {
-          info: { title: `Solicitud de Materia Prima N° ${data[i].consecutivo}` },
-          pageSize: { width: 630, height: 760 },
-          footer: function(currentPage : any, pageCount : any) {
-            return [
-              {
-                columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content : [
-            {
-              columns: [
-                { image : logoParaPdf, width : 220, height : 50, margin : [0, 20] },
-                { text: `Solicitud de Materia Prima N° ${data[i].consecutivo}`, alignment: 'right', style: 'titulo', margin: 30 }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].fecha.replace('T00:00:00', ``)} ${data[i].hora}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Ciudad}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].empresa_Direccion}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Usuario`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${data[i].usuario}`
-                    },
-                  ]
-                ]
-              },
-              layout: { defaultBorder: false, },
-              fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-              alignment: 'center',
-              style: 'header'
-            },
-
-            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Estado']),
-
-            {
-              text: `\n \nObservación sobre la Solicitud: \n ${data[i].observacion}\n`,
-              style: 'header',
-            }
-          ],
-          styles: {
-            header: { fontSize: 10, bold: true },
-            titulo: { fontSize: 20, bold: true }
-          }
-        }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
-        this.cargando = false;
+    this.dtSolicitudService.GetInfoSolicitud(solicitud_Id).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        let titulo : string = `Solicitud de Materia Prima N° ${datos_orden[i].consecutivo}`;
+        let content : any [] = this.contenidoPDF(datos_orden[i]);
+        this.creacionPDFService.formatoPDF(titulo, content);
+        setTimeout(() => this.cargando = false, 3000);
         break;
       }
-    }, error => { this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`); this.cargando = false; });
+    }, error => {
+      this.msj.mensajeError(`¡El número de la solicitud no existe!`, `${error.error}`);
+      this.cargando = false;
+    });
+  }
+
+  contenidoPDF(datos_orden){
+    let data : any [] = [];
+    data.push(this.informacionMateriaPrimaPDF());
+    data.push(this.datosMateriasPrimasPDF());
+    data.push(this.observacionPDF(datos_orden));
+    return data;
+  }
+
+  informacionMateriaPrimaPDF(){
+    return {
+      text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+      alignment: 'center',
+      style: 'header'
+    }
+  }
+
+  datosMateriasPrimasPDF(){
+    return this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Estado']);
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: ['10%', '50%', '15%', '10%', '15%'],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -544,20 +477,17 @@ export class SolicitudMateriaPrimaComponent implements OnInit {
     return body;
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  observacionPDF(datos_orden){
     return {
+      margin: [0, 20],
       table: {
-        headerRows: 1,
-        widths: [60, 247, 60, 60, 70],
-        body: this.buildTableBody(data, columns),
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: `${datos_orden.observacion.toString().trim()}` }]
+        ]
       },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
+      fontSize: 9,
+    }
   }
 }

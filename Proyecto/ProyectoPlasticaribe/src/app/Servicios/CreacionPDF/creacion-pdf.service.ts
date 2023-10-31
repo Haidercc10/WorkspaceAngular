@@ -26,7 +26,7 @@ export class CreacionPdfService {
         setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
     }
     
-    private headerPDF(today, hour, titulo, headerAdicional){
+    private headerPDF(today, hour, titulo, headerAdicional) : {} {
         return (currentPage : any, pageCount : any) => {
             return [
                 {
@@ -43,7 +43,7 @@ export class CreacionPdfService {
         }
     }
 
-    private empresaFechaHoraTituloPDF(titulo : string){
+    private empresaFechaHoraTituloPDF(titulo : string) : {} {
         return {
             width: '*',
             alignment: 'center',
@@ -59,7 +59,7 @@ export class CreacionPdfService {
         }
     }
 
-    private paginadoFechaHoraPDF(currentPage, pageCount, today, hour){
+    private paginadoFechaHoraPDF(currentPage, pageCount, today, hour) : {} {
         return {
             width: '*',
             alignment: 'center',
@@ -75,7 +75,7 @@ export class CreacionPdfService {
         }
     }
 
-    private lineaHeaderFooterPDF(borders : boolean []){
+    private lineaHeaderFooterPDF(borders : boolean []) : {} {
         return {
             margin: [20, 0],
             table: {
