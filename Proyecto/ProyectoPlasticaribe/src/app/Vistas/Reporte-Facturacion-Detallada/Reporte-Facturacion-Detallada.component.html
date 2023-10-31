@@ -71,7 +71,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Buscar Facturas" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-        <button pButton class="p-button-success" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="formatoPDF()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="mostrarEleccion()"></button>
       </div>
     </div>
   </form>
@@ -173,3 +173,23 @@
   </div>
 
 </p-card>
+
+<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="formatoPDF()" icon="pi pi-table" label="Consolidado" class="p-button-warning" pTooltip="Exportará la información detallada de las facturas y devoluciones que se realizaron en el rango de fecha y/o cliente, vendedor, e item seleccionado(s)"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="getFormatoPdfDetallado()" icon="pi pi-list" label="Detallado" class="p-button-success" pTooltip="Exportará la información consolidada de las facturas y devoluciones que se realizaron en el rango de fecha y/o cliente, vendedor, e item seleccionado(s), agrupada por factura y cliente!"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

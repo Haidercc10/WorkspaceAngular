@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -34,7 +35,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
                     private productosService : ProductoService,
                       private vendedorService : UsuarioService,
                         private pdfService : CreacionPdfService,
-                          private msj : MensajesAplicacionService) {
+                          private msj : MensajesAplicacionService, 
+                            private msg : MessageService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -119,14 +121,15 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let vendedor : string = this.formFiltros.value.vendedor;
     let producto : any = this.formFiltros.value.idProducto;
     let ruta : string = ``;
-    
-    if (`vendedor`.length == 2) vendedor = `0${vendedor}`;
-    else if (`vendedor`.length == 1) vendedor = `00${vendedor}`;
+
+    if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
+    else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
 
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
     if (factura && producto != null) ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
+
     return ruta;
   }
 
@@ -183,6 +186,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de generar el PDF de la información de las facturas y de las devoluciones realizadas en el rango de fechas seleccionado.
   formatoPDF(){
     if (this.dataFacturacion.length > 0) {
+      this.onReject();
       this.cargando = true;
       this.dataPDF = this.dataFacturacion;
       let headerAdicional : any [] = this.headerAdicional();
@@ -273,9 +277,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
+    this.infoPdf = []
     this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
       this.infoPdf = resp;
-      this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ``).subscribe(devoluciones => {
+      this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ruta).subscribe(devoluciones => {
         devoluciones.forEach(dv => {
           this.infoPdf.push({
             idVendedor : dv.idvende,
@@ -295,11 +300,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       }); 
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     });
-    setTimeout(() => {
-      console.log(this.infoPdf);
-    }, 2000);
   }
 
+  //Tabla de encabezado de los items de cada factura
   headerItems(){
     let data : any = [];
     data.push([
@@ -327,29 +330,34 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
-  getVendedores(informacion : any[]){
+  //Funcion que retornará el contenido del PDF detallado por vendedor
+  getFormatoPdfDetallado(){
+    console.log(this.infoPdf);
+    this.onReject();
+    this.cargando = true;
     let vendedores : any = [];
     let titulo = `Facturación Detallada x Dia`;
-    informacion.forEach(inf => { 
+    this.infoPdf.forEach(inf => { 
       if(vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
         vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
       }
     });
     this.vendedores = vendedores;
     this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {});
+    this.cargando = false;
   }
 
+  //.Función que llenará la tabla con los vendedores, y los valores totales de ventas y devoluciones
   tablaVendedores(vendedores : any) {
     let data : any = [];
     for (let index = 0; index < vendedores.length; index++) {
       data.push([{
-        margin: [10, 10],
+        margin: [5, 10],
           fontSize: 10,
           bold: true,
           table: {
-            dontBreakRows : true,
             widths: ['100%'],
-            body: this.llenarTabla(vendedores[index])
+            body: this.llenarTablaVendedores(vendedores[index])
           }
       }]);
       data.push([
@@ -362,7 +370,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
-  llenarTabla(vendedores : any) {
+  //.Función que cargará el id y nombre en la tabla de vendedores
+  llenarTablaVendedores(vendedores : any) {
     let array : any[] = [];
     array.push(
         [
@@ -373,6 +382,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return array;
   }
   
+  //.Función que retornará los clientes y las facturas por vendedor en el rango de fechas especificado. 
   getClientesVendedor(vendedores : any){
     let data : any = [];
     let clientes : any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);  
@@ -386,6 +396,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
+  //.Función que llenará en la tabla los clientes y facturas de cada vendedor.
   tablaClientesVendedor(clientes : any) {
     let data : any[] = [];
     data.push({
@@ -407,6 +418,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
+  //Función que cargará items que compró cada cliente y las facturas asociadas.
   getItemsClientesVendedor(clientes : any){
     let data : any = [];
     let items : any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente);
@@ -417,6 +429,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return data;
   }
 
+  //.Función que colocará la información de los items de cada factura en la tabla.
   tablaItemsClientesVendedor(items : any){  
     return {
      margin: [0, 0],
@@ -440,22 +453,35 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     } 
   }
 
+  //Total de facturación en el rango de fechas especificado
   total(){
     let total : number = 0;
     total = this.infoPdf.reduce((a,b) => a + b.valorTotal, 0);
     console.log(total);
   }
 
+  //Total de facturación por vendedor
   subTotalVendedor(vendedor : any){
     let subtotal : number = 0;
     subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal > 0).reduce((a,b) => a + b.valorTotal, 0);
     return subtotal;
   }
 
+  //Total de devoluciones por vendedor
   subTotalDevolucionesVendedor(vendedor : any){
     let subtotal : number = 0;
     subtotal = this.infoPdf.filter(x => x.idVendedor == vendedor && x.valorTotal < 0).reduce((a,b) => a + b.valorTotal, 0);
     return subtotal;
   }
+
+  //.Función que en que formato se desea exportar la información, si detallado o consolidado. 
+  mostrarEleccion(){
+    if (this.dataFacturacion.length > 0) {
+      this.msg.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `En qué tipo de formato desea exportar la información?`, sticky: true});
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay registros para exportar!`);
+  }
+
+  //.Función que quitará el mensaje de elección de formatos.
+  onReject = () => this.msg.clear('eleccion');
   
 }
