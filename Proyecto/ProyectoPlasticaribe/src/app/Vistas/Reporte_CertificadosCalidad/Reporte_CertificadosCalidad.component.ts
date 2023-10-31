@@ -160,5 +160,9 @@ export class Reporte_CertificadosCalidadComponent implements OnInit {
   }
 
   // Mostrar formato pdf de los certificados de calidad
-  mostrarPdf = (consecutivo : number) => this.Certificados.crearPdfCertificado(consecutivo);
+  mostrarPdf (consecutivo : number) {
+    this.load = true;
+    this.Certificados.crearPdfCertificado(consecutivo);
+    setTimeout(() => this.load = false, 3000);
+  }
 }

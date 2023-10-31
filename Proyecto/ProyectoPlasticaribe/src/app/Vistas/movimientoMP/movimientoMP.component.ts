@@ -2,15 +2,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsMovimientosBopp as defaultSteps } from 'src/app/data';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-movimientoMP',
@@ -46,7 +45,8 @@ export class MovimientoMPComponent implements OnInit {
                     private detallesAsignacionService : DetallesAsignacionService,
                       private bagProServices : BagproService,
                         private shepherdService: ShepherdService,
-                          private mensajeService : MensajesAplicacionService,) {
+                          private mensajeService : MensajesAplicacionService,
+                            private creacionPDFService : CreacionPdfService,) {
 
     this.formMovimientos = this.frmBuilder.group({
       Codigo : [null, Validators.required],
@@ -104,19 +104,28 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a consultar la información de los movimientos
   consultarMovimientos(){
-    this.cargando = true;
     this.cantRestante = 0;
     this.cantAsignada = 0;
     this.movimientosPolietilenos = [];
     this.movimientosTintas = [];
     this.movimientosBiorientados = [];
     let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let codigo : any = this.formMovimientos.value.Codigo;
     let fechaInicial : any = moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formMovimientos.value.FechaInicial).format('YYYY-MM-DD');
     let fechaFinal : any =moment( this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formMovimientos.value.FechaFinal).format('YYYY-MM-DD');
+    let ruta : string = this.validacionParametrosConsulta();
+
+    this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
+      if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
+      else this.llenarMateriasPrimasConsultadas(datos);
+    }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`), () => this.cargando = false);
+    this.totalAsignadoRestanteAsignar();
+  }
+
+  validacionParametrosConsulta(){
+    let ruta : string = ``;
+    let codigo : any = this.formMovimientos.value.Codigo;
     let tipoMovimiento : any = this.formMovimientos.value.TipoMovimiento;
     let materiaPrima : any = this.formMovimientos.value.MateriasPrimas_Id;
-    let ruta : string = ``;
 
     if (codigo != null && tipoMovimiento != null && materiaPrima != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}&materiaPrima=${materiaPrima}`;
     else if (codigo != null && tipoMovimiento != null) ruta = `?codigo=${codigo}&tipoMov=${tipoMovimiento}`;
@@ -127,47 +136,11 @@ export class MovimientoMPComponent implements OnInit {
     else if (materiaPrima != null) ruta = `?materiaPrima=${materiaPrima}`;
     else ruta = ``;
 
-    this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        let info : any = {
-          Id : datos[i].id,
-          Codigo : datos[i].codigo,
-          Movimiento : datos[i].movimiento,
-          Tipo_Movimiento : datos[i].tipo_Movimiento,
-          Fecha : datos[i].fecha,
-          Usuario : datos[i].usuario,
-          Id_MateriaPrima : datos[i].materia_Prima_Id,
-          Materia_Prima : datos[i].materia_Prima,
-          Id_Tinta : datos[i].tinta_Id,
-          Tinta : datos[i].tinta,
-          Id_Bopp : datos[i].bopp_Id,
-          Bopp : datos[i].bopp,
-          Cantidad : datos[i].cantidad,
-          Presentacion : datos[i].presentacion,
-          Precio : datos[i].precio,
-          SubTotal : datos[i].subTotal,
-        }
-        // Polietilenos
-        if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) this.movimientosPolietilenos.push(info);
-        this.movimientosPolietilenos.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-        this.movimientosPolietilenos.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+    return ruta;
+  }
 
-        // Tintas
-        if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) this.movimientosTintas.push(info);
-        this.movimientosTintas.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-        this.movimientosTintas.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
-
-        // Biorientado
-        if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id != 449 || datos[i].bopp_Id != 1)) this.movimientosBiorientados.push(info);
-        this.movimientosBiorientados.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
-        this.movimientosBiorientados.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
-      }
-      if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
-    }, () => {
-      this.cargando = false;
-      this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`)
-    }, () => this.cargando = false);
-
+  totalAsignadoRestanteAsignar(){
+    let codigo : any = this.formMovimientos.value.Codigo;
     if (codigo != null) {
       this.bagProServices.srvObtenerListaClienteOT_Item(codigo).subscribe(datos_procesos => {
         for (let i = 0; i < datos_procesos.length; i++) {
@@ -181,293 +154,282 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
+  llenarMateriasPrimasConsultadas(datos){
+    this.cargando = true;
+    let count : number = 0;
+    for (let i = 0; i < datos.length; i++) {
+      let info : any = {
+        Id : datos[i].id,
+        Codigo : datos[i].codigo,
+        Movimiento : datos[i].movimiento,
+        Tipo_Movimiento : datos[i].tipo_Movimiento,
+        Fecha : datos[i].fecha,
+        Usuario : datos[i].usuario,
+        Id_MateriaPrima : datos[i].materia_Prima_Id,
+        Materia_Prima : datos[i].materia_Prima,
+        Id_Tinta : datos[i].tinta_Id,
+        Tinta : datos[i].tinta,
+        Id_Bopp : datos[i].bopp_Id,
+        Bopp : datos[i].bopp,
+        Cantidad : datos[i].cantidad,
+        Presentacion : datos[i].presentacion,
+        Precio : datos[i].precio,
+        SubTotal : datos[i].subTotal,
+      };
+      this.agrupacionMateriasPrimas(datos[i], info);
+      count++;
+      if (datos.length == count) this.cargando = false;
+    }
+  }
+
+  agrupacionMateriasPrimas(datos, infoMateriaPrima){
+    // Polietilenos
+    if (datos.materia_Prima_Id != 84 && datos.tinta_Id == 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) this.movimientosPolietilenos.push(infoMateriaPrima);
+    this.movimientosPolietilenos.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosPolietilenos.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+
+    // Tintas
+    if (datos.materia_Prima_Id == 84 && datos.tinta_Id != 2001 && (datos.bopp_Id == 449 || datos.bopp_Id == 1)) this.movimientosTintas.push(infoMateriaPrima);
+    this.movimientosTintas.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosTintas.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+
+    // Biorientado
+    if (datos.materia_Prima_Id == 84 && datos.tinta_Id == 2001 && (datos.bopp_Id != 449 || datos.bopp_Id != 1)) this.movimientosBiorientados.push(infoMateriaPrima);
+    this.movimientosBiorientados.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
+    this.movimientosBiorientados.sort((a,b) => a.Fecha.localeCompare(b.Fecha));
+  }
+
   // Funcion que va a validar el tipo de movimiento para crear el pdf
   validarTipoMovimiento(data : any){
     this.datosPdf = [];
     this.cargando = true;
+    let movAsignaciones : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS'];
+    if (movAsignaciones.includes(data.Movimiento)) this.asignacionesMateriaPrima(data);
+    else if (data.Movimiento == 'CRTINTAS') this.creacionTintas(data);
+    else if (data.Movimiento == 'DEVMP') this.devolucionesMateriaPrima(data);
+    else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') this.entradasMateriasPrimas(data);
+  }
+
+  asignacionesMateriaPrima(data : any){
     let informacionPdf : any;
-    if (data.Movimiento == 'ASIGMP' || data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY' || data.Movimiento == 'ASIGTINTAS') {
-      this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
-          let info : any = {
-            Id : '',
-            Nombre : '',
-            Cantidad : this.formatonumeros(datos[i].cantidad),
-            "Presentación" : datos[i].unidad_Medida,
-            Precio : this.formatonumeros(datos[i].precio),
-            SubTotal : this.formatonumeros(datos[i].subTotal),
-          }
-          if (data.Movimiento == 'ASIGMP') {
-            info.Id = datos[i].materia_Prima_Id;
-            info.Nombre = datos[i].materia_Prima;
-          } else if (data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY'){
-            info.Id = datos[i].bopp_Id;
-            info.Nombre = datos[i].bopp;
-          } else if (data.Movimiento == 'ASIGTINTAS'){
-            info.Id = datos[i].tinta_Id;
-            info.Nombre = datos[i].tinta;
-          }
+    this.materiaPrimaService.GetInfoMovimientoAsignaciones(data.Id, data.Movimiento).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        let info : any = {
+          Id : '',
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos[i].cantidad),
+          "Presentación" : datos[i].unidad_Medida,
+          Precio : this.formatonumeros(datos[i].precio),
+          SubTotal : this.formatonumeros(datos[i].subTotal),
+        }
+        if (data.Movimiento == 'ASIGMP') {
+          info.Id = datos[i].materia_Prima_Id;
+          info.Nombre = datos[i].materia_Prima;
+        } else if (data.Movimiento == 'ASIGBOPA' || data.Movimiento == 'ASIGBOPP' || data.Movimiento == 'ASIGPOLY'){
+          info.Id = datos[i].bopp_Id;
+          info.Nombre = datos[i].bopp;
+        } else if (data.Movimiento == 'ASIGTINTAS'){
+          info.Id = datos[i].tinta_Id;
+          info.Nombre = datos[i].tinta;
+        }
+        this.datosPdf.push(info);
+      }
+      informacionPdf = datos;
+    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+  }
+
+  creacionTintas(data: any){
+    let informacionPdf : any;
+    this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        let info : any = {
+          Id : '',
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos[i].cantidad),
+          "Presentación" : datos[i].unidad_Medida,
+          Precio : this.formatonumeros(datos[i].precio),
+          SubTotal : this.formatonumeros(datos[i].subTotal),
+        }
+        if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001) {
+          info.Id = datos[i].materia_Prima_Id;
+          info.Nombre = datos[i].materia_Prima;
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001){
+          info.Id = datos[i].tinta_Id;
+          info.Nombre = datos[i].tinta;
+        }
+
+        setTimeout(() => {
+          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
+            for (let j = 0; j < datoMP.length; j++) {
+              info.Precio = this.formatonumeros(datoMP[j].precio);
+              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
+              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
+            }
+          });
           this.datosPdf.push(info);
-        }
-        informacionPdf = datos;
-      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
-    } else if (data.Movimiento == 'CRTINTAS') {
-      this.materiaPrimaService.GetInfoMovimientoCreacionTinta(data.Id).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
-          let info : any = {
-            Id : '',
-            Nombre : '',
-            Cantidad : this.formatonumeros(datos[i].cantidad),
-            "Presentación" : datos[i].unidad_Medida,
-            Precio : this.formatonumeros(datos[i].precio),
-            SubTotal : this.formatonumeros(datos[i].subTotal),
-          }
-          if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001) {
-            info.Id = datos[i].materia_Prima_Id;
-            info.Nombre = datos[i].materia_Prima;
-          } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001){
-            info.Id = datos[i].tinta_Id;
-            info.Nombre = datos[i].tinta;
-          }
+        }, 500);
+      }
+      informacionPdf = datos;
+    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+  }
 
-          setTimeout(() => {
-            this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-              for (let j = 0; j < datoMP.length; j++) {
-                info.Precio = this.formatonumeros(datoMP[j].precio);
-                datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-                info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-              }
-            });
-            this.datosPdf.push(info);
-          }, 500);
+  devolucionesMateriaPrima(data : any){
+    let informacionPdf : any;
+    this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        let info : any = {
+          Id : '',
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos[i].cantidad),
+          "Presentación" : datos[i].unidad_Medida,
+          Precio : this.formatonumeros(datos[i].precio),
+          SubTotal : this.formatonumeros(datos[i].subTotal),
         }
-        informacionPdf = datos;
-      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
-    } else if (data.Movimiento == 'DEVMP') {
-      this.materiaPrimaService.GetInfoMovimientosDevoluciones(data.Id).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
-          let info : any = {
-            Id : '',
-            Nombre : '',
-            Cantidad : this.formatonumeros(datos[i].cantidad),
-            "Presentación" : datos[i].unidad_Medida,
-            Precio : this.formatonumeros(datos[i].precio),
-            SubTotal : this.formatonumeros(datos[i].subTotal),
-          }
-          if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
-            info.Id = datos[i].materia_Prima_Id;
-            info.Nombre = datos[i].materia_Prima;
-          } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
-            info.Id = datos[i].tinta_Id;
-            info.Nombre = datos[i].tinta;
-          } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
-            info.Id = datos[i].bopp_Id;
-            info.Nombre = datos[i].bopp;
-          }
+        if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
+          info.Id = datos[i].materia_Prima_Id;
+          info.Nombre = datos[i].materia_Prima;
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+          info.Id = datos[i].tinta_Id;
+          info.Nombre = datos[i].tinta;
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+          info.Id = datos[i].bopp_Id;
+          info.Nombre = datos[i].bopp;
+        }
 
-          setTimeout(() => {
-            this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-              for (let j = 0; j < datoMP.length; j++) {
-                info.Precio = this.formatonumeros(datoMP[j].precio);
-                datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-                info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-              }
-            });
-            this.datosPdf.push(info);
-          }, 500);
+        setTimeout(() => {
+          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
+            for (let j = 0; j < datoMP.length; j++) {
+              info.Precio = this.formatonumeros(datoMP[j].precio);
+              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
+              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
+            }
+          });
+          this.datosPdf.push(info);
+        }, 500);
+      }
+      informacionPdf = datos;
+    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
+  }
+
+  entradasMateriasPrimas(data : any){
+    let informacionPdf : any;
+    this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        let info : any = {
+          Id : '',
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos[i].cantidad),
+          "Presentación" : datos[i].unidad_Medida,
+          Precio : this.formatonumeros(datos[i].precio),
+          SubTotal : this.formatonumeros(datos[i].subTotal),
         }
-        informacionPdf = datos;
-      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
-    } else if (data.Movimiento == 'FCO' || data.Movimiento == 'REM') {
-      this.materiaPrimaService.GetInfoMovimientosEntradas(data.Id, data.Movimiento).subscribe(datos => {
-        for (let i = 0; i < datos.length; i++) {
-          let info : any = {
-            Id : '',
-            Nombre : '',
-            Cantidad : this.formatonumeros(datos[i].cantidad),
-            "Presentación" : datos[i].unidad_Medida,
-            Precio : this.formatonumeros(datos[i].precio),
-            SubTotal : this.formatonumeros(datos[i].subTotal),
-          }
-          if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
-            info.Id = datos[i].materia_Prima_Id;
-            info.Nombre = datos[i].materia_Prima;
-          } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
-            info.Id = datos[i].tinta_Id;
-            info.Nombre = datos[i].tinta;
-          } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
-            info.Id = datos[i].bopp_Id;
-            info.Nombre = datos[i].bopp;
-          }
-          setTimeout(() => {
-            this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
-              for (let j = 0; j < datoMP.length; j++) {
-                info.Precio = this.formatonumeros(datoMP[j].precio);
-                datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
-                info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
-              }
-            });
-            this.datosPdf.push(info);
-          }, 500);
+        if (datos[i].materia_Prima_Id != 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)) {
+          info.Id = datos[i].materia_Prima_Id;
+          info.Nombre = datos[i].materia_Prima;
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id != 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+          info.Id = datos[i].tinta_Id;
+          info.Nombre = datos[i].tinta;
+        } else if (datos[i].materia_Prima_Id == 84 && datos[i].tinta_Id == 2001 && (datos[i].bopp_Id == 449 || datos[i].bopp_Id == 1)){
+          info.Id = datos[i].bopp_Id;
+          info.Nombre = datos[i].bopp;
         }
-        informacionPdf = datos;
-      }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
-    }
+        setTimeout(() => {
+          this.materiaPrimaService.GetInventario(this.today, this.today, info.Id).subscribe(datoMP => {
+            for (let j = 0; j < datoMP.length; j++) {
+              info.Precio = this.formatonumeros(datoMP[j].precio);
+              datos[i].subTotal = datoMP[j].precio * datos[i].cantidad;
+              info.SubTotal = this.formatonumeros(datoMP[j].precio * datos[i].cantidad);
+            }
+          });
+          this.datosPdf.push(info);
+        }, 500);
+      }
+      informacionPdf = datos;
+    }, () => this.cargando = false, () => setTimeout(() => this.crearPDF(informacionPdf), 1000));
   }
 
   // Funcion que va a crear un PDF
   crearPDF(data : any){
-    for (let i = 0; i < data.length; i++) {
-      let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
-      const pdfDefinicion : any = {
-        info: { title: `${data[i].tipo_Movimiento} N° ${data[i].id}` },
-        pageSize: { width: 630, height: 760 },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        pageMargins : [25, 130, 25, 35],
-        header: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              margin: [20, 8, 20, 0],
-              columns: [
-                { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-                {
-                  width: 300,
-                  alignment: 'center',
-                  table: {
-                    body: [
-                      [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                      [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
-                      [{text: `${data[i].tipo_Movimiento} N° ${data[i].id}`, bold: true, alignment: 'center', fontSize: 10}],
-                      [{
-                        text: movimientoOrdenesTrabajo.includes(data[i].movimiento) ? `Orden de Trabajo N° ${data[i].codigo}` : data[i].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[i].codigo).toUpperCase()}` : '',
-                        bold: true, alignment: 'center', fontSize: 10
-                      }],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  margin: [85, 20],
-                },
-                {
-                  width: '*',
-                  alignment: 'center',
-                  margin: [20, 20, 20, 0],
-                  table: {
-                    body: [
-                      [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].fecha.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].hora, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: data[i].usuario, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    ]
-                  },
-                  layout: 'noBorders',
-                }
-              ]
-            },
-            {
-              margin: [20, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      border: [false, true, false, false],
-                      text: ''
-                    },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
-          ];
-        },
-        content : [
-          ['Remisión', 'Factura de Compra'].includes(data[i].tipo_Movimiento) ? {
-            text: `\n Información detallada del Proveedor \n \n`,
-            alignment: 'center',
-            style: 'header'
-          } : '',
-          ['Remisión', 'Factura de Compra'].includes(data[i].tipo_Movimiento) ? {
-            style: 'tablaCliente',
-            table: {
-              widths: [210,171, 171],
-              style: 'header',
-              body: [
-                [
-                  `ID: ${data[i].proveedor_Id}`,
-                  `Tipo de ID: ${data[i].tipo_Id_Proveedor}`,
-                  `Tipo de Proveedor: ${data[i].tipo_Proveedor}`
-                ],
-                [
-                  `Nombre: ${data[i].proveedor}`,
-                  `Telefono: ${data[i].telefono_Proveedor}`,
-                  `Ciudad: ${data[i].ciudad_Proveedor}`
-                ],
-                [
-                  `E-mail: ${data[i].correo_Proveedor}`,
-                  ``,
-                  ``
-                ]
-              ]
-            },
-            layout: 'lightHorizontalLines',
-            fontSize: 9,
-          } : '',
-          {
-            text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
-            alignment: 'center',
-            style: 'header'
-          },
-          this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']),
-          {
-            style: 'tablaTotales',
-            table: {
-              widths: [227, '*', 50, '*', '*', 98],
-              style: 'header',
-              body: [
-                [
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Peso Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`
-                  },
-                  '',
-                  {
-                    border: [true, false, true, true],
-                    text: `Valor Total`
-                  },
-                  {
-                    border: [false, false, true, true],
-                    text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`
-                  },
-                ],
-              ]
-            },
-            layout: {
-              defaultBorder: false,
-            },
-            fontSize: 8,
-          },
-          '\n \n',
-          {
-            text: `\n \nObservación: \n ${data[i].observacion}\n`,
-            style: 'header',
-          }
-        ],
-        styles: {
-          header: { fontSize: 10, bold: true },
-          titulo: { fontSize: 20, bold: true }
+    let movimientoOrdenesTrabajo : string [] = ['ASIGMP', 'ASIGBOPA', 'ASIGBOPP', 'ASIGPOLY', 'ASIGTINTAS', 'DEVMP'];
+    let tituloAdicional : string = movimientoOrdenesTrabajo.includes(data[0].movimiento) ? `Orden de Trabajo N° ${data[0].codigo}` : data[0].movimiento != 'CRTINTAS' ? `Codigo Documento ${(data[0].codigo).toUpperCase()}` : '';
+    let titulo : string = `${data[0].tipo_Movimiento} N° ${data[0].id} \n ${tituloAdicional}`;
+    let content : any = this.contenidoPDF(data);
+    this.creacionPDFService.formatoPDF(titulo, content);
+    setTimeout(() => this.cargando = false, 3000);
+  }
+
+  contenidoPDF(data : any){
+    let datos : any = [];
+    datos.push(this.tituloEntradasPDF(data[0]));
+    datos.push(this.informacionProveedorPDF(data[0]));
+    datos.push(this.tituloMateriasPrimasPDF());
+    datos.push(this.table(this.datosPdf, ['Id', 'Nombre', 'Cantidad', 'Presentación', 'Precio', 'SubTotal']));
+    datos.push(this.totalesPDF(data));
+    datos.push(this.observacionPDF(data[0]));
+    return datos;
+  }
+
+  tituloEntradasPDF(data : any){
+    return ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? {
+      margin: [0, 15],
+      text: `Información detallada del Proveedor`,
+      alignment: 'center',
+      style: 'header'
+    } : '';
+  }
+
+  informacionProveedorPDF(data : any){
+    return ['Remisión', 'Factura de Compra'].includes(data.tipo_Movimiento) ? {
+      table: {
+        widths: ['40%', '30%', '30%'],
+        style: 'header',
+        body: [
+          [
+            `ID: ${data.proveedor_Id}`,
+            `Tipo de ID: ${data.tipo_Id_Proveedor}`,
+            `Tipo de Proveedor: ${data.tipo_Proveedor}`
+          ],
+          [
+            `Nombre: ${data.proveedor}`,
+            `Telefono: ${data.telefono_Proveedor}`,
+            `Ciudad: ${data.ciudad_Proveedor}`
+          ],
+          [
+            `E-mail: ${data.correo_Proveedor}`,
+            ``,
+            ``
+          ]
+        ]
+      },
+      layout: 'lightHorizontalLines',
+      fontSize: 9,
+    } : '';
+  }
+
+  tituloMateriasPrimasPDF(){
+    return {
+      margin: [0, 15],
+      text: `Información detallada de la(s) Materia(s) Prima(s)`,
+      alignment: 'center',
+      style: 'header'
+    }
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: ['10%', '40%', '15%', '10%', '10%', '15%'],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      this.cargando = false;
-      break;
-    }
+    };
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -484,20 +446,38 @@ export class MovimientoMPComponent implements OnInit {
     return body;
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
-  table(data, columns) {
+  totalesPDF(data : any){
     return {
       table: {
-        headerRows: 1,
-        widths: [50, 227, 50, 50, 50, 98],
-        body: this.buildTableBody(data, columns),
+        widths: ['40%', '10%', '15%', '10%', '10%', '15%'],
+        style: 'header',
+        body: [
+          [
+            {},
+            {border: [true, false, true, true], text: `Peso Total`},
+            {border: [false, false, true, true], text: `${this.formatonumeros(this.calcularTotalCantidad(data))}`},
+            {},
+            {border: [true, false, true, true], text: `Valor Total`},
+            {border: [false, false, true, true], text: `$${this.formatonumeros(this.calcularTotalCosto(data))}`},
+          ],
+        ]
       },
+      layout: {defaultBorder: false},
       fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
+    }
+  }
+
+  observacionPDF(data : any){
+    return {
+      margin: [0, 20],
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: `${!data.observacion ? '' : data.observacion.toString().toUpperCase().trim()}` }]
+        ]
+      },
+      fontSize: 9,
     };
   }
 

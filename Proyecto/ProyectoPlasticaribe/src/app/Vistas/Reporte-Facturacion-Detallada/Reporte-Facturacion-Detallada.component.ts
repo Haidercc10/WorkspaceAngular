@@ -127,12 +127,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
       else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
     }
-
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
     if (factura && producto != null) ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
-
     return ruta;
   }
 
@@ -152,7 +150,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         factura: dev.numefac,
         cliente: dev.descritra,
         recibo: `DEVOLUCIÓN`,
-        suma: (-(dev.valortra))
+        suma: (dev.valortra)
       });
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
@@ -256,7 +254,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       ]);
     }
     data.push([
-      { colSpan: 4, border: [false, true, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalFacturacion()))}`, },
+      { colSpan: 4, border: [false, true, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalFacturacion().toFixed(2)))}`, },
       {},
       {},
       {},

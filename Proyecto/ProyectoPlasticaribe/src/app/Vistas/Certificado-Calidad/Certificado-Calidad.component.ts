@@ -1,17 +1,16 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
 import { modelCertificadosCalidad } from 'src/app/Modelo/modelCertificadosCalidad';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { Certificados_CalidadService } from 'src/app/Servicios/Certificados_Calidad/Certificados_Calidad.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { firmaJefeCalidad } from './FirmaJefeCalidad';
-import { ShepherdService } from 'angular-shepherd';
 import { defaultStepOptions, CertificadoCalidad as defaultSteps } from 'src/app/data';
+import { firmaJefeCalidad } from './FirmaJefeCalidad';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +46,8 @@ export class CertificadoCalidadComponent implements OnInit {
                     private certCalidadService : Certificados_CalidadService,
                       private undMedService : UnidadMedidaService,
                         private bagproService : BagproService,
-                          private shepherdService: ShepherdService,){
+                          private shepherdService: ShepherdService,
+                            private creacionPDFService : CreacionPdfService,){
 
     this.FormOrden = this.frmBuilder.group({
       Orden : [null, Validators.required],
@@ -325,231 +325,221 @@ export class CertificadoCalidadComponent implements OnInit {
   crearPdfCertificado(id : number){
     this.certCalidadService.Get_Id(id).subscribe(datos => {
       let titulo : string = `Certificado de Calidad N° ${datos.consecutivo}`;
-      const pdfDefinicion : any = {
-        info: { title: titulo },
-        pageSize: { width: 630, height: 760 },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-        pageMargins : [25, 110, 25, 35],
-        header: function(currentPage : any, pageCount : any) {
-          return [
-            {
-              margin: [20, 8, 20, 0],
-              columns: [
-                { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-                {
-                  width: 300,
-                  alignment: 'center',
-                  table: {
-                    body: [
-                      [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                      [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
-                      [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
-                    ]
-                  },
-                  layout: 'noBorders',
-                  margin: [85, 20],
-                },
-                {
-                  width: '*',
-                  alignment: 'center',
-                  margin: [20, 20, 20, 0],
-                  table: {
-                    body: [
-                      [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos.fecha_Registro.replace('T00:00:00', ``), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos.hora_Registro, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    ]
-                  },
-                  layout: 'noBorders',
-                }
-              ]
-            },
-            {
-              margin: [20, 0],
-              table: {
-                headerRows: 1,
-                widths: ['*'],
-                body: [
-                  [
-                    {
-                      border: [false, true, false, false],
-                      text: ''
-                    },
-                  ],
-                ]
-              },
-              layout: { defaultBorder: false, }
-            },
-          ];
-        },
-        content : [
-          {
-            table: {
-              widths: [60, '*', 60, '*'],
-              body: [
-                [
-                  { border: [true, true, false, false], text: `Orden / Lote`, bold: true },
-                  { border: [false, true, false, false], text: `${datos.orden_Trabajo}` },
-                  { border: [true, true, false, false], text: `Referencia`, bold: true },
-                  { border: [false, true, true, false], text: `${datos.referencia}` },
-                ],
-                [
-                  { border: [true, false, false, true], text: `Cliente`, bold: true },
-                  { border: [false, false, true, true], text: `${datos.cliente}` },
-                  { border: [false, false, false, true], text: `Cantidad`, bold: true },
-                  { border: [false, false, true, true], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          {
-            margin: [5, 10],
-            table: {
-              headerRows: 1,
-              widths: [125, 100, 70, 85, 75, '*'],
-              body: [
-                [
-                  { text: 'Parametro Cuantitativo', fillColor: '#bbb', bold: true, fontSize: 9 },
-                  { text: 'Und. Medida', fillColor: '#bbb', bold: true, fontSize: 9 },
-                  { text: 'Nominal', fillColor: '#bbb', bold: true, fontSize: 9 },
-                  { text: 'Tolerancia', fillColor: '#bbb', bold: true, fontSize: 9 },
-                  { text: 'Mínimo', fillColor: '#bbb', bold: true, fontSize: 9 },
-                  { text: 'Máximo', fillColor: '#bbb', bold: true, fontSize: 9 },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-          },
-          {
-            margin: [8, 0],
-            table: {
-              headerRows: 1,
-              widths: [100, 100 , '*', '*', '*', '*'],
-              body: [
-                [
-                  { text: 'Calibre', fontSize: 9, bold : true },
-                  { text: `${datos.unidad_Calibre}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.nominal_Calibre}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.tolerancia_Calibre}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.minimo_Calibre}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.maximo_Calibre}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Ancho Frente', fontSize: 9, bold : true },
-                  { text: `${datos.unidad_AnchoFrente}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.nominal_AnchoFrente}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.tolerancia_AnchoFrente}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.minimo_AnchoFrente}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.maximo_AnchoFrente}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Ancho Fuelle', fontSize: 9, bold : true },
-                  { text: `${datos.unidad_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.nominal_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.tolerancia_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.minimo_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.maximo_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Largo / Repetición', fontSize: 9, bold : true },
-                  { text: `${datos.unidad_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.nominal_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.tolerancia_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.minimo_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.maximo_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'COF', fontSize: 9, bold : true },
-                  { text: `${datos.unidad_Cof}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.nominal_Cof}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.tolerancia_Cof}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.minimo_Cof}`, fontSize: 9, alignment: 'center' },
-                  { text: `${datos.maximo_Cof}`, fontSize: 9, alignment: 'center' },
-                ],
-              ]
-            },
-          },
-          {
-            margin: [5, 10],
-            table: {
-              headerRows: 1,
-              widths: [150, '*'],
-              body: [
-                [
-                  { text: 'Parametro Cualitativo', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
-                  { text: 'Resultado', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-          },
-          {
-            margin: [8, 0],
-            table: {
-              headerRows: 1,
-              widths: [150, '*'],
-              body: [
-                [
-                  { text: 'Material', fontSize: 9, bold : true },
-                  { text: `${datos.material}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Resistencia', fontSize: 9, bold : true },
-                  { text: `${datos.resistencia}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Sellabilidad', fontSize: 9, bold : true },
-                  { text: `${datos.sellabilidad}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Transparencia', fontSize: 9, bold : true },
-                  { text: `${datos.transparencia}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Tratado', fontSize: 9, bold : true },
-                  { text: `${datos.tratado}`, fontSize: 9, alignment: 'center' },
-                ],
-                [
-                  { text: 'Impresión', fontSize: 9, bold : true },
-                  { text: `${datos.impresion}`, fontSize: 9, alignment: 'center' },
-                ],
-              ]
-            },
-          },
-          {
-            margin: [0, 20],
-            table : {
-              widths : ['*'],
-              style : '',
-              body : [
-                [ { border : [true, true, true, false], text : `Observación: `, bold : true } ],
-                [ { border : [true, false, true, true], text : `${datos.observacion}` } ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          {
-            margin: [0, 100],
-            table : {
-              widths : ['*'],
-              style : '',
-              body : [
-                [ { image : firmaJefeCalidad, width : 110, height : 60}],
-                [ {text : `Jefe de Calidad`, fontSize : 11, bold: true } ],
-                [ {text : `Plasticaribe SAS`, fontSize : 11, bold: true } ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-        ]
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
-      this.cargando = false;
+      let content : any = [
+        this.datosOrdenTrabajo(datos),
+        this.tituloParametrosCuantitativos(),
+        this.parametrosCuantitativosPDF(datos),
+        this.tituloParametrosCualitativos(),
+        this.parametrosCualitativosPDF(datos),
+        this.observacionesPDF(datos),
+        this.datosJefeCalidadPDF()
+      ];
+      this.creacionPDFService.formatoPDF(titulo, content);
+      setTimeout(() => this.cargando = false, 3000);
     });
+  }
+
+  datosOrdenTrabajo(datos : any) : {} {
+    return {
+      table: {
+        widths: [60, '*', 60, '*'],
+        body: [
+          [
+            { border: [true, true, false, false], text: `Orden / Lote`, bold: true },
+            { border: [false, true, false, false], text: `${datos.orden_Trabajo}` },
+            { border: [true, true, false, false], text: `Referencia`, bold: true },
+            { border: [false, true, true, false], text: `${datos.referencia}` },
+          ],
+          [
+            { border: [true, false, false, true], text: `Cliente`, bold: true },
+            { border: [false, false, true, true], text: `${datos.cliente}` },
+            { border: [false, false, false, true], text: `Cantidad`, bold: true },
+            { border: [false, false, true, true], text: `${this.formatonumeros(datos.cantidad_Producir.toFixed(2))} ${datos.presentacion_Producto}` },
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  tituloParametrosCuantitativos() : {} {
+    return {
+      margin: [5, 10],
+      table: {
+        headerRows: 1,
+        widths: [125, 100, 70, 85, 75, '*'],
+        body: [
+          [
+            { text: 'Parametro Cuantitativo', fillColor: '#bbb', bold: true, fontSize: 9 },
+            { text: 'Und. Medida', fillColor: '#bbb', bold: true, fontSize: 9 },
+            { text: 'Nominal', fillColor: '#bbb', bold: true, fontSize: 9 },
+            { text: 'Tolerancia', fillColor: '#bbb', bold: true, fontSize: 9 },
+            { text: 'Mínimo', fillColor: '#bbb', bold: true, fontSize: 9 },
+            { text: 'Máximo', fillColor: '#bbb', bold: true, fontSize: 9 },
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  parametrosCuantitativosPDF(datos : any) : {} {
+    let bodyTable : any [] = [
+      this.parametroCuantitativoCalibrePDF(datos),
+      this.parametroCuantitativoAnchoFrentePDF(datos),
+      this.parametroCuantitativoAnchoFuellePDF(datos),
+      this.parametroCuantitativoLargoRepeticionPDF(datos),
+      this.parametroCuantitativoCofPDF(datos)
+    ];
+    return {
+      margin: [8, 0],
+      table: {
+        headerRows: 1,
+        widths: [100, 100, '*', '*', '*', '*'],
+        body: bodyTable
+      },
+    }
+  }
+
+  parametroCuantitativoCalibrePDF(datos : any) : any [] {
+    return [
+      { text: 'Calibre', fontSize: 9, bold : true },
+      { text: `${datos.unidad_Calibre}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_Calibre}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.tolerancia_Calibre}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.minimo_Calibre}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.maximo_Calibre}`, fontSize: 9, alignment: 'center' },
+    ];
+  }
+
+  parametroCuantitativoAnchoFrentePDF(datos : any) : any [] {
+    return [
+      { text: 'Ancho Frente', fontSize: 9, bold : true },
+      { text: `${datos.unidad_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.tolerancia_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.minimo_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.maximo_AnchoFrente}`, fontSize: 9, alignment: 'center' },
+    ];
+  }
+
+  parametroCuantitativoAnchoFuellePDF(datos : any) : any [] {
+    return [
+      { text: 'Ancho Fuelle', fontSize: 9, bold : true },
+      { text: `${datos.unidad_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.tolerancia_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.minimo_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.maximo_AnchoFuelle}`, fontSize: 9, alignment: 'center' },
+    ];
+  }
+
+  parametroCuantitativoLargoRepeticionPDF(datos : any) : any [] {
+    return [
+      { text: 'Largo / Repetición', fontSize: 9, bold : true },
+      { text: `${datos.unidad_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.tolerancia_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.minimo_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.maximo_LargoRepeticion}`, fontSize: 9, alignment: 'center' },
+    ];
+  }
+
+  parametroCuantitativoCofPDF(datos : any) : any [] {
+    return [
+      { text: 'COF', fontSize: 9, bold : true },
+      { text: `${datos.unidad_Cof}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.nominal_Cof}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.tolerancia_Cof}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.minimo_Cof}`, fontSize: 9, alignment: 'center' },
+      { text: `${datos.maximo_Cof}`, fontSize: 9, alignment: 'center' },
+    ];
+  }
+
+  tituloParametrosCualitativos() : {} {
+    return {
+      margin: [5, 10],
+      table: {
+        headerRows: 1,
+        widths: [150, '*'],
+        body: [
+          [
+            { text: 'Parametro Cualitativo', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
+            { text: 'Resultado', fillColor: '#bbb', fontSize: 9, alignment: 'center', bold: true },
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  parametrosCualitativosPDF(datos : any) : {} {
+    return {
+      margin: [8, 0],
+      table: {
+        headerRows: 1,
+        widths: [150, '*'],
+        body: [
+          [
+            { text: 'Material', fontSize: 9, bold : true },
+            { text: `${datos.material}`, fontSize: 9, alignment: 'center' },
+          ],
+          [
+            { text: 'Resistencia', fontSize: 9, bold : true },
+            { text: `${datos.resistencia}`, fontSize: 9, alignment: 'center' },
+          ],
+          [
+            { text: 'Sellabilidad', fontSize: 9, bold : true },
+            { text: `${datos.sellabilidad}`, fontSize: 9, alignment: 'center' },
+          ],
+          [
+            { text: 'Transparencia', fontSize: 9, bold : true },
+            { text: `${datos.transparencia}`, fontSize: 9, alignment: 'center' },
+          ],
+          [
+            { text: 'Tratado', fontSize: 9, bold : true },
+            { text: `${datos.tratado}`, fontSize: 9, alignment: 'center' },
+          ],
+          [
+            { text: 'Impresión', fontSize: 9, bold : true },
+            { text: `${datos.impresion}`, fontSize: 9, alignment: 'center' },
+          ],
+        ]
+      },
+    }
+  }
+
+  observacionesPDF(datos : any) : {} {
+    return {
+      margin: [0, 20],
+      table : {
+        widths : ['*'],
+        style : '',
+        body : [
+          [ { border : [true, true, true, false], text : `Observación: `, bold : true } ],
+          [ { border : [true, false, true, true], text : `${datos.observacion}` } ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  datosJefeCalidadPDF() : {} {
+    return {
+      margin: [0, 100],
+      table : {
+        widths : ['*'],
+        style : '',
+        body : [
+          [ { image : firmaJefeCalidad, width : 110, height : 60}],
+          [ {text : `Jefe de Calidad`, fontSize : 11, bold: true } ],
+          [ {text : `Plasticaribe SAS`, fontSize : 11, bold: true } ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
   }
 }

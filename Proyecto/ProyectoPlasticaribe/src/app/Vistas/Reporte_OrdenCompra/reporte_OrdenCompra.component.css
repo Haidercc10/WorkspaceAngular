@@ -1,5 +1,9 @@
-span{
+span {
   color: #db4149;
+}
+
+td a {
+  color: white;
 }
 
 .p-input-icon-left {

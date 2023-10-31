@@ -9,6 +9,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardCuentasPagar as defaultSteps } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Component({
   selector: 'app-Dashboard_CuentasPagar',
@@ -35,8 +36,8 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
   constructor(private AppComponent : AppComponent,
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
-                        private facturasInverService : Facturas_Invergoal_InversuezService,
-                          private paginaPrincial : PaginaPrincipalComponent,) {
+                    private paginaPrincial : PaginaPrincipalComponent,
+                      private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -138,191 +139,99 @@ export class Dashboard_CuentasPagarComponent implements OnInit {
 
   // Funcion que va a crear un pdf
   crearPdf(data : any = this.carteraAgrupadaProveedores){
-    let nombre : string = this.storage_Nombre;
     const titulo : string = `Estado Proveedores`;
-    let total : number = 0;
-    const pdfDefinicion : any = {
-      info: { title: titulo },
-      pageSize: { width: 630, height: 760 },
-      watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-      pageMargins : [25, 140, 25, 15],
-      header: function(currentPage : any, pageCount : any) {
-        return [
-          {
-            margin: [20, 8, 20, 0],
-            columns: [
-              { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-              {
-                width: 300,
-                alignment: 'center',
-                table: {
-                  body: [
-                    [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                    [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
-                    [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
-                  ]
-                },
-                layout: 'noBorders',
-                margin: [85, 20],
-              },
-              {
-                width: '*',
-                alignment: 'center',
-                margin: [20, 20, 20, 0],
-                table: {
-                  body: [
-                    [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('YYYY-MM-DD'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                    [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: nombre, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                  ]
-                },
-                layout: 'noBorders',
-              }
-            ]
-          },
-          {
-            margin: [20, 0],
-            table: {
-              headerRows: 1,
-              widths: ['*'],
-              body: [
-                [
-                  {
-                    border: [false, true, false, false],
-                    text: ''
-                  },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, }
-          },
-          {
-            margin: [20, 10, 20, 0],
-            table: {
-              headerRows: 1,
-              widths: [110, 70, 80, 140, 40, 30, 50],
-              body: [
-                [
-                  { text: 'Factura', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Fecha', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Vence', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Valor', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Mora', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Días', fillColor: '#bbb', fontSize: 10 },
-                  { text: 'Cuenta', fillColor: '#bbb', fontSize: 10 },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, }
-          }
-        ];
-      },
-      content : []
-    };
-    for (let item of data) {
-      total += item.Cartera;
-      let proveedor = {
-        margin: [0, 5, 0, 5],
-        table: {
-          widths: [100, 70, 70, 160, 30, 40, 40],
-          body: [
-            [ { text: `Proveedor:    ${item.Id_Proveedor}    ${item.Proveedor}`, bold: true, border: [false, false, false, false], colSpan: 7},'','','','','','' ],
-          ]
-        },
-        layout: { defaultBorder: false, },
-        fontSize: 9,
-      }
-      for (let itemDetalles of item.Detalles) {
-        let info = [
-          {text: `FA-${itemDetalles.factura}`, border: [true, true, false, true], bold: false, colSpan: 1},
-          {text: `${itemDetalles.fecha_Factura}`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${itemDetalles.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${this.formatonumeros(itemDetalles.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${this.formatonumeros(this.calcularDiasRetraso(itemDetalles.factura, item.Id_Proveedor, item.Cuenta, data))}`, border: [false, true, false, true], bold: false, colSpan: 1},
-          {text: `${itemDetalles.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
-        ];
-        proveedor.table.body.push(info);
-      }
-      proveedor.table.body.push(
-        [
-          { text: `Total Proveedor:`, border: [false, false, false, false], bold: true, colSpan: 1},
-          '',
-          '',
-          { text: `${this.formatonumeros(item.Cartera)}`, border: [false, false, false, false], bold: true, colSpan: 1},
-          { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
-          '',
-          '',
-        ],
-      );
-      pdfDefinicion.content.push(proveedor);
-    }
-    let totalData = {
-      margin: [0, 10],
+    let headerAdicional : any = this.headerAdicionarPDF();
+    let content : any = this.contentPDF(data);
+    this.creacionPDFService.formatoPDF(titulo, content, headerAdicional);
+    setTimeout(() => this.cargando = false, 3000);
+  }
+
+  headerAdicionarPDF() : {} {
+    return {
+      margin: [20, 10, 20, 0],
       table: {
-        widths: [100, 70, 70, 160, 30, 40, 40],
+        headerRows: 1,
+        widths: [110, 70, 80, 140, 40, 30, 50],
         body: [
           [
-            { text: `Total General:`, border: [false, false, false, false], bold: true, colSpan: 1},
-            '',
-            '',
-            { text: `${this.formatonumeros(total)}`, border: [false, false, false, false], bold: true, colSpan: 1},
-            { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
-            '',
-            '',
+            { text: 'Factura', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Fecha', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Vence', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Valor', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Mora', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Días', fillColor: '#bbb', fontSize: 10 },
+            { text: 'Cuenta', fillColor: '#bbb', fontSize: 10 },
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, }
+    };
+  }
+
+  contentPDF(data : any []) {
+    let datos : any [] = [];
+    data.forEach(item => datos.push(this.informacionProveedoresPDF(item, data)));
+    datos.push(this.costoTotalPDF(data));
+    return datos;
+  }
+
+  informacionProveedoresPDF(data : any, datosTotales : any){
+    let bodyTable : any = [
+      [{text: `Proveedor:    ${data.Id_Proveedor}    ${data.Proveedor}`, bold: true, border: [true, true, true, true], colSpan: 7, fillColor: '#bbb'}, '','','','','','']
+    ];
+    data.Detalles.forEach(fac => bodyTable.push(this.facturasProveedorPDf(fac, data.Id_Proveedor, data.Cuenta, datosTotales)));
+    bodyTable.push(this.totalProveedorPDF(data));
+    return {
+      margin: [0, 5, 0, 5],
+      table: {
+        widths: ['20%', '15%', '15%', '25%', '5%', '10%', '10%'],
+        body: bodyTable
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  facturasProveedorPDf(data : any, proveedor, cuenta, datos){
+    return [
+      {text: `FA-${data.factura}`, border: [true, true, false, true], bold: false, colSpan: 1},
+      {text: `${data.fecha_Factura}`, border: [false, true, false, true], bold: false, colSpan: 1},
+      {text: `${data.fecha_Vencimiento}`, border: [false, true, false, true], bold: false, colSpan: 1},
+      {text: `${this.formatonumeros(data.saldo_Actual)}`, border: [false, true, false, true], bold: false, colSpan: 1},
+      {text: `0`, border: [false, true, false, true], bold: false, colSpan: 1},
+      {text: `${this.formatonumeros(this.calcularDiasRetraso(data.factura, proveedor, cuenta, datos))}`, border: [false, true, false, true], bold: false, colSpan: 1},
+      {text: `${data.cuenta}`, border: [false, true, true, true], bold: false, colSpan: 1}
+    ]
+  }
+
+  totalProveedorPDF(data : any){
+    return [
+      { text: `Total Proveedor:`, border: [false, false, false, false], bold: true, colSpan: 1},
+      '',
+      '',
+      { text: `${this.formatonumeros(data.Cartera)}`, border: [false, false, false, false], bold: true, colSpan: 1},
+      { text: `0`, border: [false, false, false, false], bold: true, colSpan: 1},
+      '',
+      '',
+    ];
+  }
+
+  costoTotalPDF(data : any){
+    let total = data.reduce((a,b) => a + b.Cartera, 0);
+    return {
+      margin: [0, 10],
+      table: {
+        widths: ['50%', '23%', '27%'],
+        body: [
+          [
+            { text: `Total General:`, border: [true, true, false, true], bold: true, colSpan: 1},
+            { text: `${this.formatonumeros(total)}`, border: [false, true, false, true], bold: true, colSpan: 1},
+            { text: `0`, border: [false, true, true, true], bold: true, colSpan: 1},
           ],
         ]
       },
       layout: { defaultBorder: false, },
       fontSize: 9,
     }
-    pdfDefinicion.content.push(totalData);
-    pdfMake.createPdf(pdfDefinicion).open();
-  }
-
-  // funcion que va a consultar las facturas de invergoal e inversuez
-  consultarFacturas(){
-    this.carteraInvergoal = [];
-    this.carteraInversuez = [];
-    this.facturasInverService.GetProveedoresFacturas_Pagar().subscribe((data : any) => {
-      this.cargando = true;
-      let numProveedores : number = 0;
-      data.forEach((factura : any) => {
-        const info : any = {
-          Id_Proveedor : factura.nit_Proveedor,
-          Proveedor : factura.prov_Nombre,
-          Cartera : factura.valorTotal,
-          Cuenta : factura.cuenta,
-          Detalles : [],
-          Id_Empresa : factura.nit_Empresa,
-        }
-        if (factura.nit_Empresa == 900362200) this.carteraInvergoal.push(info);
-        else if (factura.nit_Empresa == 900458314) this.carteraInversuez.push(info);
-        numProveedores += 1;
-        if (numProveedores == data.length) this.facturasProveedores();
-      });
-    });
-  }
-
-  // Funcion que va a llenar cada uno de las facturas de cada proveedor
-  facturasProveedores(){
-    let registros : number = 0;
-    this.facturasInverService.GetFacturas_Pagar().subscribe((datos : any) => {
-      datos.forEach((facturas : any) => {
-        const infoFacturas : any = {
-          factura : facturas.factura,
-          fecha_Factura : facturas.fecha_Factura.replace('T00:00:00', ''),
-          fecha_Vencimiento : facturas.fecha_Vencimiento.replace('T00:00:00', ''),
-          saldo_Actual : facturas.saldo_Actual,
-          mora : facturas.mora,
-          cuenta : facturas.cuenta,
-        }
-        if (facturas.empresa == 900362200) this.carteraInvergoal[this.carteraInvergoal.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
-        else if (facturas.empresa == 900458314) this.carteraInversuez[this.carteraInversuez.findIndex(x => x.Id_Empresa == facturas.empresa)].Detalles.push(infoFacturas);
-        registros += 1;
-        if (registros == datos.length) this.cargando = false;
-      });
-    });
   }
 }
