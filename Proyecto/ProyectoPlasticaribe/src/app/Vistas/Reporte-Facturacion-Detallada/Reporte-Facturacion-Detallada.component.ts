@@ -51,6 +51,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   ngOnInit() {
     this.obtenerVendedores();
+    this.cargarFacturacionDetallada(`2023-10-23`, `2023-10-26`, `?vendedor=001`);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -121,9 +122,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     let vendedor : string = this.formFiltros.value.vendedor;
     let producto : any = this.formFiltros.value.idProducto;
     let ruta : string = ``;
-
-    if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
-    else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
+    
+    if(vendedor != null && vendedor != '' && vendedor != undefined) {
+      if (vendedor.toString().length == 2) vendedor = `0${vendedor}`;
+      else if (vendedor.toString().length == 1) vendedor = `00${vendedor}`;
+    }
 
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
@@ -300,6 +303,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       }); 
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     });
+    setTimeout(() => {
+      this.getFormatoPdfDetallado();
+    }, 5000);
   }
 
   //Tabla de encabezado de los items de cada factura
@@ -332,7 +338,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   //Funcion que retornará el contenido del PDF detallado por vendedor
   getFormatoPdfDetallado(){
-    console.log(this.infoPdf);
     this.onReject();
     this.cargando = true;
     let vendedores : any = [];
@@ -386,10 +391,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   getClientesVendedor(vendedores : any){
     let data : any = [];
     let clientes : any[] = this.infoPdf.filter(x => x.idVendedor == vendedores.id);  
+    clientes.sort((a, b) => a.cliente > b.cliente ? 1 : a.cliente < b.cliente ? -1 : 0);
     let clientesVendedor : any[] = [];
     for (let index = 0; index < clientes.length; index++) {
-      if(!clientesVendedor.includes(clientes[index].cliente)){
-        clientesVendedor.push(clientes[index].cliente);
+      if(!clientesVendedor.includes(clientes[index].factura)){
+        clientesVendedor.push(clientes[index].factura);
         data.push(this.tablaClientesVendedor(clientes[index]));
       }
     }
@@ -421,7 +427,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   //Función que cargará items que compró cada cliente y las facturas asociadas.
   getItemsClientesVendedor(clientes : any){
     let data : any = [];
-    let items : any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente);
+    let items : any[] = this.infoPdf.filter(x => x.idVendedor == clientes.idVendedor && x.cliente == clientes.cliente && x.factura == clientes.factura);
     data.push(this.headerItems());
     for (let index = 0; index < items.length; index++) {
       data.push(this.tablaItemsClientesVendedor(items[index]));
