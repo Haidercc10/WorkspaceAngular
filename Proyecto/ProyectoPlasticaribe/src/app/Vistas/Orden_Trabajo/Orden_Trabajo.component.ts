@@ -2284,7 +2284,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que le va a dar el formato al arcivo PDF
   formatoPDF(datos_ot) {
-    let usuario: string = this.AppComponent.storage_Nombre;
     for (let i = 0; i < datos_ot.length; i++) {
       let titulo: string = `${datos_ot[i].numero_Orden}`;
       const pdfDefinicion: any = {
@@ -2292,607 +2291,673 @@ export class Orden_TrabajoComponent implements OnInit {
         pageSize: { width: 630, height: 760 },
         watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
         pageMargins: [25, 190, 25, 35],
-        header: [
-          {
-            margin: [25, 5],
-            columns: [
-              { image: logoParaPdf, width: 220, height: 50, margin: [10, 5] },
-              {
-                text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].numero_Orden}`,
-                style: 'titulo',
-                alignment: 'center',
-                margin: [0, 20, 0, 0],
-              },
-            ]
-          },
-          {
-            margin: [25, 5],
-            style: 'tablaEmpresa',
-            table: {
-              widths: ['10%', '40%', '10%', '40%'],
-              style: 'header',
-              body: [
-                [
-                  { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
-                  { border: [false, true, false, false], text: `${datos_ot[i].id_SedeCliente}` },
-                  { border: [true, true, false, false], text: `Item`, style: 'titulo', },
-                  { border: [false, true, true, false], text: `${datos_ot[i].id_Producto}` },
-                ],
-                [
-                  { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
-                  { border: [false, false, true, true], text: `${datos_ot[i].cliente.toString().trim()}` },
-                  { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
-                  { border: [false, false, true, true], text: `${datos_ot[i].producto.toString().trim()}` },
-                ],
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n',
-          {
-            margin: [25, 5],
-            table: {
-              widths: ['*', '*', '*', '*', '*'],
-              style: '',
-              body: [
-                [
-                  { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Material`, style: 'titulo', alignment: 'center', },
-                  { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Bolsas`, style: 'titulo', alignment: 'center', },
-                  { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Cant. Kilos (Kg)`, style: 'titulo', alignment: 'center', },
-                  { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Presentación`, style: 'titulo', alignment: 'center', },
-                  { border: [false, false, false, false], fillColor: '#aaaaaa', text: `Despachar`, style: 'titulo', alignment: 'center', },
-                ],
-                [
-                  { border: [false, false, false, false], text: `${datos_ot[i].material}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].cantidad_Pedida).toFixed(2))}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].peso_Neto).toFixed(2))}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${datos_ot[i].presentacion}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${datos_ot[i].fecha_Entrega.replace('T00:00:00', '')}`, alignment: 'center', },
-                ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-        ],
-        footer: function (currentPage: any, pageCount: any) {
-          return [
-            '\n',
-            {
-              columns: [
-                { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-              ]
-            }
-          ]
-        },
-        content: [
-          {
-            table: {
-              widths: ['*'],
-              style: '',
-              body: [
-                [{ border: [false, false, false, false], fillColor: '#aaaaaa', text: `Materia Prima`, alignment: 'center', style: 'titulo', }]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          // Mezclas
-          '\n',
-          {
-            columns: [
-              {
-                width: datos_ot[i].mezcla_PorcentajeCapa1 == 0 ? '*' : 
-                  Math.max(...[
-                    datos_ot[i].m1C1_nombre.toString().trim().length,
-                    datos_ot[i].m2C1_nombre.toString().trim().length,
-                    datos_ot[i].m3C1_nombre.toString().trim().length,
-                    datos_ot[i].m4C1_nombre.toString().trim().length,
-                    datos_ot[i].p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
-                    datos_ot[i].p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
-                  ]) > 20 ? 'auto' : '*',
-                table: {
-                  widths: [40, '*', 'auto'],
-                  heights: (row) => (row) * 3,
-                  style: '',
-                  body: [
-                    [
-                      { colSpan: 3, text: `CAPA UNICA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                      {},
-                      {}
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `(%) Capa:` },
-                      { border: [], text: `${datos_ot[i].mezcla_PorcentajeCapa1}%` },
-                      { border: [false, false, true, false], text: `` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 1:` },
-                      { border: [], text: `${datos_ot[i].m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C1_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 2:` },
-                      { border: [], text: `${datos_ot[i].m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C1_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 3:` },
-                      { border: [], text: `${datos_ot[i].m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C1_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 4:` },
-                      { border: [], text: `${datos_ot[i].m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C1_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Pig. 1:` },
-                      { border: [], text: `${datos_ot[i].p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%` }
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Pig. 2:` },
-                      { border: [false, false, false, true], text: `${datos_ot[i].p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, true], text: `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%` }
-                    ],
-                  ]
-                }
-              },
-              {
-                width: datos_ot[i].mezcla_PorcentajeCapa2 == 0 ? '*' : 
-                  Math.max(...[
-                    datos_ot[i].m1C2_nombre.toString().trim().length,
-                    datos_ot[i].m2C2_nombre.toString().trim().length,
-                    datos_ot[i].m3C2_nombre.toString().trim().length,
-                    datos_ot[i].m4C2_nombre.toString().trim().length,
-                    datos_ot[i].p1C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
-                    datos_ot[i].p2C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
-                  ]) > 20 ? 'auto' : '*',
-                table: {
-                  widths: [40, '*', 'auto'],
-                  heights: (row) => (row) * 3,
-                  style: '',
-                  body: [
-                    [
-                      { colSpan: 3, text: `CAPA INTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                      {},
-                      {}
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `(%) Capa:` },
-                      { border: [], text: `${datos_ot[i].mezcla_PorcentajeCapa2}%` },
-                      { border: [false, false, true, false], text: `` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 1:` },
-                      { border: [], text: `${datos_ot[i].m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C2_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 2:` },
-                      { border: [], text: `${datos_ot[i].m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C2_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 3:` },
-                      { border: [], text: `${datos_ot[i].m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C2_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 4:` },
-                      { border: [], text: `${datos_ot[i].m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C2_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Pig. 1:` },
-                      { border: [], text: `${datos_ot[i].p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%` }
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Pig. 2:` },
-                      { border: [false, false, false, true], text: `${datos_ot[i].p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, true], text: `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%` }
-                    ],
-                  ]
-                }
-              },
-              {
-                width: datos_ot[i].mezcla_PorcentajeCapa3 == 0 ? '*' : 
-                  Math.max(...[
-                    datos_ot[i].m1C3_nombre.toString().trim().length,
-                    datos_ot[i].m2C3_nombre.toString().trim().length,
-                    datos_ot[i].m3C3_nombre.toString().trim().length,
-                    datos_ot[i].m4C3_nombre.toString().trim().length,
-                    datos_ot[i].p1C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
-                    datos_ot[i].p2C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
-                  ]) > 20 ? 'auto' : '*',
-                table: {
-                  widths: [40, '*', 'auto'],
-                  heights: (row) => (row) * 3,
-                  style: '',
-                  body: [
-                    [
-                      { colSpan: 3, text: `CAPA EXTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                      {},
-                      {}
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `(%) Capa: ` },
-                      { border: [], text: `${datos_ot[i].mezcla_PorcentajeCapa3}%` },
-                      { border: [false, false, true, false], text: `` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 1:` },
-                      { border: [], text: `${datos_ot[i].m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m1C3_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 2:` },
-                      { border: [], text: `${datos_ot[i].m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m2C3_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 3:` },
-                      { border: [], text: `${datos_ot[i].m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m3C3_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Mat. 4:` },
-                      { border: [], text: `${datos_ot[i].m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot[i].m4C3_nombre.toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%` }
-                    ],
-                    [
-                      { border: [true, false, false, false], text: `Pig. 1:` },
-                      { border: [], text: `${datos_ot[i].p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p1C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, false], text: `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%` }
-                    ],
-                    [
-                      { border: [true, false, false, true], text: `Pig. 2:` },
-                      { border: [false, false, false, true], text: `${datos_ot[i].p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot[i].p2C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
-                      { border: [false, false, true, true], text: `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%` }
-                    ],
-                  ]
-                }
-              },
-            ],
-            fontSize: 9,
-            columnGap: 10
-          },
-          '\n\n',
-          {
-            table: {
-              widths: ['*'],
-              style: '',
-              body: [
-                [{ border: [false, false, false, false], text: `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', }]
-              ]
-            }
-          },
-          {
-            table: {
-              widths: [65, 65, '*', 50, 70, 70, 60],
-              style: '',
-              body: [
-                [
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Pigmento`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Formato`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Ancho`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Und Medida`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Calibre`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Peso MT \n(Min/Max)`, alignment: 'center', style: 'subtitulo', },
-                  { border: [false, false, false, false], fillColor: '#eeeeee', text: `Tratado`, alignment: 'center', style: 'subtitulo', }
-                ],
-                [
-                  {},
-                  {},
-                  {},
-                  {},
-                  {},
-                  {},
-                  {},
-                ],
-                [
-                  { border: [false, false, false, false], text: `${datos_ot[i].pigmento_Extrusion.toString().trim()}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${datos_ot[i].formato_Extrusin.toString().trim()}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot[i].ancho2_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot[i].ancho3_Extrusion).toFixed(2))}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${datos_ot[i].und_Extrusion}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].calibre_Extrusion).toFixed(2))}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].peso_Extrusion).toFixed(2))}`, alignment: 'center', },
-                  { border: [false, false, false, false], text: `${datos_ot[i].tratado}`, alignment: 'center', }
-                ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n',
-          {
-            table: {
-              widths: ['*'],
-              style: '',
-              body: [
-                [{ border: [true, true, true, false], text: `Observación: ` }],
-                [{ border: [true, false, true, true], text: `${datos_ot[i].observacion.toString().trim()}` }]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-            pageBreak: 'after'
-          },
-          // Hoja 2
-          // Procesos
-          {
-            table: {
-              widths: ['*', 20, '*'],
-              style: '',
-              body: [
-                [
-                  // Extrusion
-                  {
-                    table: {
-                      widths: ['*', '*', '*'],
-                      style: '',
-                      body: [
-                        [
-                          { colSpan: 3, text: `EXTRUSIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                          {},
-                          {}
-                        ],
-                        [
-                          { border: [], text: `Pigmento: `, },
-                          { border: [], text: `${datos_ot[i].pigmento_Extrusion.toString().trim()}`, },
-                          { border: [], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `Formato: `, },
-                          { border: [], text: `${datos_ot[i].formato_Extrusin.toString().trim()}`, },
-                          { border: [], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `Calibre: `, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].calibre_Extrusion).toFixed(2))}`, },
-                          { border: [], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `Unidad Medida: `, },
-                          { border: [], text: `${datos_ot[i].und_Extrusion.toString().trim()}`, },
-                          { border: [], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `ANCHO`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot[i].ancho2_Extrusion).toFixed(2))}   +`, },
-                          { border: [], text: `   ${this.formatonumeros((datos_ot[i].ancho3_Extrusion).toFixed(2))}`, }
-                        ],
-                        [
-                          { border: [], text: `Peso MT (Min/Max): `, },
-                          { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot[i].peso_Extrusion).toFixed(2))}`, },
-                          { border: [false, false, false, false], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `Tratado Caras: `, },
-                          { border: [], text: `${datos_ot[i].tratado.toString().trim()}`, },
-                          { border: [], text: ``, }
-                        ],
-                      ]
-                    }
-                  },
-                  {},
-                  // Laminado
-                  {
-                    table: {
-                      widths: ['*', '*', '*'],
-                      style: '',
-                      body: [
-                        [
-                          { colSpan: 3, text: `LAMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                          { border: [], text: ``, },
-                          { border: [], text: ``, }
-                        ],
-                        [
-                          { border: [], text: `CAPA`, bold: true, },
-                          { border: [], text: `CALIBRE`, bold: true, },
-                          { border: [], text: `CANTIDAD`, bold: true, }
-                        ],
-                        [
-                          { border: [], text: `${datos_ot[i].laminado_Capa1.toString().trim()}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].calibre_Laminado_Capa1).toFixed(2))}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].cantidad_Laminado_Capa1).toFixed(2))}`, }
-                        ],
-                        [
-                          { border: [], text: `${datos_ot[i].laminado_Capa2.toString().trim()}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].calibre_Laminado_Capa2).toFixed(2))}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].cantidad_Laminado_Capa2).toFixed(2))}`, }
-                        ],
-                        [
-                          { border: [], text: `${datos_ot[i].laminado_Capa3.toString().trim()}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].calibre_Laminado_Capa3).toFixed(2))}`, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].cantidad_Laminado_Capa3).toFixed(2))}`, }
-                        ]
-                      ]
-                    }
-                  }
-                ],
-                [
-                  {},
-                  {},
-                  {}
-                ],
-                [
-                  {},
-                  {},
-                  {}
-                ],
-                [
-                  // Impresion
-                  {
-                    table: {
-                      widths: ['*', '*'],
-                      style: '',
-                      body: [
-                        [
-                          { colSpan: 2, text: `IMPRESIÓN`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                          {},
-                        ],
-                        [
-                          { border: [], text: `Tipo Impresión: `, },
-                          { border: [], text: `${datos_ot[i].tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot[i].tipo_Impresion.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Rodillo N°: `, },
-                          { border: [], text: `${datos_ot[i].rodillo.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `N° de Pista: `, },
-                          { border: [], text: `${datos_ot[i].pista.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 1: `, },
-                          { border: [], text: `${datos_ot[i].tinta1.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 2: `, },
-                          { border: [], text: `${datos_ot[i].tinta2.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 3: `, },
-                          { border: [], text: `${datos_ot[i].tinta3.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 4: `, },
-                          { border: [], text: `${datos_ot[i].tinta4.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 5: `, },
-                          { border: [], text: `${datos_ot[i].tinta5.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 6: `, },
-                          { border: [], text: `${datos_ot[i].tinta6.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 7: `, },
-                          { border: [], text: `${datos_ot[i].tinta7.toString().trim()}`, }
-                        ],
-                        [
-                          { border: [], text: `Tinta 8: `, },
-                          { border: [], text: `${datos_ot[i].tinta8.toString().trim()}`, }
-                        ],
-                      ]
-                    }
-                  },
-                  {},
-                  // Producto Terimnado
-                  {
-                    table: {
-                      widths: ['*', '*', '*'],
-                      style: '',
-                      body: [
-                        [
-                          { colSpan: 3, text: `PRODUCTO TERMINADO`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
-                          {},
-                          {},
-                        ],
-                        [
-                          { border: [], text: `Formato Bolsa: `, alignment: 'center', },
-                          { border: [], text: `${datos_ot[i].formato_Producto.toString().trim()}`, alignment: 'center', },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Ancho`, alignment: 'right', bold: true, },
-                          { border: [], text: `Largo`, alignment: 'center', bold: true, },
-                          { border: [], text: `Fuelle`, alignment: 'left', bold: true, },
-                        ],
-                        [
-                          { border: [], colspan: 3, text: `${this.formatonumeros((datos_ot[i].selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
-                          { border: [], colspan: 3, text: `x     ${this.formatonumeros((datos_ot[i].selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
-                          { border: [], colspan: 3, text: `${this.formatonumeros((datos_ot[i].selladoCorte_Fuelle).toFixed(2))}     ${datos_ot[i].und_Extrusion.toString().trim()}`, },
-                        ],
-                        [
-                          { border: [], text: ``, },
-                          { border: [], text: ``, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: ``, },
-                          { border: [], text: ``, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Sellado: `, },
-                          { border: [], text: `${datos_ot[i].tpSellados_Nombre.toString().trim()}`, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Margen: `, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].margen).toFixed(2))}`, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Peso Millar: `, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].selladoCorte_PesoMillar).toFixed(2))}`, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Cant. x Paquete: `, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].selladoCorte_CantBolsasPaquete).toFixed(2))}`, },
-                          { border: [], text: ``, },
-                        ],
-                        [
-                          { border: [], text: `Cant. x Bulto: `, },
-                          { border: [], text: `${this.formatonumeros((datos_ot[i].selladoCorte_CantBolsasBulto).toFixed(2))}`, },
-                          { border: [], text: ``, },
-                        ]
-                      ]
-                    }
-                  },
-                ]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-          },
-          '\n',
-          datos_ot[i].cyrel == true || datos_ot[i].cyrel == '1' ? {
-            table: {
-              widths: [20, '*', 20],
-              style: '',
-              body: [
-                [
-                  { border: [], text: ``, },
-                  { border: [], text: `Hacer Cyrel`, alignment: 'center', bold: true },
-                  { border: [], text: ``, }
-                ]
-              ]
-            }
-          } : {},
-          '\n\n',
-          {
-            table: {
-              widths: ['*'],
-              body: [
-                [{ border: [true, true, true, false], text: `Observación: ` }],
-                [{ border: [true, false, true, true], text: `${datos_ot[i].observacion}` }]
-              ]
-            },
-            layout: { defaultBorder: false, },
-            fontSize: 9,
-            margin: [0, -20]
-          }
-        ],
-        styles: {
-          header: { fontSize: 7, bold: true },
-          titulo: { fontSize: 11, bold: true },
-          ot: { fontSize: 13, bold: true },
-          subtitulo: { fontSize: 10, bold: true }
-        }
-      }
-      const pdf = pdfMake.createPdf(pdfDefinicion);
-      pdf.open();
+        header: this.headerPDF(datos_ot[i]),
+        footer: this.footerPDF(),
+        content: this.contentPDF(datos_ot[i]),
+        styles: this.stylesPDF()
+      };
+      pdfMake.createPdf(pdfDefinicion).open();
       this.cargando = false;
+    };
+  }
+
+  // Funcion que va a crear el header del PDF
+  headerPDF(datos_ot) {
+    return [
+      {
+        margin: [25, 5],
+        columns: this.informacionEmpresaHeader(datos_ot)
+      },
+      {
+        margin: [25, 5],
+        style: 'tablaEmpresa',
+        table: this.informacionClienteItemHeader(datos_ot),
+        layout: { defaultBorder: false, },
+        fontSize: 9,
+      },
+      '\n',
+      {
+        margin: [25, 5],
+        table: this.informacaionExtrusionHeader(datos_ot),
+        layout: { defaultBorder: false, },
+        fontSize: 9,
+      },
+    ];
+  }
+
+  // Funcion que va a colocar la información de la empresa en el header
+  informacionEmpresaHeader(datos_ot){
+    return [
+      { image: logoParaPdf, width: 220, height: 50, margin: [10, 5] },
+      {
+        text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot.numero_Orden}`,
+        style: 'titulo',
+        alignment: 'center',
+        margin: [0, 20, 0, 0],
+      },
+    ]
+  }
+
+  // Funaion que va a colocar la informacion del cliente y del item en el header
+  informacionClienteItemHeader(datos_ot){
+    return {
+      widths: ['10%', '40%', '10%', '40%'],
+      style: 'header',
+      body: [
+        [
+          { border: [true, true, false, false], text: `Id Cliente`, style: 'titulo', },
+          { border: [false, true, false, false], text: `${datos_ot.id_SedeCliente}` },
+          { border: [true, true, false, false], text: `Item`, style: 'titulo', },
+          { border: [false, true, true, false], text: `${datos_ot.id_Producto}` },
+        ],
+        [
+          { border: [true, false, false, true], text: `Cliente`, style: 'titulo', },
+          { border: [false, false, true, true], text: `${datos_ot.cliente.toString().trim()}` },
+          { border: [false, false, false, true], text: `Referencia`, style: 'titulo', },
+          { border: [false, false, true, true], text: `${datos_ot.producto.toString().trim()}` },
+        ],
+      ]
+    }
+  }
+
+  // Funcion que va a colocar informacion general de la extrusion en el header
+  informacaionExtrusionHeader(datos_ot){
+    return {
+      widths: ['*', '*', '*', '*', '*'],
+      body: [
+        [
+          {text: `Material`, style: 'titulosTablas', border: [true, true, false, true]},
+          {text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true]},
+          {text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true]},
+          {text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true]},
+          {text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true]},
+        ],
+        [
+          {text: `${datos_ot.material}`, style: 'datosTablaExtrusion'},
+          {text: `${this.formatonumeros((datos_ot.cantidad_Pedida).toFixed(2))}`, style: 'datosTablaExtrusion'},
+          {text: `${this.formatonumeros((datos_ot.peso_Neto).toFixed(2))}`, style: 'datosTablaExtrusion'},
+          {text: `${datos_ot.presentacion}`, style: 'datosTablaExtrusion'},
+          {text: `${datos_ot.fecha_Entrega.replace('T00:00:00', '')}`, style: 'datosTablaExtrusion'},
+        ]
+      ]
+    };
+  }
+
+  // Funcion que va a crear el contenido del PDF
+  contentPDF(datos_ot){
+    return [
+      this.hoja1ContentPDF(datos_ot),
+      this.hoja2ContentPDF(datos_ot)
+    ];
+  }
+
+  // Funcion que va a crear la hoja 1 del PDF
+  hoja1ContentPDF(datos_ot){
+    let data : any [] = [];
+    data.push(
+      this.tituloMezclas(datos_ot),
+      '\n',
+      this.datosMezclas(datos_ot),
+      '\n\n',
+      this.tituloExtrusion(),
+      this.datosExtrusion(datos_ot),
+      '\n',
+      this.observacion(datos_ot),
+    )
+    return data;
+  }
+
+  // Funcion que va a colocar el nombre de la mezcla que tiene el item
+  tituloMezclas(datos_ot){
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{text: (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas'}]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla
+  datosMezclas(datos_ot){
+    let validacion : boolean = Math.max(...[
+      datos_ot.m1C1_nombre.toString().trim().length,
+      datos_ot.m2C1_nombre.toString().trim().length,
+      datos_ot.m3C1_nombre.toString().trim().length,
+      datos_ot.m4C1_nombre.toString().trim().length,
+      datos_ot.p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
+      datos_ot.p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
+    ]) > 20;
+    
+    return {
+      columns: [
+        this.columna1Mezcla(datos_ot, validacion),
+        this.columna2Mezcla(datos_ot, validacion),
+        this.columna3Mezcla(datos_ot, validacion),
+      ],
+      fontSize: 9,
+      columnGap: 10
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 1
+  columna1Mezcla(datos_ot, validacion){
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA UNICA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa:` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa1}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C1_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa1}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C1_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa1}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C1_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa1}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C1_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C1_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa1}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa1}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C1_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa1}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 2
+  columna2Mezcla(datos_ot, validacion){
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA INTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa:` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa2}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C2_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa2}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C2_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa2}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C2_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa2}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C2_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C2_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa2}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa2}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C2_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C2_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa2}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar la información de la mezcla en la capa 3
+  columna3Mezcla(datos_ot, validacion){
+    return {
+      width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
+      table: {
+        widths: [40, '*', 'auto'],
+        heights: (row) => (row) * 3,
+        body: [
+          [
+            { colSpan: 3, text: `CAPA EXTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            {},
+            {}
+          ],
+          [
+            { border: [true, false, false, false], text: `(%) Capa: ` },
+            { border: [], text: `${datos_ot.mezcla_PorcentajeCapa3}%` },
+            { border: [false, false, true, false], text: `` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 1:` },
+            { border: [], text: `${datos_ot.m1C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m1C3_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial1_Capa3}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 2:` },
+            { border: [], text: `${datos_ot.m2C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m2C3_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial2_Capa3}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 3:` },
+            { border: [], text: `${datos_ot.m3C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m3C3_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial3_Capa3}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Mat. 4:` },
+            { border: [], text: `${datos_ot.m4C3_nombre == 'NO APLICA MATERIAL' ? 'N/A' : datos_ot.m4C3_nombre.toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajeMaterial4_Capa3}%` }
+          ],
+          [
+            { border: [true, false, false, false], text: `Pig. 1:` },
+            { border: [], text: `${datos_ot.p1C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p1C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, false], text: `${datos_ot.mezcla_PorcentajePigmto1_Capa3}%` }
+          ],
+          [
+            { border: [true, false, false, true], text: `Pig. 2:` },
+            { border: [false, false, false, true], text: `${datos_ot.p2C3_Nombre == 'NO APLICA PIGMENTO' ? 'N/A' : datos_ot.p2C3_Nombre.replace('PIGMENTO', 'PIG.').toString().trim()}` },
+            { border: [false, false, true, true], text: `${datos_ot.mezcla_PorcentajePigmto2_Capa3}%` }
+          ],
+        ]
+      }
+    }
+  }
+
+  // Funcion que va a colocar 'EXTRUSIÓN' en la hoja 1
+  tituloExtrusion(){
+    return  {
+      table: {
+        widths: ['*'],
+        body: [
+          [{text: `EXTRUSIÓN`, style: 'titulosTablas'}]
+        ]
+      }
+    };
+  }
+
+  // Funcion que va a colocar la información de extrusión en la hoja 1
+  datosExtrusion(datos_ot){
+    return {
+      table: {
+        widths: [65, 65, '*', 50, 70, 70, 60],
+        body: [
+          [
+            {text: `Pigmento`, style: 'subtituloTablas'},
+            {text: `Formato`, style: 'subtituloTablas'},
+            {text: `Ancho`, style: 'subtituloTablas'},
+            {text: `Und Medida`, style: 'subtituloTablas'},
+            {text: `Calibre`, style: 'subtituloTablas'},
+            {text: `Peso MT \n(Min/Max)`, style: 'subtituloTablas'},
+            {text: `Tratado`, style: 'subtituloTablas'}
+          ],
+          [{}, {}, {}, {}, {}, {}, {}],
+          [
+            { border: [false, false, false, false], text: `${datos_ot.pigmento_Extrusion.toString().trim()}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${datos_ot.formato_Extrusin.toString().trim()}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${datos_ot.und_Extrusion}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}`, alignment: 'center', },
+            { border: [false, false, false, false], text: `${datos_ot.tratado}`, alignment: 'center', }
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  // Función que va a colocar la observación de la OT
+  observacion(datos_ot){
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
+          [{ border: [true, false, true, true], text: `${datos_ot.observacion.toString().trim()}` }]
+        ]
+      },
+      fontSize: 9,
+    }
+  }
+
+  // Función que va a colocar la información de la hoja 2
+  hoja2ContentPDF(datos_ot){
+    let data : any [] = [];
+    data.push(
+      this.procesosHoja2(datos_ot),
+      '\n',
+      this.cyrelPDF(datos_ot),
+      '\n\n',
+      this.observacion(datos_ot),
+    )
+    return data;
+  }
+
+  // Función que va a colocar en la hoja 2 la información de cada uno de los procesos
+  procesosHoja2(datos_ot){
+    return {
+      pageBreak: 'before',
+      table: {
+        widths: ['*', 20, '*'],
+        body: [
+          [this.procesoExtrusion(datos_ot), {}, this.procesoLaminado(datos_ot)],
+          [{}, {}, {}],
+          [{}, {}, {}],
+          [this.procesoImpresion(datos_ot), {}, this.productoTermiando(datos_ot),]
+        ]
+      },
+      layout: { defaultBorder: false, },
+      fontSize: 9,
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de extrusión
+  procesoExtrusion(datos_ot){
+    return {
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            {colSpan: 3, text: `EXTRUSIÓN`, style: 'titulosTablas', border: [true, true, true, true]},
+            {},
+            {}
+          ],
+          [
+            {text: `Pigmento: `, style: 'subtitulo'},
+            {text: `${datos_ot.pigmento_Extrusion.toString().trim()}`},
+            {}
+          ],
+          [
+            {text: `Formato: `, style: 'subtitulo'},
+            {text: `${datos_ot.formato_Extrusin.toString().trim()}`},
+            {}
+          ],
+          [
+            {text: `Calibre: `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}`},
+            {}
+          ],
+          [
+            {text: `Unidad Medida: `, style: 'subtitulo'},
+            {text: `${datos_ot.und_Extrusion.toString().trim()}`},
+            {}
+          ],
+          [
+            {text: `ANCHO`, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +`},
+            {text: `   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}`}
+          ],
+          [
+            {text: `Peso MT (Min/Max): `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}`},
+            {}
+          ],
+          [
+            {text: `Tratado Caras: `, style: 'subtitulo'},
+            {text: `${datos_ot.tratado.toString().trim()}`},
+            {}
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de laminado
+  procesoLaminado(datos_ot){
+    return {
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            {colSpan: 3, text: `LAMINADO`, style: 'titulosTablas', border: [true, true, true, true]},
+            {},
+            {}
+          ],
+          [
+            {text: `CAPA`, style: 'subtitulo'},
+            {text: `CALIBRE`, style: 'subtitulo'},
+            {text: `CANTIDAD`, style: 'subtitulo'}
+          ],
+          [
+            {text: `${datos_ot.laminado_Capa1.toString().trim()}`, },
+            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa1).toFixed(2))}`, },
+            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa1).toFixed(2))}`, }
+          ],
+          [
+            {text: `${datos_ot.laminado_Capa2.toString().trim()}`, },
+            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa2).toFixed(2))}`, },
+            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa2).toFixed(2))}`, }
+          ],
+          [
+            {text: `${datos_ot.laminado_Capa3.toString().trim()}`, },
+            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa3).toFixed(2))}`, },
+            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa3).toFixed(2))}`, }
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de impresión
+  procesoImpresion(datos_ot){
+    return {
+      table: {
+        widths: ['*', '*'],
+        body: [
+          [
+            {colSpan: 2, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true]},
+            {},
+          ],
+          [
+            {text: `Tipo Impresión: `, style: 'subtitulo'},
+            {text: `${datos_ot.tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot.tipo_Impresion.toString().trim()}`}
+          ],
+          [
+            {text: `Rodillo N°: `, style: 'subtitulo'},
+            {text: `${datos_ot.rodillo.toString().trim()}`}
+          ],
+          [
+            {text: `N° de Pista: `, style: 'subtitulo'},
+            {text: `${datos_ot.pista.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 1: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta1.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 2: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta2.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 3: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta3.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 4: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta4.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 5: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta5.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 6: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta6.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 7: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta7.toString().trim()}`}
+          ],
+          [
+            {text: `Tinta 8: `, style: 'subtitulo'},
+            {text: `${datos_ot.tinta8.toString().trim()}`}
+          ],
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 la información del proceso de sellado de corte
+  productoTermiando(datos_ot){
+    return {
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            {colSpan: 3, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true]},
+            {},
+            {},
+          ],
+          [
+            {text: `Formato Bolsa: `, style: 'subtitulo'},
+            {text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
+            {text: ``, },
+          ],
+          [
+            {text: `Ancho`, alignment: 'right', style: 'subtitulo'},
+            {text: `Largo`, alignment: 'center', style: 'subtitulo'},
+            {text: `Fuelle`, alignment: 'left', style: 'subtitulo'},
+          ],
+          [
+            {colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
+            {colspan: 3, text: `x     ${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
+            {colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}     ${datos_ot.und_Extrusion.toString().trim()}`, },
+          ],
+          [{}, {}, {}],
+          [{}, {}, {}],
+          [
+            {text: `Sellado: `, style: 'subtitulo'},
+            {text: `${datos_ot.tpSellados_Nombre.toString().trim()}`},
+            {},
+          ],
+          [
+            {text: `Margen: `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}`},
+            {},
+          ],
+          [
+            {text: `Peso Millar: `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}`},
+            {},
+          ],
+          [
+            {text: `Cant. x Paquete: `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}`},
+            {},
+          ],
+          [
+            {text: `Cant. x Bulto: `, style: 'subtitulo'},
+            {text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}`},
+            {},
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    }
+  }
+
+  // Función que va a colocar en la hoja 2 si a la orden de trabajo se le debe crear un cyrel o no
+  cyrelPDF(datos_ot){
+    return datos_ot.cyrel == true || datos_ot.cyrel == '1' ? {
+      table: {
+        margin: [15, 5],
+        widths: [20, '*', 20],
+        body: [
+          [
+            {},
+            {text: `Hacer Cyrel`, style: 'titulosTablas', border: [true, true, true, true]},
+            {}
+          ]
+        ]
+      },
+      layout: { defaultBorder: false, },
+    } : {}
+  }
+
+  // Función que va a colocar el footer del PDF
+  footerPDF(){
+    let usuario: string = this.AppComponent.storage_Nombre;
+    return function (currentPage: any, pageCount: any) {
+      return [
+        '\n',
+        {
+          columns: [
+            { text: `Documento generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+            { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+            { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+          ]
+        }
+      ]
+    }
+  }
+
+  // Funcion que va a colocar los estilos en el PDF
+  stylesPDF(){
+    return {
+      header: { fontSize: 7, bold: true },
+      titulo: { fontSize: 11, bold: true },
+      ot: { fontSize: 13, bold: true },
+      subtitulo: { fontSize: 10, bold: true },
+      titulosTablas: {
+        border: [false, false, false, false],
+        fillColor: '#aaaaaa',
+        alignment: 'center',
+        bold: true,
+        fontSize: 11
+      },      
+      subtituloTablas: {
+        border: [false, false, false, false],
+        fillColor: '#eeeeee',
+        alignment: 'center',
+        bold: true,
+        fontSize: 10
+      },
+      datosTablaExtrusion: {
+        alignment: 'center',
+        border: [false, false, false, false],
+      }
     }
   }
 }
