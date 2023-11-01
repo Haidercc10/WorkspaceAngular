@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -28,6 +29,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   productos : any [] = [];
   infoPdf : any[] = [];
   infoDevoluciones : any[] = [];
+  @ViewChild('dtFacturacion') dtFacturacion: Table | undefined;
+  @ViewChild('dtDevolucion') dtDevolucion: Table | undefined;
+  modal : boolean = false;
+  facturasModal : any = [];
+  nroFactura : string = ``;
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -51,7 +57,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   ngOnInit() {
     this.obtenerVendedores();
-    this.cargarFacturacionDetallada(`2023-10-23`, `2023-10-26`, `?vendedor=001`);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -278,12 +283,14 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
+    let nuevo : any = [];
     this.infoPdf = []
     this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
       this.infoPdf = resp;
       this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ruta).subscribe(devoluciones => {
         devoluciones.forEach(dv => {
-          this.infoPdf.push({
+          let vendedoresDv : any =
+          {
             idVendedor : dv.idvende,
             vendedor : '',
             cliente : dv.descritra,
@@ -296,14 +303,17 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
             cantidad : 1,
             precio : (-(dv.valortra)),
             valorTotal : (-(dv.valortra)),
-          })
-        })
+          };
+          nuevo = this.infoPdf.filter(x => x.idVendedor == dv.idvende);
+          vendedoresDv.vendedor = nuevo[0].vendedor;
+          this.infoPdf.push(vendedoresDv);  
+        });
       }); 
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     });
     setTimeout(() => {
       this.getFormatoPdfDetallado();
-    }, 5000);
+    }, 3000);
   }
 
   //Tabla de encabezado de los items de cada factura
@@ -345,7 +355,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
       }
     });
-    this.vendedores = vendedores;
     this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {});
     this.cargando = false;
   }
@@ -363,12 +372,16 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
             body: this.llenarTablaVendedores(vendedores[index])
           }
       }]);
-      data.push([
-        { margin: [10, 0, 10, 3], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Total Vendedor: $ ${this.formatonumeros((this.subTotalVendedor(vendedores[index].id)))}`, },
-      ], 
-      [
-        { margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total Devoluciones: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },
-      ]);
+      data.push(
+        [{ margin: [10, 0, 10, 3], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Total Vendedor: $ ${this.formatonumeros((this.subTotalVendedor(vendedores[index].id)))}`, }], 
+        [{ margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total DV: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },]
+      );
+    }
+    if(vendedores.length > 1){
+     data.push(
+      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion()))}`, }],
+      [{ margin: [10, 0, 10, 3], border: [true, false, true, true], alignment: 'center', color : 'red', fontSize: 12, bold: true, text: `Total Devoluciones: $ ${this.formatonumeros((this.totalDevolucion()))}`, }],
+     );
     }
     return data;
   }
@@ -458,10 +471,16 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Total de facturación en el rango de fechas especificado
-  total(){
+  totalFacturacion(){
     let total : number = 0;
-    total = this.infoPdf.reduce((a,b) => a + b.valorTotal, 0);
-    console.log(total);
+    total = this.infoPdf.filter(x => x.factura2 != 'DV').reduce((a,b) => a + b.valorTotal, 0);
+    return total;
+  }
+
+  totalDevolucion(){
+    let total : number = 0;
+    total = this.infoPdf.filter(x => x.factura2 == 'DV').reduce((a,b) => a + b.valorTotal, 0);
+    return total;
   }
 
   //Total de facturación por vendedor
@@ -488,4 +507,21 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   //.Función que quitará el mensaje de elección de formatos.
   onReject = () => this.msg.clear('eleccion');
   
+  //Función que filtrará en la tabla de facturas cuando esta contenga información
+  aplicarfiltroFacturacion = ($event, campo : any, valorCampo : string) => this.dtFacturacion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Función que filtrará en la tabla de devoluciones cuando esta contenga información
+  aplicarfiltroDevolucion = ($event, campo : any, valorCampo : string) => this.dtDevolucion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  //Función que filtrará la información del array de facturas detalladas y cargará los items de la factura seleccionada. 
+  filtrarFactura(facturas : any){
+    this.nroFactura = facturas.factura;
+    this.modal = true;
+    this.facturasModal = [];
+    this.facturasModal = this.infoPdf.filter(x => x.factura == facturas.factura);
+  }
+
+  //Función que cargará el total de facturas seleccionadas
+  totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0);
+   
 }
