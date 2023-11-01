@@ -289,8 +289,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       this.infoPdf = resp;
       this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ruta).subscribe(devoluciones => {
         devoluciones.forEach(dv => {
-          let vendedoresDv : any =
-          {
+          let vendedoresDv : any ={
             idVendedor : dv.idvende,
             vendedor : '',
             cliente : dv.descritra,
@@ -303,7 +302,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
             cantidad : 1,
             precio : (-(dv.valortra)),
             valorTotal : (-(dv.valortra)),
-          };
+          }
           nuevo = this.infoPdf.filter(x => x.idVendedor == dv.idvende);
           vendedoresDv.vendedor = nuevo[0].vendedor;
           this.infoPdf.push(vendedoresDv);  
@@ -311,9 +310,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       }); 
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     });
-    setTimeout(() => {
-      this.getFormatoPdfDetallado();
-    }, 3000);
   }
 
   //Tabla de encabezado de los items de cada factura
