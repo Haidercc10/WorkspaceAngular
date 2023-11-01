@@ -320,7 +320,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     }); 
   }
 
-  cargarNombresVendedores
+  colocarNombresVendedores(){
+
+  }
 
   //Tabla de encabezado de los items de cada factura
   headerItems(){
