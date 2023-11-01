@@ -113,9 +113,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       let fechaInicial : any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
 
-      this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosFacturas(res));
-      this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosDevoluciones(res));
+      this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosFacturas(res));
+      this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, 2, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosDevoluciones(res));
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
+      this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true));
 
       setTimeout(() => this.cargando = false, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
@@ -142,7 +143,13 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de llenar la guardar la información de las facturas
   llenarDatosFacturas(facturas : any []){
     facturas.forEach(fac => {
-      this.dataFacturacion.push(fac);
+      this.dataFacturacion.push({
+        fecha: fac.fechatra,
+        factura: fac.numefac,
+        cliente: fac.descritra,
+        recibo: ``,
+        suma: (fac.valortra)
+      });
       this.dataFacturacion.sort((a,b) => a.factura.localeCompare(b.factura));
     });
   }
@@ -283,34 +290,37 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
-    let nuevo : any = [];
     this.infoPdf = []
     this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
       this.infoPdf = resp;
-      this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, ruta).subscribe(devoluciones => {
-        devoluciones.forEach(dv => {
-          let vendedoresDv : any ={
-            idVendedor : dv.idvende,
-            vendedor : '',
-            cliente : dv.descritra,
-            fecha : dv.fechatra,
-            factura : dv.numefac,
-            factura2 : 'DV',
-            item : '',
-            referencia : '',
-            presentacion : '',
-            cantidad : 1,
-            precio : (-(dv.valortra)),
-            valorTotal : (-(dv.valortra)),
-          }
-          nuevo = this.infoPdf.filter(x => x.idVendedor == dv.idvende);
-          vendedoresDv.vendedor = nuevo[0].vendedor;
-          this.infoPdf.push(vendedoresDv);  
-        });
-      }); 
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     });
   }
+
+  cargarDevolucionesDetalladas(fecha1 : any, fecha2 : any, indicadorCPI : any, ruta? : string){
+    this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, indicadorCPI, ruta).subscribe(devoluciones => {
+      devoluciones.forEach(dv => {
+        let vendedoresDv : any = {
+          idVendedor : dv.idvende,
+          vendedor : '',
+          cliente : dv.descritra,
+          fecha : dv.fechatra,
+          factura : dv.numefac,
+          factura2 : 'DV',
+          item : '',
+          referencia : '',
+          presentacion : '',
+          cantidad : 1,
+          precio : (-(dv.valortra)),
+          valorTotal : (-(dv.valortra)),
+        }
+        this.infoPdf.push(vendedoresDv); 
+      });
+      this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
+    }); 
+  }
+
+  cargarNombresVendedores
 
   //Tabla de encabezado de los items de cada factura
   headerItems(){
@@ -351,8 +361,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
       }
     });
-    this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {});
-    this.cargando = false;
+    setTimeout(() => { 
+      this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {}); 
+      this.cargando = false;
+    }, 1000); 
   }
 
   //.Función que llenará la tabla con los vendedores, y los valores totales de ventas y devoluciones
