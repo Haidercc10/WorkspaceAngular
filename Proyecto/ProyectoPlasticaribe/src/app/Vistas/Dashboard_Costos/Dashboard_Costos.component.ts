@@ -113,7 +113,21 @@ export class Dashboard_CostosComponent implements OnInit {
     this.costo_Anio_administrativos = [];
     this.costo_Anio_ventas = [];
     this.costo_Anio_noOperacionesles = [];
+    this.diseñoGrafica();
+    this.graficaCostosFabricacion = this.formatoGraficas();
+    this.graficaCostosAdministrativos = this.formatoGraficas();
+    this.graficaCostosVentas = this.formatoGraficas();
+    this.graficaCostosNoOperacionesles = this.formatoGraficas();
+  }
 
+  formatoGraficas(){
+    return {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+  }
+
+  diseñoGrafica(){
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -142,26 +156,6 @@ export class Dashboard_CostosComponent implements OnInit {
         },
       },
       datalabels: { anchor: 'end', align: 'end' }
-    };
-
-    this.graficaCostosFabricacion = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCostosAdministrativos = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCostosVentas = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCostosNoOperacionesles = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
     };
   }
 
@@ -646,8 +640,6 @@ export class Dashboard_CostosComponent implements OnInit {
   // Funcion que se encargará de exportar a un archivo de excel la información de las cuentas en cada uno de los meses
   exportarExcel(){
     this.cargando = true;
-    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
-
     if (this.rangoFechas.length > 0) this.exportarExcel_RangoFechas();
     else {
       if (this.costo_Anio_fabricacion.length > 0) {
@@ -655,24 +647,29 @@ export class Dashboard_CostosComponent implements OnInit {
           this.zeusContabilidad.GetCostosCuentas_Mes_Mes(anio.anio).subscribe(dato => {
             let title : string = `Determinación de Costos del ${anio.anio} - ${moment().format('DD-MM-YYYY')}`;
             let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-            infoDocumento = [
-              this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
-              this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
-              this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
-              this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()))),
-              this.calcularTotalMeses(this.costosMateriasPrimas)
-            ].reduce((a, b) => a.concat(b));
-            
-            costosAgrupados = [
-              this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
-              this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
-              this.calcularCostoAgrupadoMateriaPrima(this.costosMateriasPrimas)
-            ].reduce((a, b) => a.concat(b));
-            this.formatoExcel(title, infoDocumento, costosAgrupados);
+            this.formatoExcel(title, this.calcularCostosTotalesExcel(costos), this.calcularCostosAgrupadosExcel(costos));
           });
         });
-      } else this.msj.mensajeAdvertencia('Debe seleccionaral menos un año', '');
+      } else this.msj.mensajeAdvertencia('Debe seleccionar al menos un año', '');
     }
+  }
+
+  calcularCostosAgrupadosExcel(costos : any){
+    return [
+      this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
+      this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
+      this.calcularCostoAgrupadoMateriaPrima(this.costosMateriasPrimas)
+    ].reduce((a, b) => a.concat(b));
+  }
+
+  calcularCostosTotalesExcel(costos : any){
+    return [
+      this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
+      this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
+      this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
+      this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()))),
+      this.calcularTotalMeses(this.costosMateriasPrimas)
+    ].reduce((a, b) => a.concat(b));
   }
 
   // Funcion que va a buscar la información que aparecerá en el excel, esta información se buscará según un rango de fechas
@@ -680,26 +677,11 @@ export class Dashboard_CostosComponent implements OnInit {
     this.cargando = true;
     let fechaInicial : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
     let fechaFinal : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : fechaInicial;
-
-    let infoDocumento : any [] = [], costosAgrupados : any [] = [];
     let title : string = `Determinación de Costos Desde ${moment(fechaInicial).format('MMMM').toUpperCase()} ${moment(fechaInicial).format('YYYY')} Hasta ${moment(fechaFinal).format('MMMM').toUpperCase()} ${moment(fechaFinal).format('YYYY')} - ${moment().format('DD-MM-YYYY')}`;
 
     this.zeusContabilidad.GetCostosCuentas_Mes_Mes_RangoFechas(fechaInicial, fechaFinal).subscribe(dato => {
       let costos  = [dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], dato[6], dato[7], dato[8], dato[9], dato[10], dato[11]].reduce((a, b) => a.concat(b));
-      infoDocumento = [
-        this.calcularTotalMeses([costos.filter(item => this.cuentasFabricacion.includes(item.cuenta.trim())), this.nominaFabricacion].reduce((a,b) => a.concat(b))),
-        this.calcularTotalMeses([costos.filter(item => this.cuentasAdministrativos.includes(item.cuenta.trim())), this.nominaAdministrativa].reduce((a,b) => a.concat(b))),
-        this.calcularTotalMeses([costos.filter(item => this.cuentasVentas.includes(item.cuenta.trim())), this.nominaVentas].reduce((a,b) => a.concat(b))),
-        this.calcularTotalMeses(costos.filter(item => this.cuentasNoOperacionesles.includes(item.cuenta.trim()))),
-        this.calcularTotalMeses(this.costosMateriasPrimas)
-      ].reduce((a, b) => a.concat(b));
-
-      costosAgrupados = [
-        this.calcularCostosAgrupadosFijos([costos.filter(item => this.cuentasCostosFijos.includes(item.cuenta.trim())), this.nominaFabricacion, this.nominaAdministrativa, this.nominaVentas].reduce((a,b) => a.concat(b))),
-        this.calcularCostosAgrupadosVariables([costos.filter(item => this.cuentasCostosVariables.includes(item.cuenta.trim()))].reduce((a,b) => a.concat(b))),
-        this.calcularCostoAgrupadoMateriaPrima(this.costosMateriasPrimas)
-      ].reduce((a, b) => a.concat(b));
-      this.formatoExcel(title, infoDocumento, costosAgrupados);
+      this.formatoExcel(title, this.calcularCostosTotalesExcel(costos), this.calcularCostosAgrupadosExcel(costos));
     });
   }
 
@@ -715,11 +697,9 @@ export class Dashboard_CostosComponent implements OnInit {
 
     // HOJA 1, COSTOS DETALLADOS
     let worksheet = workbook.addWorksheet(`Determinación de Costos`);
-    worksheet.addImage(imageId1, 'A1:B3');
     let titleRow = worksheet.addRow([titulo]);
     titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    worksheet.addRow([]);
-    worksheet.addRow([]);
+    worksheet.addImage(imageId1, 'A1:B3');
     let headerRow = worksheet.addRow(header);
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
@@ -777,17 +757,15 @@ export class Dashboard_CostosComponent implements OnInit {
       worksheet.getColumn(2).width = 50;
     }
 
-    let unirCeldasHoja1 : string [] = ['A1:O3', 'A5:O5', 'A23:O23', 'A69:O69', 'A109:O109', 'A118:O118'];
+    let unirCeldasHoja1 : string [] = ['A1:O3', 'A6:O6', 'A24:O24', 'A70:O70', 'A110:O110', 'A119:O119'];
     unirCeldasHoja1.forEach(cell => worksheet.mergeCells(cell));
     worksheet.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
 
     //HOJA 2, CONSOLIDADO DE COSTOS
     let worksheet2 = workbook.addWorksheet(`Consolidado de Costos`);
-    worksheet2.addImage(imageId1, 'A1:B3');
     let titleRow2 = worksheet2.addRow(['Consolidado de Costos']);
     titleRow2.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-    worksheet2.addRow([]);
-    worksheet2.addRow([]);
+    worksheet2.addImage(imageId1, 'A1:B3');
     let headerRow2 = worksheet2.addRow(header);
     headerRow2.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
@@ -840,7 +818,7 @@ export class Dashboard_CostosComponent implements OnInit {
       worksheet2.getColumn(1).width = 15;
       worksheet2.getColumn(2).width = 50;
     }
-    let unirCeldasHoja2 : string [] = ['A1:O3', 'A5:O5', 'A26:O26', 'A45:O45'];
+    let unirCeldasHoja2 : string [] = ['A1:O3', 'A6:O6', 'A27:O27', 'A46:O46'];
     unirCeldasHoja2.forEach(cell => worksheet2.mergeCells(cell));
     worksheet2.views = [{state: 'frozen', xSplit: 2, ySplit: 4, topLeftCell: 'G10', activeCell: 'A1'}];
 
@@ -851,6 +829,8 @@ export class Dashboard_CostosComponent implements OnInit {
     this.cargando = false;
     this.msj.mensajeConfirmacion(`¡Información Exportada!`, titulo);
   }
+
+  
 
   // Funcion que va a devolver un array con los totales de cada uno de los meses para cada una de las cuentas
   calcularTotalMeses(data : any, tipoCosto : string = ''){
@@ -1031,9 +1011,7 @@ export class Dashboard_CostosComponent implements OnInit {
   // Funcion que va a calcular y agrupar los cortos de cada uno de los meses de los costos de las materias primas
   calcularCostoAgrupadoMateriaPrima(data : any []){
     let datos : any [] = [];
-    datos = [
-      this.calcularCostoAgrupado(data, 'COSTOS MATERIAS PRIMAS', 'MATERIA PRIMA'),
-    ].reduce((a,b) => a.concat(b));
+    datos = [this.calcularCostoAgrupado(data, 'COSTOS MATERIAS PRIMAS', 'MATERIA PRIMA')].reduce((a,b) => a.concat(b));
     datos.push([
       '',
       'TOTAL COSTO MATERIAS PRIMAS',

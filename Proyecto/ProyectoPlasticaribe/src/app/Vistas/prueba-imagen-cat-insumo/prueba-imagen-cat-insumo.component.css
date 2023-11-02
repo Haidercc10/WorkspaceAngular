@@ -1,0 +1,202 @@
+.fondo {
+    background-image: linear-gradient(62deg, #b7ffbf 0%, #fee4e4 100%);
+    height: 100%;
+    border-radius: 20px;
+  }
+  
+  .header h3, .header .pi, .rojo {
+    font-size: calc(var(--font-size) * 1.5rem);
+    color: var(--rojo);
+  }
+  
+  .header2 h3, .header2 .pi, .rojo {
+    font-size: calc(var(--font-size) * 1.5rem);
+    color: var(--rojoClaro);
+  }
+  
+  .header h3:hover, .header .pi:hover, .rojo:hover {
+    color: var(--rojoHover);
+  }
+  
+  .header2 h3:hover, .header2 .pi:hover, .rojo:hover {
+    color: var(--rojoHover);
+  }
+  
+  .fila-1, .fila-2, .fila-3, .fila-4 {
+    padding: 0 2%;
+  }
+  
+  p-card, p-card ::ng-deep .p-card {
+    height: 100%;
+  }
+  
+  p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+    color: var(--rojo);
+    text-align: center;
+    width: 100%;
+  }
+  
+  p-chart ::ng-deep div ::ng-deep canvas {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .bg-naranja {
+    color: black;
+    background-color: #F6D45D;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-azul {
+    color: black;
+    background-color: #83D3FF;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-amarillo {
+    color: black;
+    background-color: #F3FC20;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-verde {
+    color: black;
+    background-color: #8AFC9B;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-rojo {
+    color: black;
+    background-color: #FF7878;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .bg-verde2 {
+    color: black;
+    background-color: #53CC48;
+    font-size: calc(var(--font-size) * 15px);
+  }
+  
+  .imagen {
+    width: 25%;
+    height: 100%;
+  }
+  
+  @media (max-width: 600px) {
+    .p-3 {
+      padding: 0.5rem !important;
+    }
+  }
+  
+  .toolbar {
+    width: 60%;
+  }
+  
+  p-toolbar ::ng-deep .p-toolbar, p-toolbar ::ng-deep .p-toolbar ::ng-deep .row {
+    width: 100%;
+  }
+  
+  #table td, th{
+    font-size: calc(var(--font-size) * 13px);
+  }
+  
+  p-calendar ::ng-deep span button {
+    background-color: var(--rojo);
+    border: 0;
+    transition: all 1s;
+  }
+  
+  p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+    background: var(--rojoHover);
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button:hover {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep span button span {
+    display: block;
+  }
+  
+  p-dialog ::ng-deep .p-dialog-header span {
+    color: var(--rojo);
+    align-items: center;
+  }
+  
+  ::ng-deep .p-input, .p-inputtext, .p-inputnumber-input, .p-inputtextarea {
+    display: flex;
+    width: 100%;
+  }
+  
+  ::ng-deep .p-card {
+    align-items: center;
+    margin: auto;
+    width: 90%;
+    height: 100%;
+    padding: 2%;
+    border-radius: 10px;
+    box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 5%;
+  }
+  
+  p-toolbar ::ng-deep .p-toolbar {
+    justify-content: space-around !important;
+  }
+  
+  p-card ::ng-deep [class = "p-card p-component"] {
+    border: 3px solid #fefefe00;
+    border-radius: 20px;
+    transition: all 500ms;
+  }
+  
+  p-card ::ng-deep [class = "p-card p-component"]:hover {
+    border: 3px solid #00000008;
+    box-shadow: 0 0 20px 18px rgba(0, 0, 0, 0.2);
+    width: calc(100% + 0.1%);
+    height: calc(100% + 1%);
+  }
+  
+  .fondo {
+    --s: 36px; /* control the size */
+    --c1: #8d8d8d;
+    --c2: #d2d3d5;
+    --c3: #727c7e;
+    
+    --g1: conic-gradient(at calc(250%/3) calc(50%/3),var(--c2) 60deg,#0000 0 300deg,var(--c1) 0);
+    --g2: conic-gradient(at calc(50%/3) 50%,#0000 75%,var(--c1) 0);
+    --g3: conic-gradient(at calc(100%/3) 50%,#0000 75%,var(--c2) 0);
+    --g4: conic-gradient(from 59deg at calc(200%/3) calc(249%/9),var(--c3) 61deg,#0000 62deg);
+    --g5: conic-gradient(from 60deg at 50% calc(250%/3),#f1f1f1 /*4th color*/ 60deg,var(--c1) 0 120deg,#0000 0);
+    --_p: calc(9*tan(30deg)*var(--s)); /* if you don't see the pattern replace tan(30deg) with 0.577 */
+    background:
+      var(--g1) calc(-1*var(--s)) 0,var(--g1) calc(2*var(--s)) var(--_p),
+      var(--g2),var(--g2) calc(3*var(--s)) var(--_p),
+      var(--g3),var(--g3) calc(3*var(--s)) var(--_p),
+      var(--g4),var(--g4) calc(3*var(--s)) var(--_p),
+      var(--g5) calc(3*var(--s)) 0,var(--g5) 0 var(--_p) var(--c3);
+    background-size: calc(6*var(--s)) calc(2*var(--_p));
+  }
+  
+  .costosAnios{
+    justify-content: center;
+    text-align: center;
+    background-color: #d1d1d122;
+    border: 1.9px dashed #8b8b8b;
+    border-radius: 10px;
+    margin: 10px;
+  }
+  
+  .costosAniosOscuro{
+    justify-content: center;
+    text-align: center;
+    background-color: #aaa2;
+    border: 1.9px dashed #d7d7d7;
+    border-radius: 10px;
+    margin: 10px;
+  }
+  

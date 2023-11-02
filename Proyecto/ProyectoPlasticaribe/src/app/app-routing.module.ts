@@ -8,6 +8,7 @@ import { LoginComponentComponent } from './Vistas/login-component/login-componen
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
+  {path: '**', redirectTo: 'login'},
   {path: 'Login', loadChildren: () => import('./Modules/login/login.module').then(m => m.LoginModule)},
   {path: '', component: LoginComponentComponent},
   {path: 'home', loadChildren: () => import('./Modules/inicio/inicio.module').then(m => m.InicioModule) },
@@ -130,6 +131,9 @@ export const routes: Routes = [
 
   /** */
   {path: 'facturacion-detallada', loadChildren: () => import('./Modules/reporte-facturacion-detallada/reporte-facturacion-detallada.module').then(m => m.ReporteFacturacionDetalladaModule)},
+
+  // 
+  {path: 'reporte-produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule)},
 ]
 
 @NgModule({

@@ -395,8 +395,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         [{ margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total DV: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },]
       );
     }
-    console.log(this.totalFacturacion())
-    console.log(this.totalDevolucion())
     if(vendedores.length > 1){
      data.push(
       [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()))}`, }],
@@ -409,7 +407,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   llenarTablaVendedores(vendedores : any) {
     let array : any[] = [];
     array.push(
-        [{ text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, ], 
+      [{ text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, ], 
     )
     array.push([this.getClientesVendedor(vendedores)]);
     return array;
@@ -442,9 +440,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           dontBreakRows : true,
           widths: ['100%'],
           body: [
-            [
-              { text: `FV${clientes.factura} - ${clientes.cliente}`, alignment: 'left', border: [true, true, true, true] }, 
-            ],
+            [{ text: `FV${clientes.factura} - ${clientes.cliente}`, alignment: 'left', border: [true, true, true, true] }],
           ], 
         }  
     });

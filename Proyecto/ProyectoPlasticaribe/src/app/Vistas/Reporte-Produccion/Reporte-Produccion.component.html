@@ -1,0 +1,196 @@
+<app-menuLateral></app-menuLateral>
+<app-VistasFavoritas></app-VistasFavoritas>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Reporte de Producción</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+    <div class="mb-4">
+        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
+    </div>
+
+    <form [formGroup]="formFiltros" (ngSubmit)="consultarProduccion()">
+        <div class="row g-4">
+            <!-- RANGO DE FECHAS -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+                <span class="p-float-label">
+                    <p-calendar formControlName="rangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true"></p-calendar>
+                    <label for="fecha">Rango de Fechas</label>
+                </span>
+            </div>
+
+            <!-- ORDEN DE TRABAJO -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+                <span class="p-float-label">
+                    <input formControlName="OrdenTrabajo" id="ordenTrabajo" type="text" pInputText/>
+                    <label for="ordenTrabajo">OT</label>
+                </span>
+            </div>
+
+            <!-- CLIENTE -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+              <span class="p-float-label">
+                <input formControlName="cliente" id="cli" list="clientes" type="text" pInputText (change)="clienteSeleccionado()" (keydown)="obtenerClientes()"/>
+                <datalist id="clientes">
+                  <option value={{item.codBagpro}} *ngFor="let item of clientes">{{item.nombreComercial}}</option>
+                </datalist>
+                <label for="cli">Clientes</label>
+              </span>       
+            </div>
+      
+            <!-- PRODUCTO -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+              <span class="p-float-label">
+                <input formControlName="producto" id="prod" list="productos" type="text" pInputText (change)="productoSeleccionado()" (keydown)="obtenerProductos()"/>
+                <datalist id="productos">
+                  <option value={{item.prod_Id}} *ngFor="let item of productos">{{item.prod_Nombre}}</option>
+                </datalist>
+                <label for="prod">productos</label>
+              </span>
+            </div>
+
+            <!-- PROCESOS -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+              <span class="p-float-label">
+                <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa"></p-dropdown>
+                <label for="areasEmpresa">Área Producción</label>
+              </span>
+            </div>
+
+            <!-- TURNOS -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+              <span class="p-float-label">
+                <p-dropdown formControlName="Turno" inputId="Turnos" [autoDisplayFirst]="false" [options]="turnos"></p-dropdown>
+                <label for="Turnos">Turnos</label>
+              </span>
+            </div>
+
+            <!-- ENVIO ZEUS -->
+            <div class="col-sm-12 col-md-6 col-xl-3" id="iva">
+                <div class="field-checkbox my-2 mx-4">
+                    <p-checkbox formControlName="EnvioZeus" [binary]="true" inputId="envioZeus"></p-checkbox>
+                    <label for="envioZeus"><p-chip label="Envío Zeus" [icon]="formFiltros.value.EnvioZeus ? 'pi pi-check' : 'pi pi-times'"></p-chip></label>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="row my-4">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
+                <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+            </div>
+        </div>
+    </form>
+
+    <p-table
+    #dt
+    [value]="produccion"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [rowHover]="true"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    [paginator]="true"
+    [rows]="20"
+    [rowsPerPageOptions]="[10, 20, 50, 100]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
+        <ng-template pTemplate="header">
+            <tr>
+                <th rowspan="2">#</th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'rollo')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'orden')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'idCliente')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'cliente')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'item')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'referencia')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'cantidad')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'peso')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'presentacion')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'turno')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'fecha')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'hora')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'maquina')"></th>
+                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'envioZeus')"></th>
+                <th>
+                  <p-columnFilter field="proceso" matchMode="contains" [showMenu]="false">
+                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                        <p-dropdown [autoDisplayFirst]="false" [options]="areasEmpresa" [showClear]="true" appendTo="body" [ngModel]="value" (onChange)="filter($event.value)"></p-dropdown>
+                    </ng-template>
+                  </p-columnFilter>
+                </th>
+              </tr>
+            <tr>
+                <th pSortableColumn="rollo"> <p-sortIcon field="rollo"></p-sortIcon> Bulto </th>
+                <th pSortableColumn="orden"> <p-sortIcon field="orden"></p-sortIcon> OT </th>
+                <th pSortableColumn="idCliente"> <p-sortIcon field="idCliente"></p-sortIcon> Id Cliente </th>
+                <th pSortableColumn="cliente"> <p-sortIcon field="cliente"></p-sortIcon> Cliente </th>
+                <th pSortableColumn="item"> <p-sortIcon field="item"></p-sortIcon> Item </th>
+                <th pSortableColumn="referencia"> <p-sortIcon field="referencia"></p-sortIcon> Referencia </th>
+                <th pSortableColumn="cantidad"> <p-sortIcon field="cantidad"></p-sortIcon> Peso Bruto / QTY </th>
+                <th pSortableColumn="peso"> <p-sortIcon field="peso"></p-sortIcon> Peso Neto </th>
+                <th pSortableColumn="presentacion"> <p-sortIcon field="presentacion"></p-sortIcon> Presentación </th>
+                <th pSortableColumn="turno"> <p-sortIcon field="turno"></p-sortIcon> Turno </th>
+                <th pSortableColumn="fecha"> <p-sortIcon field="fecha"></p-sortIcon> Fecha </th>
+                <th pSortableColumn="hora"> <p-sortIcon field="hora"></p-sortIcon> Hora </th>
+                <th pSortableColumn="maquina"> <p-sortIcon field="maquina"></p-sortIcon> Maquina </th>
+                <th pSortableColumn="envioZeus"> <p-sortIcon field="envioZeus"></p-sortIcon> Envío Zeus </th>
+                <th pSortableColumn="proceso"> <p-sortIcon field="proceso"></p-sortIcon> Área </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data>
+            <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td>{{data.rollo}}</td>
+                <td>{{data.orden}}</td>
+                <td>{{data.idCliente}}</td>
+                <td>{{data.cliente}}</td>
+                <td>{{data.item}}</td>
+                <td>{{data.referencia}}</td>
+                <td>{{data.cantidad | number : '1.2-2'}}</td>
+                <td>{{data.peso | number : '1.2-2'}}</td>
+                <td>{{data.presentacion}}</td>
+                <td>{{data.turno}}</td>
+                <td>{{data.fecha | date : 'YYYY-MM-dd'}}</td>
+                <td>{{data.hora}}</td>
+                <td>{{data.maquina}}</td>
+                <td>{{data.envioZeus}}</td>
+                <td><span class="badge" [ngClass]="{'bg-Extrusion': data.proceso == 'EXTRUSION',
+                                                    'bg-Impresion': data.proceso == 'IMPRESION',
+                                                    'bg-Rotograbado': data.proceso == 'ROTOGRABADO',
+                                                    'bg-Doblado': data.proceso == 'DOBLADO',
+                                                    'bg-Laminado': data.proceso == 'LAMINADO',
+                                                    'bg-Corte': data.proceso == 'CORTE',
+                                                    'bg-Empaque': data.proceso == 'EMPAQUE',
+                                                    'bg-Sellado': data.proceso == 'SELLADO',
+                                                    'bg-Wiketiado': data.proceso == 'Wiketiado'}">{{data.proceso | uppercase}}</span></td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="7" class="text-left">Totales</td>
+                <td>{{totalCantidadConsultada() | number : '1.2-2'}}</td>
+                <td>{{totalPesoConsultado() | number : '1.2-2'}}</td>
+                <td colspan="7"></td>                
+            </tr>
+        </ng-template>
+    </p-table>
+
+</p-card>

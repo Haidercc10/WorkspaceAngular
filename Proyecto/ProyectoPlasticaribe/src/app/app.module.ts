@@ -186,6 +186,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 import { ReporteFacturacionDetalladaComponent } from './Vistas/Reporte-Facturacion-Detallada/Reporte-Facturacion-Detallada.component';
+import { ReporteProduccionComponent } from './Vistas/Reporte-Produccion/Reporte-Produccion.component';
 
 @NgModule({
   declarations: [
@@ -295,7 +296,8 @@ import { ReporteFacturacionDetalladaComponent } from './Vistas/Reporte-Facturaci
     Dashboard_AreasComponent,
     Orden_TrabajoComponent,
     Formato_Facturas_VentasComponent,
-    ReporteFacturacionDetalladaComponent
+    ReporteFacturacionDetalladaComponent,
+    ReporteProduccionComponent,
   ],
 
   imports: [
