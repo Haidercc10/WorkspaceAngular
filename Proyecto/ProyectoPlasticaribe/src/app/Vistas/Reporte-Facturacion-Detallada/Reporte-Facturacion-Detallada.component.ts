@@ -116,8 +116,8 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosFacturas(res));
       this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, 2, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosDevoluciones(res));
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
-      this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true));
-
+      this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(false));
+      this.colocarNombresVendedores();
       setTimeout(() => this.cargando = false, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
   }
@@ -289,6 +289,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return total;
   }
 
+  //Función que cargará la facturacion detallada segun los filtros especificados
   cargarFacturacionDetallada(fecha1 : any, fecha2 : any, ruta? : string){
     this.infoPdf = []
     this.zeusService.GetFacturacionDetallada(fecha1, fecha2, ruta).subscribe(resp => {
@@ -297,6 +298,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     });
   }
 
+  //Función que cargará las devoluciones detalladas segun los filtros especificados
   cargarDevolucionesDetalladas(fecha1 : any, fecha2 : any, indicadorCPI : any, ruta? : string){
     this.zeusService.GetDevolucionesDetalladas(fecha1, fecha2, indicadorCPI, ruta).subscribe(devoluciones => {
       devoluciones.forEach(dv => {
@@ -316,12 +318,18 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         }
         this.infoPdf.push(vendedoresDv); 
       });
+      this.colocarNombresVendedores();
       this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
     }); 
   }
 
+  //Función que colocará el nombre de los vendedores de los registros que vienen de las devoluciones en vacío.
   colocarNombresVendedores(){
-
+    this.infoPdf.forEach(inf => {
+      this.vendedores.forEach(ven => {
+        if(inf.idVendedor == ven.usua_Id && inf.vendedor == '') inf.vendedor = ven.usua_Nombre;
+      });
+    });
   }
 
   //Tabla de encabezado de los items de cada factura
@@ -387,10 +395,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         [{ margin: [10, 0, 10, 5], border: [false, true, false, false], alignment: 'right', color : 'red', fontSize: 9, bold: true, text: `Total DV: $ ${this.formatonumeros((this.subTotalDevolucionesVendedor(vendedores[index].id)))}`, },]
       );
     }
+    console.log(this.totalFacturacion())
+    console.log(this.totalDevolucion())
     if(vendedores.length > 1){
      data.push(
-      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion()))}`, }],
-      [{ margin: [10, 0, 10, 3], border: [true, false, true, true], alignment: 'center', color : 'red', fontSize: 12, bold: true, text: `Total Devoluciones: $ ${this.formatonumeros((this.totalDevolucion()))}`, }],
+      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()))}`, }],
      );
     }
     return data;
@@ -400,9 +409,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   llenarTablaVendedores(vendedores : any) {
     let array : any[] = [];
     array.push(
-        [
-          { text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, 
-        ], 
+        [{ text: `${vendedores.id} - ${vendedores.nombre}`, alignment: 'center',  fillColor: '#ccc', border: [true, true, true, true] }, ], 
     )
     array.push([this.getClientesVendedor(vendedores)]);
     return array;
@@ -487,10 +494,11 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return total;
   }
 
+  //Total de devoluciones en el rango de fechas especificado
   totalDevolucion(){
     let total : number = 0;
     total = this.infoPdf.filter(x => x.factura2 == 'DV').reduce((a,b) => a + b.valorTotal, 0);
-    return total;
+    return Math.abs(total);
   }
 
   //Total de facturación por vendedor
@@ -532,6 +540,5 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   }
 
   //Función que cargará el total de facturas seleccionadas
-  totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0);
-   
+  totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0); 
 }
