@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -25,6 +25,7 @@ import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Product
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
 
+  @Input() reporteConsolidado : boolean = false;
   @ViewChild('dt') dt: Table | undefined; //Variable identificadora de la tabla
   @ViewChild(Recetas_ProductosComponent) receta: Recetas_ProductosComponent | undefined; 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador

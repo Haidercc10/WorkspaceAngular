@@ -6,6 +6,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { defaultStepOptions, stepsDashboarsAreas as defaultSteps } from 'src/app/data';
 import { AppComponent } from 'src/app/app.component';
+import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
 
 @Component({
   selector: 'app-Dashboard_Areas',
@@ -43,9 +44,10 @@ export class Dashboard_AreasComponent implements OnInit {
 
   constructor(private shepherdService: ShepherdService,
                 private paginaPrincial : PaginaPrincipalComponent,
-                  private bagProService : BagproService,
-                    private msj : MensajesAplicacionService,
-                      private AppComponent : AppComponent) {
+                  private reportesConsolidadosComponent : ReportesConsolidadosComponent,
+                    private bagProService : BagproService,
+                      private msj : MensajesAplicacionService,
+                        private AppComponent : AppComponent) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -155,7 +157,7 @@ export class Dashboard_AreasComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   validarConsulta(){
-    if (this.paginaPrincial.inventarioAreas) {
+    if (this.paginaPrincial.inventarioAreas || this.reportesConsolidadosComponent.consolidadoProduccionAreas) {
       if (!this.aniosGraficados.includes(this.anioSeleccionado)) this.consultarInformacion();
       else this.msj.mensajeAdvertencia(`¡El año ${this.anioSeleccionado} ya se encuentra graficado, elige un año diferente!`);
     }

@@ -1,12 +1,10 @@
-
-
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
-<div class="contain">
+<div class="contain" *ngIf="!reporteConsolidado">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <!-- principal -->
@@ -20,7 +18,7 @@
   </div>
 </div>
 
-<p-card>
+<p-card *ngIf="!reporteConsolidado">
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
@@ -153,6 +151,140 @@
     </p-table>
   </div>
 </p-card>
+
+<div class="p-5" *ngIf="reporteConsolidado">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <!-- Informacion sobre los colores -->
+  <p-toolbar class="p-2" id="informacionColores">
+    <ng-template pTemplate="right">
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-success" (click)="mostrarDescripcion($event, 'verde')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-info" (click)="mostrarDescripcion($event, 'azul')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+      <p-button id="iconos" icon="pi pi-info-circle" class="mr-2" styleClass="p-button-rounded p-button-danger" (click)="mostrarDescripcion($event, 'rojo')" pTooltip="Ver descripción" tooltipPosition="top"></p-button>
+    </ng-template>
+
+    <ng-template pTemplate="left">
+      <h6>¡Si deseas saber que indica cada color, presiona el botón con el color que quieres conocer!</h6>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Exportar a excel -->
+  <p-toolbar>
+    <div class="row g-4" [style]="{width: '100%'}">
+      <div class="col-md-4 text-center m-auto">
+        <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
+      </div>
+      <div class="col-md-2">
+        <button class="buttonPDF" (click)="modalExportarPDF = true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconPDF"><path d="M64 464H96v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288H336V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM176 352h32c30.9 0 56 25.1 56 56s-25.1 56-56 56H192v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V448 368c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24H192v48h16zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H304c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H320v96h16zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v48c0 8.8-7.2 16-16 16s-16-7.2-16-16V432 368z"/></svg>
+        </button>
+      </div>
+      <div class="col-md-2">
+        <button class="buttonExcel" (click)="exportarExcel()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+        </button>
+      </div>
+    </div>
+  </p-toolbar>
+
+  <div class="row g-2 p-2"> 
+    <p-table
+      #dt
+      [columns]="columnasSeleccionadas"
+      [value]="ArrayPedidos"
+      [resizableColumns]="true"
+      [reorderableColumns]="true"
+      rowGroupMode="subheader"
+      groupRowsBy="consecutivo"
+      dataKey="consecutivo"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      *ngIf="!cargando"
+      [expandedRowKeys]="expandedRows"
+      sortField="id_color">
+      <!-- Buscador de columnas -->
+      <ng-template pTemplate="caption">
+        <p-multiSelect
+          [options]="columnas"
+          [(ngModel)]="columnasSeleccionadas"
+          optionLabel="header"
+          selectedItemsLabel="{0} columnas seleccionadas"
+          [style]="{minWidth: '330px'}"
+          placeholder="Elige las columnas que quieres ver"
+          id="columnas"></p-multiSelect>
+      </ng-template>
+      <!-- Filtros y Titulos -->
+      <ng-template pTemplate="header" let-columns>
+        <tr id="filtros">
+          <th *ngFor="let col of columns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')"></th>
+          <th style="width: 100px"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
+          <th style="width: 100px"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
+          <th style="width: 100px" *ngIf="ValidarRol == 1"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
+          <th style="width: 100px" *ngIf="ValidarRol == 1"><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')"></th>
+        </tr>
+        <tr id="titulosColumnas">
+          <th *ngFor="let col of columnasSeleccionadas" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+            <p-sortIcon [field]="col.field"></p-sortIcon>
+          </th>
+          <th style="text-align: center;" class="font-size-14" pResizableColumn>Ver PDF</th>
+          <th style="text-align: center;" class="font-size-14" pResizableColumn>Editar</th>
+          <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" pResizableColumn>Aceptar</th>
+          <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" pResizableColumn>Anular / Cancelar</th>
+        </tr>
+      </ng-template>
+      <!-- Titulo de Agrupacion -->
+      <ng-template pTemplate="groupheader" let-pedido let-rowIndex="rowIndex" let-expanded="expanded">
+        <tr>
+          <td [attr.colspan]="columnasSeleccionadas.length" class="font-size-16" [ngClass]="{'verde' : pedido.id_color == 1, 'azul' : pedido.id_color == 2, 'rojo' : pedido.Zeus == 0, 'blanco' : pedido.id_color == 4}">
+            <button type="button" pButton pRipple [pRowToggler]="pedido" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            <span class="font-bold">
+              {{pedido.consecutivo}}
+            </span>
+            <span class="font-bold"> {{pedido.cliente}} </span>
+          </td>
+          <td style="text-align: center;" id="ver" scope="col" title="Ver detalle del pedido"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 1 ? mostrarPedidoPdf(pedido) : productosPedido(pedido.consecutivo)"></button></td>
+          <td style="text-align: center;" id="editar" scope="col" title="Editar Pedido"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" style="width: 30px; height: 30px;" (click)="pedido.Zeus == 0 ? editarPedido(pedido) : ''"></button></td>
+          <td style="text-align: center;" id="confirmar" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'aceptar')"></button></td>
+          <td style="text-align: center;" id="anular" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button [disabled]="pedido.Zeus == 1" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;" (click)="mostrarEleccion(pedido.consecutivo, 'cancelar')"></button></td>
+        </tr>
+      </ng-template>
+      <!-- Footer de los agrupado -->
+      <ng-template pTemplate="groupfooter" let-pedidos>
+        <tr class="negrita font-size-16 p-rowgroup-footer">
+          <td style="text-align: left">Total Pendiente Pedido</td>
+          <td [attr.colspan]="columnasSeleccionadas.length">{{calcularCostoPedido(pedidos.consecutivo) | currency : 'COP $'}}</td>
+        </tr>
+      </ng-template>
+      <!-- Cuerpo con informacion dellada -->
+      <ng-template pTemplate="rowexpansion" let-pedidos let-columns="columns">
+        <tr id="filas">
+          <td *ngFor="let col of columns" [ngClass]="{
+            'azul' : pedidos.color == 'azul',
+            'verde' : pedidos.color == 'verde' || (pedidos.color == 'verde'),
+            'rojo' : pedidos.Zeus == 0,
+            'blanco' : pedidos.color == 'blanco'}">
+            <span [ngClass]="{
+            'badge verde3': (col.field === 'OT' || col.field === 'Proceso_OT') && pedidos.Estado_OT === 17,
+            'badge verde2': col.field === 'OT' && pedidos.Estado_OT === 18,
+            'badge rojo' : col.field === 'OT' && pedidos.Estado_OT === 3,
+            'badge azul': col.field === 'OT' && pedidos.Estado_OT === 14,
+            'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && pedidos.Estado_OT === 16,
+            'badge naranja' : col.field === 'OT' && pedidos.Estado_OT === 15,
+            'badge bg-danger1' : col.field === 'estado' && pedidos.estado === 'Pendiente',
+            'badge bg-warning1' : col.field === 'estado' && pedidos.estado === 'Parcialmente Satisfecho',
+            'negrita font-size-16' : pedidos.producto == '' }" (dblclick)="varOrdenTranajo(pedidos)">{{col.tipo == 'numero' ? (pedidos[col.field] | number : '1.2-2') : (pedidos[col.field])}}</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
 
 <p-overlayPanel #op [style]="{background: 'rgba(4, 13, 25)', width: '350px', color : 'rgb(247, 247, 247)' }" >
   <ng-template pTemplate>

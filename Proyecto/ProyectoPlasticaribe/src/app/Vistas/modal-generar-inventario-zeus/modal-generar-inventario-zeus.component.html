@@ -1,5 +1,3 @@
-<!-- Inicio  -->
-
 <br>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
@@ -8,191 +6,357 @@
   </div>
 </div>
 
-<div class="contain">
+<div class="contain" *ngIf="!reporteConsolidado">
   <div class="container-fluid">
-    <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Inventario de Productos Terminados</h2>
+    <div class="mb-4 Titulo" [ngClass]="{'backgroundClaro' : !modoSeleccionado, 'backgroundOscuro': modoSeleccionado }">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Inventario de Productos Terminados</h2>
     </div>
-
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
-
-    <p-card>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-        <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-      </div>
-
-      <div class="mb-4">
-        <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>
-      </div>
-
-      <div class="contain">
-        <div *ngIf="load">
-          <p-toolbar styleClass="mb-4 gap-2">
-            <ng-template pTemplate="left">
-              <button pButton pRipple id="excel" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
-              <button pButton pRipple id="editar" label="Crear Receta" icon="pi pi-plus" title="Crear Receta" class="p-button-danger mx-2" (click)="mostrarModalCrearEditar()"></button>
-            </ng-template>
-
-            <ng-template pTemplate="right">
-              <div class="mb-3" *ngIf="ValidarRol != 6">
-                <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
-                  <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
-                </div>
-              </div>
-            </ng-template>
-          </p-toolbar>
-
-          <!--Inicio Tabla-->
-          <p-table
-            #dt
-            [value]="ArrayProductoZeus"
-            styleClass="p-datatable-gridlines p-datatable-sm"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            responsiveLayout="scroll"
-            [rowHover]="true"
-            [rows]="ArrayProductoZeus.length"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-            [scrollable]="true"
-            scrollHeight="50rem"
-            id="tablaProductos">
-
-            <ng-template pTemplate="caption">
-              <div style="text-align:left" id="columnas">
-                <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
-              </div>
-            </ng-template>
-
-            <!--Headers Tabla-->
-            <ng-template pTemplate="header">
-              <tr id="filtros">
-                <th style="width: 150px" pResizableColumn>
-                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
-                </th>
-                <th style="width: 250px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')">
-                </th>
-                <th style="width: 250px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
-                </th>
-                <th style="width: 150px" pResizableColumn>
-                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
-                </th>
-                <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
-                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
-                </th>
-                <th style="width: 100px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
-                </th>
-                <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
-                </th>
-                <!-- <th style="width: 150px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
-                </th> -->
-                <th style="width: 200px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
-                </th>
-                <th style="width: 150px" pResizableColumn>
-                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes_Actual', 'contains')">
-                </th>
-                <th *ngFor="let col of columnasSeleccionada" style="width: 200px" pResizableColumn>
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
-                </th>
-              </tr>
-
-              <tr class="font-size-14" id="nombres">
-                <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
-                  <p-sortIcon field="Id"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Cliente">Cliente
-                  <p-sortIcon field="Cliente"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Nombre">Referencia
-                  <p-sortIcon field="Nombre"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
-                  <p-sortIcon field="Cantidad"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Precio" *ngIf="ValidarRol != 6">Precio
-                  <p-sortIcon field="Precio"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
-                  <p-sortIcon field="Presentacion"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="ValidarRol != 6">Subtotal
-                  <p-sortIcon field="Precio_Total"></p-sortIcon>
-                </th>
-                <!-- <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
-                  <p-sortIcon field="Cant_Minima"></p-sortIcon>
-                </th> -->
-                <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
-                  <p-sortIcon field="Vendedor"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col"  pSortableColumn="Mes_Actual">{{mesActual}}
-                  <p-sortIcon field="Mes_Actual"></p-sortIcon>
-                </th>
-                <th style="text-align: center;" scope="col" *ngFor="let col of columnasSeleccionada" pSortableColumn="{{col.header}}">{{col.header}}
-                  <p-sortIcon field="{{col.header}}"></p-sortIcon>
-                </th>
-              </tr>
-            </ng-template>
-
-            <!--Cuerpo Tabla-->
-            <ng-template pTemplate="body" let-ArrayProductoZeus>
-              <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
-                <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
-                <td>{{ArrayProductoZeus.Cliente}}</td>
-                <td>{{ArrayProductoZeus.Nombre}}</td>
-                <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
-                <ng-template #rojo>
-                  <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
-                </ng-template>
-                <ng-template #azul>
-                  <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
-                </ng-template>
-                <td style="text-align: center;" *ngIf="ValidarRol != 6">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
-                <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
-                <td style="text-align: center;" *ngIf="ValidarRol != 6"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
-                <!-- <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
-                  <p-cellEditor>
-                    <ng-template pTemplate="input">
-                      <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                      {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
-                    </ng-template>
-                  </p-cellEditor>
-                </td> -->
-                <td>{{ArrayProductoZeus.Vendedor}}</td>
-                <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
-                <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>
-              </tr>
-            </ng-template>
-
-            <!-- Footer de la tabla -->
-            <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
-              <tr>
-                <td colspan="6" class="text-right">Totales</td>
-                <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
-              </tr>
-            </ng-template>
-
-            <!-- Pie de la tabla -->
-            <ng-template pTemplate="summary">
-              Cantidad Total de Productos Disponibles: <b>{{ArrayProductoZeus.length | number}}</b>
-            </ng-template>
-
-          </p-table>
-          <br>
-        </div>
-      </div>
-    </p-card>
   </div>
 </div>
+
+<p-card *ngIf="!reporteConsolidado">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>
+  </div>
+
+  <div class="contain">
+    <div *ngIf="load">
+      <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+          <button pButton pRipple id="excel" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+          <button pButton pRipple id="editar" label="Crear Receta" icon="pi pi-plus" title="Crear Receta" class="p-button-danger mx-2" (click)="mostrarModalCrearEditar()"></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <div class="mb-3" *ngIf="ValidarRol != 6">
+            <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
+              <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+            </div>
+          </div>
+        </ng-template>
+      </p-toolbar>
+
+      <!--Inicio Tabla-->
+      <p-table
+        #dt
+        [value]="ArrayProductoZeus"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        id="tablaProductos"
+        [paginator]="true"
+        [rows]="50"
+        [rowsPerPageOptions]="[10, 20, 50, 100, ArrayProductoZeus.length]">
+
+        <ng-template pTemplate="caption">
+          <div style="text-align:left" id="columnas">
+            <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+          </div>
+        </ng-template>
+
+        <!--Headers Tabla-->
+        <ng-template pTemplate="header">
+          <tr id="filtros">
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
+            </th>
+            <th style="width: 250px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')">
+            </th>
+            <th style="width: 250px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
+            </th>
+            <th style="width: 100px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
+            </th>
+            <!-- <th style="width: 150px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
+            </th> -->
+            <th style="width: 200px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes_Actual', 'contains')">
+            </th>
+            <th *ngFor="let col of columnasSeleccionada" style="width: 200px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+            </th>
+          </tr>
+
+          <tr class="font-size-14" id="nombres">
+            <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
+              <p-sortIcon field="Id"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Cliente">Cliente
+              <p-sortIcon field="Cliente"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Nombre">Referencia
+              <p-sortIcon field="Nombre"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
+              <p-sortIcon field="Cantidad"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Precio" *ngIf="ValidarRol != 6">Precio
+              <p-sortIcon field="Precio"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
+              <p-sortIcon field="Presentacion"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="ValidarRol != 6">Subtotal
+              <p-sortIcon field="Precio_Total"></p-sortIcon>
+            </th>
+            <!-- <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
+              <p-sortIcon field="Cant_Minima"></p-sortIcon>
+            </th> -->
+            <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
+              <p-sortIcon field="Vendedor"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col"  pSortableColumn="Mes_Actual">{{mesActual}}
+              <p-sortIcon field="Mes_Actual"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" *ngFor="let col of columnasSeleccionada" pSortableColumn="{{col.header}}">{{col.header}}
+              <p-sortIcon field="{{col.header}}"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+
+        <!--Cuerpo Tabla-->
+        <ng-template pTemplate="body" let-ArrayProductoZeus>
+          <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
+            <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
+            <td>{{ArrayProductoZeus.Cliente}}</td>
+            <td>{{ArrayProductoZeus.Nombre}}</td>
+            <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
+            <ng-template #rojo>
+              <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+            </ng-template>
+            <ng-template #azul>
+              <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+            </ng-template>
+            <td style="text-align: center;" *ngIf="ValidarRol != 6">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
+            <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
+            <td style="text-align: center;" *ngIf="ValidarRol != 6"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
+            <!-- <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
+                </ng-template>
+              </p-cellEditor>
+            </td> -->
+            <td>{{ArrayProductoZeus.Vendedor}}</td>
+            <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
+            <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>
+          </tr>
+        </ng-template>
+
+        <!-- Footer de la tabla -->
+        <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
+          <tr>
+            <td colspan="6" class="text-right">Totales</td>
+            <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <br>
+    </div>
+  </div>
+</p-card>
+
+<div class="p-5" *ngIf="reporteConsolidado">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
+  </div>
+
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>
+  </div>
+
+  <div class="contain">
+    <div *ngIf="load">
+      <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+          <button pButton pRipple id="excel" label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+          <button pButton pRipple id="editar" label="Crear Receta" icon="pi pi-plus" title="Crear Receta" class="p-button-danger mx-2" (click)="mostrarModalCrearEditar()"></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <div class="mb-3" *ngIf="ValidarRol != 6">
+            <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
+              <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+            </div>
+          </div>
+        </ng-template>
+      </p-toolbar>
+
+      <!--Inicio Tabla-->
+      <p-table
+        #dt
+        [value]="ArrayProductoZeus"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+        [scrollable]="true"
+        scrollHeight="50rem"
+        id="tablaProductos"
+        [paginator]="true"
+        [rows]="50"
+        [rowsPerPageOptions]="[10, 20, 50, 100, ArrayProductoZeus.length]">
+
+        <ng-template pTemplate="caption">
+          <div style="text-align:left" id="columnas">
+            <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+          </div>
+        </ng-template>
+
+        <!--Headers Tabla-->
+        <ng-template pTemplate="header">
+          <tr id="filtros">
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
+            </th>
+            <th style="width: 250px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')">
+            </th>
+            <th style="width: 250px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
+            </th>
+            <th style="width: 100px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn *ngIf="ValidarRol != 6">
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
+            </th>
+            <!-- <th style="width: 150px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
+            </th> -->
+            <th style="width: 200px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
+            </th>
+            <th style="width: 150px" pResizableColumn>
+              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes_Actual', 'contains')">
+            </th>
+            <th *ngFor="let col of columnasSeleccionada" style="width: 200px" pResizableColumn>
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+            </th>
+          </tr>
+
+          <tr class="font-size-14" id="nombres">
+            <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
+              <p-sortIcon field="Id"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Cliente">Cliente
+              <p-sortIcon field="Cliente"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Nombre">Referencia
+              <p-sortIcon field="Nombre"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
+              <p-sortIcon field="Cantidad"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Precio" *ngIf="ValidarRol != 6">Precio
+              <p-sortIcon field="Precio"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
+              <p-sortIcon field="Presentacion"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total" *ngIf="ValidarRol != 6">Subtotal
+              <p-sortIcon field="Precio_Total"></p-sortIcon>
+            </th>
+            <!-- <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
+              <p-sortIcon field="Cant_Minima"></p-sortIcon>
+            </th> -->
+            <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
+              <p-sortIcon field="Vendedor"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col"  pSortableColumn="Mes_Actual">{{mesActual}}
+              <p-sortIcon field="Mes_Actual"></p-sortIcon>
+            </th>
+            <th style="text-align: center;" scope="col" *ngFor="let col of columnasSeleccionada" pSortableColumn="{{col.header}}">{{col.header}}
+              <p-sortIcon field="{{col.header}}"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+
+        <!--Cuerpo Tabla-->
+        <ng-template pTemplate="body" let-ArrayProductoZeus>
+          <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
+            <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
+            <td>{{ArrayProductoZeus.Cliente}}</td>
+            <td>{{ArrayProductoZeus.Nombre}}</td>
+            <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
+            <ng-template #rojo>
+              <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+            </ng-template>
+            <ng-template #azul>
+              <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+            </ng-template>
+            <td style="text-align: center;" *ngIf="ValidarRol != 6">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
+            <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
+            <td style="text-align: center;" *ngIf="ValidarRol != 6"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
+            <!-- <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
+                </ng-template>
+              </p-cellEditor>
+            </td> -->
+            <td>{{ArrayProductoZeus.Vendedor}}</td>
+            <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
+            <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>
+          </tr>
+        </ng-template>
+
+        <!-- Footer de la tabla -->
+        <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
+          <tr>
+            <td colspan="6" class="text-right">Totales</td>
+            <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <br>
+    </div>
+  </div>
+</div>
+
 
 <p-dialog [(visible)]="recetaProducto" [style]="{width: '70vw'}" [resizable]="true" header="Crear y Editar Recetas de Productos" [modal]="true">
   <app-Recetas_Productos></app-Recetas_Productos>

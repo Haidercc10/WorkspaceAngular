@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardRecaudos as defaultSteps } from 'src/app/data';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes-Consolidados.component';
 
 @Component({
   selector: 'app-DashBoard-Recaudos',
@@ -39,10 +40,11 @@ export class DashBoardRecaudosComponent implements OnInit {
                 private zeusService : ZeusContabilidadService,
                   private shepherdService: ShepherdService,
                     private paginaPrincial : PaginaPrincipalComponent,
-                      private frmBuilder : FormBuilder,
-                        private vendedorService : UsuarioService,
-                          private msj : MensajesAplicacionService,
-                            private creacionPDFService : CreacionPdfService,) {
+                      private reportesConsolidadosComponent : ReportesConsolidadosComponent,
+                        private frmBuilder : FormBuilder,
+                          private vendedorService : UsuarioService,
+                            private msj : MensajesAplicacionService,
+                              private creacionPDFService : CreacionPdfService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.FormFiltros = this.frmBuilder.group({
@@ -79,7 +81,7 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    if (this.paginaPrincial.recaudos){
+    if (this.paginaPrincial.recaudos || this.reportesConsolidadosComponent.cartera){
       this.consultarCartera();
     }
   }

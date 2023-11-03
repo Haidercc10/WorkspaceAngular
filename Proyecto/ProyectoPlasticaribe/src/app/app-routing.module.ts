@@ -102,9 +102,6 @@ export const routes: Routes = [
   {path: 'Tickets', loadChildren: () => import('./Modules/tickets/tickets.module').then(m => m.TicketsModule)},
   {path: 'Gestion-Tickets', loadChildren: () => import('./Modules/gestion-tickets/gestion-tickets.module').then(m => m.GestionTicketsModule)},
 
-  /** */
-  {path: 'Reporte-Facturacion', loadChildren: () => import('./Modules/consolidad-facturacion2/consolidad-facturacion2.module').then(m => m.ConsolidadFacturacion2Module)},
-
   /*************************************************************** DASBOARD **************************************************************************/
   {path: 'nomina', loadChildren: () => import('./Modules/nomina/nomina.module').then(m => m.NominaModule)},
   {path: 'ingreso-nomina', loadChildren: () => import('./Modules/ingreso-nomina/ingreso-nomina.module').then(m => m.IngresoNominaModule)},

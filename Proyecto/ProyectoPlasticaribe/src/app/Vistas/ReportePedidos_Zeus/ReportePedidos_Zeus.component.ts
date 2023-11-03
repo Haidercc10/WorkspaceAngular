@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -30,6 +30,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
   @ViewChild(PedidoExternoComponent) modalPedidoExterno : PedidoExternoComponent;
+  @Input() reporteConsolidado : boolean = false;
 
   cargando : boolean = false;
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual

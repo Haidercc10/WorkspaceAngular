@@ -129,7 +129,6 @@ import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion
 import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
-import { Reporte_Consolidado_FacturacionComponent } from './Vistas/Reporte_Consolidado_Facturacion/Reporte_Consolidado_Facturacion.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
@@ -260,7 +259,6 @@ import { ReportesConsolidadosComponent } from './Vistas/Reportes-Consolidados/Re
     Gestion_TicketsComponent,
     DashboardOTComponent,
     ReporteFacturacion_VendedoresComponent,
-    Reporte_Consolidado_FacturacionComponent,
     VistasFavoritasComponent,
     Reporte_SolicitudesMPComponent,
     SolicitudMateriaPrimaComponent,

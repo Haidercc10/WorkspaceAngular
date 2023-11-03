@@ -6,20 +6,7 @@
   </div>
 </div>
 
-<div class="contain">
-  <!-- Navegador fin de parte superior -->
-  <div class="container-fluid">
-    <!-- principal -->
-    <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">Facturación Detallada</h2>
-    </div>
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
-  </div>
-</div>
-
-<p-card>
+<div class="fondo p-5">
   <div class="mb-4">
     <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
   </div>
@@ -177,7 +164,7 @@
       </p-table>
     </div>
   </div>
-</p-card>
+</div>
 
 <!--Mensaje de elección-->
 <p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">

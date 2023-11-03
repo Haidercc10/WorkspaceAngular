@@ -34,6 +34,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   datosFacturacion : any [] = []; //Variable que tendrá la información del consolidado consultado
+  datosFacturacionConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -169,8 +170,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let producto = this.formFiltros.value.Item;
     let nombreItem = this.formFiltros.value.Referencia;
     let cliente = this.formFiltros.value.Id_Cliente;
-    let nombreCliente = this.formFiltros.value.Cliente;
-    
+    let nombreCliente = this.formFiltros.value.Cliente;    
     let ruta : string = '';
 
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
@@ -186,7 +186,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(data => {
       if (data.length == 0) this.msj.mensajeAdvertencia('¡No se encontraron resultados de bésqueda con la combinación de filtros seleccionada!');
-      else data.forEach(x => this.llenarConsolidado(x));
+      else {
+        data.forEach(x => this.llenarConsolidado(x));
+        data.forEach(x => this.llenarDatosConsolidado(x));
+      }
     }, null, () => this.cargando = false);
   }
 
@@ -225,6 +228,62 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     this.datosFacturacion.push(info);
   }
 
+  // Funcion que va a llenar el array que contendrá la informacion del consolidado
+  llenarDatosConsolidado(data : any){
+    if (data.devolucion == 0) {
+      let info : any = {
+        Id : this.datosFacturacionConsolidado.length == 0 ? 1 : Math.max(...this.datosFacturacionConsolidado.map(x => x.Id)) + 1,
+        Ano : `${data.ano}`,
+        Id_Cliente : data.id_Cliente,
+        Cliente : data.cliente,
+        Id_Producto : data.id_Producto,
+        Producto : `${data.id_Producto} - ${data.producto} - ${data.presentacion}`,
+        Cantidad : data.cantidad,
+        Devolucion : data.devolucion,
+        Presentacion : data.presentacion,
+        Precio : data.precio,
+        SubTotal : data.subTotal,
+        SubTotalDev : data.cantidad == 0 ? data.subTotal : 0,
+        Enero : data.mes == 'Enero' ? data.cantidad : 0,
+        Febrero : data.mes == 'Febrero' ? data.cantidad : 0,
+        Marzo : data.mes == 'Marzo' ? data.cantidad : 0,
+        Abril : data.mes == 'Abril' ? data.cantidad : 0,
+        Mayo : data.mes == 'Mayo' ? data.cantidad : 0,
+        Junio : data.mes == 'Junio' ? data.cantidad : 0,
+        Julio : data.mes == 'Julio' ? data.cantidad : 0,
+        Agosto : data.mes == 'Agosto' ? data.cantidad : 0,
+        Septiembre : data.mes == 'Septiembre' ? data.cantidad : 0,
+        Octubre : data.mes == 'Octubre' ? data.cantidad : 0,
+        Noviembre : data.mes == 'Noviembre' ? data.cantidad : 0,
+        Diciembre : data.mes == 'Diciembre' ? data.cantidad : 0,
+        Id_Vendedor : data.id_Vendedor,
+        Vendedor : data.vendedor,
+      }
+      let nuevo = this.datosFacturacionConsolidado.findIndex((item) => item.Ano == info.Ano
+                  && item.Id_Cliente == info.Id_Cliente
+                  && item.Id_Producto == info.Id_Producto
+                  && item.Presentacion == info.Presentacion
+                  && item.Precio == info.Precio);
+      if (nuevo == -1) this.datosFacturacionConsolidado.push(info);
+      else {
+        data.mes == 'Enero' ? this.datosFacturacionConsolidado[nuevo].Enero = info.Enero : this.datosFacturacionConsolidado[nuevo].Enero;
+        data.mes == 'Febrero' ? this.datosFacturacionConsolidado[nuevo].Febrero = info.Febrero : this.datosFacturacionConsolidado[nuevo].Febrero;
+        data.mes == 'Marzo' ? this.datosFacturacionConsolidado[nuevo].Marzo = info.Marzo : this.datosFacturacionConsolidado[nuevo].Marzo;
+        data.mes == 'Abril' ? this.datosFacturacionConsolidado[nuevo].Abril = info.Abril : this.datosFacturacionConsolidado[nuevo].Abril;
+        data.mes == 'Mayo' ? this.datosFacturacionConsolidado[nuevo].Mayo = info.Mayo : this.datosFacturacionConsolidado[nuevo].Mayo;
+        data.mes == 'Junio' ? this.datosFacturacionConsolidado[nuevo].Junio = info.Junio : this.datosFacturacionConsolidado[nuevo].Junio;
+        data.mes == 'Julio' ? this.datosFacturacionConsolidado[nuevo].Julio = info.Julio : this.datosFacturacionConsolidado[nuevo].Julio;
+        data.mes == 'Agosto' ? this.datosFacturacionConsolidado[nuevo].Agosto = info.Agosto : this.datosFacturacionConsolidado[nuevo].Agosto;
+        data.mes == 'Septiembre' ? this.datosFacturacionConsolidado[nuevo].Septiembre = info.Septiembre : this.datosFacturacionConsolidado[nuevo].Septiembre;
+        data.mes == 'Octubre' ? this.datosFacturacionConsolidado[nuevo].Octubre = info.Octubre : this.datosFacturacionConsolidado[nuevo].Octubre;
+        data.mes == 'Noviembre' ? this.datosFacturacionConsolidado[nuevo].Noviembre = info.Noviembre : this.datosFacturacionConsolidado[nuevo].Noviembre;
+        data.mes == 'Diciembre' ? this.datosFacturacionConsolidado[nuevo].Diciembre = info.Diciembre : this.datosFacturacionConsolidado[nuevo].Diciembre;
+        this.datosFacturacionConsolidado[nuevo].SubTotal += info.SubTotal;
+        this.datosFacturacionConsolidado[nuevo].Precio = (this.datosFacturacionConsolidado[nuevo].Precio + info.Precio) / 2;
+      }
+    }
+  }
+
   // Funcion que va a calcular y devolver el valor total de la facturación
   calcularTotal = () => this.datosFacturacion.reduce((acc, item) => acc + item.SubTotal, 0);
 
@@ -236,15 +295,15 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
   exportarExcel(){
-    if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
+    if (this.datosFacturacionConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
         const title = `Consolidado Facturación - ${moment().format('DD-MM-YYYY')}`;
-        const header = ["Mes", "Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Cantidad", "Presentación", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
+        const header = ["Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Presentación", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
         let datos : any =[];
-        for (const item of this.datosFacturacion) {
-          const datos1  : any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
+        for (const item of this.datosFacturacionConsolidado) {
+          const datos1  : any = [item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Presentacion, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -258,16 +317,27 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:L3');
+        worksheet.mergeCells('A1:V3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          [2, 7, 9, 10].forEach(n => row.getCell(n).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
-          [1, 2, 8, 11].forEach(n => worksheet.getColumn(n).width = 12);
-          [3, 5, 7, 9, 10].forEach(n => worksheet.getColumn(n).width = 15);
-          [4, 6, 12].forEach(n => worksheet.getColumn(n).width = 60);
-          [1, 2].forEach(n => worksheet.getColumn(n).alignment = { horizontal : 'center' });
+          row.alignment = { horizontal : 'center' }
+
+          let frtNum : number [] = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+          let width12 : number [] = [1, 6, 21];
+          let width15 : number [] = [2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+          let width30 : number [] = [19, 20];
+          let width50 : number [] = [5, 22];
+
+          frtNum.forEach(n => row.getCell(n).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+          width12.forEach(n => worksheet.getColumn(n).width = 12);
+          width15.forEach(n => worksheet.getColumn(n).width = 15);
+          width30.forEach(n => worksheet.getColumn(n).width = 30);
+          width50.forEach(n => worksheet.getColumn(n).width = 50);
+
+          worksheet.getColumn(3).width = 60;
+          worksheet.getColumn(4).width = 20;
         });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -277,7 +347,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           this.cargando = false;
           this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
         }, 1000);
-      }, 1500);
+      }, 1000);
     }
   }
 }
