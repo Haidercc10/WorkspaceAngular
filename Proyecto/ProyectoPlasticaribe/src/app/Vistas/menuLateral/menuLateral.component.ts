@@ -51,7 +51,6 @@ export class MenuLateralComponent implements OnInit {
   position: string = '';
   modoSeleccionado : boolean;
   roles : any [] = [];
-  @Input() categoria!: string;
   cargando : boolean = false;
 
   constructor(private AppComponent : AppComponent,
@@ -153,13 +152,39 @@ export class MenuLateralComponent implements OnInit {
         });
       }
       this.categorias.sort((a, b) => a.label.localeCompare(b.label));
-      this.categorias.unshift({label: `Inicio`, icon: 'pi pi-home', command: () => this.router.navigate(['/home'])});
-      if (this.storage_Id == 123456789) {
-        this.categorias.unshift({label: `Vistas`, icon: 'pi pi-eye', command: () => this.router.navigate(['/gestion-vistas'])});
-        this.categorias.unshift({label: `Pruebas`, icon: 'pi pi-wrench', command: () => this.router.navigate(['/pruebas'])});
-      }
+      this.agregarOpcionesAdiciones();
       setTimeout(() => this.cargarOpcionesMenu(), 50);
     });
+  }
+
+  agregarOpcionesAdiciones(){
+    this.categorias.unshift({
+      label: `Inicio`, 
+      icon: 'pi pi-home', 
+      command: () => {
+        this.router.navigate(['/home']);
+        this.display = false;
+      }
+    });
+
+    if (this.storage_Id == 123456789) {
+      this.categorias.unshift({
+        label: `Vistas`, 
+        icon: 'pi pi-eye', 
+        command: () => {
+          this.router.navigate(['/gestion-vistas']);
+          this.display = false;
+        }
+      });
+      this.categorias.unshift({
+        label: `Pruebas`, 
+        icon: 'pi pi-wrench', 
+        command: () => {
+          this.router.navigate(['/pruebas']);
+          this.display = false;
+        }
+      });
+    }
   }
 
   cargarOpcionesMenu(){ 
@@ -176,8 +201,9 @@ export class MenuLateralComponent implements OnInit {
                 if(element.label == `Materia Prima`) {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
                 } else if (element.label == `Productos`) {
-                    if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]); 
+                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]); 
                 }
+                this.display = false;
               }
             });
           } 

@@ -134,6 +134,10 @@ export const routes: Routes = [
 
   // 
   {path: 'reporte-produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule)},
+
+  // 
+  {path: 'reportes-generales', loadChildren: () => import('./Modules/reportes-consolidados/reportes-consolidados.module').then(m => m.ReportesConsolidadosModule)},
+
 ]
 
 @NgModule({

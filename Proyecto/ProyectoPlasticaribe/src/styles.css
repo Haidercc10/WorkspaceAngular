@@ -94,10 +94,12 @@ a {
 
 .Titulo .tituloRojo {
   font-size: calc(var(--font-size) * 32px);
+  margin-top: 60px;
 }
 
 .Titulo .tituloClaro {
   font-size: calc(var(--font-size) * 32px);
+  margin-top: 60px;
 }
 
 .tituloRojo{

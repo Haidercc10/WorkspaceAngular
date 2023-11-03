@@ -1,6 +1,4 @@
-<app-menuLateral></app-menuLateral>
-<br>
-<app-VistasFavoritas></app-VistasFavoritas>
+
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
@@ -181,6 +179,14 @@
           <span class="p-float-label">
             <p-multiSelect formControlName="vRoles" inputId="vRoles" [options]="arrayRoles" optionLabel="rolUsu_Nombre" optionValue="rolUsu_Id"></p-multiSelect>
             <label for="vRoles">Roles</label>
+          </span>
+        </div>
+
+        <!-- Estado -->
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <p-dropdown formControlName="vEstado" inputId="estado" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="true" [options]="estados"></p-dropdown>
+            <label for="estado">Estado</label>
           </span>
         </div>
 

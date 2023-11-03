@@ -1,0 +1,47 @@
+<div class="fondo">
+  <div class="m-5" style="padding-top: 60px;">
+    <p-tabView (onChange)="cambioTab($event)" *ngIf="[1,3,60,61,69].includes(ValidarRol)">
+
+      <!-- FACTURACIÓN -->
+      <p-tabPanel
+        header="Facturación"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
+      </p-tabPanel>
+
+      <!-- PRODUCCION -->
+      <p-tabPanel
+        header="Consolidado Producción"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-Dashboard_Areas *ngIf="consolidadoProduccionAreas"></app-Dashboard_Areas>
+      </p-tabPanel>
+
+      <!-- CARTERA -->
+      <p-tabPanel
+        header="Cartera"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
+      </p-tabPanel>
+
+      <!-- PRODUCCIÓN DETALLADA -->
+      <p-tabPanel
+        header="Producción Detallada"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>
+      </p-tabPanel>
+
+      <!-- VENTAS VENDEDORES -->
+      <p-tabPanel
+        header="Facturación Vendedores"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
+      </p-tabPanel>
+
+    </p-tabView>
+  </div>
+</div>

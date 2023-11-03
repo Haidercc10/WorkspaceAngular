@@ -1,3 +1,6 @@
 <router-outlet></router-outlet>
 
+<app-menuLateral *ngIf="this.ValidarRol"></app-menuLateral>
+<app-VistasFavoritas *ngIf="this.ValidarRol"></app-VistasFavoritas>
+
 <p-toast position="center" [preventOpenDuplicates]="true" [breakpoints]="{'920px': {width: '100%', right: '0', left: '0'}}"></p-toast>

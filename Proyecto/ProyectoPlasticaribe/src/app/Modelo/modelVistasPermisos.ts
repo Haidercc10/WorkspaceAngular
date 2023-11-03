@@ -6,4 +6,5 @@ export interface modelVistasPermisos {
     Vp_Ruta : string;
     Vp_Categoria : string;
     Vp_Id_Roles : string;
+    Vp_Estado : number;
 }

@@ -10,6 +10,7 @@ import { iconos } from 'src/app/Vistas/Gestion_Vistas/Iconos';
 import { imagenes } from 'src/app/Vistas/Gestion_Vistas/Iconos';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { AppComponent } from 'src/app/app.component';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 
 @Component({
   selector: 'app-Gestion_Vistas',
@@ -38,6 +39,7 @@ export class Gestion_VistasComponent implements OnInit {
   nombreVistas : any = []; //.Array que gurardará los nombres de las vistas para evitar que se cree una igual
   modoSeleccionado : boolean; //.Variable que servirá para cambiar estilos en el modo oscuro/claro
   imagenes : any = []; //.Imagenes que se cargarán en la tabla y en los dropdown.
+  estados : any = []; //.Estados que se mostrarán en el dropdow
   nuevaCategoria : string = "";
 
   @ViewChild('op') op: OverlayPanel | undefined;
@@ -47,7 +49,8 @@ export class Gestion_VistasComponent implements OnInit {
                   private msjs : MensajesAplicacionService,
                     private srvRoles : RolesService,
                       private mensajes : MessageService, 
-                        private AppComponent : AppComponent){
+                        private AppComponent : AppComponent,
+                          private estadoService : EstadosService,){
     
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;                    
     this.formVistas = this.frmBuilder.group({
@@ -58,16 +61,20 @@ export class Gestion_VistasComponent implements OnInit {
       vCategoria: [null, Validators.required],
       vRuta: ['/', Validators.required],
       vRoles : [null, Validators.required],
+      vEstado : [null]
     });
   }
 
   ngOnInit(): void {
     this.cargarVistasDistintas();
+    this.obtenerEstados();
     this.cargarRoles();
     this.iconos2 = iconos;
     this.imagenes = imagenes;
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
+
+  obtenerEstados = () => this.estadoService.srvObtenerListaEstados().subscribe(resp => this.estados = resp.filter(x => [1,8].includes(x.estado_Id)));
 
   // Función que cargará los roles en el campo del formulario
   cargarRoles = () => this.srvRoles.srvObtenerLista().subscribe(data => this.arrayRoles = data);
@@ -104,6 +111,7 @@ export class Gestion_VistasComponent implements OnInit {
             Vp_Ruta: this.formVistas.value.vRuta.toString().replace(' ', '-'),
             Vp_Categoria: `|${this.formVistas.value.vCategoria.toString().replaceAll(',', '|')}|`,
             Vp_Id_Roles: `|${this.formVistas.value.vRoles.toString().replaceAll(',', '|')}|`,
+            Vp_Estado: this.formVistas.value.vEstado,
           }
           //Crear vista
           if(this.palabra == 'Crear') {
@@ -207,7 +215,8 @@ export class Gestion_VistasComponent implements OnInit {
         vIcono: icono[0].icon, 
         vDock: imagen[0].nombre, 
         vCategoria: categorias, 
-        vRuta: data.vp_Ruta, 
+        vRuta: data.vp_Ruta,
+        vEstado: data.vp_Estado,
       });
     });
   }

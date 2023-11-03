@@ -187,6 +187,7 @@ import { AppComponent } from './app.component';
 import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 import { ReporteFacturacionDetalladaComponent } from './Vistas/Reporte-Facturacion-Detallada/Reporte-Facturacion-Detallada.component';
 import { ReporteProduccionComponent } from './Vistas/Reporte-Produccion/Reporte-Produccion.component';
+import { ReportesConsolidadosComponent } from './Vistas/Reportes-Consolidados/Reportes-Consolidados.component';
 
 @NgModule({
   declarations: [
@@ -298,6 +299,7 @@ import { ReporteProduccionComponent } from './Vistas/Reporte-Produccion/Reporte-
     Formato_Facturas_VentasComponent,
     ReporteFacturacionDetalladaComponent,
     ReporteProduccionComponent,
+    ReportesConsolidadosComponent,
   ],
 
   imports: [

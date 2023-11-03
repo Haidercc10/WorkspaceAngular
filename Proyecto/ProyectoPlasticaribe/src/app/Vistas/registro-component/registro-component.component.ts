@@ -515,6 +515,7 @@ export class RegistroComponentComponent implements OnInit {
           Vp_Ruta: data.vp_Ruta,
           Vp_Categoria: data.vp_Categoria,
           Vp_Id_Roles: `${data.vp_Id_Roles}${rol}|`,
+          Vp_Estado : 1
         }
         if (!(data.vp_Id_Roles).split('|').includes(rol)) this.vistasPermisosService.Put(idVista, info).subscribe(() => this.msj.mensajeConfirmacion(`¡El rol se ha creado!`, ``));
       });
@@ -572,6 +573,7 @@ export class RegistroComponentComponent implements OnInit {
             Vp_Ruta: data.vp_Ruta,
             Vp_Categoria: data.vp_Categoria,
             Vp_Id_Roles: `${data.vp_Id_Roles}${this.rolEditar}|`,
+            Vp_Estado: 1
           }
           if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(vista.key, info).subscribe();
         });
@@ -588,6 +590,7 @@ export class RegistroComponentComponent implements OnInit {
               Vp_Ruta: data.vp_Ruta,
               Vp_Categoria: data.vp_Categoria,
               Vp_Id_Roles: data.vp_Id_Roles.replace(`${this.rolEditar}|`, ''),
+              Vp_Estado : 1
             }
             if (!(data.vp_Id_Roles).split('|').includes(this.rolEditar)) this.vistasPermisosService.Put(info.id, info_Permisos).subscribe();
           });
