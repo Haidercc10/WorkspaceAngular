@@ -181,6 +181,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
       let info : any = {
         Id : data.id,
+        Id2 : data.id2,
         Nombre : data.nombre,
         Ancho : data.ancho,
         Micras : data.micras,
@@ -582,6 +583,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que va a llamar el modal donde se editará la información de la materia prima
   llamarModalEdicionMateriaPrima(data : any){
     this.materialSeleccionado = data;
+    console.log(this.materialSeleccionado)
     this.cargarBoppsGenericos();
     this.modalEditarMateriasPrimas = true;
     this.FormEdicionMateriaPrima.patchValue({
@@ -947,7 +949,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     else if(cantidad < this.materialSeleccionado.Cant) {
       let cantSaliente : number = 0;
       let nueva : number = (this.materialSeleccionado.Cant - cantidad);
-      this.srvMovEntradasMP.GetInventarioxMaterial(this.materialSeleccionado.Id).subscribe(data => {
+      this.srvMovEntradasMP.GetInventarioxMaterial(this.materialSeleccionado.Id2).subscribe(data => {
         if(data.length > 0) {
           data.forEach(element => {
             if(nueva > 0) {
@@ -995,7 +997,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           });
         }
       }, error => {this.msj.mensajeError(`Error`, `Error al obtener los movimientos de entrada de materia prima`); } );
-      
     }
   }
 
@@ -1009,7 +1010,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       UndMed_Id: 'Kg',
       Precio_RealUnitario: this.FormEdicionMateriaPrima.value.Precio,
       Tipo_Entrada: 'AJUSTEMP',
-      Codigo_Entrada: 1,
+      Codigo_Entrada: mp3 != 1 ? this.materialSeleccionado.Id2 : 1,
       Estado_Id: 19,
       Cantidad_Asignada: 0,
       Cantidad_Disponible: (cantidad - this.materialSeleccionado.Cant),
