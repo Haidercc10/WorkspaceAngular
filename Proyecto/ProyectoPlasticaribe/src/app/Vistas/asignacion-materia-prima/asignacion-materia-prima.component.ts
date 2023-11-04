@@ -224,10 +224,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           }
         }
       }
-    }, () => {
-      this.load = true;
-      this.limpiarCamposMP();
-    });
+    }, () => this.limpiarCamposMP());
   }
 
   // Funcion para colocar la materia prima en la tabla
@@ -260,16 +257,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       Categoria : this.FormMateriaPrimaRetirada.value.Categoria,
       Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
     }
-    if (this.categoriasTintas.includes(categoria)) {
-      info.Id_Tinta = info.Id; 
-      this.FormMateriaPrimaRetirada.patchValue({ ProcesoRetiro : 'IMP' });
-    } else if (this.categoriasMP.includes(categoria)) {
-      info.Id_Mp = info.Id;
-      this.FormMateriaPrimaRetirada.patchValue({ ProcesoRetiro : 'EXT' });
-    }  
+    if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id; 
+    else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id
     this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
     this.materiasPrimasSeleccionadas.push(info);
-    setTimeout(() => this.FormMateriaPrimaRetirada.reset(), 500);
+    this.limpiarCamposMP();
   }
 
   // Funcion que va a calcular la cantidad de materia prima asignada
@@ -334,37 +326,18 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que se encargará de consultar el Id del proceso y hacer el ingreso de las materia primas asignadas
   obtenerProcesoId(asignacion : number){
     let count : number = 0;
-    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      let idMateriaPrima = this.materiasPrimasSeleccionadas[index].Id;
-      let cantidadMateriaPrima = this.materiasPrimasSeleccionadas[index].Cantidad;
-      let presentacionMateriaPrima = this.materiasPrimasSeleccionadas[index].Und_Medida;
-      if (this.materiasPrimasSeleccionadas[index].Id_Mp == 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001) {
-        const datosDetallesAsignacionTintas : any = {
-          AsigMp_Id : asignacion,
-          Tinta_Id : idMateriaPrima,
-          DtAsigTinta_Cantidad : cantidadMateriaPrima,
-          UndMed_Id : presentacionMateriaPrima,
-          Proceso_Id : this.materiasPrimasSeleccionadas[index].Proceso,
-        }
-        this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(() => count++, () => {
-          this.load = true;
-          this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
-        });
-        this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
-      } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
-        const datosDetallesAsignacion : any = {
-          AsigMp_Id : asignacion,
-          MatPri_Id : idMateriaPrima,
-          DtAsigMp_Cantidad : cantidadMateriaPrima,
-          UndMed_Id : presentacionMateriaPrima,
-          Proceso_Id : this.materiasPrimasSeleccionadas[index].Proceso,
-        }
-        this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(() => count++, () => {
-          this.load = true;
-          this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
-        });
-        this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
-      }
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      let polietileno_Id = this.materiasPrimasSeleccionadas[i].Id_Mp;
+      let tinta_Id = this.materiasPrimasSeleccionadas[i].Id_Tinta;
+      let matPrima_Id = this.materiasPrimasSeleccionadas[i].Id;
+      let matPrima_Nombre = this.materiasPrimasSeleccionadas[i].Nombre;
+      let cantidad = this.materiasPrimasSeleccionadas[i].Cantidad;
+      let presentacion = this.materiasPrimasSeleccionadas[i].Und_Medida;
+      let proceso = this.materiasPrimasSeleccionadas[i].Proceso;
+            
+      if (polietileno_Id == 84 && tinta_Id != 2001) this.guardarAsignacionTinta(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso);
+      else if (polietileno_Id != 84 && tinta_Id == 2001 && !this.soloTintas) this.guardarAsignacionPolietileno(asignacion, matPrima_Id, matPrima_Nombre, cantidad, presentacion, proceso);
+      count++;
     }
     setTimeout(() => {
       if (count == this.materiasPrimasSeleccionadas.length) {        
@@ -372,6 +345,36 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         setTimeout(() => this.asignacionExitosa(), 2000);
       }
      }, 2000);
+  }
+
+  guardarAsignacionTinta(asignacion, id_tinta, nombreTinta, cantidad, presentacion, proceso){
+    const datosDetallesAsignacionTintas : any = {
+      AsigMp_Id : asignacion,
+      Tinta_Id : id_tinta,
+      DtAsigTinta_Cantidad : cantidad,
+      UndMed_Id : presentacion,
+      Proceso_Id : proceso,
+    }
+    this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(null, () => {
+      this.load = true;
+      this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreTinta}!`);
+    });
+    this.moverInventarioTintas(id_tinta, cantidad);
+  }
+
+  guardarAsignacionPolietileno(asignacion, idMatPrima, nombreMatPrima, cantidad, presentacion, proceso){
+    const datosDetallesAsignacion : any = {
+      AsigMp_Id : asignacion,
+      Tinta_Id : idMatPrima,
+      DtAsigTinta_Cantidad : cantidad,
+      UndMed_Id : presentacion,
+      Proceso_Id : proceso,
+    }
+    this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(null, () => {
+      this.load = true;
+      this.mensajeService.mensajeError(`¡Error!`, `¡Error al insertar la tinta asignada ${nombreMatPrima}!`);
+    });
+    this.moverInventarioMpPedida(idMatPrima, cantidad);
   }
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien

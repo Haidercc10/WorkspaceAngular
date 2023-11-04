@@ -190,8 +190,7 @@ export class CalendarioComponent implements OnInit {
 
   // Funcion que va a crear un evento
   crearEvento(){
-    let visibilidad : string = '';
-    let todos : string = '';
+    let visibilidad : string = '', todos : string = '';
     this.rolesService.srvObtenerLista().subscribe(data => data.forEach(datos => todos += `|${datos.rolUsu_Id}`));
     setTimeout(() => {
       for (const item of this.visibilidadSeleccionada) {
