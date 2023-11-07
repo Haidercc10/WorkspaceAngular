@@ -465,14 +465,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = 0;
     this.ArrayDocumento = [];
     let fechaMesAnterior : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let ot : number = this.formularioOT.value.idDocumento;
     let fechaincial : any = moment(this.formularioOT.value.fecha).format('YYYY-MM-DD') == 'Fecha inválida' ? fechaMesAnterior : moment(this.formularioOT.value.fecha).format('YYYY-MM-DD');
     let fechaFinal : any = moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD') == 'Fecha inválida' ? this.today : moment(this.formularioOT.value.fechaFinal).format('YYYY-MM-DD');
-    let fallas : any = this.formularioOT.value.fallasOT;
-    let estado : number = this.formularioOT.value.estado;
-    let vendedor : any = this.formularioOT.value.Id_Vendedor;
-    let cliente : any = this.formularioOT.value.cliente;
-    let producto : any = this.formularioOT.value.producto;
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -480,6 +474,21 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOtAnulada = 0;
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
+    let ruta : string = this.validarParametrosConsulta();
+
+    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => data.forEach(infoOt => this.llenarArray(infoOt)), error => {
+      this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
+      this.load = true;
+    });
+  }
+
+  validarParametrosConsulta(){
+    let ot : number = this.formularioOT.value.idDocumento;
+    let fallas : any = this.formularioOT.value.fallasOT;
+    let estado : number = this.formularioOT.value.estado;
+    let vendedor : any = this.formularioOT.value.Id_Vendedor;
+    let cliente : any = this.formularioOT.value.cliente;
+    let producto : any = this.formularioOT.value.producto;
     let ruta : string = '';
 
     if (ot != null) ruta += `ot=${ot}`;
@@ -489,11 +498,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
     if (fallas != null) ruta.length > 0 ? ruta += `&falla=${fallas}` : ruta += `falla=${fallas}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
-
-    this.estadosProcesos_OTService.GetInfo_OrdenesTrabajo(fechaincial, fechaFinal, ruta).subscribe(data => data.forEach(infoOt => this.llenarArray(infoOt)), error => {
-      this.msj.mensajeError(`¡Ha ocurrido un error!`, `${error.error}`);
-      this.load = true;
-    });
+    return ruta;
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area

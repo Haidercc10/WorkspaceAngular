@@ -99,13 +99,18 @@ export class DashBoard_FacturacionComponent implements OnInit {
         else this.totalFacuturadoMes = datos_facturacion;
       }); 
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => this.totalIvaVentaMes = datos_facturacion);
-      for (let i = 0; i < 12; i++) {
-        let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
-        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
-          if (this.anoSeleccionado == 2023 && mes == '09') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
-          else this.totalFacturadoanio += datos_facturacion;
-        });
-      }
+      this.totalFacturadoAnioActual();
+    }
+  }
+
+  totalFacturadoAnioActual(){
+    this.totalFacturadoanio = 0;
+    for (let i = 0; i < 12; i++) {
+      let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
+      this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
+        if (this.anoSeleccionado == 2023 && mes == '09') this.totalFacturadoanio += (datos_facturacion + 6249600 + 12091700);
+        else this.totalFacturadoanio += datos_facturacion;
+      });
     }
   }
 
@@ -135,13 +140,11 @@ export class DashBoard_FacturacionComponent implements OnInit {
           if (i == 11) this.llenarGraficaFacturacion(costoMeses);
           let info_Anio : any = { 
             anio: this.anoSeleccionado, 
-            costo: (i == 8 && this.anoSeleccionado == 2023) ? (parseFloat(info.Valor) + 6249600 + 12091700) : parseFloat(info.Valor),
+            costo: costoMeses.reduce((a,b) => a + b, 0),
           };
           let index2 : number = this.facturadoAnios.findIndex(item => item.anio == this.anoSeleccionado);
-          if (index2 != -1) {
-            if (i == 8 && this.anoSeleccionado == 2023) this.facturadoAnios[index2].costo += (parseFloat(info.Valor) + 6249600 + 12091700);
-            else this.facturadoAnios[index2].costo += parseFloat(info.Valor);
-          } else this.facturadoAnios.push(info_Anio);
+          if (index2 != -1) this.facturadoAnios[index2].costo = costoMeses.reduce((a,b) => a + b, 0);
+          else this.facturadoAnios.push(info_Anio);
         }
       });
     } else !autoRecarga ? this.mensajeAplicacion.mensajeAdvertencia(`¡El año seleccionado ya ha sido graficado!`, ``) : null;

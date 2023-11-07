@@ -785,217 +785,176 @@ export class Orden_TrabajoComponent implements OnInit {
       this.presentacionProducto = this.FormOrdenTrabajo.value.Presentacion;
       this.buscarInformacionProducto();
       this.ordenTrabajoService.GetInfoUltOT(this.producto, this.presentacionProducto).subscribe(datos_Ot => {
-        this.FormOrdenTrabajo.patchValue({
-          OT_Observacion: datos_Ot.observacion,
-          Margen: datos_Ot.margen,
-          Cantidad: datos_Ot.cantidad_Pedida,
-          Precio: this.presentacionProducto != 'Kg' ? datos_Ot.precioUnidad : datos_Ot.precioKilo,
-        });
-        this.FormOrdenTrabajoExtrusion.patchValue({
-          Material_Extrusion: datos_Ot.id_Material,
-          Formato_Extrusion: datos_Ot.id_Formato_Extrusion,
-          Pigmento_Extrusion: datos_Ot.id_Pigmento_Extrusion,
-          Ancho_Extrusion1: datos_Ot.ancho1_Extrusion,
-          Ancho_Extrusion2: datos_Ot.ancho2_Extrusion,
-          Ancho_Extrusion3: datos_Ot.ancho3_Extrusion,
-          Calibre_Extrusion: datos_Ot.calibre_Extrusion,
-          UnidadMedida_Extrusion: datos_Ot.und_Extrusion.trim(),
-          Tratado_Extrusion: datos_Ot.id_Tratado,
-          Peso_Extrusion: datos_Ot.peso_Extrusion,
-        });
-        this.FormOrdenTrabajoImpresion.patchValue({
-          Tipo_Impresion: datos_Ot.id_Tipo_Imptesion,
-          Rodillo_Impresion: datos_Ot.rodillo,
-          Pista_Impresion: datos_Ot.pista,
-          Tinta_Impresion1: datos_Ot.tinta1,
-          Tinta_Impresion2: datos_Ot.tinta2,
-          Tinta_Impresion3: datos_Ot.tinta3,
-          Tinta_Impresion4: datos_Ot.tinta4,
-          Tinta_Impresion5: datos_Ot.tinta5,
-          Tinta_Impresion6: datos_Ot.tinta6,
-          Tinta_Impresion7: datos_Ot.tinta7,
-          Tinta_Impresion8: datos_Ot.tinta8,
-        });
-        this.FormOrdenTrabajoLaminado.patchValue({
-          Capa_Laminado1: datos_Ot.id_Capa1,
-          Calibre_Laminado1: datos_Ot.calibre_Laminado_Capa1,
-          cantidad_Laminado1: datos_Ot.cantidad_Laminado_Capa1,
-          Capa_Laminado2: datos_Ot.id_Capa2,
-          Calibre_Laminado2: datos_Ot.calibre_Laminado_Capa2,
-          cantidad_Laminado2: datos_Ot.cantidad_Laminado_Capa2,
-          Capa_Laminado3: datos_Ot.id_Capa3,
-          Calibre_Laminado3: datos_Ot.calibre_Laminado_Capa3,
-          cantidad_Laminado3: datos_Ot.cantidad_Laminado_Capa3,
-        });
-        this.FormOrdenTrabajoCorte.patchValue({
-          Formato_Corte: datos_Ot.formato_Producto,
-          Ancho_Corte: datos_Ot.selladoCorte_Ancho,
-          Largo_Corte: datos_Ot.selladoCorte_Largo,
-          Fuelle_Corte: datos_Ot.selladoCorte_Fuelle,
-          Margen_Corte: datos_Ot.margen,
-          Etiqueta_Ancho_Corte: datos_Ot.selladoCorte_Etiqueta_Ancho,
-          Etiqueta_Largo_Corte: datos_Ot.selladoCorte_Etiqueta_Largo,
-          Etiqueta_Fuelle_Corte: datos_Ot.selladoCorte_Etiqueta_Fuelle,
-        });
-        this.FormOrdenTrabajoSellado.patchValue({
-          Formato_Sellado: datos_Ot.formato_Producto,
-          Ancho_Sellado: datos_Ot.selladoCorte_Ancho,
-          Largo_Sellado: datos_Ot.selladoCorte_Largo,
-          Fuelle_Sellado: datos_Ot.selladoCorte_Fuelle,
-          Etiqueta_Ancho_Sellado : datos_Ot.selladoCorte_Etiqueta_Ancho,
-          Etiqueta_Largo_Sellado : datos_Ot.selladoCorte_Etiqueta_Largo,
-          Etiqueta_Fuelle_Sellado : datos_Ot.selladoCorte_Etiqueta_Fuelle,
-          Margen_Sellado: datos_Ot.margen,
-          PesoMillar: datos_Ot.prod_Peso_Millar,
-          TipoSellado: datos_Ot.tpSellados_Nombre,
-          CantidadPaquete: datos_Ot.selladoCorte_CantBolsasPaquete,
-          CantidadBulto: datos_Ot.selladoCorte_CantBolsasBulto,
-          PrecioDia: datos_Ot.selladoCorte_PrecioSelladoDia,
-          PrecioNoche: datos_Ot.selladoCorte_PrecioSelladoNoche,
-          PrecioWiketiadoDia_Mq50: datos_Ot.selladoCorte_PrecioDia_Wik_Mq50,
-          PrecioWiketiadoNoche_Mq50: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq50,
-          PrecioWiketiadoDia_Mq9: datos_Ot.selladoCorte_PrecioDia_Wik_Mq9,
-          PrecioWiketiadoNoche_Mq9: datos_Ot.selladoCorte_PrecioNoche_Wik_Mq9,
-        });
+        this.llenarFormularioOrdenTrabajo(datos_Ot);
+        this.llenarFormularioExtrusion(datos_Ot);
+        this.llenarFormularioLaminado(datos_Ot);
+        this.llenarFormularioCorte(datos_Ot);
+        this.llenarFormularioSellado(datos_Ot);
+        this.llenarFormularioImpresion(datos_Ot);
+        this.validarProcesosOrdenTrabajo(datos_Ot);
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
-        setTimeout(() => {
-          this.cyrel = datos_Ot.cyrel == false ? false : true;
-          this.extrusion = datos_Ot.extrusion == false ? false : true;
-          this.impresion = datos_Ot.impresion == false ? false : true;
-          this.rotograbado = datos_Ot.rotograbado == false ? false : true;
-          this.laminado = datos_Ot.laminado == false ? false : true;
-          this.corte = datos_Ot.corte == false ? false : true;
-          this.sellado = datos_Ot.sellado == false ? false : true;
-          this.calcularDatosOt();
-          this.cargarCombinacionMezclas();
-        }, 500);
-      }, () => {
-        let presentacion: string = this.presentacionProducto, impresion: any, laminadoCapa1: any, laminadoCapa2: any, laminadoCapa3: any;
-        if (presentacion == 'Kg') presentacion = 'Kilo';
-        else if (presentacion == 'Und') presentacion = 'Unidad';
-        this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(this.producto, presentacion).subscribe(datos_Ot => {
-          for (const itemOt of datos_Ot) {
-            this.FormOrdenTrabajo.patchValue({
-              OT_Observacion: itemOt.observacion,
-              Margen: itemOt.ptMargen,
-              Cantidad: presentacion == 'Kilo' ? itemOt.datoscantKg : itemOt.datoscantBolsa || 0,
-              Precio: presentacion == 'Kilo' ? itemOt.datosValorKg : itemOt.datosvalorBolsa || 0,
-            });
-
-            itemOt.extrusion != null ? itemOt.extrusion.trim() == '1' ? this.extrusion = true : this.extrusion = false : 0;
-            itemOt.impresion != null ? itemOt.impresion.trim() == '1' ? this.impresion = true : this.impresion = false : 0;
-            itemOt.lamiando ? itemOt.lamiando.trim() == '1' ? this.rotograbado = true : this.rotograbado = false : 0;
-            itemOt.laminado2 ? itemOt.laminado2.trim() == '1' ? this.laminado = true : this.laminado = false : 0;
-            itemOt.pterminado ? itemOt.pterminado.trim() == '1' ? this.sellado = true : this.sellado = false : 0;
-            itemOt.corte ? itemOt.corte.trim() == '1' ? this.corte = true : this.corte = false : 0;
-            itemOt.cyrel ? itemOt.cyrel.trim() == '1' ? this.cyrel = true : this.cyrel = false : 0;
-
-            this.FormOrdenTrabajoExtrusion.patchValue({
-              Material_Extrusion: parseInt(itemOt.extMaterial.trim()),
-              Formato_Extrusion: parseInt(itemOt.extFormato.trim()) == 5 ? 4 : parseInt(itemOt.extFormato.trim()),
-              Pigmento_Extrusion: parseInt(itemOt.extPigmento.trim()),
-              Ancho_Extrusion1: itemOt.extAcho1,
-              Ancho_Extrusion2: itemOt.extAcho2,
-              Ancho_Extrusion3: itemOt.extAcho3,
-              Calibre_Extrusion: itemOt.extCalibre,
-              UnidadMedida_Extrusion: itemOt.extUnidadesNom.trim(),
-              Tratado_Extrusion: parseInt(itemOt.extTratado.trim()),
-              Peso_Extrusion: itemOt.extPeso,
-            });
-
-            if (itemOt.impresion == '1') impresion = 2;
-            else if (itemOt.lamiando) impresion = 5;
-
-            let tinta1: any = itemOt.impTinta1Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta1Nom.trim();
-            let tinta2: any = itemOt.impTinta2Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta2Nom.trim();
-            let tinta3: any = itemOt.impTinta3Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta3Nom.trim();
-            let tinta4: any = itemOt.impTinta4Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta4Nom.trim();
-            let tinta5: any = itemOt.impTinta5Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta5Nom.trim();
-            let tinta6: any = itemOt.impTinta6Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta6Nom.trim();
-            let tinta7: any = itemOt.impTinta7Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta7Nom.trim();
-            let tinta8: any = itemOt.impTinta8Nom.trim() == '' ? 'NO APLICA' : itemOt.impTinta8Nom.trim();
-
-            this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1, tinta2, tinta3, tinta4, tinta5, tinta6, tinta7, tinta8).subscribe(datos_impresion => {
-              for (let j = 0; j < datos_impresion.length; j++) {
-                this.FormOrdenTrabajoImpresion.setValue({
-                  Tipo_Impresion: impresion,
-                  Rodillo_Impresion: itemOt.impRodillo,
-                  Pista_Impresion: itemOt.impPista,
-                  Tinta_Impresion1: datos_impresion[j].tinta_Nombre1,
-                  Tinta_Impresion2: datos_impresion[j].tinta_Nombre2,
-                  Tinta_Impresion3: datos_impresion[j].tinta_Nombre3,
-                  Tinta_Impresion4: datos_impresion[j].tinta_Nombre4,
-                  Tinta_Impresion5: datos_impresion[j].tinta_Nombre5,
-                  Tinta_Impresion6: datos_impresion[j].tinta_Nombre6,
-                  Tinta_Impresion7: datos_impresion[j].tinta_Nombre7,
-                  Tinta_Impresion8: datos_impresion[j].tinta_Nombre8,
-                });
-              }
-            });
-
-            itemOt.lamCapa1 != null ? laminadoCapa1 = itemOt.lamCapa1.trim() : 0;
-            itemOt.lamCapa2 != null ? laminadoCapa2 = itemOt.lamCapa2.trim() : 0;
-            itemOt.lamCapa3 != null ? laminadoCapa3 = itemOt.lamCapa3.trim() : 0;
-
-            if (laminadoCapa1 == '1') laminadoCapa1 = 1;
-            if (laminadoCapa2 == '1') laminadoCapa2 = 1;
-            if (laminadoCapa3 == '1') laminadoCapa3 = 1;
-
-            this.FormOrdenTrabajoLaminado.patchValue({
-              Capa_Laminado1: parseInt(laminadoCapa1),
-              Calibre_Laminado1: itemOt.lamCalibre1,
-              cantidad_Laminado1: itemOt.cant1,
-              Capa_Laminado2: parseInt(laminadoCapa2),
-              Calibre_Laminado2: itemOt.lamCalibre2,
-              cantidad_Laminado2: itemOt.cant2,
-              Capa_Laminado3: parseInt(laminadoCapa3),
-              Calibre_Laminado3: itemOt.lamCalibre3,
-              cantidad_Laminado3: itemOt.cant3,
-            });
-
-            this.FormOrdenTrabajoCorte.patchValue({
-              Formato_Corte: this.ArrayProducto[0].Tipo,
-              Ancho_Corte: this.ArrayProducto[0].Ancho,
-              Largo_Corte: this.ArrayProducto[0].Largo,
-              Fuelle_Corte: this.ArrayProducto[0].Fuelle,
-              Margen_Corte: itemOt.ptMargen,
-              Etiqueta_Ancho_Corte: itemOt.etiqueta != null ? itemOt.etiqueta.trim() : '0',
-              Etiqueta_Largo_Corte: itemOt.etiquetaLargo != null ? itemOt.etiquetaLargo.trim() : '0',
-              Etiqueta_Fuelle_Corte: itemOt.etiquetaFuelle != null ? itemOt.etiquetaFuelle.trim() : '0',
-            });
-            this.FormOrdenTrabajoSellado.patchValue({
-              Formato_Sellado: this.ArrayProducto[0].Tipo,
-              Ancho_Sellado: this.ArrayProducto[0].Ancho,
-              Largo_Sellado: this.ArrayProducto[0].Largo,
-              Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
-              Etiqueta_Ancho_Sellado : itemOt.etiqueta != null ? itemOt.etiqueta.trim() : '0',
-              Etiqueta_Largo_Sellado : itemOt.etiquetaLargo != null ? itemOt.etiquetaLargo.trim() : '0',
-              Etiqueta_Fuelle_Sellado : itemOt.etiquetaFuelle != null ? itemOt.etiquetaFuelle.trim() : '0',
-              Margen_Sellado: itemOt.ptMargen,
-              PesoMillar: this.ArrayProducto[0].PesoMillar,
-              TipoSellado: this.ArrayProducto[0].TipoSellado,
-              CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
-              PesoPaquete: [null, ''].includes(itemOt.pesopaquete) ? 0.0 : parseFloat(itemOt.pesopaquete) || 0.0,
-              CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
-              PesoBulto: [null, ''].includes(itemOt.pesoBulto) ? 0.0 : parseFloat(itemOt.pesoBulto) || 0.0,
-              PrecioDia: parseFloat(itemOt.dia) || 0.0,
-              PrecioNoche: parseFloat(itemOt.noche) || 0.0,
-              PrecioWiketiadoDia_Mq50: itemOt.wik_Dia_MQ_50 || 0.0,
-              PrecioWiketiadoNoche_Mq50: itemOt.wik_Noche_MQ_50 || 0.00,
-              PrecioWiketiadoDia_Mq9: itemOt.wik_Dia_MQ_9 || 0.0,
-              PrecioWiketiadoNoche_Mq9: itemOt.wik_Noche_MQ_9 || 0.0,
-            });
-            setTimeout(() => this.calcularDatosOt(), 1000);
-            this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
-            this.cargarCombinacionMezclas();
-          }
-        }, () => {
-          this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una Orden de Trabajo anterior para el producto ${this.producto} y presentación ${presentacion}`);
-          this.cargando = false;
-        });
-        this.cargando = false;
-      });
+        this.cargarCombinacionMezclas();
+        setTimeout(() => this.calcularDatosOt(), 500);        
+      }, () => this.consultarInformaciónBagPro());
     }
+  }
+
+  consultarInformaciónBagPro(){
+    let presentacion: string = this.presentacionProducto;
+    if (presentacion == 'Kg') presentacion = 'Kilo';
+    else if (presentacion == 'Und') presentacion = 'Unidad';
+    this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(this.producto, presentacion).subscribe(datos_Ot => {
+      for (const itemOt of datos_Ot) {
+        this.llenarFormularioOrdenTrabajo(itemOt);
+        this.validarProcesosOrdenTrabajo(itemOt);
+        this.llenarFormularioExtrusion(itemOt);
+        this.llenarFormularioImpresionBagPro(itemOt);
+        this.llenarFormularioLaminado(itemOt);
+        this.llenarFormularioCorte(itemOt);
+        this.llenarFormularioSellado(itemOt);
+        setTimeout(() => this.calcularDatosOt(), 1000);
+        this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: itemOt.mezcla_Nombre});
+        this.cargarCombinacionMezclas();
+      }
+    }, () => {
+      this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una Orden de Trabajo anterior para el producto ${this.producto} y presentación ${presentacion}`);
+      this.cargando = false;
+    });
+    this.cargando = false;
+  }
+
+  llenarFormularioOrdenTrabajo(data : any){
+    this.FormOrdenTrabajo.patchValue({
+      OT_Id: this.FormOrdenTrabajo.value.OT_Id,
+      Id_Vendedor: this.FormOrdenTrabajo.value.Id_Vendedor,
+      Nombre_Vendedor: this.FormOrdenTrabajo.value.Nombre_Vendedor,
+      OT_FechaCreacion: this.FormOrdenTrabajo.value.OT_FechaCreacion,
+      OT_FechaEntrega: this.FormOrdenTrabajo.value.OT_FechaEntrega,
+      Id_Cliente: this.FormOrdenTrabajo.value.Id_Cliente,
+      Nombre_Cliente: this.FormOrdenTrabajo.value.Nombre_Cliente,
+      Id_Producto: this.FormOrdenTrabajo.value.Id_Producto,
+      Nombre_Producto: this.FormOrdenTrabajo.value.Nombre_Producto,
+      Cantidad: data.cantidad_Pedida || this.FormOrdenTrabajo.value.Cantidad,
+      Presentacion: this.FormOrdenTrabajo.value.Presentacion,
+      Precio: (['Kilo', 'Kg'].includes(this.presentacionProducto) ? data.valorKg : data.valorUnidad) || this.FormOrdenTrabajo.value.Precio,
+      Margen: data.margen || this.FormOrdenTrabajo.value.Margen,
+      OT_Estado: this.FormOrdenTrabajo.value.OT_Estado,
+      OT_Observacion: data.observacion || this.FormOrdenTrabajo.value.OT_Observacion,
+    });
+  }
+
+  validarProcesosOrdenTrabajo(data : any){
+    this.cyrel = data.cyrel;
+    this.extrusion = data.extrusion;
+    this.impresion = data.impresion;
+    this.rotograbado = data.rotograbado;
+    this.laminado = data.laminado;
+    this.corte = data.corte;
+    this.sellado = data.sellado;
+  }
+
+  llenarFormularioExtrusion(data : any){
+    this.FormOrdenTrabajoExtrusion.patchValue({
+      Material_Extrusion: data.id_Material || this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
+      Formato_Extrusion: data.id_Formato_Extrusion || this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
+      Pigmento_Extrusion: data.id_Pigmento_Extrusion || this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
+      Ancho_Extrusion1: data.ancho1_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
+      Ancho_Extrusion2: data.ancho2_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
+      Ancho_Extrusion3: data.ancho3_Extrusion || this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
+      Calibre_Extrusion: data.calibre_Extrusion || this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
+      UnidadMedida_Extrusion: data.und_Extrusion.trim() || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+      Tratado_Extrusion: data.id_Tratado || this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
+      Peso_Extrusion: data.peso_Extrusion,
+    });
+  }
+
+  llenarFormularioImpresion(data : any){
+    this.FormOrdenTrabajoImpresion.patchValue({
+      Tipo_Impresion: data.id_Tipo_Imptesion || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
+      Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
+      Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
+      Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
+      Tinta_Impresion2: data.tinta2 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion2,
+      Tinta_Impresion3: data.tinta3 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion3,
+      Tinta_Impresion4: data.tinta4 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion4,
+      Tinta_Impresion5: data.tinta5 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion5,
+      Tinta_Impresion6: data.tinta6 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion6,
+      Tinta_Impresion7: data.tinta7 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion7,
+      Tinta_Impresion8: data.tinta8 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion8,
+    });
+  }
+
+  llenarFormularioImpresionBagPro(data : any){
+    let impresion : any = data.impresion ? 2 : data.lamiando ? 5 : null;
+    this.servicioTintas.srvObtenerListaConsultaImpresion(data.tinta1, data.tinta2, data.tinta3, data.tinta4, data.tinta5, data.tinta6, data.tinta7, data.tinta8).subscribe(datos_impresion => {
+      for (let j = 0; j < datos_impresion.length; j++) {
+        this.FormOrdenTrabajoImpresion.setValue({
+          Tipo_Impresion: impresion,
+          Rodillo_Impresion: data.rodillo,
+          Pista_Impresion: data.pista,
+          Tinta_Impresion1: datos_impresion[j].tinta_Nombre1,
+          Tinta_Impresion2: datos_impresion[j].tinta_Nombre2,
+          Tinta_Impresion3: datos_impresion[j].tinta_Nombre3,
+          Tinta_Impresion4: datos_impresion[j].tinta_Nombre4,
+          Tinta_Impresion5: datos_impresion[j].tinta_Nombre5,
+          Tinta_Impresion6: datos_impresion[j].tinta_Nombre6,
+          Tinta_Impresion7: datos_impresion[j].tinta_Nombre7,
+          Tinta_Impresion8: datos_impresion[j].tinta_Nombre8,
+        });
+      }
+    });
+  }
+
+  llenarFormularioLaminado(data : any){
+    this.FormOrdenTrabajoLaminado.patchValue({
+      Capa_Laminado1: data.id_Capa1 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
+      Calibre_Laminado1: data.calibre_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
+      cantidad_Laminado1: data.cantidad_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado1,
+      Capa_Laminado2: data.id_Capa2 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
+      Calibre_Laminado2: data.calibre_Laminado_Capa2 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado2,
+      cantidad_Laminado2: data.cantidad_Laminado_Capa2 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
+      Capa_Laminado3: data.id_Capa3 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
+      Calibre_Laminado3: data.calibre_Laminado_Capa3 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado3,
+      cantidad_Laminado3: data.cantidad_Laminado_Capa3 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
+    });
+  }
+
+  llenarFormularioCorte(data : any){
+    this.FormOrdenTrabajoCorte.patchValue({
+      Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
+      Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+      Largo_Corte: this.ArrayProducto[0].Largo || this.FormOrdenTrabajoCorte.value.Largo_Corte,
+      Fuelle_Corte: this.ArrayProducto[0].Fuelle || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+      Margen_Corte: data.margen || this.FormOrdenTrabajoCorte.value.Margen_Corte,
+      Etiqueta_Ancho_Corte: data.selladoCorte_Etiqueta_Ancho || this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte,
+      Etiqueta_Largo_Corte: data.selladoCorte_Etiqueta_Largo || this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte,
+      Etiqueta_Fuelle_Corte: data.selladoCorte_Etiqueta_Fuelle || this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte,
+    });
+  }
+
+  llenarFormularioSellado(data : any){
+    this.FormOrdenTrabajoSellado.patchValue({
+      Formato_Sellado: this.ArrayProducto[0].Tipo,
+      Ancho_Sellado: this.ArrayProducto[0].Ancho,
+      Largo_Sellado: this.ArrayProducto[0].Largo,
+      Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
+      Etiqueta_Ancho_Sellado : data.selladoCorte_Etiqueta_Ancho || '0',
+      Etiqueta_Largo_Sellado : data.selladoCorte_Etiqueta_Largo || '0',
+      Etiqueta_Fuelle_Sellado : data.selladoCorte_Etiqueta_Fuelle || '0',
+      Margen_Sellado: data.margen,
+      PesoMillar: this.ArrayProducto[0].PesoMillar,
+      TipoSellado: this.ArrayProducto[0].TipoSellado,
+      CantidadPaquete: this.ArrayProducto[0].CantPaquete || 0.0,
+      PesoPaquete: [null, ''].includes(data.selladoCorte_PesoPaquete) ? 0.0 : parseFloat(data.selladoCorte_PesoPaquete) || 0.0,
+      CantidadBulto: this.ArrayProducto[0].CantBulto || 0.0,
+      PesoBulto: [null, ''].includes(data.selladoCorte_PesoBulto) ? 0.0 : parseFloat(data.selladoCorte_PesoBulto) || 0.0,
+      PrecioDia: parseFloat(data.selladoCorte_PrecioSelladoDia) || 0.0,
+      PrecioNoche: parseFloat(data.selladoCorte_PrecioSelladoNoche) || 0.0,
+      PrecioWiketiadoDia_Mq50: data.selladoCorte_PrecioDia_Wik_Mq50 || 0.0,
+      PrecioWiketiadoNoche_Mq50: data.selladoCorte_PrecioNoche_Wik_Mq50 || 0.00,
+      PrecioWiketiadoDia_Mq9: data.selladoCorte_PrecioDia_Wik_Mq9 || 0.0,
+      PrecioWiketiadoNoche_Mq9: data.selladoCorte_PrecioNoche_Wik_Mq9 || 0.0,
+    });
   }
 
   // Funcion que va a calcular los costos de la orden de trabajo
@@ -1069,36 +1028,44 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   calcularCostosOT(margen_Adicional : number){
-    let i : number = 0;
-    if (this.ArrayProducto[0].UndCant == 'Kg') {
-      this.cantidadProducto = this.ArrayProducto[0].Cant;
-      this.margenKg = margen_Adicional * (this.ArrayProducto[0].Cant / 100);
-      this.netoKg = this.ArrayProducto[0].Cant + ((this.ArrayProducto[0].Cant * margen_Adicional) / 100);
-      this.valorKg = this.ArrayProducto[0].PrecioUnd;
-      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-      this.valorOt = this.ArrayProducto[0].Cant * this.valorProducto;
-    } else if (this.ArrayProducto[0].UndCant == 'Paquete') {
-      this.cantidadProducto = this.ArrayProducto[0].Cant;
-      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
-      this.margenKg = margen_Adicional * (((this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
-      this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (this.ArrayProducto[0].Cant * this.ArrayProducto[0].CantPaquete)));
-      this.valorOt = this.ArrayProducto[0].Cant * this.ArrayProducto[0].PrecioUnd;
-      if (this.ArrayProducto[0].PesoMillar > 0 && this.ArrayProducto[0].CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (this.ArrayProducto[0].CantPaquete / 1000);
-      if (this.ArrayProducto[0].CantPaquete > 0) this.pesoBulto = this.pesoPaquete * this.ArrayProducto[0].CantBulto;
-      if (this.ArrayProducto[0].CantPaquete == 0) this.valorKg = 0;
-      else this.ArrayProducto[0].CantPaquete > 0 ? this.valorKg = this.ArrayProducto[0].PrecioUnd / this.pesoPaquete : this.valorKg = 0;
-    } else if (this.ArrayProducto[0].UndCant == 'Und') {
-      this.cantidadProducto = this.ArrayProducto[0].Cant;
-      this.valorProducto = this.ArrayProducto[0].PrecioUnd;
+    let data = this.ArrayProducto[0];
+    if (data.UndCant == 'Kg') this.calcularCostosOT_Kg(data, margen_Adicional);
+    else if (data.UndCant == 'Paquete') this.calcularCostosOT_Paquete(data, margen_Adicional);
+    else if (data.UndCant == 'Und') this.calcularCostosOT_Und(data, margen_Adicional);
+  }
+
+  calcularCostosOT_Kg(data : any, margen_Adicional : number){
+    this.cantidadProducto = data.Cant;
+    this.margenKg = margen_Adicional * (data.Cant / 100);
+    this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
+    this.valorKg = data.PrecioUnd;
+    this.valorProducto = data.PrecioUnd;
+    this.valorOt = data.Cant * this.valorProducto;
+  }
+
+  calcularCostosOT_Paquete(data : any, margen_Adicional : number){
+    this.cantidadProducto = data.Cant;
+    this.valorProducto = data.PrecioUnd;
+    this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[0].PesoMillar) / 1000) / 100);
+    this.netoKg = ((1 + (margen_Adicional / 100)) * ((data.PesoMillar / 1000) * (data.Cant * data.CantPaquete)));
+    this.valorOt = data.Cant * data.PrecioUnd;
+    if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = data.PesoMillar * (data.CantPaquete / 1000);
+    if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
+    if (data.CantPaquete == 0) this.valorKg = 0;
+    else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
+  }
+
+  calcularCostosOT_Und(data : any, margen_Adicional : number){
+    this.cantidadProducto = data.Cant;
+      this.valorProducto = data.PrecioUnd;
       this.valorOt = this.cantidadProducto * this.valorProducto;
-      this.margenKg = (margen_Adicional * ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * this.ArrayProducto[0].Cant));
-      if (this.ArrayProducto[i].Peso_Producto > 0) {
+      this.margenKg = (margen_Adicional * ((data.Cant * data.PesoMillar) / 1000)) / 100;
+      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((data.PesoMillar / 1000) * data.Cant));
+      if (data.Peso_Producto > 0) {
         if (this.valorOt == 0) this.valorOt = 1;
-        if ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
-        else this.valorKg = this.valorOt / ((this.ArrayProducto[0].Cant * this.ArrayProducto[i].PesoMillar) / 1000);
+        if ((data.Cant * data.PesoMillar) / 1000 == 0) this.valorKg = 0;
+        else this.valorKg = this.valorOt / ((data.Cant * data.PesoMillar) / 1000);
       } else this.valorOt = 0;
-    }
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
@@ -1931,111 +1898,40 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
-    this.FormOrdenTrabajo.patchValue({ OT_Id: numeroOT });
-
     this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-
-        this.cyrel = datos_orden[i].cyrel;
-        this.extrusion = datos_orden[i].extrusion;
-        this.impresion = datos_orden[i].impresion;
-        this.rotograbado = datos_orden[i].rotograbado;
-        this.laminado = datos_orden[i].laminado;
-        this.corte = datos_orden[i].corte;
-        this.sellado = datos_orden[i].sellado;
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
-
-        this.FormOrdenTrabajo.patchValue({
-          OT_Id: datos_orden[i].numero_Orden,
-          Id_Vendedor: datos_orden[i].id_Vendedor,
-          Nombre_Vendedor: datos_orden[i].vendedor,
-          OT_FechaCreacion: datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
-          OT_FechaEntrega: datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
-          Id_Cliente: datos_orden[i].id_Cliente,
-          Nombre_Cliente: datos_orden[i].cliente,
-          Id_Producto: datos_orden[i].id_Producto,
-          Nombre_Producto: datos_orden[i].producto,
-          Cantidad: datos_orden[i].cantidad_Pedida,
-          Presentacion: datos_orden[i].id_Presentacion,
-          OT_Estado: datos_orden[i].estado_Orden,
-          OT_Observacion: datos_orden[i].observacion,
-          Margen: datos_orden[i].margen,
-          Precio: this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
-        });
         this.buscarInformacionProducto();
-
-        this.FormOrdenTrabajoExtrusion.patchValue({
-          Material_Extrusion: datos_orden[i].id_Material,
-          Formato_Extrusion: datos_orden[i].id_Formato_Extrusion,
-          Pigmento_Extrusion: datos_orden[i].id_Pigmento_Extrusion,
-          Ancho_Extrusion1: datos_orden[i].ancho1_Extrusion,
-          Ancho_Extrusion2: datos_orden[i].ancho2_Extrusion,
-          Ancho_Extrusion3: datos_orden[i].ancho3_Extrusion,
-          Calibre_Extrusion: datos_orden[i].calibre_Extrusion,
-          UnidadMedida_Extrusion: datos_orden[i].und_Extrusion.trim(),
-          Tratado_Extrusion: datos_orden[i].id_Tratado,
-        });
-        this.FormOrdenTrabajoImpresion.patchValue({
-          Tipo_Impresion: datos_orden[i].id_Tipo_Imptesion,
-          Rodillo_Impresion: datos_orden[i].rodillo,
-          Pista_Impresion: datos_orden[i].pista,
-          Tinta_Impresion1: datos_orden[i].tinta1,
-          Tinta_Impresion2: datos_orden[i].tinta2,
-          Tinta_Impresion3: datos_orden[i].tinta3,
-          Tinta_Impresion4: datos_orden[i].tinta4,
-          Tinta_Impresion5: datos_orden[i].tinta5,
-          Tinta_Impresion6: datos_orden[i].tinta6,
-          Tinta_Impresion7: datos_orden[i].tinta7,
-          Tinta_Impresion8: datos_orden[i].tinta8,
-        });
-        this.FormOrdenTrabajoLaminado.patchValue({
-          Capa_Laminado1: datos_orden[i].id_Capa1,
-          Calibre_Laminado1: datos_orden[i].calibre_Laminado_Capa1,
-          cantidad_Laminado1: datos_orden[i].cantidad_Laminado_Capa1,
-          Capa_Laminado2: datos_orden[i].id_Capa2,
-          Calibre_Laminado2: datos_orden[i].calibre_Laminado_Capa2,
-          cantidad_Laminado2: datos_orden[i].cantidad_Laminado_Capa2,
-          Capa_Laminado3: datos_orden[i].id_Capa3,
-          Calibre_Laminado3: datos_orden[i].calibre_Laminado_Capa3,
-          cantidad_Laminado3: datos_orden[i].cantidad_Laminado_Capa3,
-        });
-        this.FormOrdenTrabajoCorte.patchValue({
-          Formato_Corte: datos_orden[i].formato_Producto,
-          Ancho_Corte: datos_orden[i].selladoCorte_Ancho,
-          Largo_Corte: datos_orden[i].selladoCorte_Largo,
-          Fuelle_Corte: datos_orden[i].selladoCorte_Fuelle,
-          Margen_Corte: datos_orden[i].margen,
-          Etiqueta_Ancho_Corte: datos_orden[i].selladoCorte_Etiqueta_Ancho,
-          Etiqueta_Largo_Corte: datos_orden[i].selladoCorte_Etiqueta_Largo,
-          Etiqueta_Fuelle_Corte: datos_orden[i].selladoCorte_Etiqueta_Fuelle,
-        });
-        this.FormOrdenTrabajoSellado.patchValue({
-          Formato_Sellado: datos_orden[i].formato_Producto,
-          Ancho_Sellado: datos_orden[i].selladoCorte_Ancho,
-          Largo_Sellado: datos_orden[i].selladoCorte_Largo,
-          Fuelle_Sellado: datos_orden[i].selladoCorte_Fuelle,
-          Etiqueta_Ancho_Sellado : datos_orden[i].selladoCorte_Etiqueta_Ancho,
-          Etiqueta_Largo_Sellado : datos_orden[i].selladoCorte_Etiqueta_Largo,
-          Etiqueta_Fuelle_Sellado : datos_orden[i].selladoCorte_Etiqueta_Fuelle,
-          Margen_Sellado: datos_orden[i].margen,
-          PesoMillar: datos_orden[i].selladoCorte_PesoMillar,
-          TipoSellado: datos_orden[i].tpSellados_Nombre,
-          CantidadPaquete: datos_orden[i].selladoCorte_CantBolsasPaquete,
-          CantidadBulto: datos_orden[i].selladoCorte_CantBolsasBulto,
-          PesoPaquete: datos_orden[i].selladoCorte_PesoBulto,
-          PesoBulto: datos_orden[i].selladoCorte_PesoPaquete,
-          PrecioDia: datos_orden[i].selladoCorte_PrecioSelladoDia,
-          PrecioNoche: datos_orden[i].selladoCorte_PrecioSelladoNoche,
-          PrecioWiketiadoDia_Mq50: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq50,
-          PrecioWiketiadoNoche_Mq50: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq50,
-          PrecioWiketiadoDia_Mq9: datos_orden[i].selladoCorte_PrecioDia_Wik_Mq9,
-          PrecioWiketiadoNoche_Mq9: datos_orden[i].selladoCorte_PrecioNoche_Wik_Mq9,
-        });
-        this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre, });
-        this.cargarCombinacionMezclas();
-        setTimeout(() => this.calcularDatosOt(), 1000);
-        this.cargando = false;
+        setTimeout(() => {
+          this.FormOrdenTrabajo.patchValue({
+            OT_Id: datos_orden[i].numero_Orden,
+            Id_Vendedor: datos_orden[i].id_Vendedor,
+            Nombre_Vendedor: datos_orden[i].vendedor,
+            OT_FechaCreacion: datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
+            OT_FechaEntrega: datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
+            Id_Cliente: datos_orden[i].id_Cliente,
+            Nombre_Cliente: datos_orden[i].cliente,
+            Id_Producto: datos_orden[i].id_Producto,
+            Nombre_Producto: datos_orden[i].producto,
+            Cantidad: datos_orden[i].cantidad_Pedida,
+            Presentacion: datos_orden[i].id_Presentacion,
+            OT_Estado: datos_orden[i].estado_Orden,
+            OT_Observacion: datos_orden[i].observacion,
+            Margen: datos_orden[i].margen,
+            Precio: this.presentacionProducto == 'Kg' ? datos_orden[i].valorKg : datos_orden[i].valorUnidad,
+          });
+          this.validarProcesosOrdenTrabajo(datos_orden[i]);
+          this.llenarFormularioExtrusion(datos_orden[i]);
+          this.llenarFormularioImpresion(datos_orden[i]);
+          this.llenarFormularioLaminado(datos_orden[i]);
+          this.llenarFormularioCorte(datos_orden[i]);
+          this.llenarFormularioSellado(datos_orden[i]);
+          this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: datos_orden[i].mezcla_Nombre});
+          this.cargarCombinacionMezclas();
+          setTimeout(() => this.calcularDatosOt(), 1000);
+          this.cargando = false;
+        }, 1000);
       }
     }, error => {
       this.msj.mensajeError(error.error);

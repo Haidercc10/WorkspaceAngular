@@ -50,8 +50,8 @@ export class Dashboard_ComprasComponent implements OnInit {
                     private paginaPrincial : PaginaPrincipalComponent,
                       private facturasService : Facturas_Invergoal_InversuezService,
                         private srvMovItems : InventarioZeusService,) {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    }
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  }
 
   ngOnInit() {
     this.llenarArrayAnos();
@@ -109,6 +109,20 @@ export class Dashboard_ComprasComponent implements OnInit {
     this.anioGraficadoInvergoal = [];
     this.anioGraficadoInversuez = [];
 
+    this.graficaComprasPlasticaribe = this.formatoGraficas();
+    this.graficaComprasInvergoal = this.formatoGraficas();
+    this.graficaComprasInversuez = this.formatoGraficas();
+    this.estiloGraficas();
+  }
+
+  formatoGraficas(){
+    return {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+  }
+
+  estiloGraficas(){
     this.opcionesGrafica = {
       stacked: false,
       plugins: {
@@ -138,21 +152,6 @@ export class Dashboard_ComprasComponent implements OnInit {
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
-
-    this.graficaComprasPlasticaribe = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaComprasInvergoal = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaComprasInversuez = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
   }
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
@@ -166,7 +165,7 @@ export class Dashboard_ComprasComponent implements OnInit {
   }
 
   // Funcion que va a sumar el costo total a pagar
-  comprasEmpresa(data : any){
+  comprasEmpresa(data : number){
     data == 1 ? this.consultarCostos('0') : null;
     data == 2 ? this.consultarCostos('900362200') : null;
     data == 3 ? this.consultarCostos('900458314') : null;

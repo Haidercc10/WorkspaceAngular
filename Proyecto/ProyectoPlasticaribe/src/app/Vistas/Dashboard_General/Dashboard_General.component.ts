@@ -116,37 +116,31 @@ export class Dashboard_GeneralComponent implements OnInit {
     this.inventarioMatPrima_Anios = [];
     this.inventarioProductos_Anios = [];
 
-    this.opcionesGrafica = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
-        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 20 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' },
-          min : 0
-        },
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    };
+    this.opcionesGrafica = this.estiloGrafica();
+    this.opcionesGrafica_Pagar = this.estiloGrafica();
+    this.graficaFacturacion = this.formatoGraficas();
+    this.graficaCuentas_Cobrar = this.formatoGraficas();
+    this.graficaCuentas_Pagar_Plasticaribe = this.formatoGraficas();
+    this.graficaCuentas_Pagar_Invergoal = this.formatoGraficas();
+    this.graficaCuentas_Pagar_Inversuez = this.formatoGraficas();
+    this.graficaCuentas_Pagar_Totales = this.formatoGraficas();
+    this.graficaCompras_Plasticaribe = this.formatoGraficas();
+    this.graficaCompras_Invergoal = this.formatoGraficas();
+    this.graficaCompras_Inversuez = this.formatoGraficas();
+    this.graficaCompras_Totales = this.formatoGraficas();
+    this.graficaInventario_MatPrima = this.formatoGraficas();
+    this.graficaInventario_Productos = this.formatoGraficas();
+  }
 
-    this.opcionesGrafica_Pagar = {
+  formatoGraficas(){
+    return {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: []
+    };
+  }
+
+  estiloGrafica(){
+    return {
       stacked: false,
       plugins: {
         legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
@@ -174,66 +168,6 @@ export class Dashboard_GeneralComponent implements OnInit {
         },
       },
       datalabels: { anchor: 'end', align: 'end' }
-    };
-
-    this.graficaFacturacion = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCuentas_Cobrar = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCuentas_Pagar_Plasticaribe = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCuentas_Pagar_Invergoal = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCuentas_Pagar_Inversuez = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCuentas_Pagar_Totales = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCompras_Plasticaribe = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCompras_Invergoal = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCompras_Inversuez = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaCompras_Totales = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaInventario_MatPrima = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-
-    this.graficaInventario_Productos = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
     };
   }
 

@@ -117,39 +117,20 @@ export class Dashboard_AreasComponent implements OnInit {
     this.aniosGraficados = [];
     this.colocarTotalesProduccion();
     this.llenarOpcionesGrafica();
-    this.graficaExtrusionProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaImpresionProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaRotograbadoProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaDobladoProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaLaminadoProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaCorteProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaEmpaqueProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaSelladoProducido = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      datasets: []
-    };
-    this.graficaWiketiadoProducido = {
+    this.graficaExtrusionProducido = this.formatoGraficas();
+    this.graficaImpresionProducido = this.formatoGraficas();
+    this.graficaRotograbadoProducido = this.formatoGraficas();
+    this.graficaDobladoProducido = this.formatoGraficas();
+    this.graficaLaminadoProducido = this.formatoGraficas();
+    this.graficaCorteProducido = this.formatoGraficas();
+    this.graficaEmpaqueProducido = this.formatoGraficas();
+    this.graficaSelladoProducido = this.formatoGraficas();
+    this.graficaWiketiadoProducido = this.formatoGraficas();
+  }
+
+  // Funcion que colocará el formato que debe tener la tabla y la cantidad de puntos que tendrá
+  formatoGraficas(){
+    return {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: []
     };
@@ -235,23 +216,24 @@ export class Dashboard_AreasComponent implements OnInit {
     this.totalAnios_Empaque = [];
     this.totalAnios_Sellado = [];
     this.totalAnios_Wiketiado = [];
-    const formato = (data : any [], anio : number) : any => {
-      return {
-        Anio : anio,
-        Kg : this.calcularKgProducidos(data, anio)
-      }
-    }
     this.aniosGraficados.forEach(anio => {
-      this.totalAnios_Extrusion.push(formato(this.graficaExtrusionProducido, anio));
-      this.totalAnios_Impresion.push(formato(this.graficaImpresionProducido, anio));
-      this.totalAnios_Rotograbado.push(formato(this.graficaRotograbadoProducido, anio));
-      this.totalAnios_Doblado.push(formato(this.graficaDobladoProducido, anio));
-      this.totalAnios_Laminado.push(formato(this.graficaLaminadoProducido, anio));
-      this.totalAnios_Corte.push(formato(this.graficaCorteProducido, anio));
-      this.totalAnios_Empaque.push(formato(this.graficaEmpaqueProducido, anio));
-      this.totalAnios_Sellado.push(formato(this.graficaSelladoProducido, anio));
-      this.totalAnios_Wiketiado.push(formato(this.graficaWiketiadoProducido, anio));
+      this.totalAnios_Extrusion.push(this.formatoTotales(this.graficaExtrusionProducido, anio));
+      this.totalAnios_Impresion.push(this.formatoTotales(this.graficaImpresionProducido, anio));
+      this.totalAnios_Rotograbado.push(this.formatoTotales(this.graficaRotograbadoProducido, anio));
+      this.totalAnios_Doblado.push(this.formatoTotales(this.graficaDobladoProducido, anio));
+      this.totalAnios_Laminado.push(this.formatoTotales(this.graficaLaminadoProducido, anio));
+      this.totalAnios_Corte.push(this.formatoTotales(this.graficaCorteProducido, anio));
+      this.totalAnios_Empaque.push(this.formatoTotales(this.graficaEmpaqueProducido, anio));
+      this.totalAnios_Sellado.push(this.formatoTotales(this.graficaSelladoProducido, anio));
+      this.totalAnios_Wiketiado.push(this.formatoTotales(this.graficaWiketiadoProducido, anio));
     });
+  }
+
+  formatoTotales(data : any [], anio : number){
+    return {
+      Anio : anio,
+      Kg : this.calcularKgProducidos(data, anio)
+    }
   }
 
   // Funcion que va a calcular el total de kg producidos en total en un año

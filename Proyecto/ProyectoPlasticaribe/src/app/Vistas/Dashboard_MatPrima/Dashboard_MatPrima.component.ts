@@ -261,8 +261,8 @@ export class Dashboard_MatPrimaComponent implements OnInit {
         tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
-        x: { ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], }, grid: { color: '#ebedef' } },
-        y: { ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], }, grid: { color: '#ebedef' } }
+        x: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}},
+        y: {ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057']}, grid: {color: '#ebedef'}}
       }
     };
   }
@@ -274,23 +274,13 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       datasets: [
         {
           data: [{id : 'BOPP', nested: {value: cantBopp}}, {id : 'BOPA', nested: {value: cantBopa}}, {id : 'POLIESTER',  nested: {value: cantPoliester}}],
-          backgroundColor: [
-            "#42A5F5",
-            "#66BB6A",
-            "#FFA726"
-          ],
-        hoverBackgroundColor: [
-            "#64B5F6",
-            "#81C784",
-            "#FFB74D"
-          ]
+          backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
+          hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"]
         }
       ]
     };
     this.chartOptions = {
-      parsing: {
-        key: 'nested.value'
-      }
+      parsing: {key: 'nested.value'}
     }
   }
 }

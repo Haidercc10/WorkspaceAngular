@@ -97,13 +97,28 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus(){
-    // Pedidos CLientes
-    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => this.pedidosClientes = datos_pedidos);
-    // Pedidos Productos
-    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => this.pedidosProductos = datos_pedidos);
-    //Pedidos Vendedores
-    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => this.pedidosVendedores = datos_pedidos);
-    // Pedidos Estados
+    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => this.pedidosClientes = datos_pedidos); // Pedidos CLientes
+    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => this.pedidosProductos = datos_pedidos); // Pedidos Productos
+    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => this.pedidosVendedores = datos_pedidos); //Pedidos Vendedores
+    this.consultarPedidosEstados(); // Pedidos Estados
+    this.consultarPedidosOrdenesTrabajo(); // Pedidos con ordenes de trabajo asociadas
+    this.zeusService.getPedidosStock().subscribe(datos_pedidos => this.pedidosStock = datos_pedidos ); //Pedidos Stock
+
+    setTimeout(() => {
+      this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosProductos.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosVendedores.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosStock.sort((a,b) => a.consecutivo - b.consecutivo);
+    }, 500);
+    setTimeout(() => {
+      this.llenarGraficaPedidosClientes();
+      this.llenarGraficaPedidosProductos();
+      this.llenarGraficaPedidosVendedores();
+      this.llenarGraficaPedidos();
+    }, 1000);
+  }
+
+  consultarPedidosEstados(){
     this.zeusService.getPedidosEstados().subscribe(datos_pedidos => {
       this.pedidosTotales = [];
       this.cantidadTotalPedidos = 0;
@@ -116,19 +131,17 @@ export class DashBoard_PedidosComponent implements OnInit {
       for (const { estado, cantidad } of datos_pedidos) {
         estado === 'Pendiente' ? this.cantidadPedidosPendientes = cantidad : this.cantidadPedidosParciales = cantidad;
       }
-
       this.pedidosEstados = datos_pedidos;
-
       let info = { cantidad : 0, costo: 0 };
       for (const { cantidad, costo } of datos_pedidos) {
         this.cantidadTotalPedidos += cantidad;
         this.costoTotalPedidos += costo;
       }
-
       this.pedidosTotales.push(info);
     });
+  }
 
-    // Pedidos con ordenes de trabajo asociadas
+  consultarPedidosOrdenesTrabajo(){
     this.zeusService.GetPedidos().subscribe(async datos_pedidos => {
       this.pedidos_Ot = [];
       for (let i = 0; i < datos_pedidos.length; i++) {
@@ -157,21 +170,6 @@ export class DashBoard_PedidosComponent implements OnInit {
         }
       }
     });
-    //Pedidos Stock
-    this.zeusService.getPedidosStock().subscribe(datos_pedidos => this.pedidosStock = datos_pedidos );
-
-    setTimeout(() => {
-      this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
-      this.pedidosProductos.sort((a,b) => b.cantidad - a.cantidad);
-      this.pedidosVendedores.sort((a,b) => b.cantidad - a.cantidad);
-      this.pedidosStock.sort((a,b) => a.consecutivo - b.consecutivo);
-    }, 500);
-    setTimeout(() => {
-      this.llenarGraficaPedidosClientes();
-      this.llenarGraficaPedidosProductos();
-      this.llenarGraficaPedidosVendedores();
-      this.llenarGraficaPedidos();
-    }, 1000);
   }
 
   // Funcion que va a llenar la grafica de pie de la cantidad de pedidos por estados
@@ -189,8 +187,8 @@ export class DashBoard_PedidosComponent implements OnInit {
 
     this.multiAxisOptions = {
       plugins: {
-        legend: {  labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } } },
-        tooltip: { titleFont: { size: 25, }, bodyFont: { size: 20 }, },
+        legend: {labels: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}}},
+        tooltip: {titleFont: {size: 25}, bodyFont: {size: 20}},
       },
     };
   }
@@ -208,45 +206,48 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosClientes = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#6475FF', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
+        {label: 'Cantidad de Pedidos por Clientes', backgroundColor: ['#FFFF64'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y', data: cantOt},
+        {label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: ['#6475FF'], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo}
       ]
     };
+    this.estilosGrafica();
+  }
 
+  estilosGrafica(){
     this.opcionesGraficas = {
       stacked: false,
-        plugins: {
-          legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
-          tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+      plugins: {
+        legend: { labels: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 18 } } },
+        tooltip: { titleFont: { size: 23, }, usePointStyle: true, bodyFont: { size: 18 } }
+      },
+      tooltip: { usePointStyle: true, },
+      scales: {
+        x: {
+          ticks: {
+              color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 18 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
+          grid: {color: '#ebedef'}
         },
-        tooltip: { usePointStyle: true, },
-        scales: {
-          x: {
-            ticks: {
-               color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-              font: { size: 18 },
-              callback: function(value) {
-                if (this.getLabelForValue(value).length > 8) return `${this.getLabelForValue(value).substring(0, 5)}...`;
-                else return this.getLabelForValue(value);
-              }
-            },
-            grid: { color: '#ebedef' }
-          },
-          y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 }, },
-            grid: { color: '#ebedef' }
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 18 } },
-            grid: { drawOnChartArea: false, color: '#ebedef' }
-          },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
+          grid: {color: '#ebedef'}
         },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          ticks: {color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: {size: 18}},
+          grid: {drawOnChartArea: false, color: '#ebedef'}
+        },
+      },
     };
   }
 
@@ -263,8 +264,8 @@ export class DashBoard_PedidosComponent implements OnInit {
     this.graficaPedidosProductos = {
       labels: clientes,
       datasets: [
-        { label: 'Cantidad de Pedidos vigentes ', backgroundColor: [ '#FF646E' ], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#A453FD', ], yAxisID: 'y1', data: costo },
+        {label: 'Cantidad de Pedidos vigentes ', backgroundColor: ['#FF646E'], yAxisID: 'y', data: cantOt},
+        {label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: ['#A453FD',], yAxisID: 'y1', data: costo},
       ]
     };
   }
@@ -283,11 +284,11 @@ export class DashBoard_PedidosComponent implements OnInit {
       labels: vendedores,
       datasets : [{
         label: `Cantidad de pedidos`,
-        backgroundColor : [ '#42A5F5'],
+        backgroundColor : ['#42A5F5'],
         yAxisID: 'y',
         data : cantidad_Pedidos
       },
-      { label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: [ '#FFCA28', ], yAxisID: 'y1', data: costo }
+      {label: 'Valor Total de Ordenes de Pedidos ',  backgroundColor: ['#FFCA28'], yAxisID: 'y1', data: costo}
     ]
     };
   }
@@ -296,37 +297,42 @@ export class DashBoard_PedidosComponent implements OnInit {
   mostrarModal(tipo : string){
     this.mostrarTabla = true;
     this.infoTablaModal = [];
-    if (tipo === 'Clientes') {
-      this.nombreGrafica = 'Información detallada del ranking de pedidos por clientes';
-      for (let i = 0; i < this.pedidosClientes.length; i++) {
-        let info : any = {
-          Nombre : this.pedidosClientes[i].cliente,
-          Cantidad : this.pedidosClientes[i].cantidad,
-          Costo : this.pedidosClientes[i].costo
-        }
-        this.infoTablaModal.push(info);
-      }
-    } else if (tipo === 'Productos') {
-      this.nombreGrafica = 'Información detallada del ranking de pedidos por productos';
-      for (let i = 0; i < this.pedidosProductos.length; i++) {
-        let info : any = {
-          Nombre : this.pedidosProductos[i].producto,
-          Cantidad : this.pedidosProductos[i].cantidad,
-          Costo : this.pedidosProductos[i].costo
-        }
-        this.infoTablaModal.push(info);
-      }
-    } else if (tipo === 'Vendedores') {
-      this.nombreGrafica = 'Información detallada del ranking de pedidos por vendedores';
-      for (let i = 0; i < this.pedidosVendedores.length; i++) {
-        let info : any = {
-          Nombre : this.pedidosVendedores[i].vendedor,
-          Cantidad : this.pedidosVendedores[i].cantidad,
-          Costo : this.pedidosVendedores[i].costo
-        }
-        this.infoTablaModal.push(info);
-      }
-    }
+    if (tipo === 'Clientes') this.mostrarModalClientes();
+    else if (tipo === 'Productos') this.mostrarModalProductos();
+    else if (tipo === 'Vendedores') this.mostrarModalVendedores();
     this.infoTablaModal.sort((a,b) => Number(b.Cantidad) - Number(a.Cantidad));
+  }
+
+  mostrarModalClientes(){
+    this.nombreGrafica = 'Información detallada del ranking de pedidos por clientes';
+    for (let i = 0; i < this.pedidosClientes.length; i++) {
+      this.infoTablaModal.push({
+        Nombre : this.pedidosClientes[i].cliente,
+        Cantidad : this.pedidosClientes[i].cantidad,
+        Costo : this.pedidosClientes[i].costo
+      });
+    }
+  }
+
+  mostrarModalProductos(){
+    this.nombreGrafica = 'Información detallada del ranking de pedidos por productos';
+    for (let i = 0; i < this.pedidosProductos.length; i++) {
+      this.infoTablaModal.push({
+        Nombre : this.pedidosProductos[i].producto,
+        Cantidad : this.pedidosProductos[i].cantidad,
+        Costo : this.pedidosProductos[i].costo
+      });
+    }
+  }
+
+  mostrarModalVendedores(){
+    this.nombreGrafica = 'Información detallada del ranking de pedidos por vendedores';
+    for (let i = 0; i < this.pedidosVendedores.length; i++) {
+      this.infoTablaModal.push({
+        Nombre : this.pedidosVendedores[i].vendedor,
+        Cantidad : this.pedidosVendedores[i].cantidad,
+        Costo : this.pedidosVendedores[i].costo
+      });
+    }
   }
 }

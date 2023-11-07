@@ -18,6 +18,7 @@ import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepEntradaBopp as defaultSteps } from 'src/app/data';
 import { CrearBoppComponent } from '../crear-bopp/crear-bopp.component';
+import { modelBOPP } from 'src/app/Modelo/modelBOPP';
 
 @Injectable({
   providedIn: 'root'
@@ -145,57 +146,50 @@ export class EntradaBOPPComponent implements OnInit {
   cargarBOPPTabla(){
     if (this.FormEntradaBOPP.valid) {
       this.load = false;
-      let serial : number = this.FormEntradaBOPP.value.serial;
-      let cantidad : number = this.FormEntradaBOPP.value.cantidad;
-      let cantidadKg : number = this.FormEntradaBOPP.value.cantidadKG;
-      let nombre : string = this.FormEntradaBOPP.value.Nombre;
-      let descripcion : string = this.FormEntradaBOPP.value.Observacion;
-      let precio : number = this.FormEntradaBOPP.value.precio;
-      let ancho : number = this.FormEntradaBOPP.value.ancho;
-      let categoria : any = this.FormEntradaBOPP.value.Categoria;
-      let id : number = this.FormEntradaBOPP.value.Id;
-      let IdGenerico : number = this.FormEntradaBOPP.value.IdBoppGenerico;
-      let nombreGenerico : number = this.FormEntradaBOPP.value.boppGenerico;
-
-      this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
-        if (datos_bopp.length != 0) {
-          this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
-          this.load = true;
-        } else {
-          this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
-            let productoExt : any = {
-              Id : id,
-              Serial : serial,
-              Nombre : nombre,
-              Descripcion : descripcion,
-              Ancho : ancho,
-              Cant : cantidad,
-              UndCant : 'µm',
-              CantKg : cantidadKg,
-              UndCantKg : 'Kg',
-              Precio : precio,
-              Subtotal : 0,
-              Cat_Id : categoria,
-              Cat : datos_categorias.catMP_Nombre,
-              IdBoppGenerico : IdGenerico,
-              NombreBoppGenerico : nombreGenerico
-            }
-            let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == productoExt.IdBoppGenerico);
-            if(index == -1) {
-              this.load = true;
-              this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe elegir un bopp genérico válido`);
-            } else {
-              productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
-              this.ArrayBOPP.push(productoExt);
-              this.calcularValores();
-              this.limpiarCampos();
-              this.getPrecioBOPP();
-              this.load = true;
-            }
-          });
-        }
-      });
+      let datosBopp : any = {
+        Id : this.FormEntradaBOPP.value.Id,
+        Serial : this.FormEntradaBOPP.value.serial,
+        Nombre : this.FormEntradaBOPP.value.Nombre,
+        Descripcion : this.FormEntradaBOPP.value.Observacion,
+        Ancho : this.FormEntradaBOPP.value.ancho,
+        Cant : this.FormEntradaBOPP.value.cantidad,
+        UndCant : 'µm',
+        CantKg : this.FormEntradaBOPP.value.cantidadKG,
+        UndCantKg : 'Kg',
+        Precio : this.FormEntradaBOPP.value.precio,
+        Subtotal : 0,
+        Cat_Id : this.FormEntradaBOPP.value.Categoria,
+        Cat : '',
+        IdBoppGenerico : this.FormEntradaBOPP.value.IdBoppGenerico,
+        NombreBoppGenerico : this.FormEntradaBOPP.value.boppGenerico
+      }
+      this.colocarBoppTabla(datosBopp);
     } else this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
+  }
+
+  colocarBoppTabla(datosBopp : any){
+    this.entradaBOPPService.srvObtenerListaPorSerial(datosBopp.Serial).subscribe(datos_bopp => {
+      if (datos_bopp.length != 0) {
+        this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${datosBopp.Serial}, por favor colocar un serial distinto!`);
+        this.load = true;
+      } else {
+        this.categoriaService.srvObtenerListaPorId(datosBopp.Cat_Idz).subscribe(datos_categorias => {
+          datosBopp.Cat = datos_categorias.catMP_Nombre;          
+          let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == datosBopp.IdBoppGenerico);
+          if(index == -1) {
+            this.load = true;
+            this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe elegir un bopp genérico válido`);
+          } else {
+            datosBopp.Subtotal = parseInt(datosBopp.Precio) * parseInt(datosBopp.CantKg);
+            this.ArrayBOPP.push(datosBopp);
+            this.calcularValores();
+            this.limpiarCampos();
+            this.getPrecioBOPP();
+            this.load = true;
+          }
+        });
+      }
+    });
   }
 
   // funcion que crea los rollos en la tabla
@@ -204,32 +198,7 @@ export class EntradaBOPPComponent implements OnInit {
     else {
       this.load = false
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
-        let bodega : number;
-        if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
-        else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
-        else if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
-        else if (this.ArrayBOPP[i].Cat_Id == 17) bodega = 8;
-
-        let datosBOPP : any = {
-          bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
-          bopP_Descripcion : this.ArrayBOPP[i].Descripcion,
-          bopP_Serial : this.ArrayBOPP[i].Serial,
-          bopP_CantidadMicras : this.ArrayBOPP[i].Cant,
-          undMed_Id : 'µm',
-          catMP_Id : this.ArrayBOPP[i].Cat_Id,
-          bopP_Precio : this.ArrayBOPP[i].Precio,
-          tpBod_Id : bodega,
-          bopP_FechaIngreso : this.today,
-          bopP_Ancho : this.ArrayBOPP[i].Ancho,
-          BOPP_Stock : this.ArrayBOPP[i].CantKg,
-          undMed_Kg : 'Kg',
-          bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
-          Usua_Id : this.storage_Id,
-          BOPP_Hora : moment().format('H:mm:ss'),
-          BOPP_TipoDoc: this.tipoDoc,
-          BOPP_CodigoDoc : this.campoRemi_Faccompra,
-          BoppGen_Id : this.ArrayBOPP[i].IdBoppGenerico,
-        }
+        let datosBOPP = this.validarDatosBopp(this.ArrayBOPP[i]);
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(() => {
           this.mensajeService.mensajeConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
           this.getPrecioBOPP();
@@ -237,6 +206,40 @@ export class EntradaBOPPComponent implements OnInit {
         }, () => this.mensajeService.mensajeError(`Error`, `Error al ingresar el rollo!`));
       }
     }
+  }
+
+  validarDatosBopp(data : any){
+    let bodega : number = this.validarBodega(data.Cat_Id);
+    let datosBOPP : modelBOPP = {
+      BOPP_Nombre : `${data.Nombre} - ${data.Serial} - ${data.CantKg} - ${data.Ancho}`,
+      BOPP_Descripcion : data.Descripcion,
+      BOPP_Serial : data.Serial,
+      BOPP_CantidadMicras : data.Cant,
+      UndMed_Id : 'µm',
+      CatMP_Id : data.Cat_Id,
+      BOPP_Precio : data.Precio,
+      TpBod_Id : bodega,
+      BOPP_FechaIngreso : this.today,
+      BOPP_Ancho : data.Ancho,
+      BOPP_Stock : data.CantKg,
+      UndMed_Kg : 'Kg',
+      BOPP_CantidadInicialKg : data.CantKg,
+      Usua_Id : this.storage_Id,
+      BOPP_Hora : moment().format('H:mm:ss'),
+      BoppGen_Id : this.tipoDoc,
+      BOPP_CodigoDoc : this.campoRemi_Faccompra,
+      BOPP_TipoDoc : data.IdBoppGenerico,
+    }
+    return datosBOPP;
+  }
+
+  validarBodega(categoria : number){
+    let bodega : number;
+    if (categoria == 6) bodega = 8;
+    else if (categoria == 14) bodega = 11;
+    else if (categoria == 15) bodega = 12;
+    else if (categoria == 17) bodega = 8;
+    return bodega;
   }
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
@@ -311,7 +314,7 @@ export class EntradaBOPPComponent implements OnInit {
     });
   }
 
-   /** Función para cargar BOPPs a la tabla, segun la OC consultada. */
+  /** Función para cargar BOPPs a la tabla, segun la OC consultada. */
   cargarBopps(datos : any, dataFact? : any, dataRem?: any) {
     let infoOc : any = {
       idMatPrima : datos.matPri_Id,

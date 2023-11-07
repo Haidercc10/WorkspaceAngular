@@ -66,7 +66,7 @@ export class DashboardOTComponent implements OnInit {
                     private ordenTrabajoService : EstadosProcesos_OTService,
                       private zeusService : InventarioZeusService,
                         private shepherdService: ShepherdService) {
-      this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
@@ -121,83 +121,81 @@ export class DashboardOTComponent implements OnInit {
         { Nombre : 'ANULADO', Cantidad : 0, Class : 'bg-rojo', },
         { Nombre : 'CERRADO', Cantidad : 0, Class : 'bg-verde2', },
       ];
-
-      this.ordenTrabajoService.GetOrdenesMes_Estados().subscribe(datos_ot => {
-        datos_ot.forEach(element => {
-          this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;
-        });
-      });
-
-      this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        this.clientesOrdenesMes = datos_ordenes;
-        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        this.totalOrdenesMes = datos_ordenes.reduce((a, b) => a + b.cantidad, 0);
-      });
-
-      this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        datos_ordenes.forEach((orden) => this.productosOrdenesMes.push(orden));
-        this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
-        this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      });
-
-      this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
-      this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-      this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos => this.materialesOrdenesMes = datos );
-      this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-      this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
-          if (estados.includes(datos_ordenes[i].nomStatus)) {
-            let id : number = 0;
-            if (datos_ordenes[i].nomStatus == 'EXTRUSION') {
-              id = 1;
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'IMPRESION') {
-              id = 2;
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') {
-              id = 3;
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'LAMINADO') {
-              id = 4;
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
-              id = 5;
-              datos_ordenes[i].nomStatus = 'CORTE';
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'DOBLADO') {
-              id = 6;
-              datos_ordenes[i].und = 0;
-            }
-            if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
-            if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
-            let info : any  = {
-              id : id,
-              Nombre : datos_ordenes[i].nomStatus,
-              cantidad : datos_ordenes[i].peso,
-              und : datos_ordenes[i].und,
-            }
-            this.procesosOrdenesMes.push(info);
-            this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
-          }
-        }
-      });
-
-      this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos => this.costoTotalOrdenesMes = datos.reduce((a, b) => a + b.costo, 0));
-
-      this.zeusService.GetClienteFacturadosMes().subscribe(data => this.clientesFacturados = data);
-
-      this.zeusService.GetProductosFaturadosMes().subscribe(data => this.productosFacturas = data);
-
-      this.zeusService.GetVendedoresFacturasMes().subscribe(data => this.vendedoresFacturas = data);
+      this.consultarDatosOrdenesTrabajo();
     }
+  }
+
+  consultarDatosOrdenesTrabajo(){
+    this.ordenTrabajoService.GetOrdenesMes_Estados().subscribe(datos_ot => {
+      datos_ot.forEach(element => {
+        this.estadosOrdenes[this.estadosOrdenes.findIndex(x => x.Nombre == element.estado_Nombre)].Cantidad = element.cantidad;
+      });
+    });
+    this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      this.clientesOrdenesMes = datos_ordenes;
+      this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+      this.totalOrdenesMes = datos_ordenes.reduce((a, b) => a + b.cantidad, 0);
+    });
+    this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      datos_ordenes.forEach((orden) => this.productosOrdenesMes.push(orden));
+      this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+      this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+    });
+    this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
+    this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+    this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos => this.materialesOrdenesMes = datos );
+    this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+    this.consultarPesoProducidoOrdenes();
+    this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos => this.costoTotalOrdenesMes = datos.reduce((a, b) => a + b.costo, 0));
+    this.zeusService.GetClienteFacturadosMes().subscribe(data => this.clientesFacturados = data);
+    this.zeusService.GetProductosFaturadosMes().subscribe(data => this.productosFacturas = data);
+    this.zeusService.GetVendedoresFacturasMes().subscribe(data => this.vendedoresFacturas = data);
+  }
+
+  consultarPesoProducidoOrdenes(){
+    this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      for (let i = 0; i < datos_ordenes.length; i++) {
+        let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
+        if (estados.includes(datos_ordenes[i].nomStatus)) {
+          let id : number = 0;
+          if (datos_ordenes[i].nomStatus == 'EXTRUSION') {
+            id = 1;
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'IMPRESION') {
+            id = 2;
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') {
+            id = 3;
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'LAMINADO') {
+            id = 4;
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
+            id = 5;
+            datos_ordenes[i].nomStatus = 'CORTE';
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'DOBLADO') {
+            id = 6;
+            datos_ordenes[i].und = 0;
+          }
+          if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
+          if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
+          let info : any  = {
+            id : id,
+            Nombre : datos_ordenes[i].nomStatus,
+            cantidad : datos_ordenes[i].peso,
+            und : datos_ordenes[i].und,
+          }
+          this.procesosOrdenesMes.push(info);
+          this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+        }
+      }
+    });
   }
 
   // Funcion que va a llenar la grafica con la información de los vendedores
@@ -220,6 +218,10 @@ export class DashboardOTComponent implements OnInit {
         { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#8AFC9B', color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID:  'y1', data: costoVentas }
       ]
     };
+    this.estilosGraficasTresDimensiones();
+  }
+
+  estilosGraficasTresDimensiones(){
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
@@ -252,6 +254,33 @@ export class DashboardOTComponent implements OnInit {
           grid: { drawOnChartArea: false, color: '#ebedef' },
           ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } }
         }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
+    };
+  }
+
+  estilosGraficasDosDimensiones(){
+    this.multiAxisOptions = {
+      stacked: false,
+      plugins: {
+        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
+            font: { size: 20 },
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
+          grid: { color: '#ebedef' }
+        },
       },
       datalabels: { anchor: 'end', align: 'end' }
     };
@@ -277,41 +306,7 @@ export class DashboardOTComponent implements OnInit {
         { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
-    this.multiAxisOptions = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } } },
-        tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 15 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } }
-        }
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    };
+    this.estilosGraficasTresDimensiones();
   }
 
   // Funcion que va a llenar la grafica de pie con informacion de los estados de las ordenes de trabajo
@@ -372,40 +367,15 @@ export class DashboardOTComponent implements OnInit {
     }
     this.multiAxisData = {
       labels: labels,
-      datasets: [
-        {
-          label: nombreTipo,
-          data: data,
-          backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033'],
-          borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)'],
-          borderWidth: 1
-        },
-      ]
+      datasets: [{
+        label: nombreTipo,
+        data: data,
+        backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033'],
+        borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)'],
+        borderWidth: 1
+      }]
     };
-    this.multiAxisOptions = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
-        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 20 },
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' }
-        },
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    };
+    this.estilosGraficasDosDimensiones();
   }
 
   // Funcion que va a graficar la informacion de lo producido por los diferentes procesos
@@ -421,49 +391,21 @@ export class DashboardOTComponent implements OnInit {
     }
     this.multiAxisData = {
       labels: labels,
-      datasets: [
-        {
-          label: 'Cantidad',
-          data: cantidad,
-          backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033', '#009900', '#CCFF66'],
-          borderColor: ['rgb(255, 159, 64)'],
-          borderWidth: 1
-        },
-      ]
+      datasets: [{
+        label: 'Cantidad',
+        data: cantidad,
+        backgroundColor: ['#FFCC00', '#00CCFF', '#33FF66', '#FFFF00', '#FF0033', '#009900', '#CCFF66'],
+        borderColor: ['rgb(255, 159, 64)'],
+        borderWidth: 1
+      }]
     };
-    this.multiAxisOptions = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], usePointStyle: true, font: { size: 20 } } },
-        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'],
-            font: { size: 20 },
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
-          grid: { color: '#ebedef' }
-        },
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    };
+    this.estilosGraficasDosDimensiones();
   }
 
   llenarGraficaFactClientes() {
     this.mostrarGraficaBarras = true;
     this.nombreGrafica = `Grafica de facturación por clientes`;
-    let clientes : any = [];
-    let costo : any = [];
-    let cantVeces : any = [];
-
+    let clientes : any = [], costo : any = [], cantVeces : any = [];
     for (let i = 0; i < 10; i++) {
       clientes.push(this.clientesFacturados[i].cliente);
       costo.push(this.clientesFacturados[i].costo);
@@ -476,41 +418,7 @@ export class DashboardOTComponent implements OnInit {
         { label: 'Valor facturado',  backgroundColor: [ '#B7D996' ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
-    this.multiAxisOptions = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } } },
-        tooltip: { titleFont: { size: 22, }, bodyFont: { size: 17 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057',
-            font: { size: 15 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } }
-        }
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    }
+    this.estilosGraficasTresDimensiones();
   }
 
   llenarGraficaFactVendedores() {
@@ -532,91 +440,28 @@ export class DashboardOTComponent implements OnInit {
         { label: 'Valor facturado',  backgroundColor: [ '#A6874E' ], color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], yAxisID: 'y1', data: costo }
       ]
     };
-    this.multiAxisOptions = {
-      stacked: false,
-      plugins: {
-        legend: { labels: { color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } } },
-        tooltip: { titleFont: { size: 22, }, bodyFont: { size: 17 } }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057',
-            font: { size: 15 },
-            callback: function(value) {
-              if (this.getLabelForValue(value).length > 7) return `${this.getLabelForValue(value).substring(0, 7)}...`;
-              else return this.getLabelForValue(value);
-            }
-          },
-          grid: { color: '#ebedef' }
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } },
-          grid: { color: '#ebedef' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: this.modoSeleccionado == true ? '#F4F6F6' : '#495057', font: { size: 20 } }
-        }
-      },
-      datalabels: { anchor: 'end', align: 'end' }
-    }
+    this.estilosGraficasTresDimensiones();
   }
 
-  // Funcion que mostrará el modal de los estados de las ordenes de trabajo, adicional a eso le enviará parametros para que realice la consulta
   mostrarModalEstados(estado : string){
     this.modalEstadosOrdenes = true;
     this.modalEstadosProcesos_OT.modeModal = true;
     this.modalEstadosProcesos_OT.formularioOT.reset()
-    if (estado == 'ABIERTA') {
-      this.nombreModalEstados = 'Ordenes de Trabajo Abiertas y No Iniciadas';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 15,
-      });
-    } else if (estado == 'ASIGNADA') {
-      this.nombreModalEstados = 'Ordenes de Trabajo Asignadas y No Iniciadas';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 14,
-      });
-    } else if (estado == 'EN PROCESO') {
-      this.nombreModalEstados = 'Ordenes de Trabajo En Proceso';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 16,
-      });
-    } else if (estado == 'TERMINADA') {
-      this.nombreModalEstados = 'Ordenes de Trabajo Terminadas';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 17,
-      });
-    } else if (estado == 'ANULADO') {
-      this.nombreModalEstados = 'Ordenes de Trabajo Anuladas';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 13,
-      });
-    } else if (estado == 'CERRADA') {
-      this.nombreModalEstados = 'Ordenes de Trabajo Cerradas';
-      this.modalEstadosProcesos_OT.formularioOT.patchValue({
-        fecha: this.primerDiaMes,
-        fechaFinal : this.today,
-        estado : 18,
-      });
-    }
+    if (estado == 'ABIERTA') this.mostrarModalEstadosProcesos(15, 'Ordenes de Trabajo Abiertas y No Iniciadas');
+    else if (estado == 'ASIGNADA') this.mostrarModalEstadosProcesos(14, 'Ordenes de Trabajo Asignadas y No Iniciadas');
+    else if (estado == 'EN PROCESO') this.mostrarModalEstadosProcesos(16, 'Ordenes de Trabajo En Proceso');
+    else if (estado == 'TERMINADA') this.mostrarModalEstadosProcesos(17, 'Ordenes de Trabajo Terminadas');
+    else if (estado == 'ANULADO') this.mostrarModalEstadosProcesos(13, 'Ordenes de Trabajo Anuladas');
+    else if (estado == 'CERRADA') this.mostrarModalEstadosProcesos(18, 'Ordenes de Trabajo Cerradas');
+  }
+
+  mostrarModalEstadosProcesos(estado : 13 | 14 | 15 | 16 | 17 | 18, nombre : string){
+    this.nombreModalEstados = nombre;
+    this.modalEstadosProcesos_OT.formularioOT.patchValue({
+      fecha: this.primerDiaMes,
+      fechaFinal : this.today,
+      estado : estado,
+    });
     this.modalEstadosProcesos_OT.consultarInformacionOrdenesTrabajo();
   }
 }
