@@ -2,22 +2,6 @@
   <div class="mx-4 pb-8" style="padding-top: 60px;">
     <p-tabView (onChange)="cambioTab($event)" *ngIf="[1,3,60,61,69].includes(ValidarRol)">
 
-      <!-- PEDIDOS -->
-      <p-tabPanel
-        header="Pedidos"
-        leftIcon="pi pi-sliders-h"
-        *ngIf="[1,60].includes(ValidarRol)">
-        <app-ReportePedidos_Zeus *ngIf="pedidos" [reporteConsolidado]="true"></app-ReportePedidos_Zeus>
-      </p-tabPanel>
-
-      <!-- INVENTARIO PRODUCTOS TERMINADOS -->
-      <p-tabPanel
-        header="Inventario"
-        leftIcon="pi pi-sliders-h"
-        *ngIf="[1,60].includes(ValidarRol)">
-        <app-modal-generar-inventario-zeus *ngIf="inventarioProductos" [reporteConsolidado]="true"></app-modal-generar-inventario-zeus>
-      </p-tabPanel>
-
       <!-- FACTURACIÓN -->
       <p-tabPanel
         header="Facturación"
@@ -34,20 +18,20 @@
         <app-Dashboard_Areas *ngIf="consolidadoProduccionAreas"></app-Dashboard_Areas>
       </p-tabPanel>
 
-      <!-- CARTERA -->
-      <p-tabPanel
-        header="Cartera"
-        leftIcon="pi pi-sliders-h"
-        *ngIf="[1,60].includes(ValidarRol)">
-        <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
-      </p-tabPanel>
-
       <!-- PRODUCCIÓN DETALLADA -->
       <p-tabPanel
         header="Producción Detallada"
         leftIcon="pi pi-sliders-h"
         *ngIf="[1,60].includes(ValidarRol)">
         <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>
+      </p-tabPanel>
+
+      <!-- CARTERA -->
+      <p-tabPanel
+        header="Cartera"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
       </p-tabPanel>
 
       <!-- VENTAS VENDEDORES -->
@@ -64,6 +48,22 @@
         leftIcon="pi pi-sliders-h"
         *ngIf="[1,60].includes(ValidarRol)">
         <app-Reporte_FacturacionZeus *ngIf="facturacionItems"></app-Reporte_FacturacionZeus>
+      </p-tabPanel>
+
+      <!-- PEDIDOS -->
+      <p-tabPanel
+        header="Pedidos"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-ReportePedidos_Zeus *ngIf="pedidos" [reporteConsolidado]="true"></app-ReportePedidos_Zeus>
+      </p-tabPanel>
+
+      <!-- INVENTARIO PRODUCTOS TERMINADOS -->
+      <p-tabPanel
+        header="Inventario"
+        leftIcon="pi pi-sliders-h"
+        *ngIf="[1,60].includes(ValidarRol)">
+        <app-modal-generar-inventario-zeus *ngIf="inventarioProductos" [reporteConsolidado]="true"></app-modal-generar-inventario-zeus>
       </p-tabPanel>
 
     </p-tabView>

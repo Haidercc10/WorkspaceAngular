@@ -29,7 +29,7 @@ export class ReportesConsolidadosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.pedidos = true;
+    this.facturacion = true;
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -40,14 +40,14 @@ export class ReportesConsolidadosComponent implements OnInit {
   //
   cambioTab(e : any) {
     var index = e.index;
-    index == 0 ?  this.pedidos = true : this.pedidos = false;
-    index == 1 ?  this.inventarioProductos = true : this.inventarioProductos = false;
-    index == 2 ?  this.facturacion = true : this.facturacion = false;
-    index == 3 ?  this.consolidadoProduccionAreas = true : this.consolidadoProduccionAreas = false;
-    index == 4 ?  this.cartera = true : this.cartera = false;
-    index == 5 ?  this.produccionDetallada = true : this.produccionDetallada = false;
-    index == 6 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
-    index == 7 ?  this.facturacionItems = true : this.facturacionItems = false;
+    index == 0 ?  this.facturacion = true : this.facturacion = false;
+    index == 1 ?  this.consolidadoProduccionAreas = true : this.consolidadoProduccionAreas = false;
+    index == 2 ?  this.produccionDetallada = true : this.produccionDetallada = false;
+    index == 3 ?  this.cartera = true : this.cartera = false;
+    index == 4 ?  this.facturacionVendedores = true : this.facturacionVendedores = false;
+    index == 5 ?  this.facturacionItems = true : this.facturacionItems = false;
+    index == 6 ?  this.pedidos = true : this.pedidos = false;
+    index == 7 ?  this.inventarioProductos = true : this.inventarioProductos = false;
   }
 
 }

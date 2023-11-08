@@ -799,6 +799,7 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
+  // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
   consultarInformaciónBagPro(){
     let presentacion: string = this.presentacionProducto;
     if (presentacion == 'Kg') presentacion = 'Kilo';
@@ -823,6 +824,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargando = false;
   }
 
+  // Funcion que va a llenar el formulario de la orden de trabajo con los datos de la ultima orden de trabajo creada
   llenarFormularioOrdenTrabajo(data : any){
     this.FormOrdenTrabajo.patchValue({
       OT_Id: this.FormOrdenTrabajo.value.OT_Id,
@@ -843,6 +845,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a validar los procesos por los cuales pasará el item
   validarProcesosOrdenTrabajo(data : any){
     this.cyrel = data.cyrel;
     this.extrusion = data.extrusion;
@@ -853,6 +856,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.sellado = data.sellado;
   }
 
+  // Funcion que va a llenar el formulario de extrusión con los datos de la ultima orden de trabajo creada
   llenarFormularioExtrusion(data : any){
     this.FormOrdenTrabajoExtrusion.patchValue({
       Material_Extrusion: data.id_Material || this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -868,6 +872,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
       Tipo_Impresion: data.id_Tipo_Imptesion || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
@@ -884,6 +889,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a llenar el formulario de impresion (con los datos de bagpro) con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresionBagPro(data : any){
     let impresion : any = data.impresion ? 2 : data.lamiando ? 5 : null;
     this.servicioTintas.srvObtenerListaConsultaImpresion(data.tinta1, data.tinta2, data.tinta3, data.tinta4, data.tinta5, data.tinta6, data.tinta7, data.tinta8).subscribe(datos_impresion => {
@@ -905,6 +911,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a llenar el formulario de laminado con los datos de la ultima orden de trabajo creada
   llenarFormularioLaminado(data : any){
     this.FormOrdenTrabajoLaminado.patchValue({
       Capa_Laminado1: data.id_Capa1 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
@@ -919,6 +926,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a llenar el formulario de corte con los datos de la ultima orden de trabajo creada
   llenarFormularioCorte(data : any){
     this.FormOrdenTrabajoCorte.patchValue({
       Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
@@ -932,6 +940,7 @@ export class Orden_TrabajoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a llenar el formulario de sellado con los datos de la ultima orden de trabajo creada
   llenarFormularioSellado(data : any){
     this.FormOrdenTrabajoSellado.patchValue({
       Formato_Sellado: this.ArrayProducto[0].Tipo,
@@ -995,6 +1004,7 @@ export class Orden_TrabajoComponent implements OnInit {
     return margen_Adicional;
   }
 
+  // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   calcularPesoExtrusion(material : number, fact : number){
     let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
     let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;

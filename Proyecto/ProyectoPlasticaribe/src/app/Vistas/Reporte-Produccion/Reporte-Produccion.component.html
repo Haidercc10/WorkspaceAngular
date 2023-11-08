@@ -79,6 +79,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()"></button>
       </div>
     </div>
   </form>
@@ -86,6 +87,7 @@
   <p-table
   #dt
   [value]="produccion"
+  [(selection)]="rollosSeleccionados"
   [resizableColumns]="true"
   columnResizeMode="expand"
   styleClass="p-datatable-gridlines p-datatable-sm"
@@ -100,7 +102,7 @@
   currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
     <ng-template pTemplate="header">
       <tr>
-        <th rowspan="2">#</th>
+        <th class="text-center">#</th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'rollo')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'orden')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'idCliente')"></th>
@@ -115,7 +117,7 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'hora')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'maquina')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroTabla($event, 'envioZeus')"></th>
-        <th>
+        <th alignFrozen="right" pFrozenColumn [frozen]="true">
           <p-columnFilter field="proceso" matchMode="contains" [showMenu]="false">
             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
               <p-dropdown [autoDisplayFirst]="false" [options]="areasEmpresa" [showClear]="true" appendTo="body" [ngModel]="value" (onChange)="filter($event.value)"></p-dropdown>
@@ -124,6 +126,7 @@
         </th>
       </tr>
       <tr>
+        <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
         <th pSortableColumn="rollo"> <p-sortIcon field="rollo"></p-sortIcon> Bulto </th>
         <th pSortableColumn="orden"> <p-sortIcon field="orden"></p-sortIcon> OT </th>
         <th pSortableColumn="idCliente"> <p-sortIcon field="idCliente"></p-sortIcon> Id Cliente </th>
@@ -138,12 +141,15 @@
         <th pSortableColumn="hora"> <p-sortIcon field="hora"></p-sortIcon> Hora </th>
         <th pSortableColumn="maquina"> <p-sortIcon field="maquina"></p-sortIcon> Maquina </th>
         <th pSortableColumn="envioZeus"> <p-sortIcon field="envioZeus"></p-sortIcon> Envío Zeus </th>
-        <th pSortableColumn="proceso"> <p-sortIcon field="proceso"></p-sortIcon> Área </th>
+        <th pSortableColumn="proceso" alignFrozen="right" pFrozenColumn [frozen]="true"> <p-sortIcon field="proceso"></p-sortIcon> Área </th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data>
       <tr>
-        <td>{{rowIndex + 1}}</td>
+        <td>
+          <p-tableCheckbox [value]="data" *ngIf="['SELLADO', 'EMPAQUE'].includes(data.proceso) && (data.envioZeus).trim() == '0'"></p-tableCheckbox>
+          <span class="pl-4">{{rowIndex + 1}}</span>
+        </td>
         <td>{{data.rollo}}</td>
         <td>{{data.orden}}</td>
         <td>{{data.idCliente}}</td>
@@ -158,7 +164,7 @@
         <td>{{data.hora}}</td>
         <td>{{data.maquina}}</td>
         <td>{{data.envioZeus}}</td>
-        <td><span class="badge" [ngClass]="{'bg-Extrusion': data.proceso == 'EXTRUSION',
+        <td alignFrozen="right" pFrozenColumn [frozen]="true"><span class="badge" [ngClass]="{'bg-Extrusion': data.proceso == 'EXTRUSION',
                                             'bg-Impresion': data.proceso == 'IMPRESION',
                                             'bg-Rotograbado': data.proceso == 'ROTOGRABADO',
                                             'bg-Doblado': data.proceso == 'DOBLADO',
