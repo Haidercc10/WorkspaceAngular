@@ -9,6 +9,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -34,6 +35,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
   invPT : any = []; //Variable que guardará el inventario de los productos terminados
+  invBopp : any = []; //Variable que guardará el inventario de bopps
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
   @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
@@ -42,14 +44,16 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   @ViewChild('dtSella') dtSella: Table | undefined; //Tabla que representa el inventario de sellado
   @ViewChild('dtMatPrima') dtMatPrima: Table | undefined; //Tabla que representa el inventario de materias primas
   @ViewChild('dtReciclados') dtReciclados: Table | undefined; //Tabla que representa el inventario de reciclados
-  @ViewChild('dtPT') dtPT: Table | undefined; //Tabla que representa el inventario de productos terminados 
+  @ViewChild('dtPT') dtPT: Table | undefined; //Tabla que representa el inventario de productos terminados
+  @ViewChild('dtBopp') dtBopp: Table | undefined; //Tabla que representa el inventario de bopps
 
 
   constructor(private AppComponent : AppComponent, 
                 private svcInvAreas : Inventario_AreasService,
                   private msj : MensajesAplicacionService, 
                     private svcInvInicialMP : InventInicialDiaService,
-                      private svcInvMensualProductos : Inventario_Mes_ProductosService) {
+                      private svcInvMensualProductos : Inventario_Mes_ProductosService, 
+                        private svcBopps : EntradaBOPPService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
@@ -91,12 +95,18 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
             if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) {
+            this.inventarioMateriasPrimas(fecha2);
+            this.inventarioBoppsAgrupados();
+          } 
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
           else setTimeout(() => { this.load = false; }, 800); 
         } else {
           this.load = true;
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2);
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) {
+            this.inventarioMateriasPrimas(fecha2);
+            this.inventarioBoppsAgrupados();
+          } 
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
           else setTimeout(() => { this.load = false; }, 800); 
         }
@@ -117,6 +127,30 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   //Función que mostrará el inventario de productos terminados en la tabla. 
   inventarioProductosTerminados = (fechaFin : any) => this.svcInvMensualProductos.getInventarioProductoInicioMes(fechaFin).subscribe(data => {this.invPT = data; this.load = false; }, error => { this.load = false; } );
 
+  //Función que mostrará el inventario de biorientados en la tabla. 
+  inventarioBoppsAgrupados() {
+    this.invBopp = [];
+    this.svcBopps.GetInventarioBoppsGenericos().subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        this.cargarTablaBopp(data[index]);
+      }
+    });
+  }
+
+  //Función que cargará el inventario de biorientados a la tabla
+  cargarTablaBopp(data : any) {
+    let bopp : any = {
+      fecha_Inventario : this.today, 
+      ot : '', 
+      item : data.id, 
+      referencia : data.nombre, 
+      stock : data.stock, 
+      precio : data.precio, 
+      subtotal : (data.precio * data.stock), 
+    }
+    this.invBopp.push(bopp);
+  }
+
   //Funciones que calcularán el total de cada inventario.
   calcularTotalExtrusion = () => this.invExtrusion.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
@@ -133,6 +167,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   calcularTotalReciclados = () => this.invReciclados.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
   calcularTotalPT = () => this.invPT.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalBopp = () => this.invBopp.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
   //Funciones que permitiran realizar filtros en la tabla.
   aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -151,6 +187,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   aplicarfiltroPT = ($event, campo : any, valorCampo : string) => this.dtPT!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  aplicarfiltroBopp = ($event, campo : any, valorCampo : string) => this.dtBopp!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   // Funcion que va a crear un excel con la información de los inventarios de cada area
   exportarExcel(){
     let inventario : any = [...this.invExtrusion, ...this.invMateriales, ...this.invMatPrimas, ...this.invPT, ...this.invImpresion, ...this.invRotograbado, ...this.invSellado, ...this.invReciclados];
@@ -165,6 +203,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       let tituloMatPrimas : string = `INVENTARIO DE MATERIA PRIMA`;
       let tituloReciclados : string = `INVENTARIO DE RECICLADOS`;
       let tituloPT : string = `INVENTARIO DE PRODUCTOS TERMINADOS`;
+      let tituloBopps : string = `INVENTARIO DE BIORIENTADOS`;
       let unirCeldasHoja : string [] = [];
       let header : string [] = [];
 
@@ -312,6 +351,22 @@ export class Reporte_InventarioAreasComponent implements OnInit {
           worksheetDespacho.getCell('A1').value = tituloPT;
         } 
       }
+
+      // HOJA 10, INVENTARIO BIORIENTADOS
+      if([1, 3, 7, 61, 4].includes(this.ValidarRol)) {
+        let worksheetBopp = workbook.addWorksheet(`Inventario Biorientados`);
+        this.formatoTitulos(worksheetBopp, tituloBopps, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowBopp = worksheetBopp.addRow(header);
+        this.formatoEncabezado(headerRowBopp);
+        this.formatoCuerpo(this.calcularInvBopps(), worksheetBopp);
+        if(this.ValidarRol != 1) {
+          worksheetBopp.spliceColumns(6,2);
+          worksheetBopp.addRow([]);
+          worksheetBopp.getCell('A1').value = tituloBopps;
+        } 
+      }
+
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, `Inventarios_Areas.xlsx`);
@@ -381,7 +436,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       ['SELLADO', this.calcularTotalSellado()],
       ['ROTOGRABADO', this.calcularTotalRotograbado()],
       ['DESPACHO', this.calcularTotalPT()],
-      ['TOTAL', this.calcularTotalReciclados() + this.calcularTotalMatPrimas() + this.calcularTotalMateriales() + this.calcularTotalExtrusion() + this.calcularTotalImpresion() + this.calcularTotalSellado() + this.calcularTotalRotograbado() + this.calcularTotalPT()],
+      ['BIORIENTADOS', this.calcularTotalBopp()],
+      ['TOTAL', this.calcularTotalReciclados() + this.calcularTotalMatPrimas() + this.calcularTotalMateriales() + this.calcularTotalExtrusion() + this.calcularTotalImpresion() + this.calcularTotalSellado() + this.calcularTotalRotograbado() + this.calcularTotalPT() + this.calcularTotalBopp()],
     ];
     return datos;
   }
@@ -590,6 +646,32 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invPT.reduce((a,b) => a + b.stock, 0),
       '',
       this.invPT.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular el total del inventario de bopps
+  calcularInvBopps() : any [] {
+    let datos : any [] = [];
+    this.invBopp.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invBopp.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invBopp.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
   }
