@@ -464,4 +464,23 @@ export class DashboardOTComponent implements OnInit {
     });
     this.modalEstadosProcesos_OT.consultarInformacionOrdenesTrabajo();
   }
+
+  porcentajeProgresoMetaProduccion(data : any) : number {
+    let porcentaje : number = 80;
+    // let meta : number = data.metaProduccion;
+    // let produccion : number = data.cantidad;
+    // porcentaje = (produccion * 100) / meta;
+    return porcentaje;
+  }
+
+  colorProgresoMetaProduccion(data : any) : string {
+    let color : string;
+    let porcentaje : number = this.porcentajeProgresoMetaProduccion(data);
+    if (porcentaje >= 0 && porcentaje <= 30) color = 'Red';
+    else if (porcentaje >= 31 && porcentaje <= 50) color = 'Orange';
+    else if (porcentaje >= 51 && porcentaje <= 70) color = 'Yellow';
+    else if (porcentaje >= 71 && porcentaje <= 90) color = 'YellowGreen';
+    else if (porcentaje >= 91) color = 'LimeGreen';
+    return color;
+  }
 }

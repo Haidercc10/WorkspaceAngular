@@ -147,7 +147,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
         fecha: fac.fechatra,
         factura: fac.numefac,
         cliente: fac.descritra,
-        recibo: ``,
+        recibo: `------------------------`,
         suma: (fac.valortra)
       });
       this.dataFacturacion.sort((a,b) => a.factura.localeCompare(b.factura));
@@ -249,6 +249,16 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
           body: this.facturas(datos)
         }
       },
+      {
+        margin: 5,
+        fontSize: 8,
+        border: [true, false, true, false],
+        table: {
+          dontBreakRows: true,
+          widths : ['auto', 'auto'],
+          body: this.totalVentasGrabadas_Iva()
+        }
+      }
     ]);
     return data;
   }
@@ -282,10 +292,31 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return total;
   }
 
+  totalVentasGrabadas_Iva(){
+    let data : any = [];
+    data.push(
+      [
+        { border: [false, false, false, false], text: `Total Ventas Grabadas`, fontSize: 11 },
+        {  border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalVentasGrabadas().toFixed(2)))}` },
+      ],
+      [
+        { border: [false, false, false, false], text: `Total IVA`, fontSize: 11 },
+        { border: [false, false, false, false], alignment: 'right', fontSize: 11, bold: true, text: `$ ${this.formatonumeros((this.subTotalIva().toFixed(2)))}` },
+      ],
+    );
+    return data;
+  }
+
+  subTotalVentasGrabadas() : number {
+    let total : number = 0;
+    total = this.dataPDF.reduce((a,b) => a + b.suma, 0) - (this.dataPDF.reduce((a,b) => a + b.suma, 0) * 0.19);
+    return total;
+  }
+
   // Funcion que retornará el total de IVA
   subTotalIva() : number {
     let total : number = 0;
-    total = this.dataPDF.reduce((a,b) => a + b.iva, 0);
+    total = this.dataPDF.reduce((a,b) => a + b.suma, 0) * 0.19;
     return total;
   }
 

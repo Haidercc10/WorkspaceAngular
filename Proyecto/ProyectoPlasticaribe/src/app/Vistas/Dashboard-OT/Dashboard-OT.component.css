@@ -201,5 +201,10 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   background-size: var(--s) calc(2*var(--s)/3);
 }
 
+.textoBlanco {
+  color: #fff !important;
+}
 
-
+.textoOscuro {
+  color: #000 !important;
+}
