@@ -10,6 +10,9 @@ import * as fs from 'file-saver';
 import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 
 @Component({
   selector: 'app-Reporte_InventarioAreas',
@@ -34,8 +37,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   invSellado : any = []; //Variable que guardará el inventario de las sellado
   invImpresion : any = []; //Variable que guardará el inventario de las impresion
   invMateriales : any = []; //Variable que guardará el inventario de los materiales
+  invProductosTerminados : any = []; //Variable que guardará el inventario de los productos terminados
   invPT : any = []; //Variable que guardará el inventario de los productos terminados
   invBopp : any = []; //Variable que guardará el inventario de bopps
+  categoriasMatPrima : any = []; //Variable que guardará las categorias de las materias primas
+  categoriasTinta : any = []; //Variable que guardará las categorias de las tintas
+  categoriasBopp : any = []; //Variable que guardará las categorias de los bopp
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
   @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
@@ -53,13 +60,17 @@ export class Reporte_InventarioAreasComponent implements OnInit {
                   private msj : MensajesAplicacionService, 
                     private svcInvInicialMP : InventInicialDiaService,
                       private svcInvMensualProductos : Inventario_Mes_ProductosService, 
-                        private svcBopps : EntradaBOPPService) {
+                        private svcBopps : EntradaBOPPService, 
+                          private svcMatPrimas : MateriaPrimaService, 
+                            private svcTintas : TintasService, 
+                              private invProductosZeus : ModalGenerarInventarioZeusComponent) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
    }
 
   ngOnInit() {
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.consultarCategorias();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -81,6 +92,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.invImpresion = [];
     this.invMatPrimas = [];
     this.invReciclados = [];
+    this.invBopp = [];
     let fecha1 : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : null;
     let fecha2 : any = this.rangoFechas[1] != undefined && this.rangoFechas[1] != null ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : null;
     
@@ -95,18 +107,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
             if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
             if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
           });
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) {
-            this.inventarioMateriasPrimas(fecha2);
-            this.inventarioBoppsAgrupados();
-          } 
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2); 
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
           else setTimeout(() => { this.load = false; }, 800); 
         } else {
           this.load = true;
-          if ([1, 3, 7, 61].includes(this.ValidarRol)) {
-            this.inventarioMateriasPrimas(fecha2);
-            this.inventarioBoppsAgrupados();
-          } 
+          if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2); 
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
           else setTimeout(() => { this.load = false; }, 800); 
         }
@@ -118,8 +124,9 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   inventarioMateriasPrimas(fechaFin : any) {
     this.svcInvInicialMP.getMatPrimasInicioMes(fechaFin).subscribe(data => {
       if(data.length > 0) {
-        this.invMatPrimas = data.filter(mp => mp.idCategoria != 10);
+        this.invMatPrimas = data.filter(mp => (this.categoriasMatPrima.includes(mp.idCategoria) || this.categoriasTinta.includes(mp.idCategoria)) && mp.idCategoria != 10);
         this.invReciclados = data.filter(mp => mp.idCategoria == 10);
+        this.invBopp = data.filter(mp => this.categoriasBopp.includes(mp.idCategoria));
       } 
     });
   }
@@ -128,13 +135,15 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   inventarioProductosTerminados = (fechaFin : any) => this.svcInvMensualProductos.getInventarioProductoInicioMes(fechaFin).subscribe(data => {this.invPT = data; this.load = false; }, error => { this.load = false; } );
 
   //Función que mostrará el inventario de biorientados en la tabla. 
-  inventarioBoppsAgrupados() {
+  generarInventarioActualBopp() {
     this.invBopp = [];
+    this.load = true;
     this.svcBopps.GetInventarioBoppsGenericos().subscribe(data => {
       for (let index = 0; index < data.length; index++) {
         this.cargarTablaBopp(data[index]);
       }
     });
+    setTimeout(() => { this.load = false; }, 500);
   }
 
   //Función que cargará el inventario de biorientados a la tabla
@@ -149,6 +158,39 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       subtotal : (data.precio * data.stock), 
     }
     this.invBopp.push(bopp);
+  }
+
+  //Función que mostrará el inventario de materias primas o reciclados en sus respectivas tablas.
+  generarInventarioActualMatPrimas(tipo : string){
+    if(tipo == 'MP') this.invMatPrimas = [];
+    if(tipo == 'RC') this.invReciclados = [];
+    this.svcMatPrimas.GetInventarioMateriasPrimas().subscribe(data => {
+      if(tipo == `MP`) this.invMatPrimas = data.filter(mp => (this.categoriasMatPrima.includes(mp.idCategoria) || this.categoriasTinta.includes(mp.idCategoria)) && mp.idCategoria != 10);
+      if(tipo == `RC`) this.invReciclados = data.filter(mp => mp.idCategoria == 10); 
+    });
+  }
+
+  //Función que mostrará el inventario actual de productos terminados .
+  generarInventarioActualPTZeus() {
+    this.invPT = [];
+    this.invProductosZeus.invetarioProductos();
+    setTimeout(() => { 
+      this.invProductosTerminados = this.invProductosZeus.ArrayProductoZeus; 
+      setTimeout(() => {
+        this.invProductosTerminados.forEach(x => {
+          let info : any = {
+            'fecha_Inventario' : this.today,
+            'ot' :  '',
+            'item' : x.Id,
+            'referencia' : x.Nombre,
+            'stock' : x.Cantidad,
+            'precio' : x.Precio, 
+            'subtotal' : x.Cantidad * x.Precio,
+          }
+          this.invPT.push(info);
+        });
+      }, 2000);
+    }, 5000);
   }
 
   //Funciones que calcularán el total de cada inventario.
@@ -674,5 +716,12 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invBopp.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
+  }
+
+  //Función que consultará las categorias de todos los tipos de materiales. 
+  consultarCategorias(){
+    this.svcMatPrimas.GetCategoriasMateriaPrima().subscribe(datos => this.categoriasMatPrima = datos);
+    this.svcTintas.GetCategoriasTintas().subscribe(datos => this.categoriasTinta = datos);
+    this.svcBopps.GetCategoriasBOPP().subscribe(datos => this.categoriasBopp = datos);
   }
 }

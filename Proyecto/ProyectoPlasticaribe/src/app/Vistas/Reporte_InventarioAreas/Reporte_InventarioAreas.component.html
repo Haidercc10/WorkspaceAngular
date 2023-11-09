@@ -370,7 +370,7 @@
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
-          <th></th>
+          <th><button (click)="generarInventarioActualMatPrimas('MP')" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Materias Primas y Tintas" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar"></button></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroMatPrima($event, 'fecha_Inventario', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroMatPrima($event, 'ot', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroMatPrima($event, 'item', 'contains')"></th>
@@ -393,8 +393,8 @@
       <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
         <tr>
           <td>{{rowIndex + 1}}</td>
-          <td>{{inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
-          <td>{{inv.ot}}</td>
+          <td>{{[null, undefined].includes(inv.fecha_Inventario) ? today : inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
+          <td>{{[null, undefined].includes(inv.ot) ? '' : inv.ot}}</td>
           <td>{{inv.item}}</td>
           <td>{{inv.referencia}}</td>
           <td>{{inv.stock | number : '1.2-2'}}</td>
@@ -430,7 +430,7 @@
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
-          <th></th>
+          <th><button (click)="generarInventarioActualBopp()" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Biorientados" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar"></button></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroBopp($event, 'fecha_Inventario', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroBopp($event, 'ot', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroBopp($event, 'item', 'contains')"></th>
@@ -490,7 +490,7 @@
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
         <tr id="filtros">
-          <th></th>
+          <th><button (click)="generarInventarioActualMatPrimas('RC')" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Materiales Reciclados" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar2"></button></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroReciclado($event, 'fecha_Inventario', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroReciclado($event, 'ot', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroReciclado($event, 'item', 'contains')"></th>
@@ -513,8 +513,8 @@
       <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
         <tr>
           <td>{{rowIndex + 1}}</td>
-          <td>{{inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
-          <td>{{inv.ot}}</td>
+          <td>{{[null, undefined].includes(inv.fecha_Inventario) ? today : inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
+          <td>{{[null, undefined].includes(inv.ot) ? '' : inv.ot }}</td>
           <td>{{inv.item}}</td>
           <td>{{inv.referencia}}</td>
           <td>{{inv.stock | number : '1.2-2'}}</td>
@@ -532,63 +532,64 @@
     </p-tabPanel>
 
     <!--Productos terminados-->
-    <p-tabPanel
+    
+      <p-tabPanel
       *ngIf="[1, 61].includes(ValidarRol)"
       header="Productos Terminados"
       leftIcon="pi pi-verified"
       tooltip="Información del inventario de Productos Terminados">
-      <p-table
-      #dtPT
-      [resizableColumns]="true"
-      columnResizeMode="expand"
-      styleClass="p-datatable-gridlines p-datatable-sm"
-      responsiveLayout="scroll"
-      [rowHover]="true"
-      [value]="invPT"
-      *ngIf="!load"
-      [scrollable]="true"
-      scrollHeight="50rem">
-      <ng-template pTemplate="header" style="font-size: 30px;">
-        <tr id="filtros">
-          <th></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'fecha_Inventario', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'ot', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'item', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'referencia', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'stock', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'precio', 'contains')"></th>
-          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'subtotal', 'contains')"></th>
-        </tr>
-        <tr style="font-size: 30px;">
-          <th>#</th>
-          <th scope="col">Fecha Ingreso</th>
-          <th scope="col">OT</th>
-          <th scope="col">Id</th>
-          <th scope="col">Referencia</th>
-          <th scope="col">Stock (Kg)</th>
-          <th scope="col">Precio (Kg)</th>
-          <th scope="col">Subtotal</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
-        <tr>
-          <td>{{rowIndex + 1}}</td>
-          <td>{{inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
-          <td>{{inv.ot}}</td>
-          <td>{{inv.item}}</td>
-          <td>{{inv.referencia}}</td>
-          <td>{{inv.stock | number : '1.2-2'}}</td>
-          <td>{{inv.precio | number : '1.2-2'}}</td>
-          <td>{{inv.subtotal | number : '1.2-2'}}</td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="footer">
-        <tr>
-          <td colspan="7" class="text-right">Total</td>
-          <td>{{calcularTotalPT() | number : '1.2-2'}}</td>
-        </tr>
-      </ng-template>
-      </p-table>
-    </p-tabPanel>
+        <p-table
+        #dtPT
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [rowHover]="true"
+        [value]="invPT"
+        *ngIf="!load"
+        [scrollable]="true"
+        scrollHeight="50rem">
+        <ng-template pTemplate="header" style="font-size: 30px;">
+          <tr id="filtros">
+            <th><button (click)="generarInventarioActualPTZeus()" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Materiales Reciclados" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar2"></button></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'fecha_Inventario', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'ot', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'item', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'referencia', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'stock', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'precio', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'subtotal', 'contains')"></th>
+          </tr>
+          <tr style="font-size: 30px;">
+            <th>#</th>
+            <th scope="col">Fecha Ingreso</th>
+            <th scope="col">OT</th>
+            <th scope="col">Id</th>
+            <th scope="col">Referencia</th>
+            <th scope="col">Stock (Kg)</th>
+            <th scope="col">Precio (Kg)</th>
+            <th scope="col">Subtotal</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowIndex + 1}}</td>
+            <td>{{inv.fecha_Inventario | date : 'yyyy-MM-dd'}}</td>
+            <td>{{inv.ot}}</td>
+            <td>{{inv.item}}</td>
+            <td>{{inv.referencia}}</td>
+            <td>{{inv.stock | number : '1.2-2'}}</td>
+            <td>{{inv.precio | number : '1.2-2'}}</td>
+            <td>{{inv.subtotal | number : '1.2-2'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="7" class="text-right">Total</td>
+            <td>{{calcularTotalPT() | number : '1.2-2'}}</td>
+          </tr>
+        </ng-template>
+        </p-table>
+      </p-tabPanel>
   </p-tabView>  
 </p-card>

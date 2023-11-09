@@ -265,7 +265,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => { this.load = true; console.log(this.ArrayProductoZeus); }, 3000);
+    setTimeout(() => { this.load = true; }, 3000);
   }
 
   //
