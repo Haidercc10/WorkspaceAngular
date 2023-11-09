@@ -17,13 +17,14 @@
           styleClass="p-datatable-sm p-datatable-striped"
           responsiveLayout="scroll"
           [scrollable]="true"
-          scrollHeight="400px"
+          scrollHeight="330px"
           [rowHover]="true"
           [value]="procesosOrdenesMes">
           <ng-template pTemplate="header">
             <tr>
               <th>#</th>
               <th>Proceso</th>
+              <th>Meta</th>
               <th>Kg</th>
               <th>Und</th>
             </tr>
@@ -33,8 +34,15 @@
               <td style="padding : 11px">{{rowIndex + 1}}</td>
               <td><b>{{item.Nombre}}</b></td>
               <td>{{item.cantidad | number : '1.2-2'}}</td>
+              <td>{{item.cantidad | number : '1.2-2'}}</td>
               <td>{{item.und | number : '1.2-2'}}</td>
             </tr>
+            <!-- <tr>
+              <td colspan="5">
+                <p-progressBar [value]="porcentajeProgresoMetaProduccion(item)" [color]="colorProgresoMetaProduccion(item)" [style]="{height: '15px', 
+                color : ['Yellow'].includes(colorProgresoMetaProduccion(item)) ? 'Black' : 'White'}"></p-progressBar>
+              </td>
+            </tr> -->
           </ng-template>
         </p-table>
         <ng-template pTemplate="footer">

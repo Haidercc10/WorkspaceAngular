@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
+import { modelDetallesAsignacion } from 'src/app/Modelo/modelDetallesAsignacion';
 import { modelEntradas_Salidas_MP } from 'src/app/Modelo/modelEntradas_Salidas_MP';
 import { modelSolicitudMP_Extrusion } from 'src/app/Modelo/modelSolicitudMP_Extrusion';
 import { modeloMovimientos_Entradas_MP } from 'src/app/Modelo/modeloMovimientos_Entradas_MP';
@@ -363,10 +364,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   guardarAsignacionPolietileno(asignacion, idMatPrima, nombreMatPrima, cantidad, presentacion, proceso){
-    const datosDetallesAsignacion : any = {
+    const datosDetallesAsignacion : modelDetallesAsignacion = {
       AsigMp_Id : asignacion,
-      Tinta_Id : idMatPrima,
-      DtAsigTinta_Cantidad : cantidad,
+      MatPri_Id : idMatPrima,
+      DtAsigMp_Cantidad : cantidad,
       UndMed_Id : presentacion,
       Proceso_Id : proceso,
     }

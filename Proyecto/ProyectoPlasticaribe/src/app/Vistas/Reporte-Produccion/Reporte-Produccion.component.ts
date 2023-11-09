@@ -26,6 +26,7 @@ export class ReporteProduccionComponent implements OnInit {
   clientes : any [] = [];
   productos : any [] = [];
   produccion : any [] = [];
+  rollosSeleccionados : any [] = [];
 
   constructor(private AppComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -149,5 +150,28 @@ export class ReporteProduccionComponent implements OnInit {
     let total : number = 0;
     this.produccion.forEach(x => total += x.peso);
     return total;
+  }
+
+  // Funcion que se encargará de enviar los subir la producción a zeus
+  enviarProduccionZeus(){
+    if (this.rollosSeleccionados.length > 0) {
+      this.cargando = true;
+      let rollosSellado : any [] = this.rollosSeleccionados.filter(x => x.proceso == "SELLADO" && x.envioZeus.trim() == '0').map(x => x.rollo);
+      let rollosEmpaque : any [] = this.rollosSeleccionados.filter(x => x.proceso == "EMPAQUE" && x.envioZeus.trim() == '0').map(x => x.rollo);
+
+      if (rollosSellado.length > 0) {
+        this.bagProService.AjusteExistenciaSellado(rollosSellado).subscribe(() => this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`), res => {
+          this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
+          this.cargando = false;
+        }, () => this.cargando = false);
+      }
+
+      if (rollosEmpaque.length > 0) {
+        this.bagProService.AjusteExistenciaEmpaque(rollosEmpaque).subscribe(() => this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`), res => {
+          this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
+          this.cargando = false;
+        }, () => this.cargando = false);
+      }
+    } else this.msj.mensajeAdvertencia(`¡Debe seleccionar minimo un rollo!`);
   }
 }
