@@ -3,11 +3,6 @@
   min-width: 300px;
 }
 
-p-dropdown ::ng-deep .p-dropdown {
-  display: flex;
-  width: auto;
-}
-
 .id {
   border: none;
   width: 100%;

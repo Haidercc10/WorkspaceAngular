@@ -9,6 +9,8 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsDashboardOT as defaultSteps } from 'src/app/data';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { ProduccionAreasService } from 'src/app/Servicios/ProduciconAreas/ProduccionAreas.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 
 @Component({
   selector: 'app-Dashboard-OT',
@@ -65,7 +67,9 @@ export class DashboardOTComponent implements OnInit {
                   private bagProService : BagproService,
                     private ordenTrabajoService : EstadosProcesos_OTService,
                       private zeusService : InventarioZeusService,
-                        private shepherdService: ShepherdService) {
+                        private shepherdService: ShepherdService,
+                          private produccionAreasService : ProduccionAreasService,
+                            private msj : MensajesAplicacionService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
@@ -153,49 +157,127 @@ export class DashboardOTComponent implements OnInit {
   }
 
   consultarPesoProducidoOrdenes(){
-    this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
-        if (estados.includes(datos_ordenes[i].nomStatus)) {
-          let id : number = 0;
-          if (datos_ordenes[i].nomStatus == 'EXTRUSION') {
-            id = 1;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'IMPRESION') {
-            id = 2;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') {
-            id = 3;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'LAMINADO') {
-            id = 4;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
-            id = 5;
-            datos_ordenes[i].nomStatus = 'CORTE';
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'DOBLADO') {
-            id = 6;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
-          if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
-          let info : any  = {
-            id : id,
-            Nombre : datos_ordenes[i].nomStatus,
-            cantidad : datos_ordenes[i].peso,
-            und : datos_ordenes[i].und,
-          }
-          this.procesosOrdenesMes.push(info);
-          this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+    this.produccionAreasService.GetProduccionAreas_Mes(moment().year()).subscribe(produccionAreas => {
+      this.procesosOrdenesMes = [];
+      produccionAreas.forEach(areas => {
+        let metaMesActual : number = this.metaMesActual(areas);
+        let produccionMesActual : number = this.produccionMesActual(areas);
+        let datos : any = {
+          Orden : this.ordenArrayProcesosOrdenesMes((areas.proceso_Nombre).toUpperCase()),
+          Id : areas.id,
+          Area : (areas.proceso_Nombre).toUpperCase(),
+          Anio : areas.anio_Produccion,
+          Meta_Produccion : metaMesActual,
+          Produccion : produccionMesActual,
+          Porcentaje : this.porcentajeProgresoMetaProduccion(areas),
+          rangoSlider : this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas))
+          // Porcentaje : (produccionMesActual / metaMesActual) * 100,
+          // PorcentajeMensual : this.porcentajeProgresoMetaProduccion(areas),
         }
-      }
+        this.procesosOrdenesMes.push(datos);
+        this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
+      });
     });
+  }
+
+  metaMesActual(data : any) {
+    let mesActual : number = moment().month() + 1;
+    let metaMesActual : number = 0;
+    if (mesActual == 1) metaMesActual = data.meta_Enero;
+    else if (mesActual == 2) metaMesActual = data.meta_Febrero;
+    else if (mesActual == 3) metaMesActual = data.meta_Marzo;
+    else if (mesActual == 4) metaMesActual = data.meta_Abril;
+    else if (mesActual == 5) metaMesActual = data.meta_Mayo;
+    else if (mesActual == 6) metaMesActual = data.meta_Junio;
+    else if (mesActual == 7) metaMesActual = data.meta_Julio;
+    else if (mesActual == 8) metaMesActual = data.meta_Agosto;
+    else if (mesActual == 9) metaMesActual = data.meta_Septiembre;
+    else if (mesActual == 10) metaMesActual = data.meta_Octubre;
+    else if (mesActual == 11) metaMesActual = data.meta_Noviembre;
+    else if (mesActual == 12) metaMesActual = data.meta_Diciembre;
+    return metaMesActual;
+  }
+
+  produccionMesActual(data : any){
+    let mesActual : number = moment().month() + 1;
+    let produccionMesActual : number = 0;
+    if (mesActual == 1) produccionMesActual = data.producido_Enero;
+    else if (mesActual == 2) produccionMesActual = data.producido_Febrero;
+    else if (mesActual == 3) produccionMesActual = data.producido_Marzo;
+    else if (mesActual == 4) produccionMesActual = data.producido_Abril;
+    else if (mesActual == 5) produccionMesActual = data.producido_Mayo;
+    else if (mesActual == 6) produccionMesActual = data.producido_Junio;
+    else if (mesActual == 7) produccionMesActual = data.producido_Julio;
+    else if (mesActual == 8) produccionMesActual = data.producido_Agosto;
+    else if (mesActual == 9) produccionMesActual = data.producido_Septiembre;
+    else if (mesActual == 10) produccionMesActual = data.producido_Octubre;
+    else if (mesActual == 11) produccionMesActual = data.producido_Noviembre;
+    else if (mesActual == 12) produccionMesActual = data.producido_Diciembre;
+    return produccionMesActual;
+  }
+
+  ordenArrayProcesosOrdenesMes(area : string){
+    let orden : number = 0;
+    switch (area) {
+      case 'EXTRUSION':
+        orden = 1;
+        break;
+      case 'IMPRESION':
+        orden = 2;
+        break;
+      case 'CORTE':
+        orden = 3;
+        break;
+      case 'SELLADO':
+        orden = 4;
+        break;
+      case 'ROTOGRABADO':
+        orden = 5;
+        break;
+      case 'LAMINADO':
+        orden = 6;
+        break;
+      case 'WIKETIADO':
+        orden = 7;
+        break;
+      case 'DOBLADO':
+        orden = 8;
+        break;  
+      default:
+        break;
+    }
+    return orden;
+  }
+
+  porcentajeProgresoMetaProduccion(data : any) : number {
+    let diasCorridos : number = parseInt(moment().format('DD')) - 1;
+    let diasMes : number = moment().daysInMonth();
+    let horaCorrida : number = moment().hour();
+    let totalDiasCorridos : number = diasCorridos + (horaCorrida / 24);
+    let metaMesActual : number = this.metaMesActual(data);
+    let produccionMesActual : number = this.produccionMesActual(data);
+    let promedioDias : number = produccionMesActual / totalDiasCorridos;
+    let promedioMes : number = promedioDias * diasMes;
+    let porcentaje : number = ((promedioMes / metaMesActual) - 1) * 100;
+    return porcentaje;
+  }
+
+  rangoSliderPorcentajeProcesos(porcentaje : number){
+    let rango : number [];
+    let porcentajeFinal : number = porcentaje < 0 ? -1 * porcentaje : 50 + porcentaje;
+    rango = [50, porcentajeFinal];
+    return rango;
+  }
+
+  colorProgresoMetaProduccion(data : any) : string {
+    let color : string;
+    let porcentaje : number = data.Porcentaje;
+    if (porcentaje <= 0) color = 'Red';
+    else if (porcentaje >= 0 && porcentaje <= 40) color = 'Orange';
+    else if (porcentaje >= 41 && porcentaje <= 80) color = 'Yellow';
+    else if (porcentaje >= 81 && porcentaje <= 99) color = 'YellowGreen';
+    else if (porcentaje >= 100) color = 'LimeGreen';
+    return color;
   }
 
   // Funcion que va a llenar la grafica con la información de los vendedores
@@ -465,22 +547,13 @@ export class DashboardOTComponent implements OnInit {
     this.modalEstadosProcesos_OT.consultarInformacionOrdenesTrabajo();
   }
 
-  porcentajeProgresoMetaProduccion(data : any) : number {
-    let porcentaje : number = 80;
-    // let meta : number = data.metaProduccion;
-    // let produccion : number = data.cantidad;
-    // porcentaje = (produccion * 100) / meta;
-    return porcentaje;
-  }
-
-  colorProgresoMetaProduccion(data : any) : string {
-    let color : string;
-    let porcentaje : number = this.porcentajeProgresoMetaProduccion(data);
-    if (porcentaje >= 0 && porcentaje <= 30) color = 'Red';
-    else if (porcentaje >= 31 && porcentaje <= 50) color = 'Orange';
-    else if (porcentaje >= 51 && porcentaje <= 70) color = 'Yellow';
-    else if (porcentaje >= 71 && porcentaje <= 90) color = 'YellowGreen';
-    else if (porcentaje >= 91) color = 'LimeGreen';
-    return color;
+  actualizarMetaProduccion(id : number, $event : any){
+    let meta = this.procesosOrdenesMes.find(x => x.Id == id).Meta_Produccion;
+    if ($event.key == 'Enter') {
+      this.produccionAreasService.PutMetaProduccionMes(id, meta).subscribe(() => {
+        this.msj.mensajeConfirmacion(`¡Meta establecida con exíto!`);
+        setTimeout(() => this.consultarPesoProducidoOrdenes(), 500);
+      });
+    }
   }
 }

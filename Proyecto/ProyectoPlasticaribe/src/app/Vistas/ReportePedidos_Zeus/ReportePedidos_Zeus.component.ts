@@ -1098,7 +1098,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       pageOrientation: 'landscape',
       pageSize: 'LETTER',
       watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-      pageMargins : [25, 100, 25, 35],
+      pageMargins : [25, 93, 25, 35],
       header: this.headerPDF(today, hour),
       content : this.pedidosVendedores(vendedores),
     }
@@ -1172,10 +1172,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     for (let i = 0; i < vedendores.length; i++) {
       data.push([
         {
-          margin: [15, 5],
+          margin: [15, 3],
           text: `${vedendores[i].id} - ${vedendores[i].nombre}`,
           bold: true,
-          fontSize: 12,
+          fontSize: 11,
           alignment: 'left'
         },
         this.clientesVendedor(vedendores[i].id),
@@ -1217,13 +1217,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         clientesIncluidos.push(clientes[i].nitCliente);
         data.push([
           {
-            margin: 5,
+            margin: [5, 0],
             table: {
               dontBreakRows: true,
               widths : ['auto', '*', '*'],
               body: this.pedidoClientes(clientes[i]),
             },
-            fontSize: 10,
+            fontSize: 9,
           }
         ]);
       }   
@@ -1240,7 +1240,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         pedidosIncluidos.push(pedidos[i].consecutivo);
         data.push([
           {
-            margin: 5,
+            margin: [5, 0],
             colSpan: 3,
             border: [true, false, true, false],
             table: {
@@ -1268,10 +1268,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   valorTotalClientePDF(pedido){
     return [
       {
-        margin: [5, 5, 5, 15],
+        margin: [5, 3],
         colSpan: 3,
         alignment: 'right',
-        fontSize: 11,
+        fontSize: 10,
         bold: true,
         border: [false, true, false, false],
         text: `Total Cliente: $ ${this.formatonumeros((this.subTotalPedidosCliente(pedido.nitCliente)))}`,
@@ -1288,14 +1288,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       data.push([
         {
           colSpan: 5,
-          border: [false, false, false, false],
+          border: [true, true, true, true],
           table: {
             dontBreakRows: true,
             widths: ['5%', '33%', '10%', '8%', '8%', '8%', '8%', '10%', '10%'],
             body: this.itemsPedido(pedido)
           },
           layout: { defaultBorder: false, },
-          fontSize: 8,
+          fontSize: 7,
         },
         {},
         {},
@@ -1309,11 +1309,11 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   infoPedidoPDF(pedido){
     return [
-      { text: `PV ${pedido.consecutivo}`, bold: true, border: [true, true, false, true], fontSize: 9 },
-      { text: `${pedido.fecha_Creacion}`, bold: true, border: [false, true, false, true], fontSize: 9 },
-      { text: `${pedido.cliente}`, bold: true, border: [false, true, false, true], fontSize: 9 },
-      { text: `Orden Compra: ${pedido.orden_Compra_CLiente}`, bold: true, border: [false, true, false, true], fontSize: 9 },
-      { text: `Fecha Entrega: ${pedido.fecha_Entrega}`, bold: true, border: [false, true, true, true], fontSize: 9 },
+      { text: `PV ${pedido.consecutivo}`, bold: true, border: [true, true, false, true], fontSize: 8 },
+      { text: `${pedido.fecha_Creacion}`, bold: true, border: [false, true, false, true], fontSize: 8 },
+      { text: `${pedido.cliente}`, bold: true, border: [false, true, false, true], fontSize: 8 },
+      { text: `Orden Compra: ${pedido.orden_Compra_CLiente}`, bold: true, border: [false, true, false, true], fontSize: 8 },
+      { text: `Fecha Entrega: ${pedido.fecha_Entrega}`, bold: true, border: [false, true, true, true], fontSize: 8 },
     ]
   }
 

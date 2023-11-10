@@ -56,10 +56,7 @@
         currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
         [scrollable]="true"
         scrollHeight="50rem"
-        id="tablaProductos"
-        [paginator]="true"
-        [rows]="50"
-        [rowsPerPageOptions]="[10, 20, 50, 100, ArrayProductoZeus.length]">
+        id="tablaProductos">
 
         <ng-template pTemplate="caption">
           <div style="text-align:left" id="columnas">
@@ -187,11 +184,7 @@
   </div>
 </p-card>
 
-<div class="p-5" *ngIf="reporteConsolidado">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
-    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-  </div>
-
+<div class="px-5 pt-1 pb-5" *ngIf="reporteConsolidado">
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Tabla de Productos</h4>
   </div>
@@ -226,10 +219,7 @@
         currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
         [scrollable]="true"
         scrollHeight="50rem"
-        id="tablaProductos"
-        [paginator]="true"
-        [rows]="50"
-        [rowsPerPageOptions]="[10, 20, 50, 100, ArrayProductoZeus.length]">
+        id="tablaProductos">
 
         <ng-template pTemplate="caption">
           <div style="text-align:left" id="columnas">

@@ -26,23 +26,38 @@
               <th>Proceso</th>
               <th>Meta</th>
               <th>Kg</th>
-              <th>Und</th>
+              <th>Porc.</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr>
+            <tr [pEditableRow]="item">
               <td style="padding : 11px">{{rowIndex + 1}}</td>
-              <td><b>{{item.Nombre}}</b></td>
-              <td>{{item.cantidad | number : '1.2-2'}}</td>
-              <td>{{item.cantidad | number : '1.2-2'}}</td>
-              <td>{{item.und | number : '1.2-2'}}</td>
-            </tr>
-            <!-- <tr>
-              <td colspan="5">
-                <p-progressBar [value]="porcentajeProgresoMetaProduccion(item)" [color]="colorProgresoMetaProduccion(item)" [style]="{height: '15px', 
-                color : ['Yellow'].includes(colorProgresoMetaProduccion(item)) ? 'Black' : 'White'}"></p-progressBar>
+              <td><b>{{item.Area}}</b></td>
+              <td [pEditableColumn]="item.Meta_Produccion" pEditableColumnField="price" class="cursor">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber [(ngModel)]="item.Meta_Produccion" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="actualizarMetaProduccion(item.Id, $event)"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{item.Meta_Produccion | number : '1.2-2'}}
+                  </ng-template>
+                </p-cellEditor>
               </td>
-            </tr> -->
+              <td>{{item.Produccion | number : '1.2-2'}}</td>
+              <td class="fw-bold">{{item.Porcentaje | number : '1.2-2'}}%</td>
+            </tr> 
+            <tr>
+              <td colspan="5">
+                <div class="contenedorProgreso">
+                  <div class="progresoPositivo" [ngStyle]="{background: item.Porcentaje > 0 ? '#eee' : colorProgresoMetaProduccion(item), width: '50%'}">
+                    <div class="subProgreso" [ngStyle]="{width: item.Porcentaje + 100 + '%'}"></div>
+                  </div>
+                  <div class="progresoNegativo" [ngStyle]="{background: item.Porcentaje < 0 ? '#eee' : colorProgresoMetaProduccion(item), width: '50%'}">
+                    <div class="subProgreso" [ngStyle]="{width: item.Porcentaje < 0 ? '100%' : 100 - item.Porcentaje + '%', 'margin-left' : item.Porcentaje < 0 ? '0' : (item.Porcentaje) + '%'}"></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </ng-template>
         </p-table>
         <ng-template pTemplate="footer">

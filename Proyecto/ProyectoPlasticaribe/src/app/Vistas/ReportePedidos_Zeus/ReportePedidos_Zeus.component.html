@@ -361,7 +361,8 @@
         <h3 class="subTituloExportarPDF">Exportar por Cliente</h3>
 
         <span class="p-float-label mt-5">
-          <p-dropdown inputId="cliente" [(ngModel)]="clienteSeleccionado" (onChange)="eleccionClienteVendedore(1)" [autoDisplayFirst]="false" [options]="clientes" optionValue="id" optionLabel="nombre" [filter]="true" filterBy="nombre"></p-dropdown>
+          <p-multiSelect [options]="clientes" [(ngModel)]="clienteSeleccionado" optionValue="id" optionLabel="nombre" inputId="cliente" (onChange)="eleccionClienteVendedore(1)"></p-multiSelect>
+          <!-- <p-dropdown inputId="cliente" [(ngModel)]="clienteSeleccionado" [autoDisplayFirst]="false" [options]="clientes" optionValue="id" optionLabel="nombre" [filter]="true" filterBy="nombre"></p-dropdown> -->
           <label for="cliente">Clientes</label>
         </span>
       </div>

@@ -201,10 +201,29 @@ p-card ::ng-deep [class = "p-card p-component"]:hover {
   background-size: var(--s) calc(2*var(--s)/3);
 }
 
-.textoBlanco {
-  color: #fff !important;
+.contenedorProgreso {
+  width: 100%;
+  height: 15px;
+  border-radius: 50px;
+  display: flex;
 }
 
-.textoOscuro {
-  color: #000 !important;
+.progresoPositivo, .progresoNegativo {
+  border-radius: 50px;
+}
+
+.contenedorProgreso, .subProgreso, .progresoPositivo, .progresoNegativo, .subProgreso2 {
+  background-color: #eee;
+}
+
+.progresoPositivo, .progresoNegativo, .subProgreso, .subProgreso2 {
+  height: 100%;
+}
+
+.progresoPositivo {
+  border-radius: 50px 0 0 50px;
+}
+
+.progresoNegativo {
+  border-radius: 0 50px 50px 0;
 }
