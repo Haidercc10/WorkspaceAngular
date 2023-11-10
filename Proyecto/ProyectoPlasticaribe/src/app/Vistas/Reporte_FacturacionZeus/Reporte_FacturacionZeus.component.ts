@@ -5,12 +5,14 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src/app/data';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -21,6 +23,7 @@ import { defaultStepOptions, stepsReporteFacturacion as defaultSteps } from 'src
 export class Reporte_FacturacionZeusComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('dt2') dt2: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   cargando : boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
@@ -35,6 +38,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
   datosFacturacion : any [] = []; //Variable que tendrá la información del consolidado consultado
   datosFacturacionConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
+  tabSeleccionado : number = 1; //Variable que tendrá la información del tab seleccionado
+  eneroUno : any = moment().startOf('year').format('YYYY-MM-DD'); //Variable que contendrá el primero de enero del año actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que contendrá la fecha actual
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -42,7 +48,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
                     private usuariosService : UsuarioService,
                       private shepherdService: ShepherdService,
                         private msj : MensajesAplicacionService,
-                          private contabilidadZeus :  ZeusContabilidadService,) {
+                          private contabilidadZeus :  ZeusContabilidadService,
+                            private svcExcel : CreacionExcelService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       Vendedor: [null],
@@ -51,8 +58,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Id_Cliente : [null],
       Referencia: [null],
       Item : [null],
-      anio1: [null],
-      anio2: [null],
+      rangoFechas: [null],
     });
   }
 
@@ -87,6 +93,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     this.formFiltros.reset();
     this.consultarVendedores();
     this.datosFacturacion = [];
+    this.datosFacturacionConsolidado = [];
     this.cargando = false;
   }
 
@@ -162,9 +169,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   consultarFacturacion(){
     this.cargando = true;
     this.datosFacturacion = [];
+    this.datosFacturacionConsolidado = [];
     
-    let anoInicial : number = this.formFiltros.value.anio1;
-    let anoFinal : number = this.formFiltros.value.anio2;
+    let fechaInicial : any = this.formFiltros.value.rangoFechas == undefined ? this.eneroUno : moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
+    let fechaFinal : any = this.formFiltros.value.rangoFechas == undefined ? this.today : moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
     let vendedor = this.formFiltros.value.Id_Vendedor;
     let nombreVendedor = this.formFiltros.value.Vendedor;
     let producto = this.formFiltros.value.Item;
@@ -172,7 +180,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let cliente = this.formFiltros.value.Id_Cliente;
     let nombreCliente = this.formFiltros.value.Cliente;    
     let ruta : string = '';
-
+    
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
     if (nombreVendedor != null) ruta.length > 0 ? ruta += `&nombreVendedor=${nombreVendedor}` : ruta += `nombreVendedor=${nombreVendedor}`;
     if (producto != null) ruta.length > 0 ? ruta += `&producto=${producto}` : ruta += `producto=${producto}`;
@@ -180,11 +188,11 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
     if (nombreCliente != null) ruta.length > 0 ? ruta += `&nombreCliente=${nombreCliente}` : ruta += `nombreCliente=${nombreCliente}`;
     if (ruta.length > 0) ruta = `?${ruta}`;
+    
+    if (fechaInicial == null) fechaInicial = this.eneroUno;
+    if (fechaFinal == null) fechaFinal = this.today;
 
-    if (anoInicial == null) anoInicial = moment().year();
-    if (anoFinal == null) anoFinal = anoInicial;
-
-    this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(data => {
+    this.invetarioZeusService.GetConsolidadClientesArticulo(fechaInicial, fechaFinal, ruta).subscribe(data => {
       if (data.length == 0) this.msj.mensajeAdvertencia('¡No se encontraron resultados de bésqueda con la combinación de filtros seleccionada!');
       else {
         data.forEach(x => this.llenarConsolidado(x));
@@ -293,13 +301,16 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
+  aplicarfiltro2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
-  exportarExcel(){
+  exportarExcelConsolidadoItems(){
     if (this.datosFacturacionConsolidado.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
-        const title = `Consolidado Facturación - ${moment().format('DD-MM-YYYY')}`;
+        const title = `Consolidado Facturación x Item - ${moment().format('DD-MM-YYYY')}`;
         const header = ["Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Presentación", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
         let datos : any =[];
         for (const item of this.datosFacturacionConsolidado) {
@@ -342,12 +353,70 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Consolidado Facturacion - ${moment().format('DD-MM-YYYY')}.xlsx`);
+            fs.saveAs(blob, `Facturacion x Item - ${moment().format('DD-MM-YYYY')}.xlsx`);
           });
           this.cargando = false;
-          this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Formato Excel de Facturacion Consolidada x Item generado con éxito!`);
         }, 1000);
       }, 1000);
     }
   }
+
+  //Función que cambiará el numero del tab seleccionado
+  cambioTab(e : any) {
+    var index = e.index;
+    index == 0 ? this.tabSeleccionado = 1 : index == 1 ? this.tabSeleccionado = 2 : this.tabSeleccionado = 1; 
+  }
+
+  //Función para exportar el formato excel dependiendo la tab seleccionada en el momento.
+  exportarExcel = (nroTab : number) => nroTab == 1 ? this.exportarExcelConsolidadoMeses() : this.exportarExcelConsolidadoItems();
+  
+  //Función para exportar el formato excel consolidado por meses.
+  exportarExcelConsolidadoMeses() {
+    if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No hay registros para exportar!');
+    else {
+      this.cargando = true;
+      setTimeout(() => {
+        const title = `Consolidado Facturación x Meses - ${moment().format('DD-MM-YYYY')}`;
+        const header = ["Mes", "Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Cantidad", "Presentación", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
+         let datos : any =[];
+        for (const item of this.datosFacturacion) {
+          const datos1  : any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
+          datos.push(datos1);
+        }
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
+        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${moment().format('DD-MM-YYYY')}`);
+        worksheet.addImage(imageId1, 'A1:C3');
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:L3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          [2, 7, 9, 10].forEach(n => row.getCell(n).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+          [1, 2, 8, 11].forEach(n => worksheet.getColumn(n).width = 12);
+          [3, 5, 7, 9, 10].forEach(n => worksheet.getColumn(n).width = 15);
+          [4, 6, 12].forEach(n => worksheet.getColumn(n).width = 60);
+          [1, 2].forEach(n => worksheet.getColumn(n).alignment = { horizontal : 'center' });
+        });
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Facturacion x meses - ${moment().format('DD-MM-YYYY')}.xlsx`);
+          });
+          this.cargando = false;
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
+        }, 1000);
+      }, 1500);
+    }
+  }
+
 }

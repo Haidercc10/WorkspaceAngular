@@ -22,14 +22,16 @@ export class CreacionExcelService {
         let worksheet = workbook.addWorksheet(`${nombreHoja}`);
         let titleRow = worksheet.addRow([nombreHoja]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addImage(imageId1, 'A1:B3');
+        worksheet.addImage(imageId1, 'A1:C3');
         return worksheet;
     }
 
     creacionExcel(nombreArchivo : string, workbook : Workbook){
+      setTimeout(() => {
         workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             fs.saveAs(blob, `${nombreArchivo}.xlsx`);
-        });
+        }); 
+      }, 500);
     }
 }

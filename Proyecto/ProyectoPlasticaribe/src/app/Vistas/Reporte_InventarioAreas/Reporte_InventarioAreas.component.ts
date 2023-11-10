@@ -43,6 +43,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   categoriasMatPrima : any = []; //Variable que guardará las categorias de las materias primas
   categoriasTinta : any = []; //Variable que guardará las categorias de las tintas
   categoriasBopp : any = []; //Variable que guardará las categorias de los bopp
+  loading : boolean = false;
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
   @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
@@ -137,13 +138,14 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   //Función que mostrará el inventario de biorientados en la tabla. 
   generarInventarioActualBopp() {
     this.invBopp = [];
-    this.load = true;
+    this.loading = true;
     this.svcBopps.GetInventarioBoppsGenericos().subscribe(data => {
       for (let index = 0; index < data.length; index++) {
         this.cargarTablaBopp(data[index]);
       }
+      this.loading = false;
     });
-    setTimeout(() => { this.load = false; }, 500);
+    
   }
 
   //Función que cargará el inventario de biorientados a la tabla
@@ -162,11 +164,13 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   //Función que mostrará el inventario de materias primas o reciclados en sus respectivas tablas.
   generarInventarioActualMatPrimas(tipo : string){
+    this.loading = true;
     if(tipo == 'MP') this.invMatPrimas = [];
     if(tipo == 'RC') this.invReciclados = [];
     this.svcMatPrimas.GetInventarioMateriasPrimas().subscribe(data => {
       if(tipo == `MP`) this.invMatPrimas = data.filter(mp => (this.categoriasMatPrima.includes(mp.idCategoria) || this.categoriasTinta.includes(mp.idCategoria)) && mp.idCategoria != 10);
       if(tipo == `RC`) this.invReciclados = data.filter(mp => mp.idCategoria == 10); 
+      this.loading = false;
     });
   }
 
@@ -174,6 +178,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   generarInventarioActualPTZeus() {
     this.invPT = [];
     this.invProductosZeus.invetarioProductos();
+    this.loading = true;
     setTimeout(() => { 
       this.invProductosTerminados = this.invProductosZeus.ArrayProductoZeus; 
       setTimeout(() => {
@@ -189,6 +194,7 @@ export class Reporte_InventarioAreasComponent implements OnInit {
           }
           this.invPT.push(info);
         });
+        this.loading = false;
       }, 2000);
     }, 5000);
   }

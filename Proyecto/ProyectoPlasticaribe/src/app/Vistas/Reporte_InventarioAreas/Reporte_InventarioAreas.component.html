@@ -366,6 +366,7 @@
       [rowHover]="true"
       [value]="invMatPrimas"
       *ngIf="!load"
+      [loading]="loading"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
@@ -426,6 +427,7 @@
       [rowHover]="true"
       [value]="invBopp"
       *ngIf="!load"
+      [loading]="loading"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
@@ -486,6 +488,7 @@
       [rowHover]="true"
       [value]="invReciclados"
       *ngIf="!load"
+      [loading]="loading"
       [scrollable]="true"
       scrollHeight="50rem">
       <ng-template pTemplate="header" style="font-size: 30px;">
@@ -532,7 +535,6 @@
     </p-tabPanel>
 
     <!--Productos terminados-->
-    
       <p-tabPanel
       *ngIf="[1, 61].includes(ValidarRol)"
       header="Productos Terminados"
@@ -540,6 +542,7 @@
       tooltip="Información del inventario de Productos Terminados">
         <p-table
         #dtPT
+        [loading]="loading"
         [resizableColumns]="true"
         columnResizeMode="expand"
         styleClass="p-datatable-gridlines p-datatable-sm"
@@ -551,7 +554,7 @@
         scrollHeight="50rem">
         <ng-template pTemplate="header" style="font-size: 30px;">
           <tr id="filtros">
-            <th><button (click)="generarInventarioActualPTZeus()" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Materiales Reciclados" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar2"></button></th>
+            <th><button (click)="generarInventarioActualPTZeus()" pButton pRipple pTooltip="Haz clic para generar el inventario actual de Productos Terminados" label="Generar Inv. Actual" icon="pi pi-list" class="p-button-success" id="generar2"></button></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'fecha_Inventario', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'ot', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltroPT($event, 'item', 'contains')"></th>
