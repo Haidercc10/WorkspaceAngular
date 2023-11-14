@@ -14,7 +14,7 @@
   <form [formGroup]="formFiltros" (ngSubmit)="buscarFacturacion()">
     <div class="row my-3 g-4">
       <!-- RANGO DE FECHAS -->
-      <div class="col-sm-12 col-md-6 col-xl-3">
+      <div class="col-sm-12 col-md-6 col-xl-2">
         <span class="p-float-label">
           <p-calendar formControlName="rangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true"></p-calendar>
           <label for="fecha">Rango de Fechas</label>
@@ -22,7 +22,7 @@
       </div>
 
       <!-- VENDEDOR -->
-      <div class="col-sm-12 col-md-6 col-xl-3">
+      <div class="col-sm-12 col-md-6 col-xl-2">
         <span class="p-float-label">
           <p-dropdown formControlName="vendedor" inputId="vendedores" [autoDisplayFirst]="false" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
           <label for="vendedores">Vendedores</label>
@@ -40,14 +40,22 @@
         </span>       
       </div>
 
-      <!-- PRODUCTO -->
+      <!-- ITEM -->
+      <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <input formControlName="idProducto" id="idProducto" type="text" pInputText/>
+          <label for="idProducto">Items</label>
+        </span>
+      </div>
+
+      <!-- REFERENCIA -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
           <input formControlName="producto" id="prod" list="productos" type="text" pInputText (change)="productoSeleccionado()" (keydown)="obtenerProductos()"/>
           <datalist id="productos">
             <option value={{item.prod_Id}} *ngFor="let item of productos">{{item.prod_Nombre}}</option>
           </datalist>
-          <label for="prod">productos</label>
+          <label for="prod">Referencias</label>
         </span>
       </div>
     </div>
@@ -56,7 +64,8 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="submit" label="Buscar Facturas" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-        <button pButton class="p-button-success" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="mostrarEleccion()"></button>
+        <button pButton class="p-button-danger" type="button" label="PDF Consolidado" icon="pi pi-file-pdf" (click)="formatoPDF()" pTooltip="Exportará la información consolidada de las facturas y devoluciones teniendo en cuenta los filtros consultados"></button>
+        <button pButton class="p-button-danger" type="button" label="PDF Detallado" icon="pi pi-file-pdf" (click)="getFormatoPdfDetallado()" pTooltip="Exportará la información detallada de las facturas y devoluciones dependiendo los filtros consultados" ></button>
       </div>
     </div>
   </form>
@@ -99,7 +108,7 @@
         <ng-template pTemplate="body" let-data  let-rowIndex="rowIndex">
           <tr *ngIf="data.recibo != 'DEVOLUCIÓN'" (click)="filtrarFactura(data)" class="cursor" pTooltip="Haz clic para ver los detalles de la Factura N° {{data.factura}}">
             <td>{{rowIndex + 1}}</td>
-            <td>{{data.fecha | date : 'YYYY-MM-dd'}}</td>
+            <td>{{data.fecha }}</td>
             <td>{{data.factura}}</td>
             <td>{{data.cliente}}</td>
             <td>{{data.suma | number : '1.2-2'}}</td>
@@ -147,9 +156,9 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data  let-rowIndex="rowIndex">
-          <tr>
+          <tr *ngIf="data.recibo == 'DEVOLUCIÓN'">
             <td>{{rowIndex + 1}}</td>
-            <td>{{data.fecha | date : 'YYYY-MM-dd'}}</td>
+            <td>{{data.fecha }}</td>
             <td>{{data.factura}}</td>
             <td>{{data.cliente}}</td>
             <td>{{data.suma | number : '1.2-2'}}</td>
@@ -165,27 +174,6 @@
     </div>
   </div>
 </div>
-
-<!--Mensaje de elección-->
-<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="formatoPDF()" icon="pi pi-table" label="Consolidado" class="p-button-warning" pTooltip="Exportará la información detallada de las facturas y devoluciones que se realizaron en el rango de fecha y/o cliente, vendedor, e item seleccionado(s)"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="getFormatoPdfDetallado()" icon="pi pi-list" label="Detallado" class="p-button-success" pTooltip="Exportará la información consolidada de las facturas y devoluciones que se realizaron en el rango de fecha y/o cliente, vendedor, e item seleccionado(s), agrupada por factura y cliente!"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
 
 <!--Modal de facturas-->
 <p-dialog [(visible)]="modal" [draggable]="false" [style]="{width: '80%'}" header="Detalles de la Factura N° {{nroFactura}}" [modal]="true">

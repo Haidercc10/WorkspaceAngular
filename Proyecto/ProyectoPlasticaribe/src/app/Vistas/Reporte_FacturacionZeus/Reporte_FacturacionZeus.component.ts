@@ -68,6 +68,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     this.consultarVendedores();
     this.consultarClientes();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.exportarExcelPorMeses();
   }
 
   tutorial(){
@@ -310,7 +311,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     else {
       this.cargando = true;
       setTimeout(() => {
-        const title = `Consolidado Facturación x Item - ${moment().format('DD-MM-YYYY')}`;
+        const title = `Consolidado Facturación x Items - ${moment().format('DD-MM-YYYY')}`;
         const header = ["Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Presentación", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
         let datos : any =[];
         for (const item of this.datosFacturacionConsolidado) {
@@ -318,7 +319,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           datos.push(datos1);
         }
         let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${moment().format('DD-MM-YYYY')}`);
+        let worksheet = workbook.addWorksheet(`Consolidado Facturación x Items - ${moment().format('DD-MM-YYYY')}`);
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
@@ -385,8 +386,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           datos.push(datos1);
         }
         let workbook = new Workbook();
+        console.log(workbook)
         const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
-        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${moment().format('DD-MM-YYYY')}`);
+        let worksheet = workbook.addWorksheet(`Consolidado Facturación x Meses - ${moment().format('DD-MM-YYYY')}`);
         worksheet.addImage(imageId1, 'A1:C3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
@@ -413,10 +415,24 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
             fs.saveAs(blob, `Facturacion x meses - ${moment().format('DD-MM-YYYY')}.xlsx`);
           });
           this.cargando = false;
-          this.msj.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
+          this.msj.mensajeConfirmacion(`Confirmación`, `¡Formato Excel de Facturacion Consolidada x Mes generado con éxito!`)
         }, 1000);
       }, 1500);
     }
+  }
+
+  exportarExcelPorMeses(){
+    //if (this.datosFacturacion.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, 'No hay registros para exportar!');
+    //else {
+      const title = `Consolidado Facturación Mes`;
+      let bordes : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      let fuente : any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+      let workbook = this.svcExcel.formatoExcel(title);
+      console.log(workbook)
+      let worksheet = workbook.worksheets[0];
+      console.log(worksheet)
+      this.svcExcel.creacionExcel(`Consolidado`, workbook)
+    //}
   }
 
 }

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
@@ -34,6 +35,10 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   modal : boolean = false;
   facturasModal : any = [];
   nroFactura : string = ``;
+  facturacionConsolidada : any = [];
+  nuevasFacturas : any = [];
+  items = [];
+  dataDevolucion = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -42,7 +47,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
                       private vendedorService : UsuarioService,
                         private pdfService : CreacionPdfService,
                           private msj : MensajesAplicacionService, 
-                            private msg : MessageService) {
+                            private msg : MessageService, 
+                              private svcClientesProductos : ClientesProductosService, 
+                                private svcProductos : ProductoService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -68,6 +75,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     this.dataFacturacion = [];
     this.clientes = [];
     this.productos = [];
+    this.facturacionConsolidada = [];
   }
 
   // Funcion que se encargará de obtener los vendedores
@@ -83,10 +91,21 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   // Funcion que se encargará de colocar la información de los clientes en cada uno de los campos
   clienteSeleccionado(){
+    this.productos = []; 
     let cliente : any = this.formFiltros.value.cliente;
     this.formFiltros.patchValue({
       idCliente : cliente,
       cliente : this.clientes.find(x => x.idcliente == cliente).razoncial
+    });
+    this.cargarProductosxCliente(cliente)
+  }
+  
+  //Función que cargará los productos del cliente seleccionado en el combobox
+  cargarProductosxCliente(cliente : any){
+    this.svcClientesProductos.srvObtenerListaPorNombreCliente(cliente).subscribe(data => {
+      data.forEach(d => {
+        this.svcProductos.srvObtenerListaPorId(d.prod_Id).subscribe(datos => this.productos.push(datos));
+      });
     });
   }
 
@@ -109,14 +128,17 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   buscarFacturacion(){
     if (this.formFiltros.value.rangoFechas) {
       this.dataFacturacion = [];
+      let item : any = this.formFiltros.value.idProducto;
       this.cargando = true;
       let fechaInicial : any = moment(this.formFiltros.value.rangoFechas[0]).format('YYYY-MM-DD');
       let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
 
-      this.zeusService.GetFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosFacturas(res));
-      this.zeusService.GetDevolucionesDetalladas(fechaInicial, fechaFinal, 2, this.validarParametrosConsulta(false)).subscribe(res => this.llenarDatosDevoluciones(res));
+      this.zeusService.getNuevaFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => { this.llenarDatosFacturas(res) });
+      this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
-      this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(false));
+      if(item.toString().length > 0) this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
+      else this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true)); 
+      
       this.colocarNombresVendedores();
       setTimeout(() => this.cargando = false, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
@@ -135,35 +157,34 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     }
     if (cliente != null) ruta += `cliente=${cliente}`;
     if (vendedor != null) ruta.length > 0 ? ruta += `&vendedor=${vendedor}` : ruta += `vendedor=${vendedor}`;
-    if (factura && producto != null) ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`;
+    if (factura && producto != null) { ruta.length > 0 ? ruta += `&item=${producto}` : ruta += `item=${producto}`; } 
     if (ruta.length > 0) ruta = `?${ruta}`;
+    
     return ruta;
   }
 
   // Funcion que se encargará de llenar la guardar la información de las facturas
   llenarDatosFacturas(facturas : any []){
+    let filtroFacturas : any = [];
+
     facturas.forEach(fac => {
-      this.dataFacturacion.push({
-        fecha: fac.fechatra,
-        factura: fac.numefac,
-        cliente: fac.descritra,
-        recibo: `------------------------`,
-        suma: (fac.valortra)
-      });
-      this.dataFacturacion.sort((a,b) => a.factura.localeCompare(b.factura));
+      if(!filtroFacturas.includes(fac.factura)) {
+        filtroFacturas.push(fac.factura);
+        this.dataFacturacion.push(fac);
+      }
+      this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
   }
 
   // Funcion que se encargará de llenar la guardar la información de las devoluciones
   llenarDatosDevoluciones(devoluciones : any []){
+    let filtroFacturas : any = [];
+
     devoluciones.forEach(dev => {
-      this.dataFacturacion.push({
-        fecha: dev.fechatra,
-        factura: dev.numefac,
-        cliente: dev.descritra,
-        recibo: `DEVOLUCIÓN`,
-        suma: (dev.valortra)
-      });
+      if(!filtroFacturas.includes(dev.factura)) {
+        filtroFacturas.push(dev.factura);
+        this.dataFacturacion.push(dev);
+      }
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
   }
@@ -354,6 +375,30 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     }); 
   }
 
+  cargarDevolucionesDetalladas2(fecha1 : any, fecha2 : any, ruta? : string){
+    this.zeusService.getNuevaDevolucionConsolidada(fecha1, fecha2, ruta).subscribe(devoluciones => {
+      devoluciones.forEach(dv => {
+        let vendedoresDv : any = {
+          idVendedor : dv.idVendedor,
+          vendedor : '',
+          cliente : dv.cliente,
+          fecha : dv.fecha,
+          factura : dv.factura,
+          factura2 : 'DV',
+          item : dv.item,
+          referencia : dv.referencia,
+          presentacion : dv.presentacion,
+          cantidad : dv.devolucion,
+          precio : (-(dv.precio)),
+          valorTotal : (-(dv.suma)),
+        }
+        this.infoPdf.push(vendedoresDv); 
+      });
+      this.colocarNombresVendedores();
+      this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
+    }); 
+  }
+
   //Función que colocará el nombre de los vendedores de los registros que vienen de las devoluciones en vacío.
   colocarNombresVendedores(){
     this.infoPdf.forEach(inf => {
@@ -428,7 +473,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     }
     if(vendedores.length > 1){
      data.push(
-      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()))}`, }],
+      [{ margin: [10, 20, 10, 5], border: [true, true, true, false], alignment: 'center', fontSize: 12, bold: true, text: `Total Ventas: $ ${this.formatonumeros((this.totalFacturacion() - this.totalDevolucion()).toFixed(2))}`, }],
      );
     }
     return data;
@@ -502,9 +547,9 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
            [
              { text: `${items.fecha}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
              { text: `${items.factura2}`, alignment: items.factura2 == `DV` ? `center` : `left`, border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`}, 
-             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false] }, 
-             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false] }, 
-             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false] }, 
+             { text: `${items.item}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
+             { text: `${items.referencia}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
+             { text: `${items.presentacion}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
              { text: `${this.formatonumeros(items.cantidad)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
              { text: `${this.formatonumeros(items.precio)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black` }, 
              { text: `${this.formatonumeros(items.valorTotal)}`, alignment: 'left', border: [false, false, false, false], color: items.factura2 == `DV` ? `red` : `black`},
@@ -542,13 +587,6 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     return subtotal;
   }
 
-  //.Función que en que formato se desea exportar la información, si detallado o consolidado. 
-  mostrarEleccion(){
-    if (this.dataFacturacion.length > 0) {
-      this.msg.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `En qué tipo de formato desea exportar la información?`, sticky: true});
-    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay registros para exportar!`);
-  }
-
   //.Función que quitará el mensaje de elección de formatos.
   onReject = () => this.msg.clear('eleccion');
   
@@ -563,7 +601,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
     this.nroFactura = facturas.factura;
     this.modal = true;
     this.facturasModal = [];
-    this.facturasModal = this.infoPdf.filter(x => x.factura == facturas.factura);
+    this.facturasModal = this.infoPdf.filter(x => x.factura == this.nroFactura);
   }
 
   //Función que cargará el total de facturas seleccionadas
