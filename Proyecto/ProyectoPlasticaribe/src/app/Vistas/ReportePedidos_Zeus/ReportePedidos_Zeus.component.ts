@@ -1089,9 +1089,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     let hour : any = moment().format('HH:mm:ss');
     this.cargando = true;
     this.modalExportarPDF = false;
-    this.informacionPDF = this.ArrayPedidos.filter(x => x.Zeus == 1);
-    if (this.clienteSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.nitCliente == this.clienteSeleccionado && x.Zeus == 1);
+    if (this.clienteSeleccionado) this.clienteSeleccionado.forEach(cli => this.informacionPDF = this.informacionPDF.concat(this.ArrayPedidos.filter(x => x.nitCliente == cli.id && x.Zeus == 1)));
     if (this.vendedorSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
+    if (!this.clienteSeleccionado && !this.vendedorSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.Zeus == 1);
     let vendedores = this.getVendedores(this.informacionPDF);
     const pdfDefinicion : any = {
       info: { title: 'Pedidos de Ventas' },
@@ -1288,7 +1288,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       data.push([
         {
           colSpan: 5,
-          border: [true, true, true, true],
+          border: [false, false, false, false],
           table: {
             dontBreakRows: true,
             widths: ['5%', '33%', '10%', '8%', '8%', '8%', '8%', '10%', '10%'],
