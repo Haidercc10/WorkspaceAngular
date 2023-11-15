@@ -136,7 +136,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       this.zeusService.getNuevaFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => { this.llenarDatosFacturas(res) });
       this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
-      if(item.toString().length > 0) this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
+      if(item != null && item != undefined && item != '') this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
       else this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true)); 
       
       this.colocarNombresVendedores();
