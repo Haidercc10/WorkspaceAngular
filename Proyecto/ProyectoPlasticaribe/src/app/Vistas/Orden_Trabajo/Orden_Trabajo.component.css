@@ -65,3 +65,11 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   border-radius: 10px;
   padding: 5px;
 }
+
+.p-button.p-button-icon-only {
+  width: 5rem;
+}
+
+.p-inputgroup-addon {
+  min-width: 2rem;
+}

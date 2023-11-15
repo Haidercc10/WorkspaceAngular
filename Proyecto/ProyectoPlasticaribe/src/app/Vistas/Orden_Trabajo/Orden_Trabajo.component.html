@@ -45,9 +45,18 @@
             <!-- NUMERO ORDEN DE TRABAJO -->
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
               <div class="p-inputgroup">
-                <input formControlName="OT_Id" type="text" id="orden" placeholder="Nro. OT" pInputText (keyup.enter)="ConsultarOrdenTrabajo()"/>
+                <span class="p-inputgroup-addon cursor" pTooltip="Anterior" tooltipPosition="top" (click)="ConsultarOrdenTrabajo(-1)">
+                  <i class="pi pi-chevron-left"></i>
+                </span>
+                <p-inputNumber formControlName="OT_Id" type="number" id="orden" placeholder="Nro. OT" [useGrouping]="false" (keyup.enter)="ConsultarOrdenTrabajo(0)"></p-inputNumber>
+                <span class="p-inputgroup-addon cursor" pTooltip="Siguiente" tooltipPosition="top" (click)="ConsultarOrdenTrabajo(1)">
+                  <i class="pi pi-chevron-right"></i>
+                </span>
+                <span class="p-inputgroup-addon cursor" style="border-left: 1px solid rgb(201, 201, 201);" pTooltip="Última" tooltipPosition="top" (click)="ConsultarOrdenTrabajo(ultimaOT)">
+                  <i class="pi pi-history"></i>
+                </span>
                 <button pButton class="p-button-danger" id="pdf" type="button" icon="pi pi-file-pdf" (click)="pdfOrdenTrabajo()"></button>
-              </div>
+               </div>
             </div>
             
             <!-- ID CLIENTE -->

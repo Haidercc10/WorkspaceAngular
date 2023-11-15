@@ -1,6 +1,7 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, EventEmitter, Injectable, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
+import { error } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -125,6 +126,7 @@ export class Orden_TrabajoComponent implements OnInit {
   idMezclaSeleccionada: number = 0; //Variable que almacenará el ID de la mezcla que fue seleccionada
   nroCapas: number = 0;
   nroCapasOT: number = 0;
+  ultimaOT : number = 0;
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -379,6 +381,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarTiposProductos();
     this.cargarTiposSellado();
     this.limpiarCampos();
+    this.ultimoNumeroOT();
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -1907,8 +1910,9 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a consultar la informacion de la una orden de trabajo
-  ConsultarOrdenTrabajo() {
-    let numeroOT: number = this.FormOrdenTrabajo.value.OT_Id;
+  ConsultarOrdenTrabajo(numero : number) {
+    let numeroOT : number = this.FormOrdenTrabajo.value.OT_Id;
+    ([0, 1, -1].includes(numero)) ? numeroOT += numero : numeroOT = numero;
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
@@ -2870,4 +2874,7 @@ export class Orden_TrabajoComponent implements OnInit {
       }
     }
   }
+
+  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOT = data }, error => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
+  
 }
