@@ -18,6 +18,7 @@ import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Pro
 import { defaultStepOptions, stepsVerPedidos as defaultSteps } from 'src/app/data';
 import { ShepherdService } from 'angular-shepherd';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { DepartamentosMunicipiosColombiaService } from 'src/app/Servicios/DepartamentosMunicipiosColombia/DepartamentosMunicipiosColombia.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -58,8 +59,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   informacionPDF : any [] = [];
   vendedores : any [] = [];
   clientes : any [] = [];
+  departamentos : any [] = [];
+  municipios : any [] = [];
   clienteSeleccionado : any;
   vendedorSeleccionado : any;
+  departamentoSeleccionado : any = [];
+  municipioSeleccionado : any;
 
   constructor(private AppComponent : AppComponent,
                 private messageService: MessageService,
@@ -68,15 +73,17 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                       private pedidoExternoService : OpedidoproductoService,
                         private estadosProcesos_OTService : EstadosProcesos_OTService,
                           private shepherdService: ShepherdService,
-                            private msj : MensajesAplicacionService,) {
+                            private msj : MensajesAplicacionService,
+                              private deparMuniciosColService : DepartamentosMunicipiosColombiaService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.consultarDepartamentos();
     this.seleccionarColumnas();
     this.consultarPedidosZeus();
-    this.consultarPedidos();
+    this.consultarPedidos();    
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
@@ -97,6 +104,25 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+
+  // Funcion que consultará los departamentos de colombia
+  consultarDepartamentos(){
+    this.deparMuniciosColService.getDepartamentos().subscribe(res => {
+      this.departamentos = res.reduce((a,b) => {
+        if (!a.map(x => x.departamento).includes(b.departamento)) a = [...a, b];
+        return a;
+      }, []);
+      this.departamentos.sort((a,b) => a.departamento.localeCompare(b.departamento));
+    });
+  }
+
+  // Funcion que devolverá los municipios de los departamentos seleccionados
+  consultarMunicipios(){
+    this.municipios = [];
+    this.deparMuniciosColService.getDepartamentos().subscribe(res => {
+      this.departamentoSeleccionado.forEach(depar => this.municipios = this.municipios.concat(res.filter(x => x.departamento == depar.departamento)));
+    });
+  }
 
   // Funcion que va a consultar los pedidos de zeus
   consultarPedidosZeus(){
@@ -1078,20 +1104,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject = (dato : any) => this.messageService.clear(dato);
 
-  // 
-  eleccionClienteVendedore(num : number){
-    if (num == 1) this.vendedorSeleccionado = null;
-    else if (num == 2) this.clienteSeleccionado = null;
-  }
-
   formatoPDF(){
     let today : any = moment().format('YYYY-MM-DD');
     let hour : any = moment().format('HH:mm:ss');
     this.cargando = true;
     this.modalExportarPDF = false;
-    if (this.clienteSeleccionado) this.clienteSeleccionado.forEach(cli => this.informacionPDF = this.informacionPDF.concat(this.ArrayPedidos.filter(x => x.nitCliente == cli.id && x.Zeus == 1)));
-    if (this.vendedorSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
-    if (!this.clienteSeleccionado && !this.vendedorSeleccionado) this.informacionPDF = this.ArrayPedidos.filter(x => x.Zeus == 1);
+    this.informacionPDF = this.seleccionarInformacionPDf();
     let vendedores = this.getVendedores(this.informacionPDF);
     const pdfDefinicion : any = {
       info: { title: 'Pedidos de Ventas' },
@@ -1103,6 +1121,33 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       content : this.pedidosVendedores(vendedores),
     }
     setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
+  }
+
+  seleccionarInformacionPDf() : any [] {
+    let informacion : any [] = [];
+    informacion = this.ArrayPedidos.filter(x => x.Zeus == 1);
+
+    if (this.vendedorSeleccionado) informacion = informacion.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
+
+    if (this.departamentoSeleccionado.length > 0){
+      let departamentos = this.departamentoSeleccionado.map(x => (x.departamento).toLowerCase());
+      let municipios = this.municipios.map(x => (x.municipio).toLowerCase());
+      informacion = informacion.reduce((a,b) => {
+        if (departamentos.includes((b.ciudad).toLowerCase()) && b.Zeus == 1) a = [...a, b];
+        else if (municipios.includes((b.ciudad).toLowerCase()) && b.Zeus == 1) a = [...a, b];
+        return a;
+      }, []);
+    }
+
+    if (this.clienteSeleccionado) {
+      let clientes = this.clienteSeleccionado.map(x => x.id);
+      informacion = informacion.reduce((a,b) => {
+        if (clientes.includes(b.nitCliente) && b.Zeus == 1) a = [...a, b];
+        return a;
+      }, []);
+    }
+    
+    return informacion;
   }
 
   headerPDF(today, hour){
@@ -1194,7 +1239,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           body: [
             [
               {
-                margin: 10,
+                margin: [10, 5, 10, 5],
                 border: [true, true, true, true],
                 alignment: 'right',
                 fontSize: 11,
