@@ -348,7 +348,7 @@
   </ng-template>
 </p-toast>
 
-<p-dialog [(visible)]="modalExportarPDF" [style]="{width: '50%'}" [contentStyle]="{'overflow':'visible'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Exportar a PDF" [modal]="true" [draggable]="false" [resizable]="false">
+<p-dialog [(visible)]="modalExportarPDF" [style]="{width: '70%'}" [contentStyle]="{'overflow':'visible'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Exportar a PDF" [modal]="true" [draggable]="false" [resizable]="false">
   <ng-template pTemplate="content">
     <div class="row g-4 mb-3">
       <div class="col-md-12">
@@ -357,22 +357,32 @@
     </div>
 
     <div class="row g-4">
-      <div class="col-sm-12 col-md-6">
+      <!-- DEPARTAMENTOS -->
+      <div class="col-sm-12 col-md-4">
+        <h3 class="subTituloExportarPDF">Filtrar Por Departamentos</h3>
+
+        <span class="p-float-label mt-5">
+          <p-multiSelect [options]="departamentos" [(ngModel)]="departamentoSeleccionado" optionLabel="departamento" inputId="depar" (onChange)="consultarMunicipios()"></p-multiSelect>
+          <label for="depar">Departamentos</label>
+        </span>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="col-sm-12 col-md-4">
         <h3 class="subTituloExportarPDF">Exportar por Cliente</h3>
 
         <span class="p-float-label mt-5">
-          <p-multiSelect [options]="clientes" [(ngModel)]="clienteSeleccionado" optionLabel="nombre" inputId="cliente" (onChange)="eleccionClienteVendedore(1)"></p-multiSelect>
-          <!-- <p-dropdown inputId="cliente" [(ngModel)]="clienteSeleccionado" [autoDisplayFirst]="false" [options]="clientes" optionValue="id" optionLabel="nombre" [filter]="true" filterBy="nombre"></p-dropdown> -->
+          <p-multiSelect [options]="clientes" [(ngModel)]="clienteSeleccionado" optionLabel="nombre" inputId="cliente"></p-multiSelect>
           <label for="cliente">Clientes</label>
         </span>
       </div>
 
-      <!-- EXPORTAR POR VENDEDOR -->
-      <div class="col-sm-12 col-md-6">
+      <!-- VENDEDORES -->
+      <div class="col-sm-12 col-md-4">
         <h3 class="subTituloExportarPDF">Exportar por Vendedor</h3>
 
         <span class="p-float-label mt-5">
-          <p-dropdown inputId="vendedor" [(ngModel)]="vendedorSeleccionado" (onChange)="eleccionClienteVendedore(2)" [autoDisplayFirst]="false" [options]="vendedores" optionValue="id" optionLabel="nombre" [filter]="true" filterBy="nombre"></p-dropdown>
+          <p-dropdown inputId="vendedor" [(ngModel)]="vendedorSeleccionado" [autoDisplayFirst]="false" [options]="vendedores" optionValue="id" optionLabel="nombre" [filter]="true" filterBy="nombre"></p-dropdown>
           <label for="vendedor">Vendedores</label>
         </span>
       </div>
