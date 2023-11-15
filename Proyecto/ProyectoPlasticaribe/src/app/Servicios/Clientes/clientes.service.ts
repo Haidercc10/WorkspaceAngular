@@ -33,4 +33,6 @@ export class ClientesService {
   srvGuardar = (data : modelCliente): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data);
 
   LikeGetCliente = (dato : string): Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/LikeGetClientes/${dato}`);
+
+  GetSedesClientes_NombreCliente = (nombre : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Clientes/getSedesClientes_NombreCliente/${nombre}`);
 }
