@@ -173,7 +173,7 @@ export class EntradaBOPPComponent implements OnInit {
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${datosBopp.Serial}, por favor colocar un serial distinto!`);
         this.load = true;
       } else {
-        this.categoriaService.srvObtenerListaPorId(datosBopp.Cat_Idz).subscribe(datos_categorias => {
+        this.categoriaService.srvObtenerListaPorId(datosBopp.Cat_Id).subscribe(datos_categorias => {
           datosBopp.Cat = datos_categorias.catMP_Nombre;          
           let index = this.boppsGenericos.findIndex((item) => item.boppGen_Id == datosBopp.IdBoppGenerico);
           if(index == -1) {
@@ -226,9 +226,9 @@ export class EntradaBOPPComponent implements OnInit {
       BOPP_CantidadInicialKg : data.CantKg,
       Usua_Id : this.storage_Id,
       BOPP_Hora : moment().format('H:mm:ss'),
-      BoppGen_Id : this.tipoDoc,
+      BoppGen_Id : data.IdBoppGenerico,
       BOPP_CodigoDoc : this.campoRemi_Faccompra,
-      BOPP_TipoDoc : data.IdBoppGenerico,
+      BOPP_TipoDoc : this.tipoDoc,
     }
     return datosBOPP;
   }
