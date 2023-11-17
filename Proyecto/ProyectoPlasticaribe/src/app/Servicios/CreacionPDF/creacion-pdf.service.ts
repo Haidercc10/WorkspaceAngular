@@ -90,7 +90,11 @@ export class CreacionPdfService {
     }
 
     private crearPDF(pdfDefinicion){
-        pdfMake.createPdf(pdfDefinicion).open();
+        const win = window.open('', "tempWinForPdf");
+        pdfMake.createPdf(pdfDefinicion).print({}, win);
+        setTimeout(() => {
+            win.close();
+        }, 500); 
     }
 
 }

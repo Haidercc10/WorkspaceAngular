@@ -382,6 +382,9 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarTiposSellado();
     this.limpiarCampos();
     this.ultimoNumeroOT();
+    setTimeout(() => {
+      console.log(this.tiposImpresion)
+    }, 2000);
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -806,6 +809,35 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
+  // Funcion que va a consultar los datos de la ultima orden de trabajo realizada al producto que se seleccionó
+  buscarOT(data : any) {
+    console.log(data)
+    this.limpiarProducto();
+    if (this.FormOrdenTrabajo.value.Id_Producto != null && this.FormOrdenTrabajo.value.Presentacion != null) {
+      this.cargando = true;
+      this.producto = data.item;
+      this.presentacionProducto = data.presentacion;
+      if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
+      else if (this.presentacionProducto == 'Unidad') this.presentacionProducto = 'Und';
+      this.buscarInformacionProducto();
+      this.bagProService.GetOrdenItemPresentacion(data.ordenTrabajo, this.producto, data.presentacion).subscribe(datos_Ot => {
+        console.log(datos_Ot)
+      for (const itemOt of datos_Ot) {
+        this.llenarFormularioOrdenTrabajo(itemOt);
+        this.llenarFormularioExtrusion(itemOt);
+        this.llenarFormularioLaminado(itemOt);
+        this.llenarFormularioCorte(itemOt);
+        this.llenarFormularioSellado(itemOt);
+        this.llenarFormularioImpresion(itemOt);
+        this.validarProcesosOrdenTrabajo(itemOt);
+        this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: itemOt.mezcla_Nombre, });
+      }
+        this.cargarCombinacionMezclas();
+        setTimeout(() => this.calcularDatosOt(), 500);        
+      }, () => this.consultarInformaciónBagPro());
+    }
+  }
+
   // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
   consultarInformaciónBagPro(){
     let presentacion: string = this.presentacionProducto;
@@ -882,7 +914,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: data.id_Tipo_Imptesion || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
+      Tipo_Impresion: parseInt(data.id_Tipo_Imptesion) || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
@@ -935,6 +967,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a llenar el formulario de corte con los datos de la ultima orden de trabajo creada
   llenarFormularioCorte(data : any){
+    console.log(this.ArrayProducto)
     this.FormOrdenTrabajoCorte.patchValue({
       Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
       Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
