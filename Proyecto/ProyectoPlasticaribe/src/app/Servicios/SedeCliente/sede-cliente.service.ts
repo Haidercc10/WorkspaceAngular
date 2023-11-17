@@ -29,4 +29,7 @@ export class SedeClienteService {
   GetSedeCliente = (cod : string, ciudad : string, direccion : string) : any => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedeCliente/${cod}/${ciudad}/${direccion}`);
 
   srvGuardar = (data : modelSedesClientes): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/SedesClientes', data);
+
+  GetSedeClientexNitBagPro = (cod : string) : any => this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedeClientexNitBagPro/${cod}`);
+
 }

@@ -11,6 +11,7 @@ import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pi
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_TrabajoComponent } from '../Orden_Trabajo/Orden_Trabajo.component';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 
 @Component({
   selector: 'app-Busqueda_OrdenesTrabajo',
@@ -41,12 +42,14 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     private bagProService : BagproService,
     private msj : MensajesAplicacionService,
     private zeusService : InventarioZeusService,
-    private orden_TrabajoComponent : Orden_TrabajoComponent) {
+    private orden_TrabajoComponent : Orden_TrabajoComponent,
+    private svcSedes : SedeClienteService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
       buscarPorItem_Ot : ['Item', Validators.required],
-      rangoFechas : [null],
+      fechaInicio : [null],
+      fechaFin : [null],
       idCliente : [null],
       cliente : [null],
       item : [null],
@@ -118,10 +121,9 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a consultar las ordenes de trabajo de la empresa
   consultarOrdenes(){
     this.cargando = true;
-    let rangoFechas : any = this.formFiltros.value.rangoFechas;
     let fechaAnterior : any = moment().subtract(12, 'M').format('YYYY-MM-DD');
-    let fechaIncio : any = rangoFechas.length > 1 ? moment(rangoFechas[0]).format('YYYY-MM-DD') : fechaAnterior;
-    let fechaFin : any = rangoFechas.length > 1 ? moment(rangoFechas[1]).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+    let fechaIncio : any = this.formFiltros.value.fechaInicio != null ? moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD') : fechaAnterior;
+    let fechaFin : any = this.formFiltros.value.fechaFin != null ? moment(this.formFiltros.value.fechaFin).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
     let ruta : string = this.validarRutaConsulta();
     this.bagProService.GetOrdenesTrabajo(fechaIncio, fechaFin, ruta).subscribe(data => {
       this.ordenesConsultadas = data;
@@ -217,22 +219,28 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   crearOrdenTrabajo(data : any){
+    let tipoBusqueda : 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
     tabCrearOrden2.click();
-    
-    let presentacion : string = data.presentacion;
-    if (presentacion == 'Unidad') presentacion = 'Und';
-    else if (presentacion == 'Kilo') presentacion = 'Kg';
-    this.orden_TrabajoComponent.limpiarCampos();
-    this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
-      Nombre_Cliente: data.cliente,
-      Id_Producto: data.item,
-      Nombre_Producto: data.referencia,
-      Presentacion: presentacion,
+    this.svcSedes.GetSedeClientexNitBagPro(data.nitCliente).subscribe(dato => {
+      let presentacion : string = data.presentacion;
+      if (presentacion == 'Unidad') presentacion = 'Und';
+      else if (presentacion == 'Kilo') presentacion = 'Kg';
+      this.orden_TrabajoComponent.limpiarCampos();
+      this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
+        Id_Cliente : dato[0].idCliente,
+        Nombre_Cliente: dato[0].cliente,
+        Id_Producto: data.item,
+        Nombre_Producto: data.referencia,
+        Presentacion: presentacion,
+        Id_Vendedor: dato[0].idVendedor.length == 2 ? dato[0].idVendedor = `0${dato[0].idVendedor}` : dato[0].idVendedor.length == 1 ? `00${dato[0].idVendedor}` : dato[0].idVendedor,
+        Nombre_Vendedor: dato[0].vendedor,
+      });
+      this.orden_TrabajoComponent.consultarClientes();
+      if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
+      else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.buscarOT(data);
     });
-    this.orden_TrabajoComponent.consultarClientes();
-    this.orden_TrabajoComponent.consultarInfoProducto();
   }
 
 }

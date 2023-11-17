@@ -19,17 +19,25 @@
       <p-radioButton formControlName="buscarPorItem_Ot" name="buscarPorItem_Ot" value="OT" [required]="true"></p-radioButton>
       <label class="mx-2" for="ot">OT</label>
     </div>
+    
+    <!-- FECHA INICIAL -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-calendar formControlName="fechaInicio" inputId="FechaInicial" id="FechaInicial" [showIcon]="true"></p-calendar>
+        <label for="FechaInicial">Fecha Inicial</label>
+      </span>
+    </div>
 
-    <!-- RANGO DE FECHAS -->
-    <div class="col-sm-12 col-md-6 col-xl-3">
-      <span class="p-float-label" id="rango-fechas">
-        <p-calendar formControlName="rangoFechas" inputId="fechas" selectionMode="range" [showIcon]="true" pTooltip="Selecciona el rango de fechas en el que deseas consultar"></p-calendar>
-        <label for="fechas">Rango de Fechas</label>
+    <!-- FECHA FINAL -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-calendar formControlName="fechaFin" inputId="FechaFinal" id="FechaFinal" [showIcon]="true"></p-calendar>
+        <label for="FechaFinal">Fecha Final</label>
       </span>
     </div>
 
     <!-- ID CLIENTE -->
-    <div class="col-sm-12 col-md-6 col-xl-3">
+    <div class="col-sm-12 col-md-6 col-xl-2">
       <span class="p-input-icon-left p-float-label">
         <i class="pi pi-user"></i>
         <input formControlName="idCliente" type="text" id="orden" pInputText [readonly]="true"/>
