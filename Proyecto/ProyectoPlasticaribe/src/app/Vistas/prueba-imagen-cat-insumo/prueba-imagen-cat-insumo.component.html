@@ -1,0 +1,255 @@
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+  
+<div class="contain">
+    <!-- Navegador fin de parte superior -->
+    <div class="container-fluid">
+      <div class="mb-4 Titulo">
+        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de {{proceso}}</h2>
+      </div>
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+    </div>
+</div>
+
+<p-card>
+    <div class="mb-4">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+    </div>
+
+    <form [formGroup]="formDatosProduccion">
+        <div class="row g-4 my-4">
+            <!-- ORDEN DE TRABAJO -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text" pInputText/>
+                    <label for="ot">OT</label>
+                </span>
+            </div>
+
+            <!-- ID CLIENTE -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <input formControlName="idCliente" id="idcliente" type="text" [readonly]="true" pInputText/>
+                    <label for="idcliente">Id Cliente</label>
+                </span>
+            </div>
+
+            <!-- CLIENTE -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+                <span class="p-float-label">
+                    <input formControlName="cliente" id="cliente" type="text" [readonly]="true" pInputText/> 
+                    <label for="cliente">Cliente</label>
+                </span>
+            </div>
+
+            <!-- ITEM -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <input formControlName="item" id="item" type="text" [readonly]="true" pInputText/> 
+                    <label for="item">Item</label>
+                </span>
+            </div>
+
+            <!-- REFERENCIA -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+                <span class="p-float-label">
+                    <input formControlName="referencia" id="referencia" type="text" [readonly]="true" pInputText/> 
+                    <label for="referencia">Referencia</label>
+                </span>
+            </div>
+
+            <!-- TURNO -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="turno" inputId="turnos" [options]="turnos" [readonly]="true"></p-dropdown>
+                    <label for="turnos">Turno</label>
+                </span>
+            </div>
+
+            <p-divider></p-divider>
+
+            <!-- KILOS A PRODUCIR -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoExtruir" inputId="pesoExtruir" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="pesoExtruir">KG</label>
+                </span>
+            </div>
+
+            <!-- ANCHO 1 -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="ancho1" inputId="ancho1" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="ancho1">Ancho 1</label>
+                </span>
+            </div>
+
+            <!-- ANCHO 2 -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="ancho2" inputId="ancho2" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="ancho2">Ancho 2</label>
+                </span>
+            </div>
+
+            <!-- ANCHO 3 -->
+            <div class="col-sm-12 col-md-6 col-xl-1">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="ancho3" inputId="ancho3" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="ancho3">Ancho 3</label>
+                </span>
+            </div>
+
+            <!-- UNIDAD DE MEDIDAD DE EXTRUSION -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="undExtrusion" inputId="undExt" [options]="unidadesMedida" [readonly]="true"></p-dropdown>
+                    <label for="undExt">Und Extrusión</label>
+                </span>
+            </div>
+
+            <!-- KILOS PESADOS -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="kilosPesados" inputId="kilosPesados" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="kilosPesados">Total Pesado</label>
+                </span>
+            </div>
+
+            <!-- CALIBRE -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="calibre" inputId="calibre" mode="decimal" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                    <label for="calibre">Calibre</label>
+                </span>
+            </div>
+
+            <!-- MATERIAL -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <input formControlName="material" id="material" type="text" [readonly]="true" pInputText/> 
+                    <label for="material">Material</label>
+                </span>
+            </div>
+
+            <p-divider></p-divider>
+
+            <!-- MAQUINA -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="maquina" inputId="Maquina"></p-inputNumber>
+                    <label for="Maquina">Maquina</label>
+                </span>
+            </div>
+
+            <!-- OPERARIO -->
+            <div class="col-sm-12 col-md-6 col-xl-3">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id"></p-dropdown>
+                    <label for="operario">Operario</label>
+                </span>
+            </div>
+
+            <!-- DAIPITA -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="daipita" inputId="daipita"></p-inputNumber>
+                    <label for="daipita">Daipita</label>
+                </span>
+            </div>
+
+            <!-- CONO -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-dropdown formControlName="cono" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" (onChange)="buscarDatosConoSeleccionado()" [autoDisplayFirst]="false"></p-dropdown>
+                    <label for="cono">Cono</label>
+                </span>
+            </div>
+
+            <!-- ANCHO CONOS -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="anchoCono" inputId="anchoCono" mode="decimal" [minFractionDigits]="4" [readonly]="true"></p-inputNumber>
+                    <label for="anchoCono">Ancho Cono</label>
+                </span>
+            </div>
+
+            <!-- TARA -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoTara" inputId="pesoTara" mode="decimal" [minFractionDigits]="4" [readonly]="true"></p-inputNumber>
+                    <label for="pesoTara">Tara Kg</label>
+                </span>
+            </div>
+
+            <!-- PESO BRUTO -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoBruto" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [readonly]="true"></p-inputNumber>
+                    <label for="pesoBruto">Bruto Kg</label>
+                </span>
+            </div>
+
+            <!-- PESO NETO -->
+            <div class="col-sm-12 col-md-6 col-xl-2">
+                <span class="p-float-label">
+                    <p-inputNumber formControlName="pesoNeto" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [readonly]="true"></p-inputNumber>
+                    <label for="pesoNeto">Neto Kg</label>
+                </span>
+            </div>
+
+            <p-divider></p-divider>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="buscarPuertos()"></button>
+            <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        </div>
+    </form>
+    
+    <div class="mb-4">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Pesado</h4>
+    </div>
+
+    <p-table>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>#</th>
+                <th>Rollo</th>
+                <th>Peso Bruto</th>
+                <th>Peso Neto</th>
+                <th>Material</th>
+                <th>Maquina</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Turno</th>
+                <th>Imprimir</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+</p-card>

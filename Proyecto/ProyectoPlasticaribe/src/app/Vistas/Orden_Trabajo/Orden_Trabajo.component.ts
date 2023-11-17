@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Injectable, Input, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
-import { error } from 'console';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
@@ -976,6 +975,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a calcular los costos de la orden de trabajo
   calcularDatosOt() {
     setTimeout(() => {
+      this.buscarInformacionProducto();
       if (this.ArrayProducto.length > 0) {
         this.cargando = true;
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
@@ -1031,6 +1031,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   calcularPesoProducto(material : number, fact : number){
     let i : number = 0;
+    this.ArrayProducto[i].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
     if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
       material == 3 ? fact = 0.0048 : fact = 0.00468;
       this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
@@ -1076,12 +1077,12 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cantidadProducto = data.Cant;
       this.valorProducto = data.PrecioUnd;
       this.valorOt = this.cantidadProducto * this.valorProducto;
-      this.margenKg = (margen_Adicional * ((data.Cant * data.PesoMillar) / 1000)) / 100;
-      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((data.PesoMillar / 1000) * data.Cant));
+      this.margenKg = (margen_Adicional * ((data.Cant * this.pesoMillar) / 1000)) / 100;
+      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.pesoMillar / 1000) * data.Cant));
       if (data.Peso_Producto > 0) {
         if (this.valorOt == 0) this.valorOt = 1;
         if ((data.Cant * data.PesoMillar) / 1000 == 0) this.valorKg = 0;
-        else this.valorKg = this.valorOt / ((data.Cant * data.PesoMillar) / 1000);
+        else this.valorKg = this.valorOt / ((data.Cant * this.pesoMillar) / 1000);
       } else this.valorOt = 0;
   }
 

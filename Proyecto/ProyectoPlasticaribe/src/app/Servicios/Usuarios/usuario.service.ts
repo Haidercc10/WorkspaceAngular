@@ -34,4 +34,6 @@ export class UsuarioService {
   srvEliminarUsuario = (id:number|String) => this.http.delete(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
 
   srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data);
+
+  GetOperariosProduccion = () => this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getOperariosProduccion`);
 }
