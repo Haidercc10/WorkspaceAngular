@@ -73,3 +73,19 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
 .p-inputgroup-addon {
   min-width: 2rem;
 }
+
+::ng-deep a[class*='p-accordion-header-link']{
+  color: var(--rojo);
+}
+
+::ng-deep .p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
+  background: #fff9f9;
+  border-color: #DB4149;
+}
+
+.colorTinta {
+  border-radius: 10px;
+  height: 25px;
+  width: 20px;
+  margin: auto;
+}

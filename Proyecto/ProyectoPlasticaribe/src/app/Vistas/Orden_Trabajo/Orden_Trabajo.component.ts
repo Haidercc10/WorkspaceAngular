@@ -654,6 +654,13 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
+  // Funcion que va a colocar el color correspondiente
+  colocarColor(color) : string {
+    let colorHex : string = ``;
+    colorHex = this.arrayTintas.find(x => x.tinta_Nombre == color).tinta_CodigoHexadecimal;
+    return colorHex;
+  }
+
   // Funcion que va a consultar los vendedores de la empresa
   consultarVendedores() {
     this.usuarioService.GetVendedores().subscribe(data => {

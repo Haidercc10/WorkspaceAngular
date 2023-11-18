@@ -23,6 +23,7 @@ import { CascadeSelectModule } from "primeng/cascadeselect";
 import { ChartModule } from 'primeng/chart';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChipModule } from 'primeng/chip';
+import { ColorPickerModule } from 'primeng/colorpicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -73,6 +74,7 @@ import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
+import { Busqueda_OrdenesTrabajoComponent } from './Vistas/Busqueda_OrdenesTrabajo/Busqueda_OrdenesTrabajo.component';
 import { CalendarioComponent } from './Vistas/Calendario/Calendario.component';
 import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certificado-Calidad.component';
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
@@ -96,6 +98,7 @@ import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extru
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
+import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
 import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
 import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.component';
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
@@ -125,6 +128,8 @@ import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExt
 import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
+import { ReporteFacturacionDetalladaComponent } from './Vistas/Reporte-Facturacion-Detallada/Reporte-Facturacion-Detallada.component';
+import { ReporteProduccionComponent } from './Vistas/Reporte-Produccion/Reporte-Produccion.component';
 import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
 import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturacion_Vendedores/ReporteFacturacion_Vendedores.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
@@ -140,6 +145,7 @@ import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Rep
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
 import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_SolicitudMpExtrusion/Reporte_SolicitudMpExtrusion.component';
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
+import { ReportesConsolidadosComponent } from './Vistas/Reportes-Consolidados/Reportes-Consolidados.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
@@ -183,11 +189,6 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Formato_Facturas_VentasComponent } from './Vistas/Formato_Facturas_Ventas/Formato_Facturas_Ventas.component';
-import { ReporteFacturacionDetalladaComponent } from './Vistas/Reporte-Facturacion-Detallada/Reporte-Facturacion-Detallada.component';
-import { ReporteProduccionComponent } from './Vistas/Reporte-Produccion/Reporte-Produccion.component';
-import { ReportesConsolidadosComponent } from './Vistas/Reportes-Consolidados/Reportes-Consolidados.component';
-import { Busqueda_OrdenesTrabajoComponent } from './Vistas/Busqueda_OrdenesTrabajo/Busqueda_OrdenesTrabajo.component';
 
 @NgModule({
   declarations: [
@@ -391,6 +392,7 @@ import { Busqueda_OrdenesTrabajoComponent } from './Vistas/Busqueda_OrdenesTraba
     ToggleButtonModule,
     TieredMenuModule,
     ListboxModule,
+    ColorPickerModule,
   ],
 
   providers: [

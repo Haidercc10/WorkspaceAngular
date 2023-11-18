@@ -60,7 +60,7 @@
             </div>
             
             <!-- ID CLIENTE -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2" id="idCliente">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idCliente">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-user"></i>
                 <input formControlName="Id_Cliente" type="text" id="orden" pInputText [required]="true" [readonly]="true"/>
@@ -69,7 +69,7 @@
             </div>
 
             <!-- NOMBRE CLIENTE -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-5 col-xxl-3" id="cliente">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3" id="cliente">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-users"></i>
                 <input formControlName="Nombre_Cliente" id="cliente" list="clientes" type="text" pInputText (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off"[required]="true"/>
@@ -81,7 +81,7 @@
             </div>
 
             <!-- ID PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="idProducto">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idProducto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-box"></i>
                 <input formControlName="Id_Producto" type="text" id="Id_Producto" (keyup.enter)="buscarProductoPorId()" pInputText [required]="true"/>
@@ -90,7 +90,7 @@
             </div>
 
             <!-- NOMBRE PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-3" id="producto">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="producto">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-th-large"></i>
                 <input formControlName="Nombre_Producto" id="Nombre_Producto" list="productos" type="text" pInputText (keyup)="consultarProductos()" (change)="productoSeleccionado()" autocomplete="off"[required]="true"/>
@@ -102,7 +102,7 @@
             </div>
 
             <!-- CANTIDAD A FABRICAR -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="cantidadFabricar">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="cantidadFabricar">
               <span class="p-float-label">
                 <p-inputNumber formControlName="Cantidad" mode="decimal" inputId="Cant" [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
                 <label for="Cant">Cant. Pedida</label>
@@ -110,7 +110,7 @@
             </div>
 
             <!-- PRESENTACION PRODUCTO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="presentacion">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="presentacion">
               <span class="p-float-label">
                 <p-dropdown formControlName="Presentacion" inputId="Estado" [autoDisplayFirst]="false" [options]="presentaciones" optionLabel="undMed_Nombre" optionValue="undMed_Id" (onChange)="consultarInfoProducto()" [required]="true"></p-dropdown>
                 <label for="Estado">Presentación</label>
@@ -118,7 +118,7 @@
             </div>
 
             <!-- PRECIO UNITARIO -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="precioUnitario">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="precioUnitario">
               <span class="p-float-label">
                 <p-inputNumber formControlName="Precio" mode="decimal" prefix="$ " inputId="Cant" [minFractionDigits]="2" (onKeyDown)="calcularDatosOt()" [required]="true"></p-inputNumber>
                 <label for="Cant">Precio Unitario</label>
@@ -126,15 +126,15 @@
             </div>
 
             <!-- MARGEN ADICIONAL -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="margenAdicional">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1" id="margenAdicional">
               <span class="p-float-label">
                 <p-inputNumber formControlName="Margen" mode="decimal" inputId="Cant" prefix="% " [minFractionDigits]="2" [readonly]="true" [required]="true"></p-inputNumber>
-                <label for="Cant">Margen Adicional</label>
+                <label for="Cant">Margen</label>
               </span>
             </div>
             
             <!-- ID Vendedor -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-3" id="idVendedor">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="idVendedor">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-user"></i>
                 <input formControlName="Id_Vendedor" type="text" id="Id_Vendedor" pInputText [required]="true" [readonly]="true"/>
@@ -143,7 +143,7 @@
             </div>
 
             <!-- Nombre Vendedor -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4" id="vendedor">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3" id="vendedor">
               <span class="p-float-label">
                 <p-dropdown formControlName="Nombre_Vendedor" inputId="Nombre_Vendedor" [options]="vendedores" optionValue="usua_Nombre" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre" [showClear]="true" [autoDisplayFirst]="false" [required]="true" (onChange)="vendedorSeleccionado()"></p-dropdown>
                 <label for="Nombre_Vendedor">Vendedor</label>
@@ -151,7 +151,7 @@
             </div>
 
             <!-- ESTADO DE LA ORDEN -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3" id="estadoOrden">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="estadoOrden">
               <span class="p-float-label">
                 <p-dropdown formControlName="OT_Estado" inputId="Estado" [options]="estados" optionLabel="estado_Nombre" optionValue="estado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
                 <label for="Estado">Estado OT</label>
@@ -159,7 +159,7 @@
             </div>
 
             <!-- Fecha creacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-2" id="fechaCreacion">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2" id="fechaCreacion">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-calendar"></i>
                 <input formControlName="OT_FechaCreacion" id="FechaCrea" type="text" pInputText [readOnly]="true" [required]="true"/>
@@ -168,7 +168,7 @@
             </div>
 
             <!-- Campo Observacion -->
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-12 col-xxl-12" id="observacion">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-8 col-xxl-8" id="observacion">
               <span class="p-float-label">
                 <textarea formControlName="OT_Observacion" [rows]="1" pInputTextarea></textarea>
                 <label for="textarea">Observación</label>
@@ -262,620 +262,745 @@
           <p-tabView id="datos-ot" class="justify-content-md-center">
             <!-- Datos OT -->
             <p-tabPanel
-              header="Datos OT"
+              header="Datos Orden Trabajo"
               leftIcon="pi pi-calculator"
               tooltip="Información de costos de la orden de trabajo"
               id="datosOrdenTrabajo">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center">
-                <div class="mb-3 costosFinales">
-                  <div class="row g-3">
-                    <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
-                    <label for="">{{cantidadProducto | number : '1.2-2'}}</label>
-                  </div>
-                </div>
-                <div class="mb-3 costosFinales">
-                  <div class="row g-3">
-                    <p-chip  id="valor1" label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
-                    <label for="">${{valorProducto | number : '1.2-2'}}</label>
-                  </div>
-                </div>
-                <div class="mb-3 costosFinales">
-                  <div class="row g-3">
-                    <p-chip id="neto1" label="Neto Kg" icon="pi pi-th-large"></p-chip>
-                    <label for="">{{netoKg | number : '1.2-2'}}</label>
-                  </div>
-                </div>
-                <div class="mb-3 costosFinales">
-                  <div  class="row g-3">
-                    <p-chip id="valor-kg" label="Valor Kg" icon="pi pi-money-bill"></p-chip>
-                    <label for="">${{valorKg | number : '1.2-2'}}</label>
-                  </div>
-                </div>
-                <div class="mb-3 costosFinales">
-                  <div class="row g-3">
-                    <p-chip id="valor-ot" label="Valor OT" icon="pi pi-wallet"></p-chip>
-                    <label for="">${{valorOt | number : '1.2-2'}}</label>
-                  </div>
-                </div>
-              </div>
-            </p-tabPanel>        
-
-            <!-- Extrusion -->
-            <p-tabPanel
-              header="Extrusión"
-              leftIcon="pi pi-bolt"
-              *ngIf="extrusion"
-              id="datosExtrusion">
-              <br>
-              <form [formGroup]="FormOrdenTrabajoExtrusion">
-                <div class="mb-3">
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Material -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Material_Extrusion" inputId="Material" optionValue="material_Id" [autoDisplayFirst]="false" [options]="arrayMateriales" optionLabel="material_Nombre" [required]="true"></p-dropdown>
-                        <label for="Material">Material</label>
-                      </span>
+              <p-accordion [multiple]="true" [activeIndex]="[0,1,2,3,4,5]">
+                <p-accordionTab *ngIf="extrusion">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-bolt mr-2"></i>
+                      <span class="vertical-align-middle">Extrusión</span>
                     </div>
-
-                    <!-- Formato -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Formato_Extrusion" inputId="Formato" optionValue="formato_Id" [autoDisplayFirst]="false" [options]="formatos" optionLabel="formato_Nombre" [required]="true"></p-dropdown>
-                        <label for="Formato">Formato</label>
-                      </span>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <form [formGroup]="FormOrdenTrabajoExtrusion" class="m-3">
+                      <div class="mb-3">
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Material -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Material_Extrusion" inputId="Material" optionValue="material_Id" [autoDisplayFirst]="false" [options]="arrayMateriales" optionLabel="material_Nombre" [required]="true"></p-dropdown>
+                              <label for="Material">Material</label>
+                            </span>
+                          </div>
+      
+                          <!-- Formato -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Formato_Extrusion" inputId="Formato" optionValue="formato_Id" [autoDisplayFirst]="false" [options]="formatos" optionLabel="formato_Nombre" [required]="true"></p-dropdown>
+                              <label for="Formato">Formato</label>
+                            </span>
+                          </div>
+      
+                          <!-- Pigmento -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Pigmento_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true"></p-dropdown>
+                              <label for="Pigmento">Pigmento</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tratado -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Tratado_Extrusion" inputId="Tratado" [options]="tratado" optionLabel="tratado_Nombre" optionValue="tratado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                              <label for="Tratado">Tratado</label>
+                            </span>
+                          </div>
+      
+                          <!--Ancho 1 -->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Extrusion1" inputId="Ancho1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Ancho1">Ancho 1</label>
+                            </span>
+                          </div>
+      
+                          <!--Ancho 2-->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Extrusion2" inputId="Ancho2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Ancho2">Ancho 2</label>
+                            </span>
+                          </div>
+      
+                          <!--Ancho 3-->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Extrusion3" inputId="Ancho3" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Ancho3">Ancho 3</label>
+                            </span>
+                          </div>
+      
+                          <!-- Calibre -->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Calibre_Extrusion" inputId="Calibre" mode="decimal" [minFractionDigits]="2" (keyup)="calcularDatosOt()" [required]="true"></p-inputNumber>
+                              <label for="Calibre">Calibre</label>
+                            </span>
+                          </div>
+      
+                          <!-- Unidad Medida -->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
+                              <label for="UndMedida">Und. Medida</label>
+                            </span>
+                          </div>
+      
+                          <!-- Peso Extrusion -->
+                          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-2 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Peso_Extrusion" inputId="PesoExtrusion" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
+                              <label for="PesoExtrusion">Peso Extrusión</label>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </ng-template>
+                </p-accordionTab>
+                <p-accordionTab *ngIf="impresion || rotograbado">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-printer mr-2"></i>
+                      <span class="vertical-align-middle">Impresión</span>
                     </div>
-
-                    <!-- Pigmento -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Pigmento_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true"></p-dropdown>
-                        <label for="Pigmento">Pigmento</label>
-                      </span>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <form [formGroup]="FormOrdenTrabajoImpresion" class="m-3">
+                      <div class="mb-3">
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Tipo de Impresión -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Tipo_Impresion" inputId="TipoImpresion" [autoDisplayFirst]="false" [options]="tiposImpresion" optionValue="tpImpresion_Id" optionLabel="tpImpresion_Nombre" [required]="true" [readonly]="true"></p-dropdown>
+                              <label for="TipoImpresion">Tipo Impresión</label>
+                            </span>
+                          </div>
+      
+                          <!-- Rodillo -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Rodillo_Impresion" inputId="Rodillo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Rodillo">Rodillo</label>
+                            </span>
+                          </div>
+      
+                            <!-- Pista -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-3 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Pista_Impresion" inputId="Pista" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Pista">Pista</label>
+                            </span>
+                          </div>
+      
+                        </div>
+                      </div>
+      
+                      <!--Fila 2-->
+                      <div class="mb-3" style="text-align: center;">
+                        <h6 class="tituloRojo">Tintas</h6>
+                        <br>
+                      </div>
+      
+                        <!--Fila 3-->
+                      <div class="mb-4">
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Tinta 1 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta1" formControlName="Tinta_Impresion1" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion1)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion1 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta1">Tinta 1 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 2 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta2" formControlName="Tinta_Impresion2" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion2)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion2 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta2">Tinta 2 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 3 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta3" formControlName="Tinta_Impresion3" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion3)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion3 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta3">Tinta 3 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                            <!-- Tinta 4 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta4" formControlName="Tinta_Impresion4" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion4)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion4 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta4">Tinta 4 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 5-->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta5" formControlName="Tinta_Impresion5" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion5)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion5 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta5">Tinta 5 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 6 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta6" formControlName="Tinta_Impresion6" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion6)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion6 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta6">Tinta 6 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 7 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta7" formControlName="Tinta_Impresion7" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion7)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion7 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta7">Tinta 7 (Opcional)</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tinta 8 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+                            <span class="p-float-label">
+                              <p-dropdown [options]="arrayTintas" inputId="Tinta8" formControlName="Tinta_Impresion8" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" optionValue="tinta_Nombre" [showClear]="true" placeholder="Tinta">
+                                <ng-template pTemplate="selectedItem">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{colocarColor(FormOrdenTrabajoImpresion.value.Tinta_Impresion8)}}" disabled/>
+                                    <div class="mx-2">{{ FormOrdenTrabajoImpresion.value.Tinta_Impresion8 }}</div>
+                                  </div>
+                                </ng-template>
+                                <ng-template let-tinta pTemplate="item">
+                                  <div class="flex align-items-center gap-2">
+                                    <input type="color" id="head" name="head" value="{{tinta.tinta_CodigoHexadecimal}}" disabled/>
+                                    <div class="mx-2">{{ tinta.tinta_Nombre }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <label for="Tinta8">Tinta 8 (Opcional)</label>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </ng-template>
+                </p-accordionTab>
+                <p-accordionTab *ngIf="laminado">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-map mr-2"></i>
+                      <span class="vertical-align-middle">Laminado</span>
                     </div>
-
-                    <!-- Tratado -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tratado_Extrusion" inputId="Tratado" [options]="tratado" optionLabel="tratado_Nombre" optionValue="tratado_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                        <label for="Tratado">Tratado</label>
-                      </span>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <form [formGroup]="FormOrdenTrabajoLaminado" class="m-3">
+                      <!--Fila 1-->
+                      <div class="mb-3" >
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!--Capa 1-->
+                          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Capa_Laminado1" (onChange)="validarLaminado(1)" inputId="Capa1" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                              <label for="Capa1">Capa 1</label>
+                            </span>
+                          </div>
+      
+                          <!--Calibre 1-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Calibre_Laminado1" (keyup)="validarLaminadoCapa(1)" inputId="Calibre1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Calibre1">Calibre 1</label>
+                            </span>
+                          </div>
+      
+                          <!--Cantidad x capa 1-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="cantidad_Laminado1" (keyup)="validarLaminadoCapa(1)" inputId="Cantidad1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Cantidad1">Cantidad 1</label>
+                            </span>
+                          </div>
+      
+                          <!--Capa 2-->
+                          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Capa_Laminado2" (onChange)="validarLaminado(2)" inputId="Capa2" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                              <label for="Capa2">Capa 2</label>
+                            </span>
+                          </div>
+      
+                          <!--Calibre 2-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Calibre_Laminado2" (keyup)="validarLaminadoCapa(2)" inputId="Calibre2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Calibre2">Calibre 2</label>
+                            </span>
+                          </div>
+      
+                          <!--Cantidad x capa 2-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="cantidad_Laminado2" (keyup)="validarLaminadoCapa(2)" inputId="Cantidad2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Cantidad2">Cantidad 2</label>
+                            </span>
+                          </div>
+      
+                          <!--Capa 3-->
+                          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Capa_Laminado3" (onChange)="validarLaminado(3)" inputId="Capa3" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                              <label for="Capa3">Capa 3</label>
+                            </span>
+                          </div>
+      
+                          <!--Calibre 3-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Calibre_Laminado3" inputId="Calibre3" (keyup)="validarLaminadoCapa(3)" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Calibre3">Calibre 3</label>
+                            </span>
+                          </div>
+      
+                          <!--Cantidad x capa 1-->
+                          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="cantidad_Laminado3" inputId="Cantidad3" (keyup)="validarLaminadoCapa(3)" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Cantidad3">Cantidad 3</label>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </ng-template>
+                </p-accordionTab>
+                <p-accordionTab *ngIf="corte">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-th-large mr-2"></i>
+                      <span class="vertical-align-middle">Corte</span>
                     </div>
-
-                    <!--Ancho 1 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Ancho_Extrusion1" inputId="Ancho1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Ancho1">Ancho 1</label>
-                      </span>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <form [formGroup]="FormOrdenTrabajoCorte" class="m-3">
+                      <div class="mb-3">
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Formato -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-2">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
+                              <label for="Formato">Formato</label>
+                            </span>
+                          </div>
+      
+                          <!-- Ancho -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Corte" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Ancho">Ancho</label>
+                            </span>
+                          </div>
+      
+                          <!-- Largo-->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Largo_Corte" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Largo">Largo</label>
+                            </span>
+                          </div>
+      
+                          <!-- Fuelle-->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Fuelle_Corte" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Fuelle">Fuelle</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Ancho -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-2">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Ancho_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="etiquetaAncho">Etiq. Ancho</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Largo-->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-2">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Largo_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="Largo">Etiq. Largo</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Fuelle-->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-2">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Fuelle_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="Fuelle">Etiq. Fuelle</label>
+                            </span>
+                          </div>
+      
+                          <!-- Margen -->
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-1">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Margen_Corte" inputId="Margen" mode="decimal" prefix="% " [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
+                              <label for="Margen">Margen</label>
+                            </span>
+                            <div>
+                              <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </ng-template>
+                </p-accordionTab>
+                <p-accordionTab *ngIf="sellado">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-tags mr-2"></i>
+                      <span class="vertical-align-middle">Sellado</span>
                     </div>
-
-                    <!--Ancho 2-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Ancho_Extrusion2" inputId="Ancho2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Ancho2">Ancho 2</label>
-                      </span>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <form [formGroup]="FormOrdenTrabajoSellado" class="m-3">
+                      <div class="mb-3" >
+                        <!-- DATOS PRODUCTO TERMINADO -->
+                        <div class="mb-4 text-center">
+                          <h6 class="tituloRojo">Producto Terminado</h6>
+                        </div>
+      
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Formato -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
+                              <label for="Formato">Formato</label>
+                            </span>
+                          </div>
+      
+                          <!-- Ancho -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Ancho">Ancho</label>
+                            </span>
+                          </div>
+      
+                          <!-- Largo-->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Largo_Sellado" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Largo">Largo</label>
+                            </span>
+                          </div>
+      
+                          <!-- Fuelle-->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Fuelle_Sellado" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="Fuelle">Fuelle</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Ancho -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Ancho_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="etiquetaAncho">Etiq. Ancho</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Largo-->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="Largo">Etiq. Largo</label>
+                            </span>
+                          </div>
+      
+                          <!-- Etiqueta Fuelle-->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
+                              <label for="Fuelle">Etiq. Fuelle</label>
+                            </span>
+                          </div>
+      
+                          <!-- Margen -->
+                          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="Margen_Sellado" inputId="Margen" mode="decimal" prefix="% " [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
+                              <label for="Margen">Margen</label>
+                            </span>
+                            <div>
+                              <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                            </div>
+                          </div>
+                        </div>
+                        <hr>
+      
+                        <!-- DATOS SELLADO -->
+                        <div class="my-4 text-center">
+                          <h6 class="tituloRojo">Sellado</h6>
+                        </div>
+      
+                        <div class="row g-4 justify-content-md-center">
+      
+                          <!-- Peso Millar -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PesoMillar" [(ngModel)]="pesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
+                              <label for="PesoMillar">Peso Millar</label>
+                            </span>
+                          </div>
+      
+                          <!-- Tipo Sellado -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-dropdown formControlName="TipoSellado" inputId="TipoSellado" [options]="tipoSellado" optionLabel="tpSellados_Nombre" optionValue="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                              <label for="TipoSellado">Tipo Sellado</label>
+                            </span>
+                          </div>
+      
+                          <!-- Cantidad Paquete -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="CantidadPaquete">Cantidad Paquete</label>
+                            </span>
+                          </div>
+      
+                          <!-- Peso Paquete -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PesoPaquete">Peso Paquete</label>
+                            </span>
+                          </div>
+      
+                          <!-- Cantidad Bulto -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="CantidadBulto">Cantidad Bulto</label>
+                            </span>
+                          </div>
+      
+                          <!-- Peso Bulto -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PesoBulto" inputId="PesoBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PesoBulto">Peso Bulto</label>
+                            </span>
+                          </div>
+                        </div>
+                        <hr>
+      
+                        <!-- PRECIOS SELLADO Y WIKETIADO -->
+                        <div class="my-4 text-center">
+                          <h6 class="tituloRojo">Precios Producción</h6>
+                        </div>
+      
+                        <div class="row g-4 justify-content-md-center">
+                          <!-- Precio Sellado Día -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioDia" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioDia">Sellado Día</label>
+                            </span>
+                          </div>
+                          
+                          <!-- Precio Sellado Noche -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioNoche" inputId="PrecioNoche" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioNoche">Sellado Noche</label>
+                            </span>
+                          </div>
+                          
+                          <!-- Precio Wiketiado Día Maquina 50 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioWiketiadoDia_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioDia">Wik. Día MQ 50</label>
+                            </span>
+                          </div>
+                          
+                          <!-- Precio Wiketiado Noche Maquina 50 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioDia">Wik. Noche MQ 50</label>
+                            </span>
+                          </div>
+                          
+                          <!-- Precio Wiketiado Día Maquina 9 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioWiketiadoDia_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioDia">Wik. Día MQ 9</label>
+                            </span>
+                          </div>
+                          
+                          <!-- Precio Wiketiado Día Maquina 50 -->
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                            <span class="p-float-label">
+                              <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+                              <label for="PrecioDia">Wik. Noche MQ 9</label>
+                            </span>
+                          </div>
+                        </div>
+                        <hr>
+                      </div>
+                    </form>
+                  </ng-template>
+                </p-accordionTab>
+                <p-accordionTab>
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-calculator mr-2"></i>
+                      <span class="vertical-align-middle">Datos/Costos OT</span>
                     </div>
-
-                    <!--Ancho 3-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Ancho_Extrusion3" inputId="Ancho3" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Ancho3">Ancho 3</label>
-                      </span>
-                    </div>
-
-                    <!-- Calibre -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Calibre_Extrusion" inputId="Calibre" mode="decimal" [minFractionDigits]="2" (keyup)="calcularDatosOt()" [required]="true"></p-inputNumber>
-                        <label for="Calibre">Calibre</label>
-                      </span>
-                    </div>
-
-                    <!-- Unidad Medida -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="UnidadMedida_Extrusion" inputId="UndMedida" [options]="arrayUnidadesMedidas" [autoDisplayFirst]="false" optionLabel="undMed_Id" optionValue="undMed_Id" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
-                        <label for="UndMedida">Und. Medida</label>
-                      </span>
-                    </div>
-
-                    <!-- Peso Extrusion -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Peso_Extrusion" inputId="PesoExtrusion" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
-                        <label for="PesoExtrusion">Peso Extrusión</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </p-tabPanel>
-
-            <!-- Impresión -->
-            <p-tabPanel
-              header="Impresión"
-              leftIcon="pi pi-print"
-              *ngIf="impresion || rotograbado">
-              <br>
-              <form [formGroup]="FormOrdenTrabajoImpresion">
-                <div class="mb-3">
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Tipo de Impresión -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tipo_Impresion" inputId="TipoImpresion" [autoDisplayFirst]="false" [options]="tiposImpresion" optionValue="tpImpresion_Id" optionLabel="tpImpresion_Nombre" [required]="true" [readonly]="true"></p-dropdown>
-                        <label for="TipoImpresion">Tipo Impresión</label>
-                      </span>
-                    </div>
-
-                    <!-- Rodillo -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Rodillo_Impresion" inputId="Rodillo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Rodillo">Rodillo</label>
-                      </span>
-                    </div>
-
-                      <!-- Pista -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Pista_Impresion" inputId="Pista" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Pista">Pista</label>
-                      </span>
-                    </div>
-
-                  </div>
-                </div>
-
-                <!--Fila 2-->
-                <div class="mb-3" style="text-align: center;">
-                  <h6 class="tituloRojo">Tintas</h6>
-                  <br>
-                </div>
-
-                  <!--Fila 3-->
-                <div class="mb-4">
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Tinta 1 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion1" inputId="Tinta1" (onChange)="validarTinta('1')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta1">Tinta 1 (Opcional)</label>
-                      </span>
-                    </div>
-
-                    <!-- Tinta 2 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion2" inputId="Tinta2" (onChange)="validarTinta('2')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta2">Tinta 2 (Opcional)</label>
-                      </span>
-                    </div>
-
-                    <!-- Tinta 3 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion3" inputId="Tinta13" (onChange)="validarTinta('3')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta3">Tinta 3 (Opcional)</label>
-                      </span>
-                    </div>
-
-                      <!-- Tinta 4 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion4" inputId="Tinta4" (onChange)="validarTinta('4')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta4">Tinta 4 (Opcional)</label>
-                      </span>
-                    </div>
-
-                    <!-- Tinta 5-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion5" inputId="Tinta5" (onChange)="validarTinta('5')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta5">Tinta 5 (Opcional)</label>
-                      </span>
-                    </div>
-
-                    <!-- Tinta 6 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion6" inputId="Tinta6" (onChange)="validarTinta('6')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta6">Tinta 6 (Opcional)</label>
-                      </span>
-                    </div>
-
-                    <!-- Tinta 7 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion7" inputId="Tinta7" (onChange)="validarTinta('7')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta7">Tinta 7 (Opcional)</label>
-                      </span>
-                    </div>
-
-                      <!-- Tinta 8 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Tinta_Impresion8" inputId="Tinta8" (onChange)="validarTinta('8')" [autoDisplayFirst]="false" [options]="arrayTintas" optionValue="tinta_Nombre" optionLabel="tinta_Nombre" [filter]="true" filterBy="tinta_Nombre" [required]="true"></p-dropdown>
-                        <label for="Tinta8">Tinta 8 (Opcional)</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </p-tabPanel>
-
-            <!-- Laminado -->
-            <p-tabPanel
-              header="Laminado"
-              leftIcon="pi pi-map"
-              *ngIf="laminado">
-              <br>
-              <form [formGroup]="FormOrdenTrabajoLaminado">
-                <!--Fila 1-->
-                <div class="mb-3" >
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!--Capa 1-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Capa_Laminado1" (onChange)="validarLaminado(1)" inputId="Capa1" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                        <label for="Capa1">Capa 1</label>
-                      </span>
-                    </div>
-
-                    <!--Calibre 1-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Calibre_Laminado1" (keyup)="validarLaminadoCapa(1)" inputId="Calibre1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Calibre1">Calibre 1</label>
-                      </span>
-                    </div>
-
-                    <!--Cantidad x capa 1-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="cantidad_Laminado1" (keyup)="validarLaminadoCapa(1)" inputId="Cantidad1" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Cantidad1">Cantidad 1</label>
-                      </span>
-                    </div>
-
-                    <!--Capa 2-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Capa_Laminado2" (onChange)="validarLaminado(2)" inputId="Capa2" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                        <label for="Capa2">Capa 2</label>
-                      </span>
-                    </div>
-
-                    <!--Calibre 2-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Calibre_Laminado2" (keyup)="validarLaminadoCapa(2)" inputId="Calibre2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Calibre2">Calibre 2</label>
-                      </span>
-                    </div>
-
-                    <!--Cantidad x capa 2-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="cantidad_Laminado2" (keyup)="validarLaminadoCapa(2)" inputId="Cantidad2" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Cantidad2">Cantidad 2</label>
-                      </span>
-                    </div>
-
-                    <!--Capa 3-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Capa_Laminado3" (onChange)="validarLaminado(3)" inputId="Capa3" [options]="laminado_capas" optionLabel="lamCapa_Nombre" optionValue="lamCapa_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                        <label for="Capa3">Capa 3</label>
-                      </span>
-                    </div>
-
-                    <!--Calibre 3-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Calibre_Laminado3" inputId="Calibre3" (keyup)="validarLaminadoCapa(3)" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Calibre3">Calibre 3</label>
-                      </span>
-                    </div>
-
-                    <!--Cantidad x capa 1-->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-2">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="cantidad_Laminado3" inputId="Cantidad3" (keyup)="validarLaminadoCapa(3)" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Cantidad3">Cantidad 3</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </p-tabPanel>
-
-            <!-- Corte -->
-            <p-tabPanel
-              header="Corte"
-              leftIcon="pi pi-th-large"
-              *ngIf="corte">
-              <br>
-              <form [formGroup]="FormOrdenTrabajoCorte">
-                <div class="mb-3">
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Formato -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Formato_Corte" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
-                        <label for="Formato">Formato</label>
-                      </span>
-                    </div>
-
-                    <!-- Ancho -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Ancho_Corte" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Ancho">Ancho</label>
-                      </span>
-                    </div>
-
-                    <!-- Largo-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Largo_Corte" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Largo">Largo</label>
-                      </span>
-                    </div>
-
-                    <!-- Fuelle-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Fuelle_Corte" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Fuelle">Fuelle</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Ancho -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Ancho_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="etiquetaAncho">Etiqueta Ancho</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Largo-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Largo_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="Largo">Etiqueta Largo</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Fuelle-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Fuelle_Corte" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="Fuelle">Etiqueta Fuelle</label>
-                      </span>
-                    </div>
-
-                    <!-- Margen -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Margen_Corte" inputId="Margen" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
-                        <label for="Margen">Margen (%)</label>
-                      </span>
-                      <div>
-                        <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center text-center">
+                      <div class="mb-3 costosFinales">
+                        <div class="row g-3">
+                          <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
+                          <label for="">{{cantidadProducto | number : '1.2-2'}}</label>
+                        </div>
+                      </div>
+                      <div class="mb-3 costosFinales">
+                        <div class="row g-3">
+                          <p-chip  id="valor1" label="Valor {{presentacionProducto}}" icon="pi pi-dollar"></p-chip>
+                          <label for="">${{valorProducto | number : '1.2-2'}}</label>
+                        </div>
+                      </div>
+                      <div class="mb-3 costosFinales">
+                        <div class="row g-3">
+                          <p-chip id="neto1" label="Neto Kg" icon="pi pi-th-large"></p-chip>
+                          <label for="">{{netoKg | number : '1.2-2'}}</label>
+                        </div>
+                      </div>
+                      <div class="mb-3 costosFinales">
+                        <div  class="row g-3">
+                          <p-chip id="valor-kg" label="Valor Kg" icon="pi pi-money-bill"></p-chip>
+                          <label for="">${{valorKg | number : '1.2-2'}}</label>
+                        </div>
+                      </div>
+                      <div class="mb-3 costosFinales">
+                        <div class="row g-3">
+                          <p-chip id="valor-ot" label="Valor OT" icon="pi pi-wallet"></p-chip>
+                          <label for="">${{valorOt | number : '1.2-2'}}</label>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </form>
-            </p-tabPanel>
-
-            <!-- Sellado -->
-            <p-tabPanel
-              header="Sellado"
-              leftIcon="pi pi-tags"
-              *ngIf="sellado">
-              <br>
-              <form [formGroup]="FormOrdenTrabajoSellado">
-                <div class="mb-3" >
-                  <!-- DATOS PRODUCTO TERMINADO -->
-                  <div class="mb-4 text-center">
-                    <h6 class="tituloRojo">Producto Terminado</h6>
-                  </div>
-
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Formato -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="Formato_Sellado" inputId="Formato" [options]="tipoProductos" optionLabel="tpProd_Nombre" optionValue="tpProd_Nombre" [autoDisplayFirst]="false" [required]="true" (onChange)="calcularDatosOt()"></p-dropdown>
-                        <label for="Formato">Formato</label>
-                      </span>
-                    </div>
-
-                    <!-- Ancho -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Ancho_Sellado" inputId="Ancho" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Ancho">Ancho</label>
-                      </span>
-                    </div>
-
-                    <!-- Largo-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Largo_Sellado" inputId="Largo" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Largo">Largo</label>
-                      </span>
-                    </div>
-
-                    <!-- Fuelle-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Fuelle_Sellado" inputId="Fuelle" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="Fuelle">Fuelle</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Ancho -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Ancho_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="etiquetaAncho">Etiqueta Ancho</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Largo-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Largo_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="Largo">Etiqueta Largo</label>
-                      </span>
-                    </div>
-
-                    <!-- Etiqueta Fuelle-->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <input formControlName="Etiqueta_Fuelle_Sellado" id="etiquetaAncho" type="text" pInputText autocomplete="off" [required]="true"/>
-                        <label for="Fuelle">Etiqueta Fuelle</label>
-                      </span>
-                    </div>
-
-                    <!-- Margen -->
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="Margen_Sellado" inputId="Margen" mode="decimal" [minFractionDigits]="2" [required]="true" (onKeyDown)="calcularDatosOt()"></p-inputNumber>
-                        <label for="Margen">Margen (%)</label>
-                      </span>
-                      <div>
-                        <label><b>Margen Kg: </b>{{margenKg | number}}</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr>
-
-                  <!-- DATOS SELLADO -->
-                  <div class="my-4 text-center">
-                    <h6 class="tituloRojo">Sellado</h6>
-                  </div>
-
-                  <div class="row g-4 justify-content-md-center">
-
-                    <!-- Peso Millar -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PesoMillar" [(ngModel)]="pesoMillar" inputId="PesoMillar" mode="decimal" [minFractionDigits]="2" [required]="true" [readonly]="true"></p-inputNumber>
-                        <label for="PesoMillar">Peso Millar</label>
-                      </span>
-                    </div>
-
-                    <!-- Tipo Sellado -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-dropdown formControlName="TipoSellado" inputId="TipoSellado" [options]="tipoSellado" optionLabel="tpSellados_Nombre" optionValue="tpSellados_Nombre" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                        <label for="TipoSellado">Tipo Sellado</label>
-                      </span>
-                    </div>
-
-                    <!-- Cantidad Paquete -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="CantidadPaquete" inputId="CantidadPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="CantidadPaquete">Cantidad Paquete</label>
-                      </span>
-                    </div>
-
-                    <!-- Peso Paquete -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PesoPaquete" inputId="PesoPaquete" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PesoPaquete">Peso Paquete</label>
-                      </span>
-                    </div>
-
-                    <!-- Cantidad Bulto -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="CantidadBulto" inputId="CantidadBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="CantidadBulto">Cantidad Bulto</label>
-                      </span>
-                    </div>
-
-                    <!-- Peso Bulto -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PesoBulto" inputId="PesoBulto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PesoBulto">Peso Bulto</label>
-                      </span>
-                    </div>
-                  </div>
-                  <hr>
-
-                  <!-- PRECIOS SELLADO Y WIKETIADO -->
-                  <div class="my-4 text-center">
-                    <h6 class="tituloRojo">Precios Producción</h6>
-                  </div>
-
-                  <div class="row g-4 justify-content-md-center">
-                    <!-- Precio Sellado Día -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioDia" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioDia">Sellado Día</label>
-                      </span>
-                    </div>
-                    
-                    <!-- Precio Sellado Noche -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioNoche" inputId="PrecioNoche" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioNoche">Sellado Noche</label>
-                      </span>
-                    </div>
-                    
-                    <!-- Precio Wiketiado Día Maquina 50 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioWiketiadoDia_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioDia">Wik. Día MQ 50</label>
-                      </span>
-                    </div>
-                    
-                    <!-- Precio Wiketiado Noche Maquina 50 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq50" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioDia">Wik. Noche MQ 50</label>
-                      </span>
-                    </div>
-                    
-                    <!-- Precio Wiketiado Día Maquina 9 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioWiketiadoDia_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioDia">Wik. Día MQ 9</label>
-                      </span>
-                    </div>
-                    
-                    <!-- Precio Wiketiado Día Maquina 50 -->
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
-                      <span class="p-float-label">
-                        <p-inputNumber formControlName="PrecioWiketiadoNoche_Mq9" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
-                        <label for="PrecioDia">Wik. Noche MQ 9</label>
-                      </span>
-                    </div>
-                  </div>
-                  <hr>
-                </div>
-              </form>
+                  </ng-template>
+                </p-accordionTab>
+              </p-accordion>
             </p-tabPanel>
 
             <!-- Mezclas -->
@@ -2007,7 +2132,6 @@
                 </form>
               </div>
             </p-tabPanel>
-
           </p-tabView>
 
           <!-- Botones -->
