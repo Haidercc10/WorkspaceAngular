@@ -93,7 +93,7 @@ export class BagproService {
 
   GetOrdenesTrabajo = (inicio : any, fin : any, ruta : string) => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getOrdenesTrabajo/${inicio}/${fin}${ruta}`);
 
-  GetOrdenItemPresentacion = (ot : number, producto : number, presentacion : string):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/getOrdenItemPresentacion/${ot}/${producto}/${presentacion}`);
+  GetOrdenDeTrabajo = (ot : number):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/GetOrdenDeTrabajo/${ot}`);
 
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 

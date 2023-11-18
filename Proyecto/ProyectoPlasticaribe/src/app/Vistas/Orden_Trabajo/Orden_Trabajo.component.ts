@@ -36,6 +36,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2 } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 
 @Injectable({
   providedIn: 'root'
@@ -126,6 +127,7 @@ export class Orden_TrabajoComponent implements OnInit {
   nroCapas: number = 0;
   nroCapasOT: number = 0;
   ultimaOT : number = 0;
+  ultimaOTApp : number = 0;
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -154,7 +156,8 @@ export class Orden_TrabajoComponent implements OnInit {
     private otSelladoCorteService: OrdenTrabajo_Sellado_CorteService,
     private usuarioService: UsuarioService,
     private messageService: MessageService,
-    private shepherdService: ShepherdService,) {
+    private shepherdService: ShepherdService,
+    private svcSedes : SedeClienteService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -380,10 +383,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarTiposProductos();
     this.cargarTiposSellado();
     this.limpiarCampos();
-    this.ultimoNumeroOT();
-    setTimeout(() => {
-      console.log(this.tiposImpresion)
-    }, 2000);
+    this.ultimaOTBagPro();
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -808,33 +808,50 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  // Funcion que va a consultar los datos de la ultima orden de trabajo realizada al producto que se seleccionó
-  buscarOT(data : any) {
-    console.log(data)
+  //Función que consultará una OT en bagpro y llenará todos los campos del formulario con dicha información
+  busquedaOTBagPro(ot : any){
+    this.cargando = true;
+    ot = typeof(ot) == 'number' ? ot : ot.ordenTrabajo;
     this.limpiarProducto();
-    if (this.FormOrdenTrabajo.value.Id_Producto != null && this.FormOrdenTrabajo.value.Presentacion != null) {
-      this.cargando = true;
-      this.producto = data.item;
-      this.presentacionProducto = data.presentacion;
-      if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
-      else if (this.presentacionProducto == 'Unidad') this.presentacionProducto = 'Und';
-      this.buscarInformacionProducto();
-      this.bagProService.GetOrdenItemPresentacion(data.ordenTrabajo, this.producto, data.presentacion).subscribe(datos_Ot => {
-        console.log(datos_Ot)
-      for (const itemOt of datos_Ot) {
-        this.llenarFormularioOrdenTrabajo(itemOt);
-        this.llenarFormularioExtrusion(itemOt);
-        this.llenarFormularioLaminado(itemOt);
-        this.llenarFormularioCorte(itemOt);
-        this.llenarFormularioSellado(itemOt);
-        this.llenarFormularioImpresion(itemOt);
-        this.validarProcesosOrdenTrabajo(itemOt);
-        this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: itemOt.mezcla_Nombre, });
-      }
-        this.cargarCombinacionMezclas();
-        setTimeout(() => this.calcularDatosOt(), 500);        
-      }, () => this.consultarInformaciónBagPro());
-    }
+    this.bagProService.GetOrdenDeTrabajo(ot).subscribe(datos_Ot => {
+      this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(datos_Sedes => {
+        this.producto = datos_Ot[0].id_Producto;
+        this.presentacionProducto = datos_Ot[0].presentacion;
+        if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
+        else if (this.presentacionProducto == 'Unidad') this.presentacionProducto = 'Und';
+        this.buscarInformacionProducto();
+        setTimeout(() => { this.cargarFormularios(datos_Sedes[0], datos_Ot[0], ot); }, 500);
+        setTimeout(() => this.calcularDatosOt(), 800);
+        }, error => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
+    }, error => this.consultarInformaciónBagPro());
+  }
+
+  //Función que cargará los diferentes formularios de la orden de trabajo
+  cargarFormularios(dataSedes : any, dataOt : any, ot : any){
+    this.llenarDatosCliente(dataSedes)
+    this.llenarFormularioOrdenTrabajo(dataOt);
+    this.llenarFormularioExtrusion(dataOt);
+    this.llenarFormularioLaminado(dataOt);
+    this.llenarFormularioCorte(dataOt);
+    this.llenarFormularioSellado(dataOt);
+    this.llenarFormularioImpresion(dataOt);
+    this.validarProcesosOrdenTrabajo(dataOt);
+    this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: dataOt.mezcla_Nombre, });
+    this.FormOrdenTrabajo.patchValue({ OT_Id: ot, });
+    this.cargarCombinacionMezclas();
+  }
+
+  //Función que llenará la información del cliente, vendedor y producto
+  llenarDatosCliente(data : any){
+    this.FormOrdenTrabajo.patchValue({
+      Id_Cliente : data == undefined ? '' : data.idCliente,
+      Nombre_Cliente: data == undefined ? '' : data.cliente,
+      Id_Producto: this.ArrayProducto[0].Id,
+      Nombre_Producto: this.ArrayProducto[0].Nombre,
+      Presentacion: this.ArrayProducto[0].Und,
+      Id_Vendedor: data == undefined ? '' : data.idVendedor.length == 2 ? data.idVendedor = `0${data.idVendedor}` : data.idVendedor.length == 1 ? `00${data.idVendedor}` : data.idVendedor,
+      Nombre_Vendedor: data == undefined ? '' : data.vendedor,
+    });
   }
 
   // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
@@ -951,14 +968,15 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a llenar el formulario de laminado con los datos de la ultima orden de trabajo creada
   llenarFormularioLaminado(data : any){
+    console.log(data)
     this.FormOrdenTrabajoLaminado.patchValue({
-      Capa_Laminado1: data.id_Capa1 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
+      Capa_Laminado1: parseInt(data.id_Capa1) || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
       Calibre_Laminado1: data.calibre_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
       cantidad_Laminado1: data.cantidad_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado1,
-      Capa_Laminado2: data.id_Capa2 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
+      Capa_Laminado2: parseInt(data.id_Capa2) || this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
       Calibre_Laminado2: data.calibre_Laminado_Capa2 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado2,
       cantidad_Laminado2: data.cantidad_Laminado_Capa2 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
-      Capa_Laminado3: data.id_Capa3 || this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
+      Capa_Laminado3: parseInt(data.id_Capa3) || this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
       Calibre_Laminado3: data.calibre_Laminado_Capa3 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado3,
       cantidad_Laminado3: data.cantidad_Laminado_Capa3 || this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     });
@@ -966,7 +984,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a llenar el formulario de corte con los datos de la ultima orden de trabajo creada
   llenarFormularioCorte(data : any){
-    console.log(this.ArrayProducto)
     this.FormOrdenTrabajoCorte.patchValue({
       Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
       Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
@@ -1951,6 +1968,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
     this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
+      
       for (let i = 0; i < datos_orden.length; i++) {
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
@@ -1986,7 +2004,9 @@ export class Orden_TrabajoComponent implements OnInit {
         }, 1000);
       }
     }, error => {
-      this.msj.mensajeError(error.error);
+      this.edicionOrdenTrabajo = false;
+      this.busquedaOTBagPro(numeroOT);
+      //this.msj.mensajeError(error.error);
       this.cargando = false;
     });
   }
@@ -2909,6 +2929,9 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOT = data }, error => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
+  //Función que cargará la última OT de Plasticaribe. 
+  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOTApp = data }, error => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
   
+  //Función que cargará la última OT de Plasticaribe. 
+  ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => {this.ultimaOT = data.item; } , error => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
 }

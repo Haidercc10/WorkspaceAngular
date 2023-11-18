@@ -43,7 +43,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private zeusService : InventarioZeusService,
     private orden_TrabajoComponent : Orden_TrabajoComponent,
-    private svcSedes : SedeClienteService) {
+    private svcSedes : SedeClienteService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.frmBuilder.group({
@@ -223,7 +223,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
     tabCrearOrden2.click();
-    this.svcSedes.GetSedeClientexNitBagPro(data.nitCliente).subscribe(dato => {
+    /*this.svcSedes.GetSedeClientexNitBagPro(data.nitCliente).subscribe(dato => {
       let presentacion : string = data.presentacion;
       if (presentacion == 'Unidad') presentacion = 'Und';
       else if (presentacion == 'Kilo') presentacion = 'Kg';
@@ -236,11 +236,11 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
         Presentacion: presentacion,
         Id_Vendedor: dato[0].idVendedor.length == 2 ? dato[0].idVendedor = `0${dato[0].idVendedor}` : dato[0].idVendedor.length == 1 ? `00${dato[0].idVendedor}` : dato[0].idVendedor,
         Nombre_Vendedor: dato[0].vendedor,
-      });
+      });*/
       this.orden_TrabajoComponent.consultarClientes();
       if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
-      else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.buscarOT(data);
-    });
+      else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
+    //});
   }
 
 }
