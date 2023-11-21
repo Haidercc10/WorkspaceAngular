@@ -828,10 +828,10 @@ export class Orden_TrabajoComponent implements OnInit {
         if (this.presentacionProducto == 'Kilo') this.presentacionProducto = 'Kg';
         else if (this.presentacionProducto == 'Unidad') this.presentacionProducto = 'Und';
         this.buscarInformacionProducto();
-        setTimeout(() => { this.cargarFormularios(datos_Sedes[0], datos_Ot[0], ot); }, 500);
+        setTimeout(() => this.cargarFormularios(datos_Sedes[0], datos_Ot[0], ot), 500);
         setTimeout(() => this.calcularDatosOt(), 800);
-        }, error => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
-    }, error => this.consultarInformaciónBagPro());
+        }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
+    }, () => this.consultarInformaciónBagPro());
   }
 
   //Función que cargará los diferentes formularios de la orden de trabajo
@@ -942,7 +942,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: parseInt(data.id_Tipo_Imptesion) || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
+      Tipo_Impresion: this.impresion ? parseInt(data.id_Tipo_Imptesion) || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
@@ -980,7 +980,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a llenar el formulario de laminado con los datos de la ultima orden de trabajo creada
   llenarFormularioLaminado(data : any){
-    console.log(data)
     this.FormOrdenTrabajoLaminado.patchValue({
       Capa_Laminado1: parseInt(data.id_Capa1) || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
       Calibre_Laminado1: data.calibre_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
@@ -2015,7 +2014,7 @@ export class Orden_TrabajoComponent implements OnInit {
           this.cargando = false;
         }, 1000);
       }
-    }, error => {
+    }, () => {
       this.edicionOrdenTrabajo = false;
       this.busquedaOTBagPro(numeroOT);
       //this.msj.mensajeError(error.error);
@@ -2942,8 +2941,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Función que cargará la última OT de Plasticaribe. 
-  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOTApp = data }, error => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
+  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOTApp = data }, () => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
   
   //Función que cargará la última OT de Plasticaribe. 
-  ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => {this.ultimaOT = data.item; } , error => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
+  ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => {this.ultimaOT = data.item; } , () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
 }

@@ -15,13 +15,13 @@ export class CreacionPdfService {
         let today : any = moment().format('YYYY-MM-DD');
         let hour : any = moment().format('HH:mm:ss');
         const pdfDefinicion : any = {
-          info: { title: titulo },
-          pageOrientation: 'portrait',
-          pageSize: 'LETTER',
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 110, 25, 35],
-          header: this.headerPDF(today, hour, titulo, headerAdicional),
-          content : content,
+            info: { title: titulo },
+            pageOrientation: 'portrait',
+            pageSize: 'LETTER',
+            watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+            pageMargins : [25, 110, 25, 35],
+            header: this.headerPDF(today, hour, titulo, headerAdicional),
+            content : content,
         }
         setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
     }

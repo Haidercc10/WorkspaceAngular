@@ -13,6 +13,8 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
+import { collection, getDocs } from "firebase/firestore"; 
+import { db } from 'src/app/conexionFirebase';
 
 Injectable({
   providedIn: 'root'
@@ -75,13 +77,17 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.lecturaStorage();
     this.cantidadEventosMes();
     this.consultarEventosHoy();
     this.consultarEventosMes();
     this.CargarCategorias();
     this.abrirModalUsuario();
+    // const querySnapshot = await getDocs(collection(db, "Correos"));
+    // querySnapshot.forEach((doc) => {
+    //   doc.data();
+    // });
   }
 
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 

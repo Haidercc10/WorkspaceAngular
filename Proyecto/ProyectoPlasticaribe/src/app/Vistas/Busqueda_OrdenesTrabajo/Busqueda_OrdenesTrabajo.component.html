@@ -152,7 +152,8 @@
   currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
   [paginator]="true"
   [rows]="20"
-  [rowsPerPageOptions]="[10, 20, 50, 100, ordenesConsultadas.length]">
+  [rowsPerPageOptions]="[10, 20, 50, 100, ordenesConsultadas.length]"
+  *ngIf="!cargando">
   <ng-template pTemplate="caption">
     <p-multiSelect
       [options]="columnas"
@@ -166,6 +167,7 @@
   <ng-template pTemplate="header" let-columns>
     <tr>
       <th *ngFor="let col of columns"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field)"></th>
+      <th rowspan="2" pFrozenColumn alignFrozen="right" [frozen]="true">Crear Orden</th>
     </tr>
     <tr>
       <th *ngFor="let col of columnasSeleccionadas" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
@@ -175,7 +177,24 @@
   </ng-template>
   <ng-template pTemplate="body" let-data let-columns="columns">
     <tr (dblclick)="crearOrdenTrabajo(data)" class="no-seleccionable cursor">
-      <td *ngFor="let col of columns">{{col.tipo == 'number' ? (data[col.field] | number : '1.2-2') : col.tipo == 'date' ? (data[col.field] | date : 'YYYY-MM-dd') : (data[col.field])}}</td>
+      <td [pEditableColumn]="data" class="cursor" *ngFor="let col of columns">
+        <p-cellEditor *ngIf="['Cantidad', 'Precio'].includes(col.header)">
+          <ng-template pTemplate="input">
+            <p-inputNumber [style]="{'min-width' : '100px'}" [(ngModel)]="data[col.field]" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{col.tipo == 'number' ? (data[col.field] | number : '1.2-2') : col.tipo == 'date' ? (data[col.field] | date : 'YYYY-MM-dd') : (data[col.field])}}
+          </ng-template>
+        </p-cellEditor>
+
+        <span *ngIf="!['Cantidad', 'Precio'].includes(col.header)">
+          {{col.tipo == 'number' ? (data[col.field] | number : '1.2-2') : col.tipo == 'date' ? (data[col.field] | date : 'YYYY-MM-dd') : (data[col.field])}}
+        </span>
+      </td>
+      
+      <td pFrozenColumn alignFrozen="right" [frozen]="true" class="text-center">
+        <p-button icon="pi pi-plus" [rounded]="true" severity="success" (onClick)="crearCopiaOrdenTrabajo(data)"></p-button>
+      </td>
     </tr>
   </ng-template>
 </p-table>

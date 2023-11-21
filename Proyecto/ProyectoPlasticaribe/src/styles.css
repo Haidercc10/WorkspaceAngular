@@ -346,6 +346,10 @@ p-table .p-datatable-gridlines .p-datatable-tfoot > tr > td {
   border: 1px solid #a7a7a752 !important;
 }
 
+.p-datatable-scrollable td.p-frozen-column {
+  z-index: 0;
+}
+
 button {
   border-radius: 20px;
 }

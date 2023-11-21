@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
+import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
@@ -17,6 +22,8 @@ import { AppComponent } from 'src/app/app.component';
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
   cargando : boolean = false;
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
   modoSeleccionado : boolean = false;
   validarRol : number;
   formDatosProduccion !: FormGroup;
@@ -24,19 +31,23 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   unidadesMedida : any [] = [];
   operarios : any [] = [];
   conos : any [] = [];
-  proceso : string = ``;
+  proceso : string = `Extrusión`;
   rollosPesados : any [] = [];
+  datosOrdenTrabajo : any [] = [];
 
   constructor(private frmBuilder : FormBuilder,
-    private appComponet : AppComponent,
+    private appComponent : AppComponent,
     private turnosService : TurnosService,
     private operariosService : UsuarioService,
     private unidadMedidaService : UnidadMedidaService,
     private conosService : ConosService,
     private productoService : ProductoService,
-    private bagproService : BagproService,){
+    private bagproService : BagproService,
+    private msj : MensajesAplicacionService,
+    private produccionProcesosService : Produccion_ProcesosService,
+    private creacionPdfService : CreacionPdfService,){
 
-    this.modoSeleccionado = this.appComponet.temaSeleccionado;
+    this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
       ordenTrabajo : [null, Validators.required],
       idCliente : [null, Validators.required],
@@ -59,16 +70,27 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       pesoTara : [null, Validators.required],
       pesoBruto : [null, Validators.required],
       pesoNeto : [null, Validators.required],
-      daipita : [null, Validators.required],
+      daipita : [null],
     });
   }
 
-   ngOnInit(){
+  ngOnInit(){
+    this.lecturaStorage();
     this.obtenerTurnos();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
     setTimeout(() => { this.prueba(); }, 2000);
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.appComponent.storage_Id;
+    this.ValidarRol = this.appComponent.storage_Rol;
+  }
+
+  validarProceso(){
+
   }
 
   async buscarPuertos(){
@@ -95,17 +117,22 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     }
   }
 
-  ab2str(buf) {
-    return String.fromCharCode.apply(null, new Uint8Array(buf));
-  }
+  ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
 
   limpiarCampos(){
     this.cargando = false;
     this.formDatosProduccion.reset();
+    this.obtenerTurnos();
   }
 
   obtenerTurnos() {
+    let proceso : string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     this.turnosService.srvObtenerLista().subscribe(data => this.turnos = data.map(x => x.turno_Id));
+    this.bagproService.GetHorarioProceso(proceso).subscribe(turno => {
+      this.formDatosProduccion.patchValue({turno : turno.toString()});
+    });
   }
 
   obtenerUnidadMedida() {
@@ -113,7 +140,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   obtenerOperarios() {
-    this.operariosService.GetOperariosProduccion().subscribe(data => this.operarios = data);
+    this.operariosService.GetOperariosProduccion().subscribe(data => {
+      this.operarios = data;
+      this.operarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+    });
   }
 
   obtenerConos() {
@@ -171,7 +201,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   buscraOrdenTrabajo(){
     let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
+    this.cargando = true;
     this.bagproService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(data => {
+      this.datosOrdenTrabajo = data;
+      this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
+      this.buscarRollosPesados();
       data.forEach(datos => {
         this.formDatosProduccion.patchValue({
           idCliente : datos.cliente,
@@ -187,18 +221,82 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           material : datos.extMaterialNom.trim(),
         });
       });
-    });
+    }, () => this.cargando = false, () => this.cargando = false);
   }
 
   buscarRollosPesados(){
     this.rollosPesados = [];
+    let proceso : string = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let ordenTrabajo : string = this.formDatosProduccion.value.ordenTrabajo;
+    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => this.rollosPesados = data, () => this.cargando = false, () => this.cargando = false);
   }
 
-  sumarTotalKilosPesados(){
+  sumarPesoBruto(){
+    let total : number = 0;
+    total = this.rollosPesados.reduce((a,b) => a + b.extBruto, 0);
+    return total;
+  }
 
+  sumarPesoNeto(){
+    let total : number = 0;
+    total = this.rollosPesados.reduce((a,b) => a + b.extnetokg, 0);
+    return total;
+  }
+
+  validarDatos(){
+    if (this.datosOrdenTrabajo.length > 0) {
+      if (this.formDatosProduccion.valid) {
+        if (this.formDatosProduccion.value.pesoNeto > 0) {
+          if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
+          else this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
+        } else this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
+      } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
+    } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+  }
+
+  guardarProduccion(){
+    this.cargando = true;
+    let datos : modelProduccionProcesos = {
+      Numero_Rollo: 0,
+      Prod_Id: parseInt(this.formDatosProduccion.value.item),
+      Cli_Id: parseInt(this.formDatosProduccion.value.idCliente),
+      Operario1_Id: this.formDatosProduccion.value.operario,
+      Operario2_Id: null,
+      Operario3_Id: null,
+      Operario4_Id: null,
+      Pesado_Entre: 1,
+      Maquina: this.formDatosProduccion.value.maquina,
+      Cono_Id: this.formDatosProduccion.value.cono,
+      Ancho_Cono: this.formDatosProduccion.value.anchoCono,
+      Tara_Cono: this.formDatosProduccion.value.pesoTara,
+      Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
+      Peso_Neto: this.formDatosProduccion.value.pesoNeto,
+      Cantidad: 0,
+      Peso_Teorico: 0,
+      Desviacion: 0,
+      Precio: 0,
+      Presentacion: 'Kg',
+      Proceso_Id: this.proceso,
+      Turno_Id: this.formDatosProduccion.value.turno,
+      Envio_Zeus: false,
+      Datos_Etiqueta: '',
+      Fecha: moment().format('YYYY-MM-DD'),
+      Hora: moment().format('HH:mm:ss'),
+      Creador_Id : this.storage_Id,
+    }
+
+    this.produccionProcesosService.Post(datos).subscribe(res => {
+
+    }, () => {
+      this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
+      this.cargando = false;
+    });
+  }
+
+  crearEtiqueta(){
+    
   }
 
   prueba() {
-    this.bagproService.Prueba();
   }
 }

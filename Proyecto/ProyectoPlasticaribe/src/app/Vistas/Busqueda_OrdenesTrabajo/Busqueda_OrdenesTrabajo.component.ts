@@ -234,4 +234,25 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     } else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
   }
 
+  crearCopiaOrdenTrabajo(data : any){
+    let tipoBusqueda : 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
+    let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
+    let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
+    tabCrearOrden2.click();
+    this.orden_TrabajoComponent.consultarClientes();
+    if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
+    else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
+    setTimeout(() => {
+      this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
+        Cantidad: data.cantidad,
+        Precio: data.precio,
+      });
+    }, 1000);
+    setTimeout(() => {
+      this.orden_TrabajoComponent.guardarOt();
+      let tabCrearOrden3 = document.getElementById(tabCrearOrden[1].id);
+      tabCrearOrden3.click();
+    }, 1500);
+  }
+  
 }
