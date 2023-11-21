@@ -128,6 +128,7 @@ export class Orden_TrabajoComponent implements OnInit {
   nroCapasOT: number = 0;
   ultimaOT : number = 0;
   ultimaOTApp : number = 0;
+  dataBusquedaxItem : any;
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -850,6 +851,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que llenará la información del cliente, vendedor y producto
   llenarDatosCliente(data : any){
+    console.log(data)
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente : data == undefined ? '' : data.idCliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
@@ -867,18 +869,21 @@ export class Orden_TrabajoComponent implements OnInit {
     if (presentacion == 'Kg') presentacion = 'Kilo';
     else if (presentacion == 'Und') presentacion = 'Unidad';
     this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(this.producto, presentacion).subscribe(datos_Ot => {
-      for (const itemOt of datos_Ot) {
-        this.llenarFormularioOrdenTrabajo(itemOt);
-        this.validarProcesosOrdenTrabajo(itemOt);
-        this.llenarFormularioExtrusion(itemOt);
-        this.llenarFormularioImpresionBagPro(itemOt);
-        this.llenarFormularioLaminado(itemOt);
-        this.llenarFormularioCorte(itemOt);
-        this.llenarFormularioSellado(itemOt);
-        setTimeout(() => this.calcularDatosOt(), 1000);
-        this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: itemOt.mezcla_Nombre});
-        this.cargarCombinacionMezclas();
-      }
+      this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(data => {
+        for (const itemOt of datos_Ot) {
+          this.llenarDatosCliente(data[0]);
+          this.llenarFormularioOrdenTrabajo(itemOt);
+          this.validarProcesosOrdenTrabajo(itemOt);
+          this.llenarFormularioExtrusion(itemOt);
+          this.llenarFormularioImpresionBagPro(itemOt);
+          this.llenarFormularioLaminado(itemOt);
+          this.llenarFormularioCorte(itemOt);
+          this.llenarFormularioSellado(itemOt);
+          setTimeout(() => this.calcularDatosOt(), 1000);
+          this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: itemOt.mezcla_Nombre});
+          this.cargarCombinacionMezclas();
+        }
+      })
     }, () => {
       this.msj.mensajeAdvertencia(`¡Advertencia!`, `No se encuentra una Orden de Trabajo anterior para el producto ${this.producto} y presentación ${presentacion}`);
       this.cargando = false;

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { arrayBuffer } from 'stream/consumers';
 
 @Injectable({
   providedIn: 'root'
@@ -121,4 +122,21 @@ export class BagproService {
   srvObtenerListaUltimosClientes = (fecha : any) => this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes/${fecha}`);
 
   GetClientesNombre = (nombre : any) => this.http.get<any>(this.rutaBagPro + `/Clientes/getClientesNombre/${nombre}`);
+
+  Prueba(){
+    
+   return this.http.get(this.rutaBagPro + `/ClientesOt/Prueba`, { responseType: 'arraybuffer'}).subscribe((pdfData :  ArrayBuffer) => {
+      console.log(pdfData)
+      let blob = new Blob([pdfData], { type : 'application/pdf' });
+      let url = URL.createObjectURL(blob);
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.contentWindow.onload = () => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      }
+    });
+  }
 }

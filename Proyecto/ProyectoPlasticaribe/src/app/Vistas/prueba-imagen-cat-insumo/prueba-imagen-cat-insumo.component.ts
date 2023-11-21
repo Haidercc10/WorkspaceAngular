@@ -63,11 +63,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
   }
 
-  ngOnInit(){
+   ngOnInit(){
     this.obtenerTurnos();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
+    setTimeout(() => { this.prueba(); }, 2000);
   }
 
   async buscarPuertos(){
@@ -195,5 +196,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   sumarTotalKilosPesados(){
 
+  }
+
+  prueba() {
+    this.bagproService.Prueba();
   }
 }

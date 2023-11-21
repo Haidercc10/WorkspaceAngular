@@ -116,7 +116,7 @@ export class DashBoardRecaudosComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+  formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 
   generarPDF(){
     this.cargando = true;
@@ -137,10 +137,10 @@ export class DashBoardRecaudosComponent implements OnInit {
     for (let i = 0; i < vendedores.length; i++) {
       data.push([
         {
-          margin: [15, 5],
+          margin: [5, 5],
           text: `${vendedores[i].id} - ${vendedores[i].nombre}`,
           bold: true,
-          fontSize: 12,
+          fontSize: 11,
           alignment: 'left'
         },
         this.clientesVendedorPdf(vendedores[i].id),
@@ -159,10 +159,10 @@ export class DashBoardRecaudosComponent implements OnInit {
       if (!clientesIncluidos.includes(clientes[i].id_Cliente)) {
         clientesIncluidos.push(clientes[i].id_Cliente);
         data.push({
-          margin: [20, 5],
+          margin: [5, 0, 5, 5],
           fontSize: 10,
           table: {
-            widths: [100, 300, 100],
+            widths: ['12%', '60%', '15%', '13%'],
             body: this.facturasClientes(clientes[i])
           }
         });
@@ -178,18 +178,19 @@ export class DashBoardRecaudosComponent implements OnInit {
     data.push(this.informacionClientePDF(cliente));
     data.push([
       {
-        margin: 5,
-        colSpan: 3,
+        margin: [3, 3, 3, 0],
+        colSpan: 4,
         border: [true, false, true, true],
         table: {
           fontSize: 8,
           dontBreakRows: true,
-          widths : ['20%', '20%', '20%', '20%', '20%'],
+          widths : ['11%', '11%', '11%', '5%', '12%', '12%', '12%', '14%', '12%',],
           body: this.datosFacturasPdf(facturas)
         }
       },
       {},
-      {}
+      {},
+      {},
     ]);
     data.push(this.totalClientePdf(facturas));
     return data;
@@ -199,7 +200,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     return [
       { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true },
       { border: [false, true, false, true], text: `${cliente.nombre_CLiente}`, fillColor: '#ccc', bold: true },
-      { border: [false, true, true, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, true, true], text: `Plazo: ${cliente.plazo_De_Pago} Días`, fillColor: '#ccc', bold: true },
     ]
   }
 
@@ -208,11 +210,15 @@ export class DashBoardRecaudosComponent implements OnInit {
     data.push(this.titulosFacturasPdf());
     for (let i = 0; i < facturas.length; i++) {
       data.push([
-        { border: [true, true, false, true], fontSize: 8, text: `${facturas[i].num_Factura}`, alignment: 'center' },
-        { border: [false, true, false, true], fontSize: 8, text: `${facturas[i].id_Fecha}`, alignment: 'center' },
-        { border: [false, true, false, true], fontSize: 8, text: `${facturas[i].fecha_Vencimiento}`, alignment: 'center' },
-        { border: [false, true, false, true], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldo_Cartera).toFixed(2))}`, alignment: 'right' },
-        { border: [false, true, true, true], fontSize: 8, text: `${facturas[i].plazo_De_Pago}`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].num_Factura}`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].id_Fecha}`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].fecha_Vencimiento}`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].cantidad_Dias}`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo1)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo1).toFixed(2)) }`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo2)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo2).toFixed(2)) }`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo3)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo3).toFixed(2)) }`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo4)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo4).toFixed(2)) }`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo5)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo5).toFixed(2)) }`, alignment: 'center' },
       ]);
     }
     return data;
@@ -220,11 +226,15 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   titulosFacturasPdf(){
     return [
-      { border: [true, true, false, true], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, true, false, true], text: `Fecha`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, true, false, true], text: `Fecha Vence`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, true, false, true], text: `Cartera`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, true, true, true], text: `Plazo de Pago`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `Fecha`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `F. Vence`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `Días`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `1-30 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `31-60 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `61-90 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `91-120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `+120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
     ];
   }
 
@@ -232,14 +242,15 @@ export class DashBoardRecaudosComponent implements OnInit {
     let total = facturas.reduce((a,b) => a + b.saldo_Cartera, 0)
     return [
       {
-        margin: [5, 5, 5, 15],
-        colSpan: 3,
+        margin: [5, 5, 5, 0],
+        colSpan: 4,
         alignment: 'right',
-        fontSize: 11,
+        fontSize: 10,
         bold: true,
         border: [false, true, false, false],
         text: `Total Cliente: $ ${this.formatonumeros((total).toFixed(2))}`,
       },
+      {},
       {},
       {}
     ]

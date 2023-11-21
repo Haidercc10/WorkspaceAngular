@@ -223,24 +223,15 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
     tabCrearOrden2.click();
-    /*this.svcSedes.GetSedeClientexNitBagPro(data.nitCliente).subscribe(dato => {
-      let presentacion : string = data.presentacion;
-      if (presentacion == 'Unidad') presentacion = 'Und';
-      else if (presentacion == 'Kilo') presentacion = 'Kg';
-      this.orden_TrabajoComponent.limpiarCampos();
-      this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
-        Id_Cliente : dato[0].idCliente,
-        Nombre_Cliente: dato[0].cliente,
-        Id_Producto: data.item,
-        Nombre_Producto: data.referencia,
-        Presentacion: presentacion,
-        Id_Vendedor: dato[0].idVendedor.length == 2 ? dato[0].idVendedor = `0${dato[0].idVendedor}` : dato[0].idVendedor.length == 1 ? `00${dato[0].idVendedor}` : dato[0].idVendedor,
-        Nombre_Vendedor: dato[0].vendedor,
-      });*/
-      this.orden_TrabajoComponent.consultarClientes();
-      if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
-      else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
-    //});
+    this.orden_TrabajoComponent.consultarClientes();
+    if (tipoBusqueda == 'Item') {
+      this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({ 
+        Id_Producto : data.item,
+        Nombre_Producto : data.referencia,
+        Presentacion : data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion,
+      });
+      this.orden_TrabajoComponent.consultarInfoProducto();
+    } else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
   }
 
 }
