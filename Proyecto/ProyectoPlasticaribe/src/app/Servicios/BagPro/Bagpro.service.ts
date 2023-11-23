@@ -127,6 +127,10 @@ export class BagproService {
 
   GetClientesNombre = (nombre : any) => this.http.get<any>(this.rutaBagPro + `/Clientes/getClientesNombre/${nombre}`);
 
+  /************************************************************** HORARIOS **************************************************************/
+  GetHorarioProceso = (proceso : string) : Observable<string> => this.http.get<string>(`${this.rutaBagPro}/Horarios/getHorarioProceso/${proceso}`);
+
+  /***************************************************************** PRUEBA *********************************************************************/
   Prueba(){
    return this.http.get(this.rutaBagPro + `/ClientesOt/Prueba`, { responseType: 'arraybuffer'}).subscribe((pdfData :  ArrayBuffer) => {
       console.log(pdfData)
@@ -144,6 +148,4 @@ export class BagproService {
       }, 7000);
     });
   }
-
-
 }

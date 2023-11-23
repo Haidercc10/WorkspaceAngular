@@ -149,4 +149,8 @@ export class Produccion_SelladoComponent implements OnInit {
   }
   
   aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  getPuertos(){
+    
+  }
 }
