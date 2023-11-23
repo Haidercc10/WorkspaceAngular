@@ -1,0 +1,96 @@
+p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input {
+    display: flex;
+    width: 100%;
+}
+
+::ng-deep .p-multiselect {
+    width: 100%;
+}
+
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    padding: 0.5rem 0.5rem;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem 0.5rem;  
+}
+
+.tituloExportarPDF, .subTituloExportarPDF {
+    font-size: 1.5em;
+    color: var(--rojo);
+    text-align: center;
+  }
+  
+  .subTituloExportarPDF {
+    font-size: 1em;  
+  }
+  
+  /* EXPORTAR PDF */
+  .buttonExcel, .buttonPDF {
+    margin: auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .buttonPDF {
+    background-color: rgb(255, 69, 69);
+  }
+  
+  .buttonExcel {
+    background-color: #22C55E;
+  }
+  
+  .svgIconPDF, .svgIconExcel {
+    width: 25px;
+    transition-duration: .3s;
+  }
+  
+  .buttonPDF:hover, .buttonExcel:hover {
+    width: 140px;
+    border-radius: 50px;
+    transition-duration: .3s;
+    align-items: center;
+  }
+  
+  .buttonPDF:hover .svgIconPDF, .buttonExcel:hover .svgIconExcel {
+    width: 50px;
+    transition-duration: .3s;
+    transform: translateY(60%);
+  }
+  
+  .buttonPDF:before, .buttonExcel:before {
+    position: absolute;
+    top: -20px;
+    color: white;
+    transition-duration: .3s;
+    font-size: 2px;
+  }
+  
+  .buttonPDF:before{
+    content: "PDF";
+  }
+  
+  .buttonExcel:before{
+    content: "EXCEL";
+  }
+  
+  .buttonPDF:hover:before, .buttonExcel:hover:before {
+    font-size: 13px;
+    opacity: 1;
+    transform: translateY(30px);
+    transition-duration: .3s;
+  }
+  
+  .svgIconPDF path, .svgIconExcel path {
+    fill: white;
+  }

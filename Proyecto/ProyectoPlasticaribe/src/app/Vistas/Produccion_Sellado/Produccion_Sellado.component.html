@@ -1,0 +1,221 @@
+<!--Carga-->
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<!--Titulo-->
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingresar Producción de Sellado</h2>
+    </div>
+    <!--Linea-->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <!--Subtitulo-->
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+  </div>
+
+  <!--Formulario-->
+  <form [formGroup]="formSellado">
+    <div class="row g-4 my-4 mb-5">
+
+        <!-- OT -->
+        <div class="col-sm-12 col-md-6 col-xl-2">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="ot" id="ot" (keyup.enter)="buscarOT()" type="number" [useGrouping]="false"></p-inputNumber>
+                <label for="ot">OT</label>
+            </span>
+        </div>
+
+        <!-- Maquina -->
+        <div class="col-sm-12 col-md-6 col-xl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="maquina" id="maq" type="number" [useGrouping]="false"></p-inputNumber>
+              <label for="maq">Maquina</label>
+          </span>
+        </div>
+
+        <!-- Operario -->
+        <div class="col-sm-12 col-md-6 col-xl-4">
+          <span class="p-float-label">
+            <p-multiSelect formControlName="idOperario" inputId="operario" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id"></p-multiSelect>
+            <label for="operario">Operario</label>
+          </span>
+        </div>
+
+        <!--Cantidad Und/Paq-->
+        <div class="col-sm-12 col-md-6 col-xl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="cantUnd" id="cantUnd" type="number" [useGrouping]="false"></p-inputNumber>
+              <label for="cantUnd">Cant. Und</label>
+          </span>
+        </div>
+
+        <!--Cantidad Kg-->
+        <div class="col-sm-12 col-md-6 col-xl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="cantKg">Cant. Kg</label>
+          </span>
+        </div>
+
+        <!--Peso Teorico-->
+        <div class="col-sm-12 col-md-6 col-xl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="pesoTeorico" id="teorico" type="number" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="teorico">Peso teórico</label>
+          </span>
+        </div>
+
+        <!--Peso Real-->
+        <div class="col-sm-12 col-md-6 col-xl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="pesoReal" id="real" type="number" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="real">Peso real</label>
+          </span>
+        </div>
+
+        <!-- Turno -->
+        <div class="col-sm-12 col-md-6 col-xl-1 mb-3" >
+            <span class="p-float-label">
+                <p-dropdown formControlName="turno" inputId="turnos" [options]="turnos" optionValue="turno_Id" optionLabel="turno_Nombre" [readonly]="true"></p-dropdown>
+                <label for="turnos">Turno</label>
+            </span>
+        </div>
+    
+        <!--Tabla OT-->
+        <p-table
+        #dtOT
+        *ngIf="!cargando" 
+        styleClass="p-datatable-gridlines"
+        [value]="ordenesTrabajo">
+          <ng-template pTemplate="header">
+              <tr>
+                <th style="font-weight: 800;" class="text-center" colspan="4">Información General</th>
+                <th style="font-weight: 800;" class="text-center" colspan="2">Cantidad</th>
+                <th style="font-weight: 800;" class="text-center" colspan="2"></th>
+                <th style="font-weight: 800;" class="text-center" colspan="3">Extrusión</th>
+                <th style="font-weight: 800;" class="text-center" colspan="3">Producto Terminado</th>
+              </tr>
+              <tr>
+                  <th style="font-weight: 600;" class="text-center">Cliente</th>
+                  <th style="font-weight: 600;" class="text-center">Item</th>
+                  <th style="font-weight: 600;" class="text-center">Referencia</th>
+                  <th style="font-weight: 600;" class="text-center" >Material</th>
+                  <th style="font-weight: 600;" class="text-center">Programada</th>
+                  <th style="font-weight: 600;" class="text-center">Realizada</th>
+                  <th style="font-weight: 600;" class="text-center">Medida</th>
+                  <th style="font-weight: 600;" class="text-center">Etiqueta</th>
+                  <th style="font-weight: 600;" class="text-center">Ancho 1</th>
+                  <th style="font-weight: 600;" class="text-center">Ancho 2</th>
+                  <th style="font-weight: 600;" class="text-center">Ancho 3</th>
+                  <th style="font-weight: 600;" class="text-center">Ancho</th>
+                  <th style="font-weight: 600;" class="text-center">Largo</th>
+                  <th style="font-weight: 600;" class="text-center">Fuelle</th>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+              <tr>
+                  <td class="text-center">{{data.cliente}}</td>
+                  <td class="text-center">{{data.id_Producto}}</td>
+                  <td class="text-center">{{data.producto}}</td>
+                  <td class="text-center">{{data.material}} - {{data.pigmento_Extrusion}}</td>
+                  <td class="text-center">{{data.cantidad_Pedida | number : '1.2-2' }}</td>
+                  <td class="text-center">{{data.cantidad_Sellado | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.presentacion}}</td>
+                  <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}} X {{data.selladoCorte_Largo | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.ancho1_Extrusion | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.ancho2_Extrusion | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.ancho3_Extrusion | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.selladoCorte_Largo | number : '1.2-2'}}</td>
+                  <td class="text-center">{{data.selladoCorte_Fuelle | number : '1.2-2'}}</td>
+              </tr>
+          </ng-template>
+        </p-table>
+
+        <!-- Botones -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send"></button>
+          <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        </div>
+    </div>
+  </form>   
+
+  <!--Linea-->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!--Producción Actual-->
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información de Producción Actual</h4>
+  </div>
+
+  <!--Tabla Produccion-->
+  <p-table
+  #dtProduccion
+  [resizableColumns]="true"
+  columnResizeMode="expand"
+  responsiveLayout="scroll"
+  [rowHover]="true"
+  [scrollable]="true"
+  scrollHeight="50rem"
+  *ngIf="!cargando" 
+  styleClass="p-datatable-gridlines"
+  [value]="produccion">
+    <ng-template pTemplate="header">
+        <tr>
+          <th></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'bulto', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cedula1', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'operario1', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cantidadUnd', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion1', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion2', 'contains')"></th>
+          <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+          <th></th>
+        </tr>
+        <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Rollo</th>
+            <th class="text-center">Cédula</th>
+            <th class="text-center">Operario(s)</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-center">Und</th>
+            <th class="text-center">Peso</th>
+            <th class="text-center">Und</th>
+            <th class="text-center">Fecha</th>
+            <th class="text-center">Imprimir</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td class="text-center">{{rowIndex + 1}}</td>
+            <td class="text-center">{{data.bulto}}</td>
+            <td class="text-center">{{data.cedula1}}</td>
+            <td class="text-center">{{data.operario1}}</td>
+            <td class="text-center">{{data.cantidadUnd}}</td>
+            <td class="text-center">{{data.presentacion1}}</td>
+            <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
+            <td class="text-center">{{data.presentacion2}}</td>
+            <td class="text-center">{{data.fecha}} - {{data.hora}}</td>
+            <td class="text-center">
+              <button class="buttonPDF">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconPDF"><path d="M64 464H96v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288H336V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM176 352h32c30.9 0 56 25.1 56 56s-25.1 56-56 56H192v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V448 368c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24H192v48h16zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H304c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H320v96h16zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v48c0 8.8-7.2 16-16 16s-16-7.2-16-16V432 368z"/></svg>
+              </button>
+            </td>
+        </tr>
+    </ng-template>
+  </p-table>
+</p-card>

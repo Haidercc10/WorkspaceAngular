@@ -31,6 +31,8 @@ export class BagproService {
   GetInformacionOrden_Proceso = (orden : string, proceso : string) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getInformacionOrden_Proceso/${orden}/${proceso}`);
 
   AjusteExistenciaSellado = (rollos : number []) => this.http.post(`${this.rutaBagPro}/ProcSellado/ajusteExistencia`, rollos);
+  
+  GetProduccionSellado = (ot : any) => this.http.get<any>(this.rutaBagPro + `/ProcSellado/getProduccionSellado/${ot}`);
 
   /***************************************************** PROCEXTRUSION ***************************************************************/
 
@@ -125,6 +127,23 @@ export class BagproService {
 
   GetClientesNombre = (nombre : any) => this.http.get<any>(this.rutaBagPro + `/Clientes/getClientesNombre/${nombre}`);
 
-  /************************************************************** HORARIOS **************************************************************/
-  GetHorarioProceso = (proceso : string) : Observable<string> => this.http.get<string>(`${this.rutaBagPro}/Horarios/getHorarioProceso/${proceso}`);
+  Prueba(){
+   return this.http.get(this.rutaBagPro + `/ClientesOt/Prueba`, { responseType: 'arraybuffer'}).subscribe((pdfData :  ArrayBuffer) => {
+      console.log(pdfData)
+      let blob = new Blob([pdfData], { type : 'application/pdf' });
+      let url = URL.createObjectURL(blob);
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      //iframe.contentWindow.print();
+      setTimeout(() => {
+        console.log(iframe.contentDocument.getElementsByTagName('embed')[0])
+        iframe.contentDocument.getElementsByTagName('embed')[0].click()
+        console.log('hola')
+      }, 7000);
+    });
+  }
+
+
 }

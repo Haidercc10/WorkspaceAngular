@@ -189,6 +189,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
 
 @NgModule({
   declarations: [
@@ -300,7 +301,8 @@ import { AppComponent } from './app.component';
     ReporteFacturacionDetalladaComponent,
     ReporteProduccionComponent,
     ReportesConsolidadosComponent,
-    Busqueda_OrdenesTrabajoComponent
+    Busqueda_OrdenesTrabajoComponent, 
+    Produccion_SelladoComponent,
   ],
 
   imports: [
