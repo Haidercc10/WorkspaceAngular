@@ -19,7 +19,7 @@ export interface modelProduccionProcesos {
     Desviacion : number;
     Precio : number;
     Presentacion : string;
-    Proceso_Id : string;
+    Proceso_Id : 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE';
     Turno_Id : string;
     Envio_Zeus : boolean;
     Datos_Etiqueta : string;

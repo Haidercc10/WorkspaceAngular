@@ -96,6 +96,7 @@ export class Orden_TrabajoComponent implements OnInit {
   sellado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   corte: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   cyrel: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  motrarEmpresaEtiquetas : boolean = false; //Variable que servirá para saber si se muestra o no la empresa en las etiquetas
   informacionSeleccionada: any; //Variable que almacenará la información del producto seleccionado
   presentacionProducto: string; //Variablle que almacenará la presentacion del producto
   cantidadProducto: number = 0; //Variable que almacenará la cantidad de producto que se va a pedir
@@ -851,7 +852,6 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que llenará la información del cliente, vendedor y producto
   llenarDatosCliente(data : any){
-    console.log(data)
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente : data == undefined ? '' : data.idCliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
@@ -914,6 +914,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a validar los procesos por los cuales pasará el item
   validarProcesosOrdenTrabajo(data : any){
+    this.motrarEmpresaEtiquetas = data.motrarEmpresaEtiquetas;
     this.cyrel = data.cyrel;
     this.extrusion = data.extrusion;
     this.impresion = data.impresion;
@@ -1805,6 +1806,7 @@ export class Orden_TrabajoComponent implements OnInit {
         Ot_ValorKg: this.valorKg,
         Ot_ValorOT: this.valorOt,
         Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+        MotrarEmpresaEtiquetas : this.motrarEmpresaEtiquetas,
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
         let ot : number = datos_ot.ot_Id;
@@ -2094,6 +2096,7 @@ export class Orden_TrabajoComponent implements OnInit {
           Ot_ValorKg: this.valorKg,
           Ot_ValorOT: this.valorOt,
           Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
+          MotrarEmpresaEtiquetas : this.motrarEmpresaEtiquetas,
         }
         this.ordenTrabajoService.srvActualizar(datos_Orden.ot_Id, info).subscribe(() => {
           let ot : number = datos_Orden.ot_Id;

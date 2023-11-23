@@ -25,4 +25,5 @@ export interface modelOrden_Trabajo {
   Ot_ValorKg : number;
   Ot_ValorOT : number;
   Id_Vendedor : number;
+  MotrarEmpresaEtiquetas : boolean;
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import JsBarcode from 'jsbarcode';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +11,9 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 export class CreacionPdfService {
 
     constructor() { }
+
+    // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+    private formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
     formatoPDF(titulo : string, content : any, headerAdicional : any = {}){
         let today : any = moment().format('YYYY-MM-DD');
@@ -92,5 +96,156 @@ export class CreacionPdfService {
     private crearPDF(pdfDefinicion){
         pdfMake.createPdf(pdfDefinicion).open();
     }
+    
+    /* ============================================================== CREATE TAG PRODUCTION ===================================================================== */
+    createTagProduction(dataTag : modelTagProduction){
+        let code : number = dataTag.reel;
+        const pdfDefinition : any = {
+            pageOrientation: 'landscape',
+            info: { title: `Etiqueta ${code}` },
+            pageSize: {width: 188.97640176, height: 377.95280352},
+            pageMargins : [10, 10, 10, 20],
+            footer: this.footerPDF(dataTag.productionProcess),
+            content : this.contentPDF(dataTag),
+        }
+        pdfMake.createPdf(pdfDefinition).print();
+    }
 
+    private contentPDF(dataTag : modelTagProduction){
+        return[
+            {
+                table : {
+                    widths : ['25%', '25%', '50%'],
+                    body : this.contentPrincipalTablePDF(dataTag)
+                },
+            }
+        ]
+    }
+
+    private contentPrincipalTablePDF(dataTag : modelTagProduction) : any [] {
+        let content = [];
+        if (dataTag.showNameBussiness) content.push(this.infoBussinessPDF(dataTag));
+        content.push(this.adictionalInformationTag(dataTag));
+        content.push(
+            this.infoClient(dataTag),
+            this.infoProduct(dataTag),
+            this.dataOrderProduction(dataTag),
+            this.materiaOrderProduction(dataTag),
+            this.quantityAndBarcode(dataTag),
+            this.adictionalInformation(dataTag.reel),
+        );
+        return content;
+    }
+
+    private infoBussinessPDF(dataTag : modelTagProduction) : any [] {
+        return [
+            {text: `PLASTICARIBE S.A.S`, bold: true, fontSize: 10, alignment: 'center', colSpan: 2},
+            {},
+            {text: `CALLE 42 #52-105 Barranquilla`, bold: true, fontSize: 10, alignment: 'center'}
+        ];
+    }
+
+    private adictionalInformationTag(dataTag : modelTagProduction) : any [] {
+        return [
+            {text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 10, alignment: 'center', colSpan: 3},
+            {},
+            {}
+        ];
+    }
+
+    private infoClient(dataTag : modelTagProduction) : any [] {
+        return [
+            {text: `Cliente: ${(dataTag.client).toUpperCase()}`, bold: true, fontSize: 10, alignment: 'left', colSpan: 3},
+            {},
+            {}
+        ];
+    }
+
+    private infoProduct(dataTag : modelTagProduction) : any [] {
+        return [
+            {text: `Item: ${(dataTag.item)}`, bold: true, fontSize: 10, alignment: 'left'},
+            {text: `Referencia: ${(dataTag.reference).toUpperCase()}`, bold: true, fontSize: 10, alignment: 'left', colSpan: 2},
+            {},
+        ];
+    }
+
+    private dataOrderProduction(dataTag : modelTagProduction) : any [] {
+        return [
+            {
+                text: `OT: ${dataTag.orderProduction}\t ${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}\t CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}\t Material: ${dataTag.material}`, 
+                bold: true, 
+                fontSize: 10, 
+                alignment: 'center',
+                colSpan: 3
+            },
+            {},
+            {},
+        ];
+    }
+
+    private materiaOrderProduction(dataTag : modelTagProduction) : any [] {
+        return [
+            {text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center'},
+            {text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center'},
+            {text: `Rollo: ${dataTag.reel}`, bold: true, fontSize: 10, alignment: 'center'},  
+        ];
+    }
+
+    private quantityAndBarcode(dataTag : modelTagProduction){
+        let data = [];
+        data.push(this.tableWithQuantity(dataTag));
+        data.push(this.tableWithQuantity(dataTag));
+        data.push(this.createBarcode(dataTag.reel));
+        return data;
+    }
+
+    private tableWithQuantity(dataTag : modelTagProduction){
+        return {text: `${this.formatNumbers((dataTag.quantity).toFixed(2))}`, bold: true, fontSize: 12, alignment: 'center'};
+    }
+
+    private createBarcode(code : number){
+        const imageBarcode = document.createElement('img');
+        imageBarcode.id = 'barcode';
+        document.body.appendChild(imageBarcode);
+        JsBarcode("#barcode", code.toString(), {format: "CODE128A", displayValue: false, width:5, height:100});
+        let imagePDF = {image : imageBarcode.src, width : 160, height: 40};
+        imageBarcode.remove();
+        return imagePDF;
+    }
+
+    private adictionalInformation(code : number){
+        return [
+            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
+            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
+            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
+        ];
+    }
+
+    private footerPDF(productionProcess : 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO'){
+        return {
+            columns: [
+                { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8 },
+                { text: productionProcess, alignment: 'center', fontSize: 8},
+            ]
+        }
+    }
+}
+
+export interface modelTagProduction {
+    client : string;
+    item : number;
+    reference : string;
+    width : number;
+    height : number;
+    bellows : number;
+    und : string;
+    cal : number;
+    orderProduction : string;
+    material : string;
+    quantity : number;
+    reel : number;
+    presentationItem1 : string;
+    presentationItem2 : string;
+    productionProcess : 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO';
+    showNameBussiness? : boolean;
 }

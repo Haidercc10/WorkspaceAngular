@@ -4,10 +4,11 @@ import moment from 'moment';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -45,7 +46,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     private bagproService : BagproService,
     private msj : MensajesAplicacionService,
     private produccionProcesosService : Produccion_ProcesosService,
-    private creacionPdfService : CreacionPdfService,){
+    private createPDFService : CreacionPdfService,
+    private clientsService : SedeClienteService,){
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -60,7 +62,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       ancho3 : [null, Validators.required],
       undExtrusion : [null, Validators.required],
       pesoExtruir : [null, Validators.required],
-      kilosPesados : [null, Validators.required],
       calibre : [null, Validators.required],
       material : [null, Validators.required],
       maquina : [null, Validators.required],
@@ -80,7 +81,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    setTimeout(() => { this.prueba(); }, 2000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -108,7 +108,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           if (value) {
             let valor = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
-            this.formDatosProduccion.patchValue({pesoBruto : valor});
+            this.formDatosProduccion.patchValue({
+              pesoBruto : valor,
+              pesoNeto : valor - this.formDatosProduccion.value.pesoTara,
+            });
           }
         }
       } catch (error) {
@@ -202,23 +205,28 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   buscraOrdenTrabajo(){
     let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
     this.cargando = true;
-    this.bagproService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(data => {
+    this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => {
       this.datosOrdenTrabajo = data;
       this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
       this.buscarRollosPesados();
       data.forEach(datos => {
-        this.formDatosProduccion.patchValue({
-          idCliente : datos.cliente,
-          cliente : datos.clienteNom,
-          item : datos.clienteItems,
-          referencia : datos.clienteItemsNom,
-          pesoExtruir : datos.datoscantKg,
-          ancho1 : datos.extAcho1,
-          ancho2 : datos.extAcho2,
-          ancho3 : datos.extAcho3,
-          undExtrusion : datos.extUnidadesNom.trim(),
-          calibre : datos.extCalibre,
-          material : datos.extMaterialNom.trim(),
+        this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
+          dataClient.forEach(cli => {
+            this.datosOrdenTrabajo[0].idCliente = cli.idCliente;
+            this.formDatosProduccion.patchValue({
+              idCliente : cli.idCliente,
+              cliente : datos.cliente,
+              item : datos.id_Producto,
+              referencia : datos.producto,
+              pesoExtruir : datos.peso_Neto,
+              ancho1 : this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
+              ancho2 : this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
+              ancho3 : this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
+              undExtrusion : datos.und_Extrusion.trim(),
+              calibre : datos.calibre_Extrusion,
+              material : datos.material.trim(),
+            });
+          });
         });
       });
     }, () => this.cargando = false, () => this.cargando = false);
@@ -246,7 +254,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   validarDatos(){
     if (this.datosOrdenTrabajo.length > 0) {
       if (this.formDatosProduccion.valid) {
-        if (this.formDatosProduccion.value.pesoNeto > 0) {
+        if (this.formDatosProduccion.value.maquina > 0) {
           if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
           else this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
         } else this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
@@ -276,7 +284,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       Desviacion: 0,
       Precio: 0,
       Presentacion: 'Kg',
-      Proceso_Id: this.proceso,
+      Proceso_Id: this.validateProcess(),
       Turno_Id: this.formDatosProduccion.value.turno,
       Envio_Zeus: false,
       Datos_Etiqueta: '',
@@ -284,19 +292,73 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       Hora: moment().format('HH:mm:ss'),
       Creador_Id : this.storage_Id,
     }
-
     this.produccionProcesosService.Post(datos).subscribe(res => {
-
+      this.createTagProduction(res.numero_Rollo, res.peso_Neto);
+      this.limpiarCampos();
+      this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
       this.cargando = false;
     });
   }
 
-  crearEtiqueta(){
-    
+  validateProcess() : 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' {
+    let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    switch (proceso) {
+      case 'EXTRUSION':
+        proceso = 'EXT'
+        break;
+      case 'IMPRESION':
+        proceso = 'IMP'
+        break;
+      case 'ROTOGRABADO':
+        proceso = 'ROT'
+        break;
+      case 'LAMINADO':
+        proceso = 'LAM'
+        break;
+      case 'DOBLADO':
+        proceso = 'DBLD'
+        break;
+      case 'CORTE':
+        proceso = 'CORTE'
+        break;
+      case 'EMPAQUE':
+        proceso = 'EMP'
+        break;
+      case 'SELLADO':
+        proceso = 'SELLA'
+        break;
+      case 'WIKETIADO':
+        proceso = 'WIKE'
+        break;
+      default:
+        break;
+    }
+    return proceso;
   }
 
-  prueba() {
+  createTagProduction(code : number, quantity : number){
+    let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let dataTagProduction : modelTagProduction = {
+      client: this.formDatosProduccion.value.cliente,
+      item: this.formDatosProduccion.value.item,
+      reference: this.formDatosProduccion.value.referencia,
+      width: this.formDatosProduccion.value.ancho1,
+      height: this.formDatosProduccion.value.ancho3,
+      bellows: this.formDatosProduccion.value.ancho2,
+      und: this.formDatosProduccion.value.undExtrusion,
+      cal: this.formDatosProduccion.value.calibre,
+      orderProduction: this.formDatosProduccion.value.ordenTrabajo,
+      material: this.formDatosProduccion.value.material,
+      quantity: quantity,
+      reel: code,
+      presentationItem1: ['SELLADO', 'WIKETIADO'].includes(proceso) ? 'Kg Bruto' : 'Und',
+      presentationItem2: ['SELLADO', 'WIKETIADO'].includes(proceso) ? 'Kg Neto' : 'Kg',
+      productionProcess: proceso,
+      showNameBussiness: true,
+    }
+    this.createPDFService.createTagProduction(dataTagProduction);
   }
+
 }

@@ -18,5 +18,5 @@ export class Produccion_ProcesosService {
 
   GetPorId = (id : any) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);
 
-  Post = (body : modelProduccionProcesos) => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
+  Post = (body : modelProduccionProcesos) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
 }

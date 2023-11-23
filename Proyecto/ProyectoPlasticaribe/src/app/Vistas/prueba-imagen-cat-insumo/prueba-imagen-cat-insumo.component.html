@@ -26,7 +26,7 @@
             <!-- ORDEN DE TRABAJO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text" pAutoFocus [autofocus]="true" pInputText required=""/>
+                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text" pAutoFocus [autofocus]="true" pInputText required/>
                     <label for="ot">OT</label>
                 </span>
             </div>
@@ -66,7 +66,7 @@
             <!-- ANCHO CONOS -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="anchoCono" inputId="anchoCono" [min]="1" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="anchoCono" inputId="anchoCono" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
                     <label for="anchoCono">Ancho Cono</label>
                 </span>
             </div>
@@ -74,7 +74,7 @@
             <!-- TARA -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="pesoTara" inputId="pesoTara" [min]="1" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="pesoTara" inputId="pesoTara" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
                     <label for="pesoTara">Tara Kg</label>
                 </span>
             </div>
@@ -82,7 +82,7 @@
             <!-- PESO BRUTO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="pesoBruto" inputId="pesoBruto" [min]="1" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
                     <label for="pesoBruto">Bruto Kg</label>
                 </span>
             </div>
@@ -90,7 +90,7 @@
             <!-- PESO NETO -->
             <div class="col-sm-12 col-md-2 col-xl-1">
                 <span class="p-float-label">
-                    <p-inputNumber formControlName="pesoNeto" inputId="pesoNeto" [min]="1" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
                     <label for="pesoNeto">Neto Kg</label>
                 </span>
             </div>
@@ -123,18 +123,18 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                     <tr>
+                        <td>{{data.idCliente}}</td>
                         <td>{{data.cliente}}</td>
-                        <td>{{data.clienteNom}}</td>
-                        <td>{{data.clienteItems}}</td>
-                        <td>{{data.clienteItemsNom}}</td>
+                        <td>{{data.id_Producto}}</td>
+                        <td>{{data.producto}}</td>
                         <td>{{data.turno}}</td>
-                        <td>{{data.datoscantKg | number : '1.2-2'}}</td>
-                        <td>{{data.extAcho1 | number : '1.2-2'}}</td>
-                        <td>{{data.extAcho2 | number : '1.2-2'}}</td>
-                        <td>{{data.extAcho3 | number : '1.2-2'}}</td>
-                        <td>{{data.extUnidadesNom.trim()}}</td>
-                        <td>{{data.extCalibre | number : '1.2-2'}}</td>
-                        <td>{{data.extMaterialNom.trim()}}</td>
+                        <td>{{data.peso_Neto | number : '1.2-2'}}</td>
+                        <td>{{proceso != 'Empaque' ? (data.ancho1_Extrusion | number : '1.2-2') : (data.selladoCorte_Ancho | number : '1.2-2')}}</td>
+                        <td>{{proceso != 'Empaque' ? (data.ancho2_Extrusion | number : '1.2-2') : (data.selladoCorte_Largo | number : '1.2-2')}}</td>
+                        <td>{{proceso != 'Empaque' ? (data.ancho3_Extrusion | number : '1.2-2') : (data.selladoCorte_Fuelle | number : '1.2-2')}}</td>
+                        <td>{{data.und_Extrusion}}</td>
+                        <td>{{data.calibre_Extrusion | number : '1.2-2'}}</td>
+                        <td>{{data.material}}</td>
                     </tr>
                 </ng-template>
             </p-table>
@@ -143,8 +143,9 @@
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="buscarPuertos()"></button>
+            <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="validarDatos()" [disabled]="formDatosProduccion.invalid"></button>
             <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+            <button pButton class="p-button-success" id="concetar" type="button" label="Conectar Báscula" icon="pi pi-box" (click)="buscarPuertos()" [disabled]="formDatosProduccion.value.pesoNeto"></button>
         </div>
     </form>
     
@@ -191,7 +192,7 @@
                 <td class="text-center">{{data.hora}}</td>
                 <td class="text-center">{{data.turno}}</td>
                 <td>
-                    <button class="buttonPrint">
+                    <button class="buttonPrint" (click)="createTagProduction(data.item, data.extnetokg)">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconPrint"><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
                     </button>
                 </td>
