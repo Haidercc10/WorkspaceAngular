@@ -190,14 +190,6 @@
           <!-- Checkbox Procesos  -->
           <div class="mb-4" id="check">
             <div class="row g-3 d-flex justify-content-center">
-              <!-- Mostrar Empresas en Etiquetas -->
-              <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3 mx-3">
-                <div class="field-checkbox" >
-                  <p-checkbox [(ngModel)]="motrarEmpresaEtiquetas" [binary]="true" inputId="motrarEmpresaEtiquetas" id="motrarEmpresaEtiquetas"></p-checkbox>
-                  <label for="motrarEmpresaEtiquetas">Mostrar Empresa en Etiquetas</label>
-                </div>
-              </div>
-
               <!-- Cyrel -->
               <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-1 col-xxl-1 mx-3">
                 <div class="field-checkbox" >
@@ -251,6 +243,14 @@
                 <div class="field-checkbox">
                   <p-checkbox [(ngModel)]="sellado" [binary]="true" inputId="OT_Sellado" id="sella"></p-checkbox>
                   <label for="OT_Sellado">Sellado</label>
+                </div>
+              </div>
+
+              <!-- Mostrar Empresas en Etiquetas -->
+              <div class="col-xs-12 col-sm-4 col-md-4 col-lg mx-3">
+                <div class="field-checkbox" >
+                  <p-checkbox [(ngModel)]="motrarEmpresaEtiquetas" [binary]="true" inputId="motrarEmpresaEtiquetas" id="motrarEmpresaEtiquetas"></p-checkbox>
+                  <label for="motrarEmpresaEtiquetas">Mostrar Empresa en Etiquetas</label>
                 </div>
               </div>
             </div>

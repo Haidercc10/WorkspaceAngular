@@ -193,14 +193,14 @@ export class CreacionPdfService {
 
     private quantityAndBarcode(dataTag : modelTagProduction){
         let data = [];
-        data.push(this.tableWithQuantity(dataTag));
-        data.push(this.tableWithQuantity(dataTag));
+        data.push(this.tableWithQuantity(dataTag.quantity));
+        data.push(this.tableWithQuantity(dataTag.quantity2));
         data.push(this.createBarcode(dataTag.reel));
         return data;
     }
 
-    private tableWithQuantity(dataTag : modelTagProduction){
-        return {text: `${this.formatNumbers((dataTag.quantity).toFixed(2))}`, bold: true, fontSize: 12, alignment: 'center'};
+    private tableWithQuantity(quantity : number){
+        return {text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: 12, alignment: 'center'};
     }
 
     private createBarcode(code : number){
@@ -243,6 +243,7 @@ export interface modelTagProduction {
     orderProduction : string;
     material : string;
     quantity : number;
+    quantity2 : number;
     reel : number;
     presentationItem1 : string;
     presentationItem2 : string;

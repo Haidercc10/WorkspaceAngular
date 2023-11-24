@@ -96,7 +96,7 @@ export class Orden_TrabajoComponent implements OnInit {
   sellado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   corte: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   cyrel: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
-  motrarEmpresaEtiquetas : boolean = false; //Variable que servirá para saber si se muestra o no la empresa en las etiquetas
+  motrarEmpresaEtiquetas : boolean = true; //Variable que servirá para saber si se muestra o no la empresa en las etiquetas
   informacionSeleccionada: any; //Variable que almacenará la información del producto seleccionado
   presentacionProducto: string; //Variablle que almacenará la presentacion del producto
   cantidadProducto: number = 0; //Variable que almacenará la cantidad de producto que se va a pedir
@@ -557,6 +557,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.edicionOrdenTrabajo = false;
     this.cyrel = false;
     this.corte = false;
+    this.motrarEmpresaEtiquetas = true;
     this.ArrayProducto = [];
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;

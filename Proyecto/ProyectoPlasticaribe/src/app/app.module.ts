@@ -190,6 +190,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
+import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Produccion_Extrusion.component';
 
 @NgModule({
   declarations: [
@@ -303,6 +304,7 @@ import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Producc
     ReportesConsolidadosComponent,
     Busqueda_OrdenesTrabajoComponent, 
     Produccion_SelladoComponent,
+    Produccion_ExtrusionComponent
   ],
 
   imports: [

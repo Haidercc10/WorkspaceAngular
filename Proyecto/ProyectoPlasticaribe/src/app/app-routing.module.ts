@@ -135,6 +135,8 @@ export const routes: Routes = [
   // 
   {path: 'reportes-generales', loadChildren: () => import('./Modules/reportes-consolidados/reportes-consolidados.module').then(m => m.ReportesConsolidadosModule)},
 
+  /*************************************************************** PRODUCCION *************************************************************************************************/
+  {path: 'produccion-procesos', loadChildren: () => import('./Modules/produccion-extrusion/produccion-extrusion.module').then(m => m.ProduccionExtrusionModule)},
   {path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule)},
  
 ]

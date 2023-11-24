@@ -79,7 +79,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-        <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()"></button>
+        <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()" *ngIf="[1].includes(ValidarRol)"></button>
       </div>
     </div>
   </form>
@@ -126,7 +126,7 @@
         </th>
       </tr>
       <tr>
-        <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+        <th><p-tableHeaderCheckbox *ngIf="[1].includes(ValidarRol)"></p-tableHeaderCheckbox></th>
         <th pSortableColumn="rollo"> <p-sortIcon field="rollo"></p-sortIcon> Bulto </th>
         <th pSortableColumn="orden"> <p-sortIcon field="orden"></p-sortIcon> OT </th>
         <th pSortableColumn="idCliente"> <p-sortIcon field="idCliente"></p-sortIcon> Id Cliente </th>
@@ -147,7 +147,7 @@
     <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data>
       <tr>
         <td>
-          <p-tableCheckbox [value]="data" *ngIf="['SELLADO', 'EMPAQUE'].includes(data.proceso) && (data.envioZeus).trim() == '0'"></p-tableCheckbox>
+          <p-tableCheckbox [value]="data" *ngIf="['SELLADO', 'EMPAQUE'].includes(data.proceso) && (data.envioZeus).trim() == '0' && [1].includes(ValidarRol)"></p-tableCheckbox>
           <span class="pl-4">{{rowIndex + 1}}</span>
         </td>
         <td>{{data.rollo}}</td>
