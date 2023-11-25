@@ -876,7 +876,7 @@ export class Orden_TrabajoComponent implements OnInit {
           this.llenarFormularioOrdenTrabajo(itemOt);
           this.validarProcesosOrdenTrabajo(itemOt);
           this.llenarFormularioExtrusion(itemOt);
-          this.llenarFormularioImpresionBagPro(itemOt);
+          this.llenarFormularioImpresion(itemOt);
           this.llenarFormularioLaminado(itemOt);
           this.llenarFormularioCorte(itemOt);
           this.llenarFormularioSellado(itemOt);
@@ -944,7 +944,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: this.impresion ? parseInt(data.id_Tipo_Imptesion) : 1,
+      Tipo_Impresion: this.impresion || this.rotograbado ? parseInt(data.id_Tipo_Imptesion) : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
@@ -955,28 +955,6 @@ export class Orden_TrabajoComponent implements OnInit {
       Tinta_Impresion6: data.tinta6 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion6,
       Tinta_Impresion7: data.tinta7 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion7,
       Tinta_Impresion8: data.tinta8 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion8,
-    });
-  }
-
-  // Funcion que va a llenar el formulario de impresion (con los datos de bagpro) con los datos de la ultima orden de trabajo creada
-  llenarFormularioImpresionBagPro(data : any){
-    let impresion : any = data.impresion ? 2 : data.lamiando ? 5 : null;
-    this.servicioTintas.srvObtenerListaConsultaImpresion(data.tinta1, data.tinta2, data.tinta3, data.tinta4, data.tinta5, data.tinta6, data.tinta7, data.tinta8).subscribe(datos_impresion => {
-      for (let j = 0; j < datos_impresion.length; j++) {
-        this.FormOrdenTrabajoImpresion.setValue({
-          Tipo_Impresion: impresion,
-          Rodillo_Impresion: data.rodillo,
-          Pista_Impresion: data.pista,
-          Tinta_Impresion1: datos_impresion[j].tinta_Nombre1,
-          Tinta_Impresion2: datos_impresion[j].tinta_Nombre2,
-          Tinta_Impresion3: datos_impresion[j].tinta_Nombre3,
-          Tinta_Impresion4: datos_impresion[j].tinta_Nombre4,
-          Tinta_Impresion5: datos_impresion[j].tinta_Nombre5,
-          Tinta_Impresion6: datos_impresion[j].tinta_Nombre6,
-          Tinta_Impresion7: datos_impresion[j].tinta_Nombre7,
-          Tinta_Impresion8: datos_impresion[j].tinta_Nombre8,
-        });
-      }
     });
   }
 
