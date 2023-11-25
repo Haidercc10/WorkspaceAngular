@@ -804,6 +804,8 @@ export class Orden_TrabajoComponent implements OnInit {
       this.presentacionProducto = this.FormOrdenTrabajo.value.Presentacion;
       this.buscarInformacionProducto();
       this.ordenTrabajoService.GetInfoUltOT(this.producto, this.presentacionProducto).subscribe(datos_Ot => {
+        console.log(datos_Ot)
+        this.llenarDatosCliente(datos_Ot);
         this.llenarFormularioOrdenTrabajo(datos_Ot);
         this.llenarFormularioExtrusion(datos_Ot);
         this.llenarFormularioLaminado(datos_Ot);
@@ -854,12 +856,12 @@ export class Orden_TrabajoComponent implements OnInit {
   //Función que llenará la información del cliente, vendedor y producto
   llenarDatosCliente(data : any){
     this.FormOrdenTrabajo.patchValue({
-      Id_Cliente : data == undefined ? '' : data.idCliente,
+      Id_Cliente : data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
       Id_Producto: this.ArrayProducto[0].Id,
       Nombre_Producto: this.ArrayProducto[0].Nombre,
       Presentacion: this.ArrayProducto[0].Und,
-      Id_Vendedor: data == undefined ? '' : data.idVendedor.length == 2 ? data.idVendedor = `0${data.idVendedor}` : data.idVendedor.length == 1 ? `00${data.idVendedor}` : data.idVendedor,
+      Id_Vendedor: data == undefined ? '' : data.id_Vendedor.length == 2 ? data.id_Vendedor = `0${data.id_Vendedor}` : data.id_Vendedor.length == 1 ? `00${data.id_Vendedor}` : data.id_Vendedor,
       Nombre_Vendedor: data == undefined ? '' : data.vendedor,
     });
   }
