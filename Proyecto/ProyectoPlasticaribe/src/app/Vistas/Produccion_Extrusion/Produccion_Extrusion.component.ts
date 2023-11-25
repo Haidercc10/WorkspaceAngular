@@ -6,6 +6,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
@@ -21,78 +22,109 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class Produccion_ExtrusionComponent implements OnInit {
 
-  cargando : boolean = false;
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
-  modoSeleccionado : boolean = false;
+  cargando: boolean = false;
+  storage_Id: number;
+  ValidarRol: number;
+  modoSeleccionado: boolean = false;
   formDatosProduccion !: FormGroup;
-  turnos : any [] = [];
-  unidadesMedida : any [] = [];
-  operarios : any [] = [];
-  conos : any [] = [];
-  proceso : string = `Extrusión`;
-  rollosPesados : any [] = [];
-  datosOrdenTrabajo : any [] = [];
+  turnos: any[] = [];
+  unidadesMedida: any[] = [];
+  operarios: any[] = [];
+  conos: any[] = [];
+  proceso: string = ``;
+  process: any[] = [];
+  rollosPesados: any[] = [];
+  datosOrdenTrabajo: any[] = [];
 
-  constructor(private frmBuilder : FormBuilder,
-    private appComponent : AppComponent,
-    private turnosService : TurnosService,
-    private operariosService : UsuarioService,
-    private unidadMedidaService : UnidadMedidaService,
-    private conosService : ConosService,
-    private productoService : ProductoService,
-    private bagproService : BagproService,
-    private msj : MensajesAplicacionService,
-    private produccionProcesosService : Produccion_ProcesosService,
-    private createPDFService : CreacionPdfService,
-    private clientsService : SedeClienteService,){
+  constructor(private frmBuilder: FormBuilder,
+    private appComponent: AppComponent,
+    private turnosService: TurnosService,
+    private operariosService: UsuarioService,
+    private unidadMedidaService: UnidadMedidaService,
+    private conosService: ConosService,
+    private productoService: ProductoService,
+    private bagproService: BagproService,
+    private msj: MensajesAplicacionService,
+    private produccionProcesosService: Produccion_ProcesosService,
+    private createPDFService: CreacionPdfService,
+    private clientsService: SedeClienteService,
+    private processService: ProcesosService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
-      ordenTrabajo : [null, Validators.required],
-      idCliente : [null, Validators.required],
-      cliente : [null, Validators.required],
-      item : [null, Validators.required],
-      referencia : [null, Validators.required],
-      turno : [null, Validators.required],
-      ancho1 : [null, Validators.required],
-      ancho2 : [null, Validators.required],
-      ancho3 : [null, Validators.required],
-      undExtrusion : [null, Validators.required],
-      pesoExtruir : [null, Validators.required],
-      calibre : [null, Validators.required],
-      material : [null, Validators.required],
-      maquina : [null, Validators.required],
-      operario : [null, Validators.required],
-      cono : [null, Validators.required],
+      ordenTrabajo: [null, Validators.required],
+      idCliente: [null, Validators.required],
+      cliente: [null, Validators.required],
+      item: [null, Validators.required],
+      referencia: [null, Validators.required],
+      turno: [null, Validators.required],
+      ancho1: [null, Validators.required],
+      ancho2: [null, Validators.required],
+      ancho3: [null, Validators.required],
+      undExtrusion: [null, Validators.required],
+      pesoExtruir: [null, Validators.required],
+      calibre: [null, Validators.required],
+      material: [null, Validators.required],
+      maquina: [null, Validators.required],
+      operario: [null, Validators.required],
+      cono: [null, Validators.required],
       anchoCono: [null, Validators.required],
-      pesoTara : [null, Validators.required],
-      pesoBruto : [null, Validators.required],
-      pesoNeto : [null, Validators.required],
-      daipita : [null],
+      pesoTara: [null, Validators.required],
+      pesoBruto: [null, Validators.required],
+      pesoNeto: [null, Validators.required],
+      daipita: [null],
+      proceso: [null, Validators.required],
     });
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.lecturaStorage();
-    this.obtenerTurnos();
+    this.getProcess();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
     this.chargeSerialPorts();
+    this.validarProceso();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
-  validarProceso(){
-
+  validarProceso() {
+    switch (this.ValidarRol) {
+      case 7:
+        this.proceso = 'Extrusión';
+        break;
+      case 62:
+        this.proceso = 'Impresión';
+        break;
+      case 63:
+        this.proceso = 'Rotograbado';
+        break;
+      case 70:
+        this.proceso = 'Laminado';
+        break;
+      case 71:
+        this.proceso = 'Doblado';
+        break;
+      case 72:
+        this.proceso = 'Corte';
+        break;
+      case 9:
+        this.proceso = 'Empaque';
+        break;
+      default:
+        this.proceso = this.formDatosProduccion.value.proceso;
+        break;
+    }
+    if (this.ValidarRol != 1) this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
+    this.obtenerTurnos();
   }
 
-  chargeSerialPorts(){
+  chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
         port.open({ baudRate: 9600 }).then(async () => {
@@ -102,13 +134,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
     });
   }
 
-  async buscarPuertos(){
+  async buscarPuertos() {
     const port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     this.chargeDataFromSerialPort(port);
   }
 
-  async chargeDataFromSerialPort(port : any){
+  async chargeDataFromSerialPort(port: any) {
     while (port.readable) {
       const reader = port.readable.getReader();
       try {
@@ -122,8 +154,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
             let valor = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
             this.formDatosProduccion.patchValue({
-              pesoBruto : valor,
-              pesoNeto : valor - this.formDatosProduccion.value.pesoTara,
+              pesoBruto: valor,
+              pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
             });
           }
         }
@@ -135,21 +167,66 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
-  eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
+  eliminarDiacriticos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  limpiarCampos(){
+  limpiarCampos() {
     this.cargando = false;
     this.formDatosProduccion.reset();
     this.obtenerTurnos();
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
+    this.validarProceso();
+  }
+
+  getProcess() {
+    this.processService.srvObtenerLista().subscribe(res => {
+      res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP'].includes(x.proceso_Id)).forEach(process => {
+        this.process.push({
+          order : this.sortArrayProcess(process.proceso_Nombre),
+          proceso_Id : process.proceso_Id,
+          proceso_Nombre : process.proceso_Nombre,
+        });
+      });
+      this.process.sort((a, b) => Number(a.order) - Number(b.order));
+    });
+  }
+
+  sortArrayProcess(process : string){
+    let num : number = 0;
+    switch (process.toUpperCase()) {
+      case 'EXTRUSION':
+        num = 1;
+        break;
+      case 'IMPRESION':
+        num = 2;
+        break;
+      case 'ROTOGRABADO':
+        num = 3;
+        break;
+      case 'DOBLADO':
+        num = 4;
+        break;
+      case 'LAMINADO':
+        num = 5;
+        break;
+      case 'CORTE':
+        num = 6;
+        break;
+      case 'EMPAQUE':
+        num = 7;
+        break;
+      default:
+        break;
+    }
+    return num;
   }
 
   obtenerTurnos() {
-    let proceso : string = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     this.turnosService.srvObtenerLista().subscribe(data => this.turnos = data.map(x => x.turno_Id));
     this.bagproService.GetHorarioProceso(proceso).subscribe(turno => {
-      this.formDatosProduccion.patchValue({turno : turno.toString()});
+      this.formDatosProduccion.patchValue({ turno: turno.toString() });
+      if (this.datosOrdenTrabajo.length > 0) this.datosOrdenTrabajo[0].turno = turno.toString();
     });
   }
 
@@ -160,33 +237,33 @@ export class Produccion_ExtrusionComponent implements OnInit {
   obtenerOperarios() {
     this.operariosService.GetOperariosProduccion().subscribe(data => {
       this.operarios = data;
-      this.operarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+      this.operarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
     });
   }
 
   obtenerConos() {
     this.conosService.GetConos().subscribe(data => {
       this.conos = data
-      this.conos.sort((a,b) => b.cono_Id.localeCompare(a.cono_Id));
+      this.conos.sort((a, b) => b.cono_Id.localeCompare(a.cono_Id));
     });
   }
 
-  buscarDatosConoSeleccionado(){
+  buscarDatosConoSeleccionado() {
     let cono = this.formDatosProduccion.get('cono').value;
-    if (cono){
+    if (cono) {
       let datosCono = this.conos.find(x => x.cono_Id == cono);
-      let ancho : number = datosCono.cono_KgXCmsAncho;
-      this.formDatosProduccion.patchValue({anchoCono : ancho});
+      let ancho: number = datosCono.cono_KgXCmsAncho;
+      this.formDatosProduccion.patchValue({ anchoCono: ancho });
       this.validarAnchoCono();
     }
   }
 
-  validarAnchoCono(){
-    let ancho : number = 0;
+  validarAnchoCono() {
+    let ancho: number = 0;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
     let proceso = this.proceso;
     if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.consultarDatosProducto();
-    else if (['Doblado'].includes(proceso)){
+    else if (['Doblado'].includes(proceso)) {
       if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
       ancho = ancho1 / 2;
     } else {
@@ -194,81 +271,83 @@ export class Produccion_ExtrusionComponent implements OnInit {
       ancho = ancho1;
     }
     this.formDatosProduccion.patchValue({
-      ancho1 : ancho1,
-      pesoTara : this.validarTaraCono(ancho)
+      ancho1: ancho1,
+      pesoTara: this.validarTaraCono(ancho)
     });
   }
 
-  consultarDatosProducto(){
+  consultarDatosProducto() {
     let item = this.formDatosProduccion.get('item').value;
     let datosItem;
     this.productoService.srvObtenerListaPorId(item).subscribe(data => datosItem = data);
     return datosItem.prod_Ancho;
   }
 
-  validarTaraCono(ancho : number) : number{
-    let tara : number = 0;
+  validarTaraCono(ancho: number): number {
+    let tara: number = 0;
     let anchoCono = this.formDatosProduccion.get('anchoCono').value;
     let undExtrusion = this.formDatosProduccion.get('undExtrusion').value;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
-    if (ancho1 && anchoCono){
+    if (ancho1 && anchoCono) {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
       else tara = ancho * anchoCono;
     }
     return tara;
   }
 
-  buscraOrdenTrabajo(){
-    let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
-    this.cargando = true;
-    this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => {
-      this.datosOrdenTrabajo = data;
-      this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
-      this.buscarRollosPesados();
-      data.forEach(datos => {
-        this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
-          dataClient.forEach(cli => {
-            this.datosOrdenTrabajo[0].idCliente = cli.idCliente;
-            this.formDatosProduccion.patchValue({
-              idCliente : cli.idCliente,
-              cliente : datos.cliente,
-              item : datos.id_Producto,
-              referencia : datos.producto,
-              pesoExtruir : datos.peso_Neto,
-              ancho1 : this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
-              ancho2 : this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
-              ancho3 : this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
-              undExtrusion : datos.und_Extrusion.trim(),
-              calibre : datos.calibre_Extrusion,
-              material : datos.material.trim(),
+  buscraOrdenTrabajo() {
+    if (this.formDatosProduccion.value.proceso){
+      let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
+      this.cargando = true;
+      this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => {
+        this.datosOrdenTrabajo = data;
+        this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
+        this.buscarRollosPesados();
+        data.forEach(datos => {
+          this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
+            dataClient.forEach(cli => {
+              this.datosOrdenTrabajo[0].idCliente = cli.idCliente;
+              this.formDatosProduccion.patchValue({
+                idCliente: cli.idCliente,
+                cliente: datos.cliente,
+                item: datos.id_Producto,
+                referencia: datos.producto,
+                pesoExtruir: datos.peso_Neto,
+                ancho1: this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
+                ancho2: this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
+                ancho3: this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
+                undExtrusion: datos.und_Extrusion.trim(),
+                calibre: datos.calibre_Extrusion,
+                material: datos.material.trim(),
+              });
+              this.buscarDatosConoSeleccionado();
             });
-            this.buscarDatosConoSeleccionado();
           });
         });
-      });
-    }, () => this.cargando = false, () => this.cargando = false);
+      }, () => this.cargando = false, () => this.cargando = false);
+    } else this.msj.mensajeAdvertencia(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
-  buscarRollosPesados(){
+  buscarRollosPesados() {
     this.rollosPesados = [];
-    let proceso : string = this.eliminarDiacriticos(this.proceso).toUpperCase();
-    let ordenTrabajo : string = this.formDatosProduccion.value.ordenTrabajo;
+    let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => this.rollosPesados = data, () => this.cargando = false, () => this.cargando = false);
   }
 
-  sumarPesoBruto(){
-    let total : number = 0;
-    total = this.rollosPesados.reduce((a,b) => a + b.extBruto, 0);
+  sumarPesoBruto() {
+    let total: number = 0;
+    total = this.rollosPesados.reduce((a, b) => a + b.extBruto, 0);
     return total;
   }
 
-  sumarPesoNeto(){
-    let total : number = 0;
-    total = this.rollosPesados.reduce((a,b) => a + b.extnetokg, 0);
+  sumarPesoNeto() {
+    let total: number = 0;
+    total = this.rollosPesados.reduce((a, b) => a + b.extnetokg, 0);
     return total;
   }
 
-  validarDatos(){
+  validarDatos() {
     if (this.datosOrdenTrabajo.length > 0) {
       if (this.formDatosProduccion.valid) {
         if (this.formDatosProduccion.value.maquina > 0) {
@@ -279,9 +358,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
   }
 
-  guardarProduccion(){
+  guardarProduccion() {
     this.cargando = true;
-    let datos : modelProduccionProcesos = {
+    let datos: modelProduccionProcesos = {
       Numero_Rollo: 0,
       Prod_Id: parseInt(this.formDatosProduccion.value.item),
       Cli_Id: parseInt(this.formDatosProduccion.value.idCliente),
@@ -307,7 +386,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Datos_Etiqueta: '',
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
-      Creador_Id : this.storage_Id,
+      Creador_Id: this.storage_Id,
     }
     this.produccionProcesosService.Post(datos).subscribe(res => {
       this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
@@ -319,7 +398,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     });
   }
 
-  validateProcess() : 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' {
+  validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
     switch (proceso) {
       case 'EXTRUSION':
@@ -355,9 +434,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
     return proceso;
   }
 
-  createTagProduction(code : number, quantity : number, quantity2 : number){
+  createTagProduction(code: number, quantity: number, quantity2: number) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
-    let dataTagProduction : modelTagProduction = {
+    let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
       item: this.formDatosProduccion.value.item,
       reference: this.formDatosProduccion.value.referencia,

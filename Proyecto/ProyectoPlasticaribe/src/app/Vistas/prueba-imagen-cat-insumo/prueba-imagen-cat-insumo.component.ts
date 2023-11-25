@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -21,6 +20,36 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  async requestDevice() {
+    try {
+      let filters = [{vendorId: 10473}];
+      const device = await navigator.usb.requestDevice({ filters: filters });
+      console.log(device);
+      this.transferOutTest(device)
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async transferOutTest(device) {
+    await device.open();
+    await device.selectConfiguration(1);
+    await device.claimInterface(0);
+    await device.transferOut(
+      2,
+      new Uint8Array(
+        new TextEncoder().encode('Test value\n')
+      ),
+    );
+    await device.close();
+  }
+
+  connectedDevice(){
+    navigator.usb.getDevices().then((devices) => {
+      console.log(devices)
+    });
   }
 
 }

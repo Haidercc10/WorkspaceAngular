@@ -118,6 +118,7 @@ export class CrearProductoComponent implements OnInit {
         ProduBolsasBulto : 0,
         ProduBolsasPaquete : 0,
       });
+      this.FormCrearPresentacionProducto.patchValue({ProdId: datos + 1});
     });
   }
 

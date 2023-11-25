@@ -18,84 +18,91 @@
 
 <p-card>
   <div class="mb-4">
-      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
   </div>
 
   <form [formGroup]="formDatosProduccion">
       <div class="row g-4 my-4">
-          <!-- ORDEN DE TRABAJO -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                    <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text" pAutoFocus [autofocus]="true" pInputText required/>
-                    <label for="ot">OT</label>
-              </span>
-          </div>
+        <!-- PROCESO -->
+        <div class="col-sm-12 col-md-2" *ngIf="ValidarRol == 1">
+            <span class="p-float-label">
+                <p-dropdown formControlName="proceso" inputId="Proceso" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Nombre" (onChange)="validarProceso()" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <label for="Proceso">Proceso</label>
+            </span>
+        </div>
 
-          <!-- MAQUINA -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="maquina" inputId="Maquina" [required]="true"></p-inputNumber>
-                  <label for="Maquina">Maquina</label>
-              </span>
-          </div>
+        <!-- ORDEN DE TRABAJO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <input formControlName="ordenTrabajo" id="ot" (keyup.enter)="buscraOrdenTrabajo()" type="text" pAutoFocus [autofocus]="true" pInputText required/>
+                <label for="ot">OT</label>
+            </span>
+        </div>
 
-          <!-- OPERARIO -->
-          <div class="col-sm-12 col-md-3 col-xl-3">
-              <span class="p-float-label">
-                  <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true"></p-dropdown>
-                  <label for="operario">Operario</label>
-              </span>
-          </div>
+        <!-- MAQUINA -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="maquina" inputId="Maquina" [required]="true"></p-inputNumber>
+                <label for="Maquina">Maquina</label>
+            </span>
+        </div>
 
-          <!-- DAIPITA -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="daipita" inputId="daipita"></p-inputNumber>
-                  <label for="daipita">Daipita</label>
-              </span>
-          </div>
+        <!-- OPERARIO -->
+        <div class="col-sm-12 col-md-3 col-xl-3">
+            <span class="p-float-label">
+                <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true"></p-dropdown>
+                <label for="operario">Operario</label>
+            </span>
+        </div>
 
-          <!-- CONO -->
-          <div class="col-sm-12 col-md-3 col-xl-2">
-              <span class="p-float-label">
-                  <p-dropdown formControlName="cono" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" (onChange)="buscarDatosConoSeleccionado()" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
-                  <label for="cono">Cono</label>
-              </span>
-          </div>
+        <!-- DAIPITA -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="daipita" inputId="daipita"></p-inputNumber>
+                <label for="daipita">Daipita</label>
+            </span>
+        </div>
 
-          <!-- ANCHO CONOS -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="anchoCono" inputId="anchoCono" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="anchoCono">Ancho Cono</label>
-              </span>
-          </div>
+        <!-- CONO -->
+        <div class="col-sm-12 col-md-3 col-xl-2">
+            <span class="p-float-label">
+                <p-dropdown formControlName="cono" inputId="cono" [options]="conos" optionLabel="cono_Id" optionValue="cono_Id" (onChange)="buscarDatosConoSeleccionado()" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+                <label for="cono">Cono</label>
+            </span>
+        </div>
 
-          <!-- TARA -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="pesoTara" inputId="pesoTara" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="pesoTara">Tara Kg</label>
-              </span>
-          </div>
+        <!-- ANCHO CONOS -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="anchoCono" inputId="anchoCono" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="anchoCono">Ancho Cono</label>
+            </span>
+        </div>
 
-          <!-- PESO BRUTO -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="pesoBruto">Bruto Kg</label>
-              </span>
-          </div>
+        <!-- TARA -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="pesoTara" inputId="pesoTara" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="pesoTara">Tara Kg</label>
+            </span>
+        </div>
 
-          <!-- PESO NETO -->
-          <div class="col-sm-12 col-md-2 col-xl-1">
-              <span class="p-float-label">
-                  <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
-                  <label for="pesoNeto">Neto Kg</label>
-              </span>
-          </div>
+        <!-- PESO BRUTO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="pesoBruto" [min]="2" inputId="pesoBruto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="pesoBruto">Bruto Kg</label>
+            </span>
+        </div>
 
-          <p-divider></p-divider>
+        <!-- PESO NETO -->
+        <div class="col-sm-12 col-md-2 col-xl-1">
+            <span class="p-float-label">
+                <p-inputNumber formControlName="pesoNeto" [min]="2" inputId="pesoNeto" mode="decimal" [minFractionDigits]="4" [readonly]="true" [required]="true"></p-inputNumber>
+                <label for="pesoNeto">Neto Kg</label>
+            </span>
+        </div>
+        <p-divider></p-divider>
       </div>
 
       <div class="row my-3">
@@ -145,7 +152,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="validarDatos()" [disabled]="formDatosProduccion.invalid"></button>
           <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-          <button pButton class="p-button-success" id="concetar" type="button" label="Conectar Báscula" icon="pi pi-box" (click)="buscarPuertos()" [disabled]="formDatosProduccion.value.pesoNeto"></button>
+          <button pButton class="p-button-success" id="concetar" type="button" label="Conectar Báscula" icon="pi pi-box" (click)="buscarPuertos()" [disabled]="formDatosProduccion.value.pesoNeto != null"></button>
       </div>
   </form>
   

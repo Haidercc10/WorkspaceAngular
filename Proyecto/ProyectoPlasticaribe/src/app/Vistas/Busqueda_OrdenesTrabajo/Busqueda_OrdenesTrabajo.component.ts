@@ -244,19 +244,24 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
     tabCrearOrden2.click();
     this.orden_TrabajoComponent.consultarClientes();
-    if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
-    else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
+    this.orden_TrabajoComponent.cargando = true;
     setTimeout(() => {
       this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
+        Id_Producto : data.item,
+        Nombre_Producto : data.referencia,
+        Presentacion : data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion,
         Cantidad: data.cantidad,
         Precio: data.precio,
       });
+      if (tipoBusqueda == 'Item') this.orden_TrabajoComponent.consultarInfoProducto();
+      else if (tipoBusqueda == 'OT') this.orden_TrabajoComponent.busquedaOTBagPro(data);
     }, 1000);
     setTimeout(() => {
       this.orden_TrabajoComponent.guardarOt();
+      this.orden_TrabajoComponent.cargando = false;
       let tabCrearOrden3 = document.getElementById(tabCrearOrden[1].id);
       tabCrearOrden3.click();
-    }, 1500);
+    }, 2500);
   }
   
 }

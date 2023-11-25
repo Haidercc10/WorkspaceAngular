@@ -944,7 +944,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: this.impresion ? parseInt(data.id_Tipo_Imptesion) || this.FormOrdenTrabajoImpresion.value.Tipo_Impresion : 1,
+      Tipo_Impresion: this.impresion ? parseInt(data.id_Tipo_Imptesion) : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
@@ -1925,7 +1925,7 @@ export class Orden_TrabajoComponent implements OnInit {
         SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
       }
       this.otSelladoCorteService.post(info).subscribe(() => {
-        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${ordenTrabajo}`);
+        this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${numeroOT}`);
         this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.Id_Cliente);
         this.cambiarEstadoProducto(this.producto);
         this.limpiarCampos();

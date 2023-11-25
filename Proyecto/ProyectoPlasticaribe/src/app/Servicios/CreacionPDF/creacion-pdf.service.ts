@@ -96,7 +96,7 @@ export class CreacionPdfService {
     private crearPDF(pdfDefinicion){
         pdfMake.createPdf(pdfDefinicion).open();
     }
-    
+
     /* ============================================================== CREATE TAG PRODUCTION ===================================================================== */
     createTagProduction(dataTag : modelTagProduction){
         let code : number = dataTag.reel;
