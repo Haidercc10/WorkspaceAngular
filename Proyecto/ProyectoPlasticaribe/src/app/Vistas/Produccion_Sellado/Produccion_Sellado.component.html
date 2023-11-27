@@ -54,15 +54,15 @@
 
         <!--Saldo-->
         <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
-          <p-checkbox formControlName="saldo" [binary]="true" inputId="binary" id="saldo" (click)="habilitarSaldo()" pTooltip="Al hacer click sobre este check el campo 'Cantidad Und.' será habilitado para casos donde la cantidad del bulto/paquete solo sea un saldo "></p-checkbox>
+          <p-checkbox formControlName="saldo" [binary]="true" inputId="binary" id="saldo" (onChange)="habilitarSaldo()" pTooltip="Al hacer click sobre este check el campo 'Cantidad Und.' será habilitado para casos donde la cantidad del bulto/paquete solo sea un saldo "></p-checkbox>
           <label for="saldo">Saldo</label>
         </div>  
 
         <!--Cantidad Und/Paq-->
-        <div class="col-sm-12 col-md-6 col-xl-1">
+        <div class="col-sm-12 col-md-6 col-xl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantUnd" id="cantUnd" type="number" [ariaReadOnly]="esSaldo" [useGrouping]="false"></p-inputNumber>
-              <label for="cantUnd">Cant. Und</label>
+            <p-inputNumber formControlName="cantUnd" id="cantUnd" type="number" [readonly]="esSoloLectura" [useGrouping]="false" pTooltip="Cantidad de Unidades/Paquetes"></p-inputNumber>
+              <label for="cantUnd">Cant. Unds/Paqs</label>
           </span>
         </div>
 
@@ -75,18 +75,18 @@
         </div>
 
         <!--Peso Teorico-->
-        <div class="col-sm-12 col-md-6 col-xl-1">
+        <!--<div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
             <p-inputNumber formControlName="pesoTeorico" id="teorico" type="number" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
               <label for="teorico">Peso teórico</label>
           </span>
-        </div>
+        </div>-->
 
-        <!--Peso Real-->
+        <!--Peso Neto-->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="pesoReal" id="real" type="number" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
-              <label for="real">Peso real</label>
+            <p-inputNumber formControlName="pesoNeto" id="real" type="number" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
+              <label for="real">Peso neto</label>
           </span>
         </div>
 

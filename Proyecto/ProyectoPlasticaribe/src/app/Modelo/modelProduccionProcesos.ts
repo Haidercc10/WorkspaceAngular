@@ -1,5 +1,6 @@
 export interface modelProduccionProcesos {
     Id? : number;
+    OT : number;
     Numero_Rollo : number;
     Prod_Id : number;
     Cli_Id : number;

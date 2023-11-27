@@ -387,6 +387,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
+      OT: parseInt(this.formDatosProduccion.value.ordenTrabajo)
     }
     this.produccionProcesosService.Post(datos).subscribe(res => {
       this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
