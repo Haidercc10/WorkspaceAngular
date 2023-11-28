@@ -72,6 +72,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     this.cargando = false;
     this.formFiltros.reset();
     this.ordenesConsultadas = [];
+    this.formFiltros.patchValue({buscarPorItem_Ot : 'Item'});
   }
 
   // Funcion que permitirá filtrar la información de la tabla
@@ -186,7 +187,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       { header: 'Calibre', field: 'calibre', tipo: 'number' },
       { header: 'Ancho', field: 'ancho', tipo: 'number' },
       { header: 'Largo', field: 'largo', tipo: 'number' },
-      { header: 'Fuele', field: 'fuelle', tipo: 'number' },
+      { header: 'Fuelle', field: 'fuelle', tipo: 'number' },
       { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date' },
     ];
   }
@@ -217,7 +218,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
       { header: 'Formato', field: 'formato', tipo: 'text' },
       { header: 'Ancho', field: 'ancho', tipo: 'number' },
       { header: 'Largo', field: 'largo', tipo: 'number' },
-      { header: 'Fuele', field: 'fuelle', tipo: 'number' },
+      { header: 'Fuelle', field: 'fuelle', tipo: 'number' },
       { header: 'Ult. Fecha', field: 'fechaCreacion', tipo: 'date' },
     ];
   }

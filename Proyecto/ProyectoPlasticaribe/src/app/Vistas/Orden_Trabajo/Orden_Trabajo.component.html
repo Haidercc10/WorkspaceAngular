@@ -23,7 +23,6 @@
   </div>
 
   <p-tabView>
-
     <p-tabPanel
     header="Crear Orden Trabajo"
     leftIcon="pi pi-plus-circle"
@@ -374,7 +373,7 @@
                 <p-accordionTab *ngIf="impresion || rotograbado">
                   <ng-template pTemplate="header">
                     <div class="flex align-items-center">
-                      <i class="pi pi-printer mr-2"></i>
+                      <i class="pi pi-print mr-2"></i>
                       <span class="vertical-align-middle">Impresión</span>
                     </div>
                   </ng-template>
@@ -756,7 +755,7 @@
                               <label for="Margen">Margen</label>
                             </span>
                             <div>
-                              <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                              <label><b>Margen Kg: </b>{{margenKg | number}}%</label>
                             </div>
                           </div>
                         </div>
@@ -844,7 +843,7 @@
                               <label for="Margen">Margen</label>
                             </span>
                             <div>
-                              <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                              <label><b>Margen Kg: </b>{{margenKg | number}}%</label>
                             </div>
                           </div>
                         </div>

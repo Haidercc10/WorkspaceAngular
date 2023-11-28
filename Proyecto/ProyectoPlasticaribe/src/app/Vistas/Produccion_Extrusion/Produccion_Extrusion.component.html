@@ -50,7 +50,7 @@
         <!-- OPERARIO -->
         <div class="col-sm-12 col-md-3 col-xl-3">
             <span class="p-float-label">
-                <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true"></p-dropdown>
+                <p-dropdown formControlName="operario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
                 <label for="operario">Operario</label>
             </span>
         </div>
@@ -130,7 +130,7 @@
               </ng-template>
               <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
                   <tr>
-                      <td>{{data.idCliente}}</td>
+                      <td>{{data.id_Cliente}}</td>
                       <td>{{data.cliente}}</td>
                       <td>{{data.id_Producto}}</td>
                       <td>{{data.producto}}</td>
