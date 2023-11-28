@@ -261,7 +261,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
     }, 1000);
     setTimeout(() => {
       this.orden_TrabajoComponent.guardarOt();
-      this.orden_TrabajoComponent.cargando = false;
       let tabCrearOrden3 = document.getElementById(tabCrearOrden[1].id);
       tabCrearOrden3.click();
     }, 2500);

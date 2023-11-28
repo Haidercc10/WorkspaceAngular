@@ -83,6 +83,11 @@ p-dialog ::ng-deep .p-dialog-header ::ng-deep span {
   border-color: #DB4149;
 }
 
+::ng-deep .p-accordion .p-accordion-content {
+  border: 1px solid #DB4149;
+  border-top: 0;
+}
+
 .colorTinta {
   border-radius: 10px;
   height: 25px;

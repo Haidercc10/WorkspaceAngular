@@ -364,7 +364,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
       } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
     } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
   }
-
   guardarProduccion() {
     this.cargando = true;
     let datos: modelProduccionProcesos = {
@@ -407,39 +406,19 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+    const processMapping = {
+      'EXTRUSION': 'EXT',
+      'IMPRESION': 'IMP',
+      'ROTOGRABADO': 'ROT',
+      'LAMINADO': 'LAM',
+      'DOBLADO': 'DBLD',
+      'CORTE': 'CORTE',
+      'EMPAQUE': 'EMP',
+      'SELLADO': 'SELLA',
+      'WIKETIADO': 'WIKE'
+    };
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
-    switch (proceso) {
-      case 'EXTRUSION':
-        proceso = 'EXT'
-        break;
-      case 'IMPRESION':
-        proceso = 'IMP'
-        break;
-      case 'ROTOGRABADO':
-        proceso = 'ROT'
-        break;
-      case 'LAMINADO':
-        proceso = 'LAM'
-        break;
-      case 'DOBLADO':
-        proceso = 'DBLD'
-        break;
-      case 'CORTE':
-        proceso = 'CORTE'
-        break;
-      case 'EMPAQUE':
-        proceso = 'EMP'
-        break;
-      case 'SELLADO':
-        proceso = 'SELLA'
-        break;
-      case 'WIKETIADO':
-        proceso = 'WIKE'
-        break;
-      default:
-        break;
-    }
-    return proceso;
+    return processMapping[proceso] || proceso;
   }
 
   createTagProduction(code: number, quantity: number, quantity2: number) {

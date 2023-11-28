@@ -150,7 +150,7 @@
       </div>
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="validarDatos()" [disabled]="formDatosProduccion.invalid"></button>
+          <button pButton class="p-button-danger" id="crear" type="button" label="Registrar Producción" icon="pi pi-send" (click)="validarDatos()"></button>
           <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
           <button pButton class="p-button-success" id="concetar" type="button" label="Conectar Báscula" icon="pi pi-box" (click)="buscarPuertos()" [disabled]="formDatosProduccion.value.pesoNeto != null"></button>
       </div>
