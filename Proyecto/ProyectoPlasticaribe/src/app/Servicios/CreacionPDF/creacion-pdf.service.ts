@@ -108,13 +108,7 @@ export class CreacionPdfService {
             footer: this.footerPDF(dataTag.productionProcess),
             content : this.contentPDF(dataTag),
         }
-        pdfMake.createPdf(pdfDefinition).getBase64((data) => {
-            let iframe = document.createElement('iframe');
-            iframe.setAttribute('src', 'data:application/pdf;base64,' + data);
-            document.body.appendChild(iframe);
-            iframe.contentWindow.print();
-            iframe.remove();
-        });
+        pdfMake.createPdf(pdfDefinition).print();
     }
 
     private contentPDF(dataTag : modelTagProduction){

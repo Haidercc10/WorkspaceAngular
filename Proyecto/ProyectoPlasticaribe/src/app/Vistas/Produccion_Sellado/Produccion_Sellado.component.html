@@ -45,7 +45,7 @@
         </div>
 
         <!-- Operario -->
-        <div class="col-sm-12 col-md-6 col-xl-5">
+        <div class="col-sm-12 col-md-6 col-xl-4">
           <span class="p-float-label">
             <p-multiSelect formControlName="idOperario" inputId="operario" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id"></p-multiSelect>
             <label for="operario">Operario</label>
@@ -61,7 +61,7 @@
         <!--Cantidad Und/Paq-->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantUnd" id="cantUnd" type="number" [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false" pTooltip="Cantidad de Unidades / Paquetes / Kilos" tooltipPosition="top"></p-inputNumber>
+            <p-inputNumber formControlName="cantUnd" (onInput)="calcularPesoTeorico()" id="cantUnd" type="number" [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false" pTooltip="Cantidad de Unidades / Paquetes / Kilos" tooltipPosition="top"></p-inputNumber>
               <label for="cantUnd">Cantidad</label>
           </span>
         </div>
@@ -75,12 +75,12 @@
         </div>
 
         <!--Peso Teorico-->
-        <!--<div class="col-sm-12 col-md-6 col-xl-1">
+        <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
             <p-inputNumber formControlName="pesoTeorico" id="teorico" type="number" [readonly]="true" [maxFractionDigits]="2"></p-inputNumber>
               <label for="teorico">Peso teórico</label>
           </span>
-        </div>-->
+        </div>
 
         <!--Peso Neto-->
         <!--<div class="col-sm-12 col-md-6 col-xl-1">
