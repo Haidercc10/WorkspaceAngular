@@ -804,7 +804,6 @@ export class Orden_TrabajoComponent implements OnInit {
       this.presentacionProducto = this.FormOrdenTrabajo.value.Presentacion;
       this.buscarInformacionProducto();
       this.ordenTrabajoService.GetInfoUltOT(this.producto, this.presentacionProducto).subscribe(datos_Ot => {
-        console.log(datos_Ot)
         this.llenarDatosCliente(datos_Ot);
         this.llenarFormularioOrdenTrabajo(datos_Ot);
         this.llenarFormularioExtrusion(datos_Ot);
@@ -834,7 +833,7 @@ export class Orden_TrabajoComponent implements OnInit {
         this.buscarInformacionProducto();
         setTimeout(() => this.cargarFormularios(datos_Sedes[0], datos_Ot[0], ot), 500);
         setTimeout(() => this.calcularDatosOt(), 800);
-        }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
+      }, () => this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró la sede del cliente consultada.`));
     }, () => this.consultarInformaciónBagPro());
   }
 
@@ -855,14 +854,15 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que llenará la información del cliente, vendedor y producto
   llenarDatosCliente(data : any){
+    let vendedor : string = data.id_Vendedor;
     this.FormOrdenTrabajo.patchValue({
       Id_Cliente : data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
       Id_Producto: this.ArrayProducto[0].Id,
       Nombre_Producto: this.ArrayProducto[0].Nombre,
       Presentacion: this.ArrayProducto[0].Und,
-      Id_Vendedor: data == undefined ? '' : data.id_Vendedor.length == 2 ? data.id_Vendedor = `0${data.id_Vendedor}` : data.id_Vendedor.length == 1 ? `00${data.id_Vendedor}` : data.id_Vendedor,
-      Nombre_Vendedor: data == undefined ? '' : data.vendedor,
+      Id_Vendedor: !data ? '' : vendedor.length == 2 ? vendedor = `0${vendedor}` : (vendedor).length == 1 ? `00${vendedor}` : vendedor,
+      Nombre_Vendedor: !data ? '' : data.vendedor,
     });
   }
 
@@ -946,7 +946,7 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
   llenarFormularioImpresion(data : any){
     this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion: this.impresion || this.rotograbado ? parseInt(data.id_Tipo_Imptesion) : 1,
+      Tipo_Impresion: data.impresion ? 2 : data.rotograbado ? 5 : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
       Pista_Impresion: data.pista || this.FormOrdenTrabajoImpresion.value.Pista_Impresion,
       Tinta_Impresion1: data.tinta1 || this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1,
@@ -1916,7 +1916,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Funcion que va a cambiar el estado de un producto a "Activo"
   cambiarEstadoProducto(producto: number) {
-    this.productoService.srvObtenerListaPorIdProducto(producto).subscribe(datos => {
+    this.productoService.srvObtenerListaPorId(producto).subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
         let info: any = {
           Prod_Id: producto,
@@ -1944,7 +1944,7 @@ export class Orden_TrabajoComponent implements OnInit {
           Prod_Peso_Paquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
           Prod_Peso_Bulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
         }
-        this.productoService.PutEstadoProducto(producto, info).subscribe(null, error => this.msj.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
+        this.productoService.srvActualizar(producto, info).subscribe(null, error => this.msj.mensajeError(`¡No fue posible actualizar el estado del producto ${producto}!`, error.error));
       }
     }, error => this.msj.mensajeError(`¡El producto ${producto} no se ha encontrado!`, error.error));
   }
@@ -1961,8 +1961,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
-    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
-      
+    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {      
       for (let i = 0; i < datos_orden.length; i++) {
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
@@ -2000,7 +1999,6 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => {
       this.edicionOrdenTrabajo = false;
       this.busquedaOTBagPro(numeroOT);
-      //this.msj.mensajeError(error.error);
       this.cargando = false;
     });
   }
@@ -2925,8 +2923,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Función que cargará la última OT de Plasticaribe. 
-  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => { this.ultimaOTApp = data }, () => { this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``) });
+  ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => this.ultimaOTApp = data, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``));
   
   //Función que cargará la última OT de Plasticaribe. 
-  ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => {this.ultimaOT = data.item; } , () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
+  ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => this.ultimaOT = data.item, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
 }

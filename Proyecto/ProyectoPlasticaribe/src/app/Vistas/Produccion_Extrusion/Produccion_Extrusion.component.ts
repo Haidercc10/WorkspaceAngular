@@ -6,6 +6,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -35,6 +36,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   process: any[] = [];
   rollosPesados: any[] = [];
   datosOrdenTrabajo: any[] = [];
+  showNameBussiness : boolean = true;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -48,7 +50,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
     private produccionProcesosService: Produccion_ProcesosService,
     private createPDFService: CreacionPdfService,
     private clientsService: SedeClienteService,
-    private processService: ProcesosService,) {
+    private processService: ProcesosService,
+    private orderProductionsService : Orden_TrabajoService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -299,33 +302,37 @@ export class Produccion_ExtrusionComponent implements OnInit {
     if (this.formDatosProduccion.value.proceso){
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
-      this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => {
-        this.datosOrdenTrabajo = data;
-        this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
-        this.buscarRollosPesados();
-        data.forEach(datos => {
-          this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
-            dataClient.forEach(cli => {
-              this.datosOrdenTrabajo[0].idCliente = cli.idCliente;
-              this.formDatosProduccion.patchValue({
-                idCliente: cli.idCliente,
-                cliente: datos.cliente,
-                item: datos.id_Producto,
-                referencia: datos.producto,
-                pesoExtruir: datos.peso_Neto,
-                ancho1: this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
-                ancho2: this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
-                ancho3: this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
-                undExtrusion: datos.und_Extrusion.trim(),
-                calibre: datos.calibre_Extrusion,
-                material: datos.material.trim(),
-              });
-              this.buscarDatosConoSeleccionado();
-            });
-          });
-        });
-      }, () => this.cargando = false, () => this.cargando = false);
+      this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
+        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => this.cargando = false, () => this.cargando = false);
+      });
     } else this.msj.mensajeAdvertencia(`¡Debe haber seleccionado un proceso previamente!`);
+  }
+
+  putDataOrderProduction(data){
+    this.datosOrdenTrabajo = data;
+    this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
+    this.buscarRollosPesados();
+    data.forEach(datos => {
+      this.clientsService.GetSedeClientexNitBagPro(datos.nitCliente).subscribe(dataClient => {
+        dataClient.forEach(cli => {
+          this.datosOrdenTrabajo[0].id_Cliente = cli.id_Cliente;
+          this.formDatosProduccion.patchValue({
+            idCliente: cli.id_Cliente,
+            cliente: datos.cliente,
+            item: datos.id_Producto,
+            referencia: datos.producto,
+            pesoExtruir: datos.peso_Neto,
+            ancho1: this.proceso != 'Empaque' ? datos.ancho1_Extrusion : datos.selladoCorte_Ancho,
+            ancho2: this.proceso != 'Empaque' ? datos.ancho2_Extrusion : datos.selladoCorte_Largo,
+            ancho3: this.proceso != 'Empaque' ? datos.ancho3_Extrusion : datos.selladoCorte_Fuelle,
+            undExtrusion: datos.und_Extrusion.trim(),
+            calibre: datos.calibre_Extrusion,
+            material: datos.material.trim(),
+          });
+          this.buscarDatosConoSeleccionado();
+        });
+      });
+    });
   }
 
   buscarRollosPesados() {
@@ -362,6 +369,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.cargando = true;
     let datos: modelProduccionProcesos = {
       Numero_Rollo: 0,
+      OT: this.formDatosProduccion.value.ordenTrabajo,
       Prod_Id: parseInt(this.formDatosProduccion.value.item),
       Cli_Id: parseInt(this.formDatosProduccion.value.idCliente),
       Operario1_Id: this.formDatosProduccion.value.operario,
@@ -387,7 +395,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
-      OT: parseInt(this.formDatosProduccion.value.ordenTrabajo)
     }
     this.produccionProcesosService.Post(datos).subscribe(res => {
       this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
@@ -451,10 +458,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
       quantity: quantity,
       quantity2: quantity2,
       reel: code,
-      presentationItem1: ['SELLADO', 'WIKETIADO'].includes(proceso) ? 'Kg' : 'Kg Bruto',
-      presentationItem2: ['SELLADO', 'WIKETIADO'].includes(proceso) ? 'Kg' : 'Kg Neto',
+      presentationItem1: 'Kg Bruto',
+      presentationItem2: 'Kg Neto',
       productionProcess: proceso,
-      showNameBussiness: true,
+      showNameBussiness: this.showNameBussiness,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
   }

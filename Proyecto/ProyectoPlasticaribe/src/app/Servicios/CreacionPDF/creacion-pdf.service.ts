@@ -102,13 +102,19 @@ export class CreacionPdfService {
         let code : number = dataTag.reel;
         const pdfDefinition : any = {
             pageOrientation: 'landscape',
-            info: { title: `Etiqueta ${code}` },
+            info: {title: `Etiqueta ${code}`},
             pageSize: {width: 188.97640176, height: 377.95280352},
             pageMargins : [10, 10, 10, 20],
             footer: this.footerPDF(dataTag.productionProcess),
             content : this.contentPDF(dataTag),
         }
-        pdfMake.createPdf(pdfDefinition).print();
+        pdfMake.createPdf(pdfDefinition).getBase64((data) => {
+            let iframe = document.createElement('iframe');
+            iframe.setAttribute('src', 'data:application/pdf;base64,' + data);
+            document.body.appendChild(iframe);
+            iframe.contentWindow.print();
+            iframe.remove();
+        });
     }
 
     private contentPDF(dataTag : modelTagProduction){
