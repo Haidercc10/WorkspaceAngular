@@ -88,13 +88,17 @@ export class Produccion_SelladoComponent implements OnInit {
         this.cargando = true;
         this.ordenConsultada = this.formSellado.value.ot;
         this.ordenesTrabajo = data; 
+        this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
         this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, cantKg : 50 });
         this.formSellado.get('saldo')?.enable();
-        setTimeout(() => { this.calcularPesoTeorico() }, 500);
+        setTimeout(() => { this.calcularPesoTeorico(); }, 500);
         this.claseCantidadRealizada(data[0]);
         this.cargarProduccionSellado(this.formSellado.value.ot);
       }
-    }, error => { this.ordenesNoEncontradas(); });
+    }, error => {  
+      this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
+      this.limpiarCampos();
+    });
   }
 
   //Función que carga la producción de sellado para la OT consultada
@@ -103,19 +107,12 @@ export class Produccion_SelladoComponent implements OnInit {
       if(data.length > 0) {
         let qty : any = this.formSellado.value.cantUnd;
         this.produccion = data;
+        this.cantBultoEstandar = (qty == 0) ? data[0].cantidadUnd : qty;
         this.formSellado.patchValue({ cantUnd : qty == 0 ? data[0].cantidadUnd : qty });
         this.produccion.sort((a, b) => a.bulto - b.bulto);
         this.cargando = false;
       } else this.cargando = false;
     }, error => { this.svcMsjs.mensajeError(`La OT ${ot} no fue encontrada en el proceso de Sellado`) });
-  }
-
-  //Función que se ejecutará cuando no se encuentre la OT consultada
-  ordenesNoEncontradas(){
-    this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT ${this.formSellado.value.ot} no existe!`);
-    this.cargando = false;
-    this.ordenesTrabajo = [];
-    this.produccion = [];
   }
 
   //Función que carga el turno actual.
@@ -132,18 +129,21 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que valida la entrada del registro
   validarEntrada(){
     if(this.formSellado.valid) {
-      if(this.formSellado.value.ot != null || this.formSellado.value.ot != '') {
-        if(this.formSellado.value.maquina > 0) {
-          if(this.formSellado.value.idOperario != null) {
-            if( (this.formSellado.value.idOperario).length < 5) {
-              if(this.formSellado.value.cantUnd > 0) {
-                if(this.formSellado.value.cantKg > -2) {
-                  this.crearEntrada(this.ordenesTrabajo[0]);
-                } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en kilos debe ser mayor que '0'!`);
-              } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en unidades/paquetes debe ser mayor a '0'!`);
-            } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
-          } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un operario!`);  
-        } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una máquina válida!`);
+      console.log(this.formSellado)
+      if(this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
+        if(this.ordenesTrabajo.length > 0) {
+          if(this.formSellado.value.maquina > 0) {
+            if(this.formSellado.value.idOperario != null) {
+              if( (this.formSellado.value.idOperario).length < 5) {
+                if(this.formSellado.value.cantUnd > 0) {
+                  if(this.formSellado.value.cantKg > 0) {
+                    this.crearEntrada(this.ordenesTrabajo[0]);
+                  } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en kilos debe ser mayor que '0'!`);
+                } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en unidades/paquetes debe ser mayor a '0'!`);
+              } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
+            } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un operario!`);  
+          } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una máquina válida!`);
+        } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No hay ordenes de trabajo consultadas!`);
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe consultar una orden de trabajo!`);
     } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
   }
@@ -194,8 +194,8 @@ export class Produccion_SelladoComponent implements OnInit {
     setTimeout(() => {
       this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de entrada de producción creado con éxito!`);
       this.limpiarCampos();
-      this.formSellado.patchValue({ ot : this.ordenConsultada});
-      this.buscarOT(); 
+      //this.formSellado.patchValue({ ot : this.ordenConsultada});
+      //this.buscarOT(); 
     }, 1000); 
     }, error => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
   }
@@ -297,12 +297,14 @@ export class Produccion_SelladoComponent implements OnInit {
       let pesoMillar : number = this.ordenesTrabajo[0].selladoCorte_PesoMillar;
       let cantidad : number = this.formSellado.value.cantUnd;
       let cantBolsasPaq : number = this.ordenesTrabajo[0].selladoCorte_CantBolsasPaquete;
-
-      if(this.ordenesTrabajo[0].presentacion == 'Kilo') pesoTeorico = cantidad;
-      else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
-      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
-      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
-      this.formSellado.patchValue({ 'pesoTeorico' : pesoTeorico });
+      if(cantidad > this.cantBultoEstandar) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El saldo no puede ser mayor a ${this.cantBultoEstandar}`);
+      else {
+        if(this.ordenesTrabajo[0].presentacion == 'Kilo') pesoTeorico = cantidad;
+        else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
+        else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
+        else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
+        this.formSellado.patchValue({ 'pesoTeorico' : pesoTeorico });
+      }
     }
   }
 
