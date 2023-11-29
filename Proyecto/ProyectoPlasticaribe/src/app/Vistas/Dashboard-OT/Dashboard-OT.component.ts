@@ -170,9 +170,9 @@ export class DashboardOTComponent implements OnInit {
           Meta_Produccion : metaMesActual,
           Produccion : produccionMesActual,
           Porcentaje : this.porcentajeProgresoMetaProduccion(areas),
-          rangoSlider : this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas))
-          // Porcentaje : (produccionMesActual / metaMesActual) * 100,
-          // PorcentajeMensual : this.porcentajeProgresoMetaProduccion(areas),
+          rangoSlider : this.rangoSliderPorcentajeProcesos(this.porcentajeProgresoMetaProduccion(areas)),
+          PorcentajeMeta : (produccionMesActual / metaMesActual) * 100,
+          PorcentajeMensual : this.porcentajeProgresoMetaProduccion(areas),
         }
         this.procesosOrdenesMes.push(datos);
         this.procesosOrdenesMes.sort((a,b) => a.Orden - b.Orden);
@@ -271,9 +271,9 @@ export class DashboardOTComponent implements OnInit {
 
   colorProgresoMetaProduccion(data : any) : string {
     let color : string;
-    let porcentaje : number = data.Porcentaje;
-    if (porcentaje <= 0) color = 'Red';
-    else if (porcentaje >= 0 && porcentaje <= 40) color = 'Orange';
+    let porcentaje : number = data.PorcentajeMeta;
+    if (porcentaje >= 0 && porcentaje <= 20) color = 'Red';
+    else if (porcentaje >= 21 && porcentaje <= 40) color = 'Orange';
     else if (porcentaje >= 41 && porcentaje <= 80) color = 'Yellow';
     else if (porcentaje >= 81 && porcentaje <= 99) color = 'YellowGreen';
     else if (porcentaje >= 100) color = 'LimeGreen';

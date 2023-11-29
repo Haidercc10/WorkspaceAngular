@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ShepherdService } from 'angular-shepherd';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';

@@ -24,8 +24,8 @@
             <tr>
               <th>#</th>
               <th>Proceso</th>
-              <th>Meta</th>
               <th>Kg</th>
+              <th>Meta</th>
               <th>Porc.</th>
             </tr>
           </ng-template>
@@ -33,6 +33,7 @@
             <tr [pEditableRow]="item">
               <td style="padding : 11px">{{rowIndex + 1}}</td>
               <td><b>{{item.Area}}</b></td>
+              <td>{{item.Produccion | number : '1.2-2'}}</td>
               <td [pEditableColumn]="item.Meta_Produccion" pEditableColumnField="price" class="cursor">
                 <p-cellEditor>
                   <ng-template pTemplate="input">
@@ -43,10 +44,14 @@
                   </ng-template>
                 </p-cellEditor>
               </td>
-              <td>{{item.Produccion | number : '1.2-2'}}</td>
               <td class="fw-bold">{{item.Porcentaje | number : '1.2-2'}}%</td>
             </tr> 
             <tr>
+              <td colspan="5">
+                <p-progressBar [value]="item.PorcentajeMeta.toFixed(2)" [color]="colorProgresoMetaProduccion(item)" [style]="{height: '15px'}"></p-progressBar>
+              </td>
+            </tr>
+            <!-- <tr>
               <td colspan="5">
                 <div class="contenedorProgreso">
                   <div class="progresoPositivo" [ngStyle]="{background: item.Porcentaje > 0 ? '#eee' : colorProgresoMetaProduccion(item), width: '50%'}">
@@ -57,7 +62,7 @@
                   </div>
                 </div>
               </td>
-            </tr>
+            </tr> -->
           </ng-template>
         </p-table>
         <ng-template pTemplate="footer">
