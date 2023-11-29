@@ -108,7 +108,7 @@ export class CreacionPdfService {
             footer: this.footerPDF(dataTag.productionProcess),
             content : this.contentPDF(dataTag),
         }
-        var win = window.open('', 'Print', 'height=100,width=100');
+        var win = window.open('', 'Print', 'height=189,width=378');
         pdfMake.createPdf(pdfDefinition).print({}, win);
         setTimeout(() => win.close(), 3000);
     }
