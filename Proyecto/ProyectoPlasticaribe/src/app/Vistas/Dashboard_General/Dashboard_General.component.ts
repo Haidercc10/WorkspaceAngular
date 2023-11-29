@@ -164,7 +164,6 @@ export class Dashboard_GeneralComponent implements OnInit {
           position: 'left',
           ticks: {  color: this.modoSeleccionado == true ? ['#F4F6F6'] : ['#495057'], font: { size: 20 } },
           grid: { color: '#ebedef' },
-          max : 0
         },
       },
       datalabels: { anchor: 'end', align: 'end' }

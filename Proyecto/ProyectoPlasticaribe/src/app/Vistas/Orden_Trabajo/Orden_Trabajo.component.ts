@@ -8,7 +8,7 @@ import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
-import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
+import { modelOrden_Trabajo, modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -1756,11 +1756,13 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la información de la orden de trabajo
-  guardarOt() {
+  guardarOt(otCreadaBagPro : boolean = false) {
     this.cargando = true;
     this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
       let numeroOrden : number = numero_OT + 1;
-      if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
+      if (!otCreadaBagPro) {
+        if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
+      } else numeroOrden = this.FormOrdenTrabajo.value.OT_Id;
       let infoOT: modelOrden_Trabajo = {
         Numero_OT : numeroOrden,
         SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
@@ -1997,7 +1999,6 @@ export class Orden_TrabajoComponent implements OnInit {
         }, 1000);
       }
     }, () => {
-      this.edicionOrdenTrabajo = false;
       this.busquedaOTBagPro(numeroOT);
       this.cargando = false;
     });
@@ -2086,7 +2087,8 @@ export class Orden_TrabajoComponent implements OnInit {
           this.cargando = false;
         });
       }, () => {
-        this.msj.mensajeError(`¡Error!`, `No se pudo obtener información de la Orden de Trabajo N° ${ot}`);
+        this.guardarOt(true);
+        this.edicionOrdenTrabajo = false;
         this.cargando = false;
       });
     }

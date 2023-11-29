@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
 import { environment } from 'src/environments/environment';
 import { arrayBuffer } from 'stream/consumers';
 
@@ -99,6 +100,8 @@ export class BagproService {
   GetOrdenesTrabajo = (inicio : any, fin : any, ruta : string) => this.http.get<any>(`${this.rutaBagPro}/ClientesOt/getOrdenesTrabajo/${inicio}/${fin}${ruta}`);
 
   GetOrdenDeTrabajo = (ot : number):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/ClientesOt/GetOrdenDeTrabajo/${ot}`);
+
+  PutOrdenTrabajo = (orden : number, data : modelOrden_Trabajo_BagPro) => this.http.put(`${this.rutaBagPro}/ClientesOt/putOrdenTrabajo/${orden}`, data);
 
   /**************************************************************** CLIENTESOTITEM *******************************************************/
 
