@@ -305,7 +305,9 @@
                           <!-- Pigmento -->
                           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
                             <span class="p-float-label">
-                              <p-dropdown formControlName="Pigmento_Extrusion" inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true"></p-dropdown>
+                              <p-dropdown formControlName="Pigmento_Extrusion"  inputId="Pigmento" [options]="arrayPigmentos" optionLabel="pigmt_Nombre" optionValue="pigmt_Id" [autoDisplayFirst]="false" [filter]="true" filterBy="pigmt_Nombre" [required]="true">
+                                <i class="pi pi-circle-fill"></i>
+                              </p-dropdown>
                               <label for="Pigmento">Pigmento</label>
                             </span>
                           </div>
@@ -913,7 +915,7 @@
       
                         <div class="row g-4 justify-content-md-center">
                           <!-- Precio Sellado Día -->
-                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="PrecioDia" inputId="PrecioDia" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                               <label for="PrecioDia">Sellado Día</label>
@@ -921,13 +923,13 @@
                           </div>
                           
                           <!-- Precio Sellado Noche -->
-                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
+                          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
                             <span class="p-float-label">
                               <p-inputNumber formControlName="PrecioNoche" inputId="PrecioNoche" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
                               <label for="PrecioNoche">Sellado Noche</label>
                             </span>
                           </div>
-                          
+
                           <!-- Precio Wiketiado Día Maquina 50 -->
                           <!-- <div class="col-xs-12 col-sm-12 col-md-6 col-lg">
                             <span class="p-float-label">
@@ -959,6 +961,7 @@
                               <label for="PrecioDia">Wik. Noche MQ 9</label>
                             </span>
                           </div> -->
+                          
                         </div>
                         <hr>
                       </div>
@@ -977,7 +980,7 @@
                       <div class="mb-3 costosFinales">
                         <div class="row g-3">
                           <p-chip id="cantidad" label="Cantidad {{presentacionProducto}}" icon="pi pi-shopping-cart"></p-chip>
-                          <label for="">{{cantidadProducto | number : '1.2-2'}}</label>
+                          <label for="">{{cantidadProducto | number}}</label>
                         </div>
                       </div>
                       <div class="mb-3 costosFinales">

@@ -2252,7 +2252,7 @@ export class Orden_TrabajoComponent implements OnInit {
       const pdfDefinicion: any = {
         info: { title: titulo },
         pageSize: { width: 630, height: 760 },
-        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.03, bold: true, italics: false },
         pageMargins: [25, 190, 25, 35],
         header: this.headerPDF(datos_ot[i]),
         footer: this.footerPDF(),

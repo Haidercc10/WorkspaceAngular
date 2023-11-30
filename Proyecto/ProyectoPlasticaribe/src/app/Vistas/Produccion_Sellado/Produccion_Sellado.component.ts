@@ -282,7 +282,7 @@ export class Produccion_SelladoComponent implements OnInit {
       quantity: cantUnd,
       quantity2: cantKg,
       reel: rollo,
-      presentationItem1: `${medida}(s)`,
+      presentationItem1: medida != 'Kg' ? `${medida}(s)` : 'Kg',
       presentationItem2: 'Kg',
       productionProcess: proceso.Nombre,
       showNameBussiness: true,
