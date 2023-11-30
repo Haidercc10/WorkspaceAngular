@@ -89,7 +89,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.ordenConsultada = this.formSellado.value.ot;
         this.ordenesTrabajo = data; 
         this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
-        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, cantKg : 50 });
+        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, });
         this.formSellado.get('saldo')?.enable();
         setTimeout(() => { this.calcularPesoTeorico(); }, 500);
         this.claseCantidadRealizada(data[0]);
@@ -129,7 +129,6 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que valida la entrada del registro
   validarEntrada(){
     if(this.formSellado.valid) {
-      console.log(this.formSellado)
       if(this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
         if(this.ordenesTrabajo.length > 0) {
           if(this.formSellado.value.maquina > 0) {
@@ -192,7 +191,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.svcProdProcesos.Post(entrada).subscribe(data => { 
     this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion);
     setTimeout(() => {
-      this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de entrada de producción creado con éxito!`);
+      this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
       this.limpiarCampos();
       //this.formSellado.patchValue({ ot : this.ordenConsultada});
       //this.buscarOT(); 
@@ -210,6 +209,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.clase = ``;
     this.formSellado.get('saldo')?.disable();
     this.cargarTurnoActual();
+    this.cantBultoEstandar = 0;
   }
   
   //Función que filtra la info de la tabla 
