@@ -111,7 +111,7 @@ export class CreacionPdfService {
         let windoeFeatures = `height=189,width=378`;
         let win = window.open('', 'Print', windoeFeatures);
         pdfMake.createPdf(pdfDefinition).print({}, win);
-        setTimeout(() => win.close(), 3000);
+        // setTimeout(() => win.close(), 3000);
     }
 
     private contentPDF(dataTag : modelTagProduction){
@@ -157,17 +157,21 @@ export class CreacionPdfService {
     }
 
     private infoClient(dataTag : modelTagProduction) : any [] {
+        let nameClient : string = (dataTag.client).toUpperCase();
+        let size : number = nameClient.length > 40 ? 10 : 12;
         return [
-            {text: `Cliente: ${(dataTag.client).toUpperCase()}`, bold: true, fontSize: 10, alignment: 'left', colSpan: 3},
+            {text: `Cliente: ${(dataTag.client).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 3},
             {},
             {}
         ];
     }
 
     private infoProduct(dataTag : modelTagProduction) : any [] {
+        let reference : string = (dataTag.reference).toUpperCase();
+        let size : number = reference.length > 30 ? 9 : 12;
         return [
-            {text: `Item: ${(dataTag.item)}`, bold: true, fontSize: 10, alignment: 'left'},
-            {text: `Referencia: ${(dataTag.reference).toUpperCase()}`, bold: true, fontSize: 10, alignment: 'left', colSpan: 2},
+            {text: `Item: ${(dataTag.item)}`, bold: true, fontSize: 12, alignment: 'left'},
+            {text: `REF: ${(dataTag.reference).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 2},
             {},
         ];
     }
@@ -175,11 +179,19 @@ export class CreacionPdfService {
     private dataOrderProduction(dataTag : modelTagProduction) : any [] {
         return [
             {
-                text: `OT: ${dataTag.orderProduction}\t ${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}\t CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}\t Material: ${dataTag.material}`, 
-                bold: true, 
-                fontSize: 10, 
-                alignment: 'center',
-                colSpan: 3
+                colSpan: 3,
+                table : {
+                    widths : ['auto', '*', 'auto', 'auto'],
+                    body : [
+                        [
+                            {text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 11, alignment: 'center'},
+                            {text: `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}`, bold: true, fontSize: 10, alignment: 'center'},
+                            {text: `CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center'},
+                            {text: `Material: ${dataTag.material}`, bold: true, fontSize: 10, alignment: 'center'},
+                        ]
+                    ]
+                },
+                layout: 'noBorders'
             },
             {},
             {},
@@ -203,7 +215,8 @@ export class CreacionPdfService {
     }
 
     private tableWithQuantity(quantity : number){
-        return {text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: 12, alignment: 'center'};
+        let size : number = quantity > 999 ? 18 : quantity > 9999 ? 14 : 24;
+        return {text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center'};
     }
 
     private createBarcode(code : number){

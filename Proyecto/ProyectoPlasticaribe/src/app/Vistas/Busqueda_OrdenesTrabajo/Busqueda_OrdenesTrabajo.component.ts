@@ -136,7 +136,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
   }
 
   validarRutaConsulta() : string {
-    let cliente : any = this.formFiltros.value.cliente;
+    let cliente : any = this.formFiltros.value.idCliente;
     let item : number = this.formFiltros.value.item;
     let material : any = this.formFiltros.value.material;
     let pigmento : number = this.formFiltros.value.pigmento;
@@ -241,9 +241,6 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
 
   crearCopiaOrdenTrabajo(data : any){
     let tipoBusqueda : 'Item' | 'OT' = this.formFiltros.value.buscarPorItem_Ot;
-    let tabCrearOrden = document.getElementsByClassName('p-element p-ripple p-tabview-nav-link');
-    let tabCrearOrden2 = document.getElementById(tabCrearOrden[0].id);
-    tabCrearOrden2.click();
     this.orden_TrabajoComponent.consultarClientes();
     this.orden_TrabajoComponent.cargando = true;
     this.orden_TrabajoComponent.FormOrdenTrabajo.patchValue({
@@ -259,11 +256,7 @@ export class Busqueda_OrdenesTrabajoComponent implements OnInit {
         Precio: data.precio,
       });
     }, 1000);
-    setTimeout(() => {
-      this.orden_TrabajoComponent.guardarOt();
-      let tabCrearOrden3 = document.getElementById(tabCrearOrden[1].id);
-      tabCrearOrden3.click();
-    }, 2500);
+    setTimeout(() => this.orden_TrabajoComponent.guardarOt(), 2500);
   }
   
 }

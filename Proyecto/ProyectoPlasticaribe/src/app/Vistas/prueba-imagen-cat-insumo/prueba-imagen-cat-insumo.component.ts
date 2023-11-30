@@ -1,7 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -10,7 +12,7 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./prueba-imagen-cat-insumo.component.css']
 })
 
-export class PruebaImagenCatInsumoComponent implements OnInit, OnDestroy {
+export class PruebaImagenCatInsumoComponent implements OnInit {
 
   load: boolean = false;
   storage_Id: number;
@@ -18,40 +20,47 @@ export class PruebaImagenCatInsumoComponent implements OnInit, OnDestroy {
   modoSeleccionado: boolean = false;
   sendProductionZeus: any[] = [];
   productionSearched : any;
+  formProduction : FormGroup;
+  drivers : any[] = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce : Produccion_ProcesosService,
     private msj : MensajesAplicacionService,
-    private createPDFService : CreacionPdfService,) {
+    private createPDFService : CreacionPdfService,
+    private usuariosService : UsuarioService,
+    private frmBuilder : FormBuilder,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
+    this.formProduction = this.frmBuilder.group({
+      production : [''],
+      observation : [''],
+      driver: [''],
+      car : [''],
+    });
   }
 
   ngOnInit() {
-    this.focusInput(true, false);
+    document.getElementById('RolloBarsCode').focus();
+    this.getDrivers();
   }
-
-  ngOnDestroy(): void {
-    this.focusInput(false, true);
-  }
-
-  focusInput(start : boolean, finish : boolean){
-    let time = setInterval(() => {
-      if (start && !finish) document.getElementById('RolloBarsCode').focus();
-      else if (!start && finish) clearInterval(time);
-    }, 500);
-  }
-
+  
   clearFields(){
     this.sendProductionZeus = [];
     this.productionSearched = null;
   }
 
+  getDrivers(){
+    this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
+  }
+
   searchProductionByReel(){
-    let production = parseInt(this.productionSearched);
-    this.productionSearched = null;
+    let production = parseInt(this.formProduction.value.production);
+    this.formProduction.patchValue({production : null});
+    document.getElementById('RolloBarsCode').focus();
     let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else this.productionProcessSerivce.GetInformationAboutProduction(production).subscribe(data => this.sendProductionZeus = data);
+    else this.productionProcessSerivce.GetInformationAboutProduction(production).subscribe(data => this.sendProductionZeus = data, () => {
+      this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
+    });
   }
 
   updateProductionZeus(){

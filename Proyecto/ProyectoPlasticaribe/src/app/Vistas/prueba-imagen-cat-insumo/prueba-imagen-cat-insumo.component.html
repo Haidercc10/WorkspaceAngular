@@ -8,7 +8,7 @@
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
       <div class="mb-4 Titulo">
-        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Subir / Ver Producción</h2>
+        <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingreso Despacho</h2>
       </div>
       <div class="mb-4">
         <hr class="colorLinea">
@@ -23,14 +23,37 @@
 
     <p-tabView>
         <p-tabPanel header="Subir Producción" leftIcon="pi pi-upload">
-            <div class="row mb-5">
-                <div class="col-sm-12 col-md-2">
-                    <span class="p-float-label">
-                        <input type="text" id="RolloBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="searchProductionByReel()"/>
-                        <label for="Rollo">Rollo Leído</label>
-                    </span>
+            <form [formGroup]="formProduction">
+                <div class="row g-4 mb-5">
+                    <div class="col-sm-12 col-md-4">
+                        <span class="p-float-label">
+                            <input formControlName="production" type="text" id="RolloBarsCode" pInputText pAutoFocus (keyup.enter)="searchProductionByReel()"/>
+                            <label for="RolloBarsCode">Rollo Leído</label>
+                        </span>
+                    </div>
+
+                    <div class="col-sm-12 col-md-4">
+                        <span class="p-float-label">
+                            <p-dropdown formControlName="production" inputId="production" [autoDisplayFirst]="false" [options]="drivers" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+                            <label for="operario">Conductores</label>
+                        </span>
+                    </div>
+
+                    <div class="col-sm-12 col-md-4">
+                        <span class="p-float-label">
+                            <input formControlName="car" type="text" id="car" pInputText/>
+                            <label for="car">Placa Carro</label>
+                        </span>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <span class="p-float-label">
+                          <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
+                          <label for="textarea">Observación</label>
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </form>
 
             <p-table
             [value]="sendProductionZeus"

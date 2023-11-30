@@ -1,0 +1,164 @@
+<div class="d-flex justify-content-center overlay" *ngIf="loading">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="row g-4 m-2" [style]="{width: '100%', margin: 'auto', height: '100%'}">
+  <!-- OPTIONS -->
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
+    <div class="row g-3">
+      <!-- <div class="optionsMails">
+        <ul>
+          <li class="newMails">
+            <a aria-expanded="false">dasd</a>
+          </li>
+          <li class="allMails"></li>
+          <li class="responseMails"></li>
+        </ul>
+      </div> -->
+
+      <!-- NEW -->
+      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Nuevos" icon="pi pi-inbox" severity="primary" badge="{{getNewMails()}}" badgeClass="p-badge-info"></p-button>
+      </div> -->
+
+      <!-- ALL -->
+      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Todos" icon="pi pi-th-large" severity="danger" badge="{{mails.length}}" badgeClass="p-badge-info"></p-button>
+      </div> -->
+
+      <!-- RESPONSE SEND -->
+      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Respondidos" icon="pi pi-send" severity="success" badge="{{getResponseMails()}}" badgeClass="p-badge-info"></p-button>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- MAILS INFORMATION -->
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-9">    
+    <p-table 
+    #dt_Mails
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="20"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+    [rowHover]="true"
+    [value]="mails"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    *ngIf="mails.length > 0">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Asunto</th>
+          <th>Descripción</th>
+          <th>Correo</th>
+          <th>Telefono</th>
+          <th>Fecha/Hora</th>
+          <th pFrozenColumn [frozen]="true" alignFrozen="right">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td>{{rowIndex + 1}}</td>
+          <td>{{data.Nombre}}</td>
+          <td>{{data.Asunto}}</td>
+          <td>{{(data.Mensaje).length > 30 ? (data.Mensaje).substring(0, 30) + '...' : data.Mensaje}}</td>
+          <td>{{data.Correo}}</td>
+          <td>{{data.Telefono}}</td>
+          <td>{{data.Fecha}} {{data.Hora}}</td>
+          <td pFrozenColumn [frozen]="true" alignFrozen="right">
+            <p-button icon="pi pi-eye" severity="success" (onClick)="showMailInformation(data)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- MAIL INFORMATION -->
+<p-dialog [(visible)]="modalMailInformation" [style]="{width: '80%', margin: 'auto', height: '80%'}" header="Información Correo" [modal]="true">
+  <ng-template pTemplate="content">
+    <form [formGroup]="formMailInformation">
+      <div class="row g-4 my-2">
+        <!-- NAME -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-user"></i>
+            <input formControlName="name" type="text" id="name" pInputText readonly/>
+            <label htmlFor="name">Nombre</label>
+          </span>
+        </div>
+
+        <!-- MAIL -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-at"></i>
+            <input formControlName="mail" type="text" id="mail" pInputText readonly/>
+            <label htmlFor="mail">Correo</label>
+          </span>
+        </div>
+
+        <!-- PHONE NUMBER -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-phone"></i>
+            <input formControlName="phoneNumber" type="text" id="phoneNumber" pInputText readonly/>
+            <label htmlFor="phoneNumber">Telefono</label>
+          </span>
+        </div>
+
+        <!-- DATE -->
+        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-calendar"></i>
+            <input formControlName="date" type="text" id="date" pInputText readonly/>
+            <label htmlFor="date">Fecha</label>
+          </span>
+        </div>
+
+        <!-- HOUR -->
+        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-clock"></i>
+            <input formControlName="hour" type="text" id="hour" pInputText readonly/>
+            <label htmlFor="hour">Hora</label>
+          </span>
+        </div>
+
+        <!-- SUBJECT -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label p-input-icon-left">
+            <i class="pi pi-envelope"></i>
+            <input formControlName="subject" type="text" id="subject" pInputText readonly/>
+            <label htmlFor="subject">Asunto</label>
+          </span>
+        </div>
+
+        <!-- MESSAGE -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <textarea formControlName="message" id="message" [rows]="getBreakeRows(formMailInformation.value.message)" pInputTextarea [readOnly]="true"></textarea>
+            <label for="textarea">Mensaje</label>
+          </span>
+        </div>
+
+        <!-- MESSAGE -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <textarea formControlName="response" id="response" [rows]="5" pInputTextarea required></textarea>
+            <label for="textarea">Respuesta</label>
+          </span>
+        </div>
+      </div>
+
+      <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-success" id="crear" type="button" label="Responder" icon="pi pi-send" [disabled]="formMailInformation.invalid" (click)="sendResponse()"></button>
+      </div>
+    </form>
+  </ng-template>
+</p-dialog>

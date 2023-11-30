@@ -1133,7 +1133,7 @@ export class Orden_TrabajoComponent implements OnInit {
   cargarCombinacionMezclas() {
     let simboloPorcentaje: boolean = false;
     let data : string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
-    if (`${data}`.trim() == 'CUSTOM') data = 'NO APLICA MEZCLA';
+    if (['CUSTOM', ''].includes(`${data}`.trim())) data = 'NO APLICA MEZCLA';
     simboloPorcentaje = data.includes("%") ? true : false;
     if (simboloPorcentaje) data = data.replace('%', '%25')
     else data = data;
@@ -2348,10 +2348,12 @@ export class Orden_TrabajoComponent implements OnInit {
 
   // Funcion que va a crear el contenido del PDF
   contentPDF(datos_ot){
-    return [
-      this.hoja1ContentPDF(datos_ot),
-      this.hoja2ContentPDF(datos_ot)
-    ];
+    let data = [];
+    data.push(this.hoja1ContentPDF(datos_ot));
+    data.push(this.hoja2ContentPDF(datos_ot));
+    // if (this.impresion || this.rotograbado) data.push(this.hoja2ContentPDF(datos_ot));
+    // if (this.sellado) data.push(this.hoja2ContentPDF(datos_ot));
+    return data;
   }
 
   // Funcion que va a crear la hoja 1 del PDF
@@ -2376,7 +2378,7 @@ export class Orden_TrabajoComponent implements OnInit {
       table: {
         widths: ['*'],
         body: [
-          [{text: (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas'}]
+          [{text: (datos_ot.mezcla_Nombre).trim() == '' ? 'MATERIA PRIMA' : (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas'}]
         ]
       },
       fontSize: 9,

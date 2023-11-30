@@ -11,13 +11,34 @@
 
 <form [formGroup]="formFiltros" (ngSubmit)="consultarOrdenes()">
   <div class="row g-4 mb-2">
-      <!-- BUSCAR POR -->
+    <!-- BUSCAR POR -->
     <div class="col-sm-12 col-md-6 col-xl-2 text-center">
       <p-radioButton formControlName="buscarPorItem_Ot" name="buscarPorItem_Ot" value="Item" [required]="true"></p-radioButton>
       <label class="mx-2" for="item">Item</label>
 
       <p-radioButton formControlName="buscarPorItem_Ot" name="buscarPorItem_Ot" value="OT" [required]="true"></p-radioButton>
       <label class="mx-2" for="ot">OT</label>
+    </div>
+
+    <!-- CLIENTE -->
+    <div class="col-sm-12 col-md-6 col-xl-4">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-users"></i>
+        <input formControlName="cliente" id="cliente" list="clientesConsultados" type="text" pInputText (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off"/>
+        <datalist id="clientesConsultados">
+          <option value={{item.sedeCli_CodBagPro}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
+        </datalist>
+        <label for="cliente">Cliente</label>
+      </span>
+    </div>
+
+    <!-- ID CLIENTE -->
+    <div class="col-sm-12 col-md-6 col-xl-2">
+      <span class="p-input-icon-left p-float-label">
+        <i class="pi pi-user"></i>
+        <input formControlName="idCliente" type="text" id="orden" pInputText [readonly]="true"/>
+        <label for="orden">Id Cliente</label>
+      </span>
     </div>
     
     <!-- FECHA INICIAL -->
@@ -36,32 +57,10 @@
       </span>
     </div>
 
-    <!-- ID CLIENTE -->
-    <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-input-icon-left p-float-label">
-        <i class="pi pi-user"></i>
-        <input formControlName="idCliente" type="text" id="orden" pInputText [readonly]="true"/>
-        <label for="orden">Id Cliente</label>
-      </span>
-    </div>
-
-    <!-- CLIENTE -->
-    <div class="col-sm-12 col-md-6 col-xl-4">
-      <span class="p-input-icon-left p-float-label">
-        <i class="pi pi-users"></i>
-        <input formControlName="cliente" id="cliente" list="clientesConsultados" type="text" pInputText (keyup)="consultarClientes()" (change)="clienteSeleccionado()" autocomplete="off"/>
-        <datalist id="clientesConsultados">
-          <option value={{item.sedeCli_CodBagPro}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
-        </datalist>
-        <label for="cliente">Cliente</label>
-      </span>
-    </div>
-
     <!-- ITEM -->
     <div class="col-sm-12 col-md-6 col-xl-2">
-      <span class="p-input-icon-left p-float-label">
-        <i class="pi pi-box"></i>
-        <input formControlName="item" type="text" id="item" pInputText/>
+      <span class="p-float-label">
+        <p-inputNumber formControlName="item" inputId="item" [useGrouping]="false"></p-inputNumber>
         <label for="item">Item</label>
       </span>
     </div>

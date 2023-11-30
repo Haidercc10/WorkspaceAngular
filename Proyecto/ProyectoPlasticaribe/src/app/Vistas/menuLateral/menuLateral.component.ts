@@ -13,8 +13,6 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
-import { collection, getDocs } from "firebase/firestore"; 
-import { db } from 'src/app/conexionFirebase';
 
 Injectable({
   providedIn: 'root'
@@ -41,6 +39,7 @@ export class MenuLateralComponent implements OnInit {
   menuUsuario : boolean = false;
   modalUsuario : boolean = false;
   modalCalendario : boolean = false;
+  modalCorreos : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -50,6 +49,7 @@ export class MenuLateralComponent implements OnInit {
   eventosHoy : any [] = []; //VAriable que almacenará los eventos que hay para el día actual
   eventosMes : any [] = []; //Variable que almacenará los eventos que hay para el mes actual
   eventosDia : boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
+  cantidadCorreosNuevos : number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   position: string = '';
   modoSeleccionado : boolean;
   roles : any [] = [];
@@ -84,10 +84,6 @@ export class MenuLateralComponent implements OnInit {
     this.consultarEventosMes();
     this.CargarCategorias();
     this.abrirModalUsuario();
-    // const querySnapshot = await getDocs(collection(db, "Correos"));
-    // querySnapshot.forEach((doc) => {
-    //   doc.data();
-    // });
   }
 
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 

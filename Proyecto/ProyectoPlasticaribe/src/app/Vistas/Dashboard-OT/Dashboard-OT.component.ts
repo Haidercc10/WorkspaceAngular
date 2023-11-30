@@ -272,10 +272,10 @@ export class DashboardOTComponent implements OnInit {
   colorProgresoMetaProduccion(data : any) : string {
     let color : string;
     let porcentaje : number = data.PorcentajeMeta;
-    if (porcentaje >= 0 && porcentaje <= 20) color = 'Red';
-    else if (porcentaje >= 21 && porcentaje <= 40) color = 'Orange';
-    else if (porcentaje >= 41 && porcentaje <= 80) color = 'Yellow';
-    else if (porcentaje >= 81 && porcentaje <= 99) color = 'YellowGreen';
+    if (porcentaje >= 0 && porcentaje < 21) color = 'Red';
+    else if (porcentaje >= 21 && porcentaje < 41) color = 'Orange';
+    else if (porcentaje >= 41 && porcentaje < 81) color = 'Yellow';
+    else if (porcentaje >= 81 && porcentaje < 100) color = 'YellowGreen';
     else if (porcentaje >= 100) color = 'LimeGreen';
     return color;
   }

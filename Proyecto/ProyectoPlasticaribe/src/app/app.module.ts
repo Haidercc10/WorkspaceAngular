@@ -191,6 +191,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
 import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Produccion_Extrusion.component';
+import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_PaginaWeb.component';
 
 @NgModule({
   declarations: [
@@ -304,7 +305,8 @@ import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Pro
     ReportesConsolidadosComponent,
     Busqueda_OrdenesTrabajoComponent, 
     Produccion_SelladoComponent,
-    Produccion_ExtrusionComponent
+    Produccion_ExtrusionComponent,
+    Correos_PaginaWebComponent
   ],
 
   imports: [
