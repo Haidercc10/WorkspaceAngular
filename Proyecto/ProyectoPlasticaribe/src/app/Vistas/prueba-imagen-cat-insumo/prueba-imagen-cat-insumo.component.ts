@@ -39,8 +39,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   }
 
   ngOnInit() {
-    document.getElementById('RolloBarsCode').focus();
     this.getDrivers();
+    setTimeout(() => document.getElementById('RolloBarsCode').focus(), 500);
   }
   
   clearFields(){
@@ -76,7 +76,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       else if (presentation == 'Paquete') presentation = 'PAQ';
 
       this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity, price).subscribe(res => {
-
+        
       }, error => this.msj.mensajeError(error));
     });
   }

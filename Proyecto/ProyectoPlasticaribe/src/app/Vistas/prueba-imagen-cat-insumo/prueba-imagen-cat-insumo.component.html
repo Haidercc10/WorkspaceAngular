@@ -27,7 +27,7 @@
                 <div class="row g-4 mb-5">
                     <div class="col-sm-12 col-md-4">
                         <span class="p-float-label">
-                            <input formControlName="production" type="text" id="RolloBarsCode" pInputText pAutoFocus (keyup.enter)="searchProductionByReel()"/>
+                            <input formControlName="production" type="text" id="RolloBarsCode" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="searchProductionByReel()"/>
                             <label for="RolloBarsCode">Rollo Leído</label>
                         </span>
                     </div>

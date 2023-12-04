@@ -1,0 +1,131 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Despacho de Mercancia</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+  </div>
+
+  <form [formGroup]="formProduction">
+    <div class="row g-4 my-5">
+      <div class="col-sm-12 col-md-3">
+        <span class="p-float-label">
+          <input formControlName="production" type="number" id="RolloBarCode" pInputText pAutoFocus [autofocus]="true" (keyup.enter)="searchProductionByReel()"/>
+          <label for="RolloBarCode">Rollo Leído</label>
+        </span>
+      </div>
+
+      <div class="col-sm-12 col-md-3">
+        <span class="p-float-label">
+          <input formControlName="fact" type="text" id="fact" pInputText required=""/>
+          <label for="fact">Factura</label>
+        </span>
+      </div>
+
+      <div class="col-sm-12 col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="driver" inputId="production" [autoDisplayFirst]="false" [options]="drivers" optionLabel="nombre" optionValue="id" [required]="true" [filter]="true" filterBy="nombre"></p-dropdown>
+          <label for="operario">Conductores</label>
+        </span>
+      </div>
+
+      <div class="col-sm-12 col-md-3">
+        <span class="p-float-label">
+          <input formControlName="car" type="text" id="car" pInputText required/>
+          <label for="car">Placa Carro</label>
+        </span>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+        <span class="p-float-label">
+          <textarea formControlName="observation" [rows]="1"  maxlength="200" pInputTextarea></textarea>
+          <label for="textarea">Observación</label>
+        </span>
+      </div>
+    </div>
+  </form>
+
+  <p-table
+    [value]="sendProductionZeus"
+    columnResizeMode="expand"
+    styleClass="p-datatable-sm"
+    responsiveLayout="scroll"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+    [scrollable]="true"
+    scrollHeight="50rem">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-center">#</th>
+        <th class="text-center">OT</th>
+        <th class="text-center">Cliente</th>
+        <th class="text-center">Rollo</th>
+        <th class="text-center">Peso Bruto/Cantidad</th>
+        <th class="text-center">Peso Neto</th>
+        <th class="text-center">Material</th>
+        <th class="text-center">Maquina</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Hora</th>
+        <th class="text-center">Turno</th>
+        <th class="text-center">Proceso</th>
+        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>
+        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+      <tr>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.pp.ot}}</td>
+        <td class="text-center">{{data.clientes.cli_Nombre}}</td>
+        <td class="text-center">{{data.pp.numero_Rollo}}</td>
+        <td class="text-center">{{(['SELLA', 'WIKE'].includes(data.proceso.proceso_Id) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.pp.peso_Neto | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.dataExtrusion.material}}</td>
+        <td class="text-center">{{data.pp.maquina}}</td>
+        <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
+        <td class="text-center">{{data.pp.hora}}</td>
+        <td class="text-center">{{data.turno.turno_Nombre}}</td>
+        <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
+        <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+          <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
+        </td>
+        <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+          <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td class="text-center" colspan="4">Totales</td>
+        <td class="text-center">{{totalQuantity() | number : '1.2-2'}}</td>
+        <td class="text-center">{{totalWeight() | number : '1.2-2'}}</td>
+        <td colspan="8"></td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+    <button pButton class="p-button-danger" id="crear" type="button" label="Despachar Mercancia" icon="pi pi-send" [disabled]="formProduction.invalid && sendProductionZeus.length == 0" (click)="saveAsgFact()"></button>
+    <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+  </div>
+  
+</p-card>

@@ -83,11 +83,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getProcess();
+    this.validarProceso();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    this.chargeSerialPorts();
-    this.validarProceso();
+    setTimeout(() => {
+      this.chargeSerialPorts();
+    }, 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -101,22 +103,43 @@ export class Produccion_ExtrusionComponent implements OnInit {
       case 7:
         this.proceso = 'Extrusión';
         break;
+      case 74:
+        this.proceso = 'Extrusión';
+        break;
       case 62:
+        this.proceso = 'Impresión';
+        break;
+      case 75:
         this.proceso = 'Impresión';
         break;
       case 63:
         this.proceso = 'Rotograbado';
         break;
+      case 76:
+        this.proceso = 'Rotograbado';
+        break;
       case 70:
+        this.proceso = 'Laminado';
+        break;
+      case 77:
         this.proceso = 'Laminado';
         break;
       case 71:
         this.proceso = 'Doblado';
         break;
+      case 78:
+        this.proceso = 'Doblado';
+        break;
       case 72:
         this.proceso = 'Corte';
         break;
+      case 79:
+        this.proceso = 'Corte';
+        break;
       case 9:
+        this.proceso = 'Empaque';
+        break;
+      case 80:
         this.proceso = 'Empaque';
         break;
       default:
@@ -364,6 +387,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
     } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
   }
+  
   guardarProduccion() {
     this.cargando = true;
     let datos: modelProduccionProcesos = {

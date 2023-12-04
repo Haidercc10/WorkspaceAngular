@@ -23,6 +23,8 @@ export class DetallesAsignacionProductosFacturaService {
 
   srvConsultarPorFiltroFactura = (factura : any, ot : any) => this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFactura/${factura}/${ot}`);
 
+  GetRollosEnviadosCamion = (inicio : any, fin : any, ruta : string) : Observable<any> => this.http.get(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/getRollosEnviadosCamion/${inicio}/${fin}${ruta}`);
+
   srvGuardar = (data : modelDtAsgProductoFactura): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta', data);
 
   srvObtenerDocumentosXFechas = (fechaInicio : any, fechaFinal : any) : Observable<any> => this.http.get(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fechaInicio}/${fechaFinal}`);

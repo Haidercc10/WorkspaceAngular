@@ -192,6 +192,9 @@ import { AppComponent } from './app.component';
 import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
 import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Produccion_Extrusion.component';
 import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_PaginaWeb.component';
+import { IngresoProduccion_DespachoComponent } from './Vistas/IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
+import { SalidaProduccion_DespachoComponent } from './Vistas/SalidaProduccion_Despacho/SalidaProduccion_Despacho.component';
+import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Movimientos_Despacho.component';
 
 @NgModule({
   declarations: [
@@ -306,7 +309,10 @@ import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_P
     Busqueda_OrdenesTrabajoComponent, 
     Produccion_SelladoComponent,
     Produccion_ExtrusionComponent,
-    Correos_PaginaWebComponent
+    Correos_PaginaWebComponent,
+    IngresoProduccion_DespachoComponent,
+    SalidaProduccion_DespachoComponent,
+    Movimientos_DespachoComponent
   ],
 
   imports: [

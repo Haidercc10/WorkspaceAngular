@@ -22,7 +22,7 @@ export class CreacionPdfService {
             info: { title: titulo },
             pageOrientation: 'portrait',
             pageSize: 'LETTER',
-            watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
+            watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
             pageMargins : [25, 110, 25, 35],
             header: this.headerPDF(today, hour, titulo, headerAdicional),
             content : content,
@@ -111,7 +111,7 @@ export class CreacionPdfService {
         let windoeFeatures = `height=189,width=378`;
         let win = window.open('', 'Print', windoeFeatures);
         pdfMake.createPdf(pdfDefinition).print({}, win);
-        // setTimeout(() => win.close(), 3000);
+        setTimeout(() => win.close(), 3000);
     }
 
     private contentPDF(dataTag : modelTagProduction){

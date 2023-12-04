@@ -9,4 +9,5 @@ export interface modelAsigProductosFacturas {
   AsigProdFV_PlacaCamion : string;
   AsigProdFV_FechaEnvio : any;
   AsigProdFV_Hora : any;
+  AsigProdFV_HoraEnvio : any;
 }

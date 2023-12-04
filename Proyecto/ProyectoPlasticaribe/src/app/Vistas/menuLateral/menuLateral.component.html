@@ -13,7 +13,7 @@
         </button>
       </p>
       <div class="p-2">
-        <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[123456, 100, 121].includes"></i>
+        <i class="pi pi-envelope font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadCorreosNuevos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="modalCorreos = true" *ngIf="[123456789, 100, 121].includes(storage_Id)"></i>
         <i class="pi pi-calendar font-size-25 m-2 p-text-secondary cursor" pBadge value="{{cantidadEventos}}" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" (click)="mostrarModalCalendario()"></i>
         <p-avatar class="cursor" icon="pi pi-cog" pTooltip="Configuración" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'#fff0', 'color': 'var(--rojo)'}" shape="circle" (click)="configuracion()"></p-avatar>
         <p-avatar class="cursor" icon="pi pi-user" pTooltip="{{storage_Nombre}}" tooltipPosition="bottom" styleClass="mr-2" size="large" [style]="{'background-color':'var(--rojo)', 'color': '#ffffff'}" shape="circle" (click)="mostrarMenuUsuario()"></p-avatar>
