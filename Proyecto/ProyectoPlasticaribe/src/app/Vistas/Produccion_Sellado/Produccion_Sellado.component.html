@@ -244,6 +244,16 @@
       <tr>
         <td colspan="9"><h6 class="bold">No existen registros de Producción.</h6></td>
       </tr>
-  </ng-template>
+    </ng-template>  
+    <ng-template pTemplate="footer">
+      <tr id="totales">
+        <td colspan="3" class="text-right">Totales</td>
+        <td class="text-center">{{calcularCantidad()}}</td>
+        <td class="text-center">{{medida}}</td>
+        <td class="text-center">{{calcularPeso() | number}}</td>
+        <td class="text-center">{{'Kg'}}</td>
+        <td colspan="2" class="text-center"></td>
+      </tr>
+    </ng-template>  
   </p-table>
 </p-card>

@@ -34,6 +34,9 @@ export class Produccion_SelladoComponent implements OnInit {
   procesos : any = [{Id : 'SELLA', Nombre: 'SELLADO'}, {Id : 'WIKE', Nombre: 'WIKETIADO'}]; //Array que guarda los procesos
   clase : any = ``; //Variable que guardará la clase que tendrá el campo cantidad realizada de la tabla
   cantBultoEstandar : number = 0; //Guardará la cantidad estandar de unidades/paquetes/kilos del bulto del item de la ot consultada
+  cantActual : number = 0; //Guardará la cantidad pesada de unidades/paquetes/kilos del bulto del item de la ot consultada
+  pesoActual : number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada  
+  medida : string = '';
 
   constructor(private AppComponent : AppComponent, 
   private svcTurnos : TurnosService,
@@ -76,8 +79,8 @@ export class Produccion_SelladoComponent implements OnInit {
   getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
 
   //Función que carga los operarios de sellado
-  getOperarios = () => this.svcUsuarios.GetOperariosProduccion().subscribe(data => this.operarios = data); 
-
+  getOperarios = () => this.svcUsuarios.GetOperariosProduccion().subscribe(d => { this.operarios = d.filter(x => x.area_Id == 10); }); 
+  
   //Función que busca la orden de trabajo y carga la información
   buscarOT(){
     this.ordenesTrabajo = [];
@@ -89,7 +92,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.ordenConsultada = this.formSellado.value.ot;
         this.ordenesTrabajo = data; 
         this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
-        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, });
+        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, cantKg : 100 });
         this.formSellado.get('saldo')?.enable();
         setTimeout(() => { this.calcularPesoTeorico(); }, 500);
         this.claseCantidadRealizada(data[0]);
@@ -110,6 +113,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.cantBultoEstandar = (qty == 0) ? data[0].cantidadUnd : qty;
         this.formSellado.patchValue({ cantUnd : qty == 0 ? data[0].cantidadUnd : qty });
         this.produccion.sort((a, b) => a.bulto - b.bulto);
+        this.medida = data[0].presentacion1;
         this.cargando = false;
       } else this.cargando = false;
     }, error => { this.svcMsjs.mensajeError(`La OT ${ot} no fue encontrada en el proceso de Sellado`) });
@@ -156,9 +160,9 @@ export class Produccion_SelladoComponent implements OnInit {
       'Prod_Id': orden.id_Producto,
       'Cli_Id': orden.nitCliente,
       'Operario1_Id': this.formSellado.value.idOperario[0],
-      'Operario2_Id': this.formSellado.value.idOperario[1] == undefined ? null : this.formSellado.value.idOperario[1],
-      'Operario3_Id': this.formSellado.value.idOperario[2] == undefined ? null : this.formSellado.value.idOperario[2],
-      'Operario4_Id': this.formSellado.value.idOperario[3] == undefined ? null : this.formSellado.value.idOperario[3],
+      'Operario2_Id': this.formSellado.value.idOperario[1] == undefined ? 0 : this.formSellado.value.idOperario[1],
+      'Operario3_Id': this.formSellado.value.idOperario[2] == undefined ? 0 : this.formSellado.value.idOperario[2],
+      'Operario4_Id': this.formSellado.value.idOperario[3] == undefined ? 0 : this.formSellado.value.idOperario[3],
       'Pesado_Entre': (this.formSellado.value.idOperario).length,
       'Maquina': this.formSellado.value.maquina,
       'Cono_Id': 'N/A',
@@ -210,6 +214,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.formSellado.get('saldo')?.disable();
     this.cargarTurnoActual();
     this.cantBultoEstandar = 0;
+    this.medida = '';
   }
   
   //Función que filtra la info de la tabla 
@@ -325,4 +330,10 @@ export class Produccion_SelladoComponent implements OnInit {
       return device.open();
     });
   }
+
+  //Función que calcula la cantidad de unidades/paquetes
+  calcularCantidad = () => this.produccion.reduce((a, b) => a + b.cantidadUnd, 0);
+
+   //Función que calcula el peso de unidades/paquetes
+  calcularPeso = () => this.produccion.reduce((a, b) => a + b.peso, 0);
 }
