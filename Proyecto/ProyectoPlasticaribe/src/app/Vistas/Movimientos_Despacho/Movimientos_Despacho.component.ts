@@ -19,24 +19,24 @@ export class Movimientos_DespachoComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
-  formSearchDespacho : FormGroup;
-  drivers : any [] = [];
-  dataDespacho : any [] = [];
+  formSearchDespacho: FormGroup;
+  drivers: any[] = [];
+  dataDespacho: any[] = [];
 
   constructor(private appComponent: AppComponent,
-    private frmBuilder : FormBuilder,
-    private dtAsgDespacho : DetallesAsignacionProductosFacturaService,
-    private usersService : UsuarioService,
-    private msj : MensajesAplicacionService,
-    private createPDFService : CreacionPdfService,) {
-    
+    private frmBuilder: FormBuilder,
+    private dtAsgDespacho: DetallesAsignacionProductosFacturaService,
+    private usersService: UsuarioService,
+    private msj: MensajesAplicacionService,
+    private createPDFService: CreacionPdfService,) {
+
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formSearchDespacho = this.frmBuilder.group({
-      document : [null],
-      dateStart : [null],
-      dateEnd : [null],
+      document: [null],
+      dateStart: [null],
+      dateEnd: [null],
       driver: [null],
-      car : [null],
+      car: [null],
     });
   }
 
@@ -44,17 +44,17 @@ export class Movimientos_DespachoComponent implements OnInit {
     this.lecturaStorage();
     this.getDrivers();
   }
-  
-  lecturaStorage(){
+
+  lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
-  getDrivers(){
+  getDrivers() {
     this.usersService.GetConsdutores().subscribe(data => this.drivers = data);
   }
 
-  clearFields(){
+  clearFields() {
     this.formSearchDespacho.reset();
     this.load = false;
     this.dataDespacho = [];
@@ -62,24 +62,24 @@ export class Movimientos_DespachoComponent implements OnInit {
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  searchMovements(){
-    let lastMonth : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
-    let dateStart : any = moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
-    let dateEnd : any = moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
+  searchMovements() {
+    let lastMonth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
+    let dateStart: any = moment(this.formSearchDespacho.value.dateStart).format('YYYY-MM-DD');
+    let dateEnd: any = moment(this.formSearchDespacho.value.dateEnd).format('YYYY-MM-DD');
     dateStart = dateStart == 'Fecha inválida' ? lastMonth : dateStart;
     dateEnd = dateEnd == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : dateEnd;
-    let route : string = this.validateParamsInRoute();
+    let route: string = this.validateParamsInRoute();
     this.dtAsgDespacho.GetRollosEnviadosCamion(dateStart, dateEnd, route).subscribe(data => {
       this.dataDespacho = data;
       this.load = true;
     }, () => this.msj.mensajeError(`¡No se encontró información!`), () => this.load = false);
   }
 
-  validateParamsInRoute(){
-    let document : number = this.formSearchDespacho.value.document;
-    let driver : any = this.formSearchDespacho.value.driver;
-    let car : number = this.formSearchDespacho.value.car;
-    let route : string = '';
+  validateParamsInRoute() {
+    let document: number = this.formSearchDespacho.value.document;
+    let driver: any = this.formSearchDespacho.value.driver;
+    let car: number = this.formSearchDespacho.value.car;
+    let route: string = '';
 
     if (document != null) route += `factura=${document}`;
     if (car != null) route.length > 0 ? route += `&placa=${car}` : route += `placa=${car}`;
@@ -88,13 +88,13 @@ export class Movimientos_DespachoComponent implements OnInit {
     return route;
   }
 
-  totalQuantity(data) : number{
-    let total : number = 0;
+  totalQuantity(data): number {
+    let total: number = 0;
     total = data.details.reduce((acc, prod) => acc + (prod.presentacion == 'Kg' ? prod.peso : prod.cantidad), 0);
     return total;
   }
 
-  createPDF(data : any){
+  createPDF(data: any) {
     this.load = true;
     let numFact = data.factura;
     let title = `Despacho de Mercancia Factura #${numFact}`;
@@ -109,7 +109,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     setTimeout(() => this.load = false, 3000);
   }
 
-  informationAboutFact(){
+  informationAboutFact() {
     return {
       text: `Información Factura`,
       alignment: 'center',
@@ -118,7 +118,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     };
   }
 
-  datosClientePDF(data : any){
+  datosClientePDF(data: any) {
     let fact = data.factura;
     let driver = data.conductor;
     let cli = data.id_Cliente;
@@ -130,16 +130,16 @@ export class Movimientos_DespachoComponent implements OnInit {
         widths: ['50%', '50%'],
         body: [
           [
-            {text: `Factura: ${fact}`, border: [true, true, false, true]},
-            {text: ``, border: [false, true, true, true]},
+            { text: `Factura: ${fact}`, border: [true, true, false, true] },
+            { text: ``, border: [false, true, true, true] },
           ],
           [
-            {text: `Documento: ${cli}`, border: [true, true, false, true]},
-            {text: `Cliente: ${nameCli}`, border: [true, true, true, true]},
+            { text: `Documento: ${cli}`, border: [true, true, false, true] },
+            { text: `Cliente: ${nameCli}`, border: [true, true, true, true] },
           ],
           [
-            {text: `Conductor: ${driver.nombre}`, border: [true, true, false, true]},
-            {text: `Placa: ${idCar}`, border: [true, true, true, true]},
+            { text: `Conductor: ${driver.nombre}`, border: [true, true, false, true] },
+            { text: `Placa: ${idCar}`, border: [true, true, true, true] },
           ],
           [
             this.observacionPDF(data.observacion),
@@ -151,7 +151,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     }
   }
 
-  observacionPDF(observacion : string){
+  observacionPDF(observacion: string) {
     return {
       colSpan: 2,
       margin: [0, 10],
@@ -167,7 +167,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     }
   }
 
-  informacionProduction(){
+  informacionProduction() {
     return {
       text: `Información detallada de los rollos `,
       alignment: 'center',
@@ -177,11 +177,11 @@ export class Movimientos_DespachoComponent implements OnInit {
     }
   }
 
-  dataProductionInPDF(dataFact){
-    let data : any = [];
+  dataProductionInPDF(dataFact) {
+    let data: any = [];
     dataFact.details.forEach(prod => {
       data.push({
-        "Rollo" : prod.rollo,
+        "Rollo": prod.rollo,
         'Item': prod.item,
         'Referencia': prod.referencia,
         'Cantidad': this.formatonumeros((prod.cantidad).toFixed(2)),
@@ -211,9 +211,9 @@ export class Movimientos_DespachoComponent implements OnInit {
   buildTableBody(data, columns) {
     var body = [];
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach(function(column) {
+      columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
       body.push(dataRow);
@@ -221,7 +221,7 @@ export class Movimientos_DespachoComponent implements OnInit {
     return body;
   }
 
-  totalQuantities(data){
+  totalQuantities(data) {
     return {
       colSpan: 2,
       margin: [0, 10],

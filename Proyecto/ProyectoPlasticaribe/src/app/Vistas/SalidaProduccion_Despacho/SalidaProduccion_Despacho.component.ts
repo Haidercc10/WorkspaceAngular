@@ -24,27 +24,27 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   sendProductionZeus: any[] = [];
-  productionSearched : any;
-  formProduction : FormGroup;
-  drivers : any[] = [];
+  productionSearched: any;
+  formProduction: FormGroup;
+  drivers: any[] = [];
 
   constructor(private appComponent: AppComponent,
-    private productionProcessSerivce : Produccion_ProcesosService,
-    private msj : MensajesAplicacionService,
-    private createPDFService : CreacionPdfService,
-    private usuariosService : UsuarioService,
-    private frmBuilder : FormBuilder,
-    private asgProdFacturaService : AsignacionProductosFacturaService,
-    private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
-    private bagproService : BagproService,) {
+    private productionProcessSerivce: Produccion_ProcesosService,
+    private msj: MensajesAplicacionService,
+    private createPDFService: CreacionPdfService,
+    private usuariosService: UsuarioService,
+    private frmBuilder: FormBuilder,
+    private asgProdFacturaService: AsignacionProductosFacturaService,
+    private dtAsgProdFacturaService: DetallesAsignacionProductosFacturaService,
+    private bagproService: BagproService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
-      production : [''],
+      production: [''],
       client: ['', Validators.required],
-      observation : [''],
-      fact : ['', Validators.required],
+      observation: [''],
+      fact: ['', Validators.required],
       driver: ['', Validators.required],
-      car : ['', Validators.required],
+      car: ['', Validators.required],
     });
   }
 
@@ -54,14 +54,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     setTimeout(() => document.getElementById('RolloBarCode').focus(), 500);
   }
 
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
   }
 
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  
-  clearFields(){
+
+  clearFields() {
     this.sendProductionZeus = [];
     this.productionSearched = null;
     this.formProduction.reset();
@@ -69,39 +69,39 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     document.getElementById('RolloBarCode').focus();
   }
 
-  getDrivers(){
+  getDrivers() {
     this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
   }
 
-  searchProductionByReel(){
+  searchProductionByReel() {
     let production = parseInt(this.formProduction.value.production);
-    this.formProduction.patchValue({production : null});
+    this.formProduction.patchValue({ production: null });
     document.getElementById('RolloBarCode').focus();
     let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else this.productionProcessSerivce.GetInformationAboutProduction(production).subscribe(data => {
       this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
         this.sendProductionZeus.push(data[0]);
-        let i : number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+        let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
         this.sendProductionZeus[i].dataExtrusion = {
           extrusion_Ancho1: res[0].ancho1_Extrusion,
           extrusion_Ancho2: res[0].ancho2_Extrusion,
           extrusion_Ancho3: res[0].ancho3_Extrusion,
-          undMed_Id : res[0].und_Extrusion,
-          extrusion_Calibre : res[0].calibre_Extrusion,
-          material : res[0].material,
+          undMed_Id: res[0].und_Extrusion,
+          extrusion_Calibre: res[0].calibre_Extrusion,
+          material: res[0].material,
         }
-        this.formProduction.patchValue({client : data[0].clientes.cli_Id});
+        this.formProduction.patchValue({ client: data[0].clientes.cli_Id });
       });
     }, () => {
       this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
     });
   }
 
-  saveAsgFact(){
+  saveAsgFact() {
     this.load = true;
     let cli = this.formProduction.value.client;
-    let data : modelAsigProductosFacturas = {
+    let data: modelAsigProductosFacturas = {
       FacturaVta_Id: this.formProduction.value.fact,
       NotaCredito_Id: '',
       Usua_Id: this.storage_Id,
@@ -122,10 +122,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  saveProduction(AsigProdFV_Id : number){
-    let count : number = 0;
+  saveProduction(AsigProdFV_Id: number) {
+    let count: number = 0;
     this.sendProductionZeus.forEach(prod => {
-      let data : modelDtAsgProductoFactura = {
+      let data: modelDtAsgProductoFactura = {
         AsigProdFV_Id: AsigProdFV_Id,
         Prod_Id: prod.producto.prod_Id,
         DtAsigProdFV_Cantidad: prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad,
@@ -146,8 +146,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  printTag(data : any){
-    let proceso : string = data.proceso.proceso_Id;
+  printTag(data: any) {
+    let proceso: string = data.proceso.proceso_Id;
     let dataTagProduction: modelTagProduction = {
       client: data.clientes.cli_Nombre,
       item: data.producto.prod_Id,
@@ -170,24 +170,24 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.createPDFService.createTagProduction(dataTagProduction);
   }
 
-  removeProduction(data : any){
-    let i : number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+  removeProduction(data: any) {
+    let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
     this.sendProductionZeus.splice(i, 1);
   }
 
-  totalQuantity() : number{
-    let total : number = 0;
+  totalQuantity(): number {
+    let total: number = 0;
     total = this.sendProductionZeus.reduce((acc, prod) => acc + (prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad), 0);
     return total;
   }
 
-  totalWeight() : number{
-    let total : number = 0;
+  totalWeight(): number {
+    let total: number = 0;
     total = this.sendProductionZeus.reduce((acc, prod) => acc + (prod.pp.peso_Neto), 0);
     return total;
   }
 
-  createPDF(){
+  createPDF() {
     let numFact = this.formProduction.value.fact;
     let title = `Despacho de Mercancia Factura #${numFact}`;
     let content = [
@@ -201,7 +201,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.clearFields();
   }
 
-  informationAboutFact(){
+  informationAboutFact() {
     return {
       text: `Información Factura`,
       alignment: 'center',
@@ -210,7 +210,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     };
   }
 
-  datosProveedorPDF(){
+  datosProveedorPDF() {
     let fact = this.formProduction.value.fact;
     let driver = this.drivers.find(x => x.id == this.formProduction.value.driver);
     let cli = this.formProduction.value.client;
@@ -222,16 +222,16 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         widths: ['50%', '50%'],
         body: [
           [
-            {text: `Factura: ${fact}`, border: [true, true, false, true]},
-            {text: ``, border: [false, true, true, true]},
+            { text: `Factura: ${fact}`, border: [true, true, false, true] },
+            { text: ``, border: [false, true, true, true] },
           ],
           [
-            {text: `Documento: ${cli}`, border: [true, true, false, true]},
-            {text: `Cliente: ${nameCli}`, border: [true, true, true, true]},
+            { text: `Documento: ${cli}`, border: [true, true, false, true] },
+            { text: `Cliente: ${nameCli}`, border: [true, true, true, true] },
           ],
           [
-            {text: `Conductor: ${driver.nombre}`, border: [true, true, false, true]},
-            {text: `Placa: ${idCar}`, border: [true, true, true, true]},
+            { text: `Conductor: ${driver.nombre}`, border: [true, true, false, true] },
+            { text: `Placa: ${idCar}`, border: [true, true, true, true] },
           ],
           [
             this.observacionPDF(),
@@ -243,7 +243,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }
   }
 
-  observacionPDF(){
+  observacionPDF() {
     return {
       colSpan: 2,
       margin: [0, 10],
@@ -259,7 +259,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }
   }
 
-  informacionProduction(){
+  informacionProduction() {
     return {
       text: `Información detallada de los rollos `,
       alignment: 'center',
@@ -269,12 +269,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     }
   }
 
-  dataProductionInPDF(){
-    let data : any = [];
+  dataProductionInPDF() {
+    let data: any = [];
     this.sendProductionZeus.forEach(prod => {
-      let proceso : string = prod.proceso.proceso_Id;
+      let proceso: string = prod.proceso.proceso_Id;
       data.push({
-        "Rollo" : prod.pp.numero_Rollo,
+        "Rollo": prod.pp.numero_Rollo,
         'Item': prod.producto.prod_Id,
         'Referencia': prod.producto.prod_Nombre,
         'Cantidad': ['SELLA', 'WIKE'].includes(proceso) ? this.formatonumeros((prod.pp.cantidad).toFixed(2)) : this.formatonumeros((prod.pp.peso_Neto).toFixed(2)),
@@ -304,9 +304,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   buildTableBody(data, columns) {
     var body = [];
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach(function(column) {
+      columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
       body.push(dataRow);
@@ -314,7 +314,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     return body;
   }
 
-  totalQuantities(){
+  totalQuantities() {
     return {
       colSpan: 2,
       margin: [0, 10],

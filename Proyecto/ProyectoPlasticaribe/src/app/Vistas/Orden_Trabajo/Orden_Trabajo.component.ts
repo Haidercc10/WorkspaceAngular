@@ -8,7 +8,7 @@ import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
-import { modelOrden_Trabajo, modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
+import { modelOrden_Trabajo } from 'src/app/Modelo/modelOrden_Trabajo';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -96,7 +96,7 @@ export class Orden_TrabajoComponent implements OnInit {
   sellado: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   corte: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   cyrel: boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
-  motrarEmpresaEtiquetas : boolean = true; //Variable que servirá para saber si se muestra o no la empresa en las etiquetas
+  motrarEmpresaEtiquetas: boolean = true; //Variable que servirá para saber si se muestra o no la empresa en las etiquetas
   informacionSeleccionada: any; //Variable que almacenará la información del producto seleccionado
   presentacionProducto: string; //Variablle que almacenará la presentacion del producto
   cantidadProducto: number = 0; //Variable que almacenará la cantidad de producto que se va a pedir
@@ -108,7 +108,7 @@ export class Orden_TrabajoComponent implements OnInit {
   pesoPaquete: number = 0; //Variable que almacenará cuantos kg pesa un paquete
   pesoBulto: number = 0; //Variable que almacenará cuantos kg pesa un bulto
   pesoProducto: number = 0; //Variable que almacenará el peso del producto
-  pesoMillar : number = 0; //Variable que almacenará el peso de un millar
+  pesoMillar: number = 0; //Variable que almacenará el peso de un millar
   producto: number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
   ArrayProducto: any[] = []; //Variable que tendrá la informacion de los productos que fueron pedidos
 
@@ -127,9 +127,9 @@ export class Orden_TrabajoComponent implements OnInit {
   idMezclaSeleccionada: number = 0; //Variable que almacenará el ID de la mezcla que fue seleccionada
   nroCapas: number = 0;
   nroCapasOT: number = 0;
-  ultimaOT : number = 0;
-  ultimaOTApp : number = 0;
-  dataBusquedaxItem : any;
+  ultimaOT: number = 0;
+  ultimaOTApp: number = 0;
+  dataBusquedaxItem: any;
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -159,7 +159,7 @@ export class Orden_TrabajoComponent implements OnInit {
     private usuarioService: UsuarioService,
     private messageService: MessageService,
     private shepherdService: ShepherdService,
-    private svcSedes : SedeClienteService,) {
+    private svcSedes: SedeClienteService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -496,9 +496,9 @@ export class Orden_TrabajoComponent implements OnInit {
       Largo_Sellado: 0,
       Fuelle_Sellado: 0,
       Margen_Sellado: 0,
-      Etiqueta_Ancho_Sellado : 0,
-      Etiqueta_Largo_Sellado : 0,
-      Etiqueta_Fuelle_Sellado : 0,
+      Etiqueta_Ancho_Sellado: 0,
+      Etiqueta_Largo_Sellado: 0,
+      Etiqueta_Fuelle_Sellado: 0,
       PesoMillar: 0,
       TipoSellado: 'NO APLICA',
       CantidadPaquete: 0,
@@ -642,24 +642,24 @@ export class Orden_TrabajoComponent implements OnInit {
   cargarMateriales_MatPrima = () => this.servicioMateriales.srvObtenerLista().subscribe(materiasProd => this.arrayMateriales2 = materiasProd);
 
   // Funcion que va a validar cuando el campo marcado sea impresión (flexografia)
-  impresionSeleccionada(){
-    if (this.impresion){
+  impresionSeleccionada() {
+    if (this.impresion) {
       this.rotograbado = false;
-      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion : 2});
+      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion: 2 });
     }
   }
 
   // Funcion que va a validar cuando el campo marcado sea rotograbado
-  rotograbadoSeleccionado(){
+  rotograbadoSeleccionado() {
     if (this.rotograbado) {
       this.impresion = false;
-      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion : 5});
+      this.FormOrdenTrabajoImpresion.patchValue({ Tipo_Impresion: 5 });
     }
   }
 
   // Funcion que va a colocar el color correspondiente
-  colocarColor(color) : string {
-    let colorHex : string = ``;
+  colocarColor(color): string {
+    let colorHex: string = ``;
     colorHex = this.arrayTintas.find(x => x.tinta_Nombre == color).tinta_CodigoHexadecimal;
     return colorHex;
   }
@@ -714,12 +714,12 @@ export class Orden_TrabajoComponent implements OnInit {
   productoSeleccionado() {
     let id_producto = this.FormOrdenTrabajo.value.Nombre_Producto;
     let producto = this.productos.find(x => x.prod_Id == id_producto);
-    let presentacion : any;
+    let presentacion: any;
     this.bagProService.GetPresentacionItem(producto.prod_Id).subscribe(data => {
       presentacion = `${data.ptPresentacionNom}`;
       if (presentacion == 'Kilo') presentacion = 'Kg';
       else if (presentacion == 'Unidad') presentacion = 'Und';
-      this.FormOrdenTrabajo.patchValue({ Presentacion : presentacion, });
+      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
     }, null);
     this.FormOrdenTrabajo.patchValue({
       Id_Producto: producto.prod_Id,
@@ -742,17 +742,17 @@ export class Orden_TrabajoComponent implements OnInit {
   // Funcion que va a buscar la información del producto por su ID
   buscarProductoPorId() {
     let id: any = this.FormOrdenTrabajo.value.Id_Producto;
-    let presentacion : any;
+    let presentacion: any;
     this.bagProService.GetPresentacionItem(id).subscribe(data => {
       presentacion = `${data.ptPresentacionNom}`;
       if (presentacion == 'Kilo') presentacion = 'Kg';
       else if (presentacion == 'Unidad') presentacion = 'Und';
-      this.FormOrdenTrabajo.patchValue({ Presentacion : presentacion, });
+      this.FormOrdenTrabajo.patchValue({ Presentacion: presentacion, });
     }, null);
     this.productoService.srvObtenerListaPorId(id).subscribe(data => {
       this.FormOrdenTrabajo.patchValue({
         Id_Producto: data.prod_Id,
-        Nombre_Producto: data.prod_Nombre, 
+        Nombre_Producto: data.prod_Nombre,
       });
       setTimeout(() => this.consultarInfoProducto(), 500);
     }, () => this.msj.mensajeAdvertencia(`¡No se encontró información del Item buscado!`));
@@ -766,7 +766,7 @@ export class Orden_TrabajoComponent implements OnInit {
     }, () => this.msj.mensajeAdvertencia(`¡No hay información de una OT para el item ${this.producto} con la presentación ${this.presentacionProducto}!`));
   }
 
-  llenarProducto(data : any) {
+  llenarProducto(data: any) {
     this.ArrayProducto = [{
       Id: data.produ.prod_Id,
       Nombre: data.produ.prod_Nombre,
@@ -814,15 +814,15 @@ export class Orden_TrabajoComponent implements OnInit {
         this.validarProcesosOrdenTrabajo(datos_Ot);
         this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_Ot.mezcla_Nombre, });
         this.cargarCombinacionMezclas();
-        setTimeout(() => this.calcularDatosOt(), 500);        
+        setTimeout(() => this.calcularDatosOt(), 500);
       }, () => this.consultarInformaciónBagPro());
     }
   }
 
   //Función que consultará una OT en bagpro y llenará todos los campos del formulario con dicha información
-  busquedaOTBagPro(ot : any){
+  busquedaOTBagPro(ot: any) {
     this.cargando = true;
-    ot = typeof(ot) == 'number' ? ot : ot.ordenTrabajo;
+    ot = typeof (ot) == 'number' ? ot : ot.ordenTrabajo;
     this.limpiarProducto();
     this.bagProService.GetOrdenDeTrabajo(ot).subscribe(datos_Ot => {
       this.svcSedes.GetSedeClientexNitBagPro(datos_Ot[0].nitCliente).subscribe(datos_Sedes => {
@@ -838,7 +838,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Función que cargará los diferentes formularios de la orden de trabajo
-  cargarFormularios(dataSedes : any, dataOt : any, ot : any){
+  cargarFormularios(dataSedes: any, dataOt: any, ot: any) {
     this.llenarDatosCliente(dataSedes)
     this.llenarFormularioOrdenTrabajo(dataOt);
     this.llenarFormularioExtrusion(dataOt);
@@ -853,10 +853,10 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Función que llenará la información del cliente, vendedor y producto
-  llenarDatosCliente(data : any){
-    let vendedor : string = data.id_Vendedor;
+  llenarDatosCliente(data: any) {
+    let vendedor: string = data.id_Vendedor;
     this.FormOrdenTrabajo.patchValue({
-      Id_Cliente : data == undefined ? '' : data.id_Cliente,
+      Id_Cliente: data == undefined ? '' : data.id_Cliente,
       Nombre_Cliente: data == undefined ? '' : data.cliente,
       Id_Producto: this.ArrayProducto[0].Id,
       Nombre_Producto: this.ArrayProducto[0].Nombre,
@@ -867,7 +867,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a consultar en la base de datos de bagpro la información de la ultima orden de trabajo creada para un producto
-  consultarInformaciónBagPro(){
+  consultarInformaciónBagPro() {
     let presentacion: string = this.presentacionProducto;
     if (presentacion == 'Kg') presentacion = 'Kilo';
     else if (presentacion == 'Und') presentacion = 'Unidad';
@@ -883,7 +883,7 @@ export class Orden_TrabajoComponent implements OnInit {
           this.llenarFormularioCorte(itemOt);
           this.llenarFormularioSellado(itemOt);
           setTimeout(() => this.calcularDatosOt(), 1000);
-          this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: itemOt.mezcla_Nombre});
+          this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: itemOt.mezcla_Nombre });
           this.cargarCombinacionMezclas();
         }
       })
@@ -895,7 +895,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de la orden de trabajo con los datos de la ultima orden de trabajo creada
-  llenarFormularioOrdenTrabajo(data : any){
+  llenarFormularioOrdenTrabajo(data: any) {
     this.FormOrdenTrabajo.patchValue({
       OT_Id: this.FormOrdenTrabajo.value.OT_Id,
       Id_Vendedor: this.FormOrdenTrabajo.value.Id_Vendedor,
@@ -916,7 +916,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a validar los procesos por los cuales pasará el item
-  validarProcesosOrdenTrabajo(data : any){
+  validarProcesosOrdenTrabajo(data: any) {
     this.motrarEmpresaEtiquetas = data.motrarEmpresaEtiquetas;
     this.cyrel = data.cyrel;
     this.extrusion = data.extrusion;
@@ -928,7 +928,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de extrusión con los datos de la ultima orden de trabajo creada
-  llenarFormularioExtrusion(data : any){
+  llenarFormularioExtrusion(data: any) {
     this.FormOrdenTrabajoExtrusion.patchValue({
       Material_Extrusion: data.id_Material || this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
       Formato_Extrusion: data.id_Formato_Extrusion || this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
@@ -944,7 +944,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
-  llenarFormularioImpresion(data : any){
+  llenarFormularioImpresion(data: any) {
     this.FormOrdenTrabajoImpresion.patchValue({
       Tipo_Impresion: data.impresion ? 2 : data.rotograbado ? 5 : 1,
       Rodillo_Impresion: data.rodillo || this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion,
@@ -961,7 +961,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de laminado con los datos de la ultima orden de trabajo creada
-  llenarFormularioLaminado(data : any){
+  llenarFormularioLaminado(data: any) {
     this.FormOrdenTrabajoLaminado.patchValue({
       Capa_Laminado1: parseInt(data.id_Capa1) || this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
       Calibre_Laminado1: data.calibre_Laminado_Capa1 || this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
@@ -976,7 +976,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de corte con los datos de la ultima orden de trabajo creada
-  llenarFormularioCorte(data : any){
+  llenarFormularioCorte(data: any) {
     this.FormOrdenTrabajoCorte.patchValue({
       Formato_Corte: this.ArrayProducto[0].Tipo || this.FormOrdenTrabajoCorte.value.Formato_Corte,
       Ancho_Corte: this.ArrayProducto[0].Ancho || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
@@ -990,15 +990,15 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de sellado con los datos de la ultima orden de trabajo creada
-  llenarFormularioSellado(data : any){
+  llenarFormularioSellado(data: any) {
     this.FormOrdenTrabajoSellado.patchValue({
       Formato_Sellado: this.ArrayProducto[0].Tipo,
       Ancho_Sellado: this.ArrayProducto[0].Ancho,
       Largo_Sellado: this.ArrayProducto[0].Largo,
       Fuelle_Sellado: this.ArrayProducto[0].Fuelle,
-      Etiqueta_Ancho_Sellado : data.selladoCorte_Etiqueta_Ancho || '0',
-      Etiqueta_Largo_Sellado : data.selladoCorte_Etiqueta_Largo || '0',
-      Etiqueta_Fuelle_Sellado : data.selladoCorte_Etiqueta_Fuelle || '0',
+      Etiqueta_Ancho_Sellado: data.selladoCorte_Etiqueta_Ancho || '0',
+      Etiqueta_Largo_Sellado: data.selladoCorte_Etiqueta_Largo || '0',
+      Etiqueta_Fuelle_Sellado: data.selladoCorte_Etiqueta_Fuelle || '0',
       Margen_Sellado: data.margen,
       PesoMillar: this.ArrayProducto[0].PesoMillar,
       TipoSellado: this.ArrayProducto[0].TipoSellado,
@@ -1024,7 +1024,7 @@ export class Orden_TrabajoComponent implements OnInit {
         this.ArrayProducto[0].Cant = this.FormOrdenTrabajo.value.Cantidad;
         this.ArrayProducto[0].PrecioUnd = this.FormOrdenTrabajo.value.Precio;
         this.ArrayProducto[0].UndCant = this.presentacionProducto;
-        let margen_Adicional = this.calcularMargenAdicional();        
+        let margen_Adicional = this.calcularMargenAdicional();
         if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
           let material: number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
           let fact: number = 0;
@@ -1041,8 +1041,8 @@ export class Orden_TrabajoComponent implements OnInit {
     }, 500);
   }
 
-  calcularMargenAdicional() : number {
-    let margen_Adicional : number = 0;
+  calcularMargenAdicional(): number {
+    let margen_Adicional: number = 0;
     if (this.sellado) {
       margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
       this.ArrayProducto[0].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
@@ -1055,7 +1055,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a llenar el formulario de impresion con los datos de la ultima orden de trabajo creada
-  calcularPesoExtrusion(material : number, fact : number){
+  calcularPesoExtrusion(material: number, fact: number) {
     let ancho1: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
     let ancho2: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
     let ancho3: number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
@@ -1072,8 +1072,8 @@ export class Orden_TrabajoComponent implements OnInit {
     }
   }
 
-  calcularPesoProducto(material : number, fact : number){
-    let i : number = 0;
+  calcularPesoProducto(material: number, fact: number) {
+    let i: number = 0;
     this.ArrayProducto[i].Tipo = this.FormOrdenTrabajoSellado.value.Formato_Sellado || this.FormOrdenTrabajoCorte.value.Formato_Corte;
     if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
       material == 3 ? fact = 0.0048 : fact = 0.00468;
@@ -1088,14 +1088,14 @@ export class Orden_TrabajoComponent implements OnInit {
     if (this.ArrayProducto[i].Tipo == 'LAMINADO' || this.ArrayProducto[i].Tipo == 'HOJA') this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].PesoMillar / 2;
   }
 
-  calcularCostosOT(margen_Adicional : number){
+  calcularCostosOT(margen_Adicional: number) {
     let data = this.ArrayProducto[0];
     if (data.UndCant == 'Kg') this.calcularCostosOT_Kg(data, margen_Adicional);
     else if (data.UndCant == 'Paquete') this.calcularCostosOT_Paquete(data, margen_Adicional);
     else if (data.UndCant == 'Und') this.calcularCostosOT_Und(data, margen_Adicional);
   }
 
-  calcularCostosOT_Kg(data : any, margen_Adicional : number){
+  calcularCostosOT_Kg(data: any, margen_Adicional: number) {
     this.cantidadProducto = data.Cant;
     this.margenKg = margen_Adicional * (data.Cant / 100);
     this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
@@ -1104,7 +1104,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.valorOt = data.Cant * this.valorProducto;
   }
 
-  calcularCostosOT_Paquete(data : any, margen_Adicional : number){
+  calcularCostosOT_Paquete(data: any, margen_Adicional: number) {
     this.cantidadProducto = data.Cant;
     this.valorProducto = data.PrecioUnd;
     this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[0].PesoMillar) / 1000) / 100);
@@ -1116,23 +1116,23 @@ export class Orden_TrabajoComponent implements OnInit {
     else data.CantPaquete > 0 ? this.valorKg = data.PrecioUnd / this.pesoPaquete : this.valorKg = 0;
   }
 
-  calcularCostosOT_Und(data : any, margen_Adicional : number){
+  calcularCostosOT_Und(data: any, margen_Adicional: number) {
     this.cantidadProducto = data.Cant;
-      this.valorProducto = data.PrecioUnd;
-      this.valorOt = this.cantidadProducto * this.valorProducto;
-      this.margenKg = (margen_Adicional * ((data.Cant * this.pesoMillar) / 1000)) / 100;
-      this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.pesoMillar / 1000) * data.Cant));
-      if (data.Peso_Producto > 0) {
-        if (this.valorOt == 0) this.valorOt = 1;
-        if ((data.Cant * data.PesoMillar) / 1000 == 0) this.valorKg = 0;
-        else this.valorKg = this.valorOt / ((data.Cant * this.pesoMillar) / 1000);
-      } else this.valorOt = 0;
+    this.valorProducto = data.PrecioUnd;
+    this.valorOt = this.cantidadProducto * this.valorProducto;
+    this.margenKg = (margen_Adicional * ((data.Cant * this.pesoMillar) / 1000)) / 100;
+    this.netoKg = ((1 + ((margen_Adicional) / 100)) * ((this.pesoMillar / 1000) * data.Cant));
+    if (data.Peso_Producto > 0) {
+      if (this.valorOt == 0) this.valorOt = 1;
+      if ((data.Cant * data.PesoMillar) / 1000 == 0) this.valorKg = 0;
+      else this.valorKg = this.valorOt / ((data.Cant * this.pesoMillar) / 1000);
+    } else this.valorOt = 0;
   }
 
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas() {
     let simboloPorcentaje: boolean = false;
-    let data : string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
+    let data: string = this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas;
     if (['CUSTOM', ''].includes(`${data}`.trim())) data = 'NO APLICA MEZCLA';
     simboloPorcentaje = data.includes("%") ? true : false;
     if (simboloPorcentaje) data = data.replace('%', '%25')
@@ -1703,8 +1703,8 @@ export class Orden_TrabajoComponent implements OnInit {
   validarLaminado(posicion: number) {
     let campoLaminado: any = this.FormOrdenTrabajoLaminado.get('Capa_Laminado' + posicion.toString())?.value;
     let laminados: any[] = Object.values(this.FormOrdenTrabajoLaminado.value);
-    let lam1: any = laminados.splice(0, 1); 
-    let lam2: any = laminados.splice(2, 1); 
+    let lam1: any = laminados.splice(0, 1);
+    let lam2: any = laminados.splice(2, 1);
     let lam3: any = laminados.splice(4, 1);
     let laminadosCapas: any[] = [...lam1, ...lam2, ...lam3];
     let indice: number = laminadosCapas.indexOf(campoLaminado);
@@ -1756,15 +1756,15 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la información de la orden de trabajo
-  guardarOt(otCreadaBagPro : boolean = false) {
+  guardarOt(otCreadaBagPro: boolean = false) {
     this.cargando = true;
     this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(numero_OT => {
-      let numeroOrden : number = numero_OT + 1;
+      let numeroOrden: number = numero_OT + 1;
       if (!otCreadaBagPro) {
         if (numeroOrden == 1) this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(numOT => numeroOrden = numOT.item + 1);
       } else numeroOrden = this.FormOrdenTrabajo.value.OT_Id;
       let infoOT: modelOrden_Trabajo = {
-        Numero_OT : numeroOrden,
+        Numero_OT: numeroOrden,
         SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
         Prod_Id: this.producto,
         UndMed_Id: this.presentacionProducto,
@@ -1789,11 +1789,11 @@ export class Orden_TrabajoComponent implements OnInit {
         Ot_ValorKg: this.valorKg,
         Ot_ValorOT: this.valorOt,
         Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-        MotrarEmpresaEtiquetas : this.motrarEmpresaEtiquetas,
+        MotrarEmpresaEtiquetas: this.motrarEmpresaEtiquetas,
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
-        let ot : number = datos_ot.ot_Id;
-        let numeroOT : number = datos_ot.numero_OT;
+        let ot: number = datos_ot.ot_Id;
+        let numeroOT: number = datos_ot.numero_OT;
         this.guardarOt_Extrusion(ot, numeroOT);
       }, error => {
         this.msj.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, error.error);
@@ -1803,7 +1803,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
-  guardarOt_Extrusion(ordenTrabajo: number, numeroOT : number){
+  guardarOt_Extrusion(ordenTrabajo: number, numeroOT: number) {
     let infoOTExt: any = {
       Ot_Id: ordenTrabajo,
       Material_Id: this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
@@ -1823,7 +1823,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de impresion de la orden de trabajo
-  guardarOt_Impresion(ordenTrabajo: number, numeroOT : number) {
+  guardarOt_Impresion(ordenTrabajo: number, numeroOT: number) {
     let rodilloImpresion: any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
     let pistaImpresion: any = this.FormOrdenTrabajoImpresion.value.Pista_Impresion;
     let tinta1Impresion: any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1;
@@ -1858,7 +1858,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   //Funcion que va a guardar la informacion de laminado de la orden de trabajo
-  guardarOt_Laminado(ordenTrabajo: number, numeroOT : number) {
+  guardarOt_Laminado(ordenTrabajo: number, numeroOT: number) {
     let infoOTLam: any = {
       OT_Id: ordenTrabajo,
       Capa_Id1: this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
@@ -1877,34 +1877,34 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
-  guardarOt_Sellado_Corte(ordenTrabajo: number, numeroOT : number) {
+  guardarOt_Sellado_Corte(ordenTrabajo: number, numeroOT: number) {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
       let info: modelOrdenTrabajo_SelladoCorte = {
-        Ot_Id : ordenTrabajo,
-        Corte : this.corte,
-        Sellado : this.sellado,
-        Formato_Id : datos.tpProd_Id,
-        SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-        SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-        SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-        SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
-        TpSellado_Id : datos.tpSellado_Id,
-        SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
-        SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
-        SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-        SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
-        SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
-        SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
-        SelladoCorte_PesoProducto : this.pesoProducto,
-        SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
-        SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
-        SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
-        SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
-        SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
-        SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
+        Ot_Id: ordenTrabajo,
+        Corte: this.corte,
+        Sellado: this.sellado,
+        Formato_Id: datos.tpProd_Id,
+        SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
+        TpSellado_Id: datos.tpSellado_Id,
+        SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
+        SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
+        SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
+        SelladoCorte_PesoProducto: this.pesoProducto,
+        SelladoCorte_Etiqueta_Ancho: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Largo: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+        SelladoCorte_Etiqueta_Fuelle: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+        SelladoCorte_PrecioDia_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+        SelladoCorte_PrecioNoche_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+        SelladoCorte_PrecioDia_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+        SelladoCorte_PrecioNoche_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
       }
       this.otSelladoCorteService.post(info).subscribe(() => {
         this.msj.mensajeConfirmacion('¡Orden de Trabajo Creada!', `Se ha creado la de orden de trabajo N°${numeroOT}`);
@@ -1957,13 +1957,13 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a consultar la informacion de la una orden de trabajo
-  ConsultarOrdenTrabajo(numero : number) {
-    let numeroOT : number = this.FormOrdenTrabajo.value.OT_Id;
+  ConsultarOrdenTrabajo(numero: number) {
+    let numeroOT: number = this.FormOrdenTrabajo.value.OT_Id;
     ([0, 1, -1].includes(numero)) ? numeroOT += numero : numeroOT = numero;
     this.limpiarCampos();
     this.edicionOrdenTrabajo = true;
     this.cargando = true;
-    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {      
+    this.ordenTrabajoService.GetOrdenTrabajo(numeroOT).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         this.producto = datos_orden[i].id_Producto;
         this.presentacionProducto = datos_orden[i].id_Presentacion;
@@ -1992,7 +1992,7 @@ export class Orden_TrabajoComponent implements OnInit {
           this.llenarFormularioLaminado(datos_orden[i]);
           this.llenarFormularioCorte(datos_orden[i]);
           this.llenarFormularioSellado(datos_orden[i]);
-          this.FormOrdenTrabajoMezclas.patchValue({Nombre_Mezclas: datos_orden[i].mezcla_Nombre});
+          this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas: datos_orden[i].mezcla_Nombre });
           this.cargarCombinacionMezclas();
           setTimeout(() => this.calcularDatosOt(), 1000);
           this.cargando = false;
@@ -2051,7 +2051,7 @@ export class Orden_TrabajoComponent implements OnInit {
       this.ordenTrabajoService.GetDatosOrden(ot).subscribe(datos_Orden => {
         let info: modelOrden_Trabajo = {
           Ot_Id: datos_Orden.ot_Id,
-          Numero_OT : datos_Orden.numero_OT,
+          Numero_OT: datos_Orden.numero_OT,
           SedeCli_Id: parseInt(`${this.FormOrdenTrabajo.value.Id_Cliente}1`),
           Prod_Id: this.producto,
           UndMed_Id: this.presentacionProducto,
@@ -2076,11 +2076,11 @@ export class Orden_TrabajoComponent implements OnInit {
           Ot_ValorKg: this.valorKg,
           Ot_ValorOT: this.valorOt,
           Id_Vendedor: parseInt(this.FormOrdenTrabajo.value.Id_Vendedor),
-          MotrarEmpresaEtiquetas : this.motrarEmpresaEtiquetas,
+          MotrarEmpresaEtiquetas: this.motrarEmpresaEtiquetas,
         }
         this.ordenTrabajoService.srvActualizar(datos_Orden.ot_Id, info).subscribe(() => {
-          let ot : number = datos_Orden.ot_Id;
-          let numeroOT : number = datos_Orden.numero_OT;
+          let ot: number = datos_Orden.ot_Id;
+          let numeroOT: number = datos_Orden.numero_OT;
           this.actualizarOt_Extrusion(ot, numeroOT);
         }, () => {
           this.msj.mensajeError(`¡Error!`, `¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`);
@@ -2095,7 +2095,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a actualizar la tabla "OT_Extrusion"
-  actualizarOt_Extrusion(ot: number, numeroOT : number) {
+  actualizarOt_Extrusion(ot: number, numeroOT: number) {
     this.otExtrusionServie.GetOT_Extrusion(ot).subscribe(datos_extrusion => {
       for (let i = 0; i < datos_extrusion.length; i++) {
         let infoOTExt: any = {
@@ -2120,7 +2120,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a actualizar la tabla "OT_Impresion"
-  actualizarOT_Impresion(ot: number, numeroOT : number) {
+  actualizarOT_Impresion(ot: number, numeroOT: number) {
     this.otImpresionService.GetOT_Impresion(ot).subscribe(datos_Impresion => {
       for (let i = 0; i < datos_Impresion.length; i++) {
         let rodilloImpresion: any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
@@ -2160,7 +2160,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a a ctualizar la tabla #OT_Laminado
-  actualizarOT_Laminado(ot: number, numeroOT : number) {
+  actualizarOT_Laminado(ot: number, numeroOT: number) {
     this.otLaminadoService.GetOT_Laminado(ot).subscribe(datos_laminado => {
       for (let i = 0; i < datos_laminado.length; i++) {
         let infoOTLam: any = {
@@ -2185,7 +2185,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a a ctualizar la tabla "OT_Sellado_Corte"
-  actualizarOT_Sellado_Corte(ot: number, numeroOT : number) {
+  actualizarOT_Sellado_Corte(ot: number, numeroOT: number) {
     this.otSelladoCorteService.GetOT_SelladoCorte(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let tipoSellado: any = this.FormOrdenTrabajoSellado.value.TipoSellado;
@@ -2193,29 +2193,29 @@ export class Orden_TrabajoComponent implements OnInit {
         this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
           let info: modelOrdenTrabajo_SelladoCorte = {
             SelladoCorte_Id: datos_ot[i].selladoCorte_Id,
-            Ot_Id : ot,
-            Corte : this.corte,
-            Sellado : this.sellado,
-            Formato_Id : datos.tpProd_Id,
-            SelladoCorte_Ancho : this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
-            SelladoCorte_Largo : this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
-            SelladoCorte_Fuelle : this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
-            SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
-            TpSellado_Id : datos.tpSellado_Id,
-            SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
-            SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
-            SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-            SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
-            SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
-            SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
-            SelladoCorte_PesoProducto : this.pesoProducto,
-            SelladoCorte_Etiqueta_Ancho : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Largo : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
-            SelladoCorte_Etiqueta_Fuelle : this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
-            SelladoCorte_PrecioDia_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
-            SelladoCorte_PrecioNoche_Wik_Mq50 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
-            SelladoCorte_PrecioDia_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
-            SelladoCorte_PrecioNoche_Wik_Mq9 : this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
+            Ot_Id: ot,
+            Corte: this.corte,
+            Sellado: this.sellado,
+            Formato_Id: datos.tpProd_Id,
+            SelladoCorte_Ancho: this.sellado ? this.FormOrdenTrabajoSellado.value.Ancho_Sellado : this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+            SelladoCorte_Largo: this.sellado ? this.FormOrdenTrabajoSellado.value.Largo_Sellado : this.FormOrdenTrabajoCorte.value.Largo_Corte,
+            SelladoCorte_Fuelle: this.sellado ? this.FormOrdenTrabajoSellado.value.Fuelle_Sellado : this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+            SelladoCorte_PesoMillar: this.FormOrdenTrabajoSellado.value.PesoMillar,
+            TpSellado_Id: datos.tpSellado_Id,
+            SelladoCorte_PrecioSelladoDia: this.FormOrdenTrabajoSellado.value.PrecioDia,
+            SelladoCorte_PrecioSelladoNoche: this.FormOrdenTrabajoSellado.value.PrecioNoche,
+            SelladoCorte_CantBolsasPaquete: this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+            SelladoCorte_CantBolsasBulto: this.FormOrdenTrabajoSellado.value.CantidadBulto,
+            SelladoCorte_PesoPaquete: this.FormOrdenTrabajoSellado.value.PesoPaquete,
+            SelladoCorte_PesoBulto: this.FormOrdenTrabajoSellado.value.PesoBulto,
+            SelladoCorte_PesoProducto: this.pesoProducto,
+            SelladoCorte_Etiqueta_Ancho: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Ancho_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Ancho_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Largo: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Largo_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Largo_Corte}`.toUpperCase(),
+            SelladoCorte_Etiqueta_Fuelle: this.sellado ? `${this.FormOrdenTrabajoSellado.value.Etiqueta_Fuelle_Sellado}`.toUpperCase() : `${this.FormOrdenTrabajoCorte.value.Etiqueta_Fuelle_Corte}`.toUpperCase(),
+            SelladoCorte_PrecioDia_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq50,
+            SelladoCorte_PrecioNoche_Wik_Mq50: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq50,
+            SelladoCorte_PrecioDia_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoDia_Mq9,
+            SelladoCorte_PrecioNoche_Wik_Mq9: this.FormOrdenTrabajoSellado.value.PrecioWiketiadoNoche_Mq9,
           }
           this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => {
             this.msj.mensajeConfirmacion('¡Actualizado Correctamente!', `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`);
@@ -2289,7 +2289,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar la información de la empresa en el header
-  informacionEmpresaHeader(datos_ot){
+  informacionEmpresaHeader(datos_ot) {
     return [
       { image: logoParaPdf, width: 220, height: 50, margin: [10, 5] },
       {
@@ -2302,7 +2302,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funaion que va a colocar la informacion del cliente y del item en el header
-  informacionClienteItemHeader(datos_ot){
+  informacionClienteItemHeader(datos_ot) {
     return {
       widths: ['10%', '40%', '10%', '40%'],
       style: 'header',
@@ -2324,30 +2324,30 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar informacion general de la extrusion en el header
-  informacaionExtrusionHeader(datos_ot){
+  informacaionExtrusionHeader(datos_ot) {
     return {
       widths: ['*', '*', '*', '*', '*'],
       body: [
         [
-          {text: `Material`, style: 'titulosTablas', border: [true, true, false, true]},
-          {text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true]},
-          {text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true]},
-          {text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true]},
-          {text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true]},
+          { text: `Material`, style: 'titulosTablas', border: [true, true, false, true] },
+          { text: `Cant. Bolsas`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Cant. Kilos (Kg)`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Presentación`, style: 'titulosTablas', border: [false, true, false, true] },
+          { text: `Despachar`, style: 'titulosTablas', border: [false, true, true, true] },
         ],
         [
-          {text: `${datos_ot.material}`, style: 'datosTablaExtrusion'},
-          {text: `${this.formatonumeros((datos_ot.cantidad_Pedida).toFixed(2))}`, style: 'datosTablaExtrusion'},
-          {text: `${this.formatonumeros((datos_ot.peso_Neto).toFixed(2))}`, style: 'datosTablaExtrusion'},
-          {text: `${datos_ot.presentacion}`, style: 'datosTablaExtrusion'},
-          {text: `${datos_ot.fecha_Entrega.replace('T00:00:00', '')}`, style: 'datosTablaExtrusion'},
+          { text: `${datos_ot.material}`, style: 'datosTablaExtrusion' },
+          { text: `${this.formatonumeros((datos_ot.cantidad_Pedida).toFixed(2))}`, style: 'datosTablaExtrusion' },
+          { text: `${this.formatonumeros((datos_ot.peso_Neto).toFixed(2))}`, style: 'datosTablaExtrusion' },
+          { text: `${datos_ot.presentacion}`, style: 'datosTablaExtrusion' },
+          { text: `${datos_ot.fecha_Entrega.replace('T00:00:00', '')}`, style: 'datosTablaExtrusion' },
         ]
       ]
     };
   }
 
   // Funcion que va a crear el contenido del PDF
-  contentPDF(datos_ot){
+  contentPDF(datos_ot) {
     let data = [];
     data.push(this.hoja1ContentPDF(datos_ot));
     data.push(this.hoja2ContentPDF(datos_ot));
@@ -2357,8 +2357,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a crear la hoja 1 del PDF
-  hoja1ContentPDF(datos_ot){
-    let data : any [] = [];
+  hoja1ContentPDF(datos_ot) {
+    let data: any[] = [];
     data.push(
       this.tituloMezclas(datos_ot),
       '\n',
@@ -2373,12 +2373,12 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar el nombre de la mezcla que tiene el item
-  tituloMezclas(datos_ot){
+  tituloMezclas(datos_ot) {
     return {
       table: {
         widths: ['*'],
         body: [
-          [{text: (datos_ot.mezcla_Nombre).trim() == '' ? 'MATERIA PRIMA' : (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas'}]
+          [{ text: (datos_ot.mezcla_Nombre).trim() == '' ? 'MATERIA PRIMA' : (datos_ot.mezcla_Nombre).trim(), style: 'titulosTablas' }]
         ]
       },
       fontSize: 9,
@@ -2386,8 +2386,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar la información de la mezcla
-  datosMezclas(datos_ot){
-    let validacion : boolean = Math.max(...[
+  datosMezclas(datos_ot) {
+    let validacion: boolean = Math.max(...[
       datos_ot.m1C1_nombre.toString().trim().length,
       datos_ot.m2C1_nombre.toString().trim().length,
       datos_ot.m3C1_nombre.toString().trim().length,
@@ -2395,7 +2395,7 @@ export class Orden_TrabajoComponent implements OnInit {
       datos_ot.p1C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length,
       datos_ot.p2C1_Nombre.replace('PIGMENTO', 'PIG.').toString().trim().length
     ]) > 20;
-    
+
     return {
       columns: [
         this.columna1Mezcla(datos_ot, validacion),
@@ -2408,7 +2408,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar la información de la mezcla en la capa 1
-  columna1Mezcla(datos_ot, validacion){
+  columna1Mezcla(datos_ot, validacion) {
     return {
       width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
       table: {
@@ -2461,7 +2461,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar la información de la mezcla en la capa 2
-  columna2Mezcla(datos_ot, validacion){
+  columna2Mezcla(datos_ot, validacion) {
     return {
       width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
       table: {
@@ -2514,7 +2514,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar la información de la mezcla en la capa 3
-  columna3Mezcla(datos_ot, validacion){
+  columna3Mezcla(datos_ot, validacion) {
     return {
       width: datos_ot.mezcla_PorcentajeCapa1 == 0 ? '*' : validacion ? 'auto' : '*',
       table: {
@@ -2567,31 +2567,31 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar 'EXTRUSIÓN' en la hoja 1
-  tituloExtrusion(){
-    return  {
+  tituloExtrusion() {
+    return {
       table: {
         widths: ['*'],
         body: [
-          [{text: `EXTRUSIÓN`, style: 'titulosTablas'}]
+          [{ text: `EXTRUSIÓN`, style: 'titulosTablas' }]
         ]
       }
     };
   }
 
   // Funcion que va a colocar la información de extrusión en la hoja 1
-  datosExtrusion(datos_ot){
+  datosExtrusion(datos_ot) {
     return {
       table: {
         widths: [65, 65, '*', 50, 70, 70, 60],
         body: [
           [
-            {text: `Pigmento`, style: 'subtituloTablas'},
-            {text: `Formato`, style: 'subtituloTablas'},
-            {text: `Ancho`, style: 'subtituloTablas'},
-            {text: `Und Medida`, style: 'subtituloTablas'},
-            {text: `Calibre`, style: 'subtituloTablas'},
-            {text: `Peso MT \n(Min/Max)`, style: 'subtituloTablas'},
-            {text: `Tratado`, style: 'subtituloTablas'}
+            { text: `Pigmento`, style: 'subtituloTablas' },
+            { text: `Formato`, style: 'subtituloTablas' },
+            { text: `Ancho`, style: 'subtituloTablas' },
+            { text: `Und Medida`, style: 'subtituloTablas' },
+            { text: `Calibre`, style: 'subtituloTablas' },
+            { text: `Peso MT \n(Min/Max)`, style: 'subtituloTablas' },
+            { text: `Tratado`, style: 'subtituloTablas' }
           ],
           [{}, {}, {}, {}, {}, {}, {}],
           [
@@ -2611,7 +2611,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar la observación de la OT
-  observacion(datos_ot){
+  observacion(datos_ot) {
     return {
       table: {
         widths: ['*'],
@@ -2625,8 +2625,8 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar la información de la hoja 2
-  hoja2ContentPDF(datos_ot){
-    let data : any [] = [];
+  hoja2ContentPDF(datos_ot) {
+    let data: any[] = [];
     data.push(
       this.procesosHoja2(datos_ot),
       '\n',
@@ -2638,7 +2638,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 la información de cada uno de los procesos
-  procesosHoja2(datos_ot){
+  procesosHoja2(datos_ot) {
     return {
       pageBreak: 'before',
       table: {
@@ -2656,49 +2656,49 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 la información del proceso de extrusión
-  procesoExtrusion(datos_ot){
+  procesoExtrusion(datos_ot) {
     return {
       table: {
         widths: ['*', '*', '*'],
         body: [
           [
-            {colSpan: 3, text: `EXTRUSIÓN`, style: 'titulosTablas', border: [true, true, true, true]},
+            { colSpan: 3, text: `EXTRUSIÓN`, style: 'titulosTablas', border: [true, true, true, true] },
             {},
             {}
           ],
           [
-            {text: `Pigmento: `, style: 'subtitulo'},
-            {text: `${datos_ot.pigmento_Extrusion.toString().trim()}`},
+            { text: `Pigmento: `, style: 'subtitulo' },
+            { text: `${datos_ot.pigmento_Extrusion.toString().trim()}` },
             {}
           ],
           [
-            {text: `Formato: `, style: 'subtitulo'},
-            {text: `${datos_ot.formato_Extrusin.toString().trim()}`},
+            { text: `Formato: `, style: 'subtitulo' },
+            { text: `${datos_ot.formato_Extrusin.toString().trim()}` },
             {}
           ],
           [
-            {text: `Calibre: `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}`},
+            { text: `Calibre: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.calibre_Extrusion).toFixed(2))}` },
             {}
           ],
           [
-            {text: `Unidad Medida: `, style: 'subtitulo'},
-            {text: `${datos_ot.und_Extrusion.toString().trim()}`},
+            { text: `Unidad Medida: `, style: 'subtitulo' },
+            { text: `${datos_ot.und_Extrusion.toString().trim()}` },
             {}
           ],
           [
-            {text: `ANCHO`, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +`},
-            {text: `   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}`}
+            { text: `ANCHO`, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.ancho1_Extrusion).toFixed(2))}   +   ${this.formatonumeros((datos_ot.ancho2_Extrusion).toFixed(2))}   +` },
+            { text: `   ${this.formatonumeros((datos_ot.ancho3_Extrusion).toFixed(2))}` }
           ],
           [
-            {text: `Peso MT (Min/Max): `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}`},
+            { text: `Peso MT (Min/Max): `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.peso_Extrusion).toFixed(2))}` },
             {}
           ],
           [
-            {text: `Tratado Caras: `, style: 'subtitulo'},
-            {text: `${datos_ot.tratado.toString().trim()}`},
+            { text: `Tratado Caras: `, style: 'subtitulo' },
+            { text: `${datos_ot.tratado.toString().trim()}` },
             {}
           ],
         ]
@@ -2708,35 +2708,35 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 la información del proceso de laminado
-  procesoLaminado(datos_ot){
+  procesoLaminado(datos_ot) {
     return {
       table: {
         widths: ['*', '*', '*'],
         body: [
           [
-            {colSpan: 3, text: `LAMINADO`, style: 'titulosTablas', border: [true, true, true, true]},
+            { colSpan: 3, text: `LAMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
             {},
             {}
           ],
           [
-            {text: `CAPA`, style: 'subtitulo'},
-            {text: `CALIBRE`, style: 'subtitulo'},
-            {text: `CANTIDAD`, style: 'subtitulo'}
+            { text: `CAPA`, style: 'subtitulo' },
+            { text: `CALIBRE`, style: 'subtitulo' },
+            { text: `CANTIDAD`, style: 'subtitulo' }
           ],
           [
-            {text: `${datos_ot.laminado_Capa1.toString().trim()}`, },
-            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa1).toFixed(2))}`, },
-            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa1).toFixed(2))}`, }
+            { text: `${datos_ot.laminado_Capa1.toString().trim()}`, },
+            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa1).toFixed(2))}`, },
+            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa1).toFixed(2))}`, }
           ],
           [
-            {text: `${datos_ot.laminado_Capa2.toString().trim()}`, },
-            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa2).toFixed(2))}`, },
-            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa2).toFixed(2))}`, }
+            { text: `${datos_ot.laminado_Capa2.toString().trim()}`, },
+            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa2).toFixed(2))}`, },
+            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa2).toFixed(2))}`, }
           ],
           [
-            {text: `${datos_ot.laminado_Capa3.toString().trim()}`, },
-            {text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa3).toFixed(2))}`, },
-            {text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa3).toFixed(2))}`, }
+            { text: `${datos_ot.laminado_Capa3.toString().trim()}`, },
+            { text: `${this.formatonumeros((datos_ot.calibre_Laminado_Capa3).toFixed(2))}`, },
+            { text: `${this.formatonumeros((datos_ot.cantidad_Laminado_Capa3).toFixed(2))}`, }
           ]
         ]
       },
@@ -2745,58 +2745,58 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 la información del proceso de impresión
-  procesoImpresion(datos_ot){
+  procesoImpresion(datos_ot) {
     return {
       table: {
         widths: ['*', '*'],
         body: [
           [
-            {colSpan: 2, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true]},
+            { colSpan: 2, text: `IMPRESIÓN`, style: 'titulosTablas', border: [true, true, true, true] },
             {},
           ],
           [
-            {text: `Tipo Impresión: `, style: 'subtitulo'},
-            {text: `${datos_ot.tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot.tipo_Impresion.toString().trim()}`}
+            { text: `Tipo Impresión: `, style: 'subtitulo' },
+            { text: `${datos_ot.tipo_Impresion.toString().trim() == 'NO APLICA' ? 'FLEXOGRAFIA' : datos_ot.tipo_Impresion.toString().trim()}` }
           ],
           [
-            {text: `Rodillo N°: `, style: 'subtitulo'},
-            {text: `${datos_ot.rodillo.toString().trim()}`}
+            { text: `Rodillo N°: `, style: 'subtitulo' },
+            { text: `${datos_ot.rodillo.toString().trim()}` }
           ],
           [
-            {text: `N° de Pista: `, style: 'subtitulo'},
-            {text: `${datos_ot.pista.toString().trim()}`}
+            { text: `N° de Pista: `, style: 'subtitulo' },
+            { text: `${datos_ot.pista.toString().trim()}` }
           ],
           [
-            {text: `Tinta 1: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta1.toString().trim()}`}
+            { text: `Tinta 1: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta1.toString().trim()}` }
           ],
           [
-            {text: `Tinta 2: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta2.toString().trim()}`}
+            { text: `Tinta 2: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta2.toString().trim()}` }
           ],
           [
-            {text: `Tinta 3: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta3.toString().trim()}`}
+            { text: `Tinta 3: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta3.toString().trim()}` }
           ],
           [
-            {text: `Tinta 4: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta4.toString().trim()}`}
+            { text: `Tinta 4: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta4.toString().trim()}` }
           ],
           [
-            {text: `Tinta 5: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta5.toString().trim()}`}
+            { text: `Tinta 5: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta5.toString().trim()}` }
           ],
           [
-            {text: `Tinta 6: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta6.toString().trim()}`}
+            { text: `Tinta 6: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta6.toString().trim()}` }
           ],
           [
-            {text: `Tinta 7: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta7.toString().trim()}`}
+            { text: `Tinta 7: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta7.toString().trim()}` }
           ],
           [
-            {text: `Tinta 8: `, style: 'subtitulo'},
-            {text: `${datos_ot.tinta8.toString().trim()}`}
+            { text: `Tinta 8: `, style: 'subtitulo' },
+            { text: `${datos_ot.tinta8.toString().trim()}` }
           ],
         ]
       },
@@ -2805,56 +2805,56 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 la información del proceso de sellado de corte
-  productoTermiando(datos_ot){
+  productoTermiando(datos_ot) {
     return {
       table: {
         widths: ['*', '*', '*'],
         body: [
           [
-            {colSpan: 3, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true]},
+            { colSpan: 3, text: `PRODUCTO TERMINADO`, style: 'titulosTablas', border: [true, true, true, true] },
             {},
             {},
           ],
           [
-            {text: `Formato Bolsa: `, style: 'subtitulo'},
-            {text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
-            {text: ``, },
+            { text: `Formato Bolsa: `, style: 'subtitulo' },
+            { text: `${datos_ot.formato_Producto.toString().trim()}`, alignment: 'center', },
+            { text: ``, },
           ],
           [
-            {text: `Ancho`, alignment: 'right', style: 'subtitulo'},
-            {text: `Largo`, alignment: 'center', style: 'subtitulo'},
-            {text: `Fuelle`, alignment: 'left', style: 'subtitulo'},
+            { text: `Ancho`, alignment: 'right', style: 'subtitulo' },
+            { text: `Largo`, alignment: 'center', style: 'subtitulo' },
+            { text: `Fuelle`, alignment: 'left', style: 'subtitulo' },
           ],
           [
-            {colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
-            {colspan: 3, text: `x     ${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
-            {colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}     ${datos_ot.und_Extrusion.toString().trim()}`, },
+            { colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Ancho).toFixed(2))}`, alignment: 'right', },
+            { colspan: 3, text: `x     ${this.formatonumeros((datos_ot.selladoCorte_Largo).toFixed(2))}     x`, alignment: 'center', },
+            { colspan: 3, text: `${this.formatonumeros((datos_ot.selladoCorte_Fuelle).toFixed(2))}     ${datos_ot.und_Extrusion.toString().trim()}`, },
           ],
           [{}, {}, {}],
           [{}, {}, {}],
           [
-            {text: `Sellado: `, style: 'subtitulo'},
-            {text: `${datos_ot.tpSellados_Nombre.toString().trim()}`},
+            { text: `Sellado: `, style: 'subtitulo' },
+            { text: `${datos_ot.tpSellados_Nombre.toString().trim()}` },
             {},
           ],
           [
-            {text: `Margen: `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}`},
+            { text: `Margen: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.margen).toFixed(2))}` },
             {},
           ],
           [
-            {text: `Peso Millar: `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}`},
+            { text: `Peso Millar: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_PesoMillar).toFixed(2))}` },
             {},
           ],
           [
-            {text: `Cant. x Paquete: `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}`},
+            { text: `Cant. x Paquete: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasPaquete).toFixed(2))}` },
             {},
           ],
           [
-            {text: `Cant. x Bulto: `, style: 'subtitulo'},
-            {text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}`},
+            { text: `Cant. x Bulto: `, style: 'subtitulo' },
+            { text: `${this.formatonumeros((datos_ot.selladoCorte_CantBolsasBulto).toFixed(2))}` },
             {},
           ]
         ]
@@ -2864,7 +2864,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar en la hoja 2 si a la orden de trabajo se le debe crear un cyrel o no
-  cyrelPDF(datos_ot){
+  cyrelPDF(datos_ot) {
     return datos_ot.cyrel == true || datos_ot.cyrel == '1' ? {
       table: {
         margin: [15, 5],
@@ -2872,7 +2872,7 @@ export class Orden_TrabajoComponent implements OnInit {
         body: [
           [
             {},
-            {text: `Hacer Cyrel`, style: 'titulosTablas', border: [true, true, true, true]},
+            { text: `Hacer Cyrel`, style: 'titulosTablas', border: [true, true, true, true] },
             {}
           ]
         ]
@@ -2882,7 +2882,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Función que va a colocar el footer del PDF
-  footerPDF(){
+  footerPDF() {
     let usuario: string = this.AppComponent.storage_Nombre;
     return function (currentPage: any, pageCount: any) {
       return [
@@ -2899,7 +2899,7 @@ export class Orden_TrabajoComponent implements OnInit {
   }
 
   // Funcion que va a colocar los estilos en el PDF
-  stylesPDF(){
+  stylesPDF() {
     return {
       header: { fontSize: 7, bold: true },
       titulo: { fontSize: 11, bold: true },
@@ -2911,7 +2911,7 @@ export class Orden_TrabajoComponent implements OnInit {
         alignment: 'center',
         bold: true,
         fontSize: 11
-      },      
+      },
       subtituloTablas: {
         border: [false, false, false, false],
         fillColor: '#eeeeee',
@@ -2928,7 +2928,7 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que cargará la última OT de Plasticaribe. 
   ultimoNumeroOT = () => this.ordenTrabajoService.GetUlt_Numero_OT().subscribe(data => this.ultimaOTApp = data, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT`, ``));
-  
+
   //Función que cargará la última OT de Plasticaribe. 
   ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => this.ultimaOT = data.item, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
 }

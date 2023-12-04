@@ -28,15 +28,15 @@ export class Produccion_ExtrusionComponent implements OnInit {
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   formDatosProduccion !: FormGroup;
-  turnos: any[] = [];
-  unidadesMedida: any[] = [];
-  operarios: any[] = [];
-  conos: any[] = [];
+  turnos: Array<any> = [];
+  unidadesMedida: Array<any> = [];
+  operarios: Array<any> = [];
+  conos: Array<any> = [];
   proceso: string = ``;
-  process: any[] = [];
-  rollosPesados: any[] = [];
-  datosOrdenTrabajo: any[] = [];
-  showNameBussiness : boolean = true;
+  process: Array<any> = [];
+  rollosPesados: Array<any> = [];
+  datosOrdenTrabajo: Array<any> = [];
+  showNameBussiness: boolean = true;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -51,7 +51,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     private createPDFService: CreacionPdfService,
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
-    private orderProductionsService : Orden_TrabajoService,) {
+    private orderProductionsService: Orden_TrabajoService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -87,9 +87,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    setTimeout(() => {
-      this.chargeSerialPorts();
-    }, 1000);
+    setTimeout(() => this.chargeSerialPorts(), 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -153,9 +151,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   chargeSerialPorts() {
     navigator.serial.getPorts().then((ports) => {
       ports.forEach((port) => {
-        port.open({ baudRate: 9600 }).then(async () => {
-          this.chargeDataFromSerialPort(port);
-        }, error => this.msj.mensajeError(`${error}`));
+        port.open({ baudRate: 9600 }).then(async () => this.chargeDataFromSerialPort(port), error => this.msj.mensajeError(`${error}`));
       });
     });
   }
@@ -208,42 +204,27 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.processService.srvObtenerLista().subscribe(res => {
       res.filter(x => ['EXT', 'IMP', 'ROT', 'LAM', 'DBLD', 'CORTE', 'EMP'].includes(x.proceso_Id)).forEach(process => {
         this.process.push({
-          order : this.sortArrayProcess(process.proceso_Nombre),
-          proceso_Id : process.proceso_Id,
-          proceso_Nombre : process.proceso_Nombre,
+          order: this.sortArrayProcess(process.proceso_Nombre),
+          proceso_Id: process.proceso_Id,
+          proceso_Nombre: process.proceso_Nombre,
         });
       });
       this.process.sort((a, b) => Number(a.order) - Number(b.order));
     });
   }
 
-  sortArrayProcess(process : string){
-    let num : number = 0;
-    switch (process.toUpperCase()) {
-      case 'EXTRUSION':
-        num = 1;
-        break;
-      case 'IMPRESION':
-        num = 2;
-        break;
-      case 'ROTOGRABADO':
-        num = 3;
-        break;
-      case 'DOBLADO':
-        num = 4;
-        break;
-      case 'LAMINADO':
-        num = 5;
-        break;
-      case 'CORTE':
-        num = 6;
-        break;
-      case 'EMPAQUE':
-        num = 7;
-        break;
-      default:
-        break;
-    }
+  sortArrayProcess(process: string) {
+    let num: number = 0;
+    const processMapping = {
+      'EXTRUSION': 1,
+      'IMPRESION': 2,
+      'ROTOGRABADO': 3,
+      'DOBLADO': 4,
+      'LAMINADO': 5,
+      'CORTE': 6,
+      'EMPAQUE': 7
+    };
+    num = processMapping[process.toUpperCase()];
     return num;
   }
 
@@ -322,7 +303,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   buscraOrdenTrabajo() {
-    if (this.formDatosProduccion.value.proceso){
+    if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
       this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
@@ -331,7 +312,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
-  putDataOrderProduction(data){
+  putDataOrderProduction(data) {
     this.datosOrdenTrabajo = data;
     this.datosOrdenTrabajo[0].turno = this.formDatosProduccion.value.turno;
     this.buscarRollosPesados();
@@ -387,9 +368,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
       } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
     } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
   }
-  
-  guardarProduccion() {
-    this.cargando = true;
+
+  datosProduccion() : modelProduccionProcesos {
     let datos: modelProduccionProcesos = {
       Numero_Rollo: 0,
       OT: this.formDatosProduccion.value.ordenTrabajo,
@@ -419,7 +399,12 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
     }
-    this.produccionProcesosService.Post(datos).subscribe(res => {
+    return datos; 
+  }
+
+  guardarProduccion() {
+    this.cargando = true;    
+    this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
       this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
       this.limpiarCampos();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
