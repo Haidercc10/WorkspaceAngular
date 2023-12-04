@@ -92,7 +92,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.ordenConsultada = this.formSellado.value.ot;
         this.ordenesTrabajo = data; 
         this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
-        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto, cantKg : 100 });
+        this.formSellado.patchValue({ cantUnd : data[0].selladoCorte_CantBolsasBulto });
         this.formSellado.get('saldo')?.enable();
         setTimeout(() => { this.calcularPesoTeorico(); }, 500);
         this.claseCantidadRealizada(data[0]);
