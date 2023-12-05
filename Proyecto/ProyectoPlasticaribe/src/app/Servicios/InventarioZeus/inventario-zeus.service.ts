@@ -181,4 +181,5 @@ export class InventarioZeusService {
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 
+  ValorTotalFacturadoHoy = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy`);
 }
