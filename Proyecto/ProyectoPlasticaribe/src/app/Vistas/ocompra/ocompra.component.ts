@@ -4,6 +4,7 @@ import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { modelDtSolcitudMP } from 'src/app/Modelo/modelDtSolcitudMP';
+import { modelOrdenCompra } from 'src/app/Modelo/modelOrdenCompra';
 import { modelSolicitudMateriaPrima } from 'src/app/Modelo/modelSolicituMateriaPrima';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
@@ -32,74 +33,79 @@ import { defaultStepOptions, stepsOrdenesCompra as defaultSteps } from 'src/app/
 
 export class OcompraComponent implements OnInit {
 
-  FormOrdenCompra : FormGroup; //Formulario principal
-  FormMateriaPrima : FormGroup; //Formulario de Materia Prima
+  FormOrdenCompra: FormGroup; //Formulario principal
+  FormMateriaPrima: FormGroup; //Formulario de Materia Prima
   ModalCrearProveedor: boolean = false; //Variable para validar que se abra el modal de creacion de proveedores
-  modalCreacionMateriaPrima : boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
-  ModalCrearMateriaPrima: boolean= false; //Variable para validar que se abra el modal de creacion de polietileno
-  ModalCrearBOPP: boolean= false; //Variable para validar que se abra el modal de creacion de bopp, bopa y/o poliester
-  ModalCrearTintas: boolean= false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenets
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  cargando : boolean = false; //Variable para validar que aparezca o no el icono de carga
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  proveedores : any [] = []; //Variable que almacenará los proveedores
-  materiaPrima : any [] = []; //Variable que almacenará las materias primas
-  unidadesMedida : any [] = []; //Variable que va a almacenar las unidades de medida
-  materiasPrimasSeleccionadas : any [] = []; //Variable que almacenará las materias primas que son escogidas para la orden de compra
-  consecutivoOrdenCompra : any = 0; //Variable que almacenará el consecutivo de la orden de compra
-  informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de compra
-  categoriasMP : any [] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
-  categoriasTintas : any [] = []; //Variable que almcanará las categorias de la tabla Tintas
-  categoriasBOPP : any [] = []; //Variable que almcanará las categorias de la tabla BOPP
-  mpSeleccionada : any [];
-  edicionOrdenCompra : boolean = false;
-  llave : string = 'pdf';
-  ordenCreada : number;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
-  solicitud : boolean = false;
-  iva : number = 19;
+  modalCreacionMateriaPrima: boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
+  ModalCrearMateriaPrima: boolean = false; //Variable para validar que se abra el modal de creacion de polietileno
+  ModalCrearBOPP: boolean = false; //Variable para validar que se abra el modal de creacion de bopp, bopa y/o poliester
+  ModalCrearTintas: boolean = false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenets
+  today: any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  cargando: boolean = false; //Variable para validar que aparezca o no el icono de carga
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  proveedores: any[] = []; //Variable que almacenará los proveedores
+  materiaPrima: any[] = []; //Variable que almacenará las materias primas
+  unidadesMedida: any[] = []; //Variable que va a almacenar las unidades de medida
+  materiasPrimasSeleccionadas: any[] = []; //Variable que almacenará las materias primas que son escogidas para la orden de compra
+  consecutivoOrdenCompra: any = 0; //Variable que almacenará el consecutivo de la orden de compra
+  informacionPDF: any[] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de compra
+  categoriasMP: any[] = []; //Variable que almcanará las categorias de la tabla Materia_Prima
+  categoriasTintas: any[] = []; //Variable que almcanará las categorias de la tabla Tintas
+  categoriasBOPP: any[] = []; //Variable que almcanará las categorias de la tabla BOPP
+  mpSeleccionada: any[];
+  edicionOrdenCompra: boolean = false;
+  llave: string = 'pdf';
+  ordenCreada: number;
+  modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  solicitud: boolean = false;
+  iva: number = 19;
 
-  constructor(private frmBuilder : FormBuilder,
-                private AppComponent : AppComponent,
-                  private proveedorService : ProveedorService,
-                    private materiaPrimaService : MateriaPrimaService,
-                      private undMedidaService : UnidadMedidaService,
-                        private ordenCompraService : OrdenCompra_MateriaPrimaService,
-                          private dtOrdenCompraService : DetallesOrdenesCompraService,
-                            private servicioTintas : TintasService,
-                              private messageService: MessageService,
-                                private boppService : EntradaBOPPService,
-                                  private shepherdService: ShepherdService,
-                                    private solicitudMpService : SolicitudMateriaPrimaService,
-                                      private dtSolicitudMp : DetalleSolicitudMateriaPrimaService,
-                                        private relacionSolOcService : RelacionSolicitud_OrdenCompraService,
-                                          private mensajeService : MensajesAplicacionService,
-                                            private creacionPDFService : CreacionPdfService,) {
+  constructor(private frmBuilder: FormBuilder,
+    private AppComponent: AppComponent,
+    private proveedorService: ProveedorService,
+    private materiaPrimaService: MateriaPrimaService,
+    private undMedidaService: UnidadMedidaService,
+    private ordenCompraService: OrdenCompra_MateriaPrimaService,
+    private dtOrdenCompraService: DetallesOrdenesCompraService,
+    private servicioTintas: TintasService,
+    private messageService: MessageService,
+    private boppService: EntradaBOPPService,
+    private shepherdService: ShepherdService,
+    private solicitudMpService: SolicitudMateriaPrimaService,
+    private dtSolicitudMp: DetalleSolicitudMateriaPrimaService,
+    private relacionSolOcService: RelacionSolicitud_OrdenCompraService,
+    private mensajeService: MensajesAplicacionService,
+    private creacionPDFService: CreacionPdfService,) {
+
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.FormOrdenCompra = this.frmBuilder.group({
-      ConsecutivoOrden : ['', Validators.required],
-      Solicitud : [''],
-      Proveedor : ['', Validators.required],
-      Id_Proveedor : ['', Validators.required],
-      Observacion : [''],
+      ConsecutivoOrden: ['', Validators.required],
+      Solicitud: [''],
+      Proveedor: ['', Validators.required],
+      Id_Proveedor: ['', Validators.required],
+      ReteIVA: [0, Validators.required],
+      ReteICA: [0, Validators.required],
+      ReteFuente: [0, Validators.required],
+      Base: [0, Validators.required],
+      Observacion: [''],
     });
 
     this.FormMateriaPrima = this.frmBuilder.group({
-      Id : [null, Validators.required],
-      Nombre : [null, Validators.required],
-      Cantidad : [null, Validators.required],
-      UndMedida : [null, Validators.required],
-      Precio : [null, Validators.required],
-      PrecioOculto : [null, Validators.required],
-      Categoria : [null, Validators.required],
-      iva : [this.iva, Validators.required],
+      Id: [null, Validators.required],
+      Nombre: [null, Validators.required],
+      Cantidad: [null, Validators.required],
+      UndMedida: [null, Validators.required],
+      Precio: [null, Validators.required],
+      PrecioOculto: [null, Validators.required],
+      Categoria: [null, Validators.required],
+      iva: [this.iva, Validators.required],
     });
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.lecturaStorage();
     this.obtenerUnidadesMedida();
     this.obtenerMateriaPrima();
@@ -108,7 +114,7 @@ export class OcompraComponent implements OnInit {
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
-  tutorial(){
+  tutorial() {
     this.shepherdService.defaultStepOptions = defaultStepOptions;
     this.shepherdService.modal = true;
     this.shepherdService.confirmCancel = false;
@@ -117,7 +123,7 @@ export class OcompraComponent implements OnInit {
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
@@ -127,10 +133,10 @@ export class OcompraComponent implements OnInit {
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   // Funcion que limpiará todos los campos de la vista
-  limpiarTodo(){
+  limpiarTodo() {
     this.FormMateriaPrima.reset();
     this.FormOrdenCompra.reset();
-    this.FormMateriaPrima.patchValue({ iva : 19 });
+    this.FormMateriaPrima.patchValue({ iva: 19 });
     this.materiasPrimasSeleccionadas = [];
     this.cargando = false;
     this.generarConsecutivo();
@@ -139,46 +145,50 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a limpiar los campos de materia prima
-  limpiarCamposMateriaPrima(){
+  limpiarCamposMateriaPrima() {
     this.FormMateriaPrima.reset();
     this.ivaOrdenCompra();
   }
 
-  ivaOrdenCompra(){
+  ivaOrdenCompra() {
     let iva = this.iva == null || this.iva == undefined ? 19 : this.iva;
-    this.FormMateriaPrima.patchValue({ iva : iva });
+    this.FormMateriaPrima.patchValue({ iva: iva });
   }
 
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
-  consultarProveedores(){
-    let nombre : string = this.FormOrdenCompra.value.Proveedor.trim();
+  consultarProveedores() {
+    let nombre: string = this.FormOrdenCompra.value.Proveedor.trim();
     if (nombre != '') this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => this.proveedores = datos_Proveedores);
   }
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
-  consultarCategorias(){
+  consultarCategorias() {
     this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => this.categoriasMP = datos);
     this.servicioTintas.GetCategoriasTintas().subscribe(datos => this.categoriasTintas = datos);
     this.boppService.GetCategoriasBOPP().subscribe(datos => this.categoriasBOPP = datos);
   }
 
   // Funcion que le va a cambiar el nombre al proveedor
-  cambiarNombreProveedor(){
-    let nuevo : any[] = this.proveedores.filter((item) => item.prov_Id == this.FormOrdenCompra.value.Proveedor);
+  cambiarNombreProveedor() {
+    let data = this.proveedores.find((x => x.prov.prov_Id == this.FormOrdenCompra.value.Proveedor));
     this.FormOrdenCompra.patchValue({
-      Proveedor : nuevo[0].prov_Nombre,
-      Id_Proveedor : nuevo[0].prov_Id,
+      Proveedor: data.prov.prov_Nombre,
+      Id_Proveedor: data.prov.prov_Id,
+      ReteIVA: data.rtIva.porcentaje,
+      ReteICA: data.rtIca.porcentaje,
+      ReteFuente: data.rtFuente.porcentaje,
+      Base: data.rtIva.base,
     });
   }
 
   // Generar Consecutivo de Orden de Compra
-  generarConsecutivo = () => this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(num => this.FormOrdenCompra.patchValue({ ConsecutivoOrden : num + 1, }), () => this.FormOrdenCompra.patchValue({ ConsecutivoOrden : 1, }));
+  generarConsecutivo = () => this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(num => this.FormOrdenCompra.patchValue({ ConsecutivoOrden: num + 1, }), () => this.FormOrdenCompra.patchValue({ ConsecutivoOrden: 1, }));
 
   // Funcion que va a consultar la materia prima
-  obtenerMateriaPrima(){
+  obtenerMateriaPrima() {
     this.materiaPrimaService.getMpTintaBopp().subscribe(datos_materiaPrimas => {
       this.materiaPrima = datos_materiaPrimas;
-      this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
+      this.materiaPrima.sort((a, b) => a.nombre.localeCompare(b.nombre));
     });
   }
 
@@ -186,39 +196,39 @@ export class OcompraComponent implements OnInit {
   obtenerUnidadesMedida = () => this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => this.unidadesMedida = datos_undMedida);
 
   //Funcion que va a mostrar el nombre de la materia prima
-  cambiarNombreMateriaPrima(){
-    let id : number = this.FormMateriaPrima.value.Nombre || this.FormMateriaPrima.value.Id;
+  cambiarNombreMateriaPrima() {
+    let id: number = this.FormMateriaPrima.value.Nombre || this.FormMateriaPrima.value.Id;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
         this.FormMateriaPrima.patchValue({
-          Id : datos_materiaPrima[i].id,
-          Nombre : datos_materiaPrima[i].nombre,
-          Cantidad : 0,
-          UndMedida : datos_materiaPrima[i].undMedida,
-          Precio : parseFloat(datos_materiaPrima[i].precio),
-          PrecioOculto : parseFloat(datos_materiaPrima[i].precio),
-          Categoria : datos_materiaPrima[i].categoria,
+          Id: datos_materiaPrima[i].id,
+          Nombre: datos_materiaPrima[i].nombre,
+          Cantidad: 0,
+          UndMedida: datos_materiaPrima[i].undMedida,
+          Precio: parseFloat(datos_materiaPrima[i].precio),
+          PrecioOculto: parseFloat(datos_materiaPrima[i].precio),
+          Categoria: datos_materiaPrima[i].categoria,
         });
       }
     }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`));
   }
 
   // Funcion que va a añadir la materia prima a la tabla
-  cargarMateriaPrima(){
-    let categoria : number = this.FormMateriaPrima.value.Categoria;
-    if (this.FormMateriaPrima.valid){
+  cargarMateriaPrima() {
+    let categoria: number = this.FormMateriaPrima.value.Categoria;
+    if (this.FormMateriaPrima.valid) {
       if (!this.materiasPrimasSeleccionadas.map(x => x.Id).includes(this.FormMateriaPrima.value.Id)) {
-        if (this.FormMateriaPrima.value.Cantidad > 0){
-          let info : any = {
-            Id : this.FormMateriaPrima.value.Id,
+        if (this.FormMateriaPrima.value.Cantidad > 0) {
+          let info: any = {
+            Id: this.FormMateriaPrima.value.Id,
             Id_Mp: 84,
             Id_Tinta: 2001,
             Id_Bopp: 1,
-            Nombre : this.FormMateriaPrima.value.Nombre,
-            Cantidad : this.FormMateriaPrima.value.Cantidad,
-            Und_Medida : this.FormMateriaPrima.value.UndMedida,
-            Precio : this.FormMateriaPrima.value.PrecioOculto,
-            SubTotal : (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto),
+            Nombre: this.FormMateriaPrima.value.Nombre,
+            Cantidad: this.FormMateriaPrima.value.Cantidad,
+            Und_Medida: this.FormMateriaPrima.value.UndMedida,
+            Precio: this.FormMateriaPrima.value.PrecioOculto,
+            SubTotal: (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto),
           }
           if (this.categoriasTintas.includes(categoria)) info.Id_Tinta = info.Id;
           else if (this.categoriasMP.includes(categoria)) info.Id_Mp = info.Id;
@@ -231,7 +241,7 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a quitar la materia prima
-  quitarMateriaPrima(data : any){
+  quitarMateriaPrima(data: any) {
     data = this.mpSeleccionada;
     this.onReject();
     this.materiasPrimasSeleccionadas.splice(this.materiasPrimasSeleccionadas.findIndex((item) => item.Id == data.Id), 1);
@@ -240,8 +250,8 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a calcular la cantidad de materia prima
-  calcularCantMateriaPrima() : number{
-    let total : number = 0;
+  calcularCantMateriaPrima(): number {
+    let total: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       total += this.materiasPrimasSeleccionadas[i].Cantidad;
       this.materiasPrimasSeleccionadas[i].SubTotal = this.materiasPrimasSeleccionadas[i].Cantidad * this.materiasPrimasSeleccionadas[i].Precio;
@@ -250,8 +260,8 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularCostoMateriaPrima() : number{
-    let total : number = 0;
+  calcularCostoMateriaPrima(): number {
+    let total: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       total += this.materiasPrimasSeleccionadas[i].SubTotal;
     }
@@ -259,19 +269,10 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularIVAMateriaPrima() : number{
-    let total : number = 0;
+  calcularIVAMateriaPrima(): number {
+    let total: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       total += (this.materiasPrimasSeleccionadas[i].SubTotal * this.iva) / 100;
-    }
-    return total;
-  }
-
-  // Funcion que va a calcular el costo de toda la materia prima seleccionada
-  calcularCostoTotalMateriaPrima() : number{
-    let total : number = 0;
-    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-      total += this.materiasPrimasSeleccionadas[i].SubTotal + ((this.materiasPrimasSeleccionadas[i].SubTotal * this.iva) / 100);
     }
     return total;
   }
@@ -283,32 +284,32 @@ export class OcompraComponent implements OnInit {
   LlamarModalCrearMateriaPrima = () => this.modalCreacionMateriaPrima = true;
 
   // Funcion para llamar el modal que crea polientileno
-  crearPolientileno(){
+  crearPolientileno() {
     this.modalCreacionMateriaPrima = false;
     this.ModalCrearMateriaPrima = true;
   }
 
   // Funcion para llamar el modal que crea bopp
-  crearBopp(){
+  crearBopp() {
     this.modalCreacionMateriaPrima = false;
     this.ModalCrearBOPP = true;
   }
 
   // Funcion para llamar el modal que crea tintas
-  creartinta(){
+  creartinta() {
     this.modalCreacionMateriaPrima = false;
     this.ModalCrearTintas = true;
   }
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la ORden de Compra
-  validarDatosOrdenCompra(){
+  validarDatosOrdenCompra() {
     if (this.FormOrdenCompra.valid) this.materiasPrimasSeleccionadas.length > 0 ? this.crearOrdenCompra() : this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe escoger minimo 1 materia prima!`);
     else this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Funcion que va a consultar la información de una orden de compra existente y prepará los campos para que sea editable
-  consultarOrdenCompra(){
-    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
+  consultarOrdenCompra() {
+    let ordenCompra: number = this.FormOrdenCompra.value.ConsecutivoOrden;
     this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
         this.ordenCreada = ordenCompra
@@ -320,22 +321,22 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF = [];
         for (let i = 0; i < datos_orden.length; i++) {
           this.FormOrdenCompra.patchValue({
-            ConsecutivoOrden : ordenCompra,
-            Proveedor : datos_orden[i].proveedor,
-            Id_Proveedor : datos_orden[i].proveedor_Id,
-            Observacion : datos_orden[i].observacion,
+            ConsecutivoOrden: ordenCompra,
+            Proveedor: datos_orden[i].proveedor,
+            Id_Proveedor: datos_orden[i].proveedor_Id,
+            Observacion: datos_orden[i].observacion,
           });
-          let info : any = {
-            Id : 0,
+          let info: any = {
+            Id: 0,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : '',
-            Cantidad : datos_orden[i].cantidad,
-            Und_Medida : datos_orden[i].unidad_Medida,
-            Precio : datos_orden[i].precio_Unitario,
-            SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
-            iva : datos_orden[i].iva,
+            Nombre: '',
+            Cantidad: datos_orden[i].cantidad,
+            Und_Medida: datos_orden[i].unidad_Medida,
+            Precio: datos_orden[i].precio_Unitario,
+            SubTotal: (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+            iva: datos_orden[i].iva,
           };
           if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -360,26 +361,26 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a consultar una solicitud de materia prima
-  consultarSolicitudMP(){
+  consultarSolicitudMP() {
     this.materiasPrimasSeleccionadas = [];
     let solicitud = this.FormOrdenCompra.value.Solicitud;
 
     if (solicitud) {
       this.dtSolicitudMp.GetInfoSolicitud(solicitud).subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          if (data[i].estado_Solicitud_Id != 5){
+          if (data[i].estado_Solicitud_Id != 5) {
             if (data[i].estado_Solicitud_Id != 4) {
-              this.FormOrdenCompra.patchValue({ Observacion : data[i].observacion, });
-              let info : any = {
-                Id : 0,
+              this.FormOrdenCompra.patchValue({ Observacion: data[i].observacion, });
+              let info: any = {
+                Id: 0,
                 Id_Mp: data[i].mP_Id,
                 Id_Tinta: data[i].tinta_Id,
                 Id_Bopp: data[i].bopp_Id,
-                Nombre : '',
-                Cantidad : data[i].cantidad,
-                Und_Medida : data[i].unidad_Medida,
-                Precio : 0,
-                SubTotal : 0,
+                Nombre: '',
+                Cantidad: data[i].cantidad,
+                Und_Medida: data[i].unidad_Medida,
+                Precio: 0,
+                SubTotal: 0,
               }
               if (info.Id_Mp != 84) {
                 info.Id = info.Id_Mp;
@@ -406,20 +407,23 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a crear la orden de compra
-  crearOrdenCompra(){
+  crearOrdenCompra() {
     this.cargando = true;
-    let solicitud : any = this.FormOrdenCompra.value.Solicitud;
-    let info : any = {
-      Usua_Id : this.storage_Id,
-      Oc_Fecha : moment().format('YYYY-MM-DD'),
-      Oc_Hora : moment().format("H:mm:ss"),
-      Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
-      Estado_Id : 11,
-      Oc_ValorTotal : this.calcularCostoMateriaPrima(),
-      Oc_PesoTotal : this.calcularCantMateriaPrima(),
-      TpDoc_Id : 'OCMP',
-      Oc_Observacion : this.FormOrdenCompra.value.Observacion == null ? '' : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
-      IVA : this.iva,
+    let solicitud: any = this.FormOrdenCompra.value.Solicitud;
+    let info: modelOrdenCompra = {
+      Usua_Id: this.storage_Id,
+      Oc_Fecha: moment().format('YYYY-MM-DD'),
+      Oc_Hora: moment().format("H:mm:ss"),
+      Prov_Id: this.FormOrdenCompra.value.Id_Proveedor,
+      Estado_Id: 11,
+      Oc_ValorTotal: this.calcularCostoMateriaPrima(),
+      Oc_PesoTotal: this.calcularCantMateriaPrima(),
+      TpDoc_Id: 'OCMP',
+      Oc_Observacion: this.FormOrdenCompra.value.Observacion == null ? '' : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
+      IVA: this.iva,
+      ReteFuente: this.FormOrdenCompra.value.ReteFuente,
+      ReteIVA: this.FormOrdenCompra.value.ReteIVA,
+      ReteICA: this.FormOrdenCompra.value.ReteICA
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
       this.ordenCreada = datos_ordenCompra.oc_Id;
@@ -431,18 +435,34 @@ export class OcompraComponent implements OnInit {
     });
   }
 
+  calcularConceptosAutomaticos(valorTotal: number): any {
+    let baseGlobal: number = this.FormOrdenCompra.value.Base;
+    let base: boolean = valorTotal >= baseGlobal;
+    let iva : number = ((valorTotal * this.iva) / 100);
+    let baseIVA: boolean = iva >= baseGlobal;
+    let reteFuente: number = base ? (valorTotal * this.FormOrdenCompra.value.ReteFuente) / 100 : 0;
+    let reteIVA: number = baseIVA ? (((valorTotal * this.iva) / 100) * this.FormOrdenCompra.value.ReteIVA) / 100 : 0;
+    let reteICA: number = base ? (valorTotal * this.FormOrdenCompra.value.ReteICA) / 100 : 0;
+    return {
+      ReteFuente: reteFuente,
+      ReteIVA: reteIVA,
+      ReteICA: reteICA,
+      ValorFinal: valorTotal + reteFuente + reteIVA + reteICA + iva,
+    }
+  }
+
   // Funcion que va a rear detalles de Orden de Compra
-  crearDtOrdenCompra(orden : number){
-    let count : number = 0;
+  crearDtOrdenCompra(orden: number) {
+    let count: number = 0;
     for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
-      let info : any = {
-        Oc_Id : orden,
-        MatPri_Id : this.materiasPrimasSeleccionadas[j].Id_Mp,
-        Tinta_Id : this.materiasPrimasSeleccionadas[j].Id_Tinta,
-        BOPP_Id : this.materiasPrimasSeleccionadas[j].Id_Bopp,
-        Doc_CantidadPedida : this.materiasPrimasSeleccionadas[j].Cantidad,
-        UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
-        Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
+      let info: any = {
+        Oc_Id: orden,
+        MatPri_Id: this.materiasPrimasSeleccionadas[j].Id_Mp,
+        Tinta_Id: this.materiasPrimasSeleccionadas[j].Id_Tinta,
+        BOPP_Id: this.materiasPrimasSeleccionadas[j].Id_Bopp,
+        Doc_CantidadPedida: this.materiasPrimasSeleccionadas[j].Cantidad,
+        UndMed_Id: this.materiasPrimasSeleccionadas[j].Und_Medida,
+        Doc_PrecioUnitario: this.materiasPrimasSeleccionadas[j].Precio,
       }
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
         count++;
@@ -458,16 +478,16 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a crear la relación entre orden de compra y solicitud de materia prima
-  crearRelacionOc_Solicitud(orden : number, solicitud : number){
-    let info : any = { Oc_Id : orden, Solicitud_Id : solicitud, }
+  crearRelacionOc_Solicitud(orden: number, solicitud: number) {
+    let info: any = { Oc_Id: orden, Solicitud_Id: solicitud, }
     this.relacionSolOcService.Post(info).subscribe(() => this.cambiarEstadoMpSolicitud(solicitud), () => this.mensajeService.mensajeError(`¡Error Solicitud!`, `¡No se pudo crear la relación entre la solicitud de materia prima y la orden de compra!`));
   }
 
   // Funcion que va a cambiar el estado de la solicitud. Posiciones Array => 0 : Pendiente, 1 : Parciales, 2 : Totales, 3 : Cantidad de Materias Primas
-  cambiarEstadoSolicitud(solicitud : number){
+  cambiarEstadoSolicitud(solicitud: number) {
     this.solicitudMpService.Get_Id(solicitud).subscribe(datos_Sol => {
-      let info : modelSolicitudMateriaPrima = {
-        Solicitud_Id : datos_Sol.solicitud_Id,
+      let info: modelSolicitudMateriaPrima = {
+        Solicitud_Id: datos_Sol.solicitud_Id,
         Usua_Id: datos_Sol.usua_Id,
         Solicitud_Observacion: datos_Sol.solicitud_Observacion,
         Solicitud_Fecha: datos_Sol.solicitud_Fecha,
@@ -487,13 +507,13 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a cambiar el estado de las materias primas de la solicitud
-  cambiarEstadoMpSolicitud(solicitud_Id : number) {
-    let count : number = 0;
+  cambiarEstadoMpSolicitud(solicitud_Id: number) {
+    let count: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       this.dtSolicitudMp.GetMateriaPrimaSolicitud(solicitud_Id, this.materiasPrimasSeleccionadas[i].Id).subscribe(data => {
         for (let j = 0; j < data.length; j++) {
-          let info : modelDtSolcitudMP = {
-            DtSolicitud_Id : data[j].dtSolicitud_Id,
+          let info: modelDtSolcitudMP = {
+            DtSolicitud_Id: data[j].dtSolicitud_Id,
             Solicitud_Id: data[j].solicitud_Id,
             MatPri_Id: data[j].matPri_Id,
             Tinta_Id: data[j].tinta_Id,
@@ -512,30 +532,30 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
-  GuardadoExitoso(){
+  GuardadoExitoso() {
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
     setTimeout(() => this.limpiarTodo(), 3000);
   }
 
   //Buscar informacion de la orden de compra creada
-  buscarinfoOrdenCompra(orden : number){
+  buscarinfoOrdenCompra(orden: number) {
     this.onReject();
     this.cargando = true;
     setTimeout(() => {
       this.ordenCreada = orden;
       this.dtOrdenCompraService.GetOrdenCompra(orden).subscribe(datos_orden => {
         for (let i = 0; i < datos_orden.length; i++) {
-          let info : any = {
-            Id : 0,
+          let info: any = {
+            Id: 0,
             Id_Mp: datos_orden[i].mP_Id,
             Id_Tinta: datos_orden[i].tinta_Id,
             Id_Bopp: datos_orden[i].bopp_Id,
-            Nombre : '',
-            Cantidad : this.formatonumeros(datos_orden[i].cantidad),
-            Medida : datos_orden[i].unidad_Medida,
-            Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-            SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+            Nombre: '',
+            Cantidad: this.formatonumeros(datos_orden[i].cantidad),
+            Medida: datos_orden[i].unidad_Medida,
+            Precio: `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
+            SubTotal: `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
           }
           if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -548,18 +568,18 @@ export class OcompraComponent implements OnInit {
             info.Nombre = datos_orden[i].bopp;
           }
           this.informacionPDF.push(info);
-          this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+          this.informacionPDF.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
         }
         this.crearPDF();
       }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`));
     }, 100);
   }
 
-  crearPDF(){
+  crearPDF() {
     this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-        let titulo : string = `Orden de Compra N° ${datos_orden[i].consecutivo}`;
-        let content : any [] = this.contenidoPDF(datos_orden[i]);
+        let titulo: string = `Orden de Compra N° ${datos_orden[i].consecutivo}`;
+        let content: any[] = this.contenidoPDF(datos_orden[i]);
         this.creacionPDFService.formatoPDF(titulo, content);
         setTimeout(() => this.cargando = false, 3000);
         break;
@@ -567,8 +587,8 @@ export class OcompraComponent implements OnInit {
     }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo obtener información de la orden de compra N° ${this.ordenCreada}!`));
   }
 
-  contenidoPDF(datos_orden){
-    let data : any [] = [];
+  contenidoPDF(datos_orden) {
+    let data: any[] = [];
     data.push(this.informacionProveedorPDF());
     data.push(this.datosProveedorPDF(datos_orden));
     data.push(this.informacionMateriaPrimaPDF());
@@ -578,7 +598,7 @@ export class OcompraComponent implements OnInit {
     return data;
   }
 
-  informacionProveedorPDF(){
+  informacionProveedorPDF() {
     return {
       text: `\n Información detallada del Proveedor \n \n`,
       alignment: 'center',
@@ -587,23 +607,23 @@ export class OcompraComponent implements OnInit {
     };
   }
 
-  datosProveedorPDF(datos_orden){
+  datosProveedorPDF(datos_orden) {
     return {
       table: {
         widths: ['50%', '20%', '30%'],
         body: [
           [
-            {text: `Nombre: ${datos_orden.proveedor}`},
-            {text: `ID: ${datos_orden.proveedor_Id}`},
-            {text: `Tipo de ID: ${datos_orden.tipo_Id}`},
+            { text: `Nombre: ${datos_orden.proveedor}` },
+            { text: `ID: ${datos_orden.proveedor_Id}` },
+            { text: `Tipo de ID: ${datos_orden.tipo_Id}` },
           ],
           [
-            {text: `Telefono: ${datos_orden.telefono_Proveedor}`},
-            {text: `Ciudad: ${datos_orden.ciudad_Proveedor}`},
-            {text: `Tipo de Proveedor: ${datos_orden.tipo_Proveedor}`}
+            { text: `Telefono: ${datos_orden.telefono_Proveedor}` },
+            { text: `Ciudad: ${datos_orden.ciudad_Proveedor}` },
+            { text: `Tipo de Proveedor: ${datos_orden.tipo_Proveedor}` }
           ],
           [
-            {text:`E-mail: ${datos_orden.correo_Proveedor}`},
+            { text: `E-mail: ${datos_orden.correo_Proveedor}` },
             {},
             {}
           ]
@@ -614,7 +634,7 @@ export class OcompraComponent implements OnInit {
     }
   }
 
-  informacionMateriaPrimaPDF(){
+  informacionMateriaPrimaPDF() {
     return {
       text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
       alignment: 'center',
@@ -622,7 +642,7 @@ export class OcompraComponent implements OnInit {
     }
   }
 
-  datosMateriasPrimasPDF(){
+  datosMateriasPrimasPDF() {
     return this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Precio', 'SubTotal'])
   }
 
@@ -644,12 +664,12 @@ export class OcompraComponent implements OnInit {
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
-  buildTableBody(data : any, columns : any) {
+  buildTableBody(data: any, columns: any) {
     var body = [];
     body.push(columns);
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach(function(column) {
+      columns.forEach(function (column) {
         dataRow.push(row[column].toString());
       });
       body.push(dataRow);
@@ -657,7 +677,24 @@ export class OcompraComponent implements OnInit {
     return body;
   }
 
-  totalesPDF(datos_orden){
+  calcularConceptosAutomaticosPDF(data : any): any {
+    let baseGlobal: number = data.base;
+    let base: boolean = data.valor_Total >= baseGlobal;
+    let iva : number = ((data.valor_Total * data.iva) / 100);
+    let baseIVA: boolean = iva >= baseGlobal;
+    let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
+    let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
+    let reteICA: number = base ? (data.valor_Total * data.reteIca) / 100 : 0;
+    return {
+      ReteFuente: reteFuente,
+      ReteIVA: reteIVA,
+      ReteICA: reteICA,
+      ValorFinal: data.valor_Total + reteFuente + reteIVA + reteICA + iva,
+    }
+  }
+
+  totalesPDF(datos_orden) {
+    let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
     return {
       table: {
         widths: ['45%', '10%', '10%', '10%', '10%', '15%'],
@@ -665,27 +702,51 @@ export class OcompraComponent implements OnInit {
         body: [
           [
             '',
-            {border: [true, false, true, true], text: `Peso Total`},
-            {border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`},
+            { border: [true, false, true, true], text: `Peso Total` },
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}` },
             '',
-            {border: [true, false, true, true], text: `Subtotal`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`},
+            { border: [true, false, true, true], text: `Subtotal` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}` },
           ],
           [
             '',
             '',
             '',
             '',
-            {border: [true, false, true, true], text: `IVA ${datos_orden.iva}%`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`},
+            { border: [true, false, true, true], text: `IVA ${datos_orden.iva}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}` },
           ],
           [
             '',
             '',
             '',
             '',
-            {border: [true, false, true, true], text: `Valor Total`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total + ((datos_orden.valor_Total * datos_orden.iva) / 100)).toFixed(2))}`},
+            { border: [true, false, true, true], text: `RTE Fuente ${datos_orden.reteFuente}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE IVA ${datos_orden.reteIva}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE ICA ${datos_orden.reteIca}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `Valor Total` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}` },
           ],
         ]
       },
@@ -694,7 +755,7 @@ export class OcompraComponent implements OnInit {
     }
   }
 
-  observacionPDF(datos_orden){
+  observacionPDF(datos_orden) {
     return {
       margin: [0, 20],
       table: {
@@ -709,10 +770,10 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Actualizar Precio de la materia prima al momento de crear la OC*/
-  actualizarPrecioMatPrimas(){
+  actualizarPrecioMatPrimas() {
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if(this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && this.materiasPrimasSeleccionadas[index].Id_Bopp == 1) {
-        this.materiaPrimaService.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataMatPrimas =>{
+      if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && this.materiasPrimasSeleccionadas[index].Id_Bopp == 1) {
+        this.materiaPrimaService.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataMatPrimas => {
           this.cargarDatosMatPrima(this.materiasPrimasSeleccionadas[index], dataMatPrimas);
         });
       }
@@ -720,88 +781,88 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Función que cargará los datos de las materias primas para luego actualizarlas. */
-  cargarDatosMatPrima(datosArray : any, data : any){
-    const info : any = {
-      MatPri_Id : data.matPri_Id,
-      MatPri_Nombre : data.matPri_Nombre,
-      MatPri_Descripcion :data.matPri_Descripcion,
+  cargarDatosMatPrima(datosArray: any, data: any) {
+    const info: any = {
+      MatPri_Id: data.matPri_Id,
+      MatPri_Nombre: data.matPri_Nombre,
+      MatPri_Descripcion: data.matPri_Descripcion,
       MatPri_Stock: data.matPri_Stock,
       UndMed_Id: data.undMed_Id,
       CatMP_Id: data.catMP_Id,
       MatPri_Precio: datosArray.Precio,
       TpBod_Id: data.tpBod_Id,
-      MatPri_Fecha:data.matPri_Fecha,
+      MatPri_Fecha: data.matPri_Fecha,
       MatPri_Hora: data.matPri_Hora,
     }
     this.materiaPrimaService.srvActualizar(info.MatPri_Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, 'No fue posible actualizar el precio de las materias primas'));
   }
 
   /** Actualizar Precio de la materia prima al momento de crear la OC */
-  actualizarPrecioTintas(){
+  actualizarPrecioTintas() {
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if(this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001 && this.materiasPrimasSeleccionadas[index].Id_Tinta > 2001)
-      this.servicioTintas.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataTintas =>{
-         this.cargarDatosTintas(this.materiasPrimasSeleccionadas[index], dataTintas);
-      });
+      if (this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001 && this.materiasPrimasSeleccionadas[index].Id_Tinta > 2001)
+        this.servicioTintas.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataTintas => {
+          this.cargarDatosTintas(this.materiasPrimasSeleccionadas[index], dataTintas);
+        });
     }
   }
 
   /** Función que cargará los datos de las materias primas para luego actualizarlas. */
-  cargarDatosTintas(datosArray : any, data : any){
-    const info : any = {
-      Tinta_Id : data.tinta_Id,
-      Tinta_Nombre : data.tinta_Nombre,
-      Tinta_Descripcion : data.tinta_Descripcion,
-      Tinta_Stock : data.tinta_Stock,
-      Tinta_CodigoHexadecimal : data.tinta_CodigoHexadecimal,
-      UndMed_Id : data.undMed_Id,
-      CatMP_Id : data.catMP_Id,
-      Tinta_Precio : datosArray.Precio,
-      TpBod_Id : data.tpBod_Id,
-      Tinta_InvInicial : data.tinta_InvInicial,
-      Tinta_FechaIngreso : data.tinta_FechaIngreso,
-      Tinta_Hora : data.tinta_Hora,
+  cargarDatosTintas(datosArray: any, data: any) {
+    const info: any = {
+      Tinta_Id: data.tinta_Id,
+      Tinta_Nombre: data.tinta_Nombre,
+      Tinta_Descripcion: data.tinta_Descripcion,
+      Tinta_Stock: data.tinta_Stock,
+      Tinta_CodigoHexadecimal: data.tinta_CodigoHexadecimal,
+      UndMed_Id: data.undMed_Id,
+      CatMP_Id: data.catMP_Id,
+      Tinta_Precio: datosArray.Precio,
+      TpBod_Id: data.tpBod_Id,
+      Tinta_InvInicial: data.tinta_InvInicial,
+      Tinta_FechaIngreso: data.tinta_FechaIngreso,
+      Tinta_Hora: data.tinta_Hora,
     }
     this.servicioTintas.srvActualizar(info.Tinta_Id, info).subscribe(null, () => this.mensajeService.mensajeError(`Error`, 'No fue posible actualizar el precio de las tintas'));
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
-  eliminarMateriaPrima(data : any){
+  eliminarMateriaPrima(data: any) {
     data = this.mpSeleccionada;
     this.dtOrdenCompraService.GetMateriaPrimaOrdenCompa(this.FormOrdenCompra.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
-          this.onReject();
-          for (let i = 0; i < datos_orden.length; i++) {
-            this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(() => {
-              this.quitarMateriaPrima(data);
-              this.llave = 'pdf';
-              this.mensajeService.mensajeAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima ${data.Nombre} de la orden de compra!`);
-            }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`));
-          }
+        this.onReject();
+        for (let i = 0; i < datos_orden.length; i++) {
+          this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(() => {
+            this.quitarMateriaPrima(data);
+            this.llave = 'pdf';
+            this.mensajeService.mensajeAdvertencia('Advertencia', `Se ha eliminado definitivamente la materia prima ${data.Nombre} de la orden de compra!`);
+          }, () => this.mensajeService.mensajeError(`Error`, `¡No se pudo eliminar la materia prima de la orden de compra!`));
+        }
       } else this.quitarMateriaPrima(data);
     });
   }
 
   // Funcion que editará la informacion general de la orden de compra
-  editarOrdenCompra(){
+  editarOrdenCompra() {
     if (this.FormOrdenCompra.valid) {
       if (this.materiasPrimasSeleccionadas.length > 0) {
         this.cargando = false;
-        let observacion : string = this.FormOrdenCompra.value.Observacion;
+        let observacion: string = this.FormOrdenCompra.value.Observacion;
         if (observacion == null) observacion = '';
         this.ordenCompraService.getId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden).subscribe(datos_Orden => {
-          let info : any = {
-            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
-            Usua_Id : datos_Orden.usua_Id,
-            Oc_Fecha : datos_Orden.oc_Fecha,
-            Oc_Hora : datos_Orden.oc_Hora,
-            Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
-            Estado_Id : datos_Orden.estado_Id,
-            Oc_ValorTotal : this.calcularCostoMateriaPrima(),
-            Oc_PesoTotal : this.calcularCantMateriaPrima(),
-            TpDoc_Id : 'OCMP',
-            Oc_Observacion : (observacion).toUpperCase(),
-            IVA : this.iva,
+          let info: any = {
+            Oc_Id: this.FormOrdenCompra.value.ConsecutivoOrden,
+            Usua_Id: datos_Orden.usua_Id,
+            Oc_Fecha: datos_Orden.oc_Fecha,
+            Oc_Hora: datos_Orden.oc_Hora,
+            Prov_Id: this.FormOrdenCompra.value.Id_Proveedor,
+            Estado_Id: datos_Orden.estado_Id,
+            Oc_ValorTotal: this.calcularCostoMateriaPrima(),
+            Oc_PesoTotal: this.calcularCantMateriaPrima(),
+            TpDoc_Id: 'OCMP',
+            Oc_Observacion: (observacion).toUpperCase(),
+            IVA: this.iva,
           }
           this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(() => this.editarDtOrdenCompa(), () => {
@@ -814,19 +875,19 @@ export class OcompraComponent implements OnInit {
   }
 
   // Funcion que va a editar los detalles de la orden de compra
-  editarDtOrdenCompa(){
-    let count : number = 0;
+  editarDtOrdenCompa() {
+    let count: number = 0;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       this.dtOrdenCompraService.GetMateriaPrimaOrdenCompa(this.FormOrdenCompra.value.ConsecutivoOrden, this.materiasPrimasSeleccionadas[i].Id).subscribe(datos_orden => {
         if (datos_orden.length == 0) {
-          let info : any = {
-            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
-            MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
-            Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
-            BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
-            Doc_CantidadPedida : this.materiasPrimasSeleccionadas[i].Cantidad,
-            UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
-            Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
+          let info: any = {
+            Oc_Id: this.FormOrdenCompra.value.ConsecutivoOrden,
+            MatPri_Id: this.materiasPrimasSeleccionadas[i].Id_Mp,
+            Tinta_Id: this.materiasPrimasSeleccionadas[i].Id_Tinta,
+            BOPP_Id: this.materiasPrimasSeleccionadas[i].Id_Bopp,
+            Doc_CantidadPedida: this.materiasPrimasSeleccionadas[i].Cantidad,
+            UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
+            Doc_PrecioUnitario: this.materiasPrimasSeleccionadas[i].Precio,
           }
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(() => {
             count++;
@@ -840,15 +901,15 @@ export class OcompraComponent implements OnInit {
             error = true;
           });
         } else {
-          let info : any = {
+          let info: any = {
             Doc_Codigo: datos_orden[0],
-            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
-            MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
-            Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
-            BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
-            Doc_CantidadPedida : this.materiasPrimasSeleccionadas[i].Cantidad,
-            UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
-            Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
+            Oc_Id: this.FormOrdenCompra.value.ConsecutivoOrden,
+            MatPri_Id: this.materiasPrimasSeleccionadas[i].Id_Mp,
+            Tinta_Id: this.materiasPrimasSeleccionadas[i].Id_Tinta,
+            BOPP_Id: this.materiasPrimasSeleccionadas[i].Id_Bopp,
+            Doc_CantidadPedida: this.materiasPrimasSeleccionadas[i].Cantidad,
+            UndMed_Id: this.materiasPrimasSeleccionadas[i].Und_Medida,
+            Doc_PrecioUnitario: this.materiasPrimasSeleccionadas[i].Precio,
           }
           this.dtOrdenCompraService.putId_DtOrdenCompra(datos_orden[0], info).subscribe(() => {
             count++;
@@ -867,18 +928,18 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
-  mostrarEleccion(item : any, modo : string){
+  mostrarEleccion(item: any, modo: string) {
     this.llave = modo;
     setTimeout(() => {
-      if(this.llave == 'quitar') {
+      if (this.llave == 'quitar') {
         this.mpSeleccionada = item;
-        this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la orden de compra?`, sticky: true});
+        this.messageService.add({ severity: 'warn', key: this.llave, summary: 'Elección', detail: `Está seguro que desea quitar la materia prima de la orden de compra?`, sticky: true });
       }
-      if(this.llave == 'eliminar') {
+      if (this.llave == 'eliminar') {
         this.mpSeleccionada = item;
-        this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea eliminar definitivamente la materia prima de la orden de compra?, recuerda que se quitará también de la base de datos!`, sticky: true});
+        this.messageService.add({ severity: 'warn', key: this.llave, summary: 'Elección', detail: `Está seguro que desea eliminar definitivamente la materia prima de la orden de compra?, recuerda que se quitará también de la base de datos!`, sticky: true });
       }
-      if(this.llave == 'pdf') this.messageService.add({severity:'success', key: this.llave, summary:'Elección', detail: `¡Se ha creado la orden de compra exitosamente!, ¿Deseas ver el detalle en pdf?`, sticky: true});
+      if (this.llave == 'pdf') this.messageService.add({ severity: 'success', key: this.llave, summary: 'Elección', detail: `¡Se ha creado la orden de compra exitosamente!, ¿Deseas ver el detalle en pdf?`, sticky: true });
     }, 200);
   }
 

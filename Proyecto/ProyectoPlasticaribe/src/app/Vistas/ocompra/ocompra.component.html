@@ -40,7 +40,7 @@
       <div class="row g-4">
 
         <!-- Consecutivo de la orden de compra -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="ConsecutivoOrden" id="orden" type="text" pInputText required/>
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Código de solicitus -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="solicitud">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-2 col-xxl-2" id="solicitud">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Solicitud" id="Solicitud" type="number" (keyup.enter)="consultarSolicitudMP()" pInputText/>
@@ -58,19 +58,40 @@
         </div>
 
         <!-- Proveedor -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3 col-xxl-3">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-5 col-xxl-5">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
             <input formControlName="Proveedor" id="Proveedores" autocomplete="off" list="Proveedor" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" required/>
             <datalist id="Proveedor">
-              <option value={{item.prov_Id}} *ngFor="let item of proveedores">{{item.prov_Nombre}}</option>
+              <option value={{item.prov.prov_Id}} *ngFor="let item of proveedores">{{item.prov.prov_Nombre}}</option>
             </datalist>
             <label for="Proveedores">Proveedor</label>
           </span>
         </div>
+        
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2 col-xl-1 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ReteIVA" inputId="ReteIVA" prefix="%" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="ReteIVA">RTE IVA</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2 col-xl-1 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ReteICA" inputId="ReteICA" prefix="%" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="ReteICA">RTE ICA</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2 col-xl-1 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ReteFuente" inputId="ReteFuente" prefix="%" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="ReteFuente">RTE Fuente</label>
+          </span>
+        </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-12 col-xl-5 col-xxl-5">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-12 col-xxl-12">
           <span class="p-float-label">
             <textarea formControlName="Observacion" [rows]="1" maxlength="200" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
@@ -184,6 +205,9 @@
             <th scope="col">Precio Unitario</th>
             <th scope="col">Subtotal</th>
             <th scope="col">IVA {{iva}}%</th>
+            <th scope="col">RTE Fuente</th>
+            <th scope="col">RTE IVA</th>
+            <th scope="col">RTE ICA</th>
             <th scope="col">Valor Total</th>
             <th scope="col">Acción</th>
           </tr>
@@ -216,9 +240,12 @@
             </td>
 
             <!-- <td>{{materiasPrimas.Precio | currency : 'COP $'}}</td> -->
-            <td>{{materiasPrimas.SubTotal | currency : 'COP $'}}</td>
-            <td>{{((materiasPrimas.SubTotal * iva) / 100) | currency : 'COP $'}}</td>
-            <td>{{((materiasPrimas.SubTotal * iva) / 100) + (materiasPrimas.SubTotal) | currency : 'COP $'}}</td>
+            <td>{{materiasPrimas.SubTotal | currency : '$'}}</td>
+            <td>{{((materiasPrimas.SubTotal * iva) / 100) | currency : '$'}}</td>
+            <td>{{calcularConceptosAutomaticos(materiasPrimas.SubTotal).ReteFuente | currency : '$'}}</td>
+            <td>{{calcularConceptosAutomaticos(materiasPrimas.SubTotal).ReteIVA | currency : '$'}}</td>
+            <td>{{calcularConceptosAutomaticos(materiasPrimas.SubTotal).ReteICA | currency : '$'}}</td>
+            <td>{{calcularConceptosAutomaticos(materiasPrimas.SubTotal).ValorFinal | currency : '$'}}</td>
             <td id="quitarMp" class="text-center">
               <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
               <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
@@ -231,9 +258,12 @@
             <td>{{calcularCantMateriaPrima() | number : '1.2-2'}}</td>
             <td>Kg</td>
             <td></td>
-            <td class="text-left">{{calcularCostoMateriaPrima() | currency : 'COP $'}}</td>
-            <td class="text-left">{{calcularIVAMateriaPrima() | currency : 'COP $'}}</td>
-            <td colspan="2" class="text-left">{{calcularCostoTotalMateriaPrima() | currency : 'COP $'}}</td>
+            <td class="text-left">{{calcularCostoMateriaPrima() | currency : '$'}}</td>
+            <td class="text-left">{{calcularIVAMateriaPrima() | currency : '$'}}</td>
+            <td class="text-left">{{calcularConceptosAutomaticos(calcularCostoMateriaPrima()).ReteFuente | currency : '$'}}</td>
+            <td class="text-left">{{calcularConceptosAutomaticos(calcularCostoMateriaPrima()).ReteIVA | currency : '$'}}</td>
+            <td class="text-left">{{calcularConceptosAutomaticos(calcularCostoMateriaPrima()).ReteICA | currency : '$'}}</td>
+            <td colspan="2" class="text-left">{{calcularConceptosAutomaticos(calcularCostoMateriaPrima()).ValorFinal | currency : '$'}}</td>
           </tr>
         </ng-template>
       </p-table>

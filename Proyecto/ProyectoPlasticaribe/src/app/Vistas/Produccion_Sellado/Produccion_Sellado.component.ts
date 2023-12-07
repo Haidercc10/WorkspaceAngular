@@ -187,11 +187,11 @@ export class Produccion_SelladoComponent implements OnInit {
     this.guardarRegistroEntrada(entrada);
   }
 
-  validarPrecio(datosOrden : any) : number{
-    let precio : number = 0;
-    let maquina : number = this.formSellado.value.maquina;
-    let proceso : string = this.formSellado.value.proceso;
-    let turno : string = this.formSellado.value.turno;
+  validarPrecio(datosOrden: any): number {
+    let precio: number = 0;
+    let maquina: number = this.formSellado.value.maquina;
+    let proceso: string = this.formSellado.value.proceso;
+    let turno: string = this.formSellado.value.turno;
 
     if (proceso == 'SELLA') {
       if (maquina == 50) {

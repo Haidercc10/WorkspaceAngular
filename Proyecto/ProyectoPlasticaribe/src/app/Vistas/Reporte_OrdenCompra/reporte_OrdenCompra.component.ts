@@ -266,7 +266,24 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     return body;
   }
 
-  totalesPDF(datos_orden){
+  calcularConceptosAutomaticosPDF(data : any): any {
+    let baseGlobal: number = data.base;
+    let base: boolean = data.valor_Total >= baseGlobal;
+    let iva : number = ((data.valor_Total * data.iva) / 100);
+    let baseIVA: boolean = iva >= baseGlobal;
+    let reteFuente: number = base ? (data.valor_Total * data.reteFuente) / 100 : 0;
+    let reteIVA: number = baseIVA ? (((data.valor_Total * data.iva) / 100) * data.reteIva) / 100 : 0;
+    let reteICA: number = base ? (data.valor_Total * data.reteIca) / 100 : 0;
+    return {
+      ReteFuente: reteFuente,
+      ReteIVA: reteIVA,
+      ReteICA: reteICA,
+      ValorFinal: data.valor_Total + reteFuente + reteIVA + reteICA + iva,
+    }
+  }
+
+  totalesPDF(datos_orden) {
+    let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
     return {
       table: {
         widths: ['45%', '10%', '10%', '10%', '10%', '15%'],
@@ -274,27 +291,51 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         body: [
           [
             '',
-            {border: [true, false, true, true], text: `Peso Total`},
-            {border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`},
+            { border: [true, false, true, true], text: `Peso Total` },
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}` },
             '',
-            {border: [true, false, true, true], text: `Subtotal`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`},
+            { border: [true, false, true, true], text: `Subtotal` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}` },
           ],
           [
             '',
             '',
             '',
             '',
-            {border: [true, false, true, true], text: `IVA ${datos_orden.iva}%`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`},
+            { border: [true, false, true, true], text: `IVA ${datos_orden.iva}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}` },
           ],
           [
             '',
             '',
             '',
             '',
-            {border: [true, false, true, true], text: `Valor Total`},
-            {border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total + ((datos_orden.valor_Total * datos_orden.iva) / 100)).toFixed(2))}`},
+            { border: [true, false, true, true], text: `RTE Fuente ${datos_orden.reteFuente}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE IVA ${datos_orden.reteIva}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `RTE ICA ${datos_orden.reteIca}%` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}` },
+          ],
+          [
+            '',
+            '',
+            '',
+            '',
+            { border: [true, false, true, true], text: `Valor Total` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}` },
           ],
         ]
       },
