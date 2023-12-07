@@ -30,3 +30,20 @@
 .optionsMails span i {
     margin: 10px 0;
 }
+
+::-webkit-scrollbar {
+    width: 2px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #d83543ae;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #f43e4d;
+    width: 10px;
+  }

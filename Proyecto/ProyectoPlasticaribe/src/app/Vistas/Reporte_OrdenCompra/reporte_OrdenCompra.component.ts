@@ -144,7 +144,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             Cantidad : this.formatonumeros(datos_orden[i].cantidad),
             Medida : datos_orden[i].unidad_Medida,
             Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
-            SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+            SubTotal : `$${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
           }
           if (info.Id_Mp != 84) {
             info.Id = info.Id_Mp;
@@ -240,7 +240,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: ['10%', '45%', '10%', '10%', '10%', '15%'],
+        widths: ['10%', '45%', '10%', '8%', '12%', '15%'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
@@ -286,16 +286,16 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
     return {
       table: {
-        widths: ['45%', '10%', '10%', '10%', '10%', '15%'],
+        widths: ['45%', '10%', '10%', '8%', '12%', '15%'],
         style: 'header',
         body: [
           [
             '',
             { border: [true, false, true, true], text: `Peso Total` },
-            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}` },
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`, alignment: 'right'},
             '',
             { border: [true, false, true, true], text: `Subtotal` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -303,7 +303,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `IVA ${datos_orden.iva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -311,7 +311,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE Fuente ${datos_orden.reteFuente}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -319,7 +319,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE IVA ${datos_orden.reteIva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -327,7 +327,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE ICA ${datos_orden.reteIca}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -335,7 +335,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `Valor Total` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right'},
           ],
         ]
       },
@@ -377,6 +377,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             Proveedor : datos_orden[i].proveedor,
             Id_Proveedor : datos_orden[i].proveedor_Id,
             Observacion : datos_orden[i].observacion,
+            ReteIVA: datos_orden[i].reteIva,
+            ReteICA: datos_orden[i].reteIca,
+            ReteFuente: datos_orden[i].reteFuente,
+            Base: datos_orden[i].base,
           });
           break;
         }

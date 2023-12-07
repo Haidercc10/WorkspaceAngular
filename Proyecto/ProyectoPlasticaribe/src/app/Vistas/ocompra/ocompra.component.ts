@@ -698,16 +698,16 @@ export class OcompraComponent implements OnInit {
     let conceptosAutomaticos = this.calcularConceptosAutomaticosPDF(datos_orden);
     return {
       table: {
-        widths: ['45%', '10%', '10%', '10%', '10%', '15%'],
+        widths: ['45%', '10%', '10%', '8%', '12%', '15%'],
         style: 'header',
         body: [
           [
             '',
             { border: [true, false, true, true], text: `Peso Total` },
-            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}` },
+            { border: [false, false, true, true], text: `${this.formatonumeros((datos_orden.peso_Total).toFixed(2))}`, alignment: 'right'},
             '',
             { border: [true, false, true, true], text: `Subtotal` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((datos_orden.valor_Total).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -715,7 +715,7 @@ export class OcompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `IVA ${datos_orden.iva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_orden.valor_Total * datos_orden.iva) / 100).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -723,7 +723,7 @@ export class OcompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE Fuente ${datos_orden.reteFuente}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteFuente).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -731,7 +731,7 @@ export class OcompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE IVA ${datos_orden.reteIva}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteIVA).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -739,7 +739,7 @@ export class OcompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `RTE ICA ${datos_orden.reteIca}%` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ReteICA).toFixed(2))}`, alignment: 'right'},
           ],
           [
             '',
@@ -747,7 +747,7 @@ export class OcompraComponent implements OnInit {
             '',
             '',
             { border: [true, false, true, true], text: `Valor Total` },
-            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}` },
+            { border: [false, false, true, true], text: `$${this.formatonumeros((conceptosAutomaticos.ValorFinal).toFixed(2))}`, alignment: 'right'},
           ],
         ]
       },
