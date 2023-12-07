@@ -27,6 +27,7 @@
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <button pButton pRipple id="crearProveedor" class="p-button-danger" label="Crear Proveedor" icon="pi pi-user-plus" (click)="LlamarModalCrearProveedor()"></button>
     <button pButton pRipple id="crearMatPrima" class="p-button-danger" label="Crear Materia Prima" icon="pi pi-check-circle" (click)="LlamarModalCrearMateriaPrima()"></button>
+    <button pButton pRipple id="crearConcepto" class="p-button-danger" label="Crear Concepto" icon="pi pi-user-plus" (click)="modalConcepts = true"></button>
   </div>
 
   <!-- Informacion de la orden de compra -->
@@ -325,6 +326,13 @@
   <p-dialog [(visible)]="ModalCrearTintas" [contentStyle]="{'overflow':'visible'}" [style]="{width: '70vw'}" [resizable]="true" header="Crear Tintas / Solventes / Chips" [modal]="true" >
     <ng-template pTemplate="content">
       <app-crear-tintas></app-crear-tintas>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal Para Crear Conceptos -->
+  <p-dialog [(visible)]="modalConcepts" [contentStyle]="{'overflow':'visible'}" [style]="{width: '50vw'}" [resizable]="true" header="Crear conceptos automáticos" [modal]="true" >
+    <ng-template pTemplate="content">
+      <app-Crear_Conceptos></app-Crear_Conceptos>
     </ng-template>
   </p-dialog>
 

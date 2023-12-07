@@ -1,0 +1,42 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+<br>
+<form [formGroup]="formConcepts">
+  <!-- Inicio Fila 1 Agregar Proveedor -->
+  <div class="mb-3">
+    <div class="row g-4">
+
+      <!-- ID Proveedor -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-8 col-xxl-8">
+        <span class="p-float-label">
+          <input formControlName="Concept" id="Concept" type="text" pInputText required/>
+          <label for="Concept">Concepto</label>
+        </span>
+      </div>
+
+      <!-- Nombre Proveedor -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-inputNumber formControlName="Base" id="Base" [maxFractionDigits]="2" [required]></p-inputNumber>
+          <label for="Base">Base</label>
+        </span>
+      </div>
+
+      <!-- Tipo de Identificacion Proveedor -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-inputNumber formControlName="Percentage" id="Percentage" prefix="%" [maxFractionDigits]="2" [required]></p-inputNumber>
+          <label for="Percentage">Porcentaje</label>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!--Inicio Fila 3 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="submit" label="Crear Concepto" icon="pi pi-check" (click)="createConcepts()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearLabels()"></button>
+    </div>
+  </div>
+</form>

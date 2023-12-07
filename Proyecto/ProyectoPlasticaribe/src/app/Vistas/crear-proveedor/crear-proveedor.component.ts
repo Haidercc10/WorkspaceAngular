@@ -5,6 +5,7 @@ import { Tipo_ProveedorService } from 'src/app/Servicios/TipoProveedor/tipo_Prov
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import moment from 'moment';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Conceptos_AutomaticosService } from 'src/app/Servicios/Conceptos_Automaticos/Conceptos_Automaticos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +22,16 @@ export class CrearProveedorComponent implements OnInit {
   public FormCrearProveedor !: FormGroup; /** Formulario para crear proveedores */
   tipoIdentificacion = []; /** Array para cargar los tipos de identificación */
   tiposProveedores = []; /** Array para cargar los proveedores */
+  conceptsRteIva = []; //Variable que cargará los conceptos de tipo reteiva
+  conceptsRteIca = []; //Variable que cargará los conceptos de tipo reteica
+  conceptsRteFuente = []; //Variable que cargará los conceptos de tipo retefuente
 
   constructor(private formBuilderCrearProveedor : FormBuilder,
                 private Crearproveerdor : ProveedorService,
                   private tipoIdentificacionService : TipoIdentificacionService,
                     private tipoProveedorService : Tipo_ProveedorService,
-                      private mensajeService : MensajesAplicacionService,) {
+                      private mensajeService : MensajesAplicacionService,
+                        private svcConcepts : Conceptos_AutomaticosService) {
 
     //Creación formulario crear proveedor en modal.
     this.FormCrearProveedor = this.formBuilderCrearProveedor.group({
@@ -37,6 +42,9 @@ export class CrearProveedorComponent implements OnInit {
       ProvCiudad: [''],
       ProvTelefono: [''],
       ProvEmail: [''],
+      ReteIva: [null],
+      ReteIca: [null],
+      ReteFuente: [null],
     });
    }
 
@@ -44,6 +52,7 @@ export class CrearProveedorComponent implements OnInit {
   ngOnInit(): void {
     this.tipoIdntificacion();
     this.tipoProveedor();
+    this.getConcepts();
   }
 
   /** Cargar tipos de identificación del proveedor nit/cedula */
@@ -83,11 +92,23 @@ export class CrearProveedorComponent implements OnInit {
       Prov_Email : email,
       Prov_Fecha : moment().format('YYYY-MM-DD'),
       Prov_Hora : moment().format('H:mm:ss'),
+      ReteFuente : this.FormCrearProveedor.value.ReteIva,
+      ReteICA : this.FormCrearProveedor.value.ReteIca,
+      ReteIVA : this.FormCrearProveedor.value.ReteFuente,
     }
 
     this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(() => {
       this.mensajeService.mensajeConfirmacion(`Proveedor Creado`, 'Proveedor creado con éxito!');
       setTimeout(() => { this.LimpiarCampos(); }, 500);
     }, () => this.mensajeService.mensajeError(`Error`, 'No fue posible crear el registro, por favor, verifique!'));
+  }
+
+  //Función que cargará todos los tipos de conceptos
+  getConcepts(){
+    this.svcConcepts.getAllConcepts().subscribe(data => {
+      this.conceptsRteIva = data.filter(x => x.concepto.includes('IVA'));
+      this.conceptsRteIca = data.filter(x => x.concepto.includes('ICA'));
+      this.conceptsRteFuente = data.filter(x => x.concepto.includes('FUENTE'));
+    });
   }
 }

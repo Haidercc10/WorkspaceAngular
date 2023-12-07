@@ -62,6 +62,7 @@ export class OcompraComponent implements OnInit {
   modoSeleccionado: boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   solicitud: boolean = false;
   iva: number = 19;
+  modalConcepts = false;
 
   constructor(private frmBuilder: FormBuilder,
     private AppComponent: AppComponent,

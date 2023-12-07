@@ -195,6 +195,7 @@ import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_P
 import { IngresoProduccion_DespachoComponent } from './Vistas/IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
 import { SalidaProduccion_DespachoComponent } from './Vistas/SalidaProduccion_Despacho/SalidaProduccion_Despacho.component';
 import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Movimientos_Despacho.component';
+import { Crear_ConceptosComponent } from './Vistas/Crear_Conceptos/Crear_Conceptos.component';
 
 @NgModule({
   declarations: [
@@ -312,7 +313,8 @@ import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Mov
     Correos_PaginaWebComponent,
     IngresoProduccion_DespachoComponent,
     SalidaProduccion_DespachoComponent,
-    Movimientos_DespachoComponent
+    Movimientos_DespachoComponent,
+    Crear_ConceptosComponent
   ],
 
   imports: [
