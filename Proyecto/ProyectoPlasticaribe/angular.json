@@ -19,7 +19,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/proyecto-plasticaribe",
+            "outputPath": "dist",
             "outputHashing": "all",
             "index": "src/index.html",
             "main": "src/main.ts",

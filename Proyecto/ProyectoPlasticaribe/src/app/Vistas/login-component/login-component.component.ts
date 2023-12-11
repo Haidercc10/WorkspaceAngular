@@ -111,7 +111,7 @@ export class LoginComponentComponent implements OnInit {
               this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));
               this.saveInLocal('Nombre', this.encriptacion.encrypt(nombre.toString()));
               this.saveInLocal('Rol', this.encriptacion.encrypt(rol.toString()));
-              window.location.pathname = '/home';
+              this.router.navigateByUrl('/home');
             }, () => {
               this.mensajeService.mensajeError(`¡Error!`, `¡Error al registrar el inicio de sesión!`);
               this.cargando = false;

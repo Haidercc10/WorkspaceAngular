@@ -157,12 +157,19 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   async buscarPuertos() {
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
-    this.chargeDataFromSerialPort(port);
+    try {
+      const port = await navigator.serial.requestPort();
+      const portInfo = port.getInfo();
+      await port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
+      else this.msj.mensajeError(ex);
+    }
   }
 
   async chargeDataFromSerialPort(port: any) {
+    console.log(port.readable.getReader())
     while (port.readable) {
       const reader = port.readable.getReader();
       try {

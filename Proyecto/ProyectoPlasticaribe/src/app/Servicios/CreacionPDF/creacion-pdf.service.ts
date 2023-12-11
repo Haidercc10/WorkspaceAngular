@@ -94,7 +94,7 @@ export class CreacionPdfService {
     }
 
     private crearPDF(pdfDefinicion){
-        pdfMake.createPdf(pdfDefinicion).open();
+        pdfMake.createPdf(pdfDefinicion).download();
     }
 
     /* ============================================================== CREATE TAG PRODUCTION ===================================================================== */
@@ -108,10 +108,9 @@ export class CreacionPdfService {
             footer: this.footerPDF(dataTag.productionProcess),
             content : this.contentPDF(dataTag),
         }
-        let windoeFeatures = `height=189,width=378`;
-        let win = window.open('', 'Print', windoeFeatures);
-        pdfMake.createPdf(pdfDefinition).print({}, win);
-        setTimeout(() => win.close(), 3000);
+        pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
+            window.electron.send('print-pdf', buffer);
+        });
     }
 
     private contentPDF(dataTag : modelTagProduction){

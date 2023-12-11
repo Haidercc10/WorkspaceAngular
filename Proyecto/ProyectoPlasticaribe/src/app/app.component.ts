@@ -113,10 +113,12 @@ export class AppComponent implements OnInit{
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
-    this.storage_Id = this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id'));
-    this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
-    this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
-    this.storage_Rol = this.ValidarRol;
+    setInterval(() => {
+      this.storage_Id = this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id'));
+      this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
+      this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
+      this.storage_Rol = this.ValidarRol;
+    }, 1000);
     let tamanoLetraCambiado = this.cookieService.get('tamanoLetraCambiado');
     if (tamanoLetraCambiado == '') this.cookieService.set('TamanoLetra', '0.90', { expires: 365, sameSite: 'Lax' });
     this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
