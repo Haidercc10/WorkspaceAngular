@@ -3,4 +3,5 @@ export interface modelConceptos_Automaticos {
     Concepto : string;
     Base : any;
     Porcentaje : number;
+    TpCcpto_Id : number;
   }

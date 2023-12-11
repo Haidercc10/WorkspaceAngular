@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { modelConceptos_Automaticos } from 'src/app/Modelo/modelConceptos_Automaticos';
 import { Conceptos_AutomaticosService } from 'src/app/Servicios/Conceptos_Automaticos/Conceptos_Automaticos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { Tipos_ConceptosService } from 'src/app/Servicios/Tipos_Conceptos/Tipos_Conceptos.service';
 
 @Component({
   selector: 'app-Crear_Conceptos',
@@ -11,13 +12,16 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 })
 export class Crear_ConceptosComponent implements OnInit {
   formConcepts !: FormGroup //Formulario para crear conceptos.
+  conceptTypes : any = []; //Tipos de conceptos.
 
   constructor(private svcConcepts : Conceptos_AutomaticosService, 
     private formBuilder : FormBuilder, 
-    private svcMsjs : MensajesAplicacionService) { }
+    private svcMsjs : MensajesAplicacionService, 
+    private svcConceptTypes : Tipos_ConceptosService) { }
 
   ngOnInit() {
     this.initForm();
+    this.getConceptTypes();
   }
 
   //Función que inicializará el formulario 
@@ -26,6 +30,7 @@ export class Crear_ConceptosComponent implements OnInit {
       Concept: ['', Validators.required],
       Base : [1145000, Validators.required],
       Percentage : [0, Validators.required],
+      conceptType : [1, Validators.required],
     });
   }  
     
@@ -35,7 +40,8 @@ export class Crear_ConceptosComponent implements OnInit {
       let data : modelConceptos_Automaticos = {
         Concepto: this.formConcepts.value.Concept,
         Base: this.formConcepts.value.Base,
-        Porcentaje: this.formConcepts.value.Percentage
+        Porcentaje: this.formConcepts.value.Percentage, 
+        TpCcpto_Id: this.formConcepts.value.conceptType,
       }
       this.svcConcepts.postConcepts(data).subscribe(res => {
         this.svcMsjs.mensajeConfirmacion(`Concepto creado correctamente!`);
@@ -46,4 +52,7 @@ export class Crear_ConceptosComponent implements OnInit {
 
   //Función para limpiar campos
   clearLabels = () => this.formConcepts.reset();
+
+  //Función que cargará los diferentes tipos de conceptos. 
+  getConceptTypes = () => this.svcConceptTypes.GetTiposConceptos().subscribe(res => this.conceptTypes = res);
 }

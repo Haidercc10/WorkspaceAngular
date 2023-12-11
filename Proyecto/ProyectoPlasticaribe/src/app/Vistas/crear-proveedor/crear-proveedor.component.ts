@@ -106,9 +106,9 @@ export class CrearProveedorComponent implements OnInit {
   //Función que cargará todos los tipos de conceptos
   getConcepts(){
     this.svcConcepts.getAllConcepts().subscribe(data => {
-      this.conceptsRteIva = data.filter(x => x.concepto.includes('IVA'));
-      this.conceptsRteIca = data.filter(x => x.concepto.includes('ICA'));
-      this.conceptsRteFuente = data.filter(x => x.concepto.includes('FUENTE'));
+      this.conceptsRteIva = data.filter(x => x.tpCcpto_Id == 3);
+      this.conceptsRteIca = data.filter(x => x.tpCcpto_Id == 4);
+      this.conceptsRteFuente = data.filter(x => x.tpCcpto_Id == 2);
     });
   }
 }

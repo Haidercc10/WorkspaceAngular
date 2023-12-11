@@ -38,6 +38,7 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
     this.loadYears();
   }
 
+  //Función que inicializa el formulario
   initForm() {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.form = this.formBuilder.group({
@@ -80,7 +81,6 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
 
   // Función que se encarga de cargar la estadistica de venta de los años seleccionados
   getStatictics(){
-    
     let years : any = this.form.value.year;
     let idClient : string = this.form.value.idClient;
     let idVendor : string = this.form.value.idVendor;
@@ -96,7 +96,11 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
     if(idVendor != null) url += `vendedor=${idVendor}`;
     if(idClient != null) url.length > 0 ? url += `&cliente=${idClient}` : url += `cliente=${idClient}`;
     if(url.length > 0) url = `?${url}`;
-    console.log(years);
+    if(years.length > 1) {
+      this.info = [];
+      this.infoTable = [];
+    } 
+
     for (let i = 0; i < years.length; i++) {
       this.svcZeus.getEstadisticaVentasAnio(years[i], url).subscribe(resp => {
         for (let index = 0; index < resp.length; index++) {
