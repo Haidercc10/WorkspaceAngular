@@ -1,0 +1,140 @@
+
+
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="fondo p-5">
+  <div class="mb-4">
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
+  </div>
+
+  <!--Formulario-->
+  <form [formGroup]="form" (ngSubmit)="getStatictics()">
+    <div class="row my-3 g-4">
+      <!-- Años -->
+      <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <p-multiSelect [options]="years" formControlName="year" placeholder="Seleccionar Años"></p-multiSelect>
+          <label for="year">Año</label>
+        </span>
+      </div>
+
+       <!-- Id Vendedor -->
+       <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <input formControlName="idVendor" id="idVendor" type="text" pInputText [readOnly]="true"/>
+          <label for="idVendor">Id Vendedor</label>
+        </span>
+      </div>
+
+      <!-- Vendedor -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="vendor" (change)="selectedVendor()" inputId="vendor" [autoDisplayFirst]="false" [options]="vendors" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <label for="vendor">Vendedores</label>
+        </span>
+      </div>
+
+       <!-- Id Cliente -->
+       <div class="col-sm-12 col-md-6 col-xl-2">
+        <span class="p-float-label">
+          <input formControlName="idClient" id="idClient" type="text" pInputText [readOnly]="true"/>
+          <label for="idClient">Id Cliente</label>
+        </span>
+      </div>
+
+      <!-- Cliente -->
+      <div class="col-sm-12 col-md-6 col-xl-3">
+        <span class="p-float-label">
+          <input formControlName="client" id="cli" list="client" type="text" pInputText (change)="selectedClient()" (keydown)="getClients()"/>
+          <datalist id="client">
+            <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+          </datalist>
+          <label for="cli">Clientes</label>
+        </span>       
+      </div>
+    </div>
+
+    <div class="my-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="submit" label="Buscar Ventas" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearLabels()"></button>
+      </div>
+    </div>
+  </form>
+  <hr>
+  <div class="mb-4">
+    <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultados de búsqueda</h2>
+  </div>
+
+  <div *ngIf="!load">
+    <p-table #dt
+             [value]="info"
+             sortField="Anio"
+             sortMode="single"
+             [scrollable]="true"
+             scrollHeight="900px"
+             rowGroupMode="subheader"
+             groupRowsBy="Anio"
+             [rowHover]="true"
+             columnResizeMode="expand"
+             responsiveLayout="scroll"
+             id="tabla">
+      <ng-template pTemplate="header">
+        <tr class="font-size-16" id="filtros">
+          <th></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Mes', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Facturado', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Devuelto', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Total', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'Iva', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'TotalMasIva', 'contains')"></th>
+        </tr>
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Mes</th>
+          <th class="text-center">Facturación</th>
+          <th class="text-center">Devoluciones</th>
+          <th class="text-center">Total</th>
+          <th class="text-center">Iva ventas</th>
+          <th class="text-center">Total + Iva</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="groupheader" let-statictic>
+        <tr pRowGroupHeader style="background-color: #83D3FF;">
+          <td colspan="7">
+            <span class="font-bold" style="color: black"><b>{{statictic.Anio}}</b></span>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-statictic let-rowIndex="rowIndex">
+        <tr class="font-size-15">
+          <td>{{rowIndex + 1}}</td>
+          <td class="text-center"><b>{{statictic.Mes}}</b></td>
+          <td class="text-center">{{statictic.Facturado | number : '1.2-2'}}</td>
+          <td class="text-center font-size-15" [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}">{{statictic.Devuelto | number : '1.2-2'}}</td>
+          <td class="text-center">{{statictic.Total | number : '1.2-2' }}</td>
+          <td class="text-center">{{statictic.Iva | number : '1.2-2'}}</td>
+          <td class="text-center"><b>{{statictic.TotalMasIva | number : '1.2-2'}}</b></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="groupfooter" let-statictic>
+        <tr class="font-bold" style="background-color: palegreen; color: black">
+          <td colspan="6" class="text-left font-bold pr-6"><b>{{'Total Año: ' + statictic.Anio}}</b></td>
+          <td class="text-center"><b>{{calculateTotalYear(statictic.Anio) | currency : 'COP $'}}</b></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="6">Totales</td>
+          <td class="text-center">{{calculateTotal() | currency : 'COP $'}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+

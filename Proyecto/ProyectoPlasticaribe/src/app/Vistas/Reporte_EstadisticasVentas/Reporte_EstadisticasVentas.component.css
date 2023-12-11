@@ -1,0 +1,4 @@
+::ng-deep .p-multiselect {
+    display: flex;
+    width: 100%;
+  }

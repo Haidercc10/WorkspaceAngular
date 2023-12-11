@@ -22,6 +22,7 @@ export class ReportesConsolidadosComponent implements OnInit {
   produccionDetallada : boolean = false;
   facturacionVendedores : boolean = false;
   facturacionItems : boolean = false;
+  estadisticasVentas  : boolean = false;
 
   constructor(private AppComponent : AppComponent,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -48,6 +49,7 @@ export class ReportesConsolidadosComponent implements OnInit {
     index == 5 ?  this.facturacionItems = true : this.facturacionItems = false;
     index == 6 ?  this.pedidos = true : this.pedidos = false;
     index == 7 ?  this.inventarioProductos = true : this.inventarioProductos = false;
+    index == 8 ?  this.estadisticasVentas = true : this.estadisticasVentas = false;
   }
 
 }

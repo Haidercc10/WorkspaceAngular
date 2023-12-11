@@ -178,6 +178,8 @@ export class InventarioZeusService {
 
   getNuevaDevolucionConsolidada = (fecha1 : any, fecha2 : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getNuevaDevolucionConsolidada/${fecha1}/${fecha2}${ruta}`);
 
+  getEstadisticaVentasAnio = (anio : any, ruta? : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getEstadisticaVentasAnio/${anio}${ruta}`);
+
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 
