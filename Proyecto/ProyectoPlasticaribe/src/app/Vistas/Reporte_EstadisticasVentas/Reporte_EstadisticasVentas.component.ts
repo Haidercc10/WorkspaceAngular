@@ -15,6 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class Reporte_EstadisticasVentasComponent implements OnInit {
   
+  @ViewChild('dt') dt : Table | undefined;
   form !: FormGroup;
   info : any = [];
   vendors : any = [];
@@ -23,7 +24,6 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
   load : boolean = false;
   years : any = [];
   infoTable : any = [];
-  @ViewChild('dt') dt : Table | undefined;
 
   constructor(private formBuilder : FormBuilder,
     private AppComponent : AppComponent, 
@@ -58,10 +58,8 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
   // Funcion que se encargará de colocar la información del vendedor seleccionado
   selectedVendor(){
     let vendor : any = this.form.value.vendor;
-    this.form.patchValue({
-      idVendor : vendor,
-      vendor : this.vendors.find(x => x.usua_Id == vendor).usua_Nombre  
-    });
+    this.form.patchValue({ idVendor : vendor, });
+    this.getClientsForVendor(vendor);
   }
 
   // Funcion que se encargará de buscar los clientes
@@ -108,14 +106,13 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
           this.changeStringsValues(response);
           this.info.push(response);
           this.infoTable.push(response);
-          setTimeout(() => { this.load = false; }, 500);
+          setTimeout(() => { this.load = false;}, 500);
         }
       }, error => { 
         this.load = false; 
         this.svcMsjs.mensajeError("No existen resultados de búsqueda!");
       });
     }
-   
   }
 
   //Función que se encarga de cambiar los valores string en decimales 
@@ -147,17 +144,24 @@ export class Reporte_EstadisticasVentasComponent implements OnInit {
   /** Función para filtrar la tabla. */
   applyFilter($event, campo : any, valorCampo : string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-      console.log(this.dt.filteredValue)
-      if(this.dt.filteredValue != null) this.info = this.dt.filteredValue;
-      if(this.dt.filteredValue == null) this.info = this.infoTable; 
-      this.calculateTotal();
-    }, 1000);
+    setTimeout(() => { if(this.dt.filteredValue) this.info = this.dt!.filteredValue; }, 500); 
+    if(!this.dt.filteredValue) this.info = this.infoTable;  
   }
 
   /** Función para calcular el total de la tabla. */
-  calculateTotal = () => this.info.reduce((a, b) => a + b.TotalMasIva, 0)
+  calculateTotal() {
+    return this.info.reduce((a, b) => a + b.TotalMasIva, 0);
+  } 
 
   /** Función para calcular el total por año. */
-  calculateTotalYear = (year : any) => this.info.filter(x => x.Anio == year).reduce((a, b) => a + b.TotalMasIva, 0)
+  calculateTotalYear = (year : any) => this.info.filter(x => x.Anio == year).reduce((a, b) => a + b.TotalMasIva, 0);
+
+  //Función que cargará los clientes del vendedor seleccionado.
+  getClientsForVendor(idVendor : any) {
+    if(idVendor.toString().length == 1) idVendor = `00${idVendor}`;
+    else if(idVendor.toString().length == 2) idVendor = `0${idVendor}`;
+
+    this.svcZeus.getClientesxVendedor(idVendor).subscribe(resp => this.clients = resp);
+  } 
+  
 }

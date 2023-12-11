@@ -33,7 +33,7 @@
       <!-- Vendedor -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="vendor" (change)="selectedVendor()" inputId="vendor" [autoDisplayFirst]="false" [options]="vendors" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+          <p-dropdown formControlName="vendor" (onChange)="selectedVendor()" inputId="vendor" [autoDisplayFirst]="false" [options]="vendors" optionValue="usua_Id" optionLabel="usua_Nombre" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
           <label for="vendor">Vendedores</label>
         </span>
       </div>
@@ -70,8 +70,9 @@
     <h2 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-list"></i> Resultados de búsqueda</h2>
   </div>
 
-  <div *ngIf="!load">
+  <div>
     <p-table #dt
+            *ngIf="!load"
              [value]="info"
              sortField="Anio"
              sortMode="single"
@@ -130,7 +131,7 @@
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="6">Totales</td>
-          <td class="text-center">{{calculateTotal() | currency : 'COP $'}}</td>
+          <td class="text-center"><b>{{calculateTotal() | currency : 'COP $'}}</b></td>
         </tr>
       </ng-template>
     </p-table>
