@@ -1,14 +1,17 @@
 {
-  "name": "proyecto-plasticaribe",
-  "version": "0.0.0",
+  "name": "plasticaribe",
+  "version": "1.0",
   "main": "main.js",
+  "icon": "/assets/Plascaribe_Icono.png",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "icon": "/assets/Plascaribe_Icono.png",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron": "ng build && electron ."
+    "electron": "ng build && electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "private": true,
   "dependencies": {
@@ -52,6 +55,7 @@
     "crypto-js": "^4.1.1",
     "datalist-css": "^1.0.0",
     "dom-to-image": "^2.6.0",
+    "electron-squirrel-startup": "^1.0.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.6.0",
@@ -94,6 +98,12 @@
     "@angular-devkit/build-angular": "^16.2.7",
     "@angular/cli": "^16.2.7",
     "@angular/compiler-cli": "~16.2.10",
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "@types/dom-to-image": "^2.6.6",
     "@types/jasmine": "~5.1.1",
     "@types/node": "^20.8.7",
@@ -108,6 +118,6 @@
     "typescript": "^4.9.3"
   },
   "description": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.0.",
-  "author": "",
+  "author": "Diego Fernández",
   "license": "ISC"
 }

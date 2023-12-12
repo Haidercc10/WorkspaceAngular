@@ -25,8 +25,8 @@ export class VistasPermisosGuard implements CanActivate {
     let Id_usuario = parseInt(this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')));
     let rol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
     this.vistaPermisosService.GetPermisos(rol,ruta).toPromise().then(() => {
-      return (['Pruebas', 'Vistas'].includes(ruta) && Id_usuario != 123456789) ? this.router.navigateByUrl('/') : true;
-    }).catch(() => this.router.navigateByUrl('/'));
+      return (['Pruebas', 'Vistas'].includes(ruta) && Id_usuario != 123456789) ? this.router.navigateByUrl('./') : true;
+    }).catch(() => this.router.navigateByUrl('./'));
     return true;
   }
 }

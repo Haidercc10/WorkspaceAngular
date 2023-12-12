@@ -1,5 +1,6 @@
 ﻿import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -27,7 +28,8 @@ export class AuthenticationService {
                     private authenticationInvZeusService : AuthenticationService_InvZeus,
                       private authenticationContaZeusService : authentication_ContaZeus,
                         private authenticationBagPro : authentication_BagPro,
-                          private encriptacion : EncriptacionService,) {
+                          private encriptacion : EncriptacionService,
+                            private router : Router,) {
 
     let token = this.encriptacion.decrypt(localStorage.getItem('user') == undefined ? '' : localStorage.getItem('user'));
     this.userSubject = new BehaviorSubject(JSON.parse(token == '' ? null : token!));
@@ -60,7 +62,7 @@ export class AuthenticationService {
       "MovApp_Nombre" : `Cierre de sesión`,
       "MovApp_Descripcion" : `El usuario "${Nombre}" con el ID ${id} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
       "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
-      "MovApp_Hora" : moment().format('H:mm:ss'),
+      "MovApp_Hora" : moment().format('HH:mm:ss'),
     }
     this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
       localStorage.clear();
@@ -69,12 +71,12 @@ export class AuthenticationService {
       this.authenticationInvZeusService.logout();
       this.authenticationContaZeusService.logout();
       this.authenticationBagPro.logout();
-      window.location.pathname = '/';
+      this.router.navigateByUrl('/');
     }, () => {
       localStorage.clear();
       this.storage.clear();
       this.userSubject.next(null);
-      window.location.pathname = '/';
+      this.router.navigateByUrl('/');
     });
   }
 }

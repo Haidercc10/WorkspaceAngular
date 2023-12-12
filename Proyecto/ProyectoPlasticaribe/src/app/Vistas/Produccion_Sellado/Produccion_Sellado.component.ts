@@ -260,9 +260,14 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que obtiene los puertos seriales
   async getPuertoSerial() {
-    const port = await navigator.serial.requestPort();
+    try {
+      const port = await navigator.serial.requestPort();
     await port.open({ baudRate: 9600 });
     this.cargarDatosPuertoSerial(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.svcMsjs.mensajeError('¡No hay dispositivos conectados!');
+      else this.svcMsjs.mensajeError(ex);
+    }
   }
 
   //Función que lee los datos del puerto serial

@@ -159,7 +159,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
   async buscarPuertos() {
     try {
       const port = await navigator.serial.requestPort();
-      const portInfo = port.getInfo();
       await port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(port);
     } catch (ex) {

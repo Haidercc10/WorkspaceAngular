@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron/main')
+const { app, BrowserWindow, ipcMain } = require('electron/main');
 const Os = require( 'os' );
 const fs = require('fs');
 const path = require('node:path')
@@ -68,7 +68,7 @@ function createWindow(){
         if (details.deviceType === 'serial' && details.origin === 'file://') return true;
     });
 
-    appWin.webContents.openDevTools();
+    // appWin.webContents.openDevTools();
 
     appWin.on("closed", () => appWin = null);
 
