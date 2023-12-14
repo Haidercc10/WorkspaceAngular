@@ -87,7 +87,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    setTimeout(() => this.chargeSerialPorts(), 1000);
+    setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -159,6 +159,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   async buscarPuertos() {
     try {
       const port = await navigator.serial.requestPort();
+      const portInfo = port.getInfo();
       await port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(port);
     } catch (ex) {
@@ -168,7 +169,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   async chargeDataFromSerialPort(port: any) {
-    console.log(port.readable.getReader())
     while (port.readable) {
       const reader = port.readable.getReader();
       try {
@@ -411,7 +411,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   guardarProduccion() {
     this.cargando = true;    
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
+      this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
       this.limpiarCampos();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
     }, () => {

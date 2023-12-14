@@ -53,7 +53,7 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getTurnos();
     this.getOperarios();
     this.cargarTurnoActual();
-    this.cargarPuertosSeriales();
+    this.getPuertoSerial();
   }
 
   //Función que inicializa los campos del formulario al cargar la vista
@@ -262,8 +262,8 @@ export class Produccion_SelladoComponent implements OnInit {
   async getPuertoSerial() {
     try {
       const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
-    this.cargarDatosPuertoSerial(port);
+      await port.open({ baudRate: 9600 });
+      this.cargarDatosPuertoSerial(port);
     } catch (ex) {
       if (ex.name === 'NotFoundError') this.svcMsjs.mensajeError('¡No hay dispositivos conectados!');
       else this.svcMsjs.mensajeError(ex);
