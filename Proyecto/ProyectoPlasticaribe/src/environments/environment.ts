@@ -7,13 +7,13 @@ export const environment = {
 
   //SERVIDOR
   // rutaPlasticaribeAPI : "http://192.168.0.85:9085/api",
-  rutaBagPro : "http://192.168.0.85:9095/api",
+  //rutaBagPro : "http://192.168.0.85:9095/api",
   //rutaZeus : "http://192.168.0.85:9055/api",
   rutaZeusContabilidad : "http://192.168.0.85:9065/api",
 
   // LOCALES 1
    rutaPlasticaribeAPI : "http://192.168.0.137:9085/api",
-  // rutaBagPro : "http://192.168.0.137:9095/api",
+   rutaBagPro : "http://192.168.0.137:9095/api",
    rutaZeus : "http://192.168.0.137:9055/api",
   // rutaZeusContabilidad : "http://192.168.0.137:9065/api"
 

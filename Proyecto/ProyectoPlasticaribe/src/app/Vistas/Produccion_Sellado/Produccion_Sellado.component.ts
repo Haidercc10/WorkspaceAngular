@@ -7,6 +7,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
@@ -44,7 +45,8 @@ export class Produccion_SelladoComponent implements OnInit {
     private svcBagPro: BagproService,
     private svcMsjs: MensajesAplicacionService,
     private svcProdProcesos: Produccion_ProcesosService,
-    private svcCrearPDF: CreacionPdfService,) {
+    private svcCrearPDF: CreacionPdfService,
+    private svcSedes : SedeClienteService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
   }
@@ -86,21 +88,24 @@ export class Produccion_SelladoComponent implements OnInit {
     this.produccion = [];
     this.cargarTurnoActual();
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
-      if (data.length > 0) {
-        this.cargando = true;
-        this.ordenConsultada = this.formSellado.value.ot;
-        this.ordenesTrabajo = data;
-        this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
-        this.formSellado.patchValue({ cantUnd: data[0].selladoCorte_CantBolsasBulto });
-        this.formSellado.get('saldo')?.enable();
-        setTimeout(() => this.calcularPesoTeorico(), 500);
-        this.claseCantidadRealizada(data[0]);
-        this.cargarProduccionSellado(this.formSellado.value.ot);
-      }
-    }, () => {
-      this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
-      this.limpiarCampos();
-    });
+      this.svcSedes.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(sede => {
+        if (data.length > 0) {
+          this.cargando = true;
+          this.ordenConsultada = this.formSellado.value.ot;
+          this.ordenesTrabajo = data;
+          this.ordenesTrabajo[0].nitCliente = sede[0].id_Cliente;
+          this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
+          this.formSellado.patchValue({ cantUnd: data[0].selladoCorte_CantBolsasBulto });
+          this.formSellado.get('saldo')?.enable();
+          setTimeout(() => this.calcularPesoTeorico(), 500);
+          this.claseCantidadRealizada(data[0]);
+          this.cargarProduccionSellado(this.formSellado.value.ot);
+        }
+      }, () => {
+        this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
+        this.limpiarCampos();
+      });
+    }) 
   }
 
   //Función que carga la producción de sellado para la OT consultada

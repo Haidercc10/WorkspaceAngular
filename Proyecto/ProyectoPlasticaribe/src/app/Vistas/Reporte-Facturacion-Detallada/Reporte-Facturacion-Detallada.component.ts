@@ -438,19 +438,21 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   //Funcion que retornará el contenido del PDF detallado por vendedor
   getFormatoPdfDetallado(){
-    this.onReject();
-    this.cargando = true;
-    let vendedores : any = [];
-    let titulo = `Facturación Detallada x Dia`;
-    this.infoPdf.forEach(inf => { 
-      if(vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
-        vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
-      }
-    });
-    setTimeout(() => { 
-      this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {}); 
-      this.cargando = false;
-    }, 1000); 
+    if(this.infoPdf.length > 0) {
+      this.onReject();
+      this.cargando = true;
+      let vendedores : any = [];
+      let titulo = `Facturación Detallada x Dia`;
+      this.infoPdf.forEach(inf => { 
+        if(vendedores.map(v => v.id).indexOf(inf.idVendedor) == -1) {
+          vendedores.push({ id : inf.idVendedor, nombre : inf.vendedor, clientes : [] });
+        }
+      });
+      setTimeout(() => { 
+        this.pdfService.formatoPDF(titulo, this.tablaVendedores(vendedores), {}); 
+        this.cargando = false;
+      }, 1000); 
+    }
   }
 
   //.Función que llenará la tabla con los vendedores, y los valores totales de ventas y devoluciones

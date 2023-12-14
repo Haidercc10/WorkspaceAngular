@@ -69,7 +69,7 @@
         <!--Cantidad Kg-->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2" ></p-inputNumber>
               <label for="cantKg">Cant. Kg</label>
           </span>
         </div>
@@ -248,7 +248,7 @@
     <ng-template pTemplate="footer">
       <tr id="totales">
         <td colspan="3" class="text-right">Totales</td>
-        <td class="text-center">{{calcularCantidad()}}</td>
+        <td class="text-center">{{calcularCantidad() | number}}</td>
         <td class="text-center">{{medida}}</td>
         <td class="text-center">{{calcularPeso() | number}}</td>
         <td class="text-center">{{'Kg'}}</td>
