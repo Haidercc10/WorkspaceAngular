@@ -228,7 +228,7 @@
             <ng-container *ngIf="data.operario1 != '0' && data.operario2 == '0' && data.operario3 == '0' && data.operario4 == '0'">
               <td>{{data.operario1}}</td>
             </ng-container>
-            <td class="text-center">{{data.cantidadUnd}}</td>
+            <td class="text-center">{{data.cantidadUnd | number : '1.2-2'}}</td>
             <td class="text-center">{{data.presentacion1}}</td>
             <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
             <td class="text-center">{{data.presentacion2}}</td>
@@ -248,9 +248,9 @@
     <ng-template pTemplate="footer">
       <tr id="totales">
         <td colspan="3" class="text-right">Totales</td>
-        <td class="text-center">{{calcularCantidad()}}</td>
+        <td class="text-center">{{calcularCantidad() | number : '1.2-2'}}</td>
         <td class="text-center">{{medida}}</td>
-        <td class="text-center">{{calcularPeso() | number}}</td>
+        <td class="text-center">{{calcularPeso() | number : '1.2-2'}}</td>
         <td class="text-center">{{'Kg'}}</td>
         <td colspan="2" class="text-center"></td>
       </tr>
