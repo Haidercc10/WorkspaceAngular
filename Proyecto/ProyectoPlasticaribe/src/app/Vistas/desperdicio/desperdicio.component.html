@@ -10,7 +10,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Desperdicio</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Desperdicio {{area.nombre != 'NO APLICA' ? area.nombre : ''}}</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -40,29 +40,10 @@
           </span>
         </div>
 
-        <!-- ID PRODUCTO -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="item">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="IdProducto" id="IdProducto" [useGrouping]="false" [readonly]="true"></p-inputNumber>
-            <label for="IdProducto">Item</label>
-          </span>
-        </div>-->
-
-        <!-- NOMBRE PRODUCTO -->
-        <!--<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="referencia">
-          <span class="p-float-label">
-            <input formControlName="Producto" id="Producto" type="text" pInputText readonly/>
-            <label for="Producto">Referencia</label>
-          </span>
-        </div>-->
-
         <!-- TIPO DE MATERIAL -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="material">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl" id="material">
           <span class="p-float-label">
-            <input formControlName="TipoMaterial" id="Nombre" list="materiales" type="text" pInputText (change)="buscarMaterial()" />
-            <datalist id="materiales">
-              <option value={{item.material_Id}} *ngFor="let item of materiales">{{item.material_Nombre}}</option>
-            </datalist>
+            <p-dropdown formControlName="IdTipoMaterial" (onChange)="buscarMaterial()" [options]="materiales" optionLabel="material_Nombre" optionValue="material_Id" [autoDisplayFirst]="false"></p-dropdown>
             <label for="Nombre">Material</label>
           </span>
         </div>
@@ -82,10 +63,7 @@
         <!-- MAQUINA -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="maquina">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Maquina" id="Maquina" list="Maquinas" [useGrouping]="false"></p-inputNumber> <!--(change)="buscarMaquina()"-->
-            <!--<datalist id="Maquinas">
-              <option value={{item.actv_Id}} *ngFor="let item of maquinas">{{item.actv_Nombre}}</option>
-            </datalist>-->
+            <p-inputNumber formControlName="Maquina" id="Maquina" list="Maquinas" [useGrouping]="false"></p-inputNumber>
             <label for="Maquina">Maquina</label>
           </span>
         </div>
@@ -120,22 +98,19 @@
           </span>
         </div>
 
-        <!-- FECHA ENTREGA -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2" id="fecha">
+        <!-- AREA -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl" id="area">
           <span class="p-float-label">
-            <p-calendar formControlName="Fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Entrega</label>
+            <p-dropdown formControlName="IdArea" (onChange)="buscarProceso()" id="Areas" [options]="procesos" optionLabel="proceso_Nombre" [readonly]="this.ValidarRol != 1" optionValue="proceso_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="Areas">Area</label>
           </span>
         </div>
 
-        <!-- AREA -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="area">
+         <!-- TURNO -->
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="turno">
           <span class="p-float-label">
-            <input formControlName="Area" id="Areas" list="Area"  type="text" pInputText (change)="buscarProceso()"/>
-            <datalist id="Area">
-              <option value={{item.proceso_Id}} *ngFor="let item of procesos">{{item.proceso_Nombre}}</option>
-            </datalist>
-            <label for="Areas">Area</label>
+            <p-dropdown formControlName="Turno" id="turno" [options]="turnos" optionLabel="turno_Id" [readonly]="true" optionValue="turno_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="turno">Turno</label>
           </span>
         </div>
 
@@ -155,13 +130,13 @@
       #dtOT
       *ngIf="!cargando" 
       styleClass="p-datatable-gridlines"
-      [value]="ordenesTrabajo">
+      [value]="ordenesTrabajo"
+      [rowHover]="true">
        <ng-template pTemplate="header">
            <tr>
              <th style="font-weight: 800;" class="text-center" colspan="3">Información General</th>
              <th style="font-weight: 800;" class="text-center" colspan="3">Desperdicio</th>
-             <th style="font-weight: 800;" class="text-center" colspan="2">Extrusión</th>
-             <th style="font-weight: 800;" class="text-center" colspan="3">Ancho</th>
+             <th style="font-weight: 800;" class="text-center" colspan="6">Extrusión</th>
            </tr>
            <tr>
                <th style="font-weight: 600;" class="text-center">Cliente</th>
@@ -175,6 +150,7 @@
                <th style="font-weight: 600;" class="text-center">Ancho 1</th>
                <th style="font-weight: 600;" class="text-center">Ancho 2</th>
                <th style="font-weight: 600;" class="text-center">Ancho 3</th>
+               <th style="font-weight: 600;" class="text-center">Medida</th>
            </tr>
        </ng-template>
        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -184,12 +160,13 @@
                <td class="text-center">{{ data.Producto }}</td>
                <td class="text-center"><b>{{ calcularPeso() | number : '1.2-2' }}</b></td>
                <td class="text-center">{{ data.Unidad }}</td>
-               <td class="text-center font-size-15" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">{{ ((calcularPeso() / data.CantKg) * 100) | number : '1.2-2'}} %</td>
+               <td class="text-center font-size-15" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><b>{{ ((calcularPeso() / data.CantKg) * 100) | number : '1.2-2'}} %</b></td>
                <td class="text-center">{{ data.TipoMaterial }}</td>
                <td class="text-center">{{ data.Calibre | number : '1.2-2' }}</td>
                <td class="text-center">{{ data.Ancho1 | number : '1.2-2' }}</td>
                <td class="text-center">{{ data.Ancho2 | number : '1.2-2' }}</td>
                <td class="text-center">{{ data.Ancho3 | number : '1.2-2' }}</td>
+               <td class="text-center">{{ data.Unidad_Extrusion }}</td>
            </tr>
        </ng-template>
       </p-table>
@@ -198,7 +175,7 @@
     <!-- BOTONES -->
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="agregar" type="button" label="Añadir Desperdicio" icon="pi pi-send" (click)="generarDesperdicio()"></button>
+        <button pButton class="p-button-danger" id="agregar" type="button" label="Añadir Desperdicio" [disabled]="ordenesTrabajo.length == 0" icon="pi pi-send" (click)="generarDesperdicio()"></button>
         <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         <button pButton class="p-button-success" id="bascula" type="button" label="Conectar Bascula" icon="pi pi-power-off" (click)="getPuertoSerial()"></button>
       </div>
@@ -209,55 +186,6 @@
   <div class="mb-4">
     <hr class="colorLinea">
   </div>
-
-  <!-- TABLA DE RETIRO -->
-  <!--<div class="row g-3">
-    <div class="table-responsive" id="tabla">
-      <p-table
-        #dt
-        [resizableColumns]="true"
-        columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="20"
-        [rowHover]="true"
-        [value]="grupoDespercios"
-        [scrollable]="true"
-        scrollHeight="50rem">
-        <ng-template pTemplate="header">
-          <tr>
-            <th scope="col">OT</th>
-            <th scope="col">Item</th>
-            <th scope="col">Maquina</th>
-            <th scope="col">Material</th>
-            <th scope="col">Operario</th>
-            <th scope="col">Area</th>
-            <th scope="col">No Conformidad</th>
-            <th scope="col">Cantidad Kg</th>
-            <th scope="col">Impreso</th>
-            <th scope="col">Observacion</th>
-            <th scope="col"></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-desperdicio>
-          <tr>
-            <td>{{desperdicio.Ot}}</td>
-            <td>{{desperdicio.Item}}</td>
-            <td>{{desperdicio.Maquina}}</td>
-            <td>{{desperdicio.Material}}</td>
-            <td>{{desperdicio.Operario}}</td>
-            <td>{{desperdicio.Area}}</td>
-            <td>{{desperdicio.NoConformidad}}</td>
-            <td>{{desperdicio.Cantidad}}</td>
-            <td>{{desperdicio.Impreso}}</td>
-            <td>{{desperdicio.Observacion}}</td>
-            <td id="quitar"><i class="pi pi-trash cursor" title="Quitar Desperdicio" (click)="mostrarEleccion(desperdicio)"></i></td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>-->
 
    <!--Desperdicio Actual-->
   <div class="mb-4">
@@ -272,7 +200,7 @@
         #dt2
         [resizableColumns]="true"
         columnResizeMode="expand"
-        styleClass="p-datatable-gridlines p-datatable-sm"
+        styleClass="p-datatable-sm"
         responsiveLayout="scroll"
         [paginator]="true"
         [rows]="20"
@@ -281,6 +209,7 @@
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
+          
           <tr>
             <th class="text-center" scope="col">#</th>
             <th class="text-center" scope="col">Rollo</th>
@@ -294,7 +223,6 @@
             <th class="text-center" scope="col">Hora</th>
             <th class="text-center" scope="col">Proceso</th>
             <th class="text-center" scope="col">Observacion</th>
-            <th class="text-center" scope="col">Ver PDF</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-desperdicio let-rowIndex="rowIndex">
@@ -302,28 +230,32 @@
             <td class="text-center">{{rowIndex + 1}}</td>
             <td class="text-center">{{desperdicio.rollo}}</td>
             <td class="text-center">{{desperdicio.maquina}}</td>
-            <td class="text-center">{{desperdicio.material}}</td>
+            <td class="text-center"><b>{{desperdicio.material}}</b></td>
             <td class="text-center">{{desperdicio.operario}}</td>
             <td class="text-center">{{desperdicio.noConformidad}}</td>
             <td class="text-center"><b>{{desperdicio.peso | number : '1.2-2' }}</b></td>
             <td class="text-center">{{desperdicio.impreso}}</td>
             <td class="text-center">{{desperdicio.fecha | date : 'yyyy-MM-dd' }}</td>
             <td class="text-center">{{desperdicio.hora}}</td>
-            <td class="text-center">{{desperdicio.proceso == 'DESP_CORTADORES' ? 'CORTE' : desperdicio.proceso.replace('DESP_', '')}}</td>
+            <td class="text-center"><b>{{desperdicio.proceso == 'DESP_CORTADORES' ? 'CORTE' : desperdicio.proceso.replace('DESP_', '')}}</b></td>
             <td class="text-center">{{desperdicio.observacion}}</td>
-            <td class="text-center" id="mostrarPdf">
-              <p-button icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-danger" [style]="{width: '30px', height: '30px'}" [rounded]="true" severity="danger"></p-button>
-            </td>
           </tr>
         </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="12"><h6 class="bold">No existen registros de Desperdicio.</h6></td>
+          </tr>
+        </ng-template>  
+        <ng-template pTemplate="footer">
+          <tr id="totales">
+            <td colspan="6" class="text-right">Totales</td>
+            <td class="text-center">{{desperdicios.length > 0 ? calcularPeso() : 0 | number : '1.2-2'}} Kg</td>
+            <td colspan="5" class="text-center"></td>
+          </tr>
+        </ng-template>  
       </p-table>
     </div>
   </div>
-
-  <!--<div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button pButton class="p-button-danger" id="crear" type="button" label="Crear Desperdicio" icon="pi pi-check" (click)="crearDesperdicio()"></button>
-    <button pButton class="p-button-secondary" id="limpiarTodo" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
-  </div>-->
 </p-card>
 
 <p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">

@@ -73,3 +73,11 @@ p-calendar ::ng-deep span button span {
 :ng-deep .p-button.p-button-icon-only.p-button-rounded {
   height: 1.8rem;
 }
+
+.bold {
+  font-weight: 800;
+ }
+
+ ::ng-deep h6 {
+  margin-top: 0.5rem;
+}
