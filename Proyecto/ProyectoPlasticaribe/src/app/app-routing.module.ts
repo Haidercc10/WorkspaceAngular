@@ -141,6 +141,7 @@ export const routes: Routes = [
   {path: 'ingreso-despacho', loadChildren: () => import('./Modules/ingreso-produccion-despacho/ingreso-produccion-despacho.module').then(m => m.IngresoProduccionDespachoModule)},
   {path: 'despacho-mercancia', loadChildren: () => import('./Modules/salida-produccion-despacho/salida-produccion-despacho.module').then(m => m.SalidaProduccionDespachoModule)},
   {path: 'orden-facturacion', loadChildren: () => import('./Modules/orden-facturacion/orden-facturacion.module').then(m => m.OrdenFacturacionModule)},
+  {path: 'movimientos-orden-facturacion', loadChildren: () => import('./Modules/movimientos-orden-facturacion/movimientos-orden-facturacion.module').then(m => m.MovimientosOrdenFacturacionModule)},
  
 ]
 

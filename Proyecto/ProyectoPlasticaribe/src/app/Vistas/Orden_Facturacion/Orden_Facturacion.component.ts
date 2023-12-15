@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
@@ -17,6 +17,10 @@ import { AppComponent } from 'src/app/app.component';
   selector: 'app-Orden_Facturacion',
   templateUrl: './Orden_Facturacion.component.html',
   styleUrls: ['./Orden_Facturacion.component.css']
+})
+
+@Injectable({
+  providedIn: 'root'
 })
 
 export class Orden_FacturacionComponent implements OnInit {

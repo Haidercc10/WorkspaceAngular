@@ -13,8 +13,10 @@ export class Dt_OrdenFacturacionService {
 
     constructor(private http: HttpClient) { }
 
-    GetInformacionOrderFact = (id : number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFact/${id}`);
+    GetInformacionOrderFact = (id: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFact/${id}`);
 
-    Post = (data : modelDt_OrdenFacturacion) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion`, data);
+    GetOrders = (startDate: any, endsDate, ruote: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getOrders/${startDate}/${endsDate}${ruote}`);
+
+    Post = (data: modelDt_OrdenFacturacion) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion`, data);
 
 }

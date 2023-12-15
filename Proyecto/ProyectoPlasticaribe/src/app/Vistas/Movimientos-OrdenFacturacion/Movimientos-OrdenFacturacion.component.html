@@ -1,0 +1,114 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Movimientos de Ordenes de Facturación</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+  </div>
+
+  <form [formGroup]="formFilters" (ngSubmit)="searchData()">
+    <div class="row g-3 my-4 justify-content-md-center">
+
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-input-icon-left p-float-label">
+          <i class="pi pi-search"></i>
+          <input formControlName="orderFact" id="orden" type="text" pInputText required/>
+          <label for="orden">Orden de Compra</label>
+        </span>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-float-label">
+          <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+          <label for="FechaInicial">Fecha Inicial</label>
+        </span>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-float-label">
+          <p-calendar formControlName="endDate" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+          <label for="FechaFinal">Fecha Final</label>
+        </span>
+      </div>
+
+    </div>
+
+    <div class="mb-3" *ngIf="!load">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
+        <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser"></button>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-list"></i> Registros consultados</h4>
+  </div>
+
+  <p-table
+    #dt
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+    [rowHover]="true"
+    [value]="serchedData"
+    dataKey="Oc"
+    [scrollable]="true"
+    scrollHeight="50rem">
+    <ng-template pTemplate="header">
+      <tr>
+        <th scope="col">
+          <p-sortIcon field="or.factura"></p-sortIcon> Código
+          <p-columnFilter type="text" field="or.factura" display="menu"></p-columnFilter>
+        </th>
+        <th scope="col">
+          <p-sortIcon field="or.cli_Id"></p-sortIcon> Id Cliente
+          <p-columnFilter type="text" field="or.cli_Id" display="menu"></p-columnFilter>
+        </th>
+        <th scope="col">
+          <p-sortIcon field="clientes.cli_Nombre"></p-sortIcon> Cliente
+          <p-columnFilter type="text" field="clientes.cli_Nombre" display="menu"></p-columnFilter>
+        </th>
+        <th scope="col">
+          <p-sortIcon field="or.fecha"></p-sortIcon> Fecha
+          <p-columnFilter type="text" field="or.fecha" display="menu"></p-columnFilter>
+        </th>
+        <th id="ver3">Ver</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data>
+      <tr>
+        <td>{{data.or.factura}}</td>
+        <td>{{data.or.cli_Id}}</td>
+        <td>{{data.clientes.cli_Nombre}}</td>
+        <td>{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
+        <td class="text-center">
+          <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</p-card>
