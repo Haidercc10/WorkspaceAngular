@@ -16,6 +16,8 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { defaultStepOptions, stepsDesperdicio as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -46,6 +48,8 @@ export class DesperdicioComponent implements OnInit {
   areas : any [] = [];
   areaOperarios : any; 
   ordenesTrabajo : any = [];
+  hora: any = moment().format('HH:mm:ss');
+  turnos : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -59,17 +63,20 @@ export class DesperdicioComponent implements OnInit {
                                 private messageService: MessageService,
                                   private shepherdService: ShepherdService,
                                     private mensajeService : MensajesAplicacionService,
-                                      private svcAreas : AreaService) {
+                                      private svcAreas : AreaService, 
+                                        private svcTurnos : TurnosService, 
+                                          private svcCrearPDF : CreacionPdfService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+    this.inicializarFormulario();
+  }
+
+  inicializarFormulario() {
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
-      IdMaquina : [null,],
       Maquina : [null, Validators.required],
       IdOperario : [null, Validators.required],
       Operario : [null, Validators.required],
-      IdProducto : [null],
-      Producto : [null],
       IdTipoMaterial : [null, Validators.required],
       TipoMaterial : [null, Validators.required],
       Impreso : [null, Validators.required],
@@ -79,12 +86,13 @@ export class DesperdicioComponent implements OnInit {
       Observacion : [null],
       IdArea : [null, Validators.required],
       Area : [null, Validators.required],
-      Fecha : [null, ],
+      Turno : [null, Validators.required],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.getTurnos();
     this.obtenerAreas();
     this.obtenerFallas();
     this.obtenerMaquinas();
@@ -108,12 +116,14 @@ export class DesperdicioComponent implements OnInit {
     else if (this.ValidarRol == 79) this.area = { id :"CORTE", nombre : "Corte", };
     else if (this.ValidarRol == 80) this.area = { id :"EMP", nombre : "Empaque", };
     else if (this.ValidarRol == 81) this.area = { id :"SELLA", nombre : "Sellado", };
-    else if (this.ValidarRol == 81) this.area = { id :"WIKE", nombre : "Wiketiado", };
+    else if (this.ValidarRol == 82) this.area = { id :"WIKE", nombre : "Wiketiado", };  
     else this.area = { id : "N/A", nombre : "NO APLICA" };
+    
     this.FormDesperdicio.patchValue({ IdArea : this.area.id, Area : this.area.nombre.toUpperCase(), });
 
     if(this.area.nombre.toUpperCase() == "NO APLICA") this.areaOperarios = [];
     else this.areaOperarios = this.areas.filter(x => x.area_Nombre == this.area.nombre.toUpperCase());
+    this.cargarTurnoActual();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -141,6 +151,7 @@ export class DesperdicioComponent implements OnInit {
     this.FormDesperdicio.reset();
     this.desperdicios = [];
     this.ordenesTrabajo = [];
+    this.filtrarArea();
   }
 
   // Funcion que va a limpiar todo
@@ -149,7 +160,10 @@ export class DesperdicioComponent implements OnInit {
     this.FormDesperdicio.reset();
     this.desperdicios = [];
     this.ordenesTrabajo = [];
+    this.filtrarArea();
   }
+
+  getTurnos = () => this.svcTurnos.srvObtenerLista().subscribe(data => this.turnos = data);
 
   // Funcion que va a consultar los operarios
   obtenerOperarios() {
@@ -159,7 +173,7 @@ export class DesperdicioComponent implements OnInit {
   } 
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
-  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos);
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6].includes(x.proceso_Codigo)));
 
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
@@ -207,7 +221,7 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que va a consultar el id del area y en su lugar colocará el nombre del area o proceso
   buscarProceso(){
-    let proceso : any = this.FormDesperdicio.value.Area;
+    let proceso : any = this.FormDesperdicio.value.IdArea;
     let nuevo : any [] =  this.procesos.filter((item) => item.proceso_Id == proceso);
     this.FormDesperdicio.patchValue({
       IdArea : nuevo[0].proceso_Id,
@@ -217,7 +231,7 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
   buscarMaterial(){
-    let material : any = this.FormDesperdicio.value.TipoMaterial;
+    let material : any = this.FormDesperdicio.value.IdTipoMaterial;
     let nuevo : any [] =  this.materiales.filter((item) => item.material_Id == material);
     this.FormDesperdicio.patchValue({
       IdTipoMaterial : nuevo[0].material_Id,
@@ -229,12 +243,14 @@ export class DesperdicioComponent implements OnInit {
   consultarOrdenTrabajo(){
     this.cargando = true;
     this.ordenesTrabajo = [];
+    this.desperdicios = [];
     let orden : any = this.FormDesperdicio.value.OTDesperdicio;
     this.bagProService.srvObtenerListaClienteOT_Item(orden).subscribe(datos_orden => {
       if (datos_orden.length == 0) {
         this.cargando = false;
         this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡No se encontró la OT N° ${orden}!`);
       } else {
+        this.cargarTurnoActual();
         for (let i = 0; i < datos_orden.length; i++) {
           this.getOT(datos_orden[i]);
           this.getOTDesperdicio(orden.toString());
@@ -264,6 +280,7 @@ export class DesperdicioComponent implements OnInit {
       'Ancho1' : parseFloat(datos_orden.extAcho1),
       'Ancho2' : parseFloat(datos_orden.extAcho2),
       'Ancho3' : parseFloat(datos_orden.extAcho3),
+      'Unidad_Extrusion' : datos_orden.extUnidadesNom.trim(),
       'Impreso' : imp,
       'CantKg' : datos_orden.datoscantKg,
       }
@@ -294,6 +311,7 @@ export class DesperdicioComponent implements OnInit {
   calcularPeso() {  
     let area : any = this.area.nombre.toUpperCase();
     if(area == "NO APLICA") area = ``;
+    if(area == "EMPAQUE" || area == "CORTE") area = `CORTADORES`;
     return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => a + b.peso, 0);
   } 
 
@@ -546,27 +564,28 @@ export class DesperdicioComponent implements OnInit {
     else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
     else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);
     else if(this.FormDesperdicio.value.IdArea == "N/A") this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
-    else if(moment(this.FormDesperdicio.value.Fecha).format('YYYY-MM-DD') > this.today) this.mensajeService.mensajeAdvertencia(`La fecha ingresada no es válida!`);
     else {
+      this.cargarTurnoActual();
       this.cargando = true;
       let info : any = {
         'Desp_OT' : this.FormDesperdicio.value.OTDesperdicio,
         'Prod_Id' : this.ordenesTrabajo[0].IdProducto,
         'Material_Id' : this.FormDesperdicio.value.IdTipoMaterial,
-        'Actv_Id' : this.FormDesperdicio.value.Maquina,
+        'Maquina' : this.FormDesperdicio.value.Maquina,
         'Usua_Operario' : this.FormDesperdicio.value.IdOperario,
         'Desp_Impresion' : this.FormDesperdicio.value.Impreso,
         'Falla_Id' : this.FormDesperdicio.value.IdTipoNoConformidad,
-        'Desp_PesoKg' : this.FormDesperdicio.value.CantidadKg,
-        'Desp_Fecha' : moment(this.FormDesperdicio.value.Fecha).format('YYYY-MM-DD'),
+        'Desp_PesoKg' : parseFloat(this.FormDesperdicio.value.CantidadKg),
+        'Desp_Fecha' : this.today,
         'Desp_Observacion' : this.FormDesperdicio.value.Observacion == null ? '' : this.FormDesperdicio.value.Observacion,
         'Usua_Id' : this.storage_Id,
         'Desp_FechaRegistro' : this.today,
         'Desp_HoraRegistro' : moment().format('H:mm:ss'),
         'Proceso_Id' : this.FormDesperdicio.value.IdArea,
+        'Turno_Id' : this.FormDesperdicio.value.Turno,
       }
-      this.deperdicioService.Insert(info).subscribe(() => {
-        this.mensajeService.mensajeConfirmacion(`Desperdicio creado exitosamente!`);
+      this.deperdicioService.Insert(info).subscribe(data => {
+        this.mensajeService.mensajeConfirmacion(`Desperdicio guardado exitosamente!`);
         this.limpiarTodo();
       }), () => {
         this.mensajeService.mensajeError(`Error`, `No se pudo ingresar el desperdicio, verifique!`);
@@ -577,7 +596,6 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que carga los puertos seriales
   cargarPuertosSeriales() {
-    console.log(1)
     navigator.serial.getPorts().then(ports => {
       ports.forEach(port => {
         port.open({ baudRate: 9600 }).then(async () => this.cargarDatosPuertoSerial(port), error => this.mensajeService.mensajeError(`${error}`));
@@ -619,4 +637,50 @@ export class DesperdicioComponent implements OnInit {
   
   //Función que convierte un buffer a un valor
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
+
+  //Función que carga el turno actual.
+  cargarTurnoActual() {
+    let horaInicioDia: any = '07:00:00';
+    let horaFinDia: any = '18:00:00';
+    let horaInicioNoche: any = '18:00:01';
+    let horaFinNoche: any = '06:59:59';
+    console.log(this.hora > horaInicioDia)
+    if (this.hora >= horaInicioDia && this.hora < horaFinDia) {
+      console.log(1)
+      if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RD' });
+      else this.FormDesperdicio.patchValue({ Turno: 'DIA' });
+    } else if (this.hora >= horaInicioNoche && this.hora < horaFinNoche) {
+      console.log(2)
+      if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RN' });
+      else this.FormDesperdicio.patchValue({ Turno: 'NOCHE' });
+    } 
+    console.log(this.FormDesperdicio.value.Turno)
+  }
+  
+  generarEtiqueta(){
+  }
+
+  //Función que crea el pdf de la etiqueta
+  crearEtiqueta(rollo: any, cantKg: number, proceso : any) {
+    let etiqueta: modelTagProduction = {
+      client: this.ordenesTrabajo[0].Cliente,
+      item: this.ordenesTrabajo[0].IdProducto,
+      reference: this.ordenesTrabajo[0].Producto,
+      width: this.ordenesTrabajo[0].Ancho1,
+      height: this.ordenesTrabajo[0].Ancho2,
+      bellows: this.ordenesTrabajo[0].Ancho3,
+      und: this.ordenesTrabajo[0].Unidad,
+      cal: this.ordenesTrabajo[0].Calibre,
+      orderProduction: this.ordenesTrabajo[0].OTDesperdicio,
+      material: this.ordenesTrabajo[0].Material,
+      quantity: cantKg,
+      quantity2: cantKg,
+      reel: rollo,
+      presentationItem1: 'Kg',
+      presentationItem2: 'Kg',
+      productionProcess: proceso,
+      showNameBussiness: true,
+    }
+    this.svcCrearPDF.createTagProduction(etiqueta);
+  }
 }

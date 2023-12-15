@@ -37,6 +37,10 @@ export class Produccion_SelladoComponent implements OnInit {
   cantActual: number = 0; //Guardará la cantidad pesada de unidades/paquetes/kilos del bulto del item de la ot consultada
   pesoActual: number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada  
   medida: string = '';
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -52,10 +56,18 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.getTurnos();
     this.getOperarios();
     this.cargarTurnoActual();
     this.cargarPuertosSeriales();
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Función que inicializa los campos del formulario al cargar la vista
