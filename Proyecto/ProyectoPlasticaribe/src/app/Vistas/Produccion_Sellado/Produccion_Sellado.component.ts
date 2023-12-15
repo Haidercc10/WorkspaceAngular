@@ -20,6 +20,7 @@ import { AppComponent } from 'src/app/app.component';
 export class Produccion_SelladoComponent implements OnInit {
 
   cargando: boolean = false; //Variable de carga 
+  ValidarRol: number;
   modoSeleccionado: boolean = false; //Variable de modo de seleccion
   formSellado !: FormGroup; //Formulario de sellado
   turnos: any[] = []; //array que contiene los diferentes turnos
@@ -56,6 +57,11 @@ export class Produccion_SelladoComponent implements OnInit {
     this.getOperarios();
     this.cargarTurnoActual();
     this.getPuertoSerial();
+    this.lecturaStorage();
+  }
+
+  lecturaStorage() {
+    this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
   //Función que inicializa los campos del formulario al cargar la vista
