@@ -197,6 +197,7 @@ import { SalidaProduccion_DespachoComponent } from './Vistas/SalidaProduccion_De
 import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Movimientos_Despacho.component';
 import { Crear_ConceptosComponent } from './Vistas/Crear_Conceptos/Crear_Conceptos.component';
 import { Reporte_EstadisticasVentasComponent } from './Vistas/Reporte_EstadisticasVentas/Reporte_EstadisticasVentas.component';
+import { Orden_FacturacionComponent } from './Vistas/Orden_Facturacion/Orden_Facturacion.component';
 
 @NgModule({
   declarations: [
@@ -316,7 +317,8 @@ import { Reporte_EstadisticasVentasComponent } from './Vistas/Reporte_Estadistic
     SalidaProduccion_DespachoComponent,
     Movimientos_DespachoComponent,
     Crear_ConceptosComponent, 
-    Reporte_EstadisticasVentasComponent
+    Reporte_EstadisticasVentasComponent,
+    Orden_FacturacionComponent
   ],
 
   imports: [

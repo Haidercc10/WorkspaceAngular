@@ -140,6 +140,7 @@ export const routes: Routes = [
   {path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule)},
   {path: 'ingreso-despacho', loadChildren: () => import('./Modules/ingreso-produccion-despacho/ingreso-produccion-despacho.module').then(m => m.IngresoProduccionDespachoModule)},
   {path: 'despacho-mercancia', loadChildren: () => import('./Modules/salida-produccion-despacho/salida-produccion-despacho.module').then(m => m.SalidaProduccionDespachoModule)},
+  {path: 'orden-facturacion', loadChildren: () => import('./Modules/orden-facturacion/orden-facturacion.module').then(m => m.OrdenFacturacionModule)},
  
 ]
 

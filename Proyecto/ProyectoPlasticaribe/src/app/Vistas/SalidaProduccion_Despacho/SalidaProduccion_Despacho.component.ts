@@ -134,11 +134,13 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         Prod_CantidadUnidades: prod.pp.cantidad,
       }
       this.dtAsgProdFacturaService.srvGuardar(data).subscribe(() => {
-        count++;
-        if (count == this.sendProductionZeus.length) {
-          this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
-          this.createPDF();
-        }
+        this.productionProcessSerivce.putChangeStateProduction(prod.pp.numero_Rollo).subscribe(() => {
+            count++;
+            if (count == this.sendProductionZeus.length) {
+              this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
+              this.createPDF();
+            }
+        });
       }, () => {
         this.msj.mensajeError(`¡Ocurrió un error al amarrar los rollos a la factura!`);
         this.load = false;
