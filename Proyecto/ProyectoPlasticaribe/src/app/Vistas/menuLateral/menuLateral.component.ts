@@ -39,7 +39,7 @@ export class MenuLateralComponent implements OnInit {
   menuUsuario : boolean = false;
   modalUsuario : boolean = false;
   modalCalendario : boolean = false;
-  modalCorreos : boolean = true;
+  modalCorreos : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador

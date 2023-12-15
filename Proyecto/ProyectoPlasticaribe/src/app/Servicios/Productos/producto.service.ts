@@ -25,6 +25,10 @@ export class ProductoService {
 
   GetInfoProducto_Prod_Presentacion = (id : number, presentacion : string) : Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/getInfoProducto_Prod_Presentacion/${id}/${presentacion}`);
 
+  GetProductsByName = (name : string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Producto/getProductsByName/${name}`);
+
+  GetProductsById = (id : number) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Producto/getProductsById/${id}`);
+
   srvActualizar = (id:any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
 
   PutEstadoProducto = (id: number, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Producto/putEstadoProducto/${id}`, datos_Productos);
