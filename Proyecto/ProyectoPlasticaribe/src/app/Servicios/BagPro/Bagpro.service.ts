@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
 import { environment } from 'src/environments/environment';
-import { arrayBuffer } from 'stream/consumers';
 
 @Injectable({
   providedIn: 'root'
@@ -116,6 +115,8 @@ export class BagproService {
 
   srvObtenerListaDespercicios_Ot = (ot : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/OT/${ot}`);
 
+  GetOtProcesoDesperdicio = (ot : any, ruta? : any):Observable<any[]> => this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/getOtProcesoDesperdicio/${ot}${ruta}`);
+
   /*********************************************************** PROCIMPRESION **************************************************************/
 
   consultarOTImpresion = (ot : any) => this.http.get<any>(this.rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
@@ -132,23 +133,4 @@ export class BagproService {
 
   /************************************************************** HORARIOS **************************************************************/
   GetHorarioProceso = (proceso : string) : Observable<string> => this.http.get<string>(`${this.rutaBagPro}/Horarios/getHorarioProceso/${proceso}`);
-
-  /***************************************************************** PRUEBA *********************************************************************/
-  Prueba(){
-   return this.http.get(this.rutaBagPro + `/ClientesOt/Prueba`, { responseType: 'arraybuffer'}).subscribe((pdfData :  ArrayBuffer) => {
-      console.log(pdfData)
-      let blob = new Blob([pdfData], { type : 'application/pdf' });
-      let url = URL.createObjectURL(blob);
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      //iframe.contentWindow.print();
-      setTimeout(() => {
-        console.log(iframe.contentDocument.getElementsByTagName('embed')[0])
-        iframe.contentDocument.getElementsByTagName('embed')[0].click()
-        console.log('hola')
-      }, 7000);
-    });
-  }
 }
