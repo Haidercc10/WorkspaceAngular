@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShepherdService } from 'angular-shepherd';
 import moment from 'moment';
@@ -18,6 +18,7 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -50,6 +51,8 @@ export class DesperdicioComponent implements OnInit {
   ordenesTrabajo : any = [];
   hora: any = moment().format('HH:mm:ss');
   turnos : any = [];
+  @ViewChild('dt2') dt2: Table | undefined; //Tabla de desperdicios
+  copiaDesperdicios : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 private AppComponent : AppComponent,
@@ -71,6 +74,7 @@ export class DesperdicioComponent implements OnInit {
     this.inicializarFormulario();
   }
 
+  //Función que inicializará el formulario de desperdicios
   inicializarFormulario() {
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
@@ -151,6 +155,7 @@ export class DesperdicioComponent implements OnInit {
     this.FormDesperdicio.reset();
     this.desperdicios = [];
     this.ordenesTrabajo = [];
+    this.copiaDesperdicios = [];
     this.filtrarArea();
   }
 
@@ -160,6 +165,7 @@ export class DesperdicioComponent implements OnInit {
     this.FormDesperdicio.reset();
     this.desperdicios = [];
     this.ordenesTrabajo = [];
+    this.copiaDesperdicios = [];
     this.filtrarArea();
   }
 
@@ -178,9 +184,6 @@ export class DesperdicioComponent implements OnInit {
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
   
-  //obtenerProcesos2 = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter((item) => [10,11,12].includes(item.proceso_Codigo)));
-
-  // Funcion que va a consultar y obtener la informacion de las fallas
   obtenerFallas = () => this.fallasService.srvObtenerLista().subscribe(datos => this.fallas = datos.filter((item) => item.tipoFalla_Id == 11));
 
   // Funcion que va a consultar y obtener la informacion de las maquinas
@@ -292,22 +295,28 @@ export class DesperdicioComponent implements OnInit {
     this.cargando = false;
   }
 
+  //Función que cargará la información del desperdicio de la orden en la tabla
   getOTDesperdicio(ot : any){
     let ruta : any = ``;
     let area : any = this.area.nombre.toUpperCase();
 
-    if(area == "CORTE") area = "CORTADORES";
+    if(area == "CORTE" || area == "EMPAQUE") area = "CORTADORES";
     if(area != "NO APLICA") ruta += `?${area}`;
     else area = ``;
     
     this.bagProService.GetOtProcesoDesperdicio(ot, ruta).subscribe(data => { 
       if([74, 75, 76, 77, 78, 79, 80, 81, 82].includes(this.ValidarRol)) {
         this.desperdicios = data.filter(x => x.proceso.includes(`DESP_${area}`));
-      } else this.desperdicios = data;
+        this.copiaDesperdicios = this.desperdicios;
+      } else {
+        this.desperdicios = data;
+        this.copiaDesperdicios = this.desperdicios;
+      } 
       this.cargando = false;
     }, error => { this.cargando = false; });
   }
 
+  //Función que calcula el peso actual
   calcularPeso() {  
     let area : any = this.area.nombre.toUpperCase();
     if(area == "NO APLICA") area = ``;
@@ -644,20 +653,14 @@ export class DesperdicioComponent implements OnInit {
     let horaFinDia: any = '18:00:00';
     let horaInicioNoche: any = '18:00:01';
     let horaFinNoche: any = '06:59:59';
-    console.log(this.hora > horaInicioDia)
+    
     if (this.hora >= horaInicioDia && this.hora < horaFinDia) {
-      console.log(1)
       if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RD' });
       else this.FormDesperdicio.patchValue({ Turno: 'DIA' });
     } else if (this.hora >= horaInicioNoche && this.hora < horaFinNoche) {
-      console.log(2)
       if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RN' });
       else this.FormDesperdicio.patchValue({ Turno: 'NOCHE' });
     } 
-    console.log(this.FormDesperdicio.value.Turno)
-  }
-  
-  generarEtiqueta(){
   }
 
   //Función que crea el pdf de la etiqueta
@@ -682,5 +685,12 @@ export class DesperdicioComponent implements OnInit {
       showNameBussiness: true,
     }
     this.svcCrearPDF.createTagProduction(etiqueta);
+  }
+
+  //Función que filtra la info de la tabla 
+  aplicarfiltro($event, campo: any, valorCampo: string) {
+    this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 100); 
+    if(!this.dt2.filteredValue) this.desperdicios = this.copiaDesperdicios;
   }
 }

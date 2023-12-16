@@ -209,7 +209,20 @@
         [scrollable]="true"
         scrollHeight="50rem">
         <ng-template pTemplate="header">
-          
+          <tr>
+            <th></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'rollo', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'maquina', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'material', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'operario', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'noConformidad', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'impreso', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'hora', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'proceso', 'contains')"></th>
+            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'observacion', 'contains')"></th>
+          </tr>
           <tr>
             <th class="text-center" scope="col">#</th>
             <th class="text-center" scope="col">Rollo</th>
@@ -249,7 +262,7 @@
         <ng-template pTemplate="footer">
           <tr id="totales">
             <td colspan="6" class="text-right">Totales</td>
-            <td class="text-center">{{desperdicios.length > 0 ? calcularPeso() : 0 | number : '1.2-2'}} Kg</td>
+            <td class="text-center">{{desperdicios.length > 0 ? calcularPeso().toFixed(2) : 0 | number : '1.2-2'}} Kg</td>
             <td colspan="5" class="text-center"></td>
           </tr>
         </ng-template>  
