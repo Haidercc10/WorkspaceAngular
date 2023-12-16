@@ -1,52 +1,41 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
-import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
-import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
-  selector: 'app-Orden_Facturacion',
-  templateUrl: './Orden_Facturacion.component.html',
-  styleUrls: ['./Orden_Facturacion.component.css']
+  selector: 'app-Devolucion_OrdenFacturacion',
+  templateUrl: './Devolucion_OrdenFacturacion.component.html',
+  styleUrls: ['./Devolucion_OrdenFacturacion.component.css']
 })
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class Orden_FacturacionComponent implements OnInit {
+export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   storage_Id: number;
   ValidarRol: number;
   load: boolean = false;
   modoSeleccionado: boolean;
   formDataOrder: FormGroup;
-  clients: Array<any> = [];
-  products: Array<any> = [];
-  presentations: Array<string> = [];
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
-    private clientService: ClientesService,
-    private productService: ProductoService,
-    private presentationService: UnidadMedidaService,
-    private productionProcessService: Produccion_ProcesosService,
-    private msj: MensajesAplicacionService,
-    private orderFactService: OrdenFacturacionService,
+    private msg: MensajesAplicacionService,
     private dtOrderFactService: Dt_OrdenFacturacionService,
-    private createPDFService: CreacionPdfService) {
+    private createPDFService: CreacionPdfService,
+    private devService : DevolucionesProductosService,
+    private dtDevService : DetallesDevolucionesProductosService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
@@ -62,7 +51,6 @@ export class Orden_FacturacionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.getPresentation();
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -76,79 +64,38 @@ export class Orden_FacturacionComponent implements OnInit {
     this.load = false;
     this.formDataOrder.reset();
     this.production = [];
-    this.clients = [];
-    this.products = [];
     this.productionSelected = [];
     this.consolidatedProduction = [];
   }
 
-  getClients() {
-    let nameClient: string = this.formDataOrder.value.client;
-    this.clientService.LikeGetCliente(nameClient).subscribe(data => this.clients = data);
-  }
-
-  getProducts() {
-    let nameProduct: string = this.formDataOrder.value.reference;
-    this.productService.GetProductsByName(nameProduct).subscribe(data => this.products = data);
-  }
-
-  getPresentation() {
-    let filterPresentations: Array<string> = ['Und', 'Kg', 'Paquete', 'Rollo'];
-    this.presentationService.srvObtenerLista().subscribe(data => {
-      this.presentations = data.filter(x => filterPresentations.includes(x.undMed_Id));
-    });
-  }
-
-  selectedClient() {
-    let idClient: string = this.formDataOrder.value.client;
-    let dataClient: any = this.clients.find(x => x.cli_Id == idClient);
-    this.formDataOrder.patchValue({
-      idClient: dataClient.cli_Id,
-      client: dataClient.cli_Nombre,
-    });
-  }
-
-  selectedProduct() {
-    let idProduct: string = this.formDataOrder.value.reference;
-    let dataProduct: any = this.products.find(x => x.prod.prod_Id == idProduct);
-    this.formDataOrder.patchValue({
-      item: dataProduct.prod.prod_Id,
-      reference: dataProduct.prod.prod_Nombre,
-      presentation: dataProduct.exis.undMed_Id
-    });
-    this.searchAvaibleProduction();
-  }
-
-  searchProductByItem() {
-    let idProduct: number = this.formDataOrder.value.item;
-    this.productService.GetProductsById(idProduct).subscribe(data => {
-      data.forEach(dataProduct => {
-        this.formDataOrder.patchValue({
-          item: dataProduct.prod.prod_Id,
-          reference: dataProduct.prod.prod_Nombre,
-          presentation: dataProduct.exis.undMed_Id
+  searchData(){
+    let fact : any = this.formDataOrder.value.fact.trim();
+    if (![null, undefined, ''].includes(fact)){
+      this.dtOrderFactService.GetInformationOrderFactByFactForDevolution(fact).subscribe(data => {
+        data.forEach(dataProduction => {
+          this.production.push({
+            item: dataProduction.producto.prod_Id,
+            reference: dataProduction.producto.prod_Nombre,
+            numberProduction: dataProduction.dtOrder.numero_Rollo,
+            quantity: dataProduction.dtOrder.cantidad,
+            presentation: dataProduction.dtOrder.presentacion
+          });
+          this.changeInformationFact(dataProduction);
         });
-        this.searchAvaibleProduction();
+      }, error => {
+        this.load = false;
+        this.msg.mensajeError(error);
       });
-    });
+    } else this.msg.mensajeAdvertencia('¡El valor de la factura no es valido!');
   }
 
-  searchAvaibleProduction() {
-    let idProduct: number = this.formDataOrder.value.item;
-    this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
-      this.load = true;
-      this.production = [];
-      data.forEach(dataProduction => {
-        this.production.push({
-          item: dataProduction.prod.prod_Id,
-          reference: dataProduction.prod.prod_Nombre,
-          numberProduction: dataProduction.pp.numero_Rollo,
-          quantity: dataProduction.pp.cantidad,
-          presentation: dataProduction.pp.presentacion
-        });
-      });
-      setTimeout(() => this.load = false, 50);
-    }, error => this.msj.mensajeError(error));
+  changeInformationFact(data : any){
+    this.formDataOrder.patchValue({
+      idClient: data.clientes.cli_Id,
+      client: data.clientes.cli_Nombre,
+      item: data.producto.prod_Id,
+      reference: data.producto.prod_Nombre,
+    });
   }
 
   selectedProduction(production: production) {
@@ -205,52 +152,56 @@ export class Orden_FacturacionComponent implements OnInit {
   validateInformation() {
     if (this.formDataOrder.valid) {
       if (this.productionSelected.length > 0) {
-        if ((this.formDataOrder.value.fact).trim() != '') this.saveOrderFact();
-        else this.msj.mensajeAdvertencia(`¡El campo 'Factura' se encuentra vacío!`);
-      } else this.msj.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
-    } else this.msj.mensajeAdvertencia(`¡Debe ingresar todos los datos!`);
+        if ((this.formDataOrder.value.fact).trim() != '') this.saveDev();
+        else this.msg.mensajeAdvertencia(`¡El campo 'Factura' se encuentra vacío!`);
+      } else this.msg.mensajeAdvertencia(`¡No ha seleccionado ningún rollo!`);
+    } else this.msg.mensajeAdvertencia(`¡Debe ingresar todos los datos!`);
   }
 
-  saveOrderFact() {
+  saveDev(){
     this.load = true;
-    let orderFact: modelOrdenFacturacion = {
-      Factura: this.formDataOrder.value.fact,
-      Cli_Id: this.formDataOrder.value.idClient,
-      Usua_Id: this.storage_Id,
-      Fecha: moment().format('YYYY-MM-DD'),
-      Hora: moment().format('HH:mm:ss'),
-      Observacion: !this.formDataOrder.value.observation ? '' : this.formDataOrder.value.observation
+    let info : any = {
+      FacturaVta_Id : this.formDataOrder.value.fact,
+      Cli_Id : this.formDataOrder.value.idClient,
+      DevProdFact_Fecha : moment().format('YYYY-MM-DD'),
+      DevProdFact_Observacion : this.formDataOrder.value.observation != null ? this.formDataOrder.value.observation : '',
+      TipoDevProdFact_Id : 1,
+      Usua_Id : this.storage_Id,
+      DevProdFact_Hora : moment().format('H:mm:ss'),
     }
-    this.orderFactService.Post(orderFact).subscribe(data => this.saveDetailsOrderFact(data));
+    this.devService.srvGuardar(info).subscribe(data => this.saveDetailsFact(data), () => {
+      this.msg.mensajeError(`¡Ocurrió un error al crear la devolución!`);
+      this.load = true;
+    });
   }
 
-  saveDetailsOrderFact(data: any) {
-    let count: number = 0;
-    this.productionSelected.forEach(production => {
-      let dtOrderFact: modelDt_OrdenFacturacion = {
-        Id_OrdenFacturacion: data.id,
-        Numero_Rollo: production.numberProduction,
-        Prod_Id: production.item,
-        Cantidad: production.quantity,
-        Presentacion: production.presentation
+  saveDetailsFact(data : any){
+    let coutn : number = 0;
+    this.productionSelected.forEach(prod => {
+      let info : any = {
+        DevProdFact_Id : data.devProdFact_Id,
+        Prod_Id : prod.item,
+        DtDevProdFact_Cantidad : prod.quantity,
+        UndMed_Id : prod.presentation,
+        Rollo_Id : prod.numberProduction,
       }
-      this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
-        count++;
-        if (count == this.productionSelected.length) {
-          this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
-          this.createPDF(data.id, data.factura);
-          this.clearFields();
-        }
+      this.dtDevService.srvGuardar(info).subscribe(() => {
+        coutn++;
+        if (coutn == this.productionSelected.length) this.createPDF(data.devProdFact_Id, this.formDataOrder.value.fact);
+      }, () => {
+        this.msg.mensajeError(`Opps...`, `¡Error al crear la devolución de rollos!`);
+        this.load = false;
       });
     });
   }
 
   createPDF(id_OrderFact: number, fact: string) {
-    this.dtOrderFactService.GetInformacionOrderFact(id_OrderFact).subscribe(data => {
-      let title: string = `Orden de Facutración N° ${fact}`;
+    this.dtDevService.GetInformationDevById(id_OrderFact).subscribe(data => {
+      let title: string = `Devolución de Facutración N° ${fact}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
-    }, error => this.msj.mensajeError(error));
+      setTimeout(() => this.clearFields(), 3000);
+    }, error => this.msg.mensajeError(error));
   }
 
   contentPDF(data): any[] {
@@ -269,16 +220,16 @@ export class Orden_FacturacionComponent implements OnInit {
   consolidatedInformation(data: any): Array<any> {
     let consolidatedInformation: Array<any> = [];
     data.forEach(prod => {
-      if (!consolidatedInformation.map(x => x.Item).includes(prod.producto.prod_Id)) {
-        let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
+      if (!consolidatedInformation.map(x => x.Item).includes(prod.prod.prod_Id)) {
+        let cuontProduction: number = data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).length;
         let totalQuantity: number = 0;
-        data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
+        data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).forEach(x => totalQuantity += x.dtDev.cantidad);
         consolidatedInformation.push({
-          "Item": prod.producto.prod_Id,
-          "Referencia": prod.producto.prod_Nombre,
+          "Item": prod.prod.prod_Id,
+          "Referencia": prod.prod.prod_Nombre,
           "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
-          "Presentación": prod.dtOrder.presentacion
+          "Presentación": prod.dtDev.presentacion
         });
       }
     });
@@ -289,11 +240,11 @@ export class Orden_FacturacionComponent implements OnInit {
     let informationProducts: Array<any> = [];
     data.forEach(prod => {
       informationProducts.push({
-        "Rollo": prod.dtOrder.numero_Rollo,
-        "Item": prod.producto.prod_Id,
-        "Referencia": prod.producto.prod_Nombre,
-        "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
-        "Presentación": prod.dtOrder.presentacion,
+        "Rollo": prod.dtDev.numero_Rollo,
+        "Item": prod.prod.prod_Id,
+        "Referencia": prod.prod.prod_Nombre,
+        "Cantidad": this.formatNumbers((prod.dtDev.cantidad).toFixed(2)),
+        "Presentación": prod.dtDev.presentacion,
       });
     });
     return informationProducts;
@@ -317,13 +268,13 @@ export class Orden_FacturacionComponent implements OnInit {
             { text: `Información detallada del Cliente`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
           ],
           [
-            { text: `Nombre: ${data.clientes.cli_Nombre}` },
-            { text: `ID: ${data.clientes.cli_Id}` },
-            { text: `Tipo de ID: ${data.clientes.tipoIdentificacion_Id}` },
+            { text: `Nombre: ${data.cliente.cli_Nombre}` },
+            { text: `ID: ${data.cliente.cli_Id}` },
+            { text: `Tipo de ID: ${data.cliente.tipoIdentificacion_Id}` },
           ],
           [
-            { text: `Telefono: ${data.clientes.cli_Telefono}` },
-            { text: `E-mail: ${data.clientes.cli_Email}`, colSpan: 2 },
+            { text: `Telefono: ${data.cliente.cli_Telefono}` },
+            { text: `E-mail: ${data.cliente.cli_Email}`, colSpan: 2 },
             {}
           ]
         ]
@@ -409,7 +360,7 @@ export class Orden_FacturacionComponent implements OnInit {
         widths: ['*'],
         body: [
           [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
-          [{ border: [true, false, true, true], text: `${data.order.observacion.toString().trim()}` }]
+          [{ border: [true, false, true, true], text: `${data.dev.devProdFact_Observacion.toString().trim()}` }]
         ]
       },
       fontSize: 9,

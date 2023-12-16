@@ -199,6 +199,7 @@ import { Crear_ConceptosComponent } from './Vistas/Crear_Conceptos/Crear_Concept
 import { Reporte_EstadisticasVentasComponent } from './Vistas/Reporte_EstadisticasVentas/Reporte_EstadisticasVentas.component';
 import { Orden_FacturacionComponent } from './Vistas/Orden_Facturacion/Orden_Facturacion.component';
 import { MovimientosOrdenFacturacionComponent } from './Vistas/Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
+import { Devolucion_OrdenFacturacionComponent } from './Vistas/Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 
 @NgModule({
   declarations: [
@@ -320,7 +321,8 @@ import { MovimientosOrdenFacturacionComponent } from './Vistas/Movimientos-Orden
     Crear_ConceptosComponent, 
     Reporte_EstadisticasVentasComponent,
     Orden_FacturacionComponent,
-    MovimientosOrdenFacturacionComponent
+    MovimientosOrdenFacturacionComponent,
+    Devolucion_OrdenFacturacionComponent
   ],
 
   imports: [

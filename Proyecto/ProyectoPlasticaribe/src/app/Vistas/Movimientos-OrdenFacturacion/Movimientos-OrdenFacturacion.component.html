@@ -94,6 +94,9 @@
         <th scope="col">
           <p-sortIcon field="or.fecha"></p-sortIcon> Fecha
           <p-columnFilter type="text" field="or.fecha" display="menu"></p-columnFilter>
+        </th><th scope="col">
+          <p-sortIcon field="type"></p-sortIcon> Tipo de Documento
+          <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
         </th>
         <th id="ver3">Ver</th>
       </tr>
@@ -104,8 +107,9 @@
         <td>{{data.or.cli_Id}}</td>
         <td>{{data.clientes.cli_Nombre}}</td>
         <td>{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
+        <td>{{data.type}}</td>
         <td class="text-center">
-          <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id)"></p-button>
+          <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type)"></p-button>
         </td>
       </tr>
     </ng-template>

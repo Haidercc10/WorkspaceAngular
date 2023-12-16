@@ -5,6 +5,8 @@ import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacio
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
+import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -25,7 +27,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private frmBuilder : FormBuilder,
     private dtOrderFactService : Dt_OrdenFacturacionService,
     private msg : MensajesAplicacionService,
-    private orden_FacturacionComponent : Orden_FacturacionComponent) {
+    private orden_FacturacionComponent : Orden_FacturacionComponent,
+    private devolucion_OrdenFacturacionComponent : Devolucion_OrdenFacturacionComponent,
+    private dtDevolutionsService : DetallesDevolucionesProductosService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formFilters = this.frmBuilder.group({
@@ -57,14 +61,27 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD') == 'Fecha inválida' ? dateLastMonth : moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let route : string = orderNum != null ? `&order=${orderNum}` : '';
-    this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => this.serchedData = data, error => {
+    this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
+      data.forEach(dataOrder => this.serchedData.push(dataOrder));
+    }, error => {
       this.load = false;
-      this.msg.mensajeError(error.error);
+      this.msg.mensajeError(error);
+    });
+    this.searchDataDevolutions(startDate, endDate, route);
+  }
+
+  searchDataDevolutions(startDate: any, endDate: any, route: string){
+    this.dtDevolutionsService.GetDevolutions(startDate, endDate, route).subscribe(data => {
+      data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
+    }, error => {
+      this.load = false;
+      this.msg.mensajeError(error);
     });
   }
 
-  createPDF(id : number){
-    this.orden_FacturacionComponent.createPDF(id);
+  createPDF(id : number, fact: string, type : string){
+    if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact);
+    else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, fact);
   }
 
 }
