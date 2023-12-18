@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import moment from 'moment';
+import { Table } from 'primeng/table';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 
 @Component({
   selector: 'app-prueba-imagen-cat-insumo',
@@ -18,96 +19,262 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
-  sendProductionZeus: any[] = [];
-  productionSearched : any;
-  formProduction : FormGroup;
-  drivers : any[] = [];
+  columns: Array<any> = [];
+  selectedColumns: Array<any> = [];
+  expandedRows: {} = {};
+  stockInformation: Array<StockInformation> = [];
+  @ViewChild('tableStock') tableStock: Table | undefined;
+  recetaProducto: boolean = false;
+  @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
 
   constructor(private appComponent: AppComponent,
-    private productionProcessSerivce : Produccion_ProcesosService,
-    private msj : MensajesAplicacionService,
-    private createPDFService : CreacionPdfService,
-    private usuariosService : UsuarioService,
-    private frmBuilder : FormBuilder,) {
+    private msg: MensajesAplicacionService,
+    private stockService: ExistenciasProductosService,
+    private createExcelService: CreacionExcelService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
-    this.formProduction = this.frmBuilder.group({
-      production : [''],
-      observation : [''],
-      driver: [''],
-      car : [''],
-    });
   }
 
   ngOnInit() {
-    this.getDrivers();
-    setTimeout(() => document.getElementById('RolloBarsCode').focus(), 500);
-  }
-  
-  clearFields(){
-    this.sendProductionZeus = [];
-    this.productionSearched = null;
+    this.getStockInformation()
   }
 
-  getDrivers(){
-    this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
+  fillColumns() {
+    this.columns = [
+      { header: 'Item', field: 'item', type: '' },
+      { header: 'Cliente', field: 'client', type: '' },
+      { header: 'Referencia', field: 'reference', type: '' },
+      { header: 'Existencia', field: 'stock', type: 'number' },
+      { header: 'Precio', field: 'price', type: 'number' },
+      { header: 'Presentación', field: 'presentation', type: '' },
+      { header: 'SubTotal', field: 'subTotal', type: 'number' },
+      { header: 'Vendedor', field: 'seller', type: '' },
+      { header: 'Mes Actual', field: 'actualMonth', type: 'number' },
+      { header: 'Enero', field: 'junuary', type: 'number' },
+      { header: 'Febrero', field: 'february', type: 'number' },
+      { header: 'Marzo', field: 'march', type: 'number' },
+      { header: 'Abril', field: 'april', type: 'number' },
+      { header: 'Mayo', field: 'may', type: 'number' },
+      { header: 'Junio', field: 'june', type: 'number' },
+      { header: 'Julio', field: 'july', type: 'number' },
+      { header: 'Agosto', field: 'august', type: 'number' },
+      { header: 'Septiembre', field: 'september', type: 'number' },
+      { header: 'Octubre', field: 'october', type: 'number' },
+      { header: 'Noviembre', field: 'november', type: 'number' },
+      { header: 'Diciembre', field: 'december', type: 'number' },
+    ];
+    this.selectedColumns = [...this.columns];
+    this.selectedColumns.splice(9, 12);
   }
 
-  searchProductionByReel(){
-    let production = parseInt(this.formProduction.value.production);
-    this.formProduction.patchValue({production : null});
-    document.getElementById('RolloBarsCode').focus();
-    let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
-    if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else this.productionProcessSerivce.GetInformationAboutProduction(production).subscribe(data => this.sendProductionZeus = data, () => {
-      this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
+  getStockInformation() {
+    this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+      this.fillColumns();
+      this.stockInformation = this.fillStockInformation(data);
+      const thisRef = this;
+      this.stockInformation.forEach((stock) => thisRef.expandedRows[stock.item] = true);
     });
   }
 
-  updateProductionZeus(){
-    this.sendProductionZeus.forEach(data => {
-      let ot = data.dataProduction.ot;
-      let item = data.dataProduction.prod_Id;
-      let presentation = data.dataProduction.presentacion;
-      let reel = data.dataProduction.numero_Rollo;
-      let quantity = presentation != 'Kg' ? data.dataProduction.cantidad : data.dataProduction.peso_Neto;
-      let price = data.dataProduction.precio;
-      if (presentation == 'Unidad') presentation = 'UND';
-      else if (presentation == 'Kilo') presentation = 'KLS';
-      else if (presentation == 'Paquete') presentation = 'PAQ';
-
-      this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity, price).subscribe(res => {
-        
-      }, error => this.msj.mensajeError(error));
+  fillStockInformation(data: any): Array<StockInformation> {
+    let stockInformation: Array<StockInformation> = [];
+    data.forEach(stock => {
+      stockInformation.push({
+        item: stock.product.item,
+        reference: stock.product.reference,
+        client: stock.client[0].cli.client,
+        stock: stock.stock.stock,
+        price: stock.stock.price,
+        presentation: stock.stock.presentation,
+        subTotal: stock.stock.stockPrice,
+        seller: stock.client[0].vende.name_Vende,
+        avaibleProducion: this.fillAvaibleProduction(stock.avaible_Production),
+        actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
+        junuary: stock.stock_MonthByMonth[0].enero,
+        february: stock.stock_MonthByMonth[0].febrero,
+        march: stock.stock_MonthByMonth[0].marzo,
+        april: stock.stock_MonthByMonth[0].abril,
+        may: stock.stock_MonthByMonth[0].mayo,
+        june: stock.stock_MonthByMonth[0].junio,
+        july: stock.stock_MonthByMonth[0].julio,
+        august: stock.stock_MonthByMonth[0].agosto,
+        september: stock.stock_MonthByMonth[0].septiembre,
+        october: stock.stock_MonthByMonth[0].octubre,
+        november: stock.stock_MonthByMonth[0].noviembre,
+        december: stock.stock_MonthByMonth[0].diciembre,
+      });
     });
+    return stockInformation;
   }
 
-  printTag(data : any){
-    let proceso : string = data.process.proceso_Id;
-    let dataTagProduction: modelTagProduction = {
-      client: data.dataProduction.clientes.cli_Nombre,
-      item: data.product.prod_Id,
-      reference: data.product.prod_Nombre,
-      width: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.product.prod_Ancho : data.dataExtrusion.extrusion_Ancho1,
-      height: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.product.prod_Largo : data.dataExtrusion.extrusion_Ancho2,
-      bellows: ['EMP', 'SELLA', 'WIKE'].includes(proceso) ? data.product.prod_Fuelle : data.dataExtrusion.extrusion_Ancho3,
-      und: data.dataExtrusion.undMed_Id,
-      cal: data.dataExtrusion.extrusion_Calibre,
-      orderProduction: data.orderProduction,
-      material: data.material.material_Nombre,
-      quantity: ['SELLA', 'WIKE'].includes(proceso) ? data.dataProduction.cantidad : data.dataProduction.peso_Bruto,
-      quantity2: data.dataProduction.peso_Neto,
-      reel: data.dataProduction.numero_Rollo,
-      presentationItem1: ['SELLA', 'WIKE'].includes(proceso) ? data.dataProduction.presentacion : 'Kg Bruto',
-      presentationItem2: ['SELLA', 'WIKE'].includes(proceso) ? 'Kg' : 'Kg Neto',
-      productionProcess: data.process.proceso_Nombre,
-      showNameBussiness: data.motrarEmpresaEtiquetas,
+  fillAvaibleProduction(data: any): Array<AvaibleProducion> {
+    let avaibleProducion: Array<AvaibleProducion> = [];
+    data.forEach(stock => {
+      avaibleProducion.push({
+        NumberProduction: stock.number,
+        Quantity: stock.quantity,
+        Weight: stock.weight,
+        Presentation: stock.presentation,
+        Process: stock.process,
+        Date: stock.date,
+        Hour: stock.hour,
+        Price: stock.price,
+        Turn: stock.turn,
+        Information: stock.information,
+        orderProduction: stock.orderProduction,
+      });
+    });
+    return avaibleProducion;
+  }
+
+  fillActualMonth(data: any) {
+    let month: number = moment().month();
+    const stockMonths = {
+      "0": data.enero,
+      "1": data.febrero,
+      "2": data.marzo,
+      "3": data.abril,
+      "4": data.mayo,
+      "5": data.junio,
+      "6": data.julio,
+      "7": data.agosto,
+      "8": data.septiembre,
+      "9": data.octubre,
+      "10": data.novimebre,
+      "11": data.diciembre,
     }
-    this.createPDFService.createTagProduction(dataTagProduction);
+    return stockMonths[month];
   }
 
-  removeProduction(data : any){
-    let i = this.sendProductionZeus.findIndex(x => x.dataProduction.numero_Rollo == data.dataProduction.numero_Rollo);
-    this.sendProductionZeus.splice(i, 1);
+  apliedFilters = ($event, campo: any) => this.tableStock!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  totalStock() {
+    let total: number = 0;
+    this.stockInformation.forEach(stock => total += stock.subTotal);
+    return total;
   }
 
+  showPopUpCreateAndEdit(data: any = "") {
+    this.recetaProducto = true;
+    this.recetas_ProductosComponent.limpiarTodo();
+    if (data != "") {
+      this.recetas_ProductosComponent.FormProductos.patchValue({ Nombre: data.Id, });
+      this.recetas_ProductosComponent.buscarProductos();
+      setTimeout(() => this.recetas_ProductosComponent.cambiarNombreProducto(), 500);
+    }
+  }
+
+  createExcel() {
+    const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
+    let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+    let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    let workbook = this.createExcelService.formatoExcel(title);
+    this.addPageExcel(workbook, font, border);
+    this.createExcelService.creacionExcel(title, workbook);
+  }
+
+  addPageExcel(workbook, font, border) {
+    let pageOne = workbook.worksheets[0];
+    this.addHeaderPageOne(pageOne, font, border);
+    pageOne.mergeCells('A1:T3');
+    pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addDataExcel(pageOne);
+  }
+
+  addHeaderPageOne(worksheet, font, border) {
+    const header = ["Item", "Cliente", "Referencia", "Existencias", "Precio", "Subtotal", "Presentación", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    let headerRow = worksheet.addRow(header);
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+      cell.font = font;
+      cell.border = border;
+    });
+  }
+
+  addDataExcel(worksheet) {
+    let dataStock = this.fillDataExcel();
+    dataStock.forEach(d => {
+      let row = worksheet.addRow(d);
+      let formatNumber: number[] = [4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+      formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    });
+    this.changeSizeColumnsExcel(worksheet);
+  }
+
+  fillDataExcel(): any[] {
+    let dataStock = [];
+    this.stockInformation.forEach(stock => {
+      dataStock.push([
+        stock.item,
+        stock.client,
+        stock.reference,
+        stock.stock,
+        stock.price,
+        stock.subTotal,
+        stock.presentation,
+        stock.seller,
+        stock.junuary,
+        stock.february,
+        stock.march,
+        stock.april,
+        stock.may,
+        stock.june,
+        stock.july,
+        stock.august,
+        stock.september,
+        stock.october,
+        stock.november,
+        stock.december,
+      ]);
+    });
+    return dataStock;
+  }
+
+  changeSizeColumnsExcel(worksheet) {
+    let size60: number[] = [2, 3, 8];
+    let size20: number[] = [4, 5, 6, 7];
+    let size15: number[] = [1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    size60.forEach(e => worksheet.getColumn(e).width = 60);
+    size20.forEach(e => worksheet.getColumn(e).width = 20);
+    size15.forEach(e => worksheet.getColumn(e).width = 15);
+    worksheet.getColumn(1).width = 10;
+  }
+}
+
+interface StockInformation {
+  item: number,
+  reference: string,
+  client: string,
+  stock: number,
+  price: number,
+  presentation: string,
+  subTotal: number,
+  seller: string,
+  avaibleProducion: Array<AvaibleProducion>,
+  actualMonth: number,
+  junuary: number,
+  february: number,
+  march: number,
+  april: number,
+  may: number,
+  june: number,
+  july: number,
+  august: number,
+  september: number,
+  october: number,
+  november: number,
+  december: number,
+}
+
+interface AvaibleProducion {
+  NumberProduction: number;
+  Quantity: number,
+  Weight: number,
+  Presentation: string,
+  Process: string,
+  Date: any,
+  Hour: string,
+  Price: number,
+  Turn: string,
+  Information: string,
+  orderProduction: number,
 }

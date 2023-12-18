@@ -1,259 +1,280 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Workbook } from 'exceljs';
-import * as fs from 'file-saver';
 import moment from 'moment';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
+import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
   templateUrl: './Inventario-Productos-PBDD.component.html',
   styleUrls: ['./Inventario-Productos-PBDD.component.css']
 })
+
 export class InventarioProductosPBDDComponent implements OnInit {
 
-  @ViewChild('dt') dt: Table | undefined;
-  public arrayInventario = [];
-  public datosCodigo : string;
-  ArrayProductosBDNueva = [];
-  public page : number;
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
-  public filtroNombre : any;
-  public NombrePT = '';
-  public load : boolean = false;
-  public NombreCliente = '';
-  numeroIdProd : number = 0;
-  totalProductos : number = 0;
-  PrecioPT : number = 0;
-  opcionFiltroFechas : string [] = ['Elija el filtro', 'Semana(s)', 'Mes(es)', 'Año(s)'];
-  filtroFechas : string;
-  cantidadDias : number;
-  modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  load: boolean = false;
+  storage_Id: number;
+  ValidarRol: number;
+  modoSeleccionado: boolean = false;
+  columns: Array<any> = [];
+  selectedColumns: Array<any> = [];
+  expandedRows: {} = {};
+  stockInformation: Array<StockInformation> = [];
+  @ViewChild('tableStock') tableStock: Table | undefined;
+  recetaProducto: boolean = false;
+  @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
 
-  constructor(private clienteOtItems : BagproService,
-                private existencias_ProductosService : ExistenciasProductosService,
-                  private productosService : ProductoService,
-                    private messageService: MessageService,
-                      private AppComponent : AppComponent) {
-    this.modoSeleccionado = this.AppComponent.temaSeleccionado;
+  constructor(private appComponent: AppComponent,
+    private msg: MensajesAplicacionService,
+    private stockService: ExistenciasProductosService,
+    private createExcelService: CreacionExcelService,) {
+    this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
-  ngOnInit(): void {
-    this.InventarioExistenciaBDNueva();
-    setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  ngOnInit() {
+    this.getStockInformation();
   }
 
-  // Funcion que calculará cual es la fecha segun los parametros especificados
-  fechaBuscada(){
-    if (this.filtroFechas == 'Semana(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'week').format('YYYY-MM-DD');
-    else if (this.filtroFechas == 'Mes(es)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'month').format('YYYY-MM-DD');
-    else if (this.filtroFechas == 'Año(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'years').format('YYYY-MM-DD');
+  fillColumns() {
+    this.columns = [
+      { header: 'Item', field: 'item', type: '' },
+      { header: 'Cliente', field: 'client', type: '' },
+      { header: 'Referencia', field: 'reference', type: '' },
+      { header: 'Existencia', field: 'stock', type: 'number' },
+      { header: 'Precio', field: 'price', type: 'number' },
+      { header: 'Presentación', field: 'presentation', type: '' },
+      { header: 'SubTotal', field: 'subTotal', type: 'number' },
+      { header: 'Vendedor', field: 'seller', type: '' },
+      { header: 'Mes Actual', field: 'actualMonth', type: 'number' },
+      { header: 'Enero', field: 'junuary', type: 'number' },
+      { header: 'Febrero', field: 'february', type: 'number' },
+      { header: 'Marzo', field: 'march', type: 'number' },
+      { header: 'Abril', field: 'april', type: 'number' },
+      { header: 'Mayo', field: 'may', type: 'number' },
+      { header: 'Junio', field: 'june', type: 'number' },
+      { header: 'Julio', field: 'july', type: 'number' },
+      { header: 'Agosto', field: 'august', type: 'number' },
+      { header: 'Septiembre', field: 'september', type: 'number' },
+      { header: 'Octubre', field: 'october', type: 'number' },
+      { header: 'Noviembre', field: 'november', type: 'number' },
+      { header: 'Diciembre', field: 'december', type: 'number' },
+    ];
+    this.selectedColumns = [...this.columns];
+    this.selectedColumns.splice(9, 12);
   }
 
-  // Funcion que buscará la ultima fecha en que se editó cada producto
-  buscarPrecios(){
-    if (this.cantidadDias > 0 && this.cantidadDias != undefined && this.filtroFechas != 'Elija el filtro') {
-      this.load = false;
-      this.fechaBuscada();
-      for (let i = 0; i < this.ArrayProductosBDNueva.length; i++) {
-        this.ArrayProductosBDNueva[i].fechaModificacion = '';
-        this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductosBDNueva[i].Item, this.ArrayProductosBDNueva[i].PrecioItem).subscribe(datos_item => {
-          if (datos_item != null) this.ArrayProductosBDNueva[i].fechaModificacion = `${datos_item}`.replace('T00:00:00','');
-        });
-      }
-      setTimeout(() => { this.ordenarItems(); }, 10000);
-    }
-  }
-
-  //Funcion que ordenará por fecha de la antugua a la mas reciente, y enviará los espacios en blanco al final
-  ordenarItems(){
-    this.ArrayProductosBDNueva.sort();
-    this.ArrayProductosBDNueva.sort((a,b) => {
-      if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
-      else return -1;
+  getStockInformation() {
+    this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+      this.fillColumns();
+      this.stockInformation = this.fillStockInformation(data);
+      const thisRef = this;
+      this.stockInformation.forEach((stock) => thisRef.expandedRows[stock.item] = true);
     });
-    this.load = true;
   }
 
-  //Funcion que exportará a un documrnto excel los datos de los productos
-  exportarExcel() : void {
-    if (this.ArrayProductosBDNueva.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
-    else {
-      this.load = false;
-      setTimeout(() => {
-        const title = `Inventario de Productos ${this.today}`;
-        const header = ["Ítem", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Mínima", "Ult. Modificación"]
-        let datos : any =[];
-        for (const item of this.ArrayProductosBDNueva) {
-          const datos1  : any = [item.Item, item.NombreItem, item.PrecioItem, item.Stock, item.Presentacion, item.Subtotal, item.CantMinima, item.fechaModificacion];
-          datos.push(datos1);
-        }
-        let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Inventario de Productos ${this.today}`);
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
-          }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:H2');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          let qty = row.getCell(4);
-          let color = 'ADD8E6';
-          if (+qty.value < d[7]) color = 'FF837B';
-          qty.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: color }
-          }
-          row.getCell(3).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(6).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-        });
-        worksheet.getColumn(1).width = 10;
-        worksheet.getColumn(2).width = 60;
-        worksheet.getColumn(3).width = 20;
-        worksheet.getColumn(4).width = 20;
-        worksheet.getColumn(5).width = 20;
-        worksheet.getColumn(6).width = 20;
-        worksheet.getColumn(7).width = 20;
-        worksheet.getColumn(8).width = 20;
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Inventario de Productos ${this.today}.xlsx`);
-          });
-          this.load = true;
-        }, 500);
-        this.mostrarConfirmacion(`Confirmación`,`Se ha generado el archivo de excel exitosamente!`);
-      }, 500);
-    }
-  }
-
-  /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
-  InventarioExistenciaBDNueva(){
-    this.load = false;
-    this.ArrayProductosBDNueva = [];
-    this.numeroIdProd = 0;
-    this.totalProductos = 0;
-
-    this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
-      for (let index = 0; index < registrosIPT.length; index++) {
-        const dataInventario : any = {
-          Item : registrosIPT[index].prod_Id,
-          NombreItem : registrosIPT[index].prod_Nombre,
-          PrecioItem : registrosIPT[index].exProd_PrecioVenta,
-          Stock : registrosIPT[index].exProd_Cantidad,
-          Presentacion : registrosIPT[index].undMed_Id,
-          Subtotal : registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta,
-          CantMinima : registrosIPT[index].exProd_CantMinima,
-          fechaModificacion : '',
-        }
-        this.ArrayProductosBDNueva.push(dataInventario)
-        this.ArrayProductosBDNueva.sort((a,b) => a.NombreItem.localeCompare(b.NombreItem));
-        this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock < b.CantMinima) - Number(a.Stock < a.CantMinima));
-        this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
-        }
+  fillStockInformation(data: any): Array<StockInformation> {
+    let stockInformation: Array<StockInformation> = [];
+    data.forEach(stock => {
+      stockInformation.push({
+        item: stock.product.item,
+        reference: stock.product.reference,
+        client: stock.client[0].cli.client,
+        stock: stock.stock.stock,
+        price: stock.stock.price,
+        presentation: stock.stock.presentation,
+        subTotal: stock.stock.stockPrice,
+        seller: stock.client[0].vende.name_Vende,
+        avaibleProducion: this.fillAvaibleProduction(stock.avaible_Production),
+        actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
+        junuary: stock.stock_MonthByMonth[0].enero,
+        february: stock.stock_MonthByMonth[0].febrero,
+        march: stock.stock_MonthByMonth[0].marzo,
+        april: stock.stock_MonthByMonth[0].abril,
+        may: stock.stock_MonthByMonth[0].mayo,
+        june: stock.stock_MonthByMonth[0].junio,
+        july: stock.stock_MonthByMonth[0].julio,
+        august: stock.stock_MonthByMonth[0].agosto,
+        september: stock.stock_MonthByMonth[0].septiembre,
+        october: stock.stock_MonthByMonth[0].octubre,
+        november: stock.stock_MonthByMonth[0].noviembre,
+        december: stock.stock_MonthByMonth[0].diciembre,
+      });
     });
-    setTimeout(() => { this.load = true; }, 1000);
+    return stockInformation;
   }
 
-  //Funcion que actualizará un producto
-  actualizarExistenciasProducto(data : any){
-    for (let i = 0; i < this.ArrayProductosBDNueva.length; i++) {
-      if (data.Item == this.ArrayProductosBDNueva[i].Item && data.Presentacion == this.ArrayProductosBDNueva[i].Presentacion) {
-        this.existencias_ProductosService.IdProductoPresentacionInventario(data.Item, data.Presentacion).subscribe(datos_existencias => {
-          for (let j = 0; j < datos_existencias.length; j++) {
-            const datosExistencias : modelExistenciaProductos = {
-              Prod_Id: datos_existencias[j].prod_Id,
-              exProd_Id : datos_existencias[j].exProd_Id,
-              ExProd_Cantidad: this.ArrayProductosBDNueva[i].Stock,
-              UndMed_Id: datos_existencias[j].undMed_Id,
-              TpBod_Id: datos_existencias[j].tpBod_Id,
-              ExProd_Precio: datos_existencias[j].exProd_Precio,
-              ExProd_PrecioExistencia: this.ArrayProductosBDNueva[i].PrecioItem * this.ArrayProductosBDNueva[i].Stock,
-              ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-              TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-              ExProd_PrecioVenta: this.ArrayProductosBDNueva[i].PrecioItem,
-              ExProd_CantMinima : this.ArrayProductosBDNueva[i].CantMinima,
-              ExProd_Fecha : datos_existencias[j].exProd_Fecha,
-              ExProd_Hora: datos_existencias[j].exProd_Hora,
-            }
-            this.existencias_ProductosService.srvActualizar(datos_existencias[j].exProd_Id, datosExistencias).subscribe(datos_actualizados => {
-              this.mostrarConfirmacion(`Advertencia`, `¡Se actualizó la información del producto ${data.NombreItem}!</b>`);
-              this.InventarioExistenciaBDNueva();
-            }, error => { this.mostrarError(`Error`, `¡Error al actualizar la información del producto ${data.NombreItem}!`); });
-          }
-        }, error => { this.mostrarError(`Error`, `¡Error al buscar la información del producto ${data.NombreItem}!`); });
-        break;
-      }
+  fillAvaibleProduction(data: any): Array<AvaibleProducion> {
+    let avaibleProducion: Array<AvaibleProducion> = [];
+    data.forEach(stock => {
+      avaibleProducion.push({
+        NumberProduction: stock.number,
+        Quantity: stock.quantity,
+        Weight: stock.weight,
+        Presentation: stock.presentation,
+        Process: stock.process,
+        Date: stock.date,
+        Hour: stock.hour,
+        Price: stock.price,
+        Turn: stock.turn,
+        Information: stock.information,
+        orderProduction: stock.orderProduction,
+      });
+    });
+    return avaibleProducion;
+  }
+
+  fillActualMonth(data: any) {
+    let month: number = moment().month();
+    const stockMonths = {
+      "0": data.enero,
+      "1": data.febrero,
+      "2": data.marzo,
+      "3": data.abril,
+      "4": data.mayo,
+      "5": data.junio,
+      "6": data.julio,
+      "7": data.agosto,
+      "8": data.septiembre,
+      "9": data.octubre,
+      "10": data.novimebre,
+      "11": data.diciembre,
+    }
+    return stockMonths[month];
+  }
+
+  apliedFilters = ($event, campo: any) => this.tableStock!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+
+  totalStock() {
+    let total: number = 0;
+    this.stockInformation.forEach(stock => total += stock.subTotal);
+    return total;
+  }
+
+  showPopUpCreateAndEdit(data: any = "") {
+    this.recetaProducto = true;
+    this.recetas_ProductosComponent.limpiarTodo();
+    if (data != "") {
+      this.recetas_ProductosComponent.FormProductos.patchValue({ Nombre: data.Id, });
+      this.recetas_ProductosComponent.buscarProductos();
+      setTimeout(() => this.recetas_ProductosComponent.cambiarNombreProducto(), 500);
     }
   }
 
-  // Funcion que va a filtrar los registros de la tabla
-  aplicarfiltroGlobal($event, valorCampo : string){
-    this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+  createExcel() {
+    const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
+    let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+    let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    let workbook = this.createExcelService.formatoExcel(title);
+    this.addPageExcel(workbook, font, border);
+    this.createExcelService.creacionExcel(title, workbook);
   }
 
-  // Funcion que va a actualizar el nombre de los productos
-  actualizarNombreProducto(data : any){
-    this.productosService.srvObtenerListaPorId(data.Item).subscribe(datos_producto => {
-      let datos : any [] = [datos_producto];
-      for (let i = 0; i < datos.length; i++) {
-        const datosProducto = {
-          Prod_Id : datos[i].prod_Id,
-          Prod_Nombre: data.NombreItem,
-          Prod_Descripcion: datos[i].prod_Descripcion,
-          TpProd_Id: datos[i].tpProd_Id,
-          Prod_Peso_Bruto: datos[i].prod_Peso_Bruto,
-          Prod_Peso_Neto: datos[i].prod_Peso_Neto,
-          UndMedPeso: datos[i].undMedPeso,
-          Prod_Fuelle: datos[i].prod_Fuelle,
-          Prod_Ancho: datos[i].prod_Ancho,
-          Prod_Calibre: datos[i].prod_Calibre,
-          UndMedACF: datos[i].undMedACF,
-          Estado_Id: datos[i].estado_Id,
-          Prod_Largo: datos[i].prod_Largo,
-          Pigmt_Id: datos[i].pigmt_Id,
-          Material_Id: datos[i].material_Id,
-          Prod_Fecha : datos[i].prod_Fecha,
-          Prod_Hora: datos[i].prod_Hora,
-        }
-        this.productosService.srvActualizar(datos[i].prod_Id, datosProducto).subscribe(datos_actualizados => {
-          this.mostrarConfirmacion(`Confirmación`,`¡Se actualizó la información del producto ${data.NombreItem}!`);
-          this.InventarioExistenciaBDNueva();
-        }, error => { this.mostrarError(`Error`, `¡Error al actualizar la información del producto ${data.NombreItem}!`); });
-      }
-    }, error => { this.mostrarError(`Error`, `¡Error al buscar la información del producto ${data.NombreItem}!`); });
+  addPageExcel(workbook, font, border) {
+    let pageOne = workbook.worksheets[0];
+    this.addHeaderPageOne(pageOne, font, border);
+    pageOne.mergeCells('A1:T3');
+    pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addDataExcel(pageOne);
   }
 
-  /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+  addHeaderPageOne(worksheet, font, border) {
+    const header = ["Item", "Cliente", "Referencia", "Existencias", "Precio", "Subtotal", "Presentación", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    let headerRow = worksheet.addRow(header);
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+      cell.font = font;
+      cell.border = border;
+    });
   }
 
-  /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  addDataExcel(worksheet) {
+    let dataStock = this.fillDataExcel();
+    dataStock.forEach(d => {
+      let row = worksheet.addRow(d);
+      let formatNumber: number[] = [4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+      formatNumber.forEach(e => row.getCell(e).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    });
+    this.changeSizeColumnsExcel(worksheet);
   }
 
-  /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+  fillDataExcel(): any[] {
+    let dataStock = [];
+    this.stockInformation.forEach(stock => {
+      dataStock.push([
+        stock.item,
+        stock.client,
+        stock.reference,
+        stock.stock,
+        stock.price,
+        stock.subTotal,
+        stock.presentation,
+        stock.seller,
+        stock.junuary,
+        stock.february,
+        stock.march,
+        stock.april,
+        stock.may,
+        stock.june,
+        stock.july,
+        stock.august,
+        stock.september,
+        stock.october,
+        stock.november,
+        stock.december,
+      ]);
+    });
+    return dataStock;
   }
+
+  changeSizeColumnsExcel(worksheet) {
+    let size60: number[] = [2, 3, 8];
+    let size20: number[] = [4, 5, 6, 7];
+    let size15: number[] = [1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    size60.forEach(e => worksheet.getColumn(e).width = 60);
+    size20.forEach(e => worksheet.getColumn(e).width = 20);
+    size15.forEach(e => worksheet.getColumn(e).width = 15);
+    worksheet.getColumn(1).width = 10;
+  }
+}
+
+interface StockInformation {
+  item: number,
+  reference: string,
+  client: string,
+  stock: number,
+  price: number,
+  presentation: string,
+  subTotal: number,
+  seller: string,
+  avaibleProducion: Array<AvaibleProducion>,
+  actualMonth: number,
+  junuary: number,
+  february: number,
+  march: number,
+  april: number,
+  may: number,
+  june: number,
+  july: number,
+  august: number,
+  september: number,
+  october: number,
+  november: number,
+  december: number,
+}
+
+interface AvaibleProducion {
+  NumberProduction: number;
+  Quantity: number,
+  Weight: number,
+  Presentation: string,
+  Process: string,
+  Date: any,
+  Hour: string,
+  Price: number,
+  Turn: string,
+  Information: string,
+  orderProduction: number,
 }
