@@ -690,7 +690,7 @@ export class DesperdicioComponent implements OnInit {
   //Función que filtra la info de la tabla 
   aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 100); 
+    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300); 
     if(!this.dt2.filteredValue) this.desperdicios = this.copiaDesperdicios;
   }
 }

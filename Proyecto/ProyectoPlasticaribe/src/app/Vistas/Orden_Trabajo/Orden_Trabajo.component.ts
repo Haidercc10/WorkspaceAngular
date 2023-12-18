@@ -37,6 +37,9 @@ import { AppComponent } from 'src/app/app.component';
 import { defaultStepOptions, stepsOrdenesTrabajo as defaultSteps, stepsMezclasOT as defaultSteps2 } from 'src/app/data';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { modelProducto } from 'src/app/Modelo/modelProducto';
+import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -130,6 +133,8 @@ export class Orden_TrabajoComponent implements OnInit {
   ultimaOT: number = 0;
   ultimaOTApp: number = 0;
   dataBusquedaxItem: any;
+  ultimoItem : number = 0;
+  hora : any = moment().format('HH:mm:ss');
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -159,7 +164,8 @@ export class Orden_TrabajoComponent implements OnInit {
     private usuarioService: UsuarioService,
     private messageService: MessageService,
     private shepherdService: ShepherdService,
-    private svcSedes: SedeClienteService,) {
+    private svcSedes: SedeClienteService,
+    private svcExistencias : ExistenciasProductosService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -386,6 +392,7 @@ export class Orden_TrabajoComponent implements OnInit {
     this.cargarTiposSellado();
     this.limpiarCampos();
     this.ultimaOTBagPro();
+    this.ultimoIdProducto();
   }
 
   /** Función que mostrará un tutorial describiendo paso a paso cada funcionalidad de la aplicación */
@@ -2931,4 +2938,92 @@ export class Orden_TrabajoComponent implements OnInit {
 
   //Función que cargará la última OT de Plasticaribe. 
   ultimaOTBagPro = () => this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(data => this.ultimaOT = data.item, () => this.msj.mensajeAdvertencia(`No fue posible consultar la última OT de BagPro.`, ``));
+
+  ultimoIdProducto = () => this.productoService.GetIdUltimoProducto().subscribe(data => { this.ultimoItem = data; }, () => this.msj.mensajeAdvertencia(`No fue posible consultar el último ID de Producto.`, ``));
+
+  // Función que va a validar los formularios
+  validarFormularios() {
+    if (this.FormOrdenTrabajo.valid) {
+      setTimeout(() => {
+        if (this.FormOrdenTrabajoExtrusion.valid) {
+          if (this.FormOrdenTrabajoImpresion.valid) {
+            if (this.FormOrdenTrabajoLaminado.valid) {
+              if (this.FormOrdenTrabajoCorte.valid) {
+                if (this.FormOrdenTrabajoSellado.valid) {
+                  if (this.FormOrdenTrabajoMezclas.valid) this.validarNuevoProducto();
+                  else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Sellado tiene campos vacios!`);
+              } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Corte tiene campos vacios!`);
+            } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡El formulario de Impresion tiene campos vacios!`);
+        } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡EL formulario de Extrusion tiene campos vacios!`);
+      }, 700);
+    } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
+  }
+
+   // Función que va a crear un nuevo producto.
+  validarNuevoProducto(){
+    this.productoService.GetProductsByName(this.FormOrdenTrabajo.value.Nombre_Producto).subscribe(data => {
+      if(data.length > 0) this.msj.mensajeAdvertencia(`El producto ${this.FormOrdenTrabajo.value.Nombre_Producto} ya existe!`); //this.validarDatos();
+    }, error => { this.crearNuevoProducto(); });
+  }
+
+  //Función que se encargará de la creación de un nuevo producto
+  crearNuevoProducto(){
+    let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
+    let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
+    this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(data => {
+      let item : modelProducto = {
+        'Prod_Id': this.ultimoItem + 1,
+        'Prod_Nombre': this.FormOrdenTrabajo.value.Nombre_Producto,
+        'Prod_Descripcion': this.FormOrdenTrabajo.value.Nombre_Producto,
+        'TpProd_Id': data.tpProd_Id,
+        'Prod_Peso': this.pesoProducto,
+        'Prod_Peso_Millar': this.FormOrdenTrabajoSellado.value.PesoMillar,
+        'UndMedPeso': 'Kg',
+        'Prod_Fuelle': this.FormOrdenTrabajoSellado.value.Fuelle_Sellado || this.FormOrdenTrabajoCorte.value.Fuelle_Corte,
+        'Prod_Ancho': this.FormOrdenTrabajoSellado.value.Ancho_Sellado || this.FormOrdenTrabajoCorte.value.Ancho_Corte,
+        'Prod_Calibre': this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
+        'UndMedACF': this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+        'Estado_Id': 10,
+        'Prod_Largo': this.FormOrdenTrabajoSellado.value.Largo_Sellado || this.FormOrdenTrabajoCorte.value.Largo_Corte,
+        'Pigmt_Id': this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
+        'Material_Id': this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
+        'Prod_CantBolsasBulto': this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        'Prod_CantBolsasPaquete': this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        'TpSellado_Id': data.tpSellado_Id,
+        'Prod_Fecha': this.today,
+        'Prod_Hora': this.hora,
+        'Prod_PesoBulto': this.FormOrdenTrabajoSellado.value.PesoBulto,
+        'Prod_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        'Prod_PrecioDia_Sellado': this.FormOrdenTrabajoSellado.value.PrecioDia,
+        'Prod_PrecioNoche_Sellado': this.FormOrdenTrabajoSellado.value.PrecioNoche,
+      } 
+      this.productoService.srvGuardar(item).subscribe(data => { this.crearExistenciaProducto(data); }, 
+      error => { this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`) });
+    });
+  }
+
+  // Función que va a crear una nueva existencia de producto.
+  crearExistenciaProducto(data : any) {
+    let existencia : modelExistenciaProductos = {
+      'Prod_Id': data.prod_Id,
+      'exProd_Id': 0,
+      'ExProd_Cantidad': 0,
+      'UndMed_Id': this.FormOrdenTrabajo.value.Presentacion,
+      'TpBod_Id': 3,
+      'ExProd_Precio': 0,
+      'ExProd_PrecioExistencia': 0,
+      'ExProd_PrecioSinInflacion': 0,
+      'TpMoneda_Id': 'COP',
+      'ExProd_PrecioVenta': this.FormOrdenTrabajo.value.Precio,
+      'ExProd_CantMinima': 0,
+      'ExProd_Fecha': this.today,
+      'ExProd_Hora': this.hora,
+    }
+    this.svcExistencias.srvGuardar(existencia).subscribe(data => {
+      this.FormOrdenTrabajo.patchValue({OT_Id : null, Id_Producto: data.prod_Id }); 
+      this.msj.mensajeConfirmacion(`Confirmación`, `Producto ${data.prod_Nombre} creado con éxito!`);
+    }, error => this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`));
+  }
 }
