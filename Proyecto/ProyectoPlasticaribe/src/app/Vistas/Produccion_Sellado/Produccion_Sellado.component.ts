@@ -313,6 +313,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que crea el pdf de la etiqueta
   crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any) {
     let proceso: any = this.procesos.find(x => x.Id == this.formSellado.value.proceso);
+    let operario : any = this.operarios.filter(x => x.usua_Id == this.formSellado.value.idOperario[0]); 
 
     let etiqueta: modelTagProduction = {
       client: this.ordenesTrabajo[0].cliente,
@@ -332,6 +333,7 @@ export class Produccion_SelladoComponent implements OnInit {
       presentationItem2: 'Kg',
       productionProcess: proceso.Nombre,
       showNameBussiness: true,
+      operator: operario[0].usua_Nombre,
     }
     this.svcCrearPDF.createTagProduction(etiqueta);
   }

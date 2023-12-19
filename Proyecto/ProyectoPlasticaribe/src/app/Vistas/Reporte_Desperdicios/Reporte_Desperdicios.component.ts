@@ -11,6 +11,7 @@ import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/mate
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { defaultStepOptions, stepsReporteDesperdicio as defaultSteps } from 'src/app/data';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Component({
   selector: 'app-Reporte_Desperdicios',
@@ -46,7 +47,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
                     private servicioDesperdicios : DesperdicioService,
                       private AppComponent : AppComponent,
                           private shepherdService: ShepherdService,
-                            private msj : MensajesAplicacionService) {
+                            private msj : MensajesAplicacionService, 
+                              private svcPDF : CreacionPdfService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formFiltros = this.formBuilder.group({
       OT : [null],
@@ -63,6 +65,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.cargarMateriales();
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.newPdf();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -89,13 +92,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   /** Función que cargará los materiales en el combobox.*/
-  cargarMateriales(){
-    this.servicioMateriales.srvObtenerLista().subscribe(dataMateriales => {
-      for (let index = 0; index < dataMateriales.length; index++) {
-        if(dataMateriales[index].material_Id != 1) this.arrayMateriales.push(dataMateriales[index])
-      }
-    });
-  }
+  cargarMateriales = () => this.servicioMateriales.srvObtenerLista().subscribe(data => this.arrayMateriales = data.filter(x => x.material_Id != 1));
 
   /** Función que cargará los productos con una consulta de tipo LIKE */
   likeCargarProductos(){
@@ -121,7 +118,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que consultará según los campos de busqueda diferentes de vacio. */
   Consultar() {
-    this.load = false;
     let OT : any = this.formFiltros.value.OT;
     let fecha1 : any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
     let fecha2 : any = moment(this.formFiltros.value.fechaFinal).format('YYYY-MM-DD');
@@ -148,13 +144,14 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
         if (dataDesperdicios.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
         else {
+          this.load = false;
           for (let index = 0; index < dataDesperdicios.length; index++) {
             this.llenarTabla(dataDesperdicios[index]);
           }
+          setTimeout(() => {  this.load = true; }, 1000);
         }
       });
     }, 900);
-    setTimeout(() => {  this.load = true; }, 1000);
   }
 
   /** Llenar la tabla inicial de resultados de busqueda */
@@ -203,7 +200,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       Material : datos.material_Nombre,
       "No_Conformidad" : datos.falla_Nombre,
       Impreso : datos.desp_Impresion,
-      Maquina : datos.actv_Serial,
+      Maquina : datos.maquina,
       Operario : datos.usua_Nombre,
       Fecha : datos.desp_Fecha.replace('T00:00:00', ''),
     }
@@ -471,6 +468,128 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       "No Conformidades" : cantDesperdicios
     }
     this.arrayDatosAgrupadosPdf.push(info);
+  }
+
+  newPdf(){
+    this.servicioDesperdicios.getDesperdicioxOT(126446).subscribe(data => {
+      console.log(data)
+      let title : string = `Reporte de merma de material \nOT N° ${123456}`;
+      let content: any[] = this.contentPDF(data);
+      this.svcPDF.formatoPDF(title, content);
+    });
+  }
+
+  //Adición de contenido al pdf. 
+  contentPDF(data : any) : any {
+    let content : any[] = [];
+    let groupedInformation : any = this.groupedInfo(data);
+    let detailedInformation : any = this.detailedInfo(data);
+    content.push(this.titleInfoConsolidated());
+    content.push(this.headerTableConsolidated(groupedInformation));
+    content.push(this.titleInfoDetails());
+    content.push(this.headerTableDetails(detailedInformation));
+    return content;
+  }
+
+  //Titulo de información consolidada
+  titleInfoConsolidated(){
+    return {
+      text: `Información consolidada de desperdicios\n `,
+      alignment: 'center',
+      style: 'header', 
+      fontSize : 10, 
+      bold : true,
+    };
+  }
+
+  //Encabezado de tabla consolidada
+  headerTableConsolidated(data : any) {
+    let columns : any[] = ['OT', 'Item', 'Referencia', 'No Conformidades', 'Cantidad', 'Presentacion'];
+    let widths: Array<string> = ['10%', '10%', '30%', '20%', '10%', '20%'];
+    return {
+      table : {
+        headerRows : 1,
+        widths : widths, 
+        body : this.builderTableBody(data, columns),  
+        
+      },
+      fontSize : 9,
+      layout : {
+        fillColor : function(rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null; 
+        },
+      }
+    }
+  }
+
+  //Información consolidada de la orden agrupada por OT.
+  groupedInfo(data : any){
+    let info : any = [];
+    data.forEach(x => {
+      if(!info.map(y => y.OT).includes(x.desp_OT)) {
+        let countOrders : number = data.filter(x => x.desp_OT == x.desp_OT).length
+        let total : number = data.filter(x => x.desp_OT == x.desp_OT).reduce((acc, item) => acc + item.desp_PesoKg, 0);
+        let object : any = {
+          'OT' : x.desp_OT,
+          'Item' : x.prod_Id, 
+          'Referencia' : x.prod_Nombre,
+          'No Conformidades' : countOrders,
+          'Cantidad' : total,
+          'Presentacion' : 'Kg' 
+        }
+        info.push(object);
+      }
+    });
+    console.log(info);
+    return info;
+  }
+  
+   //Titulo de información consolidada
+  titleInfoDetails(){
+    return {
+      text: `Información detallada de desperdicios\n `,
+      alignment: 'center',
+      style: 'header', 
+      fontSize : 10, 
+      bold : true,
+    };
+  }
+
+  //Encabezado de tabla consolidada
+  headerTableDetails(data : any) {
+    let columns : any[] = ['OT', 'Proceso', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Fecha'];
+    let widths: Array<string> = ['10%', '10%', '30%', '20%', '10%', '20%'];
+    return {
+      table : {
+        headerRows : 1,
+        widths : widths, 
+        body : this.builderTableBody(data, columns),  
+        
+      },
+      fontSize : 9,
+      layout : {
+        fillColor : function(rowIndex) {
+          return (rowIndex == 0) ? '#DDDDDD' : null; 
+        },
+      }
+    }
+  }
+
+  //Información detallada 
+  detailedInfo(data : any){
+
+  }
+
+  builderTableBody(data, columns) {
+    console.log(data)
+    var body = [];
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
   }
 }
 
