@@ -76,8 +76,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.stockInformation = this.fillStockInformation(data);
       this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
-      const thisRef = this;
-      this.stockInformation.forEach((stock) => thisRef.expandedRows[stock.item] = true);
+      this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
     });
   }
 
@@ -93,7 +92,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         presentation: stock.stock.presentation,
         subTotal: stock.stock.stockPrice,
         seller: stock.client[0].vende.name_Vende,
-        avaibleProducion: this.fillAvaibleProduction(stock.avaible_Production),
+        AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
         actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
         junuary: stock.stock_MonthByMonth[0].enero,
         february: stock.stock_MonthByMonth[0].febrero,
@@ -112,10 +111,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
     return stockInformation;
   }
 
-  fillAvaibleProduction(data: any): Array<AvaibleProducion> {
-    let avaibleProducion: Array<AvaibleProducion> = [];
+  fillAvaibleProduction(data: any): Array<AvaibleProdution> {
+    let AvaibleProdution: Array<AvaibleProdution> = [];
     data.forEach(stock => {
-      avaibleProducion.push({
+      AvaibleProdution.push({
         NumberProduction: stock.number,
         Quantity: stock.quantity,
         Weight: stock.weight,
@@ -129,7 +128,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         orderProduction: stock.orderProduction,
       });
     });
-    return avaibleProducion;
+    return AvaibleProdution;
   }
 
   fillActualMonth(data: any): number {
@@ -257,7 +256,7 @@ interface StockInformation {
   presentation: string,
   subTotal: number,
   seller: string,
-  avaibleProducion: Array<AvaibleProducion>,
+  AvaibleProdution: Array<AvaibleProdution>,
   actualMonth: number,
   junuary: number,
   february: number,
@@ -273,7 +272,7 @@ interface StockInformation {
   december: number,
 }
 
-interface AvaibleProducion {
+interface AvaibleProdution {
   NumberProduction: number;
   Quantity: number,
   Weight: number,
