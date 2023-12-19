@@ -77,6 +77,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       pesoNeto: [null, Validators.required],
       daipita: [null],
       proceso: [null, Validators.required],
+      anchoProducto: [null],
     });
   }
 
@@ -266,10 +267,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validarAnchoCono() {
-    let ancho: number = 0;
+    let ancho: any = 0;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
     let proceso = this.proceso;
-    if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.consultarDatosProducto();
+    console.log(this.formDatosProduccion.value.anchoProducto)
+    if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
     else if (['Doblado'].includes(proceso)) {
       if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
       ancho = ancho1 / 2;
@@ -283,11 +285,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
     });
   }
 
-  consultarDatosProducto() {
+  async consultarDatosProducto() {
     let item = this.formDatosProduccion.get('item').value;
     let datosItem;
     this.productoService.srvObtenerListaPorId(item).subscribe(data => datosItem = data);
-    return datosItem.prod_Ancho;
+    return await datosItem.prod_Ancho;
   }
 
   validarTaraCono(ancho: number): number {
@@ -299,6 +301,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
       else tara = ancho * anchoCono;
     }
+    console.log(tara)
     return tara;
   }
 
@@ -332,6 +335,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
             undExtrusion: datos.und_Extrusion.trim(),
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
+            anchoProducto: datos.selladoCorte_Ancho,
           });
           this.buscarDatosConoSeleccionado();
         });

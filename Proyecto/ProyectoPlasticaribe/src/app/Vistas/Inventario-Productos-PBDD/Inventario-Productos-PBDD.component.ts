@@ -19,11 +19,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
   storage_Id: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
-  columns: Array<any> = [];
-  selectedColumns: Array<any> = [];
+  columns: Array<Columns> = [];
+  selectedColumns: Array<Columns> = [];
   expandedRows: {} = {};
+  stockInformation_Kg: Array<StockInformation> = [];
+  stockInformation_UndPaq: Array<StockInformation> = [];
   stockInformation: Array<StockInformation> = [];
   @ViewChild('tableStock') tableStock: Table | undefined;
+  @ViewChild('tableStock_Kg') tableStock_Kg: Table | undefined;
+  @ViewChild('tableStock_UndPaq') tableStock_UndPaq: Table | undefined;
   recetaProducto: boolean = false;
   @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
 
@@ -35,7 +39,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getStockInformation();
+    this.getStockInformation()
   }
 
   fillColumns() {
@@ -70,8 +74,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
-      const thisRef = this;
-      this.stockInformation.forEach((stock) => thisRef.expandedRows[stock.item] = true);
+      this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
+      this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
+      this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
     });
   }
 
@@ -87,7 +92,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
         presentation: stock.stock.presentation,
         subTotal: stock.stock.stockPrice,
         seller: stock.client[0].vende.name_Vende,
-        avaibleProducion: this.fillAvaibleProduction(stock.avaible_Production),
+        AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
         actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
         junuary: stock.stock_MonthByMonth[0].enero,
         february: stock.stock_MonthByMonth[0].febrero,
@@ -106,10 +111,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
     return stockInformation;
   }
 
-  fillAvaibleProduction(data: any): Array<AvaibleProducion> {
-    let avaibleProducion: Array<AvaibleProducion> = [];
+  fillAvaibleProduction(data: any): Array<AvaibleProdution> {
+    let AvaibleProdution: Array<AvaibleProdution> = [];
     data.forEach(stock => {
-      avaibleProducion.push({
+      AvaibleProdution.push({
         NumberProduction: stock.number,
         Quantity: stock.quantity,
         Weight: stock.weight,
@@ -123,10 +128,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
         orderProduction: stock.orderProduction,
       });
     });
-    return avaibleProducion;
+    return AvaibleProdution;
   }
 
-  fillActualMonth(data: any) {
+  fillActualMonth(data: any): number {
     let month: number = moment().month();
     const stockMonths = {
       "0": data.enero,
@@ -145,11 +150,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
     return stockMonths[month];
   }
 
-  apliedFilters = ($event, campo: any) => this.tableStock!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+  apliedFilters = (data: Table, $event, campo: any) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  totalStock() {
+  totalStock(dataDocument: Array<StockInformation>): number {
     let total: number = 0;
-    this.stockInformation.forEach(stock => total += stock.subTotal);
+    dataDocument.forEach(stock => total += stock.subTotal);
     return total;
   }
 
@@ -163,21 +168,23 @@ export class InventarioProductosPBDDComponent implements OnInit {
     }
   }
 
-  createExcel() {
-    const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
-    let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
-    let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-    let workbook = this.createExcelService.formatoExcel(title);
-    this.addPageExcel(workbook, font, border);
-    this.createExcelService.creacionExcel(title, workbook);
+  createExcel(dataDocument: Array<StockInformation>) {
+    if (dataDocument.length > 0) {
+      const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
+      let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
+      let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      let workbook = this.createExcelService.formatoExcel(title);
+      this.addPageExcel(workbook, font, border, dataDocument);
+      this.createExcelService.creacionExcel(title, workbook);
+    } else this.msg.mensajeAdvertencia(`¡No hay datos suficientes para crear el archivo de Excel!`);
   }
 
-  addPageExcel(workbook, font, border) {
+  addPageExcel(workbook, font, border, dataDocument: Array<StockInformation>) {
     let pageOne = workbook.worksheets[0];
     this.addHeaderPageOne(pageOne, font, border);
     pageOne.mergeCells('A1:T3');
     pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    this.addDataExcel(pageOne);
+    this.addDataExcel(pageOne, dataDocument);
   }
 
   addHeaderPageOne(worksheet, font, border) {
@@ -190,8 +197,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
     });
   }
 
-  addDataExcel(worksheet) {
-    let dataStock = this.fillDataExcel();
+  addDataExcel(worksheet, dataDocument: Array<StockInformation>) {
+    let dataStock = this.fillDataExcel(dataDocument);
     dataStock.forEach(d => {
       let row = worksheet.addRow(d);
       let formatNumber: number[] = [4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20];
@@ -200,9 +207,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.changeSizeColumnsExcel(worksheet);
   }
 
-  fillDataExcel(): any[] {
+  fillDataExcel(dataDocument: Array<StockInformation>): any[] {
     let dataStock = [];
-    this.stockInformation.forEach(stock => {
+    dataDocument.forEach(stock => {
       dataStock.push([
         stock.item,
         stock.client,
@@ -249,7 +256,7 @@ interface StockInformation {
   presentation: string,
   subTotal: number,
   seller: string,
-  avaibleProducion: Array<AvaibleProducion>,
+  AvaibleProdution: Array<AvaibleProdution>,
   actualMonth: number,
   junuary: number,
   february: number,
@@ -265,7 +272,7 @@ interface StockInformation {
   december: number,
 }
 
-interface AvaibleProducion {
+interface AvaibleProdution {
   NumberProduction: number;
   Quantity: number,
   Weight: number,
@@ -277,4 +284,10 @@ interface AvaibleProducion {
   Turn: string,
   Information: string,
   orderProduction: number,
+}
+
+interface Columns {
+  header: string;
+  field: string;
+  type: string;
 }

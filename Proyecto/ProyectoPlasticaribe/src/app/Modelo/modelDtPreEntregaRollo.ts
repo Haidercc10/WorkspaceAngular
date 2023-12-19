@@ -8,6 +8,6 @@ export interface modelDtPreEntregaRollos {
   DtlPreEntRollo_OT : number;
   Prod_Id : number;
   UndMed_Producto : string;
-  Prod_CantBolsasPaquete : number;
-  Prod_CantBolsasBulto : number;
+  Prod_CantBolsasPaquete? : number;
+  Prod_CantBolsasBulto? : number;
 }

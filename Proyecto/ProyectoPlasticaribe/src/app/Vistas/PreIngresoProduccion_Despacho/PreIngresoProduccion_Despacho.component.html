@@ -1,0 +1,203 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Pre Ingreso de Producción</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-book"></i> Datos Pre Ingreso.</h4>
+  </div>
+
+  <form [formGroup]="formData" (ngSubmit)="searchDataOrderProduction()">
+    <div class="row g-4 my-4 justify-content-md-center">
+
+      <!-- PROCESS -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2" *ngIf="ValidarRol == 1">
+        <span class="p-float-label">
+          <p-dropdown formControlName="process" inputId="process" [options]="process" optionLabel="proceso_Nombre" optionValue="proceso_Id" [autoDisplayFirst]="false" [required]="true"></p-dropdown>
+          <label for="Proceso">Proceso</label>
+        </span>
+      </div>
+
+      <!-- ORDER PRODUCTION -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-1">
+        <span class="p-float-label">
+          <input formControlName="orderProduction" id="ot" type="text" pAutoFocus [autofocus]="true" pInputText/>
+          <label for="ot">OT</label>
+        </span>
+      </div>
+
+      <!-- START DATE -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-calendar formControlName="startDate" inputId="startDate" [showIcon]="true"></p-calendar>
+          <label for="startDate">Fecha Inicial</label>
+        </span>
+      </div>
+
+      <!-- END DATE -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-calendar formControlName="endDate" inputId="endDate" [showIcon]="true"></p-calendar>
+          <label for="endDate">Fecha Final</label>
+        </span>
+      </div>
+      
+      <!-- OBSERVATION -->
+      <div class="col-xs-12 col-sm-12 col-md col-lg col-xl col-xxl">
+        <span class="p-float-label">
+          <textarea formControlName="observation" [rows]="1" maxlength="200" pInputTextarea></textarea>
+          <label for="textarea">Observación</label>
+        </span>
+      </div>
+
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" id="crear" type="submit" label="Consultar" icon="pi pi-search"></button>
+      <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser"></button>
+    </div>
+  </form>
+  
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-th-large"></i> Rollos Disponibles.</h4>
+  </div>
+
+  <p-table
+    [value]="production"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    dataKey="numberProduction"
+    [(selection)]="productionSelected"
+    *ngIf="!load">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-checkbox (click)="selectedAllProduction()"></p-checkbox>
+        </th>
+        <th>Numero Rollo</th>
+        <th>Item</th>
+        <th>Referencia</th>
+        <th>Cantidad</th>
+        <th>Presentación</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data>
+      <tr>
+        <td pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
+        </td>
+        <td>{{data.numberProduction}}</td>
+        <td>{{data.item}}</td>
+        <td>{{data.reference}}</td>
+        <td>{{data.quantity | number : '1.2-2'}}</td>
+        <td>{{data.presentation}}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="4">Total</td>
+        <td colspan="2"></td>
+      </tr>
+    </ng-template>
+  </p-table>
+  
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Rollos Seleccionados.</h4>
+  </div>
+
+  <p-table
+    [value]="productionSelected"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    [(selection)]="production"
+    dataKey="numberProduction"
+    *ngIf="!load">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem" pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-checkbox (click)="deselectedAllProduction()"></p-checkbox>
+        </th>
+        <th>Numero Rollo</th>
+        <th>Item</th>
+        <th>Referencia</th>
+        <th>Cantidad</th>
+        <th>Presentación</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data>
+      <tr>
+        <td pFrozenColumn [frozen]="true" alignFrozen="left">
+          <p-tableCheckbox [value]="data" (click)="deselectedProduction(data)"></p-tableCheckbox>
+        </td>
+        <td>{{data.numberProduction}}</td>
+        <td>{{data.item}}</td>
+        <td>{{data.reference}}</td>
+        <td>{{data.quantity | number : '1.2-2'}}</td>
+        <td>{{data.presentation}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Consolidado de Productos Elegidos</h4>
+  </div>
+
+  <p-table
+    [value]="consolidatedProduction"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    dataKey="item">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Item</th>
+        <th>Referencia</th>
+        <th>Cantidad</th>
+        <th>Cantidad Rollos</th>
+        <th>Presentación</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data>
+      <tr>
+        <td>{{data.item}}</td>
+        <td>{{data.reference}}</td>
+        <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
+        <td>{{totalCountProductionByProduct(data.item) | number : '1.2-2'}}</td>
+        <td>{{data.presentation}}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="3">Total</td>
+        <td colspan="2">{{productionSelected.length | number : '1.2-2'}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-divider></p-divider>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button pButton class="p-button-danger" type="button" label="Crear Pre Ingreso" icon="pi pi-send" (click)="validateInformation()"></button>
+    <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+  </div>
+
+</p-card>

@@ -22,6 +22,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   columns: Array<any> = [];
   selectedColumns: Array<any> = [];
   expandedRows: {} = {};
+  stockInformation_Kg: Array<StockInformation> = [];
+  stockInformation_UndPaq: Array<StockInformation> = [];
   stockInformation: Array<StockInformation> = [];
   @ViewChild('tableStock') tableStock: Table | undefined;
   recetaProducto: boolean = false;
@@ -70,6 +72,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
+      this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
+      this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       const thisRef = this;
       this.stockInformation.forEach((stock) => thisRef.expandedRows[stock.item] = true);
     });
@@ -163,21 +167,21 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     }
   }
 
-  createExcel() {
+  createExcel(dataDocuemnt : Array<StockInformation>) {
     const title = `Inventario de Productos Terminados ${moment().format('YYYY-MM-DD')}`;
     let font: any = { name: 'Comic Sans MS', family: 4, size: 9, underline: true, bold: true };
     let border: any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
     let workbook = this.createExcelService.formatoExcel(title);
-    this.addPageExcel(workbook, font, border);
+    this.addPageExcel(workbook, font, border, dataDocuemnt);
     this.createExcelService.creacionExcel(title, workbook);
   }
 
-  addPageExcel(workbook, font, border) {
+  addPageExcel(workbook, font, border, dataDocuemnt : Array<StockInformation>) {
     let pageOne = workbook.worksheets[0];
     this.addHeaderPageOne(pageOne, font, border);
     pageOne.mergeCells('A1:T3');
     pageOne.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-    this.addDataExcel(pageOne);
+    this.addDataExcel(pageOne, dataDocuemnt);
   }
 
   addHeaderPageOne(worksheet, font, border) {
@@ -190,8 +194,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     });
   }
 
-  addDataExcel(worksheet) {
-    let dataStock = this.fillDataExcel();
+  addDataExcel(worksheet, dataDocuemnt : Array<StockInformation>) {
+    let dataStock = this.fillDataExcel(dataDocuemnt);
     dataStock.forEach(d => {
       let row = worksheet.addRow(d);
       let formatNumber: number[] = [4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20];
@@ -200,7 +204,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.changeSizeColumnsExcel(worksheet);
   }
 
-  fillDataExcel(): any[] {
+  fillDataExcel(dataDocuemnt : Array<StockInformation>): any[] {
     let dataStock = [];
     this.stockInformation.forEach(stock => {
       dataStock.push([
