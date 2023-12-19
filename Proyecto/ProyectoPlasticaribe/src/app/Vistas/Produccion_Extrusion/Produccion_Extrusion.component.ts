@@ -77,6 +77,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       pesoNeto: [null, Validators.required],
       daipita: [null],
       proceso: [null, Validators.required],
+      anchoProducto: [null]
     });
   }
 
@@ -275,12 +276,12 @@ export class Produccion_ExtrusionComponent implements OnInit {
     let ancho: number = 0;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
     let proceso = this.proceso;
-    if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.consultarDatosProducto();
+    if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
     else if (['Doblado'].includes(proceso)) {
-      if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
+      if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
       ancho = ancho1 / 2;
     } else {
-      if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
+      if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
       ancho = ancho1;
     }
     this.formDatosProduccion.patchValue({
@@ -338,6 +339,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
             undExtrusion: datos.und_Extrusion.trim(),
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
+            anchoProducto: datos.selladoCorte_Ancho
           });
           this.buscarDatosConoSeleccionado();
         });
