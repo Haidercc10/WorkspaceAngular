@@ -413,7 +413,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
   guardarProduccion() {
     this.cargando = true;    
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
+      // this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
+      this.searchDataTagCreated(res.numero_Rollo);
       this.limpiarCampos();
       this.formDatosProduccion.patchValue({ ordenTrabajo: res.ot });
       this.buscraOrdenTrabajo();
@@ -438,6 +439,34 @@ export class Produccion_ExtrusionComponent implements OnInit {
     };
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
     return processMapping[proceso] || proceso;
+  }
+
+  searchDataTagCreated(reel: number){
+    this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
+      res.forEach(data => {
+        let dataTagProduction: modelTagProduction = {
+          client: data.clienteNombre.trim(),
+          item: data.clienteItem.trim(),
+          reference: data.clienteItemNombre.trim(),
+          width: data.extancho,
+          height: data.extlargo,
+          bellows: data.extfuelle,
+          und: data.extunidad.trim(),
+          cal: data.calibre,
+          orderProduction: data.ot.trim(),
+          material: data.material.trim(),
+          quantity: data.extBruto,
+          quantity2: data.extnetokg,
+          reel: data.item,
+          presentationItem1: 'Kg Bruto',
+          presentationItem2: 'Kg Neto',
+          productionProcess: data.nomStatus.trim(),
+          showNameBussiness: this.showNameBussiness,
+        }
+        console.log(dataTagProduction);
+        this.createPDFService.createTagProduction(dataTagProduction);
+      });
+    });
   }
 
   createTagProduction(code: number, quantity: number, quantity2: number) {
