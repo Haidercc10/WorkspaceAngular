@@ -20,7 +20,6 @@ import { AppComponent } from 'src/app/app.component';
 export class Produccion_SelladoComponent implements OnInit {
 
   cargando: boolean = false; //Variable de carga 
-  ValidarRol: number;
   modoSeleccionado: boolean = false; //Variable de modo de seleccion
   formSellado !: FormGroup; //Formulario de sellado
   turnos: any[] = []; //array que contiene los diferentes turnos
@@ -38,6 +37,10 @@ export class Produccion_SelladoComponent implements OnInit {
   cantActual: number = 0; //Guardará la cantidad pesada de unidades/paquetes/kilos del bulto del item de la ot consultada
   pesoActual: number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada  
   medida: string = '';
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -53,14 +56,17 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.getTurnos();
     this.getOperarios();
     this.cargarTurnoActual();
     this.getPuertoSerial();
-    this.lecturaStorage();
   }
 
-  lecturaStorage() {
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.AppComponent.storage_Id;
+    this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
   }
 
@@ -312,6 +318,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que crea el pdf de la etiqueta
   crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any) {
     let proceso: any = this.procesos.find(x => x.Id == this.formSellado.value.proceso);
+    let operario : any = this.operarios.filter(x => x.usua_Id == this.formSellado.value.idOperario[0]); 
 
     let etiqueta: modelTagProduction = {
       client: this.ordenesTrabajo[0].cliente,
@@ -331,6 +338,7 @@ export class Produccion_SelladoComponent implements OnInit {
       presentationItem2: 'Kg',
       productionProcess: proceso.Nombre,
       showNameBussiness: true,
+      operator: operario[0].usua_Nombre,
     }
     this.svcCrearPDF.createTagProduction(etiqueta);
   }

@@ -105,7 +105,7 @@ export class CreacionPdfService {
             info: { title: `Etiqueta ${code}` },
             pageSize: { width: 188.97640176, height: 377.95280352 },
             pageMargins: [10, 10, 10, 20],
-            footer: this.footerPDF(dataTag.productionProcess),
+            footer: this.footerPDF(dataTag.productionProcess, dataTag.operator),
             content: this.contentPDF(dataTag),
         }
         pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => window.electron.send('print-pdf', buffer));
@@ -234,10 +234,13 @@ export class CreacionPdfService {
         ];
     }
 
-    private footerPDF(productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO') {
+    private footerPDF(productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO', operator?: any) {
+        let width: number = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? operator.length > 30 ? 170 : operator.length >= 20 && operator.length < 30 ? 130 : 100 : 0;
+        let operative: string = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? `${operator}` : '';
         return {
             columns: [
-                { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8 },
+                { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, },
+                { text: operative, alignment: 'center', fontSize: 8, width: width, },
                 { text: productionProcess, alignment: 'center', fontSize: 8 },
             ]
         }
@@ -262,4 +265,5 @@ export interface modelTagProduction {
     presentationItem2: string;
     productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO';
     showNameBussiness?: boolean;
+    operator?: string;
 }
