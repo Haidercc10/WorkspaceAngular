@@ -100,7 +100,8 @@ export class Produccion_SelladoComponent implements OnInit {
     this.produccion = [];
     this.cargarTurnoActual();
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
-      this.svcSedes.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(sede => {
+      let nitClient = data[0].nitCliente == null ? data[0].id_Cliente == null ? 1 : data[0].id_Cliente : data[0].nitCliente;
+      this.svcSedes.GetSedeClientexNitBagPro(nitClient).subscribe(sede => {
         if (data.length > 0) {
           this.cargando = true;
           this.ordenConsultada = this.formSellado.value.ot;
@@ -240,8 +241,8 @@ export class Produccion_SelladoComponent implements OnInit {
       setTimeout(() => {
         this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.limpiarCampos();
-        //this.formSellado.patchValue({ ot : this.ordenConsultada});
-        //this.buscarOT(); 
+        this.formSellado.patchValue({ ot : this.ordenConsultada});
+        this.buscarOT(); 
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
   }

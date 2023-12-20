@@ -74,12 +74,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   updateProductionZeus() {
     let count: number = 0;
     this.sendProductionZeus.forEach(data => {
-      let ot = data.pp.ot;
-      let item = data.producto.prod_Id;
-      let presentation = data.pp.presentacion;
-      let reel = data.pp.numero_Rollo;
-      let quantity = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
-      let price = data.pp.precio;
+      let ot: string = data.pp.ot;
+      let item: number = data.producto.prod_Id;
+      let presentation: string = data.pp.presentacion;
+      let reel: number = data.pp.numero_Rollo;
+      let quantity: number = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
+      let price: number = data.pp.precio;
       if (presentation == 'Unidad') presentation = 'UND';
       else if (presentation == 'Kilo') presentation = 'KLS';
       else if (presentation == 'Paquete') presentation = 'PAQ';

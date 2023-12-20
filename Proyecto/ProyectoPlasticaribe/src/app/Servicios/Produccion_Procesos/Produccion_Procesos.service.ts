@@ -22,7 +22,7 @@ export class Produccion_ProcesosService {
 
   GetInformationAboutProductionToUpdateZeus = (production: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionToUpdateZeus/${production}`);
 
-  sendProductionToZeus = (ot: number, item: number, presentation: string, reel: number, quantity: number, price: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/EnviarAjuste/${ot}/${item}/${presentation}/${reel}/${quantity}/${price}`);
+  sendProductionToZeus = (ot: string, item: number, presentation: string, reel: number, quantity: number, price: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/EnviarAjuste/${ot}/${item}/${presentation}/${reel}/${quantity}/${price}`);
 
   Post = (body: modelProduccionProcesos): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
 }

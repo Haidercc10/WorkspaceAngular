@@ -415,6 +415,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
       this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
       this.limpiarCampos();
+      this.formDatosProduccion.patchValue({ ordenTrabajo: res.ot });
+      this.buscraOrdenTrabajo();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
