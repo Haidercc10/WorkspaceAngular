@@ -181,10 +181,16 @@ export class CreacionPdfService {
                     widths: ['auto', '*', 'auto', 'auto'],
                     body: [
                         [
-                            { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 11, alignment: 'center' },
-                            { text: `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}`, bold: true, fontSize: 10, alignment: 'center' },
-                            { text: `CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}`, bold: true, fontSize: 10, alignment: 'center' },
-                            { text: `Material: ${dataTag.material}`, bold: true, fontSize: 10, alignment: 'center' },
+                            { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center' },
+                            { 
+                                text: `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`, 
+                                bold: true, 
+                                fontSize: 9, 
+                                alignment: 'center',
+                                colSpan: 3,
+                            },
+                            {},
+                            {},
                         ]
                     ]
                 },
