@@ -26,7 +26,7 @@ export class Produccion_ProcesosService {
 
   GetInformationAboutProductionByOrderProduction_Process = (order: number, process: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionByOrderProduction_Process/${order}/${process}`);
 
-  sendProductionToZeus = (ot: number, item: number, presentation: string, reel: number, quantity: number, price: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/EnviarAjuste/${ot}/${item}/${presentation}/${reel}/${quantity}/${price}`);
+  sendProductionToZeus = (ot: string, item: string, presentation: string, reel: number, quantity: string, price: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/EnviarAjuste/${ot}/${item}/${presentation}/${reel}/${quantity}/${price}`);
 
   putChangeStateProduction = (production: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putCambiarEstadoRollo/${production}`, production);
 

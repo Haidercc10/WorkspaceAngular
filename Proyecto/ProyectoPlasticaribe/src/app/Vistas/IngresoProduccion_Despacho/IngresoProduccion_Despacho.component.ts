@@ -83,17 +83,17 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   }
 
   updateProductionZeus(data: any) {
-    let ot = data.pp.ot;
-    let item = data.producto.prod_Id;
-    let presentation = data.pp.presentacion;
-    let reel = data.pp.numero_Rollo;
-    let quantity = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
-    let price = data.pp.precio;
+    let ot: string = data.pp.ot;
+    let item: string = data.producto.prod_Id;
+    let presentation: string = data.pp.presentacion;
+    let reel: number = data.pp.numero_Rollo;
+    let quantity: number = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
+    let price: number = data.pp.precio;
     if (presentation == 'Und') presentation = 'UND';
     else if (presentation == 'Kg') presentation = 'KLS';
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
-    this.productionProcessSerivce.sendProductionToZeus(ot.toString(), item.toString(), presentation.toString(), parseInt(reel), parseFloat(quantity), parseFloat(price)).subscribe(() => {
+    this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
       this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
     }, error => this.msj.mensajeError(error));
   }
