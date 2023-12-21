@@ -248,7 +248,8 @@ export class Produccion_SelladoComponent implements OnInit {
     this.svcProdProcesos.Post(entrada).subscribe(data => {
       this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id);
       setTimeout(() => {
-        this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
+        if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
+        else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
         this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, });
