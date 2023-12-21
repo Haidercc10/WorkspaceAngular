@@ -159,7 +159,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   }
 
   removeProduction(data: any) {
-    let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+    let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
     this.sendProductionZeus.splice(i, 1);
   }
 }
