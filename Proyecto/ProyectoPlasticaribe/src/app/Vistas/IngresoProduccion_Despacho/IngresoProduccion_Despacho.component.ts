@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import moment from 'moment';
+import { start } from 'repl';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
@@ -24,7 +28,9 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     private productionProcessSerivce: Produccion_ProcesosService,
     private msj: MensajesAplicacionService,
     private createPDFService: CreacionPdfService,
-    private bagproService: BagproService,) {
+    private bagproService: BagproService,
+    private entraceService : EntradaRollosService,
+    private dtEntracesService : DetallesEntradaRollosService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
@@ -66,27 +72,61 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             extrusion_Calibre: res[0].calibre_Extrusion,
             material: res[0].material,
           }
+          this.updateProductionZeus(this.sendProductionZeus[i]);
         });
       });
     }
   }
 
-  updateProductionZeus() {
-    let count: number = 0;
-    this.sendProductionZeus.forEach(data => {
-      let ot = data.pp.ot;
-      let item = data.producto.prod_Id;
-      let presentation = data.pp.presentacion;
-      let reel = data.pp.numero_Rollo;
-      let quantity = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
-      let price = data.pp.precio;
-      if (presentation == 'Unidad') presentation = 'UND';
-      else if (presentation == 'Kilo') presentation = 'KLS';
-      else if (presentation == 'Paquete') presentation = 'PAQ';
-      this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity, price).subscribe(() => {
-        count++;
-        if (count == this.sendProductionZeus.length) this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-      }, error => this.msj.mensajeError(error));
+  updateProductionZeus(data: any) {
+    let ot = data.pp.ot;
+    let item = data.producto.prod_Id;
+    let presentation = data.pp.presentacion;
+    let reel = data.pp.numero_Rollo;
+    let quantity = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
+    let price = data.pp.precio;
+    if (presentation == 'Und') presentation = 'UND';
+    else if (presentation == 'Kg') presentation = 'KLS';
+    else if (presentation == 'Paquete') presentation = 'PAQ';
+    this.saveDataEntrace(data);
+    this.productionProcessSerivce.sendProductionToZeus(ot.toString(), item.toString(), presentation.toString(), parseInt(reel), parseFloat(quantity), parseFloat(price)).subscribe(() => {
+      this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+    }, error => this.msj.mensajeError(error));
+  }
+
+  saveDataEntrace(data: any){
+    let info : any = {
+      EntRolloProd_Fecha : moment().format('YYYY-MM-DD'),
+      EntRolloProd_Observacion : '',
+      Usua_Id : this.storage_Id,
+      EntRolloProd_Hora : moment().format('H:mm:ss'),
+    }
+    this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), error => {
+      this.load = false;
+      this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`);
+    });
+  }
+
+  saveDataDetalleEntrance(id: number, data: any){
+    let info : any = {
+      EntRolloProd_Id : id,
+      Rollo_Id : data.pp.numero_Rollo,
+      DtEntRolloProd_Cantidad : data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto,
+      UndMed_Rollo : data.pp.presentacion,
+      Estado_Id : 19,
+      DtEntRolloProd_OT : data.pp.ot,
+      Prod_Id : data.producto.prod_Id,
+      UndMed_Prod : data.pp.presentacion,
+      Prod_CantPaquetesRestantes : 0,
+      Prod_CantBolsasPaquete : 0,
+      Prod_CantBolsasBulto : 0,
+      Prod_CantBolsasRestates : 0,
+      Prod_CantBolsasFacturadas : 0,
+      Proceso_Id : data.proceso.proceso_Id,
+    }
+    this.dtEntracesService.srvGuardar(info).subscribe(null, () => {
+      this.load = false;
+      this.msj.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
     });
   }
 

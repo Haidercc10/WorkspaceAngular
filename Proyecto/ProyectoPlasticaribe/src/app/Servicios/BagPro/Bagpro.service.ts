@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrden_Trabajo_BagPro } from 'src/app/Modelo/modelOrden_Trabajo';
 import { environment } from 'src/environments/environment';
-import { arrayBuffer } from 'stream/consumers';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +31,8 @@ export class BagproService {
   GetInformacionOrden_Proceso = (orden : string, proceso : string) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/getInformacionOrden_Proceso/${orden}/${proceso}`);
 
   AjusteExistenciaSellado = (rollos : number []) => this.http.post(`${this.rutaBagPro}/ProcSellado/ajusteExistencia`, rollos);
+
+  EnvioZeusProcSellado = (rollo: number) => this.http.get(`${this.rutaBagPro}/ProcExtrusion/EnviarAjuste/${rollo}`);
   
   GetProduccionSellado = (ot : any) => this.http.get<any>(this.rutaBagPro + `/ProcSellado/getProduccionSellado/${ot}`);
 
@@ -66,6 +67,8 @@ export class BagproService {
   GetProduccionDetalladaAreas = (inicio, fin, ruta) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProduccionDetalladaAreas/${inicio}/${fin}${ruta}`);
 
   AjusteExistenciaEmpaque = (rollos : number []) => this.http.post(`${this.rutaBagPro}/ProcExtrusion/ajusteExistencia`, rollos);
+
+  EnvioZeusProcExtrusion = (rollo: number) => this.http.get(`${this.rutaBagPro}/ProcExtrusion/EnviarAjuste/${rollo}`);
 
   GetDatosRollosPesados = (orden : string, proceso : string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getDatosRollosPesados/${orden}/${proceso}`);
 
