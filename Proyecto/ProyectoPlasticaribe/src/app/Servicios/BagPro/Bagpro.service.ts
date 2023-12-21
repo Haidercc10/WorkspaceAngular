@@ -34,6 +34,8 @@ export class BagproService {
   
   GetProduccionSellado = (ot : any) => this.http.get<any>(this.rutaBagPro + `/ProcSellado/getProduccionSellado/${ot}`);
 
+  GetEtiquetaBagpro = (rollo : any, reimpresion : any) => this.http.get<any>(this.rutaBagPro + `/ProcSellado/getEtiquetaBagpro/${rollo}/${reimpresion}`);
+
   /***************************************************** PROCEXTRUSION ***************************************************************/
 
   srvObtenerListaProcExt = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');

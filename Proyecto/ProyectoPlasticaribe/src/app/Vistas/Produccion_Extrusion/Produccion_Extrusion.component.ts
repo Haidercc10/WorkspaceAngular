@@ -416,7 +416,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
       // this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
       this.searchDataTagCreated(res.numero_Rollo);
       this.limpiarCampos();
-      this.formDatosProduccion.patchValue({ ordenTrabajo: res.ot });
+      this.formDatosProduccion.patchValue({
+        ordenTrabajo: res.ot,
+        maquina : res.maquina,
+        operario : res.operario1_Id
+      });
       this.buscraOrdenTrabajo();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
     }, () => {

@@ -28,7 +28,7 @@ export class Produccion_SelladoComponent implements OnInit {
   produccion: any[] = []; //array que contiene las diferentes producciones
   @ViewChild('dtProduccion') dtProduccion: Table | undefined; //Tabla de produccion
   hoy: any = moment().format('YYYY-MM-DD'); //Fecha actual
-  hora: any = moment().format('hh:mm:ss'); //Hora actual
+  hora: any = moment().format('HH:mm:ss'); //Hora actual
   esSoloLectura: boolean = true;  //Variable que ccolocará el campo cantidad editable o no.
   ordenConsultada: any; //Variable que guardará la orden actual consultada
   procesos: any = [{ Id: 'SELLA', Nombre: 'SELLADO' }, { Id: 'WIKE', Nombre: 'WIKETIADO' }]; //Array que guarda los procesos
@@ -41,6 +41,8 @@ export class Produccion_SelladoComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
+  maquinaConsultada : number;
+  operariosConsultados : any = [];
 
   constructor(private AppComponent: AppComponent,
     private svcTurnos: TurnosService,
@@ -98,13 +100,13 @@ export class Produccion_SelladoComponent implements OnInit {
   buscarOT() {
     this.ordenesTrabajo = [];
     this.produccion = [];
+    this.cargando = true;
     this.cargarTurnoActual();
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
-      let nitClient = data[0].nitCliente == null ? data[0].id_Cliente == null ? 1 : data[0].id_Cliente : data[0].nitCliente;
-      this.svcSedes.GetSedeClientexNitBagPro(nitClient).subscribe(sede => {
+      let nitCliente : any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
+      this.svcSedes.GetSedeClientexNitBagPro(nitCliente).subscribe(sede => {
         if (data.length > 0) {
-          this.cargando = true;
-          this.ordenConsultada = this.formSellado.value.ot;
+          this.cargarCamposUltimaOT();
           this.ordenesTrabajo = data;
           this.ordenesTrabajo[0].nitCliente = sede[0].id_Cliente;
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
@@ -118,8 +120,15 @@ export class Produccion_SelladoComponent implements OnInit {
         this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
         this.limpiarCampos();
       });
-    }) 
+    }, error => { this.cargando = false; }) 
   }
+
+  //Función que cargará los campos 
+  cargarCamposUltimaOT(){
+    this.ordenConsultada = this.formSellado.value.ot;
+    this.maquinaConsultada = this.formSellado.value.maquina;
+    this.operariosConsultados = this.formSellado.value.idOperario;
+  } 
 
   //Función que carga la producción de sellado para la OT consultada
   cargarProduccionSellado(ot: any) {
@@ -194,8 +203,8 @@ export class Produccion_SelladoComponent implements OnInit {
       'Turno_Id': this.formSellado.value.turno,
       'Envio_Zeus': false,
       'Datos_Etiqueta': `${orden.selladoCorte_Ancho} X ${orden.selladoCorte_Largo}`,
-      'Fecha': this.hoy,
-      'Hora': this.hora,
+      'Fecha': moment().format('YYYY-MM-DD'),
+      'Hora': moment().format('HH:mm:ss'),
       'Creador_Id': this.AppComponent.storage_Id,
     }
     if (entrada.Presentacion == 'Kg') entrada.Cantidad = entrada.Peso_Bruto;
@@ -237,11 +246,12 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any) {
     this.svcProdProcesos.Post(entrada).subscribe(data => {
-      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion);
+      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id);
       setTimeout(() => {
         this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
+        this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ ot : this.ordenConsultada});
+        this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, });
         this.buscarOT(); 
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
@@ -317,31 +327,35 @@ export class Produccion_SelladoComponent implements OnInit {
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   //Función que crea el pdf de la etiqueta
-  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any) {
+  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion : number, operador : any) {
     let proceso: any = this.procesos.find(x => x.Id == this.formSellado.value.proceso);
-    let operario : any = this.operarios.filter(x => x.usua_Id == this.formSellado.value.idOperario[0]); 
-
-    let etiqueta: modelTagProduction = {
-      client: this.ordenesTrabajo[0].cliente,
-      item: this.ordenesTrabajo[0].id_Producto,
-      reference: this.ordenesTrabajo[0].producto,
-      width: this.ordenesTrabajo[0].ancho1_Extrusion,
-      height: this.ordenesTrabajo[0].ancho2_Extrusion,
-      bellows: this.ordenesTrabajo[0].ancho3_Extrusion,
-      und: this.ordenesTrabajo[0].und_Extrusion,
-      cal: this.ordenesTrabajo[0].calibre_Extrusion,
-      orderProduction: this.formSellado.value.ot,
-      material: this.ordenesTrabajo[0].material,
-      quantity: cantUnd,
-      quantity2: cantKg,
-      reel: rollo,
-      presentationItem1: medida != 'Kg' ? `${medida}(s)` : 'Kg',
-      presentationItem2: 'Kg',
-      productionProcess: proceso.Nombre,
-      showNameBussiness: true,
-      operator: operario[0].usua_Nombre,
-    }
-    this.svcCrearPDF.createTagProduction(etiqueta);
+    let operario : any;
+    if(reimpresion == 0) operario = this.operarios.filter(x => x.usua_Id == operador);
+    else if(reimpresion == 1) operario = this.operarios.filter(x => x.usua_Nombre == operador);
+    
+    this.svcBagPro.GetEtiquetaBagpro(rollo, reimpresion).subscribe(data => {
+      let etiqueta: modelTagProduction = {
+        'client': this.ordenesTrabajo[0].cliente,
+        'item': this.ordenesTrabajo[0].id_Producto,
+        'reference': this.ordenesTrabajo[0].producto,
+        'width': this.ordenesTrabajo[0].ancho1_Extrusion,
+        'height': this.ordenesTrabajo[0].ancho2_Extrusion,
+        'bellows': this.ordenesTrabajo[0].ancho3_Extrusion,
+        'und': this.ordenesTrabajo[0].und_Extrusion,
+        'cal': this.ordenesTrabajo[0].calibre_Extrusion,
+        'orderProduction': this.formSellado.value.ot,
+        'material': this.ordenesTrabajo[0].material,
+        'quantity': medida == 'Kg' ? cantUnd : Math.trunc(cantUnd),
+        'quantity2': cantKg,
+        'reel': data[0].bulto,
+        'presentationItem1': medida != 'Kg' ? `${medida}(s)` : 'Kg',
+        'presentationItem2': 'Kg',
+        'productionProcess': proceso.Nombre,
+        'showNameBussiness': true,
+        'operator': operario[0].usua_Nombre,
+      }
+      this.svcCrearPDF.createTagProduction(etiqueta);
+    }, error => { this.svcMsjs.mensajeError(`Error`, `No fue posible generar la etiqueta, por favor verifique!`) });
   }
 
   //Función que calcula el peso teorico
