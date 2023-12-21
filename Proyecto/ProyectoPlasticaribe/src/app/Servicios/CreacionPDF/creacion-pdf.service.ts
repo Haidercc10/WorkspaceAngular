@@ -243,7 +243,7 @@ export class CreacionPdfService {
         return {
             columns: [ 
                 { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, },
-                { text: operative, alignment: 'center', fontSize: 8, width : width, },
+                { text: operative, alignment: 'center', fontSize: 8, width : width, bold : true, },
                 { text: productionProcess, alignment: 'center', fontSize: 8 },
             ]
         }

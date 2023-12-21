@@ -507,13 +507,14 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     let columns : any[] = ['OT', 'Item', 'Referencia', 'No Conformidades', 'Cantidad', 'Presentacion'];
     let widths: Array<string> = ['10%', '10%', '30%', '20%', '10%', '20%'];
     return {
+      margin: [0, 0, 0, 10],
+      borders : 'noBorders',
       table : {
         headerRows : 1,
         widths : widths, 
-        body : this.builderTableBody(data, columns),  
-        
+        body : this.builderTableBody(data, columns),
       },
-      fontSize : 9,
+      fontSize : 8,
       layout : {
         fillColor : function(rowIndex) {
           return (rowIndex == 0) ? '#DDDDDD' : null; 
@@ -540,7 +541,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
         info.push(object);
       }
     });
-    console.log(info);
     return info;
   }
   
@@ -557,16 +557,16 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Encabezado de tabla consolidada
   headerTableDetails(data : any) {
-    let columns : any[] = ['OT', 'Proceso', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Fecha'];
-    let widths: Array<string> = ['10%', '10%', '30%', '20%', '10%', '20%'];
+    let columns : any[] = ['OT', 'Item', 'Proceso', 'Maquina', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Fecha'];
+    let widths: Array<string> = ['9%','9%','9%','9%','9%','9%','9%','9%','9%','9%','9%'];
     return {
+      margin: [0, 0, 0, 0],
       table : {
         headerRows : 1,
         widths : widths, 
-        body : this.builderTableBody(data, columns),  
-        
+        body : this.builderTableBody(data, columns),
       },
-      fontSize : 9,
+      fontSize : 8,
       layout : {
         fillColor : function(rowIndex) {
           return (rowIndex == 0) ? '#DDDDDD' : null; 
@@ -577,7 +577,26 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Información detallada 
   detailedInfo(data : any){
-
+    let info : any = [];
+    data.forEach(x => {
+      const completeData : any = {
+        'OT' : x.desp_OT,
+        'Item' : x.prod_Id,
+        'NombreItem' : x.prod_Nombre,
+        'Peso' : x.desp_PesoKg,
+        'Cantidad' : this.formatonumeros(x.desp_PesoKg),
+        'Und' : 'Kg',
+        'Proceso' : x.proceso_Nombre,
+        'Material' : x.material_Nombre,
+        "No_Conformidad" : x.falla_Nombre,
+        'Impreso' : x.desp_Impresion,
+        'Maquina' : x.maquina,
+        'Operario' : x.usua_Nombre,
+        'Fecha' : x.desp_Fecha.replace('T00:00:00', ''),
+      }
+      info.push(completeData);
+    });
+    return info;
   }
 
   builderTableBody(data, columns) {

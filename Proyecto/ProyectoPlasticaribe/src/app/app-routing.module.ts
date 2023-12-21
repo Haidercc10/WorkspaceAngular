@@ -146,7 +146,7 @@ export const routes: Routes = [
   { path: 'movimientos-orden-facturacion', loadChildren: () => import('./Modules/movimientos-orden-facturacion/movimientos-orden-facturacion.module').then(m => m.MovimientosOrdenFacturacionModule) },
   { path: 'devolucion-facturacion', loadChildren: () => import('./Modules/devolucion-orden-facturacion/devolucion-orden-facturacion.module').then(m => m.DevolucionOrdenFacturacionModule) },
   { path: 'pre-ingreso-produccion', loadChildren: () => import('./Modules/pre-ingreso-produccion-despacho/pre-ingreso-produccion-despacho.module').then(m => m.PreIngresoProduccionDespachoModule) },
-
+  { path: 'mov-preingreso-produccion', loadChildren: () => import('./Modules/movimientos-preingreso-produccion/movimientos-preingreso-produccion.module').then(m => m.MovimientosPreingresoProduccionModule) },
 ]
 
 @NgModule({

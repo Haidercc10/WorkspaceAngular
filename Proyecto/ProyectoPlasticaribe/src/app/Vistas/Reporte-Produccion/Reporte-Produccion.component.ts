@@ -158,7 +158,6 @@ export class ReporteProduccionComponent implements OnInit {
       this.cargando = true;
       let rollosSellado : any [] = this.rollosSeleccionados.filter(x => x.proceso == "SELLADO" && x.envioZeus.trim() == '0').map(x => x.rollo);
       let rollosEmpaque : any [] = this.rollosSeleccionados.filter(x => x.proceso == "EMPAQUE" && x.envioZeus.trim() == '0').map(x => x.rollo);
-
       if (rollosSellado.length > 0) {
         this.bagProService.AjusteExistenciaSellado(rollosSellado).subscribe(() => this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`), res => {
           this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
