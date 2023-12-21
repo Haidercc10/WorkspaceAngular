@@ -419,7 +419,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
       this.formDatosProduccion.patchValue({
         ordenTrabajo: res.ot,
         maquina : res.maquina,
-        operario : res.operario1_Id
+        operario : res.operario1_Id,
+        cono: res.cono_Id,
       });
       this.buscraOrdenTrabajo();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
