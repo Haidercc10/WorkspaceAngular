@@ -79,23 +79,29 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     document.getElementById('RolloBarCode').focus();
     let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else this.productionProcessSerivce.GetInformationAboutProduction(production).subscribe(data => {
-      this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-        this.sendProductionZeus.push(data[0]);
-        let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-        this.sendProductionZeus[i].dataExtrusion = {
-          extrusion_Ancho1: res[0].ancho1_Extrusion,
-          extrusion_Ancho2: res[0].ancho2_Extrusion,
-          extrusion_Ancho3: res[0].ancho3_Extrusion,
-          undMed_Id: res[0].und_Extrusion,
-          extrusion_Calibre: res[0].calibre_Extrusion,
-          material: res[0].material,
-        }
-        this.formProduction.patchValue({ client: data[0].clientes.cli_Id });
+    else {
+      this.bagproService.GetProductionByNumber(production).subscribe(prod => {
+        let numProduction = prod[0].observaciones.replace('Rollo #', '');
+        numProduction = numProduction.replace(' en PBDD.dbo.Produccion_Procesos', '');
+        this.productionProcessSerivce.GetInformationAboutProduction(numProduction).subscribe(data => {
+        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+          this.sendProductionZeus.push(data[0]);
+          let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+          this.sendProductionZeus[i].dataExtrusion = {
+            extrusion_Ancho1: res[0].ancho1_Extrusion,
+            extrusion_Ancho2: res[0].ancho2_Extrusion,
+            extrusion_Ancho3: res[0].ancho3_Extrusion,
+            undMed_Id: res[0].und_Extrusion,
+            extrusion_Calibre: res[0].calibre_Extrusion,
+            material: res[0].material,
+          }
+          this.formProduction.patchValue({ client: data[0].clientes.cli_Id });
+        });
+      }, () => {
+        this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
+        });
       });
-    }, () => {
-      this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
-    });
+    }
   }
 
   saveAsgFact() {

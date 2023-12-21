@@ -109,7 +109,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
         item: dataProduction.producto.prod_Id,
         reference: dataProduction.producto.prod_Nombre,
         numberProduction: dataProduction.pp.numero_Rollo,
-        quantity: dataProduction.pp.cantidad,
+        quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
         presentation: dataProduction.pp.presentacion,
         date: dataProduction.pp.fecha,
         process: dataProduction.proceso.proceso_Id
