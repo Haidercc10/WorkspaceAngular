@@ -84,10 +84,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getProcess();
-    this.validarProceso();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
+    this.validarProceso();
     setTimeout(() => this.chargeSerialPorts(), 1000);
   }
 
@@ -145,7 +145,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
         this.proceso = this.formDatosProduccion.value.proceso;
         break;
     }
-    if (this.ValidarRol != 1) this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
+    this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
     this.obtenerTurnos();
   }
 

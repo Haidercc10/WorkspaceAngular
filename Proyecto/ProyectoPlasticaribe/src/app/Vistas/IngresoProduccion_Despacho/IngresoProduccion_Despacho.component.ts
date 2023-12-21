@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment';
-import { start } from 'repl';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
@@ -29,17 +28,23 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     private msj: MensajesAplicacionService,
     private createPDFService: CreacionPdfService,
     private bagproService: BagproService,
-    private entraceService : EntradaRollosService,
-    private dtEntracesService : DetallesEntradaRollosService,) {
+    private entraceService: EntradaRollosService,
+    private dtEntracesService: DetallesEntradaRollosService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.focusInput(true, false);
   }
 
   ngOnDestroy(): void {
     this.focusInput(false, true);
+  }
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage() {
+    this.storage_Id = this.appComponent.storage_Id;
+    this.ValidarRol = this.appComponent.storage_Rol;
   }
 
   focusInput(start: boolean, finish: boolean) {
@@ -61,23 +66,26 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
       this.bagproService.GetProductionByNumber(production).subscribe(prod => {
-        let numProduction = prod[0].observaciones.replace('Rollo #', '');
-        numProduction = numProduction.replace(' en PBDD.dbo.Produccion_Procesos', '');
-        this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(numProduction).subscribe(data => {
-          this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-            this.sendProductionZeus.push(data[0]);
-            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-            this.sendProductionZeus[i].dataExtrusion = {
-              extrusion_Ancho1: res[0].ancho1_Extrusion,
-              extrusion_Ancho2: res[0].ancho2_Extrusion,
-              extrusion_Ancho3: res[0].ancho3_Extrusion,
-              undMed_Id: res[0].und_Extrusion,
-              extrusion_Calibre: res[0].calibre_Extrusion,
-              material: res[0].material,
-            }
-            this.updateProductionZeus(this.sendProductionZeus[i]);
+        if (prod.length > 0){
+          let numProduction = prod[0].observaciones.replace('Rollo #', '');
+          numProduction = numProduction.replace(' en PBDD.dbo.Produccion_Procesos', '');
+          this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(numProduction).subscribe(data => {
+            this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+              this.sendProductionZeus.push(data[0]);
+              let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+              this.sendProductionZeus[i].dataExtrusion = {
+                numero_RolloBagPro: production,
+                extrusion_Ancho1: res[0].ancho1_Extrusion,
+                extrusion_Ancho2: res[0].ancho2_Extrusion,
+                extrusion_Ancho3: res[0].ancho3_Extrusion,
+                undMed_Id: res[0].und_Extrusion,
+                extrusion_Calibre: res[0].calibre_Extrusion,
+                material: res[0].material,
+              }
+              this.updateProductionZeus(this.sendProductionZeus[i]);
+            });
           });
-        });
+        } else this.msj.mensajeAdvertencia(`¡El rollo no existe o ya fue ingresado!`);
       });
     }
   }
@@ -94,39 +102,41 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-      this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-    }, error => this.msj.mensajeError(error));
+      this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
+        this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+      }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
+    }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
-  saveDataEntrace(data: any){
-    let info : any = {
-      EntRolloProd_Fecha : moment().format('YYYY-MM-DD'),
-      EntRolloProd_Observacion : '',
-      Usua_Id : this.storage_Id,
-      EntRolloProd_Hora : moment().format('H:mm:ss'),
+  saveDataEntrace(data: any) {
+    let info: any = {
+      EntRolloProd_Fecha: moment().format('YYYY-MM-DD'),
+      EntRolloProd_Observacion: '',
+      Usua_Id: this.storage_Id,
+      EntRolloProd_Hora: moment().format('H:mm:ss'),
     }
-    this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), error => {
+    this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
       this.load = false;
       this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`);
     });
   }
 
-  saveDataDetalleEntrance(id: number, data: any){
-    let info : any = {
-      EntRolloProd_Id : id,
-      Rollo_Id : data.pp.numero_Rollo,
-      DtEntRolloProd_Cantidad : data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto,
-      UndMed_Rollo : data.pp.presentacion,
-      Estado_Id : 19,
-      DtEntRolloProd_OT : data.pp.ot,
-      Prod_Id : data.producto.prod_Id,
-      UndMed_Prod : data.pp.presentacion,
-      Prod_CantPaquetesRestantes : 0,
-      Prod_CantBolsasPaquete : 0,
-      Prod_CantBolsasBulto : 0,
-      Prod_CantBolsasRestates : 0,
-      Prod_CantBolsasFacturadas : 0,
-      Proceso_Id : data.proceso.proceso_Id,
+  saveDataDetalleEntrance(id: number, data: any) {
+    let info: any = {
+      EntRolloProd_Id: id,
+      Rollo_Id: data.pp.numero_Rollo,
+      DtEntRolloProd_Cantidad: data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto,
+      UndMed_Rollo: data.pp.presentacion,
+      Estado_Id: 19,
+      DtEntRolloProd_OT: data.pp.ot,
+      Prod_Id: data.producto.prod_Id,
+      UndMed_Prod: data.pp.presentacion,
+      Prod_CantPaquetesRestantes: 0,
+      Prod_CantBolsasPaquete: 0,
+      Prod_CantBolsasBulto: 0,
+      Prod_CantBolsasRestates: 0,
+      Prod_CantBolsasFacturadas: 0,
+      Proceso_Id: data.proceso.proceso_Id,
     }
     this.dtEntracesService.srvGuardar(info).subscribe(null, () => {
       this.load = false;

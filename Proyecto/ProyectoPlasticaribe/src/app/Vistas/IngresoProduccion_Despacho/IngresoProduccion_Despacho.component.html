@@ -68,7 +68,7 @@
             <td class="text-center">{{rowIndex + 1}}</td>
             <td class="text-center">{{data.pp.ot}}</td>
             <td class="text-center">{{data.clientes.cli_Nombre}}</td>
-            <td class="text-center">{{data.pp.numero_Rollo}}</td>
+            <td class="text-center">{{data.dataExtrusion.numero_RolloBagPro}}</td>
             <td class="text-center">{{(['SELLA', 'WIKE'].includes(data.proceso.proceso_Id) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
             <td class="text-center">{{data.pp.peso_Neto | number : '1.2-2'}}</td>
             <td class="text-center">{{data.dataExtrusion.material}}</td>

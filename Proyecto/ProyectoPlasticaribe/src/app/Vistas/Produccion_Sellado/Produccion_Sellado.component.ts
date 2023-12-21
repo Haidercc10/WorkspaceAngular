@@ -211,6 +211,7 @@ export class Produccion_SelladoComponent implements OnInit {
     else if (entrada.Presentacion == 'Und') entrada.Desviacion = ((entrada.Peso_Bruto - entrada.Peso_Teorico) * 100) / entrada.Peso_Teorico;
     else if (entrada.Presentacion == 'Paquete' && entrada.Cantidad == 1) entrada.Desviacion = ((entrada.Peso_Bruto - entrada.Peso_Teorico) * 100) / entrada.Peso_Teorico;
     else if (entrada.Presentacion == 'Paquete' && entrada.Cantidad > 1) entrada.Desviacion = 0;
+    if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡!`, ``, 1200000);
     this.guardarRegistroEntrada(entrada);
   }
 
