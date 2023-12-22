@@ -44,11 +44,12 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
    }
 
   ngOnInit() {
+    this.lecturaStorage();
     this.getProcess();
-    this.loadProcessByRol();
+    setTimeout(() => { this.loadProcessByRol(); }, 500); 
   }
 
-  //. 
+  //. Inicializa el formulario
   initForm(){
     this.form = this.frmBuild.group({
       ot : [null,],
@@ -70,7 +71,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  //.
+  //. Cargar el proceso dependiendo el rol. 
   loadProcessByRol(){
     if(this.rol == 7) this.form.patchValue({ process : 'EXT' });
     else if(this.rol == 8) this.form.patchValue({ process : 'SELLA' });
@@ -78,7 +79,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     else this.form.patchValue({ process : null });
   }
 
-  //.
+  //. Buscará movimientos de preingreso dependiendo los filtros consultados
   searchMovements(){
     this.movements = [];
     this.infoTable = [];
@@ -101,6 +102,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     });
   }
 
+  //. Cargar datos de preingreso de producción en la tabla.
   loadDataTable(dataApp : any, dataBagpro : any) {
     let completeData : any = {
       'OT' : dataApp.orden, 
@@ -180,7 +182,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     return content;
   }
 
-  //Titulo de información consolidada
+  //Titulo de información consolidada en el pdf.
   titleInfoConsolidated(){
     return {
       text: `Información consolidada de Preingreso\n `,
@@ -191,7 +193,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     };
   }
 
-  //Encabezado de tabla consolidada
+  //Encabezado de tabla consolidada en el pdf.
   headerTableConsolidated(data : any) {
     let columns : any[] = ['OT', 'Item', 'Referencia', 'Rollos', 'Cantidad', 'Und'];
     let widths: Array<string> = ['10%', '10%', '50%', '10%', '10%', '10%'];
@@ -212,7 +214,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     }
   }
 
-  //Información consolidada de la orden agrupada por OT.
+  //Información consolidada de la orden agrupada por OT en el pdf..
   groupedInfo(data : any){
     let info : any = [];
     data.forEach(x => {
@@ -233,7 +235,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     return info;
   }
 
-  //.Función que retornará el total de kilos, unidades y paquetes consolidados
+  //.Función que retornará el total de kilos, unidades y paquetes consolidados en el pdf.
   tableTotalsConsolidated(){
     let info : any = [];
     info.push([
@@ -242,7 +244,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     return info;
   }
   
-  //Titulo de información consolidada
+  //Titulo de información consolidada en el pdf.
   titleInfoDetails(){
     return {
       text: `Información detallada de Preingreso\n `,
@@ -253,7 +255,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     };
   }
 
-  //Encabezado de tabla consolidada
+  //Encabezado de tabla consolidada en el pdf.
   headerTableDetails(data :any) {
     let columns : any[] = ['OT', 'Item', 'Referencia', 'Rollo', 'Cantidad', 'Und', 'Proceso', 'Fecha Ingreso',];
     let widths: Array<string> = ['6%','6%','42%','7%','7%','7%','8%','17%'];
@@ -273,7 +275,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     }
   }
 
-  //Información detallada 
+  //Información detallada del preingreso de producción en el pdf.
   detailedInfo(data : any){
     let info : any = [];
     data.forEach(x => {
@@ -304,9 +306,12 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     return body;
   }
 
+  //. Calcula la cantidades en Kilos en la tabla detallada por OT y presentación 
   calculateKls = () => this.movements.filter(x => x.Und == 'Kg').reduce((a, b) => a + b.Cantidad, 0)
 
+  //. Calcula la cantidades en Unidades en la tabla detallada por OT y presentación 
   calculateUnds = () => this.movements.filter(x => x.Und == 'Und').reduce((a, b) => a + b.Cantidad, 0)
 
+  //. Calcula la cantidades en Paquetes en la tabla detallada por OT y presentación 
   calculatePacks = () => this.movements.filter(x => x.Und == 'Paquete').reduce((a, b) => a + b.Cantidad, 0)
 }
