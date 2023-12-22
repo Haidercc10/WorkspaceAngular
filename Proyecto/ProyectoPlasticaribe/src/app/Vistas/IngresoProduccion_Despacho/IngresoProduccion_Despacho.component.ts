@@ -62,7 +62,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   searchProductionByReel() {
     let production = parseInt(this.productionSearched);
     this.productionSearched = null;
-    let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
+    let productionSearched = this.sendProductionZeus.map(prod => prod.dataExtrusion).map(x => x.numero_RolloBagPro);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
       this.bagproService.GetProductionByNumber(production).subscribe(prod => {
