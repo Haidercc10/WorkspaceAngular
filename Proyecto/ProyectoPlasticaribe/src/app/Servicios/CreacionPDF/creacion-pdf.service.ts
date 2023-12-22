@@ -174,6 +174,8 @@ export class CreacionPdfService {
     }
 
     private dataOrderProduction(dataTag: modelTagProduction): any[] {
+        let infoTag: string = `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
+        if (dataTag.productionProcess == 'SELLADO') infoTag = `${dataTag.dataTagForClient}      Material: ${dataTag.material}`;
         return [
             {
                 colSpan: 3,
@@ -183,7 +185,7 @@ export class CreacionPdfService {
                         [
                             { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center' },
                             { 
-                                text: `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`, 
+                                text: infoTag, 
                                 bold: true, 
                                 fontSize: 9, 
                                 alignment: 'center',
@@ -205,7 +207,7 @@ export class CreacionPdfService {
         return [
             { text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center' },
             { text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center' },
-            { text: `Rollo: ${dataTag.reel}`, bold: true, fontSize: 10, alignment: 'center' },
+            { text: `Rollo: ${dataTag.reel}${!dataTag.copy ? '' : '.'}`, bold: true, fontSize: 10, alignment: 'center' },
         ];
     }
 
@@ -272,4 +274,6 @@ export interface modelTagProduction {
     productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO';
     showNameBussiness?: boolean;
     operator?: string;
+    copy?: boolean;
+    dataTagForClient?: string;
 }

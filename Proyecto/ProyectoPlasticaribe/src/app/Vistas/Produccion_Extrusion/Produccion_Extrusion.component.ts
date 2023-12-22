@@ -75,6 +75,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       pesoTara: [null, Validators.required],
       pesoBruto: [null, Validators.required],
       pesoNeto: [null, Validators.required],
+      presentacion: [null, Validators.required],
       daipita: [null],
       proceso: [null, Validators.required],
       anchoProducto: [null]
@@ -88,7 +89,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    setTimeout(() => this.buscarPuertos(), 1000);
+    // setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -159,8 +160,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   async buscarPuertos() {
     try {
-      const port = await navigator.serial.requestPort();
-      const portInfo = port.getInfo();
+      const port: SerialPort = await navigator.serial.requestPort();
       await port.open({ baudRate: 9600 });
       this.chargeDataFromSerialPort(port);
     } catch (ex) {
@@ -169,9 +169,16 @@ export class Produccion_ExtrusionComponent implements OnInit {
     }
   }
 
-  async chargeDataFromSerialPort(port: any) {
-    while (port.readable) {
-      const reader = port.readable.getReader();
+  async chargeDataFromSerialPort(port: SerialPort) {
+    let reader;
+    let keepReading: boolean = true;
+    setTimeout(async () => {
+      reader.releaseLock();
+      reader.cancel();
+      await port.close();
+    }, 1000);
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
       try {
         while (true) {
           const { value, done } = await reader.read();
@@ -190,6 +197,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        reader.releaseLock();
       }
     }
   }
@@ -339,7 +348,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
             undExtrusion: datos.und_Extrusion.trim(),
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
-            anchoProducto: datos.selladoCorte_Ancho
+            anchoProducto: datos.selladoCorte_Ancho,
+            presentacion: datos.presentacion
           });
           this.buscarDatosConoSeleccionado();
         });
@@ -351,7 +361,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.rollosPesados = [];
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
-    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => this.rollosPesados = data, () => this.cargando = false, () => this.cargando = false);
+    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
+      this.rollosPesados = data;
+      this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
+    }, () => this.cargando = false, () => this.cargando = false);
   }
 
   sumarPesoBruto() {
@@ -367,17 +380,36 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validarDatos() {
-    if (this.datosOrdenTrabajo.length > 0) {
-      if (this.formDatosProduccion.valid) {
-        if (this.formDatosProduccion.value.maquina > 0) {
-          if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
-          else this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
-        } else this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
-      } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
-    } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+    this.cargando = true;
+    this.buscarPuertos();
+    setTimeout(() => {
+      if (this.datosOrdenTrabajo.length > 0) {
+        if (this.formDatosProduccion.valid) {
+          if (this.formDatosProduccion.value.maquina > 0) {
+            if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
+            else {
+              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
+              this.cargando = false;
+            }
+          } else {
+            this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
+            this.cargando = false;
+          }
+        } else {
+          this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
+          this.cargando = false;
+        }
+      } else {
+        this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+        this.cargando = false;
+      }
+    }, 1000);
   }
 
   datosProduccion() : modelProduccionProcesos {
+    let presentation = this.formDatosProduccion.value.presentacion;
+    if (presentation == 'Kilo') presentation = 'Kg';
+    else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
       Numero_Rollo: 0,
       OT: this.formDatosProduccion.value.ordenTrabajo,
@@ -394,11 +426,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: 0,
+      Cantidad: presentation == 'Unidad' ? 1 : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: 0,
-      Presentacion: 'Kg',
+      Presentacion: presentation,
       Proceso_Id: this.validateProcess(),
       Turno_Id: this.formDatosProduccion.value.turno,
       Envio_Zeus: false,
@@ -468,13 +500,12 @@ export class Produccion_ExtrusionComponent implements OnInit {
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
         }
-        console.log(dataTagProduction);
         this.createPDFService.createTagProduction(dataTagProduction);
       });
     });
   }
 
-  createTagProduction(code: number, quantity: number, quantity2: number) {
+  createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
@@ -494,6 +525,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       presentationItem2: 'Kg Neto',
       productionProcess: proceso,
       showNameBussiness: this.showNameBussiness,
+      copy: copy,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
   }
