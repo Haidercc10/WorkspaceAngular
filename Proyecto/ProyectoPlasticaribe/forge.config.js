@@ -1,7 +1,7 @@
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: '/assets/Plascaribe_Icono.png',
+    icon: '/assets/Plascaribe_Icono.ico',
     extraResource: ['node_modules/pdf-to-printer/dist/SumatraPDF-3.4.6-32.exe'],
   },
   rebuildConfig: {},

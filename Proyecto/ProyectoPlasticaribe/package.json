@@ -1,8 +1,8 @@
 {
   "name": "plasticaribe",
-  "version": "1.0",
+  "version": "2.0",
   "main": "main.js",
-  "icon": "/assets/Plascaribe_Icono.png",
+  "icon": "/assets/Plascaribe_Icono.ico",
   "scripts": {
     "ng": "ng",
     "icon": "/assets/Plascaribe_Icono.png",
