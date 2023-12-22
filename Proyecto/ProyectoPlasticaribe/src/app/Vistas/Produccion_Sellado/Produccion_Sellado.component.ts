@@ -27,8 +27,6 @@ export class Produccion_SelladoComponent implements OnInit {
   ordenesTrabajo: any[] = []; //array que contiene las diferentes ordenes de trabajo
   produccion: any[] = []; //array que contiene las diferentes producciones
   @ViewChild('dtProduccion') dtProduccion: Table | undefined; //Tabla de produccion
-  hoy: any = moment().format('YYYY-MM-DD'); //Fecha actual
-  hora: any = moment().format('HH:mm:ss'); //Hora actual
   esSoloLectura: boolean = true;  //Variable que ccolocará el campo cantidad editable o no.
   ordenConsultada: any; //Variable que guardará la orden actual consultada
   procesos: any = [{ Id: 'SELLA', Nombre: 'SELLADO' }, { Id: 'WIKE', Nombre: 'WIKETIADO' }]; //Array que guarda los procesos
@@ -151,8 +149,10 @@ export class Produccion_SelladoComponent implements OnInit {
     let horaFinDia: any = '18:00:00';
     let horaInicioNoche: any = '18:00:01';
     let horaFinNoche: any = '06:59:59';
-    if (this.hora >= horaInicioDia && this.hora < horaFinDia) this.formSellado.patchValue({ turno: 'DIA' });
-    else if (this.hora >= horaInicioNoche && this.hora < horaFinNoche) this.formSellado.patchValue({ turno: 'NOCHE' });
+    let horaActual : any = moment().format('HH:mm:ss');
+    
+    if (horaActual >= horaInicioDia && horaActual < horaFinDia) this.formSellado.patchValue({ turno: 'DIA' });
+    else if (horaActual >= horaInicioNoche && horaActual < horaFinNoche) this.formSellado.patchValue({ turno: 'NOCHE' });
   }
 
   //Función que valida la entrada del registro
@@ -203,8 +203,8 @@ export class Produccion_SelladoComponent implements OnInit {
       'Turno_Id': this.formSellado.value.turno,
       'Envio_Zeus': false,
       'Datos_Etiqueta': `${orden.selladoCorte_Ancho} X ${orden.selladoCorte_Largo}`,
-      'Fecha': this.hoy,
-      'Hora': this.hora,
+      'Fecha': moment().format('YYYY-MM-DD'),
+      'Hora': moment().format('HH:mm:ss'),
       'Creador_Id': this.AppComponent.storage_Id,
     }
     if (entrada.Presentacion == 'Kg') entrada.Cantidad = entrada.Peso_Bruto;
