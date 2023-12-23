@@ -89,7 +89,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    // setTimeout(() => this.buscarPuertos(), 1000);
+    setTimeout(() => this.buscarPuertos(), 1000);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -172,11 +172,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
   async chargeDataFromSerialPort(port: SerialPort) {
     let reader;
     let keepReading: boolean = true;
-    setTimeout(async () => {
-      reader.releaseLock();
-      reader.cancel();
-      await port.close();
-    }, 1000);
     while (port.readable && keepReading) {
       reader = port.readable.getReader();
       try {
@@ -382,7 +377,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   validarDatos() {
     this.cargando = true;
     this.obtenerTurnos();
-    this.buscarPuertos();
+    // this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {

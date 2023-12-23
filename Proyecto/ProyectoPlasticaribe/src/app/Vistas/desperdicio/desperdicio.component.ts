@@ -102,7 +102,6 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerMaquinas();
     this.obtenerProcesos();
     this.obtenerMateriales();
-    this.cargarPuertosSeriales();
     setTimeout(() => { 
       this.filtrarArea(); 
       this.obtenerOperarios();
@@ -569,38 +568,41 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD
   generarDesperdicio(){
-    if(!this.FormDesperdicio.valid) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
-    else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
-    else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);
-    else if(this.FormDesperdicio.value.IdArea == "N/A") this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
-    else {
-      this.cargarTurnoActual();
-      this.cargando = true;
-      let info : any = {
-        'Desp_OT' : this.FormDesperdicio.value.OTDesperdicio,
-        'Prod_Id' : this.ordenesTrabajo[0].IdProducto,
-        'Material_Id' : this.FormDesperdicio.value.IdTipoMaterial,
-        'Maquina' : this.FormDesperdicio.value.Maquina,
-        'Usua_Operario' : this.FormDesperdicio.value.IdOperario,
-        'Desp_Impresion' : this.FormDesperdicio.value.Impreso,
-        'Falla_Id' : this.FormDesperdicio.value.IdTipoNoConformidad,
-        'Desp_PesoKg' : parseFloat(this.FormDesperdicio.value.CantidadKg),
-        'Desp_Fecha' : this.today,
-        'Desp_Observacion' : this.FormDesperdicio.value.Observacion == null ? '' : this.FormDesperdicio.value.Observacion,
-        'Usua_Id' : this.storage_Id,
-        'Desp_FechaRegistro' : this.today,
-        'Desp_HoraRegistro' : moment().format('H:mm:ss'),
-        'Proceso_Id' : this.FormDesperdicio.value.IdArea,
-        'Turno_Id' : this.FormDesperdicio.value.Turno,
+    this.getPuertoSerial();
+    setTimeout(() => {
+      if(!this.FormDesperdicio.valid) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
+      else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
+      else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);
+      else if(this.FormDesperdicio.value.IdArea == "N/A") this.mensajeService.mensajeAdvertencia(`Debe elegir una área!`);
+      else {
+        this.cargarTurnoActual();
+        this.cargando = true;
+        let info : any = {
+          'Desp_OT' : this.FormDesperdicio.value.OTDesperdicio,
+          'Prod_Id' : this.ordenesTrabajo[0].IdProducto,
+          'Material_Id' : this.FormDesperdicio.value.IdTipoMaterial,
+          'Maquina' : this.FormDesperdicio.value.Maquina,
+          'Usua_Operario' : this.FormDesperdicio.value.IdOperario,
+          'Desp_Impresion' : this.FormDesperdicio.value.Impreso,
+          'Falla_Id' : this.FormDesperdicio.value.IdTipoNoConformidad,
+          'Desp_PesoKg' : parseFloat(this.FormDesperdicio.value.CantidadKg),
+          'Desp_Fecha' : this.today,
+          'Desp_Observacion' : this.FormDesperdicio.value.Observacion == null ? '' : this.FormDesperdicio.value.Observacion,
+          'Usua_Id' : this.storage_Id,
+          'Desp_FechaRegistro' : this.today,
+          'Desp_HoraRegistro' : moment().format('H:mm:ss'),
+          'Proceso_Id' : this.FormDesperdicio.value.IdArea,
+          'Turno_Id' : this.FormDesperdicio.value.Turno,
+        }
+        this.deperdicioService.Insert(info).subscribe(data => {
+          this.mensajeService.mensajeConfirmacion(`Desperdicio guardado exitosamente!`);
+          this.limpiarTodo();
+        }), () => {
+          this.mensajeService.mensajeError(`Error`, `No se pudo ingresar el desperdicio, verifique!`);
+          this.cargando = false;
+        }
       }
-      this.deperdicioService.Insert(info).subscribe(data => {
-        this.mensajeService.mensajeConfirmacion(`Desperdicio guardado exitosamente!`);
-        this.limpiarTodo();
-      }), () => {
-        this.mensajeService.mensajeError(`Error`, `No se pudo ingresar el desperdicio, verifique!`);
-        this.cargando = false;
-      }
-    }
+    }, 2000);
   }
 
   //Función que carga los puertos seriales
@@ -614,15 +616,27 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que obtiene los puertos seriales
   async getPuertoSerial() {
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
-    this.cargarDatosPuertoSerial(port);
+    try {
+      const port: SerialPort = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.cargarDatosPuertoSerial(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.mensajeService.mensajeError('¡No hay dispositivos conectados!');
+      else this.mensajeService.mensajeError(ex);
+    }
   }
 
   //Función que lee los datos del puerto serial
   async cargarDatosPuertoSerial(port: any) {
-    while (port.readable) {
-      const reader = port.readable.getReader();
+    let reader;
+    let keepReading: boolean = true;
+    setTimeout(async () => {
+      reader.releaseLock();
+      reader.cancel();
+      await port.close();
+    }, 1000);
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
       try {
         while (true) {
           const { value, done } = await reader.read();
@@ -640,6 +654,8 @@ export class DesperdicioComponent implements OnInit {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        reader.releaseLock();
       }
     }
   }
