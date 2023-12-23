@@ -381,6 +381,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   validarDatos() {
     this.cargando = true;
+    this.obtenerTurnos();
     this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
@@ -403,7 +404,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
         this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
         this.cargando = false;
       }
-    }, 1000);
+    }, 3000);
   }
 
   datosProduccion() : modelProduccionProcesos {

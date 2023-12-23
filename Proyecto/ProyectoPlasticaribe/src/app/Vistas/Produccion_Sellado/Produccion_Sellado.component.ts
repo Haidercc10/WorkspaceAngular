@@ -152,8 +152,9 @@ export class Produccion_SelladoComponent implements OnInit {
     let horaFinDia: any = '18:00:00';
     let horaInicioNoche: any = '18:00:01';
     let horaFinNoche: any = '06:59:59';
-    if (this.hora >= horaInicioDia && this.hora < horaFinDia) this.formSellado.patchValue({ turno: 'DIA' });
-    else if (this.hora >= horaInicioNoche && this.hora < horaFinNoche) this.formSellado.patchValue({ turno: 'NOCHE' });
+    let hora = moment().format('HH:mm:ss');
+    if (hora >= horaInicioDia && hora < horaFinDia) this.formSellado.patchValue({ turno: 'DIA' });
+    else if (hora >= horaInicioNoche && hora < horaFinNoche) this.formSellado.patchValue({ turno: 'NOCHE' });
   }
 
   //Función que valida la entrada del registro
@@ -206,6 +207,7 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que crea la entrada y alista el post.
   crearEntrada(orden: any) {
+    this.cargarTurnoActual();
     this.cargando = true;
     let entrada: modelProduccionProcesos = {
       'OT': this.formSellado.value.ot,
@@ -281,7 +283,7 @@ export class Produccion_SelladoComponent implements OnInit {
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
         this.cargarCamposUltimaOT();
         this.limpiarCampos();
-        this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, cantUnd: entrada.Cantidad  });
+        this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, cantUnd: data.cantidad  });
         this.buscarOT(); 
       }, 1000);
     }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
@@ -406,14 +408,11 @@ export class Produccion_SelladoComponent implements OnInit {
       let pesoMillar: number = this.ordenesTrabajo[0].selladoCorte_PesoMillar;
       let cantidad: number = this.formSellado.value.cantUnd;
       let cantBolsasPaq: number = this.ordenesTrabajo[0].selladoCorte_CantBolsasPaquete;
-      if (cantidad > this.cantBultoEstandar) this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El saldo no puede ser mayor a ${this.cantBultoEstandar}`);
-      else {
-        if (this.ordenesTrabajo[0].presentacion == 'Kilo') pesoTeorico = cantidad;
-        else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
-        else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
-        else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
-        this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico });
-      }
+      if (this.ordenesTrabajo[0].presentacion == 'Kilo') pesoTeorico = cantidad;
+      else if (this.ordenesTrabajo[0].presentacion == 'Unidad') pesoTeorico = ((cantidad * pesoMillar) / 1000);
+      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad == 1) pesoTeorico = (cantidad * pesoMillar);
+      else if (this.ordenesTrabajo[0].presentacion == 'Paquete' && cantidad > 1) pesoTeorico = ((cantidad * pesoMillar * cantBolsasPaq) / 1000);
+      this.formSellado.patchValue({ 'pesoTeorico': pesoTeorico });
     }
   }
 

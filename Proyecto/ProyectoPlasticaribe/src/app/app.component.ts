@@ -56,7 +56,7 @@ export class AppComponent implements OnInit{
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
     this.authenticationBagProService.user.subscribe(x => this.user_BagPro = x);
-    this.inactividad();
+    // this.inactividad();
     this.mostrar();
   }
 
