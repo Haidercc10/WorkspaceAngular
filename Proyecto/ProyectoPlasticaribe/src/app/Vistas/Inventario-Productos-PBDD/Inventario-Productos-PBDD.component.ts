@@ -6,6 +6,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
 import { Recetas_ProductosComponent } from '../Recetas_Productos/Recetas_Productos.component';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -28,18 +29,24 @@ export class InventarioProductosPBDDComponent implements OnInit {
   @ViewChild('tableStock') tableStock: Table | undefined;
   @ViewChild('tableStock_Kg') tableStock_Kg: Table | undefined;
   @ViewChild('tableStock_UndPaq') tableStock_UndPaq: Table | undefined;
+  @ViewChild('tableStockEmp') tableStockEmp: Table | undefined;
+  @ViewChild('tableStockSella') tableStockSella: Table | undefined;
   recetaProducto: boolean = false;
   @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
+  stockEmpaque: Array<StockInformation> = [];
+  stockSellado: Array<StockInformation> = [];
+  stockWiketiado: Array<StockInformation> = [];
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
     private stockService: ExistenciasProductosService,
-    private createExcelService: CreacionExcelService,) {
+    private createExcelService: CreacionExcelService,
+    private bagProService: BagproService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit() {
-    this.getStockInformation()
+    this.getStockInformation();
   }
 
   fillColumns() {
@@ -72,11 +79,23 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   getStockInformation() {
     this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
+      this.load = true;
+      this.getStockProcess();
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
       this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
+      setTimeout(() => this.load = false, 2000);
+    });
+  }
+
+  getStockProcess(){
+    ['EMP', 'SELLA', 'WIKE'].forEach((process: 'EMP' | 'SELLA' | 'WIKE') => {
+      this.stockService.GetStockProducts_Process(process).subscribe(data => {
+        if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
+        if (process == 'SELLA' || process == 'WIKE') this.stockSellado = this.fillStockInformation(data);
+      });
     });
   }
 
@@ -86,12 +105,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
       stockInformation.push({
         item: stock.product.item,
         reference: stock.product.reference,
-        client: stock.client[0].cli.client,
+        client: stock.client.length > 0 ? stock.client[0].cli.client : '',
         stock: stock.stock.stock,
         price: stock.stock.price,
         presentation: stock.stock.presentation,
         subTotal: stock.stock.stockPrice,
-        seller: stock.client[0].vende.name_Vende,
+        seller: stock.client.length > 0 ? stock.client[0].vende.name_Vende : '',
         AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
         actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
         junuary: stock.stock_MonthByMonth[0].enero,
@@ -115,15 +134,15 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let AvaibleProdution: Array<AvaibleProdution> = [];
     data.forEach(stock => {
       AvaibleProdution.push({
-        NumberProduction: stock.number,
+        NumberProduction: stock.number_BagPro,
         Quantity: stock.quantity,
         Weight: stock.weight,
         Presentation: stock.presentation,
         Process: stock.process,
         Date: stock.date,
         Hour: stock.hour,
-        Price: stock.price,
-        Turn: stock.turn,
+        Price: stock.sellPrice,
+        Turn: stock.turn.turno_Nombre,
         Information: stock.information,
         orderProduction: stock.orderProduction,
       });

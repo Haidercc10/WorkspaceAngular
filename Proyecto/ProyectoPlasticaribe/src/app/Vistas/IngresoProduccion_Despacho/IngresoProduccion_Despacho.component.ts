@@ -106,7 +106,9 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
       this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
-        this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
+          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        });
       }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }

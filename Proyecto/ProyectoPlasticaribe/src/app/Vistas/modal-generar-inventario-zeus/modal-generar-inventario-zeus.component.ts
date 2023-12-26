@@ -252,9 +252,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   { header: 'Diciembre', field: 'Diciembre'},
                 ];
 
-                for (let l = 0; l < this.columnas.length; l++) {
-                  if (this.columnas[l].header == this.mesActual) this.columnas.splice(l,1);
-                }
+                // for (let l = 0; l < this.columnas.length; l++) {
+                //   if (this.columnas[l].header == this.mesActual) this.columnas.splice(l,1);
+                // }
 
                 this.ArrayProductoZeus.push(info);
                 this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
@@ -265,7 +265,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => { this.load = true; }, 3000);
+    setTimeout(() => this.load = true, 3000);
   }
 
   //

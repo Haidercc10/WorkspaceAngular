@@ -25,6 +25,8 @@ export class ExistenciasProductosService {
 
   GetStockProducts_AvaibleProduction = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_AvaibleProduction`);
 
+  GetStockProducts_Process = (process: 'EMP' | 'SELLA' | 'WIKE'): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Existencia_Productos/getStockProducts_Process/${process}`);
+
   srvActualizar = (id:number|String, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`, datos_Productos);
 
   srvActualizarProductoPresentacion = (prod : any, presentacion : any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionProducto/${prod}/${presentacion}`, datos_Productos);

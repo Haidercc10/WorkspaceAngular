@@ -4,392 +4,617 @@
   </div>
 </div>
 
-<div class="contain">
-  <div class="container-fluid">
-    <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Inventario de Productos</h2>
-    </div>
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
-  </div>
+<div class="mb-4">
+    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información del Inventario</h4>
 </div>
 
-<p-card>
-  <div class="mb-4">
-      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Información del Inventario</h4>
-  </div>
+<p-tabView *ngIf="!load" [scrollable]="true">
+    <p-tabPanel
+    header="Inventario de Despacho"
+    leftIcon="pi pi-sliders-h">
+        <p-table
+            #tableStock
+            [columns]="selectedColumns"
+            [value]="stockInformation" 
+            dataKey="item"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            [reorderableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 30, 50, 100, 150, 200]"
+            [expandedRowKeys]="expandedRows">
+            <ng-template pTemplate="caption">
+                <div class="row g-4">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                        <p-multiSelect
+                            [options]="columns"
+                            [(ngModel)]="selectedColumns"
+                            optionLabel="header"
+                            selectedItemsLabel="{0} columnas seleccionadas"
+                            [style]="{minWidth: '330px'}"
+                            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
+                        <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th rowspan="2" class="text-center">#</th>
+                    <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock, $event, col.field)"></th>
+                </tr>
+                <tr>
+                    <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <span class="font-bold">
+                            {{rowIndex + 1}}
+                        </span>
+                    </td>
+                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-data>
+                <tr>
+                    <td colspan="23">
+                        <div class="p-3">
+                            <p-table
+                                [value]="data.AvaibleProdution"
+                                dataKey="factura"
+                                styleClass="p-datatable-gridlines p-datatable-sm"
+                                [scrollable]="true"
+                                scrollHeight="30rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rollo</th>
+                                        <th>OT</th>
+                                        <th>Cantidad</th>
+                                        <th>Presentación</th>
+                                        <th>Peso</th>
+                                        <th>Precio</th>
+                                        <th>Etiqueta</th>
+                                        <th>Proceso</th>
+                                        <th>Turno</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{rowIndex + 1}}</td>
+                                        <td>{{details.NumberProduction}}</td>
+                                        <td>{{details.orderProduction}}</td>
+                                        <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                        <td>{{details.Presentation}}</td>
+                                        <td>{{details.Weight | number : '1.2-2'}}</td>
+                                        <td>{{details.Price | number : '1.2-2'}}</td>
+                                        <td>{{details.Information}}</td>
+                                        <td>{{details.Process}}</td>
+                                        <td>{{details.Turn}}</td>
+                                        <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="11">No se encontraron registros</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7">Total</td>
+                    <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
 
-  <p-tabView>
-      <p-tabPanel
-      header="Rollos"
-      leftIcon="pi pi-sliders-h">
-          <p-table
-              #tableStock_Kg
-              [columns]="selectedColumns"
-              [value]="stockInformation_Kg" 
-              dataKey="item"
-              styleClass="p-datatable-gridlines p-datatable-sm"
-              [resizableColumns]="true"
-              [reorderableColumns]="true"
-              columnResizeMode="expand"
-              responsiveLayout="scroll"
-              [rowHover]="true"
-              [showCurrentPageReport]="true"
-              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-              [scrollable]="true"
-              scrollHeight="50rem"
-              [expandedRowKeys]="expandedRows">
-              <ng-template pTemplate="caption">
-                  <div class="row g-4">
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-                          <p-multiSelect
-                              [options]="columns"
-                              [(ngModel)]="selectedColumns"
-                              optionLabel="header"
-                              selectedItemsLabel="{0} columnas seleccionadas"
-                              [style]="{minWidth: '330px'}"
-                              placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-                      </div>
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
-                          <button class="buttonPDF mx-4" (click)="showPopUpCreateAndEdit()">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svgIconPDF"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-                          </button>
-                  
-                          <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
-                          </button>
-                      </div>
-                  </div>
-              </ng-template>
-              <ng-template pTemplate="header" let-columns>
-                  <tr>
-                      <th rowspan="2" class="text-center">#</th>
-                      <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock_Kg, $event, col.field)"></th>
-                  </tr>
-                  <tr>
-                      <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
-                      <p-sortIcon [field]="col.field"></p-sortIcon>
-                      </th>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-                  <tr>
-                      <td>
-                          <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                          <span class="font-bold">
-                              {{rowIndex + 1}}
-                          </span>
-                      </td>
-                      <td *ngFor="let col of selectedColumns" (click)="showPopUpCreateAndEdit(data)">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="rowexpansion" let-data>
-                  <tr>
-                      <td colspan="23">
-                          <div class="p-3">
-                              <p-table
-                                  [value]="data.avaibleProducion"
-                                  dataKey="factura"
-                                  styleClass="p-datatable-gridlines p-datatable-sm"
-                                  [scrollable]="true"
-                                  scrollHeight="30rem">
-                                  <ng-template pTemplate="header">
-                                      <tr>
-                                          <th>#</th>
-                                          <th>Rollo</th>
-                                          <th>OT</th>
-                                          <th>Cantidad</th>
-                                          <th>Presentación</th>
-                                          <th>Peso</th>
-                                          <th>Precio</th>
-                                          <th>Etiqueta</th>
-                                          <th>Proceso</th>
-                                          <th>Turno</th>
-                                          <th>Fecha</th>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
-                                      <tr>
-                                          <td>{{rowIndex + 1}}</td>
-                                          <td>{{details.NumberProduction}}</td>
-                                          <td>{{details.orderProduction}}</td>
-                                          <td>{{details.Quantity | number : '1.2-2'}}</td>
-                                          <td>{{details.Presentation}}</td>
-                                          <td>{{details.Weight | number : '1.2-2'}}</td>
-                                          <td>{{details.Price | number : '1.2-2'}}</td>
-                                          <td>{{details.Information}}</td>
-                                          <td>{{details.Process}}</td>
-                                          <td>{{details.Turn.turno_Id}}</td>
-                                          <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="emptymessage">
-                                      <tr>
-                                          <td colspan="11">No se encontraron registros</td>
-                                      </tr>
-                                  </ng-template>
-                              </p-table>
-                          </div>
-                      </td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="footer">
-                  <tr>
-                      <td colspan="7">Total</td>
-                      <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_Kg) | currency : 'COP '}}</td>
-                  </tr>
-              </ng-template>
-          </p-table>
-      </p-tabPanel>
-      
-      <p-tabPanel
-      header="Bultos"
-      leftIcon="pi pi-sliders-h">
-          <p-table
-              #tableStock_UndPaq
-              [columns]="selectedColumns"
-              [value]="stockInformation_UndPaq" 
-              dataKey="item"
-              styleClass="p-datatable-gridlines p-datatable-sm"
-              [resizableColumns]="true"
-              [reorderableColumns]="true"
-              columnResizeMode="expand"
-              responsiveLayout="scroll"
-              [rowHover]="true"
-              [showCurrentPageReport]="true"
-              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-              [scrollable]="true"
-              scrollHeight="50rem"
-              [expandedRowKeys]="expandedRows">
-              <ng-template pTemplate="caption">
-                  <div class="row g-4">
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-                          <p-multiSelect
-                              [options]="columns"
-                              [(ngModel)]="selectedColumns"
-                              optionLabel="header"
-                              selectedItemsLabel="{0} columnas seleccionadas"
-                              [style]="{minWidth: '330px'}"
-                              placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-                      </div>
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
-                          <button class="buttonPDF mx-4" (click)="showPopUpCreateAndEdit()">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svgIconPDF"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-                          </button>
-                  
-                          <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_UndPaq)">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
-                          </button>
-                      </div>
-                  </div>
-              </ng-template>
-              <ng-template pTemplate="header" let-columns>
-                  <tr>
-                      <th rowspan="2" class="text-center">#</th>
-                      <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock_UndPaq, $event, col.field)"></th>
-                  </tr>
-                  <tr>
-                      <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
-                      <p-sortIcon [field]="col.field"></p-sortIcon>
-                      </th>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-                  <tr>
-                      <td>
-                          <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                          <span class="font-bold">
-                              {{rowIndex + 1}}
-                          </span>
-                      </td>
-                      <td *ngFor="let col of selectedColumns" (click)="showPopUpCreateAndEdit(data)">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="rowexpansion" let-data>
-                  <tr>
-                      <td colspan="23">
-                          <div class="p-3">
-                              <p-table
-                                  [value]="data.avaibleProducion"
-                                  dataKey="factura"
-                                  styleClass="p-datatable-gridlines p-datatable-sm"
-                                  [scrollable]="true"
-                                  scrollHeight="30rem">
-                                  <ng-template pTemplate="header">
-                                      <tr>
-                                          <th>#</th>
-                                          <th>Rollo</th>
-                                          <th>OT</th>
-                                          <th>Cantidad</th>
-                                          <th>Presentación</th>
-                                          <th>Peso</th>
-                                          <th>Precio</th>
-                                          <th>Etiqueta</th>
-                                          <th>Proceso</th>
-                                          <th>Turno</th>
-                                          <th>Fecha</th>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
-                                      <tr>
-                                          <td>{{rowIndex + 1}}</td>
-                                          <td>{{details.NumberProduction}}</td>
-                                          <td>{{details.orderProduction}}</td>
-                                          <td>{{details.Quantity | number : '1.2-2'}}</td>
-                                          <td>{{details.Presentation}}</td>
-                                          <td>{{details.Weight | number : '1.2-2'}}</td>
-                                          <td>{{details.Price | number : '1.2-2'}}</td>
-                                          <td>{{details.Information}}</td>
-                                          <td>{{details.Process}}</td>
-                                          <td>{{details.Turn.turno_Id}}</td>
-                                          <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="emptymessage">
-                                      <tr>
-                                          <td colspan="11">No se encontraron registros</td>
-                                      </tr>
-                                  </ng-template>
-                              </p-table>
-                          </div>
-                      </td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="footer">
-                  <tr>
-                      <td colspan="7">Total</td>
-                      <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_UndPaq) | currency : 'COP '}}</td>
-                  </tr>
-              </ng-template>
-          </p-table>
-      </p-tabPanel>
-      
-      <p-tabPanel
-      header="Todo"
-      leftIcon="pi pi-sliders-h">
-          <p-table
-              #tableStock
-              [columns]="selectedColumns"
-              [value]="stockInformation" 
-              dataKey="item"
-              styleClass="p-datatable-gridlines p-datatable-sm"
-              [resizableColumns]="true"
-              [reorderableColumns]="true"
-              columnResizeMode="expand"
-              responsiveLayout="scroll"
-              [rowHover]="true"
-              [showCurrentPageReport]="true"
-              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-              [scrollable]="true"
-              scrollHeight="50rem"
-              [expandedRowKeys]="expandedRows">
-              <ng-template pTemplate="caption">
-                  <div class="row g-4">
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
-                          <p-multiSelect
-                              [options]="columns"
-                              [(ngModel)]="selectedColumns"
-                              optionLabel="header"
-                              selectedItemsLabel="{0} columnas seleccionadas"
-                              [style]="{minWidth: '330px'}"
-                              placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-                      </div>
-                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
-                          <button class="buttonPDF mx-4" (click)="showPopUpCreateAndEdit()">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svgIconPDF"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-                          </button>
-                  
-                          <button class="buttonExcel mx-4" (click)="createExcel(stockInformation)">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
-                          </button>
-                      </div>
-                  </div>
-              </ng-template>
-              <ng-template pTemplate="header" let-columns>
-                  <tr>
-                      <th rowspan="2" class="text-center">#</th>
-                      <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock, $event, col.field)"></th>
-                  </tr>
-                  <tr>
-                      <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
-                      <p-sortIcon [field]="col.field"></p-sortIcon>
-                      </th>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
-                  <tr>
-                      <td>
-                          <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                          <span class="font-bold">
-                              {{rowIndex + 1}}
-                          </span>
-                      </td>
-                      <td *ngFor="let col of selectedColumns" (click)="showPopUpCreateAndEdit(data)">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="rowexpansion" let-data>
-                  <tr>
-                      <td colspan="23">
-                          <div class="p-3">
-                              <p-table
-                                  [value]="data.avaibleProducion"
-                                  dataKey="factura"
-                                  styleClass="p-datatable-gridlines p-datatable-sm"
-                                  [scrollable]="true"
-                                  scrollHeight="30rem">
-                                  <ng-template pTemplate="header">
-                                      <tr>
-                                          <th>#</th>
-                                          <th>Rollo</th>
-                                          <th>OT</th>
-                                          <th>Cantidad</th>
-                                          <th>Presentación</th>
-                                          <th>Peso</th>
-                                          <th>Precio</th>
-                                          <th>Etiqueta</th>
-                                          <th>Proceso</th>
-                                          <th>Turno</th>
-                                          <th>Fecha</th>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
-                                      <tr>
-                                          <td>{{rowIndex + 1}}</td>
-                                          <td>{{details.NumberProduction}}</td>
-                                          <td>{{details.orderProduction}}</td>
-                                          <td>{{details.Quantity | number : '1.2-2'}}</td>
-                                          <td>{{details.Presentation}}</td>
-                                          <td>{{details.Weight | number : '1.2-2'}}</td>
-                                          <td>{{details.Price | number : '1.2-2'}}</td>
-                                          <td>{{details.Information}}</td>
-                                          <td>{{details.Process}}</td>
-                                          <td>{{details.Turn.turno_Id}}</td>
-                                          <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
-                                      </tr>
-                                  </ng-template>
-                                  <ng-template pTemplate="emptymessage">
-                                      <tr>
-                                          <td colspan="11">No se encontraron registros</td>
-                                      </tr>
-                                  </ng-template>
-                              </p-table>
-                          </div>
-                      </td>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="footer">
-                  <tr>
-                      <td colspan="7">Total</td>
-                      <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
-                  </tr>
-              </ng-template>
-          </p-table>
-      </p-tabPanel>
-  </p-tabView>
+    <p-tabPanel
+    header="Inventario de Rollos"
+    leftIcon="pi pi-database">
+        <p-table
+            #tableStock_Kg
+            [columns]="selectedColumns"
+            [value]="stockInformation_Kg" 
+            dataKey="item"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            [reorderableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 30, 50, 100, 150, 200]"
+            [expandedRowKeys]="expandedRows">
+            <ng-template pTemplate="caption">
+                <div class="row g-4">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                        <p-multiSelect
+                            [options]="columns"
+                            [(ngModel)]="selectedColumns"
+                            optionLabel="header"
+                            selectedItemsLabel="{0} columnas seleccionadas"
+                            [style]="{minWidth: '330px'}"
+                            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
+                        <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th rowspan="2" class="text-center">#</th>
+                    <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock_Kg, $event, col.field)"></th>
+                </tr>
+                <tr>
+                    <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <span class="font-bold">
+                            {{rowIndex + 1}}
+                        </span>
+                    </td>
+                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-data>
+                <tr>
+                    <td colspan="23">
+                        <div class="p-3">
+                            <p-table
+                                [value]="data.AvaibleProdution"
+                                dataKey="factura"
+                                styleClass="p-datatable-gridlines p-datatable-sm"
+                                [scrollable]="true"
+                                scrollHeight="30rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rollo</th>
+                                        <th>OT</th>
+                                        <th>Cantidad</th>
+                                        <th>Presentación</th>
+                                        <th>Peso</th>
+                                        <th>Precio</th>
+                                        <th>Etiqueta</th>
+                                        <th>Proceso</th>
+                                        <th>Turno</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{rowIndex + 1}}</td>
+                                        <td>{{details.NumberProduction}}</td>
+                                        <td>{{details.orderProduction}}</td>
+                                        <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                        <td>{{details.Presentation}}</td>
+                                        <td>{{details.Weight | number : '1.2-2'}}</td>
+                                        <td>{{details.Price | number : '1.2-2'}}</td>
+                                        <td>{{details.Information}}</td>
+                                        <td>{{details.Process}}</td>
+                                        <td>{{details.Turn}}</td>
+                                        <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="11">No se encontraron registros</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7">Total</td>
+                    <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_Kg) | currency : 'COP '}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
 
-</p-card>
-
-<p-dialog [(visible)]="recetaProducto" [style]="{width: '70vw'}" [resizable]="true" header="Crear y Editar Recetas de Productos" [modal]="true">
-  <app-Recetas_Productos></app-Recetas_Productos>
-</p-dialog>
+    <p-tabPanel
+    header="Inventario de Bultos"
+    leftIcon="pi pi-table">
+        <p-table
+            #tableStock_UndPaq
+            [columns]="selectedColumns"
+            [value]="stockInformation_UndPaq" 
+            dataKey="item"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            [reorderableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 30, 50, 100, 150, 200]"
+            [expandedRowKeys]="expandedRows">
+            <ng-template pTemplate="caption">
+                <div class="row g-4">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                        <p-multiSelect
+                            [options]="columns"
+                            [(ngModel)]="selectedColumns"
+                            optionLabel="header"
+                            selectedItemsLabel="{0} columnas seleccionadas"
+                            [style]="{minWidth: '330px'}"
+                            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
+                        <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th rowspan="2" class="text-center">#</th>
+                    <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStock_UndPaq, $event, col.field)"></th>
+                </tr>
+                <tr>
+                    <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <span class="font-bold">
+                            {{rowIndex + 1}}
+                        </span>
+                    </td>
+                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-data>
+                <tr>
+                    <td colspan="23">
+                        <div class="p-3">
+                            <p-table
+                                [value]="data.AvaibleProdution"
+                                dataKey="factura"
+                                styleClass="p-datatable-gridlines p-datatable-sm"
+                                [scrollable]="true"
+                                scrollHeight="30rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rollo</th>
+                                        <th>OT</th>
+                                        <th>Cantidad</th>
+                                        <th>Presentación</th>
+                                        <th>Peso</th>
+                                        <th>Precio</th>
+                                        <th>Etiqueta</th>
+                                        <th>Proceso</th>
+                                        <th>Turno</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{rowIndex + 1}}</td>
+                                        <td>{{details.NumberProduction}}</td>
+                                        <td>{{details.orderProduction}}</td>
+                                        <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                        <td>{{details.Presentation}}</td>
+                                        <td>{{details.Weight | number : '1.2-2'}}</td>
+                                        <td>{{details.Price | number : '1.2-2'}}</td>
+                                        <td>{{details.Information}}</td>
+                                        <td>{{details.Process}}</td>
+                                        <td>{{details.Turn}}</td>
+                                        <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="11">No se encontraron registros</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7">Total</td>
+                    <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation_UndPaq) | currency : 'COP '}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
+    
+    <p-tabPanel
+    header="Inventario Empaque"
+    leftIcon="pi pi-map"
+    tooltip="Información del Inventario de la Bodega de Sellado"
+    id="tablasInventario">
+        <p-table
+            #tableStockEmp
+            [value]="stockEmpaque"
+            [columns]="selectedColumns"
+            dataKey="item"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            [reorderableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 30, 50, 100, 150, 200]"
+            [expandedRowKeys]="expandedRows">
+            <ng-template pTemplate="caption">
+                <div class="row g-4">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                        <p-multiSelect
+                            [options]="columns"
+                            [(ngModel)]="selectedColumns"
+                            optionLabel="header"
+                            selectedItemsLabel="{0} columnas seleccionadas"
+                            [style]="{minWidth: '330px'}"
+                            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
+                        <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th rowspan="2" class="text-center">#</th>
+                    <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockEmp, $event, col.field)"></th>
+                </tr>
+                <tr>
+                    <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <span class="font-bold">
+                            {{rowIndex + 1}}
+                        </span>
+                    </td>
+                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-data>
+                <tr>
+                    <td colspan="23">
+                        <div class="p-3">
+                            <p-table
+                                [value]="data.AvaibleProdution"
+                                dataKey="factura"
+                                styleClass="p-datatable-gridlines p-datatable-sm"
+                                [scrollable]="true"
+                                scrollHeight="30rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rollo</th>
+                                        <th>OT</th>
+                                        <th>Cantidad</th>
+                                        <th>Presentación</th>
+                                        <th>Peso</th>
+                                        <th>Precio</th>
+                                        <th>Etiqueta</th>
+                                        <th>Proceso</th>
+                                        <th>Turno</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{rowIndex + 1}}</td>
+                                        <td>{{details.NumberProduction}}</td>
+                                        <td>{{details.orderProduction}}</td>
+                                        <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                        <td>{{details.Presentation}}</td>
+                                        <td>{{details.Weight | number : '1.2-2'}}</td>
+                                        <td>{{details.Price | number : '1.2-2'}}</td>
+                                        <td>{{details.Information}}</td>
+                                        <td>{{details.Process}}</td>
+                                        <td>{{details.Turn}}</td>
+                                        <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="11">No se encontraron registros</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7">Total</td>
+                    <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
+    
+    <p-tabPanel
+    header="Inventario Sellado"
+    leftIcon="pi pi-th-large"
+    tooltip="Información del Inventario de la Bodega de Wiketiado"
+    id="tablasInventario">
+        <p-table
+            #tableStockSella
+            [value]="stockSellado"
+            [columns]="selectedColumns"
+            dataKey="item"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            [reorderableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            [scrollable]="true"
+            scrollHeight="50rem"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[10, 20, 30, 50, 100, 150, 200]"
+            [expandedRowKeys]="expandedRows">
+            <ng-template pTemplate="caption">
+                <div class="row g-4">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                        <p-multiSelect
+                            [options]="columns"
+                            [(ngModel)]="selectedColumns"
+                            optionLabel="header"
+                            selectedItemsLabel="{0} columnas seleccionadas"
+                            [style]="{minWidth: '330px'}"
+                            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-8 col-xxl-8 d-flex justify-content-center">
+                        <button class="buttonExcel mx-4" (click)="createExcel(stockInformation_Kg)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="svgIconExcel"><path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th rowspan="2" class="text-center">#</th>
+                    <th *ngFor="let col of selectedColumns"><input pInputText type="{{col.type}}" style="width: 100%;" (input)="apliedFilters(tableStockSella, $event, col.field)"></th>
+                </tr>
+                <tr>
+                    <th *ngFor="let col of selectedColumns" class="text-center" pResizableColumn pReorderableColumn pSortableColumn="{{col.field}}">{{col.header}}
+                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data let-expanded="expanded" let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain mr-2 text-dark" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        <span class="font-bold">
+                            {{rowIndex + 1}}
+                        </span>
+                    </td>
+                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-data>
+                <tr>
+                    <td colspan="23">
+                        <div class="p-3">
+                            <p-table
+                                [value]="data.AvaibleProdution"
+                                dataKey="factura"
+                                styleClass="p-datatable-gridlines p-datatable-sm"
+                                [scrollable]="true"
+                                scrollHeight="30rem">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rollo</th>
+                                        <th>OT</th>
+                                        <th>Cantidad</th>
+                                        <th>Presentación</th>
+                                        <th>Peso</th>
+                                        <th>Precio</th>
+                                        <th>Etiqueta</th>
+                                        <th>Proceso</th>
+                                        <th>Turno</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-details let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{rowIndex + 1}}</td>
+                                        <td>{{details.NumberProduction}}</td>
+                                        <td>{{details.orderProduction}}</td>
+                                        <td>{{(details.Presentation == 'Kg' ? details.Weight : details.Quantity) | number : '1.2-2'}}</td>
+                                        <td>{{details.Presentation}}</td>
+                                        <td>{{details.Weight | number : '1.2-2'}}</td>
+                                        <td>{{details.Price | number : '1.2-2'}}</td>
+                                        <td>{{details.Information}}</td>
+                                        <td>{{details.Process}}</td>
+                                        <td>{{details.Turn}}</td>
+                                        <td>{{details.Date | date : 'yyyy-MM-dd'}} {{details.Hour}}</td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="11">No se encontraron registros</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="7">Total</td>
+                    <td [colSpan]="selectedColumns.length - 6">{{totalStock(stockInformation) | currency : 'COP '}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
+</p-tabView>
