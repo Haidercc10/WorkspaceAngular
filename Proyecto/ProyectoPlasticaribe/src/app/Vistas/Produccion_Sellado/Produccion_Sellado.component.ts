@@ -110,6 +110,7 @@ export class Produccion_SelladoComponent implements OnInit {
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
           this.formSellado.patchValue({ cantUnd: data[0].selladoCorte_CantBolsasBulto });
           this.formSellado.get('saldo')?.enable();
+          this.validarProceso();
           setTimeout(() => this.calcularPesoTeorico(), 500);
           this.claseCantidadRealizada(data[0]);
           this.cargarProduccionSellado(this.formSellado.value.ot);
@@ -246,6 +247,7 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any) {
+    console.log(entrada)
     this.svcProdProcesos.Post(entrada).subscribe(data => {
       this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id);
       setTimeout(() => {
@@ -255,7 +257,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, });
         this.buscarOT(); 
       }, 1000);
-    }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
+    }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`));
   }
 
   //Función que limpia los campos del formulario
@@ -394,4 +396,14 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que calcula el peso de unidades/paquetes
   calcularPeso = () => this.produccion.reduce((a, b) => a + b.peso, 0);
+
+  //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo. 
+  validarProceso() {
+    if(this.ordenesTrabajo.length > 0) {
+      let esWicket : boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
+
+      if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' }); 
+      else this.formSellado.patchValue({ proceso: 'SELLA' });
+    }
+  }
 }

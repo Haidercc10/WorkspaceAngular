@@ -39,7 +39,7 @@
         <!-- Maquina -->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="maquina" id="maq" type="number" [useGrouping]="false"></p-inputNumber>
+            <p-inputNumber formControlName="maquina" id="maq" (onInput)="validarProceso()" type="number" [useGrouping]="false" ></p-inputNumber>
               <label for="maq">Maquina</label>
           </span>
         </div>
@@ -61,7 +61,7 @@
         <!--Cantidad Und/Paq-->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantUnd" [max]="cantBultoEstandar" (onInput)="calcularPesoTeorico()" id="cantUnd" type="number" [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false" pTooltip="Cantidad de Unidades / Paquetes / Kilos" tooltipPosition="top"></p-inputNumber>
+            <p-inputNumber formControlName="cantUnd" (onInput)="calcularPesoTeorico()" id="cantUnd" type="number" [maxFractionDigits]="2" [readonly]="esSoloLectura" [useGrouping]="false" pTooltip="Cantidad de Unidades / Paquetes / Kilos" tooltipPosition="top"></p-inputNumber>
               <label for="cantUnd">Cantidad</label>
           </span>
         </div>

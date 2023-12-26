@@ -49,7 +49,7 @@ export class DesperdicioComponent implements OnInit {
   areas : any [] = [];
   areaOperarios : any; 
   ordenesTrabajo : any = [];
-  hora: any = moment().format('HH:mm:ss');
+  //hora: any = moment().format('HH:mm:ss');
   turnos : any = [];
   @ViewChild('dt2') dt2: Table | undefined; //Tabla de desperdicios
   copiaDesperdicios : any = [];
@@ -649,18 +649,14 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
-    let horaInicioDia: any = '07:00:00';
-    let horaFinDia: any = '18:00:00';
-    let horaInicioNoche: any = '18:00:01';
-    let horaFinNoche: any = '06:59:59';
+    let proceso : string = this.area.nombre.toUpperCase();
+    if(proceso == 'EMPAQUE' || proceso == 'CORTE') proceso = 'DESP_CORTADORES' 
+    else if (proceso == 'WIKETIADO') proceso = 'DESP_SELLADO' 
+    else if (proceso == 'NO APLICA') proceso = 'DESP_EXTRUSION'
+    else proceso = `DESP_${proceso}`;
     
-    if (this.hora >= horaInicioDia && this.hora < horaFinDia) {
-      if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RD' });
-      else this.FormDesperdicio.patchValue({ Turno: 'DIA' });
-    } else if (this.hora >= horaInicioNoche && this.hora < horaFinNoche) {
-      if(this.ValidarRol == 74) this.FormDesperdicio.patchValue({ Turno: 'RN' });
-      else this.FormDesperdicio.patchValue({ Turno: 'NOCHE' });
-    } 
+    this.bagProService.GetHorarioProceso(proceso).subscribe(data => { this.FormDesperdicio.patchValue({ Turno: data[0] }); }, 
+    error => this.mensajeService.mensajeError(`Error`, `No se pudo cargar el turno actual, verifique!`));
   }
 
   //Función que crea el pdf de la etiqueta
