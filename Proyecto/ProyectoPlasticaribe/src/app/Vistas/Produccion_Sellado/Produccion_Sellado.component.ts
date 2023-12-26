@@ -148,13 +148,9 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
-    let horaInicioDia: any = '07:00:00';
-    let horaFinDia: any = '18:00:00';
-    let horaInicioNoche: any = '18:00:01';
-    let horaFinNoche: any = '06:59:59';
-    let hora = moment().format('HH:mm:ss');
-    if (hora >= horaInicioDia && hora < horaFinDia) this.formSellado.patchValue({ turno: 'DIA' });
-    else if (hora >= horaInicioNoche && hora < horaFinNoche) this.formSellado.patchValue({ turno: 'NOCHE' });
+    this.svcBagPro.GetHorarioProceso('SELLADO').subscribe(turno => {
+      this.formSellado.patchValue({ turno: turno.toString() });
+    });
   }
 
   //Función que valida la entrada del registro
