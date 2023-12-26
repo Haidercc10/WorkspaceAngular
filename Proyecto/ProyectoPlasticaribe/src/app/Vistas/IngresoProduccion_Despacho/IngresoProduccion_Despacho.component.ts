@@ -75,6 +75,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
               let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
               this.sendProductionZeus[i].dataExtrusion = {
                 numero_RolloBagPro: production,
+                precioProducto: data[0].pp.presentacion != 'Kg' ? res[0].valorUnidad : res[0].valorKg,
                 extrusion_Ancho1: res[0].ancho1_Extrusion,
                 extrusion_Ancho2: res[0].ancho2_Extrusion,
                 extrusion_Ancho3: res[0].ancho3_Extrusion,
@@ -96,7 +97,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let presentation: string = data.pp.presentacion;
     let reel: number = data.pp.numero_Rollo;
     let quantity: number = presentation != 'Kg' ? data.pp.cantidad : data.pp.peso_Neto;
-    let price: number = data.pp.precio;
+    let price: number = data.dataExtrusion.precioProducto;
     if (presentation == 'Und') presentation = 'UND';
     else if (presentation == 'Kg') presentation = 'KLS';
     else if (presentation == 'Paquete') presentation = 'PAQ';
