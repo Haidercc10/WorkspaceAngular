@@ -31,6 +31,8 @@ export class ExistenciasProductosService {
 
   srvActualizarExistenciaCantidadMinima = (id : any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionCantMinima/${id}`, datos_Productos);;
 
+  PutExistencia = (item: number, presentation: string, quantity: number, price: number) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/tutExistencia`, null);
+
   srvGuardar = (data : modelExistenciaProductos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Existencia_Productos', data);
 
   srvObtenerInventarioExistencias = (): Observable<any> => this.http.get(this.rutaPlasticaribeAPI + '/Existencia_Productos/InventarioProductos');

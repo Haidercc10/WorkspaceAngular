@@ -3,6 +3,7 @@ import moment from 'moment';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
@@ -29,7 +30,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     private createPDFService: CreacionPdfService,
     private bagproService: BagproService,
     private entraceService: EntradaRollosService,
-    private dtEntracesService: DetallesEntradaRollosService,) {
+    private dtEntracesService: DetallesEntradaRollosService,
+    private existenciasProductosService: ExistenciasProductosService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
