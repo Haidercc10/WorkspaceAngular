@@ -422,7 +422,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: presentation == 'Unidad' ? 1 : 0,
+      Cantidad: presentation == 'Und' ? 1 : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: 0,
