@@ -17,6 +17,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './Produccion_Sellado.component.html',
   styleUrls: ['./Produccion_Sellado.component.css']
 })
+
 export class Produccion_SelladoComponent implements OnInit {
 
   cargando: boolean = false; //Variable de carga 
@@ -112,6 +113,7 @@ export class Produccion_SelladoComponent implements OnInit {
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
           this.formSellado.patchValue({ cantUnd: data[0].selladoCorte_CantBolsasBulto });
           this.formSellado.get('saldo')?.enable();
+          this.validarProceso();
           setTimeout(() => this.calcularPesoTeorico(), 500);
           this.claseCantidadRealizada(data[0]);
           this.cargarProduccionSellado(this.formSellado.value.ot);
@@ -134,10 +136,9 @@ export class Produccion_SelladoComponent implements OnInit {
   cargarProduccionSellado(ot: any) {
     this.svcBagPro.GetProduccionSellado(ot).subscribe(data => {
       if (data.length > 0) {
-        let qty: any = this.formSellado.value.cantUnd;
         this.produccion = data;
-        this.cantBultoEstandar = (qty == 0) ? data[0].cantidadUnd : qty;
-        this.formSellado.patchValue({ cantUnd: qty == 0 ? data[0].cantidadUnd : qty });
+        this.cantBultoEstandar = data[0].cantidadUnd;
+        this.formSellado.patchValue({ cantUnd: data[data.length - 1].cantidadUnd });
         this.produccion.sort((a, b) => a.bulto - b.bulto);
         this.medida = data[0].presentacion1;
         this.cargando = false;
@@ -272,17 +273,23 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any) {
-    this.svcProdProcesos.Post(entrada).subscribe(data => {
-      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id, data.datos_Etiqueta);
-      setTimeout(() => {
-        if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
-        else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
-        this.cargarCamposUltimaOT();
-        this.limpiarCampos();
-        this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, cantUnd: data.cantidad  });
-        this.buscarOT(); 
-      }, 1000);
-    }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
+    if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
+    else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
+    this.cargarCamposUltimaOT();
+    this.limpiarCampos();
+    this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados });
+    this.buscarOT();
+    // this.svcProdProcesos.Post(entrada).subscribe(data => {
+    //   this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id, data.datos_Etiqueta);
+    //   setTimeout(() => {
+    //     if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
+    //     else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
+    //     this.cargarCamposUltimaOT();
+    //     this.limpiarCampos();
+    //     this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, cantUnd: entrada.Cantidad });
+    //     this.buscarOT(); 
+    //   }, 1000);
+    // }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
   }
 
   //Función que limpia los campos del formulario
@@ -434,4 +441,14 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que calcula el peso de unidades/paquetes
   calcularPeso = () => this.produccion.reduce((a, b) => a + b.peso, 0);
+
+  //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo. 
+  validarProceso() {
+    if(this.ordenesTrabajo.length > 0) {
+      let esWicket : boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
+
+      if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' }); 
+      else this.formSellado.patchValue({ proceso: 'SELLA' });
+    }
+  }
 }
