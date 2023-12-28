@@ -157,7 +157,7 @@
                                       <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
                                       <td>{{ detalleNomina.Registros}}</td>
                                       <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
-                                      <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula)" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
+                                      <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Operario)" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
                                   </tr>
                               </ng-template>
                               <ng-template pTemplate="emptymessage">

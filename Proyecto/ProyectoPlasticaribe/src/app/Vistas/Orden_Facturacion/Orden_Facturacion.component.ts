@@ -142,8 +142,8 @@ export class Orden_FacturacionComponent implements OnInit {
         this.production.push({
           item: dataProduction.prod.prod_Id,
           reference: dataProduction.prod.prod_Nombre,
-          numberProduction: dataProduction.pp.numero_Rollo,
-          quantity: dataProduction.pp.cantidad,
+          numberProduction: dataProduction.pp.numeroRollo_BagPro,
+          quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
           presentation: dataProduction.pp.presentacion
         });
       });
