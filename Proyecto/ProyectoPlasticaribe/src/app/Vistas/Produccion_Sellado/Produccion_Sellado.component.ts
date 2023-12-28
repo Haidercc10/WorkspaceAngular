@@ -273,23 +273,17 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any) {
-    if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
-    else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
-    this.cargarCamposUltimaOT();
-    this.limpiarCampos();
-    this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados });
-    this.buscarOT();
-    // this.svcProdProcesos.Post(entrada).subscribe(data => {
-    //   this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id, data.datos_Etiqueta);
-    //   setTimeout(() => {
-    //     if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
-    //     else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
-    //     this.cargarCamposUltimaOT();
-    //     this.limpiarCampos();
-    //     this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados, cantUnd: entrada.Cantidad });
-    //     this.buscarOT(); 
-    //   }, 1000);
-    // }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
+    this.svcProdProcesos.Post(entrada).subscribe(data => {
+      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id, data.datos_Etiqueta);
+      setTimeout(() => {
+        if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
+        else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
+        this.cargarCamposUltimaOT();
+        this.limpiarCampos();
+        this.formSellado.patchValue({ ot : this.ordenConsultada, maquina : this.maquinaConsultada, idOperario : this.operariosConsultados });
+        this.buscarOT();
+      }, 1000);
+    }, () => this.svcMsjs.mensajeError(`Error`, `No fue posible crear el registro de entrada de producción!`))
   }
 
   //Función que limpia los campos del formulario
