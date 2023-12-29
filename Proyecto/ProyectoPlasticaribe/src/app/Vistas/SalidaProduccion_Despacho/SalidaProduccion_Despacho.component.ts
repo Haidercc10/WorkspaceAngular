@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { modelAsigProductosFacturas } from 'src/app/Modelo/modelAsigProductosFacturas';
 import { modelDtAsgProductoFactura } from 'src/app/Modelo/modelDtAsgProductoFactura';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
@@ -17,6 +19,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './SalidaProduccion_Despacho.component.html',
   styleUrls: ['./SalidaProduccion_Despacho.component.css']
 })
+
 export class SalidaProduccion_DespachoComponent implements OnInit {
 
   load: boolean = false;
@@ -25,8 +28,11 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   modoSeleccionado: boolean = false;
   sendProductionZeus: any[] = [];
   productionSearched: any;
+  production: Array<production> = [];
   formProduction: FormGroup;
   drivers: any[] = [];
+  modalProductionNotRead: boolean = false;
+  remainingProduction: Array<production> = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -36,9 +42,12 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private frmBuilder: FormBuilder,
     private asgProdFacturaService: AsignacionProductosFacturaService,
     private dtAsgProdFacturaService: DetallesAsignacionProductosFacturaService,
-    private bagproService: BagproService,) {
+    private bagproService: BagproService,
+    private orderFactService: OrdenFacturacionService,
+    private dtOrderFactService: Dt_OrdenFacturacionService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
+      orderFact: ['', Validators.required],
       production: [''],
       client: ['', Validators.required],
       observation: [''],
@@ -51,7 +60,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   ngOnInit() {
     this.getDrivers();
     this.lecturaStorage();
-    setTimeout(() => document.getElementById('RolloBarCode').focus(), 500);
+    // setTimeout(() => document.getElementById('RolloBarCode').focus(), 500);
   }
 
   lecturaStorage() {
@@ -73,35 +82,77 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.usuariosService.GetConsdutores().subscribe(data => this.drivers = data);
   }
 
-  searchProductionByReel() {
-    let production = parseInt(this.formProduction.value.production);
-    this.formProduction.patchValue({ production: null });
-    document.getElementById('RolloBarCode').focus();
-    let productionSearched = this.sendProductionZeus.map(prod => prod.dataProduction.numero_Rollo);
-    if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
-    else {
-      this.bagproService.GetProductionByNumber(production).subscribe(prod => {
-        let numProduction = prod[0].observaciones.replace('Rollo #', '');
-        numProduction = numProduction.replace(' en PBDD.dbo.Produccion_Procesos', '');
-        this.productionProcessSerivce.GetInformationAboutProduction(numProduction).subscribe(data => {
-        this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
-          this.sendProductionZeus.push(data[0]);
-          let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
-          this.sendProductionZeus[i].dataExtrusion = {
-            extrusion_Ancho1: res[0].ancho1_Extrusion,
-            extrusion_Ancho2: res[0].ancho2_Extrusion,
-            extrusion_Ancho3: res[0].ancho3_Extrusion,
-            undMed_Id: res[0].und_Extrusion,
-            extrusion_Calibre: res[0].calibre_Extrusion,
-            material: res[0].material,
-          }
-          this.formProduction.patchValue({ client: data[0].clientes.cli_Id });
-        });
-      }, () => {
-        this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`);
+  getInformationOrderFact(){
+    let orderFact = this.formProduction.value.orderFact;
+    this.dtOrderFactService.GetInformacionOrderFact(orderFact).subscribe(data => {
+      this.load = true;
+      this.production = [];
+      data.forEach(dataProduction => {
+        this.formProduction.patchValue({ fact: dataProduction.order.factura });
+        this.production.push({
+          saleOrder: dataProduction.dtOrder.consecutivo_Pedido,
+          item: dataProduction.producto.prod_Id,
+          reference: dataProduction.producto.prod_Nombre,
+          numberProduction: dataProduction.dtOrder.numero_Rollo,
+          quantity: dataProduction.dtOrder.cantidad,
+          presentation: dataProduction.dtOrder.presentacion
         });
       });
+      setTimeout(() => this.load = false, 50);
+    }, error => this.msj.mensajeError(`¡No se encontró información de la orden de facturación #${orderFact}!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  searchProductionByReel() {
+    let orderFact = this.formProduction.value.orderFact;
+    if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeAdvertencia(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`);
+    else {
+      let production = parseInt(this.formProduction.value.production);
+      let productionOrderSearched = this.production.map(x => x.numberProduction);
+      if (!productionOrderSearched.includes(production)) this.msj.mensajeAdvertencia(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`);
+      else {
+        this.formProduction.patchValue({ production: null });
+        document.getElementById('RolloBarCode').focus();
+        let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
+        if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
+        else {
+          this.bagproService.GetProductionForExitByNumber(production).subscribe(prod => {
+            let numProduction = prod[0].observaciones.replace('Rollo #', '');
+            numProduction = numProduction.replace(' en PBDD.dbo.Produccion_Procesos', '');
+            this.productionProcessSerivce.GetInformationAboutProduction(numProduction).subscribe(data => {
+              this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
+                this.sendProductionZeus.push(data[0]);
+                let i: number = this.sendProductionZeus.findIndex(x => x.pp.numeroRollo_BagPro == data[0].pp.numeroRollo_BagPro);
+                this.sendProductionZeus[i].dataExtrusion = {
+                  extrusion_Ancho1: res[0].ancho1_Extrusion,
+                  extrusion_Ancho2: res[0].ancho2_Extrusion,
+                  extrusion_Ancho3: res[0].ancho3_Extrusion,
+                  undMed_Id: res[0].und_Extrusion,
+                  extrusion_Calibre: res[0].calibre_Extrusion,
+                  material: res[0].material,
+                }
+                this.formProduction.patchValue({ client: data[0].clientes.cli_Id });
+              });
+            }, () => this.msj.mensajeAdvertencia(`No se obtuvo información del rollo ${production}`));
+          });
+        }
+      }
     }
+  }
+
+  validateDataToSave(){
+    this.remainingProduction = [];
+    let productionSearched = this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro);
+    this.production.forEach(prod => {
+      if (!productionSearched.includes(prod.numberProduction)) this.remainingProduction.push(prod);
+    });
+    if (this.formProduction.value.driver) {
+      if (!['', null, undefined].includes(this.formProduction.value.car)) {
+        if (this.formProduction.value.car.length == 6) {
+          if (this.remainingProduction.length == 0) this.saveAsgFact();
+          else this.modalProductionNotRead = true;
+        } else this.msj.mensajeAdvertencia(`¡La placa del carro debe tener 6 digitos!`);
+      } else this.msj.mensajeAdvertencia(`¡Debe llenar el campo 'Placa Carro'!`);
+    } else this.msj.mensajeAdvertencia(`¡Debe elegir un conductor!`);
   }
 
   saveAsgFact() {
@@ -120,9 +171,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       AsigProdFV_FechaEnvio: moment().format('YYYY-MM-DD'),
       AsigProdFV_HoraEnvio: moment().format('HH:mm:ss')
     }
-    this.asgProdFacturaService.srvGuardar(data).subscribe(res => {
-      this.saveProduction(res.asigProdFV_Id);
-    }, () => {
+    this.asgProdFacturaService.srvGuardar(data).subscribe(res => this.saveProduction(res.asigProdFV_Id), () => {
       this.msj.mensajeError(`¡Ocurrió un error al insertar los datos de la factura!`);
       this.load = false;
     });
@@ -143,8 +192,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.productionProcessSerivce.putChangeStateProduction(prod.pp.numero_Rollo).subscribe(() => {
             count++;
             if (count == this.sendProductionZeus.length) {
-              this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
-              this.createPDF();
+              let orderFact = this.formProduction.value.orderFact;
+              this.orderFactService.PutStatusOrder(orderFact).subscribe(() => {
+                this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
+                this.createPDF();
+              }, error => {
+                this.msj.mensajeError(`¡No se actualizó el estado de la orden de facturación ${AsigProdFV_Id}!`, `Error: ${error.error.title} | Status: ${error.status}`);
+                this.load = false;
+              });
             }
         });
       }, () => {
@@ -282,7 +337,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.sendProductionZeus.forEach(prod => {
       let proceso: string = prod.proceso.proceso_Id;
       data.push({
-        "Rollo": prod.pp.numero_Rollo,
+        "Rollo": prod.pp.numeroRollo_BagPro,
         'Item': prod.producto.prod_Id,
         'Referencia': prod.producto.prod_Nombre,
         'Cantidad': ['SELLA', 'WIKE'].includes(proceso) ? this.formatonumeros((prod.pp.cantidad).toFixed(2)) : this.formatonumeros((prod.pp.peso_Neto).toFixed(2)),
@@ -338,5 +393,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       fontSize: 9,
     }
   }
+}
 
+interface production {
+  saleOrder: number;
+  item: number;
+  reference: string;
+  numberProduction?: number;
+  quantity: number;
+  cuontProduction?: number;
+  presentation: string;
 }

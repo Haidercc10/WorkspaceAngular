@@ -350,6 +350,11 @@ p-table .p-datatable-gridlines .p-datatable-tfoot > tr > td {
   z-index: 0;
 }
 
+.p-datatable .p-datatable-tbody > tr.p-highlight {
+  background: #ffefef;
+  color: #d81d1d;
+}
+
 button {
   border-radius: 20px;
 }

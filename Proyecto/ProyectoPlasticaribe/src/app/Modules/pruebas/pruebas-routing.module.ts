@@ -9,7 +9,8 @@ const routes: Routes = [
     path: '',
     canActivate: [VistasPermisosGuard], 
     data: {nombre: 'Pruebas'}, 
-    component: Formato_Facturas_VentasComponent
+    // component: Formato_Facturas_VentasComponent
+    component: PruebaImagenCatInsumoComponent
   }
 ];
 

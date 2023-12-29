@@ -74,6 +74,8 @@ export class BagproService {
 
   GetProductionByNumber = (production : number) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionByNumber/${production}`);
 
+  GetProductionForExitByNumber = (production : number) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionForExitByNumber/${production}`);
+
   GetNumberReelByNumberAndProcess = (number: number, process: string): Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getNumberReelByNumberAndProcess/${number}/${process}`);
 
   /********************************************************** CLIENTESOT ****************************************************************/

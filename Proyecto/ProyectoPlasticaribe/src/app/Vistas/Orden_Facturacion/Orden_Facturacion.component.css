@@ -2,3 +2,7 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input {
     display: flex;
     width: 100%;
 }
+
+p-table ::ng-deep div {
+    max-height: 30rem !important;
+}

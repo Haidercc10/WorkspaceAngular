@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
@@ -32,7 +33,8 @@ export class ReporteProduccionComponent implements OnInit {
     private frmBuilder: FormBuilder,
     private bagProService: BagproService,
     private msj : MensajesAplicacionService,
-    private productosService : ProductoService,) {
+    private productosService : ProductoService,
+    private createPDFService : CreacionPdfService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -161,10 +163,10 @@ export class ReporteProduccionComponent implements OnInit {
       if (rollosSellado.length > 0) {
         let count : number = 0;
         rollosSellado.forEach(data => {
-          this.bagProService.EnvioZeusProcSellado(data).subscribe(res => {
+          this.bagProService.EnvioZeusProcSellado(data).subscribe(() => {
             count++;
             if (count == rollosSellado.length) this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`)
-          }, res => {
+          }, () => {
             this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
             this.cargando = false;
           }, () => this.cargando = false);
@@ -174,15 +176,60 @@ export class ReporteProduccionComponent implements OnInit {
       if (rollosEmpaque.length > 0) {
         let count : number = 0;
         rollosEmpaque.forEach(data => {
-          this.bagProService.EnvioZeusProcExtrusion(data).subscribe(res => {
+          this.bagProService.EnvioZeusProcExtrusion(data).subscribe(() => {
             count++;
             if (count == rollosEmpaque.length) this.msj.mensajeConfirmacion(`¡Los rollos se han subido a Zeus!`)
-          }, res => {
+          }, () => {
             this.msj.mensajeAdvertencia(`¡Ha ocurrido un error!`);
             this.cargando = false;
           }, () => this.cargando = false);
         });
       }
     } else this.msj.mensajeAdvertencia(`¡Debe seleccionar minimo un rollo!`);
+  }
+
+  createPDF(){
+    let process: string = ``;
+    let titulo: string = `Producción de ${process}`;
+    let content: any[] = this.contentPDF();
+    this.createPDFService.formatoPDF(titulo, content);
+  }
+
+  contentPDF(): any[] {
+    let data : Array<any> = [];
+    return data;
+  }
+
+  fillClientsPDF(dataProduction: any){
+    let clients = dataProduction.map(x => x.idCliente);
+    let clientsAlreadyIncluded: any[] = [];
+    let data : any = [];
+    for (let i = 0; i < clients.length; i++) {
+      if (!clientsAlreadyIncluded.includes(clients[i].nitCliente)) {
+        clientsAlreadyIncluded.push(clients[i].nitCliente);
+        data.push([
+          {
+            margin: [5, 0],
+            table: {
+              dontBreakRows: true,
+              widths : ['100%'],
+              body: [],
+            },
+            fontSize: 9,
+          }
+        ]);
+      }   
+    }
+    return data;
+  }
+
+  fillItemsPDF(dataProduction: any){
+    let data : any = [];
+    return data;
+  }
+
+  fillProduccionPDF(dataProduction: any){
+    let data : any = [];
+    return data;
   }
 }

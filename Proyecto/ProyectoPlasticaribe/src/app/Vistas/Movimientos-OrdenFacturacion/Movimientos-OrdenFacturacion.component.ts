@@ -61,11 +61,12 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD') == 'Fecha inválida' ? dateLastMonth : moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let route : string = orderNum != null ? `&order=${orderNum}` : '';
+    this.clearFields();
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
       data.forEach(dataOrder => this.serchedData.push(dataOrder));
     }, error => {
       this.load = false;
-      this.msg.mensajeError(error);
+      this.msg.mensajeError(`¡No se encontró información de ordenes realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
     });
     this.searchDataDevolutions(startDate, endDate, route);
   }
@@ -75,13 +76,15 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
     }, error => {
       this.load = false;
-      this.msg.mensajeError(error);
+      this.msg.mensajeError(`¡No se encontró información de devoluciones realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
     });
   }
 
   createPDF(id : number, fact: string, type : string){
+    this.load = true;
     if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact);
     else if (type == 'Devolucion') this.devolucion_OrdenFacturacionComponent.createPDF(id, fact);
+    setTimeout(() => this.load = false, 3000);
   }
 
 }
