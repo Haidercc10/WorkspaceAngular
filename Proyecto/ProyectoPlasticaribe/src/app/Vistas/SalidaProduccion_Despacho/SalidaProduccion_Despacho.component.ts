@@ -8,6 +8,7 @@ import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/Creaci
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
@@ -44,7 +45,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private dtAsgProdFacturaService: DetallesAsignacionProductosFacturaService,
     private bagproService: BagproService,
     private orderFactService: OrdenFacturacionService,
-    private dtOrderFactService: Dt_OrdenFacturacionService,) {
+    private dtOrderFactService: Dt_OrdenFacturacionService,
+    private zeusService: InventarioZeusService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
       orderFact: ['', Validators.required],
@@ -87,8 +89,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     this.dtOrderFactService.GetInformacionOrderFact(orderFact).subscribe(data => {
       this.load = true;
       this.production = [];
+      let saleOrders: Array<number> = [];
       data.forEach(dataProduction => {
         this.formProduction.patchValue({ fact: dataProduction.order.factura });
+        saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
         this.production.push({
           saleOrder: dataProduction.dtOrder.consecutivo_Pedido,
           item: dataProduction.producto.prod_Id,
@@ -97,23 +101,30 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           quantity: dataProduction.dtOrder.cantidad,
           presentation: dataProduction.dtOrder.presentacion
         });
+        if (saleOrders.length == data.length){
+          setTimeout(() => this.load = false, 50);
+          this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
+            this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
+              this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
+            });
+          });
+        }
       });
-      setTimeout(() => this.load = false, 50);
     }, error => this.msj.mensajeError(`¡No se encontró información de la orden de facturación #${orderFact}!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   searchProductionByReel() {
     let orderFact = this.formProduction.value.orderFact;
-    if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeAdvertencia(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`);
+    if ([null, undefined, ''].includes(orderFact.toString().trim())) this.msj.mensajeAdvertencia(`¡Debe buscar la orden de facturación para ingresar los rollos/bultos a despachar!`, ``, 12000000);
     else {
       let production = parseInt(this.formProduction.value.production);
       let productionOrderSearched = this.production.map(x => x.numberProduction);
-      if (!productionOrderSearched.includes(production)) this.msj.mensajeAdvertencia(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`);
+      if (!productionOrderSearched.includes(production)) this.msj.mensajeAdvertencia(`¡El rollo/bulto leido no pertenece a la orden de facturación buscada!`, ``, 12000000);
       else {
         this.formProduction.patchValue({ production: null });
         document.getElementById('RolloBarCode').focus();
         let productionSearched = this.sendProductionZeus.map(prod => prod.pp.numeroRollo_BagPro);
-        if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
+        if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`, ``, 12000000);
         else {
           this.bagproService.GetProductionForExitByNumber(production).subscribe(prod => {
             let numProduction = prod[0].observaciones.replace('Rollo #', '');

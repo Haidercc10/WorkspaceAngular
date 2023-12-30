@@ -17,4 +17,6 @@ export class OrdenFacturacionService {
     Post = (data : modelOrdenFacturacion) : Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/OrdenFacturacion`, data);
 
     PutStatusOrder = (fact: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrder/${fact}`, fact);
+
+    PutFactOrder = (order: number, fact: string) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putFactOrder/${order}/${fact}`, fact);
 }

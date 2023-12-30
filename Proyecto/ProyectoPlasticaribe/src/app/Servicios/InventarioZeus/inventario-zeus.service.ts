@@ -9,110 +9,110 @@ import { environment } from 'src/environments/environment';
 
 export class InventarioZeusService {
 
- //Encapsular httpClient en Constructor.
-  constructor(private http : HttpClient) { }
+  //Encapsular httpClient en Constructor.
+  constructor(private http: HttpClient) { }
 
   //Crear ruta del api
   readonly rutaInventarioZeusAPI = environment.rutaZeus;
 
   /************************************************************ ARTICULOS **************************************************************/
-  LikeGetClientes(texto : any){
+  LikeGetClientes(texto: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
   }
 
-  GetCliente_Vendedor_LikeNombre = (vendedor : string, nombre : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/GetCliente_Vendedor_LikeNombre/${vendedor}/${nombre}`);
+  GetCliente_Vendedor_LikeNombre = (vendedor: string, nombre: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/GetCliente_Vendedor_LikeNombre/${vendedor}/${nombre}`);
 
-  LikeGetVendedores(texto: any){
+  LikeGetVendedores(texto: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);
   }
 
-  LikeGetItems(texto: any){
+  LikeGetItems(texto: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulos/${texto}`);
   }
 
-  getClientesxVendedor(vendedor : any){
+  getClientesxVendedor(vendedor: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxVendedor/${vendedor}`);
   }
 
-  getClientesxId(idcliente : any){
+  getClientesxId(idcliente: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxId/${idcliente}`);
   }
 
-  getVendedoresxId(id: any){
+  getVendedoresxId(id: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxId/${id}`);
   }
 
-  getArticulosxId(id: any){
+  getArticulosxId(id: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulosxId/${id}`);
   }
 
   /************************************************************ EXISTENCIAS **************************************************************/
-  srvObtenerExistenciasZeus():Observable<any[]> {
+  srvObtenerExistenciasZeus(): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');
   }
 
-  getExistenciasProductos(item : any, presentacion: any) {
+  getExistenciasProductos(item: any, presentacion: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos/${item}/${presentacion}`);
   }
 
-  srvObtenerExistenciasZeusXId(Articulo : any):Observable<any[]> {
+  srvObtenerExistenciasZeusXId(Articulo: any): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/idArticulo/${Articulo}`);
   }
 
-  srvObtenerExistenciasArticulosZeus():Observable<any[]> {
+  srvObtenerExistenciasArticulosZeus(): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias/BusquedaCodigoArticulo');
   }
 
-  GetExistenciasArticulo(id : string):Observable<any[]> {
+  GetExistenciasArticulo(id: string): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getExistenciasArticulo/${id}`);
   }
 
-  GetPrecioUltimoPrecioFacturado(producto : string, presentacion : string):Observable<any> {
+  GetPrecioUltimoPrecioFacturado(producto: string, presentacion: string): Observable<any> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getPrecioUltimoPrecioFacturado/${producto}/${presentacion}`);
   }
 
   /************************************************************ DOCUMENTOS ITEMS **************************************************************/
 
   /************************************************************ FACTURACION DE CLIENTES **************************************************************/
-  GetValorFacturadoHoy(){
+  GetValorFacturadoHoy() {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/FacturaDeCliente/ValorFacturadoHoy`);
   }
   /************************************************************ MOVIMIENTOS ITEMS **************************************************************/
-  GetFacturacionMensual(fecha1 : any, fecha2 : any){
+  GetFacturacionMensual(fecha1: any, fecha2: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionMensual/${fecha1}/${fecha2}`);
   }
 
-  GetFacturacionTodosMeses(mes : any, ano : any){
+  GetFacturacionTodosMeses(mes: any, ano: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionTodosMeses/${mes}/${ano}`);
   }
 
-  GetFacturacion_Mes_Mes = (anio : string) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getFacturacion_Mes_Mes/${anio}`);
+  GetFacturacion_Mes_Mes = (anio: string) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getFacturacion_Mes_Mes/${anio}`);
 
-  GetIvaVentaMensual(fecha1 : any, fecha2 : any){
+  GetIvaVentaMensual(fecha1: any, fecha2: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaVentaMensual/${fecha1}/${fecha2}`);
   }
 
-  GetIvaCompraMensual(fecha1 : any, fecha2 : any){
+  GetIvaCompraMensual(fecha1: any, fecha2: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaCompraMensual/${fecha1}/${fecha2}`);
   }
 
-  GetIvaCompraTodosMeses(mes : any){
+  GetIvaCompraTodosMeses(mes: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaCompraTodosMeses/${mes}`);
   }
 
-  GetPedidosAgrupados(){
+  GetPedidosAgrupados() {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosAgrupados`);
   }
 
-  GetPedidos(){
+  GetPedidos() {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }
 
-  getArticulosxCliente(id: any){
+  getArticulosxCliente(id: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getArticulosxCliente/${id}`);
   }
 
-  getPedidosXConsecutivo(id : any) {
+  getPedidosXConsecutivo(id: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosPorConsecutivo/${id}`);
   }
 
@@ -136,52 +136,57 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosStock`);
   }
 
-  GetConsolidadClientesArticulo(ano1 : any, ano2 : any, ruta : string) {
+  GetConsolidadClientesArticulo(ano1: any, ano2: any, ruta: string) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getConsolidadoClientesArticulo/${ano1}/${ano2}/${ruta}`);
   }
 
-  GetDevoluciones(ano1 : any, ano2 : any) {
+  GetDevoluciones(ano1: any, ano2: any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getDevoluciones/${ano1}/${ano2}`);
   }
 
-  GetInfoPedido_Consecutivo(id : any) : Observable<any[]> {
+  GetInfoPedido_Consecutivo(id: any): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getInfoPedido_Consecutivo/${id}`);
   }
 
-  GetCostoFacturado_Vendedor = (vendedor : string, mes : any, anio : any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getCostoFacturado_Vendedor/${vendedor}/${mes}/${anio}`);
+  GetCostoFacturado_Vendedor = (vendedor: string, mes: any, anio: any) => this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getCostoFacturado_Vendedor/${vendedor}/${mes}/${anio}`);
 
-  GetClienteFacturadosMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getClienteFacturadosMes`);
+  GetClienteFacturadosMes = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getClienteFacturadosMes`);
 
-  GetProductosFaturadosMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes`);
+  GetProductosFaturadosMes = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getProductosFaturadosMes`);
 
-  GetVendedoresFacturasMes = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes`);
+  GetVendedoresFacturasMes = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getVendedoresFacturasMes`);
 
-  GetComprasMes = (anio : any, mes : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes/${anio}/${mes}`);
+  GetComprasMes = (anio: any, mes: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes/${anio}/${mes}`);
 
-  GetComprasMesInverGoal_InverSuez = (anio : any, mes : any, id : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMesInverGoal_InverSuez/${anio}/${mes}/${id}`);
+  GetComprasMesInverGoal_InverSuez = (anio: any, mes: any, id: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMesInverGoal_InverSuez/${anio}/${mes}/${id}`);
 
-  GetComprasMes_Mes_Plasticaribe = (anio : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes_Mes_Plasticaribe/${anio}`);
+  GetComprasMes_Mes_Plasticaribe = (anio: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes_Mes_Plasticaribe/${anio}`);
 
-  GetComprasMes_Mes_InverGoal_InverSuez = (anio : any, id : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes_Mes_InverGoal_InverSuez/${anio}/${id}`);
+  GetComprasMes_Mes_InverGoal_InverSuez = (anio: any, id: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasMes_Mes_InverGoal_InverSuez/${anio}/${id}`);
 
-  GetComprasDetalladas = (proveedor : any, factura : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasDetalladas/${proveedor}/${factura}`);
+  GetComprasDetalladas = (proveedor: any, factura: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getComprasDetalladas/${proveedor}/${factura}`);
 
-  GetFacturasEcopetrol = (factura, trm, valor, fecha) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturasEcopetrol/${factura}/${trm}/${valor}/${fecha}`);
+  GetFacturasEcopetrol = (factura, trm, valor, fecha): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturasEcopetrol/${factura}/${trm}/${valor}/${fecha}`);
 
-  GetFacturacionDetallada = (fecha1 : any, fecha2 : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturacionDetallada/${fecha1}/${fecha2}${ruta}`);
+  GetFacturacionDetallada = (fecha1: any, fecha2: any, ruta?: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturacionDetallada/${fecha1}/${fecha2}${ruta}`);
 
-  GetFacturacionConsolidada = (fecha1 : any, fecha2 : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturacionConsolidada/${fecha1}/${fecha2}${ruta}`);
+  GetFacturacionConsolidada = (fecha1: any, fecha2: any, ruta?: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getFacturacionConsolidada/${fecha1}/${fecha2}${ruta}`);
 
-  GetDevolucionesDetalladas = (fecha1 : any, fecha2 : any, indicadorCPI : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/GetDevolucionesDetalladas/${fecha1}/${fecha2}/${indicadorCPI}${ruta}`);
+  GetDevolucionesDetalladas = (fecha1: any, fecha2: any, indicadorCPI: any, ruta?: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/GetDevolucionesDetalladas/${fecha1}/${fecha2}/${indicadorCPI}${ruta}`);
 
-  getNuevaFacturacionConsolidada = (fecha1 : any, fecha2 : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getNuevaFacturacionConsolidada/${fecha1}/${fecha2}${ruta}`);
+  getNuevaFacturacionConsolidada = (fecha1: any, fecha2: any, ruta?: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getNuevaFacturacionConsolidada/${fecha1}/${fecha2}${ruta}`);
 
-  getNuevaDevolucionConsolidada = (fecha1 : any, fecha2 : any, ruta? : string) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getNuevaDevolucionConsolidada/${fecha1}/${fecha2}${ruta}`);
+  getNuevaDevolucionConsolidada = (fecha1: any, fecha2: any, ruta?: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getNuevaDevolucionConsolidada/${fecha1}/${fecha2}${ruta}`);
 
-  getEstadisticaVentasAnio = (anio : any, ruta? : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getEstadisticaVentasAnio/${anio}${ruta}`);
+  getEstadisticaVentasAnio = (anio: any, ruta?: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getEstadisticaVentasAnio/${anio}${ruta}`);
 
   //*********************************************************************** TRANSAC ******************************************************************************/
-  GetRecibosCaja = (fecha1 : any, fecha2 : any) : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
+  GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 
-  ValorTotalFacturadoHoy = () : Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy`);
+  ValorTotalFacturadoHoy = (): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/ValorTotalFacturadoHoy`);
+
+  /*********************************************************************** Cruce_DocumentosRelacionados ******************************************************************************/
+  GetFactura_PorPedidos = (orderSales: Array<string>) => this.http.post(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura_PorPedidos`, orderSales);
+
+  GetFactura = (orderSales: number): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura/${orderSales}`);
 }
