@@ -43,6 +43,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   ngOnDestroy(): void {
     this.focusInput(false, true);
   }
+  
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;

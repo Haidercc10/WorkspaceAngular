@@ -1,0 +1,112 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<form [formGroup]="formFilters" (ngSubmit)="searchaDataProductionIncome()">
+  <div class="row g-4 my-4">
+    <!-- START DATE -->
+    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-calendar formControlName="startDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+        <label for="FechaInicial">Fecha Inicial</label>
+      </span>
+    </div>
+
+    <!-- END DATE -->
+    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-calendar formControlName="endDate" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+        <label for="FechaInicial">Fecha Final</label>
+      </span>
+    </div>
+
+    <!-- ORDER PRODUCTION (OT) -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-inputNumber formControlName="orderProduction" inputId="orderProduction" [required]="true"></p-inputNumber>
+        <label for="orderProduction">Orden de Trabajo</label>
+      </span>
+    </div>
+
+    <!-- ITEM -->
+    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-4">
+      <span class="p-float-label">
+        <input formControlName="reference" id="prod" list="producto" type="text" pInputText (change)="selectedProduct()" (keydown)="searchProduct()"/>
+        <datalist id="producto">
+          <option value={{item.prod_Id}} *ngFor="let item of products">{{item.prod_Nombre}}</option>
+        </datalist>
+        <label for="prod">Producto</label>
+      </span>
+    </div>
+
+    <!-- PRODUCTION -->
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-inputNumber formControlName="production" inputId="production" [required]="true"></p-inputNumber>
+        <label for="production">Rollo / Bulto</label>
+      </span>
+    </div>
+  </div>
+
+  <div class="row my-4">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+      <button pButton class="p-button-danger" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="dataSearched.length == 0" (click)="createPDF()"></button>
+    </div>
+  </div>
+</form>
+
+<p-table
+  #table
+  [value]="dataSearched"
+  columnResizeMode="expand"
+  styleClass="p-datatable-sm"
+  responsiveLayout="scroll"
+  [rowHover]="true"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+  [scrollable]="true"
+  scrollHeight="50rem">
+  <ng-template pTemplate="header">
+    <tr class="font-size-16">
+      <th rowspan="2">#</th>
+      <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'orderProduction')"></th>
+      <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference')"></th>
+      <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'production')"></th>
+      <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
+    </tr>
+    <tr>
+      <th class="text-center" pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT</th>
+      <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
+      <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
+      <th class="text-center" pSortableColumn="production"><p-sortIcon field="production"></p-sortIcon> Rollo</th>
+      <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
+      <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
+      <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
+      <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
+      <th class="text-center" pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+    <tr>
+      <td class="text-center">{{rowIndex + 1 | number}}</td>
+      <td class="text-center">{{data.orderProduction}}</td>
+      <td class="text-center">{{data.item}}</td>
+      <td>{{data.reference}}</td>
+      <td class="text-center">{{data.production}}</td>
+      <td class="text-center">{{data.quantity | number: '1.2-2'}}</td>
+      <td class="text-center">{{data.presentation}}</td>
+      <td class="text-center">{{data.process}}</td>
+      <td class="text-center">{{data.date}}</td>
+      <td class="text-center">{{data.hour}}</td>
+    </tr>
+  </ng-template>
+</p-table>

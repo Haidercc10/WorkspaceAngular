@@ -25,6 +25,8 @@ export class DetallesEntradaRollosService {
   
   GetRollos = (data : any []): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto/getRollos', data);
 
+  GetDataProductionIncome = (startDate: any, endDate: any, route: string) : Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetalleEntradaRollo_Producto/getDataProductionIncome/${startDate}/${endDate}${route}`);
+
   srvActualizar = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
 
   srvGuardar = (data : modelDtEntradaRollos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto', data);
