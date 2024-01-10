@@ -104,6 +104,7 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que va a consultar la información de los movimientos
   consultarMovimientos(){
+    this.cargando = true;
     this.cantRestante = 0;
     this.cantAsignada = 0;
     this.movimientosPolietilenos = [];
@@ -117,6 +118,7 @@ export class MovimientoMPComponent implements OnInit {
     this.materiaPrimaService.GetMoviemientos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
       if (datos.length == 0) this.mensajeService.mensajeAdvertencia(`¡Advertencia!`, `¡No se encontró información con los parametros consultados!`);
       else this.llenarMateriasPrimasConsultadas(datos);
+      this.cargando = false;
     }, () => this.mensajeService.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`), () => this.cargando = false);
     this.totalAsignadoRestanteAsignar();
   }
