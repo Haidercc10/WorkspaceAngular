@@ -178,7 +178,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       this.cantSaliente += data.salida;
       this.cantExistencias += data.stock;
       this.cantDiferencia += data.diferencia;
-
+      
       let info: any = {
         Id: data.id,
         Id2: data.id2,
