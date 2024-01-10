@@ -9,6 +9,7 @@
       <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
   </div>
 
+  <!--Formulario de filtros-->
   <form [formGroup]="formFiltros" (ngSubmit)="consultarProduccion()">
     <div class="row g-4">
       <!-- RANGO DE FECHAS -->
@@ -80,10 +81,12 @@
         <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()" *ngIf="[1].includes(ValidarRol)"></button>
+        <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="produccion.length == 0" label="Exportar PDF" icon="pi pi-file-pdf"></button>
       </div>
     </div>
   </form>
 
+  <!--Tabla de registros-->
   <p-table
   #dt
   [value]="produccion"
