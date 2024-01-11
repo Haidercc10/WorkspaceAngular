@@ -116,58 +116,58 @@
             <!--Tabla 2-->
             <ng-template pTemplate="rowexpansion" let-nomina>
               <tr>
-                  <td colspan="7">
-                      <div class="p-3">
-                          <p-table
-                          [value]="nomina.detalle"
-                          dataKey="id"
-                          styleClass="p-datatable-gridlines p-datatable-sm">
-                              <ng-template pTemplate="header">
-                                  <tr>
-                                      <th>Cédula</th>
-                                      <th>Operario</th>
-                                      <th>Turno</th>
-                                      <th>Ot</th>
-                                      <th>Item</th>
-                                      <th>Referencia</th>
-                                      <th>Presentación</th>
-                                      <th>Cantidad Total</th>
-                                      <th>Cant. Sellada Operario</th>
-                                      <th>Pesado entre</th>
-                                      <th>Precio Día</th>
-                                      <th>Precio Noche</th>
-                                      <th>Registros</th>
-                                      <th>Pago Total</th>
-                                      <th >Ver</th>
-                                  </tr>
-                              </ng-template>
-                              <ng-template pTemplate="body" let-detalleNomina>
-                                  <tr>
-                                      <td>{{ detalleNomina.Cedula }}</td>
-                                      <td>{{ detalleNomina.Operario }}</td>
-                                      <td>{{ detalleNomina.Turno }}</td>
-                                      <td>{{ detalleNomina.Ot }}</td>
-                                      <td>{{ detalleNomina.Referencia}}</td>
-                                      <td>{{ detalleNomina.Nombre_Referencia }}</td>
-                                      <td>{{ detalleNomina.Presentacion }}</td>
-                                      <td>{{ detalleNomina.CantidadTotal | number : '1.2-2' }}</td>
-                                      <td>{{ detalleNomina.Cantidad | number : '1.2-2' }}</td>
-                                      <td>{{ detalleNomina.Pesado_Entre }}</td>
-                                      <td>{{ detalleNomina.PrecioDia | number : '1.2-2' }}</td>
-                                      <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
-                                      <td>{{ detalleNomina.Registros}}</td>
-                                      <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
-                                      <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula)" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
-                                  </tr>
-                              </ng-template>
-                              <ng-template pTemplate="emptymessage">
-                                  <tr>
-                                      <td colspan="6">No se encontraron registros</td>
-                                  </tr>
-                              </ng-template>
-                          </p-table>
-                      </div>
-                  </td>
+                <td colspan="7">
+                  <div class="p-3">
+                    <p-table
+                    [value]="nomina.detalle"
+                    dataKey="id"
+                    styleClass="p-datatable-gridlines p-datatable-sm">
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon></th>
+                          <th pSortableColumn="Operario">Operario <p-sortIcon field="Operario"></p-sortIcon></th>
+                          <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
+                          <th pSortableColumn="Ot">Ot <p-sortIcon field="Ot"></p-sortIcon></th>
+                          <th pSortableColumn="Referencia">Item <p-sortIcon field="Referencia"></p-sortIcon></th>
+                          <th pSortableColumn="Nombre_Referencia">Referencia <p-sortIcon field="Nombre_Referencia"></p-sortIcon></th>
+                          <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+                          <th pSortableColumn="CantidadTotal">Cantidad Total <p-sortIcon field="CantidadTotal"></p-sortIcon></th>
+                          <th pSortableColumn="Cantidad">Cant. Sellada Operario <p-sortIcon field="Cantidad"></p-sortIcon></th>
+                          <th pSortableColumn="Pesado_Entre">Pesado entre <p-sortIcon field="Pesado_Entre"></p-sortIcon></th>
+                          <th pSortableColumn="PrecioDia">Precio Día <p-sortIcon field="PrecioDia"></p-sortIcon></th>
+                          <th pSortableColumn="PrecioNoche">Precio Noche <p-sortIcon field="PrecioNoche"></p-sortIcon></th>
+                          <th pSortableColumn="Registros">Registros <p-sortIcon field="Registros"></p-sortIcon></th>
+                          <th pSortableColumn="PagoTotal">Pago Total <p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                          <th>Ver</th>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-detalleNomina>
+                        <tr>
+                          <td>{{ detalleNomina.Cedula }}</td>
+                          <td>{{ detalleNomina.Operario }}</td>
+                          <td>{{ detalleNomina.Turno }}</td>
+                          <td>{{ detalleNomina.Ot }}</td>
+                          <td>{{ detalleNomina.Referencia}}</td>
+                          <td>{{ detalleNomina.Nombre_Referencia }}</td>
+                          <td>{{ detalleNomina.Presentacion }}</td>
+                          <td>{{ detalleNomina.CantidadTotal | number : '1.2-2' }}</td>
+                          <td>{{ detalleNomina.Cantidad | number : '1.2-2' }}</td>
+                          <td>{{ detalleNomina.Pesado_Entre }}</td>
+                          <td>{{ detalleNomina.PrecioDia | number : '1.2-2' }}</td>
+                          <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
+                          <td>{{ detalleNomina.Registros}}</td>
+                          <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
+                          <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula)" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="6">No se encontraron registros</td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </td>
               </tr>
             </ng-template>
           </p-table>
@@ -310,17 +310,17 @@
           </tr>
           <tr>
             <th>#</th>
-            <th>Fecha - Hora</th>
-            <th>Bulto</th>
-            <th>Pesado Entre</th>
-            <th>Cant Total</th>
-            <th>Cant Dividida</th>
-            <th>Presentación</th>
-            <th>Maquina</th>
-            <th>Peso</th>
-            <th>Turno</th>
-            <th>Precio</th>
-            <th>Total</th>
+            <th pSortableColumn="Fecha">Fecha - Hora <p-sortIcon field="Fecha"></p-sortIcon></th>
+            <th pSortableColumn="Bulto">Bulto <p-sortIcon field="Bulto"></p-sortIcon></th>
+            <th pSortableColumn="Pesado_Entre">Pesado Entre <p-sortIcon field="Pesado_Entre"></p-sortIcon></th>
+            <th pSortableColumn="Cantidad_Total">Cant Total <p-sortIcon field="Cantidad_Total"></p-sortIcon></th>
+            <th pSortableColumn="Cantidad">Cant Dividida <p-sortIcon field="Cantidad"></p-sortIcon></th>
+            <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+            <th pSortableColumn="Maquina">Maquina <p-sortIcon field="Maquina"></p-sortIcon></th>
+            <th pSortableColumn="Peso">Peso <p-sortIcon field="Peso"></p-sortIcon></th>
+            <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
+            <th pSortableColumn="Precio">Precio <p-sortIcon field="Precio"></p-sortIcon></th>
+            <th pSortableColumn="Valor_Total">Total <p-sortIcon field="Valor_Total"></p-sortIcon></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">

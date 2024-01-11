@@ -316,7 +316,7 @@ export class NominaComponent implements OnInit {
     this.servicioBagPro.GetNominaSelladoDetalladaItemPersona(fechaInicial, fechaFinal, item, persona).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
         let info : any = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
-        info.Fecha = info.Fecha.replace('12:00:00 a.\u00A0m. ', ''),
+        info.Fecha = info.Fecha.replace(' 0:00:00', ''),
         info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
         info.Peso = parseFloat(info.Peso.toString().replace(',', '.')),
         info.Precio = parseFloat(info.Precio.toString().replace(',', '.'));

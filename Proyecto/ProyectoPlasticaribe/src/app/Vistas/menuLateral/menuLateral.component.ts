@@ -353,9 +353,6 @@ export class MenuLateralComponent implements OnInit {
     querySnapshot.forEach((doc) => {
       count++;
       if (!doc.data()['Estado']) this.cantidadCorreosNuevos++;
-      if (count == querySnapshot.size) {
-        if (this.cantidadCorreosNuevos > 0) this.mensajeService.mensajeConfirmacion(`¡Hay ${this.cantidadCorreosNuevos} correos no leidos!`, `Para ver los correos presiona el icono de "Carta" que aparece en la parte superior junto a los eventos e información de usuaio.`);
-      }
     });
   }
 }
