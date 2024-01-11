@@ -53,7 +53,7 @@
       <!-- PROCESOS -->
       <div class="col-sm-12 col-md-6 col-xl-3">
         <span class="p-float-label">
-          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa"></p-dropdown>
+          <p-dropdown formControlName="proceso" inputId="areasEmpresa" [autoDisplayFirst]="false" [options]="areasEmpresa" [required]="true"></p-dropdown>
           <label for="areasEmpresa">Área Producción</label>
         </span>
       </div>
@@ -81,7 +81,7 @@
         <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()" *ngIf="[1].includes(ValidarRol)"></button>
-        <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="produccion.length == 0" label="Exportar PDF" icon="pi pi-file-pdf"></button>
+        <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="formFiltros.invalid" label="Exportar PDF" icon="pi pi-file-pdf"></button>
       </div>
     </div>
   </form>

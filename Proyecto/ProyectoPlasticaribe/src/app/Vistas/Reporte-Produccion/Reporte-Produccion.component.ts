@@ -41,7 +41,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.formFiltros = this.frmBuilder.group({
       rangoFechas: [null, Validators.required],
       OrdenTrabajo: [null],
-      proceso: [null],
+      proceso: [null, Validators.required],
       idCliente : [null],
       cliente : [null],
       idProducto : [null],
@@ -210,7 +210,7 @@ export class ReporteProduccionComponent implements OnInit {
     let content : any[] = [];
     let clients : any[] = this.getClients(data);
     let tableClients : any[] = this.tableClients(clients);
-    let tableTotalsFinals : any = this.tableTotalsFinals(); 
+    let tableTotalsFinals : any = this.tableTotalsFinals(data); 
     let tableTextsFinals : any = this.tableTextsFinals();  
     
     content.push(tableClients);
@@ -238,8 +238,8 @@ export class ReporteProduccionComponent implements OnInit {
               { text: `Cant.`, alignment: 'center', bold : true, border: [false, false, false, false] },
               { text: `Und.`, alignment: 'center', bold : true, border: [false, false, false, false] },
               { text: `Maq.`, alignment: 'center', bold : true, border: [false, false, false, false] },
-              { text: proceso == 'SELLADO' ? `P. Teorico` : `P. Bruto`, alignment: 'center', bold : true, border: [false, false, false, false] },
-              { text: proceso == 'SELLADO' ? `P. Real` : `P. Neto`, alignment: 'center', bold : true, border: [false, false, false, false] },
+              { text: proceso == 'SELLADO' || 'Wiketiado' ? `Teorico` : `P. Bruto`, alignment: 'center', bold : true, border: [false, false, false, false] },
+              { text: proceso == 'SELLADO' || 'Wiketiado' ? `P. Real` : `P. Neto`, alignment: 'center', bold : true, border: [false, false, false, false] },
               { text: `Desv.`, alignment: 'center', bold : true, border: [false, false, false, false] },
               { text: `Turno`, alignment: 'center', bold : true, border: [false, false, false, false] },
               { text: `Hora`, alignment: 'center', bold : true, border: [false, false, false, false] },
@@ -272,6 +272,7 @@ export class ReporteProduccionComponent implements OnInit {
           fontSize: 10,
           bold: true,
           table: {
+            headerRows: 1,
             widths: ['100%'],
             body: this.loadTableClients(clients[index])
           }
@@ -311,6 +312,7 @@ export class ReporteProduccionComponent implements OnInit {
         bold: true,
         colSpan : 4,
         table: {
+          headerRows: 1,
           dontBreakRows : true,
           widths: ['13%', '55%', '12%', '20%'],
           body: [
@@ -340,6 +342,7 @@ export class ReporteProduccionComponent implements OnInit {
   
   //.Tabla de detalles de la producción consultada
   detailsProduction(items : any){
+    console.log(items.proceso)
     return {
      margin: [0, 0],
        fontSize: 8,
@@ -350,12 +353,12 @@ export class ReporteProduccionComponent implements OnInit {
            [
              { text: `${items.fecha.replace('T00:00:00', '')}`, alignment: 'center', border: [false, false, false, false], }, 
              { text: `${items.rollo}`, alignment:  'center', border: [false, false, false, false], }, 
-             { text: items.proceso == 'SELLADO' ? `${this.formatonumeros(items.cantidad)}` : `${this.formatonumeros(items.peso)}`, alignment:  'center', border: [false, false, false, false], },
+             { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.cantidad)}` : `${this.formatonumeros(items.peso)}`, alignment:  'center', border: [false, false, false, false], },
              { text: `${items.presentacion}`, alignment: 'center', border: [false, false, false, false],  }, 
              { text: `${items.maquina}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: items.proceso == 'SELLADO' ? `${this.formatonumeros(items.pesoTeorico)}` : `${this.formatonumeros(items.cantidad)}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: `${this.formatonumeros(items.peso)}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: `${this.formatonumeros(0)}%`, alignment: 'center', border: [false, false, false, false],  },
+             { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.pesoTeorico)}` : `${this.formatonumeros(items.cantidad)}`, alignment: 'center', border: [false, false, false, false],  }, 
+             { text: `${this.formatonumeros(items.peso)}`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < -10 ? 'blue' : 'black', }, 
+             { text: `${this.formatonumeros(items.desviacion.toFixed(2))}%`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < 5 ? 'black' : 'red', },
              { text: `${items.turno}`, alignment: 'center', border: [false, false, false, false],  }, 
              { text: `${items.hora}`, alignment: 'center', border: [false, false, false, false], },
              { text: `${items.envioZeus}`, alignment: 'center', border: [false, false, false, false], },
@@ -376,11 +379,11 @@ export class ReporteProduccionComponent implements OnInit {
           body: [
             [
               { text: ``, alignment: 'center', border: [false, false, false, false], }, 
-              { text: ``, alignment:  'center', border: [false, false, false, false], }, 
-              { text: data.proceso == 'SELLADO' ? `${this.formatonumeros(this.totalQty(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeight(data.orden).toFixed(2))}`, alignment:  'center', bold : true, border: [false, true, false, false], },
+              { text: `${data.length + 1}`, alignment:  'center', border: [false, false, false, false], }, 
+              { text: ['SELLADO', 'Wiketiado'].includes(data.proceso) ? `${this.formatonumeros(this.totalQty(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeightReal(data.orden).toFixed(2))}`, alignment:  'center', bold : true, border: [false, true, false, false], },
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
-              { text: data.proceso == 'SELLADO' ? `${this.formatonumeros(this.totalWeightTeoric(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeight(data.orden).toFixed(2))}`, alignment: 'center', bold : true, border: [false, true, false, false],  }, 
+              { text: ['SELLADO', 'Wiketiado'].includes(data.proceso) ? `${this.formatonumeros(this.totalWeightTeoric(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeight(data.orden).toFixed(2))}`, alignment: 'center', bold : true, border: [false, true, false, false],  }, 
               { text: `${this.formatonumeros(this.totalWeightReal(data.orden).toFixed(2))}`, alignment: 'center', bold : true, border: [false, true, false, false],  }, 
               { text: ``, alignment: 'center', border: [false, false, false, false],  },
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
@@ -393,20 +396,20 @@ export class ReporteProduccionComponent implements OnInit {
   }
 
   // Tabla con pesos totales finales. 
-  tableTotalsFinals() {
+  tableTotalsFinals(data : any) {
     return {
       margin: [0, 10, 0, 0],
         fontSize: 9,
         bold: false,
         table: {
-          widths: ['10%', '9%', '9%', '8%', '9%', '9%', '9%', '9%', '9%', '9%', '9%'],
+          widths: ['9%', '9%', '9%', '7%', '10%', '10%', '9%', '9%', '9%', '9%', '9%'],
           body: [
             [
               { text: ``, alignment: 'center', border: [false, false, false, false], }, 
               { text: ``, alignment:  'center', border: [false, false, false, false], }, 
               { text: ``, alignment:  'center', border: [false, false, false, false], },
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
-              { text: `${this.formatonumeros(this.totalFinalGrossWeight().toFixed(2))}`, alignment: 'center', bold : true, border: [false, false, false, true],  }, 
+              { text: ['SELLADO', 'Wiketiado'].includes(data[data.length - 1].proceso) ? `${this.formatonumeros(this.totalFinalTeoricWeight().toFixed(2))}` : `${this.formatonumeros(this.totalFinalGrossWeight().toFixed(2))}`, alignment: 'center', bold : true, border: [false, false, false, true],  }, 
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
               { text: `${this.formatonumeros(this.totalFinalWeightReal().toFixed(2))}`, alignment: 'center', bold : true, border: [false, false, false, true],  }, 
               { text: ``, alignment: 'center', border: [false, false, false, false],  },
@@ -460,6 +463,9 @@ export class ReporteProduccionComponent implements OnInit {
 
   //. Total final peso bruto por cliente y orden de trabajo.
   totalFinalGrossWeight = () =>  this.produccion.reduce((total, item) => total + item.cantidad, 0);
+
+  //. Total final peso teorico por cliente y orden de trabajo.
+  totalFinalTeoricWeight = () =>  this.produccion.reduce((total, item) => total + item.pesoTeorico, 0);
 
   //. Total final peso neto por cliente y orden de trabajo.
   totalFinalWeightReal = () =>  this.produccion.reduce((total, item) => total + item.peso, 0);
