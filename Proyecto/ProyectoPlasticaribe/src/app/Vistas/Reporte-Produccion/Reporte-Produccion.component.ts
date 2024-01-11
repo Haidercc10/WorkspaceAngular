@@ -379,7 +379,7 @@ export class ReporteProduccionComponent implements OnInit {
           body: [
             [
               { text: ``, alignment: 'center', border: [false, false, false, false], }, 
-              { text: `${data.length + 1}`, alignment:  'center', border: [false, false, false, false], }, 
+              { text: `Bultos: ${this.totalRows(data.orden)}`, alignment:  'center', border: [false, true, false, false], bold : true, }, 
               { text: ['SELLADO', 'Wiketiado'].includes(data.proceso) ? `${this.formatonumeros(this.totalQty(data.orden).toFixed(2))}` : `${this.formatonumeros(this.totalWeightReal(data.orden).toFixed(2))}`, alignment:  'center', bold : true, border: [false, true, false, false], },
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
               { text: ``, alignment: 'center', border: [false, false, false, false],  }, 
@@ -469,4 +469,7 @@ export class ReporteProduccionComponent implements OnInit {
 
   //. Total final peso neto por cliente y orden de trabajo.
   totalFinalWeightReal = () =>  this.produccion.reduce((total, item) => total + item.peso, 0);
+
+  //. Cantidad de bultos por orden de trabajo. 
+  totalRows = (ot : any) => this.produccion.filter(x => x.orden == ot).length;
 }
