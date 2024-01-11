@@ -55,8 +55,16 @@ export class Correos_PaginaWebComponent implements OnInit {
         Estado : doc.data()['Estado'],
       });
       this.mails.sort((a, b) => a.Hora.localeCompare(b.Hora));
-      this.mails.sort((a, b) => a.Fecha.localeCompare(b.Fecha));
+      this.mails.sort((a, b) => b.Fecha.localeCompare(a.Fecha));
     });
+  }
+
+  getinfoNewMails(){
+    this.mails = this.mails.filter((mail) => !mail.Estado);
+  }
+
+  getInforResponsedMails(){
+    this.mails = this.mails.filter((mail) => mail.Respuesta);
   }
 
   getNewMails() : number {

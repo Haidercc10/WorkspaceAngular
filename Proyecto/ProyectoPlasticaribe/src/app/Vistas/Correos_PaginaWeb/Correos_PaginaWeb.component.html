@@ -6,45 +6,32 @@
 
 <div class="row g-4 m-2" [style]="{width: '100%', margin: 'auto', height: '100%'}">
   <!-- OPTIONS -->
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 col-xxl-3">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-2 col-xl-2 col-xxl-2 m-auto">
     <div class="row g-3">
-      <!-- <div class="optionsMails">
-        <ul>
-          <li class="newMails">
-            <a aria-expanded="false">dasd</a>
-          </li>
-          <li class="allMails"></li>
-          <li class="responseMails"></li>
-        </ul>
-      </div> -->
-
       <!-- NEW -->
-      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
-        <p-button label="Nuevos" icon="pi pi-inbox" severity="primary" badge="{{getNewMails()}}" badgeClass="p-badge-info"></p-button>
-      </div> -->
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Nuevos" icon="pi pi-inbox" severity="primary" badge="{{getNewMails()}}" badgeClass="p-badge-info" (onClick)="getinfoNewMails()"></p-button>
+      </div>
 
       <!-- ALL -->
-      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
-        <p-button label="Todos" icon="pi pi-th-large" severity="danger" badge="{{mails.length}}" badgeClass="p-badge-info"></p-button>
-      </div> -->
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Todos" icon="pi pi-th-large" severity="danger" badge="{{mails.length}}" badgeClass="p-badge-info" (onClick)="getMails()"></p-button>
+      </div>
 
       <!-- RESPONSE SEND -->
-      <!-- <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
-        <p-button label="Respondidos" icon="pi pi-send" severity="success" badge="{{getResponseMails()}}" badgeClass="p-badge-info"></p-button>
-      </div> -->
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-12 col-xl-12 col-xxl-12">
+        <p-button label="Respondidos" icon="pi pi-send" severity="success" badge="{{getResponseMails()}}" badgeClass="p-badge-info" (onClick)="getInforResponsedMails()"></p-button>
+      </div>
     </div>
   </div>
 
   <!-- MAILS INFORMATION -->
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-9">    
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-xl-10 col-xxl-10">
     <p-table 
     #dt_Mails
     [resizableColumns]="true"
     columnResizeMode="expand"
     responsiveLayout="scroll"
-    [paginator]="true"
-    [rows]="20"
-    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
     [rowHover]="true"
     [value]="mails"
     [scrollable]="true"

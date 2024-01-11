@@ -13,6 +13,8 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
+import { collection, getDocs, doc, setDoc } from "firebase/firestore"; 
+import { db } from 'src/app/conexionFirebase';
 
 Injectable({
   providedIn: 'root'
@@ -23,7 +25,6 @@ Injectable({
   templateUrl: './menuLateral.component.html',
   styleUrls: ['./menuLateral.component.css']
 })
-
 
 export class MenuLateralComponent implements OnInit {
 
@@ -106,6 +107,7 @@ export class MenuLateralComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
+    if (['100','121','123456789'].includes(this.storage_Id.toString())) this.getMails();
   }
 
   aumentarLetra() {
@@ -343,5 +345,17 @@ export class MenuLateralComponent implements OnInit {
     this.cookieService.set('theme', tema, { expires: 365, sameSite: 'Lax' });
     let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
     linkTema.href = 'lara-' + tema + '-blue' + '.css';
+  }
+
+  async getMails(){
+    let count: number = 0;
+    const querySnapshot = await getDocs(collection(db, "Correos"));
+    querySnapshot.forEach((doc) => {
+      count++;
+      if (!doc.data()['Estado']) this.cantidadCorreosNuevos++;
+      if (count == querySnapshot.size) {
+        if (this.cantidadCorreosNuevos > 0) this.mensajeService.mensajeConfirmacion(`¡Hay ${this.cantidadCorreosNuevos} correos no leidos!`, `Para ver los correos presiona el icono de "Carta" que aparece en la parte superior junto a los eventos e información de usuaio.`);
+      }
+    });
   }
 }
