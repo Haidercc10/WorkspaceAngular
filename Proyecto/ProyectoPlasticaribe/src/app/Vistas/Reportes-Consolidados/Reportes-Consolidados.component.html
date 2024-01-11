@@ -4,6 +4,7 @@
 
       <!-- FACTURACIÓN -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Facturación"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Facturacion-Detallada *ngIf="facturacion"></app-Reporte-Facturacion-Detallada>
@@ -11,6 +12,7 @@
 
       <!-- PRODUCCION -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Consolidado Producción"
         leftIcon="pi pi-sliders-h">
         <app-Dashboard_Areas *ngIf="consolidadoProduccionAreas"></app-Dashboard_Areas>
@@ -18,6 +20,7 @@
 
       <!-- PRODUCCIÓN DETALLADA -->
       <p-tabPanel
+        *ngIf="[1,6,7,8,9,10,62,63].includes(ValidarRol)"
         header="Producción Detallada"
         leftIcon="pi pi-sliders-h">
         <app-Reporte-Produccion *ngIf="produccionDetallada"></app-Reporte-Produccion>
@@ -25,6 +28,7 @@
 
       <!-- CARTERA -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Cartera"
         leftIcon="pi pi-sliders-h">
         <app-DashBoard-Recaudos *ngIf="cartera"></app-DashBoard-Recaudos>
@@ -32,13 +36,15 @@
 
       <!-- VENTAS VENDEDORES -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Facturación Vendedores"
         leftIcon="pi pi-sliders-h">
         <app-ReporteFacturacion_Vendedores *ngIf="facturacionVendedores"></app-ReporteFacturacion_Vendedores>
-      </p-tabPanel>`
+      </p-tabPanel>
 
       <!-- FACTURACIÓN DE ITEMS -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Facturación de Items"
         leftIcon="pi pi-sliders-h">
         <app-Reporte_FacturacionZeus *ngIf="facturacionItems"></app-Reporte_FacturacionZeus>
@@ -46,6 +52,7 @@
 
       <!-- PEDIDOS -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Pedidos"
         leftIcon="pi pi-sliders-h">
         <app-ReportePedidos_Zeus *ngIf="pedidos" [reporteConsolidado]="true"></app-ReportePedidos_Zeus>
@@ -53,6 +60,7 @@
 
       <!-- INVENTARIO PRODUCTOS TERMINADOS -->
       <p-tabPanel
+        *ngIf="[1,6].includes(ValidarRol)"
         header="Inventario"
         leftIcon="pi pi-sliders-h">
         <app-modal-generar-inventario-zeus *ngIf="inventarioProductos" [reporteConsolidado]="true"></app-modal-generar-inventario-zeus>
@@ -60,9 +68,10 @@
 
       <!-- ESTADISTICA DE VENTAS -->
       <p-tabPanel
-      header="Estadisticas Ventas"
-      leftIcon="pi pi-sliders-h">
-       <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>
+        *ngIf="[1,6].includes(ValidarRol)"
+        header="Estadisticas Ventas"
+        leftIcon="pi pi-sliders-h">
+        <app-Reporte_EstadisticasVentas></app-Reporte_EstadisticasVentas>
      </p-tabPanel>
 
     </p-tabView>

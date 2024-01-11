@@ -6,7 +6,7 @@
 
 <div class="mb-8 p-5">
   <div class="mb-4">
-      <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
+    <h3 [ngClass]="{'tituloRojo': !modoSeleccionado, 'tituloClaro': modoSeleccionado}"><i class="pi pi-search"></i> Filtros de Busqueda</h3>
   </div>
 
   <!--Formulario de filtros-->
@@ -69,8 +69,11 @@
       <!-- ENVIO ZEUS -->
       <div class="col-sm-12 col-md-6 col-xl-3" id="iva">
         <div class="field-checkbox my-2 mx-4">
-          <p-checkbox formControlName="EnvioZeus" [binary]="true" inputId="envioZeus"></p-checkbox>
-          <label for="envioZeus"><p-chip label="Envío Zeus" [icon]="formFiltros.value.EnvioZeus ? 'pi pi-check' : 'pi pi-times'"></p-chip></label>
+          <p-triStateCheckbox formControlName="EnvioZeus" inputId="tricheckbox"></p-triStateCheckbox>
+          <label for="tricheckbox">
+            <p-chip [label]="formFiltros.value.EnvioZeus == null ? 'Todos' : formFiltros.value.EnvioZeus ? 'Enviados a Zeus' : 'No Enviados a Zeus'"
+                    [icon]="formFiltros.value.EnvioZeus == null ? 'pi pi-sync' : formFiltros.value.EnvioZeus ? 'pi pi-check' : 'pi pi-times'"></p-chip>
+          </label>
         </div>
       </div>
     </div>
@@ -81,7 +84,7 @@
         <button pButton id="consultarOT" class="p-button-danger" type="submit" [disabled]="formFiltros.invalid" label="Consultar Producción" icon="pi pi-search"></button>
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()" *ngIf="[1].includes(ValidarRol)"></button>
-        <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="formFiltros.invalid" label="Exportar PDF" icon="pi pi-file-pdf"></button>
+        <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="formFiltros.invalid || cargando" label="Exportar PDF" icon="pi pi-file-pdf"></button>
       </div>
     </div>
   </form>

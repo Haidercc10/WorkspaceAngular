@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { co } from '@fullcalendar/core/internal-common';
+import { co, s } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -23,7 +23,7 @@ export class ReporteProduccionComponent implements OnInit {
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   ValidarRol: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   formFiltros !: FormGroup;
-  areasEmpresa: string[] = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
+  areasEmpresa: string[] = [];
   turnos : string[] = ['DIA', 'NOCHE'];
   clientes : any [] = [];
   productos : any [] = [];
@@ -47,18 +47,29 @@ export class ReporteProduccionComponent implements OnInit {
       idProducto : [null],
       producto : [null],
       Turno: [null],
-      EnvioZeus: [false],
+      EnvioZeus: [null],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.validarProcesoPorUsuarioRegistrado();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
     this.ValidarRol = this.AppComponent.storage_Rol;
+  }
+
+  validarProcesoPorUsuarioRegistrado(){
+    if (![1, 10].includes(this.ValidarRol)) {
+      if (this.ValidarRol == 7) this.areasEmpresa = ['EXTRUSION'];
+      if (this.ValidarRol == 8) this.areasEmpresa = ['SELLADO', 'Wiketiado'];
+      if (this.ValidarRol == 9) this.areasEmpresa = ['EMPAQUE'];
+      if (this.ValidarRol == 62) this.areasEmpresa = ['IMPRESION'];
+      if (this.ValidarRol == 63) this.areasEmpresa = ['ROTOGRABADO'];
+    } else this.areasEmpresa = ['EXTRUSION', 'IMPRESION', 'ROTOGRABADO', 'DOBLADO', 'LAMINADO', 'CORTE', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -70,7 +81,7 @@ export class ReporteProduccionComponent implements OnInit {
   // Funcion que va a limpiar los campos de busqueda y la información consultada
   limpiarCampos() {
     this.formFiltros.reset();
-    this.formFiltros.patchValue({EnvioZeus : false})
+    this.formFiltros.patchValue({EnvioZeus : null})
     this.produccion = [];
     this.clientes = [];
     this.productos = [];
@@ -129,7 +140,7 @@ export class ReporteProduccionComponent implements OnInit {
     let cliente = this.formFiltros.value.idCliente;
     let producto = this.formFiltros.value.idProducto;
     let turno = this.formFiltros.value.Turno;
-    let envioZeus = this.formFiltros.value.EnvioZeus ? '1' : '0';
+    let envioZeus = this.formFiltros.value.EnvioZeus == null ? 'Todo' : this.formFiltros.value.EnvioZeus ? '1' : '0';
 
     if (orden != null) ruta += `orden=${orden}`;
     if (proceso != null) ruta.length > 0 ? ruta += `&proceso=${proceso}` : ruta += `proceso=${proceso}`;
@@ -199,10 +210,8 @@ export class ReporteProduccionComponent implements OnInit {
     let title : string = `Informe de producción \nDel ${date1} al ${date2}`;
     let content: any[] = this.contentPDF(data);
     
-    setTimeout(() => { 
-      this.svcPDF.formatoPDF(title, content, this.headerInfo()); 
-      this.cargando = false;
-    }, 1000); 
+    setTimeout(() => this.svcPDF.formatoPDF(title, content, this.headerInfo()), 1000);
+    setTimeout(() => this.cargando = false, 4000);
   }
 
   //Función que almacena y retorna el contenido del PDF
@@ -342,29 +351,29 @@ export class ReporteProduccionComponent implements OnInit {
   
   //.Tabla de detalles de la producción consultada
   detailsProduction(items : any){
-    console.log(items.proceso)
     return {
      margin: [0, 0],
        fontSize: 8,
        bold: false,
        table: {
-         widths: ['10%', '9%', '9%', '8%', '9%', '9%', '9%', '9%', '9%', '9%', '9%'],
-         body: [
-           [
-             { text: `${items.fecha.replace('T00:00:00', '')}`, alignment: 'center', border: [false, false, false, false], }, 
-             { text: `${items.rollo}`, alignment:  'center', border: [false, false, false, false], }, 
-             { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.cantidad)}` : `${this.formatonumeros(items.peso)}`, alignment:  'center', border: [false, false, false, false], },
-             { text: `${items.presentacion}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: `${items.maquina}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.pesoTeorico)}` : `${this.formatonumeros(items.cantidad)}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: `${this.formatonumeros(items.peso)}`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < -10 ? 'blue' : 'black', }, 
-             { text: `${this.formatonumeros(items.desviacion.toFixed(2))}%`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < 5 ? 'black' : 'red', },
-             { text: `${items.turno}`, alignment: 'center', border: [false, false, false, false],  }, 
-             { text: `${items.hora}`, alignment: 'center', border: [false, false, false, false], },
-             { text: `${items.envioZeus}`, alignment: 'center', border: [false, false, false, false], },
-            ],
-         ],
-       } 
+        dontBreakRows: true,
+        widths: ['10%', '9%', '9%', '8%', '9%', '9%', '9%', '9%', '9%', '9%', '9%'],
+        body: [
+          [
+            { text: `${items.fecha.replace('T00:00:00', '')}`, alignment: 'center', border: [false, false, false, false], }, 
+            { text: `${items.rollo}`, alignment:  'center', border: [false, false, false, false], }, 
+            { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.cantidad)}` : `${this.formatonumeros(items.peso)}`, alignment:  'center', border: [false, false, false, false], },
+            { text: `${items.presentacion}`, alignment: 'center', border: [false, false, false, false],  }, 
+            { text: `${items.maquina}`, alignment: 'center', border: [false, false, false, false],  }, 
+            { text: ['SELLADO', 'Wiketiado'].includes(items.proceso) ? `${this.formatonumeros(items.pesoTeorico)}` : `${this.formatonumeros(items.cantidad)}`, alignment: 'center', border: [false, false, false, false],  }, 
+            { text: `${this.formatonumeros(items.peso)}`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < -10 ? 'blue' : 'black', }, 
+            { text: `${this.formatonumeros(items.desviacion.toFixed(2))}%`, alignment: 'center', border: [false, false, false, false], color : items.desviacion < 5 ? 'black' : 'red', },
+            { text: `${items.turno}`, alignment: 'center', border: [false, false, false, false],  }, 
+            { text: `${items.hora}`, alignment: 'center', border: [false, false, false, false], },
+            { text: `${items.envioZeus}`, alignment: 'center', border: [false, false, false, false], },
+          ],
+        ],
+      } 
     } 
   }
 

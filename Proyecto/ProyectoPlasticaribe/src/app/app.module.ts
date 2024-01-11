@@ -204,6 +204,7 @@ import { PreIngresoProduccion_DespachoComponent } from './Vistas/PreIngresoProdu
 import { Movimientos_PreIngresoProduccionComponent } from './Vistas/Movimientos_PreIngresoProduccion/Movimientos_PreIngresoProduccion.component';
 import { MovimientosIngresosDespachoComponent } from './Vistas/Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { EliminarRollos_ProduccionComponent } from './Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
+import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 
 @NgModule({
   declarations: [
@@ -423,6 +424,7 @@ import { EliminarRollos_ProduccionComponent } from './Vistas/EliminarRollos_Prod
     TieredMenuModule,
     ListboxModule,
     ColorPickerModule,
+    TriStateCheckboxModule,
   ],
 
   providers: [

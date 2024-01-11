@@ -31,6 +31,7 @@ export class ReportesConsolidadosComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.facturacion = true;
+    if ([7,8,9,62,63].includes(this.ValidarRol)) this.produccionDetallada = true;
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
