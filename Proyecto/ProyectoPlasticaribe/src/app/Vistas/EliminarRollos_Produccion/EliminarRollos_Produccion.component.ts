@@ -21,7 +21,6 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   process : any = []; //Variable que almacenará la informacion de los procesos de producción
   rolls : any = []; //Variable que almacenará la informacion de los rollos de producción
   rollsInsert : any = []; //Variable que almacenará la informacion de los rollos a insertar en la base de datos
-  oneMonthBack : any = moment().subtract(30, 'days').format('YYYY-MM-DD');
   consolidatedInfo : any = []; //Variable que almacenará la informacion consolidada de los rollos de producción
   @ViewChild('dt1') dt1: Table | undefined;
   @ViewChild('dt2') dt2: Table | undefined;
@@ -50,19 +49,18 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     });
   }
 
+  //Función para obtener los procesos. 
   getProcess = () => this.svcProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => [8,4,3,7,2,1,9,5,6].includes(x.proceso_Codigo)));
 
+  //Función para buscar los rollos a eliminar. 
   searchRolls(){
     let ot : any = this.form.value.OT;
     let process : any = this.form.value.Bodega;
-    let roll : any = this.form.value.Roll;
-    console.log(this.form.value.rangoFechas)
+    let roll : any = this.form.value.Rollo;
     let date1 : any = this.form.value.RangoFechas == null || this.form.value.RangoFechas.length == 0 ? this.today : moment(this.form.value.RangoFechas[0]).format('YYYY-MM-DD');
     let date2 : any = this.form.value.RangoFechas == null || this.form.value.RangoFechas.length == 0 ? date1 : moment(this.form.value.RangoFechas[1]).format('YYYY-MM-DD');
     this.load = true;
     let url : any = ``;
-
-    console.log(this.form.value.rangoFechas)
 
     if(process != null) url.length > 0 ? url += `&process=${process}` : url += `process=${process}`
     if(ot != null) url.length > 0 ? url += `&ot=${ot}` : url += `ot=${ot}`
@@ -70,24 +68,24 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     url.length > 0 ? url = `?${url}` : url = ``;
     
     this.svcProdProcess.GetInfoProduction(date1, date2, url).subscribe(data => {
-      this.rolls = data;
+      this.rolls = this.rolls.concat(data);
       this.load = false;
-      console.log(data)
     }, error => {
-      this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error, por favor, verifique!`);
+      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontraron registros de busqueda!`);
       this.load = false;
     });
   }
 
+  //Función para seleccionar todos los rollos consultados a la tabla de rollos a eliminar. 
   selectAllRolls(){
     this.load = true;
     this.rolls = [];
     this.rollsInsert = this.rollsInsert.concat(this.rolls);
-    console.log(this.rollsInsert)
     this.getInfoConsolidated();
     setTimeout(() => this.load = false, 5);
   }
 
+  //Función para seleccionar un rollo consultado a la tabla de rollos a eliminar. 
   loadRollInsert(roll : any){
     this.load = true;
     let index = this.rolls.findIndex(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro);
@@ -96,6 +94,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     setTimeout(() => this.load = false, 5);
   }
 
+  //Función para deseleccionar todos los rollos a eliminar.
   quitAllRolls(){
     this.load = true;
     this.rollsInsert = [];
@@ -104,6 +103,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     setTimeout(() => this.load = false, 5);
   }
 
+  //Función para deseleccionar un rollo a eliminar.
   quitRollInsert(roll : any){
     this.load = true;
     let index = this.rollsInsert.findIndex(x => x.numeroRollo_BagPro == roll.numeroRollo_BagPro);
@@ -112,6 +112,7 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     setTimeout(() => this.load = false, 5);
   }
 
+  //Función para mostrar la información consolidada de los rollos a eliminar
   getInfoConsolidated(){
     this.consolidatedInfo = this.rollsInsert.reduce((a, b) => {
       if(!a.map(x => x.prod_Id).includes(b.prod_Id)) a = [...a, b];
@@ -119,16 +120,25 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     }, [])
   }
   
+  //Cantidad total consolidada por item 
   totalQuantityByItem = (item: number): number => this.rollsInsert.filter(x => x.prod_Id == item).reduce((a, b) => a + b.cantidad, 0);
 
+  //Cantidad total consolidada por item 
+  totalWeightByItem = (item: number): number => this.rollsInsert.filter(x => x.prod_Id == item).reduce((a, b) => a + b.peso_Neto, 0);
+
+  //Cantidad de rollos a eliminar consolidada por item 
   totalRollsByItems = (item: number): number => this.rollsInsert.filter(x => x.prod_Id == item).length;
 
+  //Cantidad total consolidada de los rollos a eliminar.
   totalQuantityConsolidated = (): number => this.rollsInsert.reduce((a, b) => a + b.cantidad, 0);
 
+  //Total de rollos a eliminar
   totalRollsConsolidated = (): number => this.rollsInsert.length;
 
+  //Función para mostrar mensaje de confirmación de eliminación de rollos.
   seeMsgElection = () => this.svcMsg.add({severity:'warn', key:'delete', summary:'Elección', detail: `¿Está seguro que desea eliminar el/los rollo(s) seleccionado(s)?`, sticky: true});
 
+  //Función para eliminar los rollos seleccionados.
   deleteRolls(){
     let isError : boolean = false;
     this.onReject('delete');
@@ -142,20 +152,25 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.confirmDeleteMessage(isError); 
   }
 
+  //Función para mostrar mensaje de confirmación de eliminación de rollos.
   confirmDeleteMessage(isError : boolean) {
     if(isError) this.svcMsjs.mensajeError(`Error`, `Ha ocurrido un error, verifique!`) 
     else {
       this.svcMsjs.mensajeConfirmacion(`Rollos eliminados exitosamente!`);
-      this.clearAll();
+      setTimeout(() => { this.clearAll(); }, 1000);
     }
   }
 
+  //Función para filtrar la tabla de rollos consultados.
   applyFilter = ($event, campo : any, valorCampo : string) => this.dt1!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  //Función para filtrar la tabla de rollos a eliminar.
   applyFilter2 = ($event, campo : any, valorCampo : string) => this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  //Función para limpiar los campos de filtros.
   clearLabels = () => this.form.reset();
     
+  //Función para limpiar todo
   clearAll() {
     this.form.reset();
     this.rolls = [];
@@ -164,5 +179,6 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
     this.load = false;
   }
 
+  //Función para cerrar el dialogo de elección.
   onReject = (key : any) => this.svcMsg.clear(key);
 }

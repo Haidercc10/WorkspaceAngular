@@ -20,9 +20,9 @@
   
   <p-card>
   
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+    <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end" >
       <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
-    </div>
+    </div>-->
   
     <div class="mb-5">
       <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
@@ -37,7 +37,7 @@
           <!--Rango fechas-->  
           <div class="col-sm-12 col-md-6 col-xl-3">
               <span class="p-float-label">
-                <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true"></p-calendar>
+                <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
                 <label for="fecha">Rango de Fechas</label>
               </span>
           </div>  
@@ -71,8 +71,9 @@
   
       <!-- Botones -->
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="consultarRollos" type="submit" label="Consultar Rollos"  icon="pi pi-search"></button>
+        <button pButton class="p-button-danger" id="consultarRollos" type="submit" label="Consultar Rollos" icon="pi pi-search" pTooltip="Si no llenas ningún filtro se cargarán todos los bultos pesados hoy."></button>
         <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" (click)="clearLabels()" icon="pi pi-eraser"></button>
+        <button pButton class="p-button-secondary p-button-outlined" id="limpiarTodo" type="button" label="Limpiar Todo" (click)="clearAll()" icon="pi pi-eraser"></button>
       </div>
   
     </form>
@@ -83,7 +84,7 @@
   
     <!-- titulo tabla 1 -->
     <div class="mb-4">
-      <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+      <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos Consultados</h4>
     </div>
   
     <!-- tabla 1-->
@@ -118,7 +119,7 @@
             <tr>
               <th class="text-center" scope="col">#</th>
               <th class="text-center" scope="col">OT</th>
-              <th class="text-center" scope="col">N° Rollo</th>
+              <th class="text-center" scope="col">N° Bulto</th>
               <th class="text-center" scope="col">Item</th>
               <th class="text-center" scope="col">Referencia</th>
               <th class="text-center" scope="col">Cantidad</th>
@@ -126,7 +127,7 @@
               <th class="text-center" scope="col">Fecha Ingreso</th>
               <th class="text-center" scope="col">Proceso</th>
               <th class="text-center" style="width: 3rem">
-                <p-tableHeaderCheckbox (click)="selectAllRolls()" id="elegirRollos"></p-tableHeaderCheckbox>
+                <p-tableHeaderCheckbox (click)="selectAllRolls()" id="elegirRollos" pTooltip="Selecciona todos los rollos consultados"></p-tableHeaderCheckbox>
               </th>
             </tr>
           </ng-template>
@@ -142,7 +143,7 @@
                 <td class="text-center">{{roll.fecha | date : 'dd/MM/YYYY'}}</td>
                 <td class="text-center">{{roll.proceso_Nombre}}</td>
                 <td>
-                  <p-tableCheckbox [value]="roll" (click)="loadRollInsert(roll)"></p-tableCheckbox>
+                  <p-tableCheckbox [value]="roll" (click)="loadRollInsert(roll)" pTooltip="Seleccionar Rollo N° {{roll.numeroRollo_BagPro}}"></p-tableCheckbox>
                 </td>
             </tr>
           </ng-template>
@@ -190,7 +191,7 @@
             <tr>
               <th class="text-center" scope="col">#</th>
               <th class="text-center" scope="col">OT</th>
-              <th class="text-center" scope="col">N° Rollo</th>
+              <th class="text-center" scope="col">N° Bulto</th>
               <th class="text-center" scope="col">Item</th>
               <th class="text-center" scope="col">Referencia</th>
               <th class="text-center" scope="col">Cantidad</th>
@@ -198,7 +199,7 @@
               <th class="text-center" scope="col">Fecha Ingreso</th>
               <th class="text-center" scope="col">Proceso</th>
               <th style="width: 3rem">
-                <p-tableHeaderCheckbox (click)="quitAllRolls()" id=""></p-tableHeaderCheckbox>
+                <p-tableHeaderCheckbox (click)="quitAllRolls()" id="" pTooltip="Quitar todos los rollos a eliminar"></p-tableHeaderCheckbox>
               </th>
             </tr>
           </ng-template>
@@ -214,7 +215,7 @@
               <td class="text-center">{{rollsIns.fecha | date : 'dd/MM/yyyy' }}</td>
               <td class="text-center">{{rollsIns.proceso_Nombre}}</td>
               <td>
-                <p-tableCheckbox [value]="rollsIns" (click)="quitRollInsert(rollsIns)"></p-tableCheckbox>
+                <p-tableCheckbox [value]="rollsIns" (click)="quitRollInsert(rollsIns)" pTooltip="Quitar el rollo N° {{rollsIns.numeroRollo_BagPro}} de la tabla" ></p-tableCheckbox>
               </td>
             </tr>
           </ng-template>
@@ -288,6 +289,7 @@
   
   </p-card>
   
+  <!--Mensaje de confirmación-->
   <p-toast position="center" key="delete" (onClose)="onReject('delete')" [baseZIndex]="5000">
     <ng-template let-message pTemplate="message">
       <div class="flex flex-column" style="flex: 1">
