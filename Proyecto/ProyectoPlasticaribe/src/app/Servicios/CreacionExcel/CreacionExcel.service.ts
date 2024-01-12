@@ -11,18 +11,18 @@ export class CreacionExcelService {
 
     constructor() { }
 
-    formatoExcel(titulo : string){
+    formatoExcel(titulo : string, image: boolean = true){
         let workbook = new Workbook();
-        this.creacionHoja(workbook, titulo);
+        this.creacionHoja(workbook, titulo, image);
         return workbook;
     }
 
-    creacionHoja(workbook : Workbook, nombreHoja : string){
+    creacionHoja(workbook : Workbook, nombreHoja : string, image: boolean = true){
         const imageId1 = workbook.addImage({ base64:  logoParaPdf, extension: 'png', });
         let worksheet = workbook.addWorksheet(`${nombreHoja}`);
         let titleRow = worksheet.addRow([nombreHoja]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addImage(imageId1, 'A1:C3');
+        if (image) worksheet.addImage(imageId1, 'A1:C3');
         return worksheet;
     }
 

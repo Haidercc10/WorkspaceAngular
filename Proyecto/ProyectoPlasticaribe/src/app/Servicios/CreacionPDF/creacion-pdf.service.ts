@@ -3,6 +3,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import JsBarcode from 'jsbarcode';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +14,7 @@ export class CreacionPdfService {
     constructor() { }
 
     // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-    private formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
     formatoPDF(titulo : string, content : any, headerAdicional : any = {}){
         let today : any = moment().format('YYYY-MM-DD');
@@ -30,14 +31,14 @@ export class CreacionPdfService {
         setTimeout(() => this.crearPDF(pdfDefinicion), 3000);
     }
     
-    private headerPDF(today, hour, titulo, headerAdicional) : {} {
+    private headerPDF(today: any, hour: any, titulo: string, headerAdicional: any) : {} {
         return (currentPage : any, pageCount : any) => {
             return [
                 {
                     margin: [20, 8, 20, 0],
                     columns: [
                         { image : logoParaPdf, width : 150, height : 30, margin: [20, 25, 80, 10] },
-                        this.empresaFechaHoraTituloPDF(titulo),
+                        this.empresaFechaHoraTituloPDF(titulo, today, hour),
                         this.paginadoFechaHoraPDF(currentPage, pageCount, today, hour)
                     ]
                 },
@@ -47,14 +48,13 @@ export class CreacionPdfService {
         }
     }
 
-    private empresaFechaHoraTituloPDF(titulo : string) : {} {
+    private empresaFechaHoraTituloPDF(titulo : string, today: any, hour: any) : {} {
         return {
             width: '*',
             alignment: 'center',
             table: {
                 body: [
                     [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                    [{text: `Fecha Doc. ${moment().format('YYYY-MM-DD')} ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8}],
                     [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
                 ]
             },
@@ -63,7 +63,7 @@ export class CreacionPdfService {
         }
     }
 
-    private paginadoFechaHoraPDF(currentPage, pageCount, today, hour) : {} {
+    private paginadoFechaHoraPDF(currentPage: { toString: () => string; }, pageCount: string, today: any, hour: any) : {} {
         return {
             width: '*',
             alignment: 'center',
@@ -93,7 +93,7 @@ export class CreacionPdfService {
         }
     }
 
-    private crearPDF(pdfDefinicion){
+    private crearPDF(pdfDefinicion: TDocumentDefinitions){
         pdfMake.createPdf(pdfDefinicion).open();
     }
 

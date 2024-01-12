@@ -45,7 +45,8 @@
       </div>
 
       <div class="col justify-content-end text-right">
-        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success" id="exportar" pTooltip="" (click)="mostrarEleccion()"></button>
+        <button pButton pRipple label="Exportar a PDF" icon="pi pi-file-pdf" class="p-button-danger mx-2" id="exportar" pTooltip="" (click)="createPDF()"></button>
+        <button pButton pRipple label="Exportar a Excel" icon="pi pi-file-excel"class="p-button-success mx-2" id="exportar" pTooltip="" (click)="createExcel()"></button>
       </div>
     </div>
   </p-toolbar>
@@ -59,119 +60,247 @@
       leftIcon="pi pi-tags"
       tooltip="Información de la Nómina de Sellado">
       <div class="mb-3" *ngIf="load">
-        <div class="row g-3 font-size-14" id="table1">
-          <p-table
-            #dt
-            [value]="arraySellado"
-            [resizableColumns]="true"
-            columnResizeMode="expand"
-            styleClass="p-datatable-sm"
-            responsiveLayout="scroll"
-            [paginator]="true"
-            [rows]="arraySellado.length"
-            [rowsPerPageOptions]="[10,25,50,100,arraySellado.length]"
-            [rowHover]="true"
-            dataKey="Cedula"
-            [scrollable]="true"
-            scrollHeight="50rem">
-            <ng-template pTemplate="header">
-              <!--Filtros-->
-              <tr class="font-size-16" id="filtros">
-                <th></th>
-                <th></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cedula', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Operario', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cargo', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PagoTotal', 'contains')"></th>
-              </tr>
-              <!--Encabezado-->
-              <tr id="campos">
-                <th id="desplegable"></th>
-                <th>#</th>
-                <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
-                <th pSortableColumn="Operario" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="Operario"></p-sortIcon></th>
-                <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
-                <th id="entrada" pSortableColumn="PagoTotal" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="PagoTotal"></p-sortIcon></th>
-              </tr>
-            </ng-template>
-            <!--Cuerpo Tabla 1 -->
-            <ng-template pTemplate="body" let-nomina let-expanded="expanded" let-rowIndex="rowIndex">
-              <tr>
-                <td>
-                  <button type="button" pButton pRipple [pRowToggler]="nomina" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                </td>
-                <td><b>{{rowIndex + 1}}</b></td>
-                <td>{{nomina.Cedula}}</td>
-                <td><b>{{nomina.Operario}}</b></td>
-                <td>{{nomina.Cargo}}</td>
-                <td><b style="color: #00a2ff;">{{nomina.PagoTotal | number : '1.2-2'}}</b></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="5" class="text-right">Total Nómina Sellado</td>
-                <td id="total">{{calcularTotalAPagar() | number : '1.2-2'}}</td>
-              </tr>
-            </ng-template>
-            <!--Tabla 2-->
-            <ng-template pTemplate="rowexpansion" let-nomina>
-              <tr>
-                <td colspan="7">
-                  <div class="p-3">
-                    <p-table
-                    [value]="nomina.detalle"
-                    dataKey="id"
-                    styleClass="p-datatable-gridlines p-datatable-sm">
-                      <ng-template pTemplate="header">
-                        <tr>
-                          <th pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon></th>
-                          <th pSortableColumn="Operario">Operario <p-sortIcon field="Operario"></p-sortIcon></th>
-                          <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
-                          <th pSortableColumn="Ot">Ot <p-sortIcon field="Ot"></p-sortIcon></th>
-                          <th pSortableColumn="Referencia">Item <p-sortIcon field="Referencia"></p-sortIcon></th>
-                          <th pSortableColumn="Nombre_Referencia">Referencia <p-sortIcon field="Nombre_Referencia"></p-sortIcon></th>
-                          <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
-                          <th pSortableColumn="CantidadTotal">Cantidad Total <p-sortIcon field="CantidadTotal"></p-sortIcon></th>
-                          <th pSortableColumn="Cantidad">Cant. Sellada Operario <p-sortIcon field="Cantidad"></p-sortIcon></th>
-                          <th pSortableColumn="Pesado_Entre">Pesado entre <p-sortIcon field="Pesado_Entre"></p-sortIcon></th>
-                          <th pSortableColumn="PrecioDia">Precio Día <p-sortIcon field="PrecioDia"></p-sortIcon></th>
-                          <th pSortableColumn="PrecioNoche">Precio Noche <p-sortIcon field="PrecioNoche"></p-sortIcon></th>
-                          <th pSortableColumn="Registros">Registros <p-sortIcon field="Registros"></p-sortIcon></th>
-                          <th pSortableColumn="PagoTotal">Pago Total <p-sortIcon field="PagoTotal"></p-sortIcon></th>
-                          <th>Ver</th>
-                        </tr>
-                      </ng-template>
-                      <ng-template pTemplate="body" let-detalleNomina>
-                        <tr>
-                          <td>{{ detalleNomina.Cedula }}</td>
-                          <td>{{ detalleNomina.Operario }}</td>
-                          <td>{{ detalleNomina.Turno }}</td>
-                          <td>{{ detalleNomina.Ot }}</td>
-                          <td>{{ detalleNomina.Referencia}}</td>
-                          <td>{{ detalleNomina.Nombre_Referencia }}</td>
-                          <td>{{ detalleNomina.Presentacion }}</td>
-                          <td>{{ detalleNomina.CantidadTotal | number : '1.2-2' }}</td>
-                          <td>{{ detalleNomina.Cantidad | number : '1.2-2' }}</td>
-                          <td>{{ detalleNomina.Pesado_Entre }}</td>
-                          <td>{{ detalleNomina.PrecioDia | number : '1.2-2' }}</td>
-                          <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
-                          <td>{{ detalleNomina.Registros}}</td>
-                          <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
-                          <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula)" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
-                        </tr>
-                      </ng-template>
-                      <ng-template pTemplate="emptymessage">
-                        <tr>
-                          <td colspan="6">No se encontraron registros</td>
-                        </tr>
-                      </ng-template>
-                    </p-table>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+        <p-tabView id="tabs">
+          <!-- Nomina de Sellado con Todos los rollos/bultos que se han pesado -->
+          <p-tabPanel
+            header="Total"
+            leftIcon="pi pi-tags"
+            tooltip="Nomina de Sellado con Todos los rollos/bultos que se han pesado">
+            <div class="row g-3 font-size-14" id="table1">
+              <p-table
+                #dt
+                [value]="arraySellado"
+                [resizableColumns]="true"
+                columnResizeMode="expand"
+                styleClass="p-datatable-sm"
+                responsiveLayout="scroll"
+                [paginator]="true"
+                [rows]="arraySellado.length"
+                [rowsPerPageOptions]="[10,25,50,100,arraySellado.length]"
+                [rowHover]="true"
+                dataKey="Cedula"
+                [scrollable]="true"
+                scrollHeight="50rem">
+                <ng-template pTemplate="header">
+                  <!--Filtros-->
+                  <tr class="font-size-16" id="filtros">
+                    <th></th>
+                    <th></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro(dt, $event, 'Cedula', 'contains')"></th>
+                    <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro(dt, $event, 'Operario', 'contains')"></th>
+                    <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro(dt, $event, 'Cargo', 'contains')"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro(dt, $event, 'PagoTotal', 'contains')"></th>
+                  </tr>
+                  <!--Encabezado-->
+                  <tr id="campos">
+                    <th id="desplegable"></th>
+                    <th>#</th>
+                    <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                    <th pSortableColumn="Operario" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="Operario"></p-sortIcon></th>
+                    <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                    <th id="entrada" pSortableColumn="PagoTotal" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                  </tr>
+                </ng-template>
+                <!--Cuerpo Tabla 1 -->
+                <ng-template pTemplate="body" let-nomina let-expanded="expanded" let-rowIndex="rowIndex">
+                  <tr>
+                    <td>
+                      <button type="button" pButton pRipple [pRowToggler]="nomina" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                    </td>
+                    <td><b>{{rowIndex + 1}}</b></td>
+                    <td>{{nomina.Cedula}}</td>
+                    <td><b>{{nomina.Operario}}</b></td>
+                    <td>{{nomina.Cargo}}</td>
+                    <td><b style="color: #00a2ff;">{{nomina.PagoTotal | number : '1.2-2'}}</b></td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr>
+                    <td colspan="5" class="text-right">Total Nómina Sellado</td>
+                    <td id="total">{{calcularTotalAPagar(arraySellado) | number : '1.2-2'}}</td>
+                  </tr>
+                </ng-template>
+                <!--Tabla 2-->
+                <ng-template pTemplate="rowexpansion" let-nomina>
+                  <tr>
+                    <td colspan="7">
+                      <div class="p-3">
+                        <p-table
+                        [value]="nomina.detalle"
+                        dataKey="id"
+                        styleClass="p-datatable-gridlines p-datatable-sm">
+                          <ng-template pTemplate="header">
+                            <tr>
+                              <th pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon></th>
+                              <th pSortableColumn="Operario">Operario <p-sortIcon field="Operario"></p-sortIcon></th>
+                              <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
+                              <th pSortableColumn="Ot">Ot <p-sortIcon field="Ot"></p-sortIcon></th>
+                              <th pSortableColumn="Referencia">Item <p-sortIcon field="Referencia"></p-sortIcon></th>
+                              <th pSortableColumn="Nombre_Referencia">Referencia <p-sortIcon field="Nombre_Referencia"></p-sortIcon></th>
+                              <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+                              <th pSortableColumn="CantidadTotal">Cantidad Total <p-sortIcon field="CantidadTotal"></p-sortIcon></th>
+                              <th pSortableColumn="Cantidad">Cant. Sellada Operario <p-sortIcon field="Cantidad"></p-sortIcon></th>
+                              <th pSortableColumn="Pesado_Entre">Pesado entre <p-sortIcon field="Pesado_Entre"></p-sortIcon></th>
+                              <th pSortableColumn="PrecioDia">Precio Día <p-sortIcon field="PrecioDia"></p-sortIcon></th>
+                              <th pSortableColumn="PrecioNoche">Precio Noche <p-sortIcon field="PrecioNoche"></p-sortIcon></th>
+                              <th pSortableColumn="Registros">Registros <p-sortIcon field="Registros"></p-sortIcon></th>
+                              <th pSortableColumn="PagoTotal">Pago Total <p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                              <th>Ver</th>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-detalleNomina>
+                            <tr>
+                              <td>{{ detalleNomina.Cedula }}</td>
+                              <td>{{ detalleNomina.Operario }}</td>
+                              <td>{{ detalleNomina.Turno }}</td>
+                              <td>{{ detalleNomina.Ot }}</td>
+                              <td>{{ detalleNomina.Referencia}}</td>
+                              <td>{{ detalleNomina.Nombre_Referencia }}</td>
+                              <td>{{ detalleNomina.Presentacion }}</td>
+                              <td>{{ detalleNomina.CantidadTotal | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Cantidad | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Pesado_Entre }}</td>
+                              <td>{{ detalleNomina.PrecioDia | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Registros}}</td>
+                              <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
+                              <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula, ['0','1'])" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="emptymessage">
+                            <tr>
+                              <td colspan="6">No se encontraron registros</td>
+                            </tr>
+                          </ng-template>
+                        </p-table>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </p-tabPanel>
+
+          <!-- Nomina de despacho con los rollos/bultos que se han recibido en despacho -->
+          <p-tabPanel
+            header="Recibidos en Despacho"
+            leftIcon="pi pi-tags"
+            tooltip="Nomina de despacho con los rollos/bultos que se han recibido en despacho">
+            <div class="row g-3 font-size-14" id="table1">
+              <p-table
+                #dtDespacho
+                [value]="nominaDespacho"
+                [resizableColumns]="true"
+                columnResizeMode="expand"
+                styleClass="p-datatable-sm"
+                responsiveLayout="scroll"
+                [paginator]="true"
+                [rows]="nominaDespacho.length"
+                [rowsPerPageOptions]="[10,25,50,100,nominaDespacho.length]"
+                [rowHover]="true"
+                dataKey="Cedula"
+                [scrollable]="true"
+                scrollHeight="50rem">
+                <ng-template pTemplate="header">
+                  <!--Filtros-->
+                  <tr class="font-size-16" id="filtros">
+                    <th></th>
+                    <th></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro(dtDespacho, $event, 'Cedula', 'contains')"></th>
+                    <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro(dtDespacho, $event, 'Operario', 'contains')"></th>
+                    <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro(dtDespacho, $event, 'Cargo', 'contains')"></th>
+                    <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro(dtDespacho, $event, 'PagoTotal', 'contains')"></th>
+                  </tr>
+                  <!--Encabezado-->
+                  <tr id="campos">
+                    <th id="desplegable"></th>
+                    <th>#</th>
+                    <th scope="col" pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon> </th>
+                    <th pSortableColumn="Operario" pReorderableColumn scope="col">Nombre Operario<p-sortIcon field="Operario"></p-sortIcon></th>
+                    <th id="inicial" pSortableColumn="Cargo" pReorderableColumn scope="col">Cargo <p-sortIcon field="Cargo"></p-sortIcon></th>
+                    <th id="entrada" pSortableColumn="PagoTotal" pReorderableColumn scope="col">Valor a pagar<p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                  </tr>
+                </ng-template>
+                <!--Cuerpo Tabla 1 -->
+                <ng-template pTemplate="body" let-nomina let-expanded="expanded" let-rowIndex="rowIndex">
+                  <tr>
+                    <td>
+                      <button type="button" pButton pRipple [pRowToggler]="nomina" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                    </td>
+                    <td><b>{{rowIndex + 1}}</b></td>
+                    <td>{{nomina.Cedula}}</td>
+                    <td><b>{{nomina.Operario}}</b></td>
+                    <td>{{nomina.Cargo}}</td>
+                    <td><b style="color: #00a2ff;">{{nomina.PagoTotal | number : '1.2-2'}}</b></td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr>
+                    <td colspan="5" class="text-right">Total Nómina Sellado</td>
+                    <td id="total">{{calcularTotalAPagar(nominaDespacho) | number : '1.2-2'}}</td>
+                  </tr>
+                </ng-template>
+                <!--Tabla 2-->
+                <ng-template pTemplate="rowexpansion" let-nomina>
+                  <tr>
+                    <td colspan="7">
+                      <div class="p-3">
+                        <p-table
+                        [value]="nomina.detalle"
+                        dataKey="id"
+                        styleClass="p-datatable-gridlines p-datatable-sm">
+                          <ng-template pTemplate="header">
+                            <tr>
+                              <th pSortableColumn="Cedula">Cédula <p-sortIcon field="Cedula"></p-sortIcon></th>
+                              <th pSortableColumn="Operario">Operario <p-sortIcon field="Operario"></p-sortIcon></th>
+                              <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
+                              <th pSortableColumn="Ot">Ot <p-sortIcon field="Ot"></p-sortIcon></th>
+                              <th pSortableColumn="Referencia">Item <p-sortIcon field="Referencia"></p-sortIcon></th>
+                              <th pSortableColumn="Nombre_Referencia">Referencia <p-sortIcon field="Nombre_Referencia"></p-sortIcon></th>
+                              <th pSortableColumn="Presentacion">Presentación <p-sortIcon field="Presentacion"></p-sortIcon></th>
+                              <th pSortableColumn="CantidadTotal">Cantidad Total <p-sortIcon field="CantidadTotal"></p-sortIcon></th>
+                              <th pSortableColumn="Cantidad">Cant. Sellada Operario <p-sortIcon field="Cantidad"></p-sortIcon></th>
+                              <th pSortableColumn="Pesado_Entre">Pesado entre <p-sortIcon field="Pesado_Entre"></p-sortIcon></th>
+                              <th pSortableColumn="PrecioDia">Precio Día <p-sortIcon field="PrecioDia"></p-sortIcon></th>
+                              <th pSortableColumn="PrecioNoche">Precio Noche <p-sortIcon field="PrecioNoche"></p-sortIcon></th>
+                              <th pSortableColumn="Registros">Registros <p-sortIcon field="Registros"></p-sortIcon></th>
+                              <th pSortableColumn="PagoTotal">Pago Total <p-sortIcon field="PagoTotal"></p-sortIcon></th>
+                              <th>Ver</th>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-detalleNomina>
+                            <tr>
+                              <td>{{ detalleNomina.Cedula }}</td>
+                              <td>{{ detalleNomina.Operario }}</td>
+                              <td>{{ detalleNomina.Turno }}</td>
+                              <td>{{ detalleNomina.Ot }}</td>
+                              <td>{{ detalleNomina.Referencia}}</td>
+                              <td>{{ detalleNomina.Nombre_Referencia }}</td>
+                              <td>{{ detalleNomina.Presentacion }}</td>
+                              <td>{{ detalleNomina.CantidadTotal | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Cantidad | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Pesado_Entre }}</td>
+                              <td>{{ detalleNomina.PrecioDia | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.PrecioNoche | number : '1.2-2' }}</td>
+                              <td>{{ detalleNomina.Registros}}</td>
+                              <td>{{ detalleNomina.PagoTotal | number : '1.2-2' }}</td>
+                              <td class="text-center"><button (click)="cargarModalSellado(detalleNomina.Referencia, detalleNomina.Cedula, ['1'])" pButton type="button" style="width: 30px; height: 30px;" class="p-button-success p-button-rounded" pTooltip="Ver detallado de producción del empleado {{detalleNomina.Operario}}" icon="pi pi-eye"></button></td>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="emptymessage">
+                            <tr>
+                              <td colspan="6">No se encontraron registros</td>
+                            </tr>
+                          </ng-template>
+                        </p-table>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
       </div>
     </p-tabPanel>
 
@@ -179,7 +308,8 @@
     <p-tabPanel
       header="Nomina Ingresada"
       leftIcon="pi pi-wallet"
-      tooltip="Información de la Nómina de Ingresada">
+      tooltip="Información de la Nómina de Ingresada"
+      *ngIf="[1,65].includes(ValidarRol)">
       <p-table
         #dt_NominaIngresada
         [value]="nominaIngresada"
@@ -307,6 +437,7 @@
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Turno', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Precio', 'contains')"></th>
             <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Valor_Total', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'EnvioZeus', 'contains')"></th>
           </tr>
           <tr>
             <th>#</th>
@@ -321,6 +452,7 @@
             <th pSortableColumn="Turno">Turno <p-sortIcon field="Turno"></p-sortIcon></th>
             <th pSortableColumn="Precio">Precio <p-sortIcon field="Precio"></p-sortIcon></th>
             <th pSortableColumn="Valor_Total">Total <p-sortIcon field="Valor_Total"></p-sortIcon></th>
+            <th pSortableColumn="EnvioZeus">Envio Zeus <p-sortIcon field="EnvioZeus"></p-sortIcon></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -337,6 +469,7 @@
             <td><b>{{data.Turno}}</b></td>
             <td>{{data.Precio | number : '1.2-2'}}</td>
             <td><b>{{data.Valor_Total | number : '1.2-2'}}</b></td>
+            <td><b>{{data.EnvioZeus}}</b></td>
           </tr>
         </ng-template>
       </p-table>
@@ -344,23 +477,3 @@
     </ng-template>
   </p-dialog>
 </p-card>
-
-<p-toast position="center" key="msj" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message" let-matPrima>
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="exportarExcel(1)" icon="pi pi-table" label="Acumulado" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="exportarExcel(2)" icon="pi pi-list" label="Detallado" class="p-button-success"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
