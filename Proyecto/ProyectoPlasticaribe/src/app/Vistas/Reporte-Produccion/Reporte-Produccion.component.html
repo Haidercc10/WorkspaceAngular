@@ -85,6 +85,7 @@
         <button pButton id="limpiarCampos" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton id="limpiarCampos" class="p-button-success" type="button" label="Subir Rollos" [disabled]="rollosSeleccionados.length == 0" icon="pi pi-send" (click)="enviarProduccionZeus()" *ngIf="[1].includes(ValidarRol)"></button>
         <button (click)="downloadPdf()" pButton id="exportPdf" class="p-button-danger p-button-outlined" type="button" [disabled]="formFiltros.invalid || cargando" label="Exportar PDF" icon="pi pi-file-pdf"></button>
+        <button (click)="exportExcel()" pButton id="exportExcel" class="p-button-success p-button-outlined" type="button" [disabled]="formFiltros.invalid || cargando" label="Exportar Excel" icon="pi pi-file-excel"></button>
       </div>
     </div>
   </form>

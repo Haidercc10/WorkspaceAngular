@@ -4,6 +4,7 @@ import { co, s } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -35,7 +36,8 @@ export class ReporteProduccionComponent implements OnInit {
     private bagProService: BagproService,
     private msj: MensajesAplicacionService,
     private productosService: ProductoService,
-    private svcPDF: CreacionPdfService) {
+    private svcPDF: CreacionPdfService, 
+    private svcExcel : CreacionExcelService) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
     this.formFiltros = this.frmBuilder.group({
@@ -480,4 +482,132 @@ export class ReporteProduccionComponent implements OnInit {
 
   //. Cantidad de bultos por orden de trabajo. 
   totalRows = (ot: any) => this.produccion.filter(x => x.orden == ot).length;
+
+  //.Excel
+  //. Función utilizada para descargar el formato excel
+  exportExcel(){
+    if(this.produccion.length > 0) {
+      let date1 : any = moment(this.formFiltros.value.rangoFechas[0]).format('DD-MM-YYYY'); 
+      let date2 : any = moment(this.formFiltros.value.rangoFechas[1]).format('DD-MM-YYYY'); 
+      this.cargando = true;
+      setTimeout(() => {
+        let title : string = `Reporte Producción de ${date1} a ${date2}`;
+        let fill : any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
+        let font : any = { size: 12, bold: true, alignment: 'center', name : 'Calibri' };
+        let border : any = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        let workbook = this.svcExcel.formatoExcel(title, true);
+        this.addSheet(workbook, fill, font, border, this.infoProduction(), 1);
+        this.svcExcel.creacionHoja(workbook, `Reporte Producción Consolidado`, false);
+        this.addGroupedSheet(workbook, fill, font, border, this.groupedInfoExcel(), 2);
+        this.svcExcel.creacionExcel(`Reporte Producción de ${date1} a ${date2}`, workbook);
+        this.cargando = false;  
+      }, 2000);
+    } else this.msj.mensajeAdvertencia(`No hay registros para exportar!`);
+  }
+
+  //.Agregar hoja al formato excel.
+  addSheet(workbook, fill , font, border, data : any, pageNumber : number) {
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addHeaderPage(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addInfoExcel(page, data);
+  }
+
+  //.Información de la producción.
+  infoProduction(){
+    let info : any = [];
+    this.produccion.forEach(d => info.push([d.orden, d.rollo, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, d.turno, d.fecha.replace('T00:00:00', ''), d.hora, d.proceso, d.maquina, d.envioZeus == 1 ? 'SI' : 'NO',]));
+    return info;
+  }
+
+  //.Agregar información a la hoja del excel.
+  addInfoExcel(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [7];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar encabezado a la hoja del excel.
+  addHeaderPage(worksheet, font, border, fill) {
+    
+    let rowHeader : any = ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'I5', 'J5', 'K5', 'L5', 'M5', 'N5']
+    worksheet.addRow(['OT', 'Rollo', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', 'Turno', 'Fecha', 'Hora', 'Proceso', 'Maquina', 'Envio Zeus', ]);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:N3'];
+    this.stylesPage(worksheet, concatCells, []);
+  }
+
+  //.Estilos de la hoja del excel.
+  stylesPage(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].forEach(x => worksheet.getColumn(x).width = 12);
+    [3,5].forEach(x => worksheet.getColumn(x).width = 50)
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
+  //Hoja 2 Agrupada
+  addGroupedSheet(workbook, fill , font, border, data : any, pageNumber : number){
+    let page = workbook.worksheets[pageNumber - 1];
+    this.addGroupedHeader(page, font, border, fill);
+    page.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+    this.addGroupedInfoExcel(page, data);
+  }
+
+  //.Agregar encabezado a la hoja del excel.
+  addGroupedHeader(worksheet, font, border, fill) {
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    let rowHeader : any = ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4'];
+    worksheet.addRow(['OT', 'Cliente', 'Item', 'Referencia', 'Peso', 'Cantidad', 'Unidad', ]);
+    
+    rowHeader.forEach(x => worksheet.getCell(x).fill = fill);
+    rowHeader.forEach(x => worksheet.getCell(x).font = font);
+    rowHeader.forEach(x => worksheet.getCell(x).border = border);
+
+    let concatCells : any = ['A1:G3'];
+    this.stylesGroupedPage(worksheet, concatCells, []);
+  }
+
+  //.Agregar información a la hoja del excel.
+  addGroupedExcel(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [7];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  //.Agregar información a la hoja del excel.
+  addGroupedInfoExcel(worksheet : any, data : any) {
+    let formatNumber: Array<number> = [6];
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(d => worksheet.addRow(d));
+  }
+
+  groupedInfoExcel(){
+    let info : any = [];
+    info = this.produccion.reduce((acc, ot) => {
+      console.log(acc);
+      console.log(ot)
+      if(!acc.map(x => x[0]).includes(ot.orden)) {
+        acc = [...acc, [ot.orden, ot.cliente, ot.item, ot.referencia, ot.peso, ot.cantidad, ot.presentacion]]
+      } else {
+        acc[acc.map(x => x[0]).indexOf(ot.orden)][4] += ot.peso;
+        acc[acc.map(x => x[0]).indexOf(ot.orden)][5] += ot.cantidad;
+      }
+      return acc;
+    }, [])
+    //this.produccion.forEach(d => info.push([d.orden, d.cliente, d.item, d.referencia, d.peso, d.cantidad, d.presentacion, ]));
+    return info;
+  }
+
+  stylesGroupedPage(worksheet, concatCells, formatNumber) {
+    formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    [1, 2, 5, 6, 7].forEach(x => worksheet.getColumn(x).width = 12);
+    [2, 4].forEach(x => worksheet.getColumn(x).width = 50)
+    concatCells.forEach(cell => worksheet.mergeCells(cell));
+  }
+
 }

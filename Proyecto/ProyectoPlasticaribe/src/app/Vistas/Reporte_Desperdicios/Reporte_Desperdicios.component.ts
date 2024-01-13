@@ -142,6 +142,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
+        console.log(dataDesperdicios)
         if (dataDesperdicios.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
         else {
           this.load = false;
@@ -157,13 +158,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Llenar la tabla inicial de resultados de busqueda */
   llenarTabla(datos : any) {
     const registro : any = {
-      OT : datos.ot,
-      Item : datos.item,
-      NombreItem : datos.nombreItem,
-      NombreMaterial : datos.material,
-      Impreso : datos.impreso,
-      PesoTotal : datos.pesoTotal,
-      Presentacion : 'Kg'
+      'OT' : datos.ot,
+      'Item' : datos.item,
+      'NombreItem' : datos.nombreItem,
+      'NombreMaterial' : datos.material,
+      'Impreso' : datos.impreso,
+      'PesoTotal' : datos.pesoTotal,
+      'Presentacion' : 'Kg'
     }
     this.arrayConsulta.push(registro);
   }
@@ -488,6 +489,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     content.push(this.headerTableConsolidated(groupedInformation));
     content.push(this.titleInfoDetails());
     content.push(this.headerTableDetails(detailedInformation));
+    content.push(this.totalInfo());
     return content;
   }
 
@@ -557,14 +559,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Encabezado de tabla consolidada
   headerTableDetails(data : any) {
-    let columns : any[] = ['OT', 'Item', 'Proceso', 'Maquina', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Fecha'];
-    let widths: Array<string> = ['9%','9%','9%','9%','9%','9%','9%','9%','9%','9%','9%'];
+    let columns : any[] = ['OT', 'Item', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Impreso', 'Fecha'];
+    let widths: Array<string> = ['8%','8%','9%','4%','7%','14%','21%','6%','5%','7%','9%'];
     return {
       margin: [0, 0, 0, 0],
       table : {
-        headerRows : 1,
         widths : widths, 
-        body : this.builderTableBody(data, columns),
+        body : this.builderTableBody2(data, columns),
       },
       fontSize : 8,
       layout : {
@@ -584,19 +585,30 @@ export class Reporte_DesperdiciosComponent implements OnInit {
         'Item' : x.prod_Id,
         'NombreItem' : x.prod_Nombre,
         'Peso' : x.desp_PesoKg,
-        'Cantidad' : this.formatonumeros(x.desp_PesoKg),
+        'Cant' : this.formatonumeros(x.desp_PesoKg),
         'Und' : 'Kg',
         'Proceso' : x.proceso_Nombre,
         'Material' : x.material_Nombre,
         "No_Conformidad" : x.falla_Nombre,
         'Impreso' : x.desp_Impresion,
-        'Maquina' : x.maquina,
+        'Maq' : x.maquina,
         'Operario' : x.usua_Nombre,
         'Fecha' : x.desp_Fecha.replace('T00:00:00', ''),
       }
       info.push(completeData);
     });
     return info;
+  }
+
+   //Titulo de información consolidada
+  totalInfo(){
+    return {
+      text: `Cantidad total: ${this.calcularTotal() }`,
+      alignment: 'right',
+      style: 'header', 
+      fontSize : 10, 
+      bold : true,
+    };
   }
 
   builderTableBody(data, columns) {
@@ -610,5 +622,19 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     });
     return body;
   }
+
+  builderTableBody2(data, columns) {
+    console.log(data)
+    var body = [];
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  calcularTotal = () => this.arrayConsulta.reduce((acc, item) => acc + item.cant, 0);
 }
 

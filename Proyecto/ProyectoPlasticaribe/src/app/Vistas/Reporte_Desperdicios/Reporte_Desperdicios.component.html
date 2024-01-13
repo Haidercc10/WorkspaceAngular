@@ -83,6 +83,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="consultar" type="button" label="Consultar" icon="pi pi-search" (click)="Consultar()"></button>
         <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+        <button pButton class="p-button-danger p-button-outlined" id="pdf" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="newPdf()"></button>
       </div>
     </div>
   </form>
@@ -91,7 +92,6 @@
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"> <i class="pi pi-list"></i> Resultados de búsqueda</h4>
   </div>
 
-  <!-- TABLA DE RETIRO -->
   <div class="mb-3" *ngIf="load">
     <p-table
       #dt

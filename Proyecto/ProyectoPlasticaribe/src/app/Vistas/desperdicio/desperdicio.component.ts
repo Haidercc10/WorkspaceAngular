@@ -49,7 +49,6 @@ export class DesperdicioComponent implements OnInit {
   areas : any [] = [];
   areaOperarios : any; 
   ordenesTrabajo : any = [];
-  //hora: any = moment().format('HH:mm:ss');
   turnos : any = [];
   @ViewChild('dt2') dt2: Table | undefined; //Tabla de desperdicios
   copiaDesperdicios : any = [];
@@ -63,12 +62,11 @@ export class DesperdicioComponent implements OnInit {
                           private maquinasService : ActivosService,
                             private deperdicioService : DesperdicioService,
                               private materiaService : MaterialProductoService,
-                                private messageService: MessageService,
-                                  private shepherdService: ShepherdService,
-                                    private mensajeService : MensajesAplicacionService,
-                                      private svcAreas : AreaService, 
-                                        private svcTurnos : TurnosService, 
-                                          private svcCrearPDF : CreacionPdfService) {
+                                private shepherdService: ShepherdService,
+                                  private mensajeService : MensajesAplicacionService,
+                                    private svcAreas : AreaService, 
+                                      private svcTurnos : TurnosService, 
+                                        private svcCrearPDF : CreacionPdfService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarFormulario();
@@ -80,12 +78,12 @@ export class DesperdicioComponent implements OnInit {
       OTDesperdicio : [null],
       Maquina : [null, Validators.required],
       IdOperario : [null, Validators.required],
-      Operario : [null, Validators.required],
+      Operario : [null, ],
       IdTipoMaterial : [null, Validators.required],
       TipoMaterial : [null, Validators.required],
       Impreso : [null, Validators.required],
       IdTipoNoConformidad : [null, Validators.required],
-      TipoNoConformidad : [null, Validators.required],
+      TipoNoConformidad : [null],
       CantidadKg : [null, Validators.required],
       Observacion : [null],
       IdArea : [null, Validators.required],
@@ -192,36 +190,6 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar y obtener la inforamcion de los materiales
   obtenerMateriales = () => this.materiaService.srvObtenerLista().subscribe(datos => this.materiales = datos);
 
-  // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
-  buscarFalla(){
-    let noConformidad : any = this.FormDesperdicio.value.TipoNoConformidad;
-    let nuevo : any [] =  this.fallas.filter((item) => item.falla_Id == noConformidad);
-    this.FormDesperdicio.patchValue({
-      IdTipoNoConformidad : nuevo[0].falla_Id,
-      TipoNoConformidad : nuevo[0].falla_Nombre,
-    });
-  }
-
-  // Funcion que va a consultar el id del operario y en su lugar colocará el nombre en el formulario
-  buscarOperario(){
-    let operario : any = this.FormDesperdicio.value.Operario;
-    let nuevo : any [] =  this.operarios.filter((item) => item.usua_Id == operario);
-    this.FormDesperdicio.patchValue({
-      IdOperario : nuevo[0].usua_Id,
-      Operario : nuevo[0].usua_Nombre,
-    });
-  }
-
-  // Funcion que va a consultar el id de la maquina y en su lugar colocará el serial de la maquina
-  buscarMaquina(){
-    let maquina : any = this.FormDesperdicio.value.Maquina;
-    let nuevo : any [] =  this.maquinas.filter((item) => item.actv_Id == maquina);
-    this.FormDesperdicio.patchValue({
-      IdMaquina : nuevo[0].actv_Id,
-      Maquina : nuevo[0].actv_Nombre,
-    });
-  }
-
   // Funcion que va a consultar el id del area y en su lugar colocará el nombre del area o proceso
   buscarProceso(){
     let proceso : any = this.FormDesperdicio.value.IdArea;
@@ -324,251 +292,10 @@ export class DesperdicioComponent implements OnInit {
     return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => a + b.peso, 0);
   } 
 
-  // Funcion que va a llenar la tabla con la informacion del desperdicio digitadi
-  llenarTabla(){
-    this.cargando = true;
-    if (this.FormDesperdicio.valid) {
-      if (this.FormDesperdicio.value.OTDesperdicio == null) this.FormDesperdicio.value.OTDesperdicio = 0;
-      if (this.FormDesperdicio.value.Producto == null) this.FormDesperdicio.value.Producto = `No aplica`;
-      if (this.FormDesperdicio.value.IdProducto == null) this.FormDesperdicio.value.IdProducto = 100163;
-      let info : any = {
-        Ot : this.FormDesperdicio.value.OTDesperdicio,
-        IdMaquina : this.FormDesperdicio.value.IdMaquina,
-        Maquina : this.FormDesperdicio.value.Maquina,
-        IdItem : this.FormDesperdicio.value.IdProducto,
-        Item : `${this.FormDesperdicio.value.IdProducto} - ${this.FormDesperdicio.value.Producto}`,
-        IdMateria : parseInt(this.FormDesperdicio.value.IdTipoMaterial),
-        Material : this.FormDesperdicio.value.TipoMaterial,
-        IdOperario : this.FormDesperdicio.value.IdOperario,
-        Operario : this.FormDesperdicio.value.Operario,
-        IdNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-        NoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-        Cantidad : this.FormDesperdicio.value.CantidadKg,
-        Impreso : this.FormDesperdicio.value.Impreso,
-        Observacion : this.FormDesperdicio.value.Observacion,
-        Fecha : moment(this.FormDesperdicio.value.Fecha).format('YYYY-MM-DD'),
-        IdArea : this.FormDesperdicio.value.IdArea,
-        Area : this.FormDesperdicio.value.Area,
-      }
-      this.grupoDespercios.push(info);
-      this.cargando = false;
-    } else {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
-      this.cargando = false;
-    }
-  }
-
-  // Funcion que va a crear el registro de desperdicio
-  crearDesperdicio(){
-    let error : boolean = false;
-    if (this.grupoDespercios.length != 0){
-      this.cargando = true;
-      for (let i = 0; i < this.grupoDespercios.length; i++) {
-        let observacion : any = this.grupoDespercios[i].Observacion;
-        if (observacion == null) observacion = '';
-        let info : any = {
-          Desp_OT : this.grupoDespercios[i].Ot,
-          Prod_Id : this.grupoDespercios[i].IdItem,
-          Material_Id : this.grupoDespercios[i].IdMateria,
-          Actv_Id : this.grupoDespercios[i].IdMaquina,
-          Usua_Operario : this.grupoDespercios[i].IdOperario,
-          Desp_Impresion : this.grupoDespercios[i].Impreso,
-          Falla_Id : this.grupoDespercios[i].IdNoConformidad,
-          Desp_PesoKg : this.grupoDespercios[i].Cantidad,
-          Desp_Fecha :  this.today,
-          Desp_Observacion : observacion,
-          Usua_Id : this.storage_Id,
-          Desp_FechaRegistro : this.today,
-          Desp_HoraRegistro : moment().format('H:mm:ss'),
-          Proceso_Id : this.grupoDespercios[i].IdArea,
-        }
-        this.deperdicioService.Insert(info).subscribe(() => this.mensajeService.mensajeConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`), () => {
-          this.mensajeService.mensajeError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
-          this.cargando = false;
-          error = true;
-        });
-      }
-    } else {
-      this.mensajeService.mensajeAdvertencia(`Advertencia`, `¡Debe añadir minimo un registro a la tabla para crear un desperdicio!`);
-      this.cargando = false;
-    }
-
-    setTimeout(() => {
-      if (!error) {
-        this.llenarDatosPdf();
-        this.limpiarTodo();
-      }
-    }, 2000);
-  }
-
-  // Funcion que creará un PDF del desperdicio ingresado
-  crearPdf(){
-    this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
-      for (let i = 0; i < datos_desperdicios.length; i++) {
-        let titulo : string = `Reporte Merma de Material - ${this.today}`;
-        const pdfDefinicion : any = {
-          info: { title: titulo },
-          pageSize: { width: 630, height: 760 },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          pageMargins : [25, 150, 25, 35],
-          header: function(currentPage : any, pageCount : any) {
-            return [
-              {
-                margin: [20, 8, 20, 0],
-                columns: [
-                  { image : logoParaPdf, width : 150, height : 30, margin: [20, 25] },
-                  {
-                    width: 300,
-                    alignment: 'center',
-                    table: {
-                      body: [
-                        [{text: 'NIT. 800188732', bold: true, alignment: 'center', fontSize: 10}],
-                        [{text: `Fecha de Análizis: ${moment().format('YYYY-MM-DD')}`, alignment: 'center', fontSize: 8}],
-                        [{text: titulo, bold: true, alignment: 'center', fontSize: 10}],
-                      ]
-                    },
-                    layout: 'noBorders',
-                    margin: [85, 20],
-                  },
-                  {
-                    width: '*',
-                    alignment: 'center',
-                    margin: [20, 20, 20, 0],
-                    table: {
-                      body: [
-                        [{text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true}, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_desperdicios[i].desp_FechaRegistro.replace('T00:00:00', ''), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Hora: `, alignment: 'left', fontSize: 8, bold: true}, {text: moment().format('H:mm:ss'), alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                        [{text: `Usuario: `, alignment: 'left', fontSize: 8, bold: true}, {text: datos_desperdicios[i].nombreCreador, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-                      ]
-                    },
-                    layout: 'noBorders',
-                  }
-                ]
-              },
-              {
-                margin: [20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: ['*'],
-                  body: [
-                    [
-                      {
-                        border: [false, true, false, false],
-                        text: ''
-                      },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, }
-              },
-              {
-                margin: [20, 10, 20, 0],
-                table: {
-                  headerRows: 1,
-                  widths: [30, 40, 30, 40, 60, 70, 40, 35, 40, 42, 60],
-                  body: [
-                    [
-                      { text: 'OT', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Maquina', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Item', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Material', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Operario', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'No_Conformidad', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Cantidad', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Impreso', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Area', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Fecha', fillColor: '#bbb', fontSize: 9 },
-                      { text: 'Observacion', fillColor: '#bbb', fontSize: 9 },
-                    ],
-                  ]
-                },
-                layout: { defaultBorder: false, },
-              }
-            ];
-          },
-          content : [
-            this.table(this.datosPdf, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Impreso', 'Area', 'Fecha', 'Observacion']),
-          ],
-          styles: {
-            header: { fontSize: 10, bold: true },
-            texto: { fontSize: 9, },
-            titulo: { fontSize: 20, bold: true }
-          }
-        }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
-        this.cargando = false;
-        break;
-      }
-    }, () => this.mensajeService.mensajeError(`Error`,`¡Error al consultar la información del último registro!`));
-  }
-
-  // Funcion que va a consultar los datos de desperdicio
-  llenarDatosPdf(){
-    this.datosPdf = [];
-    this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
-      for (let i = 0; i < datos_desperdicios.length; i++) {
-        let info : any = {
-          OT : datos_desperdicios[i].desp_OT,
-          Maquina : datos_desperdicios[i].actv_Serial,
-          Item : datos_desperdicios[i].prod_Id,
-          Material : datos_desperdicios[i].material_Nombre,
-          Operario : datos_desperdicios[i].usua_Nombre,
-          No_Conformidad : datos_desperdicios[i].falla_Nombre,
-          Cantidad : this.formatonumeros(datos_desperdicios[i].desp_PesoKg.toFixed()),
-          Impreso : datos_desperdicios[i].desp_Impresion,
-          Observacion : datos_desperdicios[i].desp_Observacion,
-          Fecha : datos_desperdicios[i].desp_Fecha.replace('T00:00:00', ''),
-          Area : datos_desperdicios[i].proceso_Nombre,
-        }
-        this.datosPdf.push(info);
-      }
-      setTimeout(() => this.crearPdf(), 2000);
-    }, () => this.mensajeService.mensajeError(`Error`, `¡Error al consultar la información del último registro!`));
-  }
-
-  // Funcion que se encagará de llenar la tabla del pdf
-  buildTableBody(data, columns) {
-    var body = [];
-    data.forEach(function(row) {
-      var dataRow = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [30, 40, 30, 40, 60, 70, 37, 32, 40, 42, 58],
-        body: this.buildTableBody(data, columns),
-      },
-      fontSize: 8,
-    };
-  }
-
-  // Funcion que va a quitar un desperdicio de la tabla
-  quitarDesperdicio(data: any){
-    data = this.registroSeleccionado;
-    this.onReject();
-    this.grupoDespercios.splice(this.grupoDespercios.findIndex((item) => item.Ot == data.Ot && item.NoConformidad == data.NoConformidad), 1);
-    this.mensajeService.mensajeConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
-  }
-
-  onReject = () => this.messageService.clear('eleccion');
-
-  mostrarEleccion(item : any){
-    this.registroSeleccionado = item;
-    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea eliminar el desperdicio de la tabla?`, sticky: true});
-  }
-
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD
   generarDesperdicio(){
+    console.log(this.FormDesperdicio)
+    console.log(this.FormDesperdicio.value)
     if(!this.FormDesperdicio.valid) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
     else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
     else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);

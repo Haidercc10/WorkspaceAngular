@@ -69,24 +69,18 @@
         </div>
 
         <!-- OPERARIO -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2" id="operario">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="Operario" id="Operario" list="Operarios"  type="text" pInputText (change)="buscarOperario()"/>
-            <datalist id="Operarios">
-              <option value={{item.usua_Id}} *ngFor="let item of operarios">{{item.usua_Nombre}}</option>
-            </datalist>
-            <label for="Operario">Operarios</label>
+              <p-dropdown formControlName="IdOperario" inputId="operario" [autoDisplayFirst]="false" [options]="operarios" optionLabel="usua_Nombre" optionValue="usua_Id" [required]="true" [filter]="true" filterBy="usua_Nombre"></p-dropdown>
+              <label for="operario">Operario</label>
           </span>
         </div>
 
         <!-- NO CONFORMIDAD -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2" id="conformidad">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-            <input formControlName="TipoNoConformidad" id="NoConformidad" list="TipoNoConformidad"  type="text" pInputText (change)="buscarFalla()"/>
-            <datalist id="TipoNoConformidad">
-              <option value={{item.falla_Id}} *ngFor="let item of fallas">{{item.falla_Nombre}}</option>
-            </datalist>
-            <label for="NoConformidad">No Conformidad</label>
+              <p-dropdown formControlName="IdTipoNoConformidad" inputId="NoConformidad" [autoDisplayFirst]="false" [options]="fallas" optionLabel="falla_Nombre" optionValue="falla_Id" [required]="true" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+              <label for="NoConformidad">No Conformidad</label>
           </span>
         </div>
 
@@ -270,23 +264,3 @@
     </div>
   </div>
 </p-card>
-
-<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message" let-desperdicio>
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle font-size-48"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <div class="p-fluid" style="display: flex;">
-        <div class="col-6" style="margin-right: 5px;">
-          <button type="button" pButton (click)="quitarDesperdicio(desperdicio)" icon="pi pi-check" label="Si" class="p-button-success"></button>
-        </div>
-        <div class="col-6">
-          <button type="button" pButton (click)="onReject()" icon="pi pi-database" label="No" class="p-button-secondary"></button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</p-toast>
