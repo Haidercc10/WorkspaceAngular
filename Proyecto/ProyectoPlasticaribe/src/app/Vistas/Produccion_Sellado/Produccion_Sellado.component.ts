@@ -86,6 +86,7 @@ export class Produccion_SelladoComponent implements OnInit {
       maquina: [null],
       saldo: [false],
       proceso: ['SELLA'],
+      mostratDatosProducto: [false],
     });
 
     this.formSellado.get('saldo')?.disable();
@@ -288,7 +289,9 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que limpia los campos del formulario
   limpiarCampos() {
+    let mostratDatosProducto: boolean = this.formSellado.value.mostratDatosProducto;
     this.formSellado.reset();
+    this.formSellado.patchValue({ mostratDatosProducto: mostratDatosProducto }); 
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargando = false;
@@ -393,6 +396,7 @@ export class Produccion_SelladoComponent implements OnInit {
         'operator': operario[0].usua_Nombre,
         'copy': reimpresion == 0 ? false : true,
         'dataTagForClient': datosEtiqueta == '' ? `${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Ancho} X ${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Largo}` : datosEtiqueta,
+        showDataTagForClient: this.formSellado.value.mostratDatosProducto,
       }
       this.svcCrearPDF.createTagProduction(etiqueta);
     }, error => { this.svcMsjs.mensajeError(`Error`, `No fue posible generar la etiqueta, por favor verifique!`) });

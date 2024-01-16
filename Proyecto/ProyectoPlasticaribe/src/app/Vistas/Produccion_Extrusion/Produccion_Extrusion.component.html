@@ -102,6 +102,13 @@
                 <label for="pesoNeto">Neto Kg</label>
             </span>
         </div>
+
+        <!-- MOSTRAR DATOS PRODUCTO -->
+        <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
+            <p-checkbox formControlName="mostratDatosProducto" [binary]="true" inputId="binary" id="saldo" pTooltip="Cuando este campo esté activo no se mostrará en la etiqueta la siguiente información: Ancho, Alto, Fuelle, Calibre y Material" tooltipPosition="top"></p-checkbox>
+            <label for="saldo">Mostrar Datos Etiqueta</label>
+        </div>  
+
         <p-divider></p-divider>
       </div>
 

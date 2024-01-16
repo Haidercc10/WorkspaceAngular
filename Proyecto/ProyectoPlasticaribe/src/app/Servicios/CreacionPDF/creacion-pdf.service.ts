@@ -183,14 +183,14 @@ export class CreacionPdfService {
                     widths: ['auto', '*', 'auto', 'auto'],
                     body: [
                         [
-                            { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center' },
-                            { 
+                            { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center', colSpan: dataTag.showDataTagForClient ? 4 : 1 },
+                            !dataTag.showDataTagForClient ? { 
                                 text: infoTag, 
                                 bold: true, 
                                 fontSize: 9, 
                                 alignment: 'center',
                                 colSpan: 3,
-                            },
+                            } : {},
                             {},
                             {},
                         ]
@@ -276,4 +276,5 @@ export interface modelTagProduction {
     operator?: string;
     copy?: boolean;
     dataTagForClient?: string;
+    showDataTagForClient?: boolean;
 }

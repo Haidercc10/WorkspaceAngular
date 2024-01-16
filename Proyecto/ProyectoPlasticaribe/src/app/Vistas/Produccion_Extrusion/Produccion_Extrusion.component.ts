@@ -78,7 +78,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
       presentacion: [null, Validators.required],
       daipita: [null],
       proceso: [null, Validators.required],
-      anchoProducto: [null]
+      anchoProducto: [null],
+      mostratDatosProducto: [false],
     });
   }
 
@@ -204,7 +205,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   limpiarCampos() {
     this.cargando = false;
+    let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
+    this.formDatosProduccion.patchValue({ mostratDatosProducto: mostratDatosProducto }); 
     this.obtenerTurnos();
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
@@ -495,6 +498,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
           presentationItem2: 'Kg Neto',
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
+          showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
         }
         this.createPDFService.createTagProduction(dataTagProduction);
       });
@@ -522,6 +526,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       productionProcess: proceso,
       showNameBussiness: this.showNameBussiness,
       copy: copy,
+      showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
   }
