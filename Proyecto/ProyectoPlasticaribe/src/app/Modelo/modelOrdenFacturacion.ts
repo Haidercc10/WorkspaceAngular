@@ -6,4 +6,5 @@ export interface modelOrdenFacturacion {
     Fecha: any;
     Hora: string;
     Observacion: string;
+    Estado_Id: number;
 }

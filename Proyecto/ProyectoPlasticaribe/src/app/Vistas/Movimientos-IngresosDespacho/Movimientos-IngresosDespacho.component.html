@@ -80,6 +80,7 @@
       <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'quantity')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ubication')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
     </tr>
@@ -91,6 +92,7 @@
       <th class="text-center" pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
       <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
       <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
+      <th class="text-center" pSortableColumn="ubication"><p-sortIcon field="ubication"></p-sortIcon> Ubicación</th>
       <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
       <th class="text-center" pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
     </tr>
@@ -105,6 +107,7 @@
       <td class="text-center">{{data.quantity | number: '1.2-2'}}</td>
       <td class="text-center">{{data.presentation}}</td>
       <td class="text-center">{{data.process}}</td>
+      <td class="text-center">{{data.ubication}}</td>
       <td class="text-center">{{data.date}}</td>
       <td class="text-center">{{data.hour}}</td>
     </tr>

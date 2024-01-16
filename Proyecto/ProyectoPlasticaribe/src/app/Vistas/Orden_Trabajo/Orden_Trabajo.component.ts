@@ -133,8 +133,8 @@ export class Orden_TrabajoComponent implements OnInit {
   ultimaOT: number = 0;
   ultimaOTApp: number = 0;
   dataBusquedaxItem: any;
-  ultimoItem : number = 0;
-  hora : any = moment().format('HH:mm:ss');
+  ultimoItem: number = 0;
+  hora: any = moment().format('HH:mm:ss');
 
   constructor(private frmBuilderPedExterno: FormBuilder,
     private AppComponent: AppComponent,
@@ -165,7 +165,7 @@ export class Orden_TrabajoComponent implements OnInit {
     private messageService: MessageService,
     private shepherdService: ShepherdService,
     private svcSedes: SedeClienteService,
-    private svcExistencias : ExistenciasProductosService,) {
+    private svcExistencias: ExistenciasProductosService,) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
 
@@ -2423,7 +2423,7 @@ export class Orden_TrabajoComponent implements OnInit {
         heights: (row) => (row) * 3,
         body: [
           [
-            { colSpan: 3, text: `CAPA UNICA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            { colSpan: 3, text: `CAPA UNICA`, alignment: 'center', style: 'titulosTablas' },
             {},
             {}
           ],
@@ -2476,7 +2476,7 @@ export class Orden_TrabajoComponent implements OnInit {
         heights: (row) => (row) * 3,
         body: [
           [
-            { colSpan: 3, text: `CAPA INTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            { colSpan: 3, text: `CAPA INTERNA`, alignment: 'center', style: 'titulosTablas', },
             {},
             {}
           ],
@@ -2529,7 +2529,7 @@ export class Orden_TrabajoComponent implements OnInit {
         heights: (row) => (row) * 3,
         body: [
           [
-            { colSpan: 3, text: `CAPA EXTERNA`, alignment: 'center', fillColor: '#aaaaaa', style: 'titulo', },
+            { colSpan: 3, text: `CAPA EXTERNA`, alignment: 'center', style: 'titulosTablas', },
             {},
             {}
           ],
@@ -2914,7 +2914,7 @@ export class Orden_TrabajoComponent implements OnInit {
       subtitulo: { fontSize: 10, bold: true },
       titulosTablas: {
         border: [false, false, false, false],
-        fillColor: '#aaaaaa',
+        fillColor: '#cccccc',
         alignment: 'center',
         bold: true,
         fontSize: 11
@@ -2961,19 +2961,19 @@ export class Orden_TrabajoComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`¡Advertencia!`, `¡Hay campos vacios en el formulario principal!`);
   }
 
-   // Función que va a crear un nuevo producto.
-  validarNuevoProducto(){
+  // Función que va a crear un nuevo producto.
+  validarNuevoProducto() {
     this.productoService.GetProductsByName(this.FormOrdenTrabajo.value.Nombre_Producto).subscribe(data => {
-      if(data.length > 0) this.msj.mensajeAdvertencia(`El producto ${this.FormOrdenTrabajo.value.Nombre_Producto} ya existe!`); //this.validarDatos();
-    }, error => { this.crearNuevoProducto(); });
+      if (data.length > 0) this.msj.mensajeAdvertencia(`El producto ${this.FormOrdenTrabajo.value.Nombre_Producto} ya existe!`); //this.validarDatos();
+    }, () => this.crearNuevoProducto());
   }
 
   //Función que se encargará de la creación de un nuevo producto
-  crearNuevoProducto(){
+  crearNuevoProducto() {
     let tipoSellado: number = this.FormOrdenTrabajoSellado.value.TipoSellado;
     let formato: number = this.sellado ? this.FormOrdenTrabajoSellado.value.Formato_Sellado : this.FormOrdenTrabajoCorte.value.Formato_Corte;
     this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(data => {
-      let item : modelProducto = {
+      let item: modelProducto = {
         'Prod_Id': this.ultimoItem + 1,
         'Prod_Nombre': this.FormOrdenTrabajo.value.Nombre_Producto,
         'Prod_Descripcion': this.FormOrdenTrabajo.value.Nombre_Producto,
@@ -2998,15 +2998,14 @@ export class Orden_TrabajoComponent implements OnInit {
         'Prod_PesoPaquete': this.FormOrdenTrabajoSellado.value.PesoPaquete,
         'Prod_PrecioDia_Sellado': this.FormOrdenTrabajoSellado.value.PrecioDia,
         'Prod_PrecioNoche_Sellado': this.FormOrdenTrabajoSellado.value.PrecioNoche,
-      } 
-      this.productoService.srvGuardar(item).subscribe(data => { this.crearExistenciaProducto(data); }, 
-      error => { this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`) });
+      }
+      this.productoService.srvGuardar(item).subscribe(data => this.crearExistenciaProducto(data), () => this.msj.mensajeError(`Error`, `No fue posible crear el producto, verifique!`));
     });
   }
 
   // Función que va a crear una nueva existencia de producto.
-  crearExistenciaProducto(data : any) {
-    let existencia : modelExistenciaProductos = {
+  crearExistenciaProducto(data: any) {
+    let existencia: modelExistenciaProductos = {
       'Prod_Id': data.prod_Id,
       'exProd_Id': 0,
       'ExProd_Cantidad': 0,
@@ -3022,8 +3021,8 @@ export class Orden_TrabajoComponent implements OnInit {
       'ExProd_Hora': this.hora,
     }
     this.svcExistencias.srvGuardar(existencia).subscribe(data => {
-      this.FormOrdenTrabajo.patchValue({OT_Id : null, Id_Producto: data.prod_Id }); 
+      this.FormOrdenTrabajo.patchValue({ OT_Id: null, Id_Producto: data.prod_Id });
       this.msj.mensajeConfirmacion(`Confirmación`, `Producto ${data.prod_Nombre} creado con éxito!`);
-    }, error => this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`));
+    }, () => this.msj.mensajeError(`Error`, `No fue posible la existencia del producto, verifique!`));
   }
 }

@@ -266,9 +266,9 @@ export class NominaComponent implements OnInit {
         let info: any = JSON.parse(`{${data[i].replaceAll("'", '"')}}`);
         if (envioZeus.includes(info.EnvioZeus)) {
           info.Fecha = info.Fecha.replace(' 0:00:00', '').replace(' 12:00:00', ''),
-            info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
-            info.Peso = parseFloat(info.Peso.toString().replace(',', '.')),
-            info.Precio = parseFloat(info.Precio.toString().replace(',', '.'));
+          info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
+          info.Peso = parseFloat(info.Peso.toString().replace(',', '.')),
+          info.Precio = parseFloat(info.Precio.toString().replace(',', '.'));
           info.Valor_Total = parseFloat(info.Valor_Total.toString().replace(',', '.'));
           info.Pesado_Entre = parseFloat(info.Pesado_Entre.toString().replace(',', '.'));
           info.Cantidad_Total = parseFloat(info.Cantidad_Total.toString().replace(',', '.'));
@@ -299,11 +299,11 @@ export class NominaComponent implements OnInit {
         info.Ot = parseInt(info.Ot);
         info.Bulto = parseInt(info.Bulto);
         info.Fecha = info.Fecha.toString().replace('12:00:00 a.\u00A0m. ', '');
-        info.Cantidad = parseFloat(info.Cantidad);
-        info.Cantidad_Total = parseFloat(info.Cantidad_Total);
-        info.Peso = parseFloat(info.Peso);
-        info.Precio = parseFloat(info.Precio);
-        info.Valor_Total = parseFloat(info.Valor_Total);
+        info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
+        info.Cantidad_Total = parseFloat(info.Cantidad_Total.toString().replace(',', '.')),
+        info.Peso = parseFloat(info.Peso.toString().replace(',', '.'));
+        info.Precio = parseFloat(info.Precio.toString().replace(',', '.'));
+        info.Valor_Total = parseFloat(info.Valor_Total.toString().replace(',', '.'));
         this.detalladoxBultos.push(info);
         this.detalladoxBultos.sort((a, b) => Number(a.Bulto) - Number(b.Bulto));
         this.detalladoxBultos.sort((a, b) => Number(a.Cedula) - Number(b.Cedula));
@@ -449,6 +449,7 @@ export class NominaComponent implements OnInit {
     let consolidatedInformation: Array<ConsolidateInformation> = this.getConsolidateInformationPDF();
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.subTotalConsolidated());
+    content.push(this.tableDetailsOperatorPDF());
     return content;
   }
 
@@ -522,6 +523,137 @@ export class NominaComponent implements OnInit {
     });
     return body;
   }
+
+  tableDetailsOperatorPDF(): Array<any> {
+    let data: Array<any> = [];
+    let includedOperators: Array<number> = [];
+    let count: number = 0;
+    this.detalladoxBultos.forEach(x => {
+      if (!includedOperators.includes(x.Cedula)) {
+        includedOperators.push(x.Cedula);
+        count++;
+        data.push([
+          {
+            margin: [0, 10],
+            colSpan: 4,
+            table: {
+              headerRows: 1,
+              widths : ['5%', '15%', '65%', '15%'],
+              body: this.tableDetailsOrdersProductionPDF(x.Cedula, count),
+            },
+            fontSize: 9,
+          },{},{},{}
+        ]);
+      }
+    });
+    return data;
+  }
+
+  tableDetailsOrdersProductionPDF(operator: number, countOperator: number){
+    let orderByOperator: Array<any> = this.detalladoxBultos.filter(x => x.Cedula == operator);
+    let includedOrders: Array<number> = [];
+    let count: number = 0;
+    let data: Array<any> = [this.informationOperatorPDF(operator, countOperator)];
+    orderByOperator.forEach(x => {
+      if (!includedOrders.includes(x.Ot)) {
+        includedOrders.push(x.Ot);
+        count++;
+        data.push([
+          {
+            margin: [5, 5],
+            colSpan: 4,
+            table: {
+              headerRows: 1,
+              widths : ['5%', '15%', '15%', '55%', '10%'],
+              body: this.tableDetailsProductionByOrderPDF(x.Ot, orderByOperator, count),
+            },
+            fontSize: 9,
+          },{},{},{}
+        ]);
+      }
+    });
+    return data;
+  }
+
+  informationOperatorPDF(operator: any, countOperator: number){
+    let totalQuantity: number = 0;
+    this.detalladoxBultos.filter(y => y.Cedula == operator).forEach(y => totalQuantity += y.Valor_Total);
+    let dataOperator: Array<any> = this.detalladoxBultos.filter(x => x.Cedula == operator);
+    return [
+      { border: [true, true, true, true], text: countOperator, fillColor: '#ccc', bold: true },
+      { border: [true, true, true, true], text: `${dataOperator[0].Cedula}`, fillColor: '#ccc', bold: true },
+      { border: [true, true, true, true], text: `${dataOperator[0].Operario}`, fillColor: '#ccc', bold: true },
+      { border: [true, true, true, true], text: this.formatNumbers((totalQuantity).toFixed(2)), fillColor: '#ccc', bold: true, alignment: 'right' },
+    ];
+  }
+
+  tableDetailsProductionByOrderPDF(order: number, dataProduction: Array<any>, countOrder: number) {
+    let data: Array<any> = [this.informationOrderPDF(order, countOrder, dataProduction)];
+    data.push([
+      {
+        margin: [5, 5],
+        colSpan: 5,
+        table: {
+          headerRows: 1,
+          widths : ['5%', '20%', '10%', '10%', '5%', '5%', '10%', '8%', '10%', '12%', '5%'],
+          body: this.dataDetailsProductionPDF(order, dataProduction),
+        },
+        fontSize: 9,
+      },{},{},{},{}
+    ]);
+    return data;
+  }
+
+  informationOrderPDF(order: any, countOrder: number, dataProduction){
+    let dataOrder: Array<any> = dataProduction.filter(x => x.Ot == order);
+    return [
+      { border: [true, true, true, false], text: countOrder, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, false], text: `${dataOrder[0].Ot}`, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, false], text: `${dataOrder[0].Referencia}`, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, false], text: `${dataOrder[0].Nombre_Referencia}`, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, false], text: this.formatNumbers((dataOrder.length)), fillColor: '#ddd', bold: true, alignment: 'right' },
+    ];
+  }
+
+  dataDetailsProductionPDF(order: number, dataProduction: Array<any>){
+    let data: Array<any> = [this.titlesDetailsProductionPDF()];
+    let productionByOrder: Array<any> = dataProduction.filter(x => x.Ot == order);
+    let count: number = 0;
+    productionByOrder.forEach(x => {
+      count++;
+      data.push([
+        { border: [false, false, false, false], fontSize: 8, alignment: 'right', text: this.formatNumbers((count)) },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.Fecha.replace(' 0:00:00','') },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.Bulto },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'right', text: this.formatNumbers((x.Cantidad).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.Presentacion },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.Maquina },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'right', text: this.formatNumbers((x.Peso).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.Turno },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'right', text: this.formatNumbers((x.Precio).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'right', text: this.formatNumbers((x.Valor_Total).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 8, alignment: 'center', text: x.EnvioZeus },
+      ]);
+    });
+    return data;
+  }
+
+  titlesDetailsProductionPDF(){
+    return [
+      { border: [true, true, true, true], alignment: 'center', text: `#`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Fecha`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Bulto`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `QTY`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Und`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `MQ`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Peso`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Turno`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Valor`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Total`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Zeus`, fillColor: '#eee', bold: true },
+    ]
+  }
+
 }
 
 interface ConsolidateInformation {

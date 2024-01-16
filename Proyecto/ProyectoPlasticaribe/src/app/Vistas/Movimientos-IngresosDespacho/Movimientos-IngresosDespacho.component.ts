@@ -121,6 +121,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       hour: (data.ent.entRolloProd_Hora).length == 7 ? `0${data.ent.entRolloProd_Hora}` : data.ent.entRolloProd_Hora,
       user: (data.user.usua_Nombre).toString().toUpperCase(),
       process: (data.process.proceso_Nombre).toString().toUpperCase(),
+      ubication: (data.ent.entRolloProd_Observacion).toString().toUpperCase(),
     });
 
     this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
@@ -250,4 +251,5 @@ interface dataDesp {
   hour: string;
   user: string;
   process: string;
+  ubication: string;
 }

@@ -107,7 +107,7 @@ export class MenuLateralComponent implements OnInit {
     this.storage_Nombre = this.AppComponent.storage_Nombre;
     this.ValidarRol = this.AppComponent.storage_Rol;
     this.rolService.srvObtenerListaPorId(this.ValidarRol).subscribe(datos => this.storage_Rol = datos.rolUsu_Nombre);
-    if (['100','121','123456789'].includes(this.storage_Id.toString())) this.getMails();
+    // if (['100','121','123456789'].includes(this.storage_Id.toString())) this.getMails();
   }
 
   aumentarLetra() {

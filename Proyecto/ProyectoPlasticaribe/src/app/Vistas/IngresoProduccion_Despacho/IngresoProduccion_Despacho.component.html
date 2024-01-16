@@ -24,12 +24,40 @@
   <p-tabView>
     <p-tabPanel header="Subir Producción" leftIcon="pi pi-upload">
       <div class="row mb-5">
-          <div class="col-sm-12 col-md-2">
-              <span class="p-float-label">
-                  <input type="text" id="RolloBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="searchProductionByReel()"/>
-                  <label for="Rollo">Rollo Leído</label>
-              </span>
-          </div>
+        <div class="col-sm-12 col-md-2">
+          <span class="p-float-label">
+            <input type="text" id="RolloBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()"/>
+            <label for="Rollo">Rollo Leído</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false" [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"></p-dropdown>
+            <label for="bodegas">Bodega</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false" [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"></p-dropdown>
+            <label for="ubication">Ubicación</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion" [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getCubesBySubUbication()"></p-dropdown>
+            <label for="subUbication">Sub Ubicación</label>
+          </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
+            <label for="cube">Cubos</label>
+          </span>
+        </div>
       </div>
 
       <p-table

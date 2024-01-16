@@ -257,7 +257,8 @@ export class Orden_FacturacionComponent implements OnInit {
       Usua_Id: this.storage_Id,
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
-      Observacion: !this.formDataOrder.value.observation ? '' : this.formDataOrder.value.observation
+      Observacion: !this.formDataOrder.value.observation ? '' : this.formDataOrder.value.observation,
+      Estado_Id: 19
     }
     this.orderFactService.Post(orderFact).subscribe(data => this.saveDetailsOrderFact(data));
   }
@@ -286,7 +287,8 @@ export class Orden_FacturacionComponent implements OnInit {
 
   createPDF(id_OrderFact: number, fact: string) {
     this.dtOrderFactService.GetInformacionOrderFact(id_OrderFact).subscribe(data => {
-      let title: string = `Orden de Facutración N° ${id_OrderFact}`;
+      let title: string = `Orden de Facturación N° ${id_OrderFact}`;
+      title += `${fact.length > 0 ? ` \n Factura N° ${fact}` : ''}`;
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
     }, error => this.msj.mensajeError(error));
