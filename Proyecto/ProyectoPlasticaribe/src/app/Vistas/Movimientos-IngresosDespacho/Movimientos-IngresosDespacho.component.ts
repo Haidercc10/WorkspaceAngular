@@ -101,7 +101,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let orderProduction = this.formFilters.value.orderProduction;
     let item = this.formFilters.value.item;
     
-    if (production != null) route += `production=${document}`;
+    if (production != null) route += `production=${production}`;
     if (orderProduction != null) route.length > 0 ? route += `&orderProduction=${orderProduction}` : route += `orderProduction=${orderProduction}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
     if (route.length > 0) route = `?${route}`;
@@ -110,22 +110,24 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   fillDataProductionIncome(data: any){
-    this.dataSearched.push({
-      orderProduction: data.details.dtEntRolloProd_OT,
-      item: data.product.prod_Id,
-      reference: data.product.prod_Nombre,
-      production: data.detailsProduction.numeroRollo_BagPro,
-      quantity: data.details.dtEntRolloProd_Cantidad,
-      presentation: data.details.undMed_Rollo,
-      date: (data.ent.entRolloProd_Fecha).replace('T00:00:00', ''),
-      hour: (data.ent.entRolloProd_Hora).length == 7 ? `0${data.ent.entRolloProd_Hora}` : data.ent.entRolloProd_Hora,
-      user: (data.user.usua_Nombre).toString().toUpperCase(),
-      process: (data.process.proceso_Nombre).toString().toUpperCase(),
-      ubication: (data.ent.entRolloProd_Observacion).toString().toUpperCase(),
-    });
+    if (!this.dataSearched.map(x => x.production).includes(data.detailsProduction.numeroRollo_BagPro)) {
+      this.dataSearched.push({
+        orderProduction: data.details.dtEntRolloProd_OT,
+        item: data.product.prod_Id,
+        reference: data.product.prod_Nombre,
+        production: data.detailsProduction.numeroRollo_BagPro,
+        quantity: data.details.dtEntRolloProd_Cantidad,
+        presentation: data.details.undMed_Rollo,
+        date: (data.ent.entRolloProd_Fecha).replace('T00:00:00', ''),
+        hour: (data.ent.entRolloProd_Hora).length == 7 ? `0${data.ent.entRolloProd_Hora}` : data.ent.entRolloProd_Hora,
+        user: (data.user.usua_Nombre).toString().toUpperCase(),
+        process: (data.process.proceso_Nombre).toString().toUpperCase(),
+        ubication: (data.ent.entRolloProd_Observacion).toString().toUpperCase(),
+      });
 
-    this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
-    this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
+      this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
+      this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
+    }
   }
 
   applyFilter = ($event, campo : any) => this.table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');

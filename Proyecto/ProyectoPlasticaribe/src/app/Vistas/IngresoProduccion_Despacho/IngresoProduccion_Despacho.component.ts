@@ -111,7 +111,6 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   }
 
   validateUbicationSelected() {
-    // if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected) this.searchProductionByReel();
     if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected) this.searchProductionByReel();
     else this.msj.mensajeAdvertencia(`¡Debe llenar los campo para validar la ubicación que tendrá el rollo/bulto!`);
   }
@@ -214,11 +213,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-      this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
-        this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
-          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-      }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
+      this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
+        this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        // this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
+        // });
+      }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
@@ -235,17 +234,18 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-      this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
-        if (['SELLADO', 'Wiketiado'].includes(process)) {
-          this.bagproService.EnvioZeusProcSellado(reel).subscribe(() => {
-            this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-          }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-        } else {
-          this.bagproService.EnvioZeusProcExtrusion(reel).subscribe(() => {
-            this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-          }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-        }
-      }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
+      if (['SELLADO', 'Wiketiado'].includes(process)) {
+        this.bagproService.EnvioZeusProcSellado(reel).subscribe(() => {
+          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
+      } else {
+        this.bagproService.EnvioZeusProcExtrusion(reel).subscribe(() => {
+          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
+      }
+      // this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
+        
+      // }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
@@ -270,7 +270,6 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Usua_Id: this.storage_Id,
       EntRolloProd_Hora: moment().format('H:mm:ss'),
     }
-    this.saveDataDetalleEntrance(1, data)
     this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
       this.load = false;
       this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`);
