@@ -261,14 +261,14 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let ubicationSelected = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
     let ubicationName: string, subUbicationName: string;
-    let cube: string = this.cubeSelected == '' ? `` : `- ${this.cubeSelected.replace('CUBO','C')}`
+    let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO','').replace('P.', '')}`
     if (ubicationSelected.nombreUbicacion == 'ESTANTE') ubicationName = 'EST';
-    else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PLTD';
-    else if (ubicationSelected.nombreUbicacion == 'PASILLO JAULAS') ubicationName = 'PSJ';
+    else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PD';
+    else if (ubicationSelected.nombreUbicacion == 'PASILLO JAULAS') ubicationName = 'PS';
     else if (ubicationSelected.nombreUbicacion == 'PASILLO') ubicationName = 'PS';
     if (subUbicationSelected.nombreSubUbicacion == 'PALO') subUbicationName = 'PL';
     else if (subUbicationSelected.nombreSubUbicacion == 'ESTIBA') subUbicationName = 'ESTB';
-    return `BODEGA ${this.storehouseSelected} - ${ubicationName} ${ubicationSelected.idUbicacion} - ${subUbicationName} ${subUbicationSelected.idSubUbicacion} ${cube}`;
+    return `B${this.storehouseSelected}_${ubicationName}${ubicationSelected.idUbicacion}_${subUbicationName}${subUbicationSelected.idSubUbicacion}${cube}`;
   }
 
   saveDataEntrace(data: any) {
