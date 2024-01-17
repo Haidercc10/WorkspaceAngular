@@ -299,7 +299,7 @@ export class RegistroComponentComponent implements OnInit {
       });
       worksheet.mergeCells('A1:P2');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      datos.forEach(d => {
+      datos.forEach(() => {
       });
       worksheet.getColumn(1).width = 12;
       worksheet.getColumn(2).width = 40;

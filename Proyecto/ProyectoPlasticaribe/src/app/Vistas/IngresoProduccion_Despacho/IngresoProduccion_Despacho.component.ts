@@ -9,6 +9,7 @@ import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/En
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
+import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 
 @Component({
   selector: 'app-IngresoProduccion_Despacho',
@@ -20,6 +21,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
 
   load: boolean = false;
   storage_Id: number;
+  storage_Name: number;
   ValidarRol: number;
   modoSeleccionado: boolean = false;
   sendProductionZeus: any[] = [];
@@ -32,6 +34,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   subUbicationSelected: any;
   cubes: Array<any> = [];
   cubeSelected: any;
+  dataSearched: Array<dataDesp> = [];
 
   constructor(private appComponent: AppComponent,
     private productionProcessSerivce: Produccion_ProcesosService,
@@ -59,6 +62,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
+    this.storage_Name = this.appComponent.storage_Nombre;
   }
 
   focusInput(start: boolean, finish: boolean) {
@@ -111,8 +115,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   }
 
   validateUbicationSelected() {
-    // if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected) this.searchProductionByReel();
-    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected) this.searchProductionByReel();
+    if (this.storehouseSelected && this.ubicationSelected && this.subUbicationSelected && this.cubeSelected != null) this.searchProductionByReel();
     else this.msj.mensajeAdvertencia(`¡Debe llenar los campo para validar la ubicación que tendrá el rollo/bulto!`);
   }
 
@@ -214,11 +217,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-      this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
-        this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
-          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-      }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
+      this.productionProcessSerivce.putSendZeus(reel).subscribe(() => {
+        this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        // this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
+        // });
+      }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
@@ -235,42 +238,46 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     else if (presentation == 'Paquete') presentation = 'PAQ';
     this.saveDataEntrace(data);
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-      this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
-        if (['SELLADO', 'Wiketiado'].includes(process)) {
-          this.bagproService.EnvioZeusProcSellado(reel).subscribe(() => {
-            this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-          }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-        } else {
-          this.bagproService.EnvioZeusProcExtrusion(reel).subscribe(() => {
-            this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
-          }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
-        }
-      }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
+      if (['SELLADO', 'Wiketiado'].includes(process)) {
+        this.bagproService.EnvioZeusProcSellado(reel).subscribe(() => {
+          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
+      } else {
+        this.bagproService.EnvioZeusProcExtrusion(reel).subscribe(() => {
+          this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
+        }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
+      }
+      // this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
+        
+      // }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
-  saveDataEntrace(data: any) {
+  setUbication(): string {
     // let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
     // let cube: string = this.cubeSelected == '' ? `` : `- ${this.cubeSelected}`
     // let ubication: string = `BODEGA ${this.storehouseSelected} - ${this.ubicationSelected} - ${subUbicationSelected.nombreSubUbicacion} ${subUbicationSelected.idSubUbicacion} ${cube}`;
+    
     let ubicationSelected = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
     let ubicationName: string, subUbicationName: string;
-    let cube: string = this.cubeSelected == '' ? `` : `- ${this.cubeSelected.replace('CUBO','C')}`
+    let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO','').replace('P.', '')}`
     if (ubicationSelected.nombreUbicacion == 'ESTANTE') ubicationName = 'EST';
-    else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PLTD';
-    else if (ubicationSelected.nombreUbicacion == 'PASILLO JAULAS') ubicationName = 'PSJ';
+    else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PD';
+    else if (ubicationSelected.nombreUbicacion == 'PASILLO JAULAS') ubicationName = 'PS';
     else if (ubicationSelected.nombreUbicacion == 'PASILLO') ubicationName = 'PS';
     if (subUbicationSelected.nombreSubUbicacion == 'PALO') subUbicationName = 'PL';
     else if (subUbicationSelected.nombreSubUbicacion == 'ESTIBA') subUbicationName = 'ESTB';
-    let ubication: string = `BODEGA ${this.storehouseSelected} - ${ubicationName} ${ubicationSelected.idUbicacion} - ${subUbicationName} ${subUbicationSelected.idSubUbicacion} ${cube}`;
+    return `B${this.storehouseSelected}_${ubicationName}${ubicationSelected.idUbicacion}_${subUbicationName}${subUbicationSelected.idSubUbicacion}${cube}`;
+  }
+
+  saveDataEntrace(data: any) {
     let info: any = {
       EntRolloProd_Fecha: moment().format('YYYY-MM-DD'),
-      EntRolloProd_Observacion: ubication,
+      EntRolloProd_Observacion: this.setUbication(),
       Usua_Id: this.storage_Id,
       EntRolloProd_Hora: moment().format('H:mm:ss'),
     }
-    this.saveDataDetalleEntrance(1, data)
     this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
       this.load = false;
       this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`);
@@ -327,5 +334,191 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   removeProduction(data: any) {
     let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
     this.sendProductionZeus.splice(i, 1);
+  }
+
+  formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+  fillDataProductionIncome() {
+    let count: number = 0;
+    this.sendProductionZeus.forEach(data => {
+      count++;
+      if (!this.dataSearched.map(x => x.production).includes(data.dataExtrusion.numero_RolloBagPro)) {
+        this.dataSearched.push({
+          orderProduction: data.pp.ot,
+          item: data.producto.prod_Id,
+          reference: data.producto.prod_Nombre,
+          production: data.dataExtrusion.numero_RolloBagPro,
+          quantity: data.pp.cantidad,
+          presentation: data.pp.presentacion,
+          date: (data.pp.fecha).replace('T00:00:00', ''),
+          hour: (data.pp.hora).length == 7 ? `0${data.pp.hora}` : data.pp.hora,
+          user: (this.storage_Name).toString().toUpperCase(),
+          process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
+          ubication: (this.setUbication()).toString().toUpperCase(),
+        });
+  
+        this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
+        this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
+      }
+      if (count == this.sendProductionZeus.length) this.createPDF();
+    });
+  }
+
+  createPDF() {
+    this.load = true;
+    let title: string = `Ingresos a despacho`;
+    let content: any[] = this.contentPDF2();
+    this.createPDFService.formatoPDF(title, content);
+    setTimeout(() => this.load = false, 3000);
+  }
+
+  consolidatedInformation(data: Array<dataDesp>): Array<any> {
+    let consolidatedInformation: Array<any> = [];
+    let count: number = 0;
+    data.forEach(prod => {
+      if (!consolidatedInformation.map(x => x.Item).includes(prod.item)) {
+        let cuontProduction: number = data.filter(x => x.item == prod.item).length;
+        let totalQuantity: number = 0;
+        data.filter(x => x.item == prod.item).forEach(x => totalQuantity += x.quantity);
+        count++;
+        consolidatedInformation.push({
+          "#": { text: this.formatNumbers(count), alignment: 'right', fontSize: 8 },
+          "Item": prod.item,
+          "Referencia": prod.reference,
+          "Cant. Rollos": { text: this.formatNumbers((cuontProduction)), alignment: 'right', fontSize: 8 },
+          "Cantidad": { text: this.formatNumbers((totalQuantity).toFixed(2)), alignment: 'right', fontSize: 8 },
+          "Presentación": prod.presentation
+        });
+      }
+    });
+    return consolidatedInformation;
+  }
+
+  contentPDF2(): Array<any> {
+    let content: Array<any> = [];
+    let consolidatedInformation: Array<any> = this.consolidatedInformation(this.dataSearched);
+    content.push(this.fillDataProductsPDF(consolidatedInformation));
+    return content;
+  }
+
+  fillDataProductsPDF(consolidatedInformation: any) {
+    let data: Array<any> = [];
+    let count: number = 0;
+    consolidatedInformation.forEach(prod => {
+      count++;
+      data.push({
+        margin: [0, 5],
+        fontSize: 8,
+        table: {
+          headerRows: 1,
+          widths: ['10%', '10%', '50%', '20%', '10%'],
+          body: this.fillDataOrdersByItemPDF(prod.Item, count),
+        },
+      });
+    });
+    return data;
+  }
+
+  fillDataOrdersByItemPDF(item: any, countItem: number){
+    let ordersByItem: Array<any> = this.dataSearched.filter(x => x.item == item);
+    let count: number = 0;
+    let includedOrders: Array<number> = [];
+    let data: Array<any> = [this.informationItemPDF(item, countItem)];
+    ordersByItem.forEach(prod => {
+      if (!includedOrders.includes(prod.orderProduction)) {
+        count++;
+        includedOrders.push(prod.orderProduction);
+        data.push([
+          {
+            margin: [0, 5],
+            colSpan: 5,
+            fontSize: 8,
+            table: {
+              headerRows: 1,
+              widths: ['25%', '25%', '25%', '25%'],
+              body: this.fillDataProductionyOrderPDF(prod.orderProduction, count),
+            },
+            layout: { defaultBorder: false, },
+          },{},{},{},{}
+        ]);
+      }
+    });
+    return data;
+  }
+
+  informationItemPDF(item: any, countOperator: number){
+    let totalQuantity: number = 0;
+    this.dataSearched.filter(y => y.item == item).forEach(y => totalQuantity += y.quantity);
+    let dataOperator: Array<any> = this.dataSearched.filter(x => x.item == item);
+    return [
+      { border: [true, true, false, true], text: countOperator, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: `${dataOperator[0].item}`, fillColor: '#ccc', bold: true, alignment: 'right' },
+      { border: [false, true, false, true], text: `${dataOperator[0].reference}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: this.formatNumbers((totalQuantity).toFixed(2)), fillColor: '#ccc', bold: true, alignment: 'right' },
+      { border: [false, true, true, true], text: `${dataOperator[0].presentation}`, fillColor: '#ccc', bold: true, alignment: 'right' },
+    ];
+  }
+
+  fillDataProductionyOrderPDF(order: number, countOrder: number) {
+    let widths: Array<string> = ['5%', '10%', '10%', '10%', '15%', '20%', '30%'];
+    let data: Array<any> = [this.informationOrderPDF(order, countOrder)];
+    data.push([
+      {
+        margin: [0, 5],
+        colSpan: 4,
+        table: {
+          widths: widths,
+          headerRows: 1,
+          dontBreakRow: true,
+          body: this.informationProductionPDF(order),
+        },
+        layout: { defaultBorder: false, },
+        fontSize: 7,
+      },{},{},{}
+    ]);
+    return data;
+  }
+
+  informationOrderPDF(order: any, countOrder: number){
+    let totalQuantity: number = 0;
+    this.dataSearched.filter(y => y.orderProduction == order).forEach(y => totalQuantity += y.quantity);
+    let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
+    return [
+      { border: [true, true, true, true], text: countOrder, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, true], text: `OT: ${productionByOrder[0].orderProduction}`, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, true], text: `Cantidad: ${this.formatNumbers((totalQuantity).toFixed(2))}`, fillColor: '#ddd', bold: true, alignment: 'right' },
+      { border: [true, true, true, true], text: `Presentación: ${productionByOrder[0].presentation}`, fillColor: '#ddd', bold: true, alignment: 'right' },
+    ];
+  }
+
+  informationProductionPDF(order: any){
+    let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
+    let data: Array<any> = [this.titlesDetailsProductionPDF()];
+    let count: number = 0;
+    productionByOrder.forEach(x => {
+      count++;
+      data.push([
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: this.formatNumbers((count)) },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: x.production },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: this.formatNumbers((x.quantity).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.presentation },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.process },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${x.date} - ${x.hour}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.ubication },
+      ]);
+    });
+    return data;
+  }
+
+  titlesDetailsProductionPDF(){
+    return [
+      { border: [true, true, true, true], alignment: 'center', text: `#`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Rollo`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Cantidad`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Presentación`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Proceso`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Fecha`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Ubicación`, fillColor: '#eee', bold: true },
+    ]
   }
 }

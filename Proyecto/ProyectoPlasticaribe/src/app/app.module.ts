@@ -69,6 +69,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { TreeTableModule } from 'primeng/treetable';
+import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 import { VirtualScrollerModule } from 'primeng/virtualscroller';
 import { MaterialExampleModule } from '../material.module';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
@@ -80,9 +81,11 @@ import { CertificadoCalidadComponent } from './Vistas/Certificado-Calidad/Certif
 import { ControlCalidadComponent } from './Vistas/ControlCalidad/ControlCalidad.component';
 import { ControlCalidad_ExtrusionComponent } from './Vistas/ControlCalidad_Extrusion/ControlCalidad_Extrusion.component';
 import { ControlCalidad_SelladoComponent } from './Vistas/ControlCalidad_Sellado/ControlCalidad_Sellado.component';
+import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_PaginaWeb.component';
 import { Costos_CajaMenorComponent } from './Vistas/Costos_CajaMenor/Costos_CajaMenor.component';
 import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.component';
 import { CrearTipoSalida_CajaMenorComponent } from './Vistas/CrearTipoSalida_CajaMenor/CrearTipoSalida_CajaMenor.component';
+import { Crear_ConceptosComponent } from './Vistas/Crear_Conceptos/Crear_Conceptos.component';
 import { DashBoardRecaudosComponent } from './Vistas/DashBoard-Recaudos/DashBoard-Recaudos.component';
 import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
@@ -93,8 +96,10 @@ import { Dashboard_CostosComponent } from './Vistas/Dashboard_Costos/Dashboard_C
 import { Dashboard_CuentasPagarComponent } from './Vistas/Dashboard_CuentasPagar/Dashboard_CuentasPagar.component';
 import { Dashboard_GeneralComponent } from './Vistas/Dashboard_General/Dashboard_General.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
+import { Devolucion_OrdenFacturacionComponent } from './Vistas/Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
+import { EliminarRollos_ProduccionComponent } from './Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { Facturas_Invergoal_InversuezComponent } from './Vistas/Facturas_Invergoal_Inversuez/Facturas_Invergoal_Inversuez.component';
@@ -104,6 +109,7 @@ import { Gestion_VistasComponent } from './Vistas/Gestion_Vistas/Gestion_Vistas.
 import { Gestionar_Facturas_Invergoal_InversuezComponent } from './Vistas/Gestionar_Facturas_Invergoal_Inversuez/Gestionar_Facturas_Invergoal_Inversuez.component';
 import { Informe_ConsumosComponent } from './Vistas/Informe_Consumos/Informe_Consumos.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
+import { IngresoProduccion_DespachoComponent } from './Vistas/IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
 import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
 import { Ingreso_NominaComponent } from './Vistas/Ingreso_Nomina/Ingreso_Nomina.component';
 import { Ingreso_Rollos_ExtrusionComponent } from './Vistas/Ingreso_Rollos_Extrusion/Ingreso_Rollos_Extrusion.component';
@@ -115,16 +121,24 @@ import { Kardex_MateriasPrimasComponent } from './Vistas/Kardex_MateriasPrimas/K
 import { Mantenimiento_CamionesComponent } from './Vistas/Mantenimiento_Camiones/Mantenimiento_Camiones.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
+import { MovimientosIngresosDespachoComponent } from './Vistas/Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
+import { MovimientosOrdenFacturacionComponent } from './Vistas/Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
+import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Movimientos_Despacho.component';
 import { Movimientos_MantenimientoComponent } from './Vistas/Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
+import { Movimientos_PreIngresoProduccionComponent } from './Vistas/Movimientos_PreIngresoProduccion/Movimientos_PreIngresoProduccion.component';
 import { Movimientos_SolicitudRollosComponent } from './Vistas/Movimientos_SolicitudRollos/Movimientos_SolicitudRollos.component';
 import { NominaComponent } from './Vistas/Nomina/Nomina.component';
+import { Orden_FacturacionComponent } from './Vistas/Orden_Facturacion/Orden_Facturacion.component';
 import { Orden_MaquilaComponent } from './Vistas/Orden_Maquila/Orden_Maquila.component';
 import { Orden_TrabajoComponent } from './Vistas/Orden_Trabajo/Orden_Trabajo.component';
 import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component';
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
+import { PreIngresoProduccion_DespachoComponent } from './Vistas/PreIngresoProduccion_Despacho/PreIngresoProduccion_Despacho.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
+import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Produccion_Extrusion.component';
+import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
 import { Recetas_ProductosComponent } from './Vistas/Recetas_Productos/Recetas_Productos.component';
 import { Recibos_CajaComponent } from './Vistas/Recibos_Caja/Recibos_Caja.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
@@ -135,6 +149,7 @@ import { ReporteFacturacion_VendedoresComponent } from './Vistas/ReporteFacturac
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { Reporte_CertificadosCalidadComponent } from './Vistas/Reporte_CertificadosCalidad/Reporte_CertificadosCalidad.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
+import { Reporte_EstadisticasVentasComponent } from './Vistas/Reporte_EstadisticasVentas/Reporte_EstadisticasVentas.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 import { Reporte_InventarioAreasComponent } from './Vistas/Reporte_InventarioAreas/Reporte_InventarioAreas.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
@@ -147,6 +162,7 @@ import { Reporte_SolicitudMpExtrusionComponent } from './Vistas/Reporte_Solicitu
 import { Reporte_SolicitudesMPComponent } from './Vistas/Reporte_SolicitudesMP/Reporte_SolicitudesMP.component';
 import { ReportesConsolidadosComponent } from './Vistas/Reportes-Consolidados/Reportes-Consolidados.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
+import { SalidaProduccion_DespachoComponent } from './Vistas/SalidaProduccion_Despacho/SalidaProduccion_Despacho.component';
 import { SolicitudMateriaPrimaComponent } from './Vistas/Solicitud-Materia-Prima/Solicitud-Materia-Prima.component';
 import { SolicitudMP_ExtrusionComponent } from './Vistas/SolicitudMP_Extrusion/SolicitudMP_Extrusion.component';
 import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bodegas/Solicitud_Rollos_Bodegas.component';
@@ -166,6 +182,7 @@ import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear
 import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
+import { InventarioBodegaDespachoComponent } from './Vistas/inventarioBodegaDespacho/inventarioBodegaDespacho.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
@@ -189,22 +206,6 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Produccion_SelladoComponent } from './Vistas/Produccion_Sellado/Produccion_Sellado.component';
-import { Produccion_ExtrusionComponent } from './Vistas/Produccion_Extrusion/Produccion_Extrusion.component';
-import { Correos_PaginaWebComponent } from './Vistas/Correos_PaginaWeb/Correos_PaginaWeb.component';
-import { IngresoProduccion_DespachoComponent } from './Vistas/IngresoProduccion_Despacho/IngresoProduccion_Despacho.component';
-import { SalidaProduccion_DespachoComponent } from './Vistas/SalidaProduccion_Despacho/SalidaProduccion_Despacho.component';
-import { Movimientos_DespachoComponent } from './Vistas/Movimientos_Despacho/Movimientos_Despacho.component';
-import { Crear_ConceptosComponent } from './Vistas/Crear_Conceptos/Crear_Conceptos.component';
-import { Reporte_EstadisticasVentasComponent } from './Vistas/Reporte_EstadisticasVentas/Reporte_EstadisticasVentas.component';
-import { Orden_FacturacionComponent } from './Vistas/Orden_Facturacion/Orden_Facturacion.component';
-import { MovimientosOrdenFacturacionComponent } from './Vistas/Movimientos-OrdenFacturacion/Movimientos-OrdenFacturacion.component';
-import { Devolucion_OrdenFacturacionComponent } from './Vistas/Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
-import { PreIngresoProduccion_DespachoComponent } from './Vistas/PreIngresoProduccion_Despacho/PreIngresoProduccion_Despacho.component';
-import { Movimientos_PreIngresoProduccionComponent } from './Vistas/Movimientos_PreIngresoProduccion/Movimientos_PreIngresoProduccion.component';
-import { MovimientosIngresosDespachoComponent } from './Vistas/Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
-import { EliminarRollos_ProduccionComponent } from './Vistas/EliminarRollos_Produccion/EliminarRollos_Produccion.component';
-import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
 
 @NgModule({
   declarations: [
@@ -331,7 +332,8 @@ import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
     PreIngresoProduccion_DespachoComponent,
     Movimientos_PreIngresoProduccionComponent,
     MovimientosIngresosDespachoComponent,
-    EliminarRollos_ProduccionComponent
+    EliminarRollos_ProduccionComponent,
+    InventarioBodegaDespachoComponent,
   ],
 
   imports: [
