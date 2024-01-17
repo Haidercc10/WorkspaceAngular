@@ -105,7 +105,7 @@ export class RegistroComponentComponent implements OnInit {
   cargarRoles = () => this.servicioRoles.srvObtenerLista().subscribe(dataRoles => this.arrayRoles = dataRoles);
 
   // Funcion que cargará los estados que pueden tener los usuarios
-  cargarEstados = () => this.servicioEstados.srvObtenerListaEstados().subscribe(data => this.arrayEstados = data.filter(item => item.estado_Nombre == 'Activo' || item.estado_Nombre == 'Inactivo'));
+  cargarEstados = () => this.servicioEstados.srvObtenerListaEstados().subscribe(data => this.arrayEstados = data.filter(item => item.estado_Nombre == 'ACTIVO' || item.estado_Nombre == 'INACTIVO'));
 
   // Funcion que cargará los tipos de usuarios
   cargarTiposUsuarios = () => this.servicioTpUsuarios.srvObtenerLista().subscribe(data => this.arrayTiposUsuarios = data);
@@ -299,7 +299,7 @@ export class RegistroComponentComponent implements OnInit {
       });
       worksheet.mergeCells('A1:P2');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      datos.forEach(d => {
+      datos.forEach(() => {
       });
       worksheet.getColumn(1).width = 12;
       worksheet.getColumn(2).width = 40;
