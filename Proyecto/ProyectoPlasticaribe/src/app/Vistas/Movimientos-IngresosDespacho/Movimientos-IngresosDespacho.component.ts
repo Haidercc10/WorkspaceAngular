@@ -23,14 +23,14 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   selectedMode: boolean = false;
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
-  @ViewChild('table') table : Table | undefined;
+  @ViewChild('table') table: Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private detailsProductionIncomeService: DetallesEntradaRollosService,
     private productsService: ProductoService,
     private msg: MensajesAplicacionService,
-    private createPDFService : CreacionPdfService,) {
+    private createPDFService: CreacionPdfService,) {
 
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
@@ -56,27 +56,27 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     });
   }
 
-  clearFields(){
+  clearFields() {
     this.products = [];
     this.dataSearched = [];
     this.formFilters.reset();
     this.load = false;
   }
 
-  searchProduct(){
-    let nombre : string = this.formFilters.value.reference;
+  searchProduct() {
+    let nombre: string = this.formFilters.value.reference;
     this.productsService.obtenerItemsLike(nombre).subscribe(resp => this.products = resp);
   }
 
-  selectedProduct(){
-    let producto : any = this.formFilters.value.reference;
+  selectedProduct() {
+    let producto: any = this.formFilters.value.reference;
     this.formFilters.patchValue({
-      item : producto,
-      reference : this.products.find(x => x.prod_Id == producto).prod_Nombre
+      item: producto,
+      reference: this.products.find(x => x.prod_Id == producto).prod_Nombre
     });
   }
 
-  searchaDataProductionIncome(){
+  searchaDataProductionIncome() {
     let lastMounth: any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let startDate: any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let endDate: any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
@@ -86,7 +86,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     this.load = true;
     this.dataSearched = [];
     this.table.clear();
-    
+
     this.detailsProductionIncomeService.GetDataProductionIncome(startDate, endDate, route).subscribe(data => {
       data.forEach(dataProduction => this.fillDataProductionIncome(dataProduction));
     }, error => {
@@ -100,7 +100,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let production = this.formFilters.value.production;
     let orderProduction = this.formFilters.value.orderProduction;
     let item = this.formFilters.value.item;
-    
+
     if (production != null) route += `production=${production}`;
     if (orderProduction != null) route.length > 0 ? route += `&orderProduction=${orderProduction}` : route += `orderProduction=${orderProduction}`;
     if (item != null) route.length > 0 ? route += `&item=${item}` : route += `item=${item}`;
@@ -109,7 +109,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     return route;
   }
 
-  fillDataProductionIncome(data: any){
+  fillDataProductionIncome(data: any) {
     if (!this.dataSearched.map(x => x.production).includes(data.detailsProduction.numeroRollo_BagPro)) {
       this.dataSearched.push({
         orderProduction: data.details.dtEntRolloProd_OT,
@@ -130,11 +130,11 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     }
   }
 
-  applyFilter = ($event, campo : any) => this.table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
+  applyFilter = ($event, campo: any) => this.table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  createPDF(){
+  createPDF() {
     this.load = true;
     let title: string = `Ingresos a despacho`;
     let content: any[] = this.contentPDF();
@@ -161,11 +161,11 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         data.filter(x => x.item == prod.item).forEach(x => totalQuantity += x.quantity);
         count++;
         consolidatedInformation.push({
-          "#" : this.formatNumbers(count),
+          "#": { text: this.formatNumbers(count), alignment: 'right', fontSize: 8 },
           "Item": prod.item,
           "Referencia": prod.reference,
-          "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
-          "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
+          "Cant. Rollos": { text: this.formatNumbers((cuontProduction)), alignment: 'right', fontSize: 8 },
+          "Cantidad": { text: this.formatNumbers((totalQuantity).toFixed(2)), alignment: 'right', fontSize: 8 },
           "Presentación": prod.presentation
         });
       }
@@ -179,12 +179,13 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     data.forEach(prod => {
       count++;
       informationProducts.push({
-        "#" : this.formatNumbers(count),
-        "Rollo": prod.production,
-        "Item": prod.item,
+        "#": { text: this.formatNumbers(count), alignment: 'right', fontSize: 7 },
+        "Rollo": { text: prod.production, alignment: 'right', fontSize: 7 },
+        "Item": { text: prod.item, alignment: 'right', fontSize: 7 },
         "Referencia": prod.reference,
-        "Cantidad": this.formatNumbers((prod.quantity).toFixed(2)),
+        "Cantidad": { text: this.formatNumbers((prod.quantity).toFixed(2)), alignment: 'right', fontSize: 7 },
         "Presentación": prod.presentation,
+        "Ubicación": prod.ubication
       });
     });
     return informationProducts;
@@ -198,7 +199,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       table: {
         headerRows: 2,
         widths: widths,
-        body: this.buildTableBody(data, columns, 'Consolidado de producto(s)'),
+        body: this.buildTableBody(data, columns, 'Consolidado de producto(s)', 'COLIDATED'),
       },
       fontSize: 8,
       layout: {
@@ -210,17 +211,17 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['5%', '12%', '12%', '46%', '15%', '10%'];
+    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
+    let widths: Array<string> = ['5%', '7%', '7%', '40%', '8%', '10%', '23%'];
     return {
       margin: [0, 5],
       table: {
         headerRows: 2,
         widths: widths,
         dontBreakRow: true,
-        body: this.buildTableBody(data, columns, 'Rollos Ingresados'),
+        body: this.buildTableBody(data, columns, 'Rollos Ingresados', 'DETAIL'),
       },
-      fontSize: 8,
+      fontSize: 7,
       layout: {
         fillColor: function (rowIndex) {
           return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
@@ -229,20 +230,21 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     };
   }
 
-  buildTableBody(data, columns, title: string) {
+  buildTableBody(data, columns, title: string, type: 'COLIDATED' | 'DETAIL') {
     var body = [];
-    body.push([{colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 } , '', '', '', '', '']);
+    if (type == 'COLIDATED') body.push([{ colSpan: 6, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '']);
+    else body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
+      columns.forEach((column) => dataRow.push(row[column]));
       body.push(dataRow);
     });
     return body;
   }
 }
 
-interface dataDesp {
+export interface dataDesp {
   orderProduction: number;
   item: number;
   reference: string;
