@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { co, s } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -557,7 +556,7 @@ export class ReporteProduccionComponent implements OnInit {
     this.addGroupedInfoExcel(page, data);
   }
 
-  //.Agregar encabezado a la hoja del excel.
+  //.Agregar encabezado de la hoja 2: Reporte de producción consolidado.
   addGroupedHeader(worksheet, font, border, fill) {
     worksheet.addRow([]);
     worksheet.addRow([]);
@@ -572,20 +571,21 @@ export class ReporteProduccionComponent implements OnInit {
     this.stylesGroupedPage(worksheet, concatCells, []);
   }
 
-  //.Agregar información a la hoja del excel.
+  //.Agregar información a la hoja 2: Reporte de producción consolidado.
   addGroupedExcel(worksheet : any, data : any) {
     let formatNumber: Array<number> = [7];
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(d => worksheet.addRow(d));
   }
 
-  //.Agregar información a la hoja del excel.
+  //.Agregar información a la hoja 2: Reporte de producción consolidado.
   addGroupedInfoExcel(worksheet : any, data : any) {
     let formatNumber: Array<number> = [6];
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     data.forEach(d => worksheet.addRow(d));
   }
 
+  //.Información agrupada de la hoja 2: Reporte de producción consolidado.
   groupedInfoExcel(){
     let info : any = [];
     info = this.produccion.reduce((acc, ot) => {
@@ -603,6 +603,7 @@ export class ReporteProduccionComponent implements OnInit {
     return info;
   }
 
+  //.Estilos de la hoja 2: Reporte de producción consolidado..
   stylesGroupedPage(worksheet, concatCells, formatNumber) {
     formatNumber.forEach(i => worksheet.getColumn(i).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
     [1, 2, 5, 6, 7].forEach(x => worksheet.getColumn(x).width = 12);

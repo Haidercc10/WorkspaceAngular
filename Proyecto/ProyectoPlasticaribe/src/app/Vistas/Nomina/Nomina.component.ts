@@ -163,16 +163,18 @@ export class NominaComponent implements OnInit {
     for (let index = 0; index < data.length; index++) {
       let info: any = JSON.parse(`{${data[index].replaceAll("'", '"')}}`);
       info.Cedula = info.Cedula,
-        info.Operario = info.Operario,
-        info.Cargo = 'Operario Sellado',
-        info.PagoTotal = parseFloat(info.PagoTotal.toString().replace(',', '.')),
-        info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
-        info.CantidadTotal = parseFloat(info.CantidadTotal.toString().replace(',', '.')),
-        info.PrecioDia = parseFloat(info.PrecioDia.toString().replace(',', '.')),
-        info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
-        info.detalle = [];
+      info.Operario = info.Operario,
+      info.Cargo = 'Operario Sellado',
+      info.PagoTotal = parseFloat(info.PagoTotal.toString().replace(',', '.')),
+      info.Cantidad = parseFloat(info.Cantidad.toString().replace(',', '.')),
+      info.CantidadTotal = parseFloat(info.CantidadTotal.toString().replace(',', '.')),
+      info.PrecioDia = parseFloat(info.PrecioDia.toString().replace(',', '.')),
+      info.PrecioNoche = parseFloat(info.PrecioNoche.toString().replace(',', '.')),
+      info.detalle = [];
+
 
       array = this.arraySellado.findIndex(item => item.Cedula == info.Cedula);
+      
       if (array >= 0) {
         this.arraySellado[array].detalle.push(info);
         this.arraySellado[array].PagoTotal += parseFloat(info.PagoTotal);

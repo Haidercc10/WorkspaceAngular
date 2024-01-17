@@ -472,9 +472,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   newPdf(){
-    this.servicioDesperdicios.getDesperdicioxOT(126446).subscribe(data => {
-      console.log(data)
-      let title : string = `Reporte de merma de material \nOT N° ${123456}`;
+    this.servicioDesperdicios.getDesperdicioxOT(this.otSeleccionada).subscribe(data => {
+      let title : string = `Reporte de merma de material \nOT N° ${this.otSeleccionada}`;
       let content: any[] = this.contentPDF(data);
       this.svcPDF.formatoPDF(title, content);
     });
@@ -636,5 +635,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   calcularTotal = () => this.arrayConsulta.reduce((acc, item) => acc + item.cant, 0);
+
+  pdfInitial(){
+    if(this.arrayConsulta.length > 0){
+      let title : string = `Reporte de merma de material`;
+      let content: any[] = this.contentPDF(this.arrayConsulta);
+      this.svcPDF.formatoPDF(title, content);
+    }
+  }
 }
 
