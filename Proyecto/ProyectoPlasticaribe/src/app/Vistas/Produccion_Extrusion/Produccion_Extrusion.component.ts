@@ -21,6 +21,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './Produccion_Extrusion.component.html',
   styleUrls: ['./Produccion_Extrusion.component.css']
 })
+
 export class Produccion_ExtrusionComponent implements OnInit {
 
   cargando: boolean = false;
@@ -380,6 +381,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   validarDatos() {
     this.cargando = true;
     this.obtenerTurnos();
+    this.buscraOrdenTrabajo();
     // this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {

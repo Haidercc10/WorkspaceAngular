@@ -158,6 +158,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que valida la entrada del registro
   validarEntrada() {
     this.getPuertoSerial();
+    this.buscarOT();
     this.cargando = true;
     setTimeout(() => {
       if (this.formSellado.valid) {
