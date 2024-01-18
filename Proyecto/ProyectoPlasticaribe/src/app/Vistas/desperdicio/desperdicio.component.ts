@@ -106,7 +106,6 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que cargará el area del usuario logueado
   filtrarArea(){
-    this.cargarPuertosSeriales();
     if (this.ValidarRol == 74) this.area = { id : "EXT", nombre : "Extrusion", };
     else if (this.ValidarRol == 75) this.area = { id :"IMP", nombre : "Impresion", };
     else if (this.ValidarRol == 76) this.area = { id :"ROT", nombre : "Rotograbado", };
@@ -116,6 +115,7 @@ export class DesperdicioComponent implements OnInit {
     else if (this.ValidarRol == 80) this.area = { id :"EMP", nombre : "Empaque", };
     else if (this.ValidarRol == 81) this.area = { id :"SELLA", nombre : "Sellado", };
     else if (this.ValidarRol == 82) this.area = { id :"WIKE", nombre : "Wiketiado", };  
+    else if (this.ValidarRol == 84) this.area = { id :"RECUP", nombre : "Recuperado", };  
     else this.area = { id : "N/A", nombre : "NO APLICA" };
     
     this.FormDesperdicio.patchValue({ IdArea : this.area.id, Area : this.area.nombre.toUpperCase(), });
@@ -174,7 +174,7 @@ export class DesperdicioComponent implements OnInit {
   } 
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
-  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6].includes(x.proceso_Codigo)));
+  obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6,10].includes(x.proceso_Codigo)));
 
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
@@ -404,9 +404,10 @@ export class DesperdicioComponent implements OnInit {
   //Función que carga el turno actual.
   cargarTurnoActual() {
     let proceso : string = this.area.nombre.toUpperCase();
-    if(proceso == 'EMPAQUE' || proceso == 'CORTE') proceso = 'DESP_CORTADORES' 
-    else if (proceso == 'WIKETIADO') proceso = 'DESP_SELLADO' 
-    else if (proceso == 'NO APLICA') proceso = 'DESP_EXTRUSION'
+    if(proceso == 'EMPAQUE' || proceso == 'CORTE') proceso = 'DESP_CORTADORES';
+    else if (proceso == 'WIKETIADO') proceso = 'DESP_SELLADO';
+    else if (proceso == 'NO APLICA') proceso = 'DESP_EXTRUSION';
+    else if (proceso == 'RECUPERADO') proceso = 'DESP_REBOBINAR';
     else proceso = `DESP_${proceso}`;
     
     this.bagProService.GetHorarioProceso(proceso).subscribe(data => { this.FormDesperdicio.patchValue({ Turno: data[0] }); }, 
