@@ -38,8 +38,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  arrayDatosAgrupadosPdf : any = [];
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
+  arrayDesperdicios : any = []; //Array que guardará la información total de los desperdicios consultados.
 
   constructor(private formBuilder : FormBuilder,
                 private servicioMateriales : MaterialProductoService,
@@ -54,8 +54,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       OT : [null],
       Producto : [null],
       productoId : [null],
-      fechaInicio : [null],
-      fechaFinal : [null],
+      RangoFechas : [null],
       Material : [null],
     });
   }
@@ -65,7 +64,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.cargarMateriales();
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    this.newPdf();
+    //this.newPdf();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -118,18 +117,39 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que consultará según los campos de busqueda diferentes de vacio. */
   Consultar() {
+    let fecha : any = this.formFiltros.value.RangoFechas;
+    let fecha1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+    let fecha2 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+    this.arrayConsulta = [];
+    this.arrayDesperdicios = [];
+    this.load = false;
+    let ordenesTrabajo : any = [];
+
+    setTimeout(() => {
+      this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
+        this.arrayDesperdicios = data;
+        if (data.length == 0) {
+          this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
+          this.load = true;
+        } else {
+          for (let i = 0; i < data.length; i++) {
+            if(ordenesTrabajo.indexOf(data[i].ot) == -1) {
+              ordenesTrabajo.push(data[i].ot);
+              this.llenarTabla(data[i]);
+            } 
+          }
+          setTimeout(() => { this.load = true; }, 1000);
+        }
+      });
+    }, 500);
+  }
+
+  //Función que valida la ruta que se utilizará en la consulta en el API.
+  rutaAPI() {
     let OT : any = this.formFiltros.value.OT;
-    let fecha1 : any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
-    let fecha2 : any = moment(this.formFiltros.value.fechaFinal).format('YYYY-MM-DD');
     let material : any = this.formFiltros.value.Material;
     let item : any = this.formFiltros.value.productoId;
-    this.arrayConsulta = [];
     let ruta : string = '';
-
-    if (fecha1 == 'Fecha inválida') fecha1 = null;
-    if (fecha2 == 'Fecha inválida') fecha2 = null;
-    if (fecha1 == null) fecha1 = this.today;
-    if (fecha2 == null) fecha2 = fecha1;
 
     if (OT != null && material != null && item != null) ruta = `?OT=${OT}&material=${material}&item=${item}`;
     else if (OT != null && material != null) ruta = `?OT=${OT}&material=${material}`;
@@ -139,32 +159,29 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     else if (item != null) ruta = `?item=${item}`;
     else if (material != null) ruta = `?material=${material}`;
     else ruta = ``;
-
-    setTimeout(() => {
-      this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-        console.log(dataDesperdicios)
-        if (dataDesperdicios.length == 0) this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
-        else {
-          this.load = false;
-          for (let index = 0; index < dataDesperdicios.length; index++) {
-            this.llenarTabla(dataDesperdicios[index]);
-          }
-          setTimeout(() => {  this.load = true; }, 1000);
-        }
-      });
-    }, 900);
+    console.log(ruta)
+    return ruta;
   }
 
   /** Llenar la tabla inicial de resultados de busqueda */
   llenarTabla(datos : any) {
+    datos.observacion = datos.observacion.replace('Rollo #', '');
+    datos.observacion = datos.observacion.includes('Ext') ? datos.observacion.replace(' en ProcExtrusion Bagpro', '') : datos.observacion.replace(' en ProcDesperdicio Bagpro', '');
     const registro : any = {
       'OT' : datos.ot,
       'Item' : datos.item,
-      'NombreItem' : datos.nombreItem,
-      'NombreMaterial' : datos.material,
+      'Referencia' : datos.referencia,
+      'Material' : datos.material,
       'Impreso' : datos.impreso,
-      'PesoTotal' : datos.pesoTotal,
-      'Presentacion' : 'Kg'
+      'Cantidad' : this.calculateTotalOT(datos.ot),
+      'Presentacion' : 'Kg',
+      'No_Conformidades' : this.calculateNoConformityOT(datos.ot), 
+      'Proceso' : datos.proceso,
+      'Fecha' : datos.fecha.replace('T00:00:00', ''),
+      'Maquina' : datos.maquina,
+      'Operario' : datos.operario,
+      'No_Conformidad' : datos.falla,
+      'Observacion' : datos.observacion,
     }
     this.arrayConsulta.push(registro);
   }
@@ -180,30 +197,33 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       }
       this.pesoTotalDesperdicio();
     });
-
     setTimeout(() => { this.load = true }, 500);
-    setTimeout(() => { this.grupoDatosPdf(); }, 1000);
   }
 
   /** Función para llenar la tabla de modal. */
   llenarModal(datos : any){
+    datos.observacion = datos.observacion.replace('Rollo #', '');
+    datos.observacion = datos.observacion.includes('ProcExtrusion') ? datos.observacion.replace(' en ProcExtrusion Bagpro', '') : datos.observacion.replace(' en ProcDesperdicio Bagpro', '');
     this.dialog = true;
-    this.otSeleccionada = datos.desp_OT;
+    this.otSeleccionada = datos.ot;
 
     const dataCompleta : any = {
-      OT : datos.desp_OT,
-      Item : datos.prod_Id,
-      NombreItem : datos.prod_Nombre,
-      Peso : datos.desp_PesoKg,
-      Cantidad : this.formatonumeros(datos.desp_PesoKg),
-      Und : 'Kg',
-      Proceso : datos.proceso_Nombre,
-      Material : datos.material_Nombre,
-      "No_Conformidad" : datos.falla_Nombre,
-      Impreso : datos.desp_Impresion,
-      Maquina : datos.maquina,
-      Operario : datos.usua_Nombre,
-      Fecha : datos.desp_Fecha.replace('T00:00:00', ''),
+      'OT' : datos.ot,
+      'Bulto' : datos.bulto,
+      'Item' : datos.item,
+      'Referencia' : datos.referencia,
+      'Peso' : datos.cantidad,
+      'Cantidad' : this.formatonumeros(datos.cantidad),
+      'Und' : datos.presentacion,
+      'Proceso' : datos.proceso,
+      'Material' : datos.material,
+      "No_Conformidad" : datos.falla,
+      'No_Conformidades' : this.calculateNoConformityOT(datos.ot),
+      'Impreso' : datos.impreso,
+      'Maquina' : datos.maquina,
+      'Operario' : datos.operario,
+      'Fecha' : datos.fecha.replace('T00:00:00', ''),
+      'Observacion' : datos.observacion,
     }
     this.arrayModal.push(dataCompleta);
   }
@@ -211,6 +231,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Función para limpiar filtros de busqueda */
   limpiarCampos(){
     this.formFiltros.reset();
+    this.arrayConsulta = [];
+    this.arrayModal = [];
+    this.arrayDesperdicios = [];
   }
 
   /** Función que calcula la cantidad total del desperdicio */
@@ -229,202 +252,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     }, 500);
   }
 
-  /** Función que exportará el reporte en PDF */
-  exportarPDF(){
-    let nombre : string = this.storage_Nombre;
-    this.servicioDesperdicios.getDesperdicioxOT(this.otSeleccionada).subscribe(dataDesp => {
-      for (let index = 0; index < dataDesp.length; index++) {
-        const infoPdf : any = {
-          info: {
-            title: `Reporte de desperdicios ${this.today}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
-          footer: function(currentPage : any, pageCount : any) {
-            return [
-              '\n',
-              {
-                columns: [
-                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                ]
-              }
-            ]
-          },
-          watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.05, bold: true, italics: false },
-          content : [
-            {
-              columns: [
-                {
-                  image : logoParaPdf,
-                  width : 220,
-                  height : 50
-                },
-                {
-                  text: `Reporte Merma de Material - OT ${this.otSeleccionada}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: [0, 30, 0, 0],
-                }
-              ]
-            },
-            '\n \n',
-            {
-              style: 'tablaEmpresa',
-              table: {
-                widths: [90, 167, 90, 166],
-                style: 'header',
-                body: [
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${dataDesp[index].empresa_Nombre}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${dataDesp[index].empresa_Ciudad}`
-                    },
-                  ],
-                  [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${dataDesp[index].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${dataDesp[index].empresa_Direccion}`
-                    },
-                  ],
-                ]
-              },
-              layout: {
-                defaultBorder: false,
-              },
-              fontSize: 9,
-            },
-            '\n \n',
-            {
-              text: `Información consolidada de desperdicios\n `,
-              alignment: 'center',
-              style: 'subtitulo'
-            },
-            this.table2(this.arrayDatosAgrupadosPdf, ['OT', 'Item', 'Nombre', 'Proceso', 'No Conformidades', 'Cantidad', 'Presentacion']),
-            '\n',
-            {
-              text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
-              alignment: 'right',
-              style: 'header'
-            },
-            {
-              text: `Información detallada de desperdicios\n `,
-              alignment: 'center',
-              style: 'subtitulo'
-            },
-            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
-            '\n',
-            {
-              text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
-              alignment: 'right',
-              style: 'header'
-            },
-          ],
-          styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            texto: {
-              fontSize: 9,
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            },
-            subtitulo: {
-              fontSize: 14,
-              bold: true
-            }
-
-          }
-
-         }
-         const pdf = pdfMake.createPdf(infoPdf);
-         pdf.open();
-         this.load = true;
-         this.msj.mensajeConfirmacion(`Confirmación`,`PDF generado con éxito!`);
-         break;
-      }
-    });
-  }
-
-  // Funcion que se encagará de llenar la tabla del pd
-  buildTableBody(data, columns) {
-    var body = [];
-    body.push(columns);
-    data.forEach(function(row) {
-      var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
-      body.push(dataRow);
-    });
-
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [30, 32, 30, 30, 80, 80, 35, 15, 35, 40, 45],
-        body: this.buildTableBody(data, columns)
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table2(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [40, 40, 160, 50, 70, 50, 75],
-        body: this.buildTableBody(data, columns)
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
-  }
-
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -436,107 +263,72 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.pesoTotalDesperdicio();
   }
 
-  //Agrupar valores en PDF.
-  grupoDatosPdf(){
-    let arrayGrupoProcesos : any = [];
-    this.arrayDatosAgrupadosPdf = [];
-
-    for (let index = 0; index < this.arrayModal.length; index++) {
-      if(!arrayGrupoProcesos.includes(this.arrayModal[index].Proceso)) {
-        let cantidadKg : number = 0;
-        let cantidadDesperdicios : number = 0;
-        for (let grp = 0; grp < this.arrayModal.length; grp++) {
-          if(this.arrayModal[grp].Proceso == this.arrayModal[index].Proceso) {
-            cantidadKg += this.arrayModal[grp].Peso;
-            cantidadDesperdicios += 1;
-          }
-        }
-        arrayGrupoProcesos.push(this.arrayModal[index].Proceso);
-        this.datosAgrupadosPdf(this.arrayModal[index], cantidadKg, cantidadDesperdicios);
-      }
-    }
-  }
-
-  datosAgrupadosPdf(datos : any, cantidadProceso : number, cantDesperdicios : number) {
-    const info : any = {
-      OT : datos.OT,
-      Item : datos.Item,
-      Nombre : datos.NombreItem,
-      Proceso : datos.Proceso,
-      Cantidad : this.formatonumeros(cantidadProceso),
-      Cantidad2 : cantidadProceso,
-      Presentacion : 'Kg',
-      "No Conformidades" : cantDesperdicios
-    }
-    this.arrayDatosAgrupadosPdf.push(info);
-  }
-
+  // Función para crear tanto el PDF del modal como el consolidado por OT.
   newPdf(){
-    this.servicioDesperdicios.getDesperdicioxOT(this.otSeleccionada).subscribe(data => {
-      let title : string = `Reporte de merma de material \nOT N° ${this.otSeleccionada}`;
-      let content: any[] = this.contentPDF(data);
+    if(this.arrayConsulta.length > 0){
+      this.load = false;
+      let date1 : any = moment(this.formFiltros.value.RangoFechas).format('DD/MM/YYYY'); 
+      let date2 : any = moment(this.formFiltros.value.RangoFechas).format('DD/MM/YYYY');
+
+      if (date1 == 'Fecha inválida') date1 = null;
+      if (date2 == 'Fecha inválida') date2 = null;
+      if (date1 == null) date1 = this.today;
+      if (date2 == null) date2 = date1;
+
+      let title : string = this.dialog ? `Reporte Desperdicios \nOT N° ${this.otSeleccionada}` : `Reporte Desperdicios \n ${date1} a ${date2}`;
+      this.arrayModal = this.arrayModal.filter(item => item.OT == this.otSeleccionada);
+      let content: any[] = this.dialog ? this.contentPDF(this.arrayModal) : this.contentPDF(this.arrayConsulta);
       this.svcPDF.formatoPDF(title, content);
-    });
+      setTimeout(() => { this.load = true; }, 2000); 
+    } else this.msj.mensajeAdvertencia(`Advertencia`, `No hay información para generar el reporte.`);
   }
 
   //Adición de contenido al pdf. 
   contentPDF(data : any) : any {
     let content : any[] = [];
     let groupedInformation : any = this.groupedInfo(data);
-    let detailedInformation : any = this.detailedInfo(data);
-    content.push(this.titleInfoConsolidated());
+    let detailedInformation : any = this.dialog ? this.detailedInfo(data) : this.detailedInfo(this.arrayDesperdicios);
+
     content.push(this.headerTableConsolidated(groupedInformation));
-    content.push(this.titleInfoDetails());
     content.push(this.headerTableDetails(detailedInformation));
     content.push(this.totalInfo());
     return content;
   }
 
-  //Titulo de información consolidada
-  titleInfoConsolidated(){
-    return {
-      text: `Información consolidada de desperdicios\n `,
-      alignment: 'center',
-      style: 'header', 
-      fontSize : 10, 
-      bold : true,
-    };
-  }
 
-  //Encabezado de tabla consolidada
+  //Encabezado de tabla consolidada del PDF
   headerTableConsolidated(data : any) {
-    let columns : any[] = ['OT', 'Item', 'Referencia', 'No Conformidades', 'Cantidad', 'Presentacion'];
-    let widths: Array<string> = ['10%', '10%', '30%', '20%', '10%', '20%'];
+    let columns : any[] = ['N°', 'OT', 'Item', 'Referencia', 'No_Conformidades', 'Cantidad', 'Presentacion'];
+    let widths: Array<string> = ['5%', '10%', '10%', '40%', '15%', '10%', '10%'];
     return {
-      margin: [0, 0, 0, 10],
+      margin: [0, 0, 0, 20],
       borders : 'noBorders',
       table : {
-        headerRows : 1,
+        headerRows : 2,
         widths : widths, 
-        body : this.builderTableBody(data, columns),
+        body : this.builderTableBody(data, columns, 'Información consolidada de desperdicios'),
       },
       fontSize : 8,
       layout : {
         fillColor : function(rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null; 
+          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
         },
       }
     }
   }
 
-  //Información consolidada de la orden agrupada por OT.
+  //Información consolidada de la(s) orden(es) de trabajo agrupada(s) por OT.
   groupedInfo(data : any){
     let info : any = [];
     data.forEach(x => {
-      if(!info.map(y => y.OT).includes(x.desp_OT)) {
-        let countOrders : number = data.filter(x => x.desp_OT == x.desp_OT).length
-        let total : number = data.filter(x => x.desp_OT == x.desp_OT).reduce((acc, item) => acc + item.desp_PesoKg, 0);
+      if(!info.map(y => y.OT).includes(x.OT)) {
         let object : any = {
-          'OT' : x.desp_OT,
-          'Item' : x.prod_Id, 
-          'Referencia' : x.prod_Nombre,
-          'No Conformidades' : countOrders,
-          'Cantidad' : total,
+          'N°' : info.length + 1,
+          'OT' : x.OT,
+          'Item' : x.Item, 
+          'Referencia' : x.Referencia,
+          'No_Conformidades' : x.No_Conformidades,
+          'Cantidad' : this.dialog ? this.calculateTotalOT(x.OT) : x.Cantidad,
           'Presentacion' : 'Kg' 
         }
         info.push(object);
@@ -544,65 +336,55 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     });
     return info;
   }
-  
-   //Titulo de información consolidada
-  titleInfoDetails(){
-    return {
-      text: `Información detallada de desperdicios\n `,
-      alignment: 'center',
-      style: 'header', 
-      fontSize : 10, 
-      bold : true,
-    };
-  }
 
-  //Encabezado de tabla consolidada
+  //Encabezado de tabla consolidada del PDF
   headerTableDetails(data : any) {
-    let columns : any[] = ['OT', 'Item', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Impreso', 'Fecha'];
-    let widths: Array<string> = ['8%','8%','9%','4%','7%','14%','21%','6%','5%','7%','9%'];
+    let columns : any[] = ['N°', 'OT', 'Item', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Impreso', 'Fecha'];
+    let widths: Array<string> = ['3%', '7%','7%','9%','4%','7%','15%','20%','5%','5%','7%','9%'];
     return {
       margin: [0, 0, 0, 0],
       table : {
         widths : widths, 
-        body : this.builderTableBody2(data, columns),
+        body : this.builderTableBody2(data, columns, 'Información consolidada de desperdicios'),
       },
       fontSize : 8,
       layout : {
         fillColor : function(rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null; 
+          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
         },
       }
     }
   }
 
-  //Información detallada 
+  //Información detallada de los desperdicios por bulto en el PDF
   detailedInfo(data : any){
     let info : any = [];
     data.forEach(x => {
       const completeData : any = {
-        'OT' : x.desp_OT,
-        'Item' : x.prod_Id,
-        'NombreItem' : x.prod_Nombre,
-        'Peso' : x.desp_PesoKg,
-        'Cant' : this.formatonumeros(x.desp_PesoKg),
-        'Und' : 'Kg',
-        'Proceso' : x.proceso_Nombre,
-        'Material' : x.material_Nombre,
-        "No_Conformidad" : x.falla_Nombre,
-        'Impreso' : x.desp_Impresion,
-        'Maq' : x.maquina,
-        'Operario' : x.usua_Nombre,
-        'Fecha' : x.desp_Fecha.replace('T00:00:00', ''),
+        'N°' : info.length + 1,
+        'OT' : this.dialog ? x.OT : x.ot,
+        'Item' : this.dialog ? x.Item : x.item,
+        'Referencia' : this.dialog ? x.Referencia : x.referencia,
+        'Cantidad' : this.dialog ? x.Cantidad : x.cantidad,
+        'Cant' : this.dialog ? this.formatonumeros(x.Cantidad) : this.formatonumeros(x.cantidad),
+        'Und' : this.dialog ? x.Und : x.presentacion,
+        'Proceso' : this.dialog ? x.Proceso : x.proceso,
+        'Material' : this.dialog ? x.Material : x.material,
+        "No_Conformidad" : this.dialog ? x.No_Conformidad : x.falla,
+        'Impreso' : this.dialog ? x.Impreso : x.impreso,
+        'Maq' : this.dialog ? x.Maquina : x.maquina,
+        'Operario' : this.dialog ? x.Operario : x.operario,
+        'Fecha' : this.dialog ? x.Fecha.replace('T00:00:00', '') : x.fecha.replace('T00:00:00', ''),
       }
       info.push(completeData);
     });
     return info;
   }
 
-   //Titulo de información consolidada
+   //Cantidad total pesada en desperdicios en el PDF.
   totalInfo(){
     return {
-      text: `Cantidad total: ${this.calcularTotal() }`,
+      text: `\nCantidad total: ${this.dialog ? this.calculateTotalOT(this.otSeleccionada) : this.calculateTotal()} KLS`,
       alignment: 'right',
       style: 'header', 
       fontSize : 10, 
@@ -610,9 +392,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     };
   }
 
-  builderTableBody(data, columns) {
-    console.log(data)
+  //Constructor tabla 1 (Consolidada)
+  builderTableBody(data, columns, tittle) {
     var body = [];
+    body.push([{ colSpan: 7, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}]);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -622,9 +405,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     return body;
   }
 
-  builderTableBody2(data, columns) {
-    console.log(data)
+   //Constructor tabla 1 (Detalles)
+  builderTableBody2(data, columns, tittle) {
     var body = [];
+    body.push([{ colSpan: 12, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -634,14 +418,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     return body;
   }
 
-  calcularTotal = () => this.arrayConsulta.reduce((acc, item) => acc + item.cant, 0);
+  //Función para calcular la cantidad total.
+  calculateTotal = () => this.arrayDesperdicios.reduce((acc, item) => acc + item.cantidad, 0);
 
-  pdfInitial(){
-    if(this.arrayConsulta.length > 0){
-      let title : string = `Reporte de merma de material`;
-      let content: any[] = this.contentPDF(this.arrayConsulta);
-      this.svcPDF.formatoPDF(title, content);
-    }
-  }
+  //Función para calcular la cantidad total por orden de trabajo en el PDF.
+  calculateTotalOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).reduce((acc, item) => acc + item.cantidad, 0);
+
+  //Función para calcular la cantidad total de no conformidades en el PDF.
+  calculateNoConformityOT = (ot : number) => this.arrayDesperdicios.filter(x => x.ot == ot).length;
 }
 

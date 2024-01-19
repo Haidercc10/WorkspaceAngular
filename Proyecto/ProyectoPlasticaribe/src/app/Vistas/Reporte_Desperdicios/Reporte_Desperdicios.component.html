@@ -21,44 +21,38 @@
 </div>
 
 <p-card>
+  <!--Tutorial-->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
     <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="tutorial()" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
   </div>
 
+  <!--Subtitulo 1-->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
+  <!-- Formulario -->
   <form [formGroup]="formFiltros">
     <div class="mb-3" id="formulario">
       <div class="row g-3">
 
         <!-- ID Documento -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
+        <div class="col-sm-12 col-md-6 col-xl-2">
           <span class="p-float-label">
             <p-inputNumber formControlName="OT" id="ordenTrabajo" type="number" [useGrouping]="false"></p-inputNumber>
             <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
-        <!-- Fecha Inicial -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
+        <div class="col-sm-12 col-md-6 col-xl-3">
           <span class="p-float-label">
-            <p-calendar formControlName="fechaInicio" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
+            <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
+            <label for="fecha">Rango de Fechas</label>
           </span>
-        </div>
-
-        <!-- Fecha Final -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
-          </span>
-        </div>
+        </div>  
 
          <!--Item-->
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-3 col-xxl-4">
+        <div class="col-sm-12 col-md-6 col-xl-5">
           <span class="p-float-label">
             <input formControlName="Producto" id="Producto" list="productos" autocomplete="off" type="text" pInputText (keyup)="likeCargarProductos()" (change)="seleccionarProducto()"/>
             <datalist id="productos">
@@ -69,7 +63,7 @@
         </div>
 
         <!-- Material -->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl col-xxl">
+        <div class="col-sm-12 col-md-6 col-xl-2">
           <span class="p-float-label">
             <p-dropdown formControlName="Material" inputId="Material" [autoDisplayFirst]="false" [options]="arrayMateriales" optionValue="material_Id" optionLabel="material_Nombre"></p-dropdown>
             <label for="Material">Material</label>
@@ -78,26 +72,33 @@
       </div>
     </div>
 
-    <!-- BOTONES -->
+    <!-- Botones -->
     <div class="mb-0">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="consultar" type="button" label="Consultar" icon="pi pi-search" (click)="Consultar()"></button>
         <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-        <button pButton class="p-button-danger p-button-outlined" id="pdf" type="button" label="Exportar PDF" icon="pi pi-file-pdf" (click)="newPdf()"></button>
+        <button pButton class="p-button-danger p-button-outlined" id="pdf" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="arrayConsulta.length == 0" (click)="newPdf()"></button>
       </div>
     </div>
   </form>
 
+  <!--Linea-->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!-- Subtitulo 2 -->
   <div class="mb-4">
     <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"> <i class="pi pi-list"></i> Resultados de búsqueda</h4>
   </div>
 
+  <!--Tabla-->
   <div class="mb-3" *ngIf="load">
     <p-table
       #dt
       id="tabla"
       [value]="arrayConsulta"
-      styleClass="p-datatable-gridlines p-datatable-sm"
+      styleClass="p-datatable-sm"
       responsiveLayout="scroll"
       [paginator]="true"
       [rows]="20"
@@ -133,34 +134,38 @@
           <th style="width: 10%;"></th>
         </tr>
         <tr>
-          <th scope="col">OT</th>
-          <th scope="col">Item</th>
-          <th scope="col">Nombre Item</th>
-          <th scope="col">Material</th>
-          <th scope="col">Impreso</th>
-          <th scope="col">Peso Consulta</th>
-          <th scope="col">Presentación</th>
-          <th scope="col" title="Ver detalle de Desperdicio">Ver Detalle</th>
+          <th scope="col" class="text-center">OT</th>
+          <th scope="col" class="text-center">Item</th>
+          <th scope="col" class="text-center">Referencia</th>
+          <th scope="col" class="text-center">Material</th>
+          <th scope="col" class="text-center">No conformidades</th>
+          <th scope="col" class="text-center">Cantidad</th>
+          <th scope="col" class="text-center">Presentación</th>
+          <th scope="col" class="text-center" title="Ver detalle de Desperdicio">Ver Detalle</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-arrayConsulta>
         <tr>
-          <td>{{arrayConsulta.OT}}</td>
-          <td>{{arrayConsulta.Item}}</td>
-          <td>{{arrayConsulta.NombreItem}}</td>
-          <td>{{arrayConsulta.NombreMaterial}}</td>
-          <td>{{arrayConsulta.Impreso}}</td>
-          <td>{{arrayConsulta.PesoTotal | number}}</td>
-          <td>{{arrayConsulta.Presentacion}}</td>
-          <td style="text-align: center;" id="ver"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="consultarOTenTabla(arrayConsulta)" style="width: 30px; height: 30px;"></button></td>
+          <td class="text-center">{{arrayConsulta.OT}}</td>
+          <td class="text-center">{{arrayConsulta.Item}}</td>
+          <td>{{arrayConsulta.Referencia}}</td>
+          <td class="text-center">{{arrayConsulta.Material}}</td>
+          <td class="text-center">{{calculateNoConformityOT(arrayConsulta.OT)}}</td>
+          <td class="text-center">{{arrayConsulta.Cantidad | number}}</td>
+          <td class="text-center">{{arrayConsulta.Presentacion}}</td>
+          <td class="text-center" style="text-align: center;" id="ver"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="consultarOTenTabla(arrayConsulta)" style="width: 30px; height: 30px;"></button></td>
         </tr>
       </ng-template>
     </p-table>
   </div>
 
+  <!--Modal-->
   <p-dialog *ngIf="load" header="OT Nro. {{otSeleccionada}}" [contentStyle]="{'overflow':'visible'}" [(visible)]="dialog" [style]="{width: '85%'}" [modal]="true" >
      <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
       <div class="table-responsive" *ngIf="load">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end" >
+          <button pButton pRipple label="Exportar PDF" (click)="newPdf()" icon="pi pi-upload" class="p-button-danger"></button>
+        </div>
         <p-table
           #dt2
           [resizableColumns]="true"
@@ -178,87 +183,62 @@
           scrollHeight="50rem">
           <ng-template pTemplate="header">
             <tr title="Filtros para realizar busquedas de cada campo">
-              <th>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'OT', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Item', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'NombreItem', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'NombreMaterial', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Impreso', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'Peso', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Und', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'No_Conformidad', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Operario', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proceso', 'contains')" class="w-full">
-              </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Maquina', 'contains')" class="w-full">
-              </th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'OT', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Bulto', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Item', 'contains')" class="w-full"> </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Referencia', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Material', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Impreso', 'contains')" class="w-full"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'Cantidad', 'contains')" class="w-full"> </th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Und', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'No_Conformidad', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Operario', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proceso', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Maquina', 'contains')" class="w-full"></th>
             </tr>
             <tr>
-              <th scope="col">OT</th>
-              <th scope="col">Item</th>
-              <th scope="col">Nombre Item</th>
-              <th scope="col">Material</th>
-              <th scope="col">Impreso</th>
-              <th scope="col">Peso</th>
-              <th scope="col">Und</th>
-              <th scope="col">No Conformidad</th>
-              <th scope="col">Fecha</th>
-              <th scope="col">Operario</th>
-              <th scope="col">Proceso</th>
-              <th scope="col">Maquina</th>
+              <th scope="col" class="text-center">OT</th>
+              <th scope="col" class="text-center">Bulto</th>
+              <th scope="col" class="text-center">Item</th>
+              <th scope="col" class="text-center">Referencia</th>
+              <th scope="col" class="text-center">Material</th>
+              <th scope="col" class="text-center">Impreso</th>
+              <th scope="col" class="text-center">Cantidad</th>
+              <th scope="col" class="text-center">Und</th>
+              <th scope="col" class="text-center">No Conformidad</th>
+              <th scope="col" class="text-center">Fecha</th>
+              <th scope="col" class="text-center">Operario</th>
+              <th scope="col" class="text-center">Proceso</th>
+              <th scope="col" class="text-center">Maquina</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-arrayModal>
             <tr class="font-size-14 centrarTh">
-              <td>{{arrayModal.OT}}</td>
-              <td>{{arrayModal.Item}}</td>
-              <td>{{arrayModal.NombreItem}}</td>
-              <td>{{arrayModal.Material}}</td>
-              <td>{{arrayModal.Impreso}}</td>
-              <td>{{arrayModal.Peso | number}}</td>
-              <td>{{arrayModal.Und}}</td>
-              <td>{{arrayModal.No_Conformidad}}</td>
-              <td>{{arrayModal.Fecha}}</td>
-              <td>{{arrayModal.Operario}}</td>
-              <td>{{arrayModal.Proceso}}</td>
-              <td>{{arrayModal.Maquina}}</td>
+              <td class="text-center">{{arrayModal.OT}}</td>
+              <td class="text-center">{{arrayModal.Observacion}}</td>
+              <td class="text-center">{{arrayModal.Item}}</td>
+              <td>{{arrayModal.Referencia}}</td>
+              <td class="text-center">{{arrayModal.Material}}</td>
+              <td class="text-center">{{arrayModal.Impreso}}</td>
+              <td class="text-center">{{arrayModal.Peso | number}}</td>
+              <td class="text-center">{{arrayModal.Und}}</td>
+              <td class="text-center">{{arrayModal.No_Conformidad}}</td>
+              <td class="text-center">{{arrayModal.Fecha}}</td>
+              <td class="text-center">{{arrayModal.Operario}}</td>
+              <td class="text-center">{{arrayModal.Proceso}}</td>
+              <td class="text-center">{{arrayModal.Maquina}}</td>
             </tr>
           </ng-template>
           <ng-template pTemplate="footer">
             <tr>
-              <td colspan="5" style="text-align: end">Cantidad total desperdicio</td>
-              <td>{{totalDesperdicio | number}} </td>
-              <td>{{"Kg"}}</td>
+              <td colspan="6" style="text-align: end">Cantidad total desperdicio</td>
+              <td class="text-center">{{totalDesperdicio | number}} </td>
+              <td class="text-center">{{"Kg"}}</td>
               <td colspan="5"></td>
             </tr>
           </ng-template>
         </p-table>
-      </div>
-      <br>
-      <div class="d-grid gap-2 justify-content-md-center">
-        <button pButton pRipple label="Exportar PDF" (click)="newPdf()" icon="pi pi-upload" class="p-button-danger"></button>
       </div>
   </p-dialog>
 </p-card>
