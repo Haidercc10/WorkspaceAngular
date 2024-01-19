@@ -159,7 +159,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     else if (item != null) ruta = `?item=${item}`;
     else if (material != null) ruta = `?material=${material}`;
     else ruta = ``;
-    console.log(ruta)
+
     return ruta;
   }
 
@@ -267,14 +267,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   newPdf(){
     if(this.arrayConsulta.length > 0){
       this.load = false;
-      let date1 : any = moment(this.formFiltros.value.RangoFechas).format('DD/MM/YYYY'); 
-      let date2 : any = moment(this.formFiltros.value.RangoFechas).format('DD/MM/YYYY');
-
-      if (date1 == 'Fecha inválida') date1 = null;
-      if (date2 == 'Fecha inválida') date2 = null;
-      if (date1 == null) date1 = this.today;
-      if (date2 == null) date2 = date1;
-
+      let fecha : any = this.formFiltros.value.RangoFechas;
+      let date1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
+      let date2 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       let title : string = this.dialog ? `Reporte Desperdicios \nOT N° ${this.otSeleccionada}` : `Reporte Desperdicios \n ${date1} a ${date2}`;
       this.arrayModal = this.arrayModal.filter(item => item.OT == this.otSeleccionada);
       let content: any[] = this.dialog ? this.contentPDF(this.arrayModal) : this.contentPDF(this.arrayConsulta);
