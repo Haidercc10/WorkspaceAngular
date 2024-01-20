@@ -40,6 +40,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   modoSeleccionado : boolean; //Variable que servirá para cambiar estilos en el modo oscuro/claro
   arrayDesperdicios : any = []; //Array que guardará la información total de los desperdicios consultados.
+  date : any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
 
   constructor(private formBuilder : FormBuilder,
                 private servicioMateriales : MaterialProductoService,
@@ -54,7 +55,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       OT : [null],
       Producto : [null],
       productoId : [null],
-      RangoFechas : [null],
+      RangoFechas : [null, null],
       Material : [null],
     });
   }
@@ -64,7 +65,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.cargarMateriales();
     this.lecturaStorage();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    //this.newPdf();
   }
 
   // Funcion que va a hacer que se inicie el tutorial in-app
@@ -119,7 +119,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   Consultar() {
     let fecha : any = this.formFiltros.value.RangoFechas;
     let fecha1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
-    let fecha2 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+    let fecha2 : any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
     this.arrayConsulta = [];
     this.arrayDesperdicios = [];
     this.load = false;
@@ -234,6 +234,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayConsulta = [];
     this.arrayModal = [];
     this.arrayDesperdicios = [];
+    this.formFiltros.patchValue({ RangoFechas : [new Date(), new Date()] }); 
   }
 
   /** Función que calcula la cantidad total del desperdicio */

@@ -44,9 +44,10 @@
           </span>
         </div>
 
+        <!-- Rango de fechas -->
         <div class="col-sm-12 col-md-6 col-xl-3">
           <span class="p-float-label">
-            <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
+            <p-calendar formControlName="RangoFechas" inputId="fecha" [(ngModel)]="date" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
             <label for="fecha">Rango de Fechas</label>
           </span>
         </div>  
@@ -76,7 +77,7 @@
     <div class="mb-0">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="consultar" type="button" label="Consultar" icon="pi pi-search" (click)="Consultar()"></button>
-        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+        <button pButton class="p-button-secondary" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         <button pButton class="p-button-danger p-button-outlined" id="pdf" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="arrayConsulta.length == 0" (click)="newPdf()"></button>
       </div>
     </div>
