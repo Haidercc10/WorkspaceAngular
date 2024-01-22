@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
@@ -21,6 +22,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './Produccion_Extrusion.component.html',
   styleUrls: ['./Produccion_Extrusion.component.css']
 })
+
 export class Produccion_ExtrusionComponent implements OnInit {
 
   cargando: boolean = false;
@@ -37,6 +39,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   rollosPesados: Array<any> = [];
   datosOrdenTrabajo: Array<any> = [];
   showNameBussiness: boolean = true;
+  @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -75,21 +78,26 @@ export class Produccion_ExtrusionComponent implements OnInit {
       pesoTara: [null, Validators.required],
       pesoBruto: [null, Validators.required],
       pesoNeto: [null, Validators.required],
+      presentacion: [null, Validators.required],
       daipita: [null],
       proceso: [null, Validators.required],
       anchoProducto: [null],
+      mostratDatosProducto: [false],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
     this.getProcess();
+    this.validarProceso();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
-    this.validarProceso();
-    setTimeout(() => this.chargeSerialPorts(), 1000);
+    setTimeout(() => this.buscarPuertos(), 1000);
   }
+
+  //Función que filtra la info de la tabla 
+  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -145,7 +153,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
         this.proceso = this.formDatosProduccion.value.proceso;
         break;
     }
-    this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
+    if (this.ValidarRol != 1) this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
     this.obtenerTurnos();
   }
 
@@ -158,14 +166,21 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   async buscarPuertos() {
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
-    this.chargeDataFromSerialPort(port);
+    try {
+      const port: SerialPort = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(port);
+    } catch (ex) {
+      if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
+      else this.msj.mensajeError(ex);
+    }
   }
 
-  async chargeDataFromSerialPort(port: any) {
-    while (port.readable) {
-      const reader = port.readable.getReader();
+  async chargeDataFromSerialPort(port: SerialPort) {
+    let reader;
+    let keepReading: boolean = true;
+    while (port.readable && keepReading) {
+      reader = port.readable.getReader();
       try {
         while (true) {
           const { value, done } = await reader.read();
@@ -184,6 +199,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        reader.releaseLock();
       }
     }
   }
@@ -194,7 +211,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   limpiarCampos() {
     this.cargando = false;
+    let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
+    this.formDatosProduccion.patchValue({ mostratDatosProducto: mostratDatosProducto }); 
     this.obtenerTurnos();
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
@@ -267,16 +286,15 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validarAnchoCono() {
-    let ancho: any = 0;
+    let ancho: number = 0;
     let ancho1 = this.formDatosProduccion.get('ancho1').value;
     let proceso = this.proceso;
-    console.log(this.formDatosProduccion.value.anchoProducto)
     if (['Empaque', 'Corte', 'Rebobinar'].includes(proceso)) ancho = this.formDatosProduccion.value.anchoProducto;
     else if (['Doblado'].includes(proceso)) {
-      if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
+      if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
       ancho = ancho1 / 2;
     } else {
-      if (ancho1 == 0) ancho1 = this.consultarDatosProducto();
+      if (ancho1 == 0) ancho1 = this.formDatosProduccion.value.anchoProducto;
       ancho = ancho1;
     }
     this.formDatosProduccion.patchValue({
@@ -285,11 +303,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
     });
   }
 
-  async consultarDatosProducto() {
+  consultarDatosProducto() {
     let item = this.formDatosProduccion.get('item').value;
     let datosItem;
     this.productoService.srvObtenerListaPorId(item).subscribe(data => datosItem = data);
-    return await datosItem.prod_Ancho;
+    return datosItem.prod_Ancho;
   }
 
   validarTaraCono(ancho: number): number {
@@ -301,7 +319,6 @@ export class Produccion_ExtrusionComponent implements OnInit {
       if (undExtrusion == 'Plgs') tara = ancho * 2.54 * anchoCono;
       else tara = ancho * anchoCono;
     }
-    console.log(tara)
     return tara;
   }
 
@@ -336,6 +353,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
             anchoProducto: datos.selladoCorte_Ancho,
+            presentacion: datos.presentacion
           });
           this.buscarDatosConoSeleccionado();
         });
@@ -347,7 +365,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.rollosPesados = [];
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
-    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => this.rollosPesados = data, () => this.cargando = false, () => this.cargando = false);
+    this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
+      this.rollosPesados = data;
+      this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
+    }, () => this.cargando = false, () => this.cargando = false);
   }
 
   sumarPesoBruto() {
@@ -363,17 +384,38 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validarDatos() {
-    if (this.datosOrdenTrabajo.length > 0) {
-      if (this.formDatosProduccion.valid) {
-        if (this.formDatosProduccion.value.maquina > 0) {
-          if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
-          else this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
-        } else this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
-      } else this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
-    } else this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+    this.cargando = true;
+    this.obtenerTurnos();
+    this.buscraOrdenTrabajo();
+    // this.buscarPuertos();
+    setTimeout(() => {
+      if (this.datosOrdenTrabajo.length > 0) {
+        if (this.formDatosProduccion.valid) {
+          if (this.formDatosProduccion.value.maquina > 0) {
+            if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
+            else {
+              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
+              this.cargando = false;
+            }
+          } else {
+            this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
+            this.cargando = false;
+          }
+        } else {
+          this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
+          this.cargando = false;
+        }
+      } else {
+        this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
+        this.cargando = false;
+      }
+    }, 3000);
   }
 
   datosProduccion() : modelProduccionProcesos {
+    let presentation = this.formDatosProduccion.value.presentacion;
+    if (presentation == 'Kilo') presentation = 'Kg';
+    else if (presentation == 'Unidad') presentation = 'Und';
     let datos: modelProduccionProcesos = {
       Numero_Rollo: 0,
       OT: this.formDatosProduccion.value.ordenTrabajo,
@@ -390,11 +432,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: 0,
+      Cantidad: presentation == 'Und' ? 1 : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: 0,
-      Presentacion: 'Kg',
+      Presentacion: presentation,
       Proceso_Id: this.validateProcess(),
       Turno_Id: this.formDatosProduccion.value.turno,
       Envio_Zeus: false,
@@ -409,8 +451,16 @@ export class Produccion_ExtrusionComponent implements OnInit {
   guardarProduccion() {
     this.cargando = true;    
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.createTagProduction(res.numero_Rollo, res.Peso_Bruto, res.peso_Neto);
+      // this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
+      this.searchDataTagCreated(res.numero_Rollo);
       this.limpiarCampos();
+      this.formDatosProduccion.patchValue({
+        ordenTrabajo: res.ot,
+        maquina : res.maquina,
+        operario : res.operario1_Id,
+        cono: res.cono_Id,
+      });
+      this.buscraOrdenTrabajo();
       this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
@@ -434,7 +484,35 @@ export class Produccion_ExtrusionComponent implements OnInit {
     return processMapping[proceso] || proceso;
   }
 
-  createTagProduction(code: number, quantity: number, quantity2: number) {
+  searchDataTagCreated(reel: number){
+    this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
+      res.forEach(data => {
+        let dataTagProduction: modelTagProduction = {
+          client: data.clienteNombre.trim(),
+          item: data.clienteItem.trim(),
+          reference: data.clienteItemNombre.trim(),
+          width: data.extancho,
+          height: data.extlargo,
+          bellows: data.extfuelle,
+          und: data.extunidad.trim(),
+          cal: data.calibre,
+          orderProduction: data.ot.trim(),
+          material: data.material.trim(),
+          quantity: data.extBruto,
+          quantity2: data.extnetokg,
+          reel: data.item,
+          presentationItem1: 'Kg Bruto',
+          presentationItem2: 'Kg Neto',
+          productionProcess: data.nomStatus.trim(),
+          showNameBussiness: this.showNameBussiness,
+          showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
+        }
+        this.createPDFService.createTagProduction(dataTagProduction);
+      });
+    });
+  }
+
+  createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
@@ -454,6 +532,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
       presentationItem2: 'Kg Neto',
       productionProcess: proceso,
       showNameBussiness: this.showNameBussiness,
+      copy: copy,
+      showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
   }

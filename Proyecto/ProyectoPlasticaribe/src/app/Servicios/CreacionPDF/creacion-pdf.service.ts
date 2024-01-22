@@ -98,34 +98,34 @@ export class CreacionPdfService {
     }
 
     /* ============================================================== CREATE TAG PRODUCTION ===================================================================== */
-    createTagProduction(dataTag : modelTagProduction){
-        let code : number = dataTag.reel;
-        const pdfDefinition : any = {
+    createTagProduction(dataTag: modelTagProduction) {
+        let code: number = dataTag.reel;
+        const pdfDefinition: any = {
             pageOrientation: 'landscape',
-            info: {title: `Etiqueta ${code}`},
-            pageSize: {width: 188.97640176, height: 377.95280352},
-            pageMargins : [10, 10, 10, 20],
+            info: { title: `Etiqueta ${code}` },
+            pageSize: { width: 188.97640176, height: 377.95280352 },
+            pageMargins: [10, 10, 10, 20],
             footer: this.footerPDF(dataTag.productionProcess, dataTag.operator),
-            content : this.contentPDF(dataTag),
+            content: this.contentPDF(dataTag),
         }
-        let windoeFeatures = `height=189,width=378`;
+        let windoeFeatures = `height=500,width=500`;
         let win = window.open('', 'Print', windoeFeatures);
         pdfMake.createPdf(pdfDefinition).print({}, win);
-        setTimeout(() => win.close(), 3000);
+        setTimeout(() => win.close(), 8000);
     }
 
-    private contentPDF(dataTag : modelTagProduction){
-        return[
+    private contentPDF(dataTag: modelTagProduction) {
+        return [
             {
-                table : {
-                    widths : ['25%', '25%', '50%'],
-                    body : this.contentPrincipalTablePDF(dataTag)
+                table: {
+                    widths: ['25%', '25%', '50%'],
+                    body: this.contentPrincipalTablePDF(dataTag)
                 },
             }
         ]
     }
 
-    private contentPrincipalTablePDF(dataTag : modelTagProduction) : any [] {
+    private contentPrincipalTablePDF(dataTag: modelTagProduction): any[] {
         let content = [];
         if (dataTag.showNameBussiness) content.push(this.infoBussinessPDF(dataTag));
         content.push(this.adictionalInformationTag(dataTag));
@@ -140,54 +140,62 @@ export class CreacionPdfService {
         return content;
     }
 
-    private infoBussinessPDF(dataTag : modelTagProduction) : any [] {
+    private infoBussinessPDF(dataTag: modelTagProduction): any[] {
         return [
-            {text: `PLASTICARIBE S.A.S`, bold: true, fontSize: 10, alignment: 'center', colSpan: 2},
+            { text: `PLASTICARIBE S.A.S`, bold: true, fontSize: 10, alignment: 'center', colSpan: 2 },
             {},
-            {text: `CALLE 42 #52-105 Barranquilla`, bold: true, fontSize: 10, alignment: 'center'}
+            { text: `CALLE 42 #52-105 Barranquilla`, bold: true, fontSize: 10, alignment: 'center' }
         ];
     }
 
-    private adictionalInformationTag(dataTag : modelTagProduction) : any [] {
+    private adictionalInformationTag(dataTag: modelTagProduction): any[] {
         return [
-            {text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 10, alignment: 'center', colSpan: 3},
-            {},
-            {}
-        ];
-    }
-
-    private infoClient(dataTag : modelTagProduction) : any [] {
-        let nameClient : string = (dataTag.client).toUpperCase();
-        let size : number = nameClient.length > 40 ? 10 : 12;
-        return [
-            {text: `Cliente: ${(dataTag.client).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 3},
+            { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 10, alignment: 'center', colSpan: 3 },
             {},
             {}
         ];
     }
 
-    private infoProduct(dataTag : modelTagProduction) : any [] {
-        let reference : string = (dataTag.reference).toUpperCase();
-        let size : number = reference.length > 30 ? 9 : 12;
+    private infoClient(dataTag: modelTagProduction): any[] {
+        let nameClient: string = (dataTag.client).toUpperCase();
+        let size: number = nameClient.length > 40 ? 10 : 12;
         return [
-            {text: `Item: ${(dataTag.item)}`, bold: true, fontSize: 12, alignment: 'left'},
-            {text: `REF: ${(dataTag.reference).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 2},
+            { text: `Cliente: ${(dataTag.client).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 3 },
+            {},
+            {}
+        ];
+    }
+
+    private infoProduct(dataTag: modelTagProduction): any[] {
+        let reference: string = (dataTag.reference).toUpperCase();
+        let size: number = reference.length > 30 ? 9 : 12;
+        return [
+            { text: `Item: ${(dataTag.item)}`, bold: true, fontSize: 12, alignment: 'left' },
+            { text: `REF: ${(dataTag.reference).toUpperCase()}`, bold: true, fontSize: size, alignment: 'left', colSpan: 2 },
             {},
         ];
     }
 
-    private dataOrderProduction(dataTag : modelTagProduction) : any [] {
+    private dataOrderProduction(dataTag: modelTagProduction): any[] {
+        let infoTag: string = `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}  CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}   Material: ${dataTag.material}`;
+        if (dataTag.productionProcess == 'SELLADO') infoTag = `${dataTag.dataTagForClient}      Material: ${dataTag.material}`;
         return [
             {
                 colSpan: 3,
-                table : {
-                    widths : ['auto', '*', 'auto', 'auto'],
-                    body : [
+                table: {
+                    widths: ['auto', '*', 'auto', 'auto'],
+                    body: [
                         [
-                            {text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center'},
-                            {text: `${this.formatNumbers((dataTag.width).toFixed(2))} ${this.formatNumbers((dataTag.bellows).toFixed(2))} ${this.formatNumbers((dataTag.height).toFixed(2))} ${dataTag.und}`, bold: true, fontSize: 9, alignment: 'center'},
-                            {text: `CAL: ${this.formatNumbers((dataTag.cal).toFixed(2))}`, bold: true, fontSize: 9, alignment: 'center'},
-                            {text: `Material: ${dataTag.material}`, bold: true, fontSize: 9, alignment: 'center'},
+                            { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center', colSpan: dataTag.showDataTagForClient ? 4 : 1 },
+                            !dataTag.showDataTagForClient ? { 
+                                text: infoTag, 
+                                bold: true, 
+                                fontSize: 9, 
+                                alignment: 'center',
+                                colSpan: 3,
+                            } : {},
+                            {},
+                            {},
                         ]
                     ]
                 },
@@ -198,15 +206,15 @@ export class CreacionPdfService {
         ];
     }
 
-    private materiaOrderProduction(dataTag : modelTagProduction) : any [] {
+    private materiaOrderProduction(dataTag: modelTagProduction): any[] {
         return [
-            {text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center'},
-            {text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center'},
-            {text: `Rollo: ${dataTag.reel}`, bold: true, fontSize: 10, alignment: 'center'},  
+            { text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center' },
+            { text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center' },
+            { text: `Rollo: ${dataTag.reel}${!dataTag.copy ? '' : '.'}`, bold: true, fontSize: 10, alignment: 'center' },
         ];
     }
 
-    private quantityAndBarcode(dataTag : modelTagProduction){
+    private quantityAndBarcode(dataTag: modelTagProduction) {
         let data = [];
         data.push(this.tableWithQuantity(dataTag.quantity));
         data.push(this.tableWithQuantity(dataTag.quantity2));
@@ -214,36 +222,36 @@ export class CreacionPdfService {
         return data;
     }
 
-    private tableWithQuantity(quantity : number){
-        let size : number = quantity > 999 ? 18 : quantity > 9999 ? 14 : 24;
-        return {text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center'};
+    private tableWithQuantity(quantity: number) {
+        let size: number = quantity > 999 ? 18 : quantity > 9999 ? 14 : 24;
+        return { text: `${this.formatNumbers((quantity).toFixed(2))}`, bold: true, fontSize: size, alignment: 'center' };
     }
 
-    private createBarcode(code : number){
+    private createBarcode(code: number) {
         const imageBarcode = document.createElement('img');
         imageBarcode.id = 'barcode';
         document.body.appendChild(imageBarcode);
-        JsBarcode("#barcode", code.toString(), {format: "CODE128A", displayValue: false, width:5, height:100});
-        let imagePDF = {image : imageBarcode.src, width : 160, height: 40};
+        JsBarcode("#barcode", code.toString(), { format: "CODE128A", displayValue: false, width: 5, height: 100 });
+        let imagePDF = { image: imageBarcode.src, width: 160, height: 40 };
         imageBarcode.remove();
         return imagePDF;
     }
 
-    private adictionalInformation(code : number){
+    private adictionalInformation(code: number) {
         return [
-            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
-            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
-            {text: ``, bold: true, fontSize: 10, alignment: 'center', border : [false, false, false, false]},
+            { text: ``, bold: true, fontSize: 10, alignment: 'center', border: [false, false, false, false] },
+            { text: ``, bold: true, fontSize: 10, alignment: 'center', border: [false, false, false, false] },
+            { text: ``, bold: true, fontSize: 10, alignment: 'center', border: [false, false, false, false] },
         ];
     }
 
-    private footerPDF(productionProcess : 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO', operator? : any){
-        let width : number = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? operator.length > 30 ? 170 : operator.length >= 20 && operator.length < 30 ? 130 : 100 : 0;
-        let operative : string = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? `${operator}` : '';
+    private footerPDF(productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO', operator?: any) {
+        let width: number = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? operator.length > 30 ? 170 : operator.length >= 20 && operator.length < 30 ? 130 : 100 : 0;
+        let operative: string = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? `${operator}` : '';
         return {
-            columns: [ 
+            columns: [
                 { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, },
-                { text: operative, alignment: 'center', fontSize: 8, width : width, bold : true, },
+                { text: operative, alignment: 'center', fontSize: 8, width: width, },
                 { text: productionProcess, alignment: 'center', fontSize: 8 },
             ]
         }
@@ -251,22 +259,25 @@ export class CreacionPdfService {
 }
 
 export interface modelTagProduction {
-    client : string;
-    item : number;
-    reference : string;
-    width : number;
-    height : number;
-    bellows : number;
-    und : string;
-    cal : number;
-    orderProduction : string;
-    material : string;
-    quantity : number;
-    quantity2 : number;
-    reel : number;
-    presentationItem1 : string;
-    presentationItem2 : string;
-    productionProcess : 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO';
-    showNameBussiness? : boolean;
-    operator? : string;
+    client: string;
+    item: number;
+    reference: string;
+    width: number;
+    height: number;
+    bellows: number;
+    und: string;
+    cal: number;
+    orderProduction: string;
+    material: string;
+    quantity: number;
+    quantity2: number;
+    reel: number;
+    presentationItem1: string;
+    presentationItem2: string;
+    productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO';
+    showNameBussiness?: boolean;
+    operator?: string;
+    copy?: boolean;
+    dataTagForClient?: string;
+    showDataTagForClient?: boolean;
 }

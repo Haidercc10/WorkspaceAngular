@@ -1,0 +1,131 @@
+.B0031 {
+    width: auto;
+    min-width: 1000px;
+    max-width: 1300px;
+    height: auto;
+    min-height: 800px;
+    max-height: 900px;
+    border: solid 1px #000;
+    border-radius: 20px;
+    margin: auto;
+}
+
+.stands {
+    border: solid 1px #000;
+    margin: 0 1%;
+    padding: 1%;
+}
+
+.cube {
+    background-color: #5b9bd5;
+    width: 100%;
+    height: 20px;
+    text-align: start;
+    justify-content: center;
+}
+
+.textCube {
+    display: block;
+    width: max-content;
+    height: 100%;
+    background-color: #ff9933;
+    color: #FFF;
+    font-weight: bold;
+    text-align: center;
+}
+
+.B0031_PSJ5,
+.B0031_PS6,
+.B0031_PS7 {
+    border: solid 1px #000;
+    padding: 1%;
+    margin: 0 1%;
+}
+
+.pallets {
+    background-color: #bdd7ee;
+    height: 100px;
+    text-align: end;
+    justify-content: center;
+    border: solid .5px #000;
+}
+
+.textPallets {
+    display: block;
+    height: max-content;
+    background-color: #70ad47;
+    color: #FFF;
+    font-weight: bold;
+    text-align: center;
+}
+
+.B0031_PSJ5_ESTB1,
+.B0031_PSJ5_ESTB2,
+.B0031_PS7_ESTB1 {
+    height: 100px;
+}
+
+.B0031_PSJ5_ESTB3 {
+    height: 60px;
+}
+
+.B0031_PS7_ESTB1,
+.B0031_PS7_ESTB2,
+.B0031_PS7_ESTB3,
+.B0031_PS7_ESTB4 {
+    height: 50px;
+}
+
+.B0031_PS6_ESTB1 {
+    height: 120px;
+}
+
+.B0031_PS6_ESTB2,
+.B0031_PS6_ESTB3 {
+    height: 210px;
+}
+
+.B0031_PSJ5 .B0031_PSJ5_UNKNOWN {
+    height: 80px;
+    margin: auto;
+    background: #cce6f1;
+    border-radius: 0px 0px 0px 50px;
+    border: solid 0.3px #000;
+}
+
+.B0031_PS7_ESTB1, .B0031_PS7_ESTB2 {
+    height: 145px;
+}
+
+.hall {
+    width: 100%;
+    height: 5px;
+    background-color: #c00000;
+    margin: 0 2px;
+}
+
+.whiteSpace {
+    background-color: #0000;
+    height: 95px;
+}
+
+.unknownSpace {
+    background: linear-gradient(180deg, #fff 2%, #4377a8 100%);
+    height: 70px;
+    width: 80%;
+}
+
+.bottom {
+    height: 100px;
+    border: solid 1px #000;
+    margin: 1%;
+}
+
+.B0032 {
+    display: grid;
+    grid-template-columns: repeat(17, 1fr);
+    grid-template-rows: repeat(17);
+    gap: 10px;
+    grid-auto-rows: minmax(100px, auto);
+    background-color: #4377a8;
+}

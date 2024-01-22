@@ -57,7 +57,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   ngOnDestroy(): void {
     this.focusInput(false, true);
   }
-  
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
@@ -95,7 +95,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     });
   }
 
-  getCubesBySubUbication(){
+  getCubesBySubUbication() {
     let dataUbication: any = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     this.storehouseService.GetCubosPorSubUbicacion(this.storehouseSelected, dataUbication.idUbicacion, dataUbication.nombreUbicacion, this.subUbicationSelected).subscribe(data => {
       this.cubes = data;
@@ -126,7 +126,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
       this.bagproService.GetProductionByNumber(production).subscribe(prod => {
-        if (prod.length > 0){
+        if (prod.length > 0) {
           if (!(prod[0].observaciones).toString().startsWith('Rollo #')) this.searchProductionByReelBagPro(prod[0]);
           else {
             let numProduction = prod[0].observaciones.replace('Rollo #', '');
@@ -154,8 +154,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }
   }
 
-  searchProductionByReelBagPro(prod){
-    if (prod.length > 0){
+  searchProductionByReelBagPro(prod) {
+    if (prod.length > 0) {
       this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
         data.forEach(res => {
           this.sendProductionZeus.push({
@@ -167,7 +167,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
               peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
               peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
               maquina: prod[0].maquina,
-              fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00','') : prod[0].fecha.replace('T00:00:00',''),
+              fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
               hora: prod[0].hora,
             },
             producto: {
@@ -225,7 +225,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
 
-  updateProductionZeusByBagPro(data: any){
+  updateProductionZeusByBagPro(data: any) {
     let process: string = data.proceso.proceso_Nombre;
     let ot: string = data.pp.ot;
     let item: string = data.producto.prod_Id;
@@ -248,7 +248,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
         }, () => this.msj.mensajeError(`¡Error al cambiar el estado del rollo!`));
       }
       // this.existenciasProductosService.PutExistencia(parseInt(item), presentation, quantity, price).subscribe(() => {
-        
+
       // }, () => this.msj.mensajeError(`¡Error al actualizar las existencias de Plasticaribe!`));
     }, () => this.msj.mensajeError(`¡Error al actualizar el inventario del rollo!`));
   }
@@ -257,11 +257,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     // let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
     // let cube: string = this.cubeSelected == '' ? `` : `- ${this.cubeSelected}`
     // let ubication: string = `BODEGA ${this.storehouseSelected} - ${this.ubicationSelected} - ${subUbicationSelected.nombreSubUbicacion} ${subUbicationSelected.idSubUbicacion} ${cube}`;
-    
+
     let ubicationSelected = this.ubicationsStorehouse.find(x => x.nombreCompleto == this.ubicationSelected);
     let subUbicationSelected = this.subUbicationsStorehouse.find(x => x.idSubUbicacion == this.subUbicationSelected);
     let ubicationName: string, subUbicationName: string;
-    let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO','').replace('P.', '')}`
+    let cube: string = this.cubeSelected == '' ? `` : `_${this.cubeSelected.replace('CUBO', '').replace('P.', '')}`
     if (ubicationSelected.nombreUbicacion == 'ESTANTE') ubicationName = 'EST';
     else if (ubicationSelected.nombreUbicacion == 'PLATAFORMA DINAMICA') ubicationName = 'PD';
     else if (ubicationSelected.nombreUbicacion == 'PASILLO JAULAS') ubicationName = 'PS';
@@ -348,7 +348,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
           item: data.producto.prod_Id,
           reference: data.producto.prod_Nombre,
           production: data.dataExtrusion.numero_RolloBagPro,
-          quantity: data.pp.cantidad,
+          quantity: data.pp.presentacion != 'Kg' ? data.pp.cantidad : data.pp.peso_Bruto,
           presentation: data.pp.presentacion,
           date: (data.pp.fecha).replace('T00:00:00', ''),
           hour: (data.pp.hora).length == 7 ? `0${data.pp.hora}` : data.pp.hora,
@@ -356,7 +356,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
           process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
           ubication: (this.setUbication()).toString().toUpperCase(),
         });
-  
+
         this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
         this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
       }
@@ -419,7 +419,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return data;
   }
 
-  fillDataOrdersByItemPDF(item: any, countItem: number){
+  fillDataOrdersByItemPDF(item: any, countItem: number) {
     let ordersByItem: Array<any> = this.dataSearched.filter(x => x.item == item);
     let count: number = 0;
     let includedOrders: Array<number> = [];
@@ -439,14 +439,14 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
               body: this.fillDataProductionyOrderPDF(prod.orderProduction, count),
             },
             layout: { defaultBorder: false, },
-          },{},{},{},{}
+          }, {}, {}, {}, {}
         ]);
       }
     });
     return data;
   }
 
-  informationItemPDF(item: any, countOperator: number){
+  informationItemPDF(item: any, countOperator: number) {
     let totalQuantity: number = 0;
     this.dataSearched.filter(y => y.item == item).forEach(y => totalQuantity += y.quantity);
     let dataOperator: Array<any> = this.dataSearched.filter(x => x.item == item);
@@ -474,12 +474,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
         },
         layout: { defaultBorder: false, },
         fontSize: 7,
-      },{},{},{}
+      }, {}, {}, {}
     ]);
     return data;
   }
 
-  informationOrderPDF(order: any, countOrder: number){
+  informationOrderPDF(order: any, countOrder: number) {
     let totalQuantity: number = 0;
     this.dataSearched.filter(y => y.orderProduction == order).forEach(y => totalQuantity += y.quantity);
     let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
@@ -491,7 +491,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     ];
   }
 
-  informationProductionPDF(order: any){
+  informationProductionPDF(order: any) {
     let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
     let data: Array<any> = [this.titlesDetailsProductionPDF()];
     let count: number = 0;
@@ -510,7 +510,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return data;
   }
 
-  titlesDetailsProductionPDF(){
+  titlesDetailsProductionPDF() {
     return [
       { border: [true, true, true, true], alignment: 'center', text: `#`, fillColor: '#eee', bold: true },
       { border: [true, true, true, true], alignment: 'center', text: `Rollo`, fillColor: '#eee', bold: true },

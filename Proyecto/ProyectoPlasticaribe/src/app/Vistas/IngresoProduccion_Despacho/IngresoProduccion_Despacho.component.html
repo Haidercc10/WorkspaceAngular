@@ -89,7 +89,7 @@
             <th class="text-center">Hora</th>
             <th class="text-center">Turno</th>
             <th class="text-center">Proceso</th>
-            <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th>
+            <!-- <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th> -->
             <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
           </tr>
         </ng-template>
@@ -107,9 +107,9 @@
             <td class="text-center">{{data.pp.hora}}</td>
             <td class="text-center">{{data.turno.turno_Nombre}}</td>
             <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
-            <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+            <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
-            </td>
+            </td> -->
             <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
             </td>

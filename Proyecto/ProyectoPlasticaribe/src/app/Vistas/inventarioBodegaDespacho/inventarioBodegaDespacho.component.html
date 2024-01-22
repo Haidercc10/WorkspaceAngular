@@ -1,0 +1,202 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+
+<p-card>
+    <div class="mb-4">
+      <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Inventario Despacho</h4>
+    </div>
+
+    <p-tabView>
+        <p-tabPanel header="Bodega 0031" leftIcon="pi pi-th-large">
+            <div class="B0031">
+                <div class="row g-4 px-5 my-2">
+                    <div class="col-md-4">
+                        <div class="B0031_EST1 stands row" pTooltip="ESTANTE 1" tooltipPosition="top">
+                            <div class="B0031_EST1_PL1 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST1_PL1_A" pTooltip="PALO 1 CUBO A"><span class="textCube">P1.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL1_B" pTooltip="PALO 1 CUBO B"><span class="textCube">P1.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL1_C" pTooltip="PALO 1 CUBO C"><span class="textCube">P1.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST1_PL2 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST1_PL2_A" pTooltip="PALO 2 CUBO A"><span class="textCube">P2.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL2_B" pTooltip="PALO 2 CUBO B"><span class="textCube">P2.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL2_C" pTooltip="PALO 2 CUBO C"><span class="textCube">P2.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST1_PL3 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST1_PL3_A" pTooltip="PALO 3 CUBO A"><span class="textCube">P3.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL3_B" pTooltip="PALO 3 CUBO B"><span class="textCube">P3.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST1_PL3_C" pTooltip="PALO 3 CUBO C"><span class="textCube">P3.C</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="B0031_PSJ5 row" pTooltip="PASILLO JAULAS 5" tooltipPosition="top">
+                            <div class="col-md-2 pallets B0031_PSJ5_ESTB1" id="B0031_PSJ5_ESTB1"><span class="textPallets">ESTB 1</span></div>
+                            <div class="col-md-8"></div>
+                            <div class="col-md-2 B0031_PSJ5_UNKNOWN"></div>
+                        </div>
+                        
+                        <div class="B0031_EST2 stands row" pTooltip="ESTANTE 2" tooltipPosition="top">
+                            <div class="B0031_EST2_PL1 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST2_PL1_A" pTooltip="PALO 1 CUBO A"><span class="textCube">P1.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL1_B" pTooltip="PALO 1 CUBO B"><span class="textCube">P1.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL1_C" pTooltip="PALO 1 CUBO C"><span class="textCube">P1.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST2_PL2 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST2_PL2_A" pTooltip="PALO 2 CUBO A"><span class="textCube">P2.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL2_B" pTooltip="PALO 2 CUBO B"><span class="textCube">P2.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL2_C" pTooltip="PALO 2 CUBO C"><span class="textCube">P2.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST2_PL3 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST2_PL3_A" pTooltip="PALO 3 CUBO A"><span class="textCube">P3.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL3_B" pTooltip="PALO 3 CUBO B"><span class="textCube">P3.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST2_PL3_C" pTooltip="PALO 3 CUBO C"><span class="textCube">P3.C</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hall"></div>
+                        
+                        <div class="B0031_EST3 stands row" pTooltip="ESTANTE 3" tooltipPosition="top">
+                            <div class="B0031_EST3_PL1 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST3_PL1_A" pTooltip="PALO 1 CUBO A"><span class="textCube">P1.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL1_B" pTooltip="PALO 1 CUBO B"><span class="textCube">P1.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL1_C" pTooltip="PALO 1 CUBO C"><span class="textCube">P1.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST3_PL2 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST3_PL2_A" pTooltip="PALO 2 CUBO A"><span class="textCube">P2.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL2_B" pTooltip="PALO 2 CUBO B"><span class="textCube">P2.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL2_C" pTooltip="PALO 2 CUBO C"><span class="textCube">P2.C</span></div>
+                                </div>
+                            </div>
+                            <div class="B0031_EST3_PL3 col-md-4">
+                                <div class="row g-1">
+                                    <div class="cube col-md-12" id="B0031_EST3_PL3_A" pTooltip="PALO 3 CUBO A"><span class="textCube">P3.A</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL3_B" pTooltip="PALO 3 CUBO B"><span class="textCube">P3.B</span></div>
+                                    <div class="cube col-md-12" id="B0031_EST3_PL3_C" pTooltip="PALO 3 CUBO C"><span class="textCube">P3.C</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="B0031_PSJ5 row" pTooltip="PASILLO JAULAS 5" tooltipPosition="top">
+                            <div class="col-md-2 pallets B0031_PSJ5_ESTB2" id="B0031_PSJ5_ESTB2"><span class="textPallets">ESTB 2</span></div>
+                            <div class="col-md-8"></div>
+                            <div class="col-md-2 B0031_PSJ5_UNKNOWN"></div>
+                        </div>
+
+                        <div class="B0031_EST4_PSJ5 row">
+                            <div class="col-md-5">
+                                <div class="B0031_PSJ5 row" pTooltip="PASILLO JAULAS 5" tooltipPosition="top">
+                                    <div class="col-md-12 pallets B0031_PSJ5_ESTB3" id="B0031_PSJ5_ESTB3"><span class="textPallets">ESTB 3</span></div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="B0031_EST5 stands row" pTooltip="ESTANTE 5" tooltipPosition="top">
+                                    <div class="B0031_EST1_PL1 col-md-12">
+                                        <div class="row g-1">
+                                            <div class="cube col-md-12" id="B0031_EST5_PL1_A" pTooltip="PALO 1 CUBO A"><span class="textCube">P1.A</span></div>
+                                            <div class="cube col-md-12" id="B0031_EST5_PL1_B" pTooltip="PALO 1 CUBO B"><span class="textCube">P1.B</span></div>
+                                            <div class="cube col-md-12" id="B0031_EST5_PL1_C" pTooltip="PALO 1 CUBO C"><span class="textCube">P1.C</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="B0031_PS7 row" pTooltip="PASILLO 7" tooltipPosition="top">
+                            <div class="col-md-12 pallets B0031_PS7_ESTB3" id="B0031_PS7_ESTB3"><span class="textPallets">ESTB 3</span></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-2 whiteSpace"></div>
+                            <div class="col-md-10 unknownSpace"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 whiteSpace"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="B0031_PS7 row" pTooltip="PASILLO 7" tooltipPosition="top">
+                                    <div class="col-md-12 pallets B0031_PS7_ESTB1" id="B0031_PS7_ESTB1"><span class="textPallets">ESTB 1</span></div>
+                                </div>
+                            </div>
+                            <div class="col-md-7 whiteSpace"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 whiteSpace"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="B0031_PS7 row" pTooltip="PASILLO 7" tooltipPosition="top">
+                                    <div class="col-md-12 pallets B0031_PS7_ESTB2" id="B0031_PS7_ESTB2"><span class="textPallets">ESTB 2</span></div>
+                                </div>
+                            </div>
+                            <div class="col-md-7 whiteSpace"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="B0031_PS6 row" pTooltip="PASILLO 6" tooltipPosition="top">
+                            <div class="col-md-12 pallets B0031_PS6_ESTB1" id="B0031_PS6_ESTB1"><span class="textPallets">ESTB 1</span></div>
+                        </div>
+
+                        <div class="hall"></div>
+
+                        <div class="B0031_PS6 row" pTooltip="PASILLO 6" tooltipPosition="top">
+                            <div class="col-md-12 pallets B0031_PS6_ESTB2" id="B0031_PS6_ESTB2"><span class="textPallets">ESTB 2</span></div>
+                        </div>
+                        
+                        <div class="hall"></div>
+
+                        <div class="B0031_PS6 row" pTooltip="PASILLO 6" tooltipPosition="top">
+                            <div class="col-md-12 pallets B0031_PS6_ESTB3" id="B0031_PS6_ESTB3"><span class="textPallets">ESTB 3</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row whiteSpace"></div>
+
+                <div class="row bottom">
+                    <div class="col-md-1 bottomWhiteSpace"></div>
+                    
+                    <div class="col-md-2">
+                        <div class="bottomWhiteSpace"></div>
+                        <div class=""></div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-4"></div>
+                </div>
+            </div>
+        </p-tabPanel>
+        
+        <p-tabPanel header="Bodega 0032" leftIcon="pi pi-box">
+            <div class="B0032">
+                div.
+            </div>
+        </p-tabPanel>
+        
+        <p-tabPanel header="Bodega 0033" leftIcon="pi pi-database">
+        </p-tabPanel>
+    </p-tabView>
+
+</p-card>

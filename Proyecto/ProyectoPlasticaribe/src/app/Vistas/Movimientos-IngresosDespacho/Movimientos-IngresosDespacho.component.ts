@@ -242,6 +242,127 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     });
     return body;
   }
+
+  fillDataProductsPDF(consolidatedInformation: any) {
+    let data: Array<any> = [];
+    let count: number = 0;
+    consolidatedInformation.forEach(prod => {
+      count++;
+      data.push({
+        margin: [0, 5],
+        fontSize: 8,
+        table: {
+          headerRows: 1,
+          widths: ['10%', '10%', '50%', '20%', '10%'],
+          body: this.fillDataOrdersByItemPDF(prod.Item, count),
+        },
+      });
+    });
+    return data;
+  }
+
+  fillDataOrdersByItemPDF(item: any, countItem: number){
+    let ordersByItem: Array<any> = this.dataSearched.filter(x => x.item == item);
+    let count: number = 0;
+    let includedOrders: Array<number> = [];
+    let data: Array<any> = [this.informationItemPDF(item, countItem)];
+    ordersByItem.forEach(prod => {
+      if (!includedOrders.includes(prod.orderProduction)) {
+        count++;
+        includedOrders.push(prod.orderProduction);
+        data.push([
+          {
+            margin: [0, 5],
+            colSpan: 5,
+            fontSize: 8,
+            table: {
+              headerRows: 1,
+              widths: ['25%', '25%', '25%', '25%'],
+              body: this.fillDataProductionyOrderPDF(prod.orderProduction, count),
+            },
+            layout: { defaultBorder: false, },
+          },{},{},{},{}
+        ]);
+      }
+    });
+    return data;
+  }
+
+  informationItemPDF(item: any, countOperator: number){
+    let totalQuantity: number = 0;
+    this.dataSearched.filter(y => y.item == item).forEach(y => totalQuantity += y.quantity);
+    let dataOperator: Array<any> = this.dataSearched.filter(x => x.item == item);
+    return [
+      { border: [true, true, false, true], text: countOperator, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: `${dataOperator[0].item}`, fillColor: '#ccc', bold: true, alignment: 'right' },
+      { border: [false, true, false, true], text: `${dataOperator[0].reference}`, fillColor: '#ccc', bold: true },
+      { border: [false, true, false, true], text: this.formatNumbers((totalQuantity).toFixed(2)), fillColor: '#ccc', bold: true, alignment: 'right' },
+      { border: [false, true, true, true], text: `${dataOperator[0].presentation}`, fillColor: '#ccc', bold: true, alignment: 'right' },
+    ];
+  }
+
+  fillDataProductionyOrderPDF(order: number, countOrder: number) {
+    let widths: Array<string> = ['5%', '10%', '10%', '10%', '15%', '20%', '30%'];
+    let data: Array<any> = [this.informationOrderPDF(order, countOrder)];
+    data.push([
+      {
+        margin: [0, 5],
+        colSpan: 4,
+        table: {
+          widths: widths,
+          headerRows: 1,
+          dontBreakRow: true,
+          body: this.informationProductionPDF(order),
+        },
+        layout: { defaultBorder: false, },
+        fontSize: 7,
+      },{},{},{}
+    ]);
+    return data;
+  }
+
+  informationOrderPDF(order: any, countOrder: number){
+    let totalQuantity: number = 0;
+    this.dataSearched.filter(y => y.orderProduction == order).forEach(y => totalQuantity += y.quantity);
+    let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
+    return [
+      { border: [true, true, true, true], text: countOrder, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, true], text: `OT: ${productionByOrder[0].orderProduction}`, fillColor: '#ddd', bold: true },
+      { border: [true, true, true, true], text: `Cantidad: ${this.formatNumbers((totalQuantity).toFixed(2))}`, fillColor: '#ddd', bold: true, alignment: 'right' },
+      { border: [true, true, true, true], text: `Presentación: ${productionByOrder[0].presentation}`, fillColor: '#ddd', bold: true, alignment: 'right' },
+    ];
+  }
+
+  informationProductionPDF(order: any){
+    let productionByOrder: Array<any> = this.dataSearched.filter(x => x.orderProduction == order);
+    let data: Array<any> = [this.titlesDetailsProductionPDF()];
+    let count: number = 0;
+    productionByOrder.forEach(x => {
+      count++;
+      data.push([
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: this.formatNumbers((count)) },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: x.production },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: this.formatNumbers((x.quantity).toFixed(2)) },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.presentation },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.process },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${x.date} - ${x.hour}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: x.ubication },
+      ]);
+    });
+    return data;
+  }
+
+  titlesDetailsProductionPDF(){
+    return [
+      { border: [true, true, true, true], alignment: 'center', text: `#`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Rollo`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Cantidad`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Presentación`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Proceso`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Fecha`, fillColor: '#eee', bold: true },
+      { border: [true, true, true, true], alignment: 'center', text: `Ubicación`, fillColor: '#eee', bold: true },
+    ]
+  }
 }
 
 export interface dataDesp {

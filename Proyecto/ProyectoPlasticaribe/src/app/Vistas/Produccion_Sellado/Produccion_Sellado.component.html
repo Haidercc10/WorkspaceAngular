@@ -39,7 +39,7 @@
         <!-- Maquina -->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="maquina" id="maq" (onInput)="validarProceso()" type="number" [useGrouping]="false" ></p-inputNumber>
+            <p-inputNumber formControlName="maquina" id="maq" type="number" [useGrouping]="false" (onInput)="validarProceso()"></p-inputNumber>
               <label for="maq">Maquina</label>
           </span>
         </div>
@@ -69,7 +69,7 @@
         <!--Cantidad Kg-->
         <div class="col-sm-12 col-md-6 col-xl-1">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2" ></p-inputNumber>
+            <p-inputNumber formControlName="cantKg" id="cantKg" type="number" [maxFractionDigits]="2" [readonly]="true"></p-inputNumber>
               <label for="cantKg">Cant. Kg</label>
           </span>
         </div>
@@ -90,7 +90,7 @@
           </span>
         </div>-->
 
-        <!-- Proceso -->
+        <!-- Turno -->
         <div class="col-sm-12 col-md-6 col-xl-1 mb-3" >
             <span class="p-float-label">
                 <p-dropdown formControlName="proceso" inputId="procesos" [options]="procesos" optionValue="Id" optionLabel="Nombre"></p-dropdown>
@@ -105,6 +105,12 @@
                 <label for="turnos">Turno</label>
             </span>
         </div>
+
+        <!-- MOSTRAR DATOS PRODUCTO -->
+        <div class="col-sm-12 col-md-6 col-xl-1 field-checkbox justify-content-center">
+            <p-checkbox formControlName="mostratDatosProducto" [binary]="true" inputId="binary" id="saldo" pTooltip="Cuando este campo esté activo no se mostrará en la etiqueta la siguiente información: Ancho, Alto, Fuelle, Calibre y Material" tooltipPosition="top"></p-checkbox>
+            <label for="saldo">Mostrar Datos Etiqueta</label>
+        </div> 
     
         <!--Tabla OT-->
         <p-table
@@ -113,47 +119,47 @@
         styleClass="p-datatable-gridlines"
         [value]="ordenesTrabajo">
           <ng-template pTemplate="header">
-              <tr>
-                <th style="font-weight: 800;" class="text-center" colspan="4">Información General</th>
-                <th style="font-weight: 800;" class="text-center" colspan="2">Cantidad</th>
-                <th style="font-weight: 800;" class="text-center" colspan="2"></th>
-                <th style="font-weight: 800;" class="text-center" colspan="3">Extrusión</th>
-                <th style="font-weight: 800;" class="text-center" colspan="3">Producto Terminado</th>
-              </tr>
-              <tr>
-                  <th style="font-weight: 600;" class="text-center">Cliente</th>
-                  <th style="font-weight: 600;" class="text-center">Item</th>
-                  <th style="font-weight: 600;" class="text-center">Referencia</th>
-                  <th style="font-weight: 600;" class="text-center" >Material</th>
-                  <th style="font-weight: 600;" class="text-center">Programada</th>
-                  <th style="font-weight: 600;" class="text-center">Realizada</th>
-                  <th style="font-weight: 600;" class="text-center">Medida</th>
-                  <th style="font-weight: 600;" class="text-center">Etiqueta</th>
-                  <th style="font-weight: 600;" class="text-center">Ancho 1</th>
-                  <th style="font-weight: 600;" class="text-center">Ancho 2</th>
-                  <th style="font-weight: 600;" class="text-center">Ancho 3</th>
-                  <th style="font-weight: 600;" class="text-center">Ancho</th>
-                  <th style="font-weight: 600;" class="text-center">Largo</th>
-                  <th style="font-weight: 600;" class="text-center">Fuelle</th>
-              </tr>
+            <tr>
+              <th style="font-weight: 800;" class="text-center" colspan="4">Información General</th>
+              <th style="font-weight: 800;" class="text-center" colspan="2">Cantidad</th>
+              <th style="font-weight: 800;" class="text-center" colspan="2"></th>
+              <th style="font-weight: 800;" class="text-center" colspan="3">Extrusión</th>
+              <th style="font-weight: 800;" class="text-center" colspan="3">Producto Terminado</th>
+            </tr>
+            <tr>
+              <th style="font-weight: 600;" class="text-center">Cliente</th>
+              <th style="font-weight: 600;" class="text-center">Item</th>
+              <th style="font-weight: 600;" class="text-center">Referencia</th>
+              <th style="font-weight: 600;" class="text-center" >Material</th>
+              <th style="font-weight: 600;" class="text-center">Programada</th>
+              <th style="font-weight: 600;" class="text-center">Realizada</th>
+              <th style="font-weight: 600;" class="text-center">Medida</th>
+              <th style="font-weight: 600;" class="text-center">Etiqueta</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 1</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 2</th>
+              <th style="font-weight: 600;" class="text-center">Ancho 3</th>
+              <th style="font-weight: 600;" class="text-center">Ancho</th>
+              <th style="font-weight: 600;" class="text-center">Largo</th>
+              <th style="font-weight: 600;" class="text-center">Fuelle</th>
+            </tr>
           </ng-template>
           <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-              <tr>
-                  <td class="text-center">{{data.cliente}}</td>
-                  <td class="text-center">{{data.id_Producto}}</td>
-                  <td class="text-center">{{data.producto}}</td>
-                  <td class="text-center">{{data.material}} - {{data.pigmento_Extrusion}}</td>
-                  <td class="text-center">{{data.cantidad_Pedida | number : '1.2-2' }}</td>
-                  <td class="text-center"><span class="{{clase}}">{{data.cantidad_Sellado | number : '1.2-2'}}</span></td>
-                  <td class="text-center">{{data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion == 'Paquete' ? 'Paquete' : null}}</td>
-                  <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}} X {{data.selladoCorte_Largo | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.ancho1_Extrusion | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.ancho2_Extrusion | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.ancho3_Extrusion | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.selladoCorte_Largo | number : '1.2-2'}}</td>
-                  <td class="text-center">{{data.selladoCorte_Fuelle | number : '1.2-2'}}</td>
-              </tr>
+            <tr>
+              <td class="text-center">{{data.cliente}}</td>
+              <td class="text-center">{{data.id_Producto}}</td>
+              <td class="text-center">{{data.producto}}</td>
+              <td class="text-center">{{data.material}} - {{data.pigmento_Extrusion}}</td>
+              <td class="text-center">{{data.cantidad_Pedida | number : '1.2-2' }}</td>
+              <td class="text-center"><span class="{{clase}}">{{data.cantidad_Sellado | number : '1.2-2'}}</span></td>
+              <td class="text-center">{{data.presentacion == 'Kilo' ? 'Kg' : data.presentacion == 'Unidad' ? 'Und' : data.presentacion == 'Paquete' ? 'Paquete' : null}}</td>
+              <td class="text-center">{{data.selladoCorte_Etiqueta_Ancho}} X {{data.selladoCorte_Etiqueta_Largo}}</td>
+              <td class="text-center">{{data.ancho1_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.ancho2_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.ancho3_Extrusion | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Ancho | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Largo | number : '1.2-2'}}</td>
+              <td class="text-center">{{data.selladoCorte_Fuelle | number : '1.2-2'}}</td>
+            </tr>
           </ng-template>
         </p-table>
 
@@ -199,7 +205,7 @@
           <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
           <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion2', 'contains')"></th>
           <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
-          <th></th>
+          <th *ngIf="[1, 86].includes(ValidarRol)"></th>
         </tr>
         <tr>
             <th class="text-center">#</th>
@@ -210,7 +216,7 @@
             <th class="text-center">Peso</th>
             <th class="text-center">Und</th>
             <th class="text-center">Fecha</th>
-            <th class="text-center">Imprimir</th>
+            <th class="text-center" *ngIf="[1, 86].includes(ValidarRol)">Imprimir</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
@@ -234,8 +240,8 @@
             <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
             <td class="text-center">{{data.presentacion2}}</td>
             <td class="text-center">{{data.fecha}} - {{data.hora}}</td>
-            <td class="text-center" >
-              <button class="buttonPDF" [disabled]="ValidarRol != 1" (click)="crearEtiqueta(data.bulto, data.peso, data.cantidadUnd, data.presentacion1, 1, data.operario1)">
+            <td class="text-center" *ngIf="[1, 86].includes(ValidarRol)">
+              <button class="buttonPDF"  (click)="crearEtiqueta(data.bulto, data.peso, data.cantidadUnd, data.presentacion1, 1, data.operario1)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svgIconPDF"><path d="M64 464H96v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288H336V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM176 352h32c30.9 0 56 25.1 56 56s-25.1 56-56 56H192v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V448 368c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24H192v48h16zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H304c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H320v96h16zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v48c0 8.8-7.2 16-16 16s-16-7.2-16-16V432 368z"/></svg>
               </button>
             </td>

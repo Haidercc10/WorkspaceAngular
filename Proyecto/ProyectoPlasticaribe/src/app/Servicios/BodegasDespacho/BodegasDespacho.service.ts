@@ -20,4 +20,12 @@ constructor(private http: HttpClient) { }
     GetSubUbicacionesPorUbicacion = (bg: string, ubi: string, nomUbi: string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getSubUbicacionesPorUbicacion/${bg}/${ubi}/${nomUbi}`);
 
     GetCubosPorSubUbicacion = (bg: string, ubi: string, nomUbi: string, subUbi: string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getCubosPorSubUbicacion/${bg}/${ubi}/${nomUbi}/${subUbi}`);
+
+    GetCantidadRollosPorUbicacion = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getCantidadRollosPorUbicacion`);
+
+    GetInventarioPorUbicacionYProductos = (): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getInventarioPorUbicacionYProductos`);
+
+    GetInventarioPorUbicacionYProducto = (prod: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getInventarioPorUbicacionYProducto/${prod}`);
+
+    GetInventarioPorUbicacion = (ubication: string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/BodegasDespacho/getInventarioPorUbicacion/${ubication}`);
 }
