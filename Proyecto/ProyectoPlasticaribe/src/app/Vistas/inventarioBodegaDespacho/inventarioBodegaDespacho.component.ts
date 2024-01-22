@@ -21,6 +21,8 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   ubicationsStorehouse: Array<any> = [];
   subUbicationsStorehouse: Array<any> = [];
   cubes: Array<any> = [];
+  dataSearched: Array<StoreByUbitacion> = [];
+  showDataStore: boolean = false;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -110,14 +112,42 @@ export class InventarioBodegaDespachoComponent implements OnInit {
     });
   }
 
-  GetStoreByUbication() {
-    let ubication: string = this.setUbicationSelected();
+  GetStoreByUbication(ubication: string) {
     this.load = true;
+    let count: number = 0;
+    this.dataSearched = [];
     this.storehouseService.GetInventarioPorUbicacion(ubication).subscribe(data => {
+      data.forEach(d => {
+        count++;
+        this.dataSearched.push({
+          item: d.prod_Id,
+          reference: d.prod_Nombre,
+          ubication: d.ubicacion,
+          numberProduction: d.numer_Rollo,
+          numberProductionBagPro: d.numeroRollo_BagPro,
+          totalQuantity: d.cantTotal,
+          presentation: d.presentacion,
+          price: d.precioVenta_Producto,
+          subTotal: d.subTotal
+        });
+        if (count == data.length) this.showDataStore = true;
+      });
     }, error => {
       this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
     }, () => this.load = false);
   }
 
+}
+
+interface StoreByUbitacion {
+  item: number;
+  reference: string;
+  ubication: string;
+  numberProduction: number;
+  numberProductionBagPro: number;
+  totalQuantity: number;
+  presentation: string;
+  price: number;
+  subTotal: number;
 }
