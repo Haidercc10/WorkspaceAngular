@@ -165,8 +165,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Llenar la tabla inicial de resultados de busqueda */
   llenarTabla(datos : any) {
-    datos.observacion = datos.observacion.replace('Rollo #', '');
-    datos.observacion = datos.observacion.includes('Ext') ? datos.observacion.replace(' en ProcExtrusion Bagpro', '') : datos.observacion.replace(' en ProcDesperdicio Bagpro', '');
     const registro : any = {
       'OT' : datos.ot,
       'Item' : datos.item,
@@ -176,8 +174,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       'Cantidad' : this.calculateTotalOT(datos.ot),
       'Presentacion' : 'Kg',
       'No_Conformidades' : this.calculateNoConformityOT(datos.ot), 
-      'Proceso' : datos.proceso,
-      'Fecha' : datos.fecha.replace('T00:00:00', ''),
+      'Proceso' : datos.id_Proceso,
+      'Fecha' : datos.fecha_Registro.replace('T00:00:00', ''),
+      'Hora' : datos.hora_Registro,
       'Maquina' : datos.maquina,
       'Operario' : datos.operario,
       'No_Conformidad' : datos.falla,
@@ -215,14 +214,15 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       'Peso' : datos.cantidad,
       'Cantidad' : this.formatonumeros(datos.cantidad),
       'Und' : datos.presentacion,
-      'Proceso' : datos.proceso,
+      'Proceso' : datos.id_Proceso,
       'Material' : datos.material,
       "No_Conformidad" : datos.falla,
       'No_Conformidades' : this.calculateNoConformityOT(datos.ot),
       'Impreso' : datos.impreso,
       'Maquina' : datos.maquina,
       'Operario' : datos.operario,
-      'Fecha' : datos.fecha.replace('T00:00:00', ''),
+      'Fecha' : datos.fecha_Registro.replace('T00:00:00', ''),
+      'Hora' : datos.hora_Registro,
       'Observacion' : datos.observacion,
     }
     this.arrayModal.push(dataCompleta);
@@ -270,7 +270,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       this.load = false;
       let fecha : any = this.formFiltros.value.RangoFechas;
       let date1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
-      let date2 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
+      let date2 : any = ['Fecha inválida', null, undefined, ''].includes(fecha == null ? fecha : fecha[1]) ? this.today : moment(this.formFiltros.value.RangoFechas[1]).format('YYYY-MM-DD');
       let title : string = this.dialog ? `Reporte Desperdicios \nOT N° ${this.otSeleccionada}` : `Reporte Desperdicios \n ${date1} a ${date2}`;
       this.arrayModal = this.arrayModal.filter(item => item.OT == this.otSeleccionada);
       let content: any[] = this.dialog ? this.contentPDF(this.arrayModal) : this.contentPDF(this.arrayConsulta);
@@ -286,18 +286,18 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     let detailedInformation : any = this.dialog ? this.detailedInfo(data) : this.detailedInfo(this.arrayDesperdicios);
 
     content.push(this.headerTableConsolidated(groupedInformation));
+    content.push(this.totalInfoTableOne())
     content.push(this.headerTableDetails(detailedInformation));
     content.push(this.totalInfo());
     return content;
   }
-
-
+  
   //Encabezado de tabla consolidada del PDF
   headerTableConsolidated(data : any) {
     let columns : any[] = ['N°', 'OT', 'Item', 'Referencia', 'No_Conformidades', 'Cantidad', 'Presentacion'];
     let widths: Array<string> = ['5%', '10%', '10%', '40%', '15%', '10%', '10%'];
     return {
-      margin: [0, 0, 0, 20],
+      margin: [0, 0, 0, 0],
       borders : 'noBorders',
       table : {
         headerRows : 2,
@@ -335,8 +335,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   //Encabezado de tabla consolidada del PDF
   headerTableDetails(data : any) {
-    let columns : any[] = ['N°', 'OT', 'Item', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Impreso', 'Fecha'];
-    let widths: Array<string> = ['3%', '7%','7%','9%','4%','7%','15%','20%','5%','5%','7%','9%'];
+    let columns : any[] = ['N°', 'OT', 'Bulto', 'Proceso', 'Maq', 'Material', 'Operario', 'No_Conformidad', 'Cant', 'Und', 'Imp', 'Fecha'];
+    let widths: Array<string> = ['3%','7%','7%','7%','4%','12%','15%','20%','5%','5%','4%','9%'];
     return {
       margin: [0, 0, 0, 0],
       table : {
@@ -359,18 +359,18 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       const completeData : any = {
         'N°' : info.length + 1,
         'OT' : this.dialog ? x.OT : x.ot,
-        'Item' : this.dialog ? x.Item : x.item,
+        'Bulto' : this.dialog ? x.Observacion : x.observacion,
         'Referencia' : this.dialog ? x.Referencia : x.referencia,
         'Cantidad' : this.dialog ? x.Cantidad : x.cantidad,
         'Cant' : this.dialog ? this.formatonumeros(x.Cantidad) : this.formatonumeros(x.cantidad),
         'Und' : this.dialog ? x.Und : x.presentacion,
-        'Proceso' : this.dialog ? x.Proceso : x.proceso,
+        'Proceso' : this.dialog ? x.Proceso : x.id_Proceso,
         'Material' : this.dialog ? x.Material : x.material,
         "No_Conformidad" : this.dialog ? x.No_Conformidad : x.falla,
-        'Impreso' : this.dialog ? x.Impreso : x.impreso,
+        'Imp' : this.dialog ? x.Impreso : x.impreso,
         'Maq' : this.dialog ? x.Maquina : x.maquina,
         'Operario' : this.dialog ? x.Operario : x.operario,
-        'Fecha' : this.dialog ? x.Fecha.replace('T00:00:00', '') : x.fecha.replace('T00:00:00', ''),
+        'Fecha' : this.dialog ? x.Fecha.replace('T00:00:00', '') : x.fecha_Registro.replace('T00:00:00', ''),
       }
       info.push(completeData);
     });
@@ -386,6 +386,27 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       fontSize : 10, 
       bold : true,
     };
+  }
+
+  //Tabla con la cantidad total pesada en desperdicios en el PDF en la tabla 1.
+  totalInfoTableOne(){
+    return {
+      margin: [0, 0, 0, 20],
+      table: {
+        widths : ['5%', '10%', '10%', '40%', '15%', '10%', '10%'],
+        body: [
+          [
+           { text : ``, border : [false, false, false, false], }, 
+           { text : ``, border : [false, false, false, false], }, 
+           { text : ``, border : [false, false, false, false], }, 
+           { text : ``, border : [false, false, false, false], }, 
+           { text : `Cantidad Total`, border : [true, false, true, true], fontSize : 8, bold : true, alignment: 'right', }, 
+           { text :`${this.dialog ? this.calculateTotalOT(this.otSeleccionada) : this.calculateTotal()}`, border : [true, false, true, true], fontSize : 8, bold : true,}, 
+           { text : 'Kg', border : [true, false, true, true], fontSize : 8, bold : true,}
+          ],
+        ]
+      },
+    }
   }
 
   //Constructor tabla 1 (Consolidada)

@@ -178,7 +178,7 @@
           [rowHover]="true"
           [value]="arrayModal"
           [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[5, 10, 15, 20]"
+          [rowsPerPageOptions]="[5, 10, 15, 20, 100, 200]"
           currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
           [scrollable]="true"
           scrollHeight="50rem">
@@ -194,6 +194,7 @@
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Und', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'No_Conformidad', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')" class="w-full"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Hora', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Operario', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proceso', 'contains')" class="w-full"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Maquina', 'contains')" class="w-full"></th>
@@ -209,6 +210,7 @@
               <th scope="col" class="text-center">Und</th>
               <th scope="col" class="text-center">No Conformidad</th>
               <th scope="col" class="text-center">Fecha</th>
+              <th scope="col" class="text-center">Hora</th>
               <th scope="col" class="text-center">Operario</th>
               <th scope="col" class="text-center">Proceso</th>
               <th scope="col" class="text-center">Maquina</th>
@@ -226,6 +228,7 @@
               <td class="text-center">{{arrayModal.Und}}</td>
               <td class="text-center">{{arrayModal.No_Conformidad}}</td>
               <td class="text-center">{{arrayModal.Fecha}}</td>
+              <td class="text-center">{{arrayModal.Hora}}</td>
               <td class="text-center">{{arrayModal.Operario}}</td>
               <td class="text-center">{{arrayModal.Proceso}}</td>
               <td class="text-center">{{arrayModal.Maquina}}</td>
@@ -236,7 +239,7 @@
               <td colspan="6" style="text-align: end">Cantidad total desperdicio</td>
               <td class="text-center">{{totalDesperdicio | number}} </td>
               <td class="text-center">{{"Kg"}}</td>
-              <td colspan="5"></td>
+              <td colspan="6"></td>
             </tr>
           </ng-template>
         </p-table>
