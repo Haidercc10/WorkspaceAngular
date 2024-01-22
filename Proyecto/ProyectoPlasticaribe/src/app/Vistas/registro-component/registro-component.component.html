@@ -95,7 +95,7 @@
           <td>{{arrayUsuarios.Tipo}}</td>
           <td><b>{{arrayUsuarios.Area}}</b></td>
           <td>{{arrayUsuarios.Rol}}</td>
-          <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
+          <td *ngIf="arrayUsuarios.Estado == 'ACTIVO'; else Inactivo"><span class="badge bg-success1">{{arrayUsuarios.Estado}}</span></td>
           <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
           <td style="text-align: center;"><button id="editar" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
           <td style="text-align: center;"><button id="inactivar" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;" (click)="colocarUsuarioInactivo(arrayUsuarios.Id)"></button></td>

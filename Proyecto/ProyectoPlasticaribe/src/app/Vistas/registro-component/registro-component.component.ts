@@ -274,6 +274,7 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que va a exportar a excel los datos de los usuarios a excel
   exportarExcel() {
+    console.log(this.arrayUsuarios)
     this.load = false;
     setTimeout(() => {
       const title = `Listado de Usuarios - Plasticaribe SAS`;
@@ -299,7 +300,8 @@ export class RegistroComponentComponent implements OnInit {
       });
       worksheet.mergeCells('A1:P2');
       worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-      datos.forEach(() => {
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
       });
       worksheet.getColumn(1).width = 12;
       worksheet.getColumn(2).width = 40;
