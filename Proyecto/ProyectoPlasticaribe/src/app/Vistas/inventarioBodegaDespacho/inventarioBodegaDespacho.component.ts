@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Table } from 'primeng/table';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { AppComponent } from 'src/app/app.component';
@@ -21,8 +22,10 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   ubicationsStorehouse: Array<any> = [];
   subUbicationsStorehouse: Array<any> = [];
   cubes: Array<any> = [];
-  dataSearched: Array<StoreByUbitacion> = [];
+  dataSearched: Array<StoreByUbication> = [];
   showDataStore: boolean = false;
+  @ViewChild('consolidateTable') consolidateTable: Table | undefined;
+  @ViewChild('detailsTable') detailsTable: Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -51,6 +54,8 @@ export class InventarioBodegaDespachoComponent implements OnInit {
       cubes: [''],
     });
   }
+
+  aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   getStorehouse = () => this.storehouseService.GetBodegas().subscribe(data => this.storehouse = data);
 
@@ -114,40 +119,77 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   GetStoreByUbication(ubication: string) {
     this.load = true;
-    let count: number = 0;
-    this.dataSearched = [];
     this.storehouseService.GetInventarioPorUbicacion(ubication).subscribe(data => {
-      data.forEach(d => {
-        count++;
-        this.dataSearched.push({
-          item: d.prod_Id,
-          reference: d.prod_Nombre,
-          ubication: d.ubicacion,
-          numberProduction: d.numer_Rollo,
-          numberProductionBagPro: d.numeroRollo_BagPro,
-          totalQuantity: d.cantTotal,
-          presentation: d.presentacion,
-          price: d.precioVenta_Producto,
-          subTotal: d.subTotal
-        });
-        if (count == data.length) this.showDataStore = true;
-      });
+      this.dataSearched = this.getConsolidateInformation(data);
+      this.showDataStore = true;
     }, error => {
       this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
     }, () => this.load = false);
   }
 
+  getConsolidateInformation(dataSearched: Array<any>): Array<StoreByUbication> {
+    let data: Array<StoreByUbication> = [];
+    let items: Array<any> = dataSearched.reduce((a,b) => {
+      if (!a.map(x => x.prod_Id).includes(b.prod_Id)) a.push(b);
+      return a;
+    }, []);
+    items.forEach(d => {
+      data.push({
+        item: d.prod_Id,
+        reference: d.prod_Nombre,
+        ubication: d.ubicacion,
+        countProduction: dataSearched.filter(x => x.prod_Id == d.prod_Id).length,
+        totalQuantity: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a,b) => a += b.cantTotal, 0),
+        presentation: d.presentacion,
+        subTotal: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a,b) => a += b.subTotal, 0),
+        detailsProduction: this.getDetailsInformation(d.prod_Id, d.presentation, dataSearched),
+      });
+    });
+    return data;
+  }
+
+  getDetailsInformation(item: number, presentation: string, dataSearched: Array<any>): Array<DetailsStoreByProducts> {
+    let data: Array<DetailsStoreByProducts> = [];
+    dataSearched.filter(x => x.prod_Id == item).forEach(d => {
+      data.push({
+        orderProduction: d.ot,
+        numberProduction: d.numero_Rollo,
+        numberProductionBagPro: d.numeroRollo_BagPro,
+        weight: d.peso,
+        quantity: d.cantTotal,
+        presentation: d.presentacion,
+        date: d.fecha.replace('T00:00:00', ''),
+        hour: d.hora,
+        price: d.precioVenta_Producto,
+        subTotal: d.subTotal,
+      });
+    });
+    return data;
+  }
+
 }
 
-interface StoreByUbitacion {
+interface StoreByUbication {
   item: number;
   reference: string;
   ubication: string;
-  numberProduction: number;
-  numberProductionBagPro: number;
+  countProduction: number
   totalQuantity: number;
   presentation: string;
+  subTotal: number;
+  detailsProduction: Array<DetailsStoreByProducts>;
+}
+
+interface DetailsStoreByProducts {
+  orderProduction: number;
+  numberProduction: number;
+  numberProductionBagPro: number;
+  weight: number;
+  quantity: number;
+  presentation: string;
+  date: string;
+  hour: string;
   price: number;
   subTotal: number;
 }

@@ -88,11 +88,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.getProcess();
-    this.validarProceso();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
+    this.getProcess();
+    this.validarProceso();
     setTimeout(() => this.buscarPuertos(), 1000);
   }
 
