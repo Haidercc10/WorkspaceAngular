@@ -177,7 +177,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     while (port.readable && keepReading) {
       reader = port.readable.getReader();
       try {
-        while (!this.cargando) {
+        while (true) {
           const { value, done } = await reader.read();
           if (done) {
             reader.releaseLock();
@@ -186,10 +186,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
           if (value) {
             let valor = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
-            this.formDatosProduccion.patchValue({
-              pesoBruto: valor,
-              pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
-            });
+            if (!this.cargando) {
+              this.formDatosProduccion.patchValue({
+                pesoBruto: valor,
+                pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
+              });
+            }
+            
           }
         }
       } catch (error) {
@@ -444,7 +447,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   guardarProduccion() {
-    this.cargando = true;    
+    this.cargando = true;
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
       // this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
       this.searchDataTagCreated(res.numero_Rollo);
