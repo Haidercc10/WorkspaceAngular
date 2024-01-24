@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Table } from 'primeng/table';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
 
 @Component({
@@ -26,95 +27,87 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   showDataStore: boolean = false;
   @ViewChild('consolidateTable') consolidateTable: Table | undefined;
   @ViewChild('detailsTable') detailsTable: Table | undefined;
+  products: Array<any> = [];
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
     private storehouseService: BodegasDespachoService,
-    private msg: MensajesAplicacionService,) {
+    private msg: MensajesAplicacionService,
+    private productService: ProductoService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 
   ngOnInit() {
     this.initFormStorehouse();
-    this.getStorehouse();
+    this.formStorehouse.reset();
   }
 
   initFormStorehouse() {
     this.formStorehouse = this.frmBuilder.group({
       item: [''],
       reference: [''],
-      orderProduction: [''],
-      idStorehouse: [''],
-      nameStorehouse: [''],
-      idUbicationsStorehouse: [''],
-      ubicationsStorehouse: [''],
-      idSubUbicationsStorehouse: [''],
-      subUbicationsStorehouse: [''],
-      idCubes: [''],
-      cubes: [''],
+      numberProuction: 0,
     });
   }
 
   aplyFilter = ($event, campo: string, table: Table) => table!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  getStorehouse = () => this.storehouseService.GetBodegas().subscribe(data => this.storehouse = data);
+  clearAll() {
+    this.formStorehouse.reset();
+    this.products = [];
+    this.dataSearched = [];
+    this.showDataStore = false;
+    document.getElementsByClassName('B0031')[0].className = (document.getElementsByClassName('B0031')[0].className).replace(' searchStore', '');
+    document.getElementsByClassName('B0032')[0].className = (document.getElementsByClassName('B0032')[0].className).replace(' searchStore', '');
+    document.getElementsByClassName('B0033')[0].className = (document.getElementsByClassName('B0033')[0].className).replace(' searchStore', '');
+    document.getElementsByClassName('ubicationFound')[0].className = (document.getElementsByClassName('ubicationFound')[0].className).replace(' ubicationFound', '');
+  }
 
-  getUbicationByStorehouse() {
-    let storehouseSelected: string = this.formStorehouse.value.idStorehouse;
-    this.storehouseService.GetUbicacionesPorBodegas(storehouseSelected).subscribe(data => {
-      this.ubicationsStorehouse = data;
-      this.subUbicationsStorehouse = [];
-      this.cubes = [];
+  searchProductByItem() {
+    let idProduct: number = this.formStorehouse.value.item;
+    this.productService.GetProductsById(idProduct).subscribe(data => {
+      data.forEach(dataProduct => {
+        this.formStorehouse.patchValue({
+          item: dataProduct.prod.prod_Id,
+          reference: dataProduct.prod.prod_Nombre,
+        });
+      });
     });
   }
 
-  getSubUbicationByStorehouse() {
-    let storehouseSelected: string = this.formStorehouse.value.idStorehouse;
-    let ubicationSelected: string = this.formStorehouse.value.idUbicationsStorehouse;
-    let dataUbication: any = this.ubicationsStorehouse.find(x => x.nombreCompleto == ubicationSelected);
-    this.storehouseService.GetSubUbicacionesPorUbicacion(storehouseSelected, dataUbication.idUbicacion, dataUbication.nombreUbicacion).subscribe(data => {
-      this.subUbicationsStorehouse = data;
-      this.cubes = [];
-    });
+  searchProductByReference() {
+    let reference: string = this.formStorehouse.value.reference;
+    this.productService.GetProductsByName(reference).subscribe(data => this.products = data);
   }
 
-  getCubesBySubUbication() {
-    let storehouseSelected: string = this.formStorehouse.value.idStorehouse;
-    let ubicationSelected: string = this.formStorehouse.value.idUbicationsStorehouse;
-    let subUbicationSelected: string = this.formStorehouse.value.idSubUbicationsStorehouse;
-    let dataUbication: any = this.ubicationsStorehouse.find(x => x.nombreCompleto == ubicationSelected);
-    this.storehouseService.GetCubosPorSubUbicacion(storehouseSelected, dataUbication.idUbicacion, dataUbication.nombreUbicacion, subUbicationSelected).subscribe(data => this.cubes = data);
-  }
-
-  setUbicationSelected(): string {
-    let idStorehouseSelected: string = this.formStorehouse.value.idStorehouse;
-    let idUbicationSelected: string = this.formStorehouse.value.idUbicationsStorehouse;
-    let ubicationSelected: string = this.formStorehouse.value.ubicationsStorehouse;
-    let idSubUbicationSelected = this.formStorehouse.value.idSubUbicationsStorehouse;
-    let subUbicationSelected = this.formStorehouse.value.subUbicationsStorehouse;
-    let cubeSelected = this.formStorehouse.value.idCubes;
-
-    if (ubicationSelected == 'ESTANTE') ubicationSelected = 'EST';
-    else if (ubicationSelected == 'PLATAFORMA DINAMICA') ubicationSelected = 'PD';
-    else if (ubicationSelected == 'PASILLO JAULAS') ubicationSelected = 'PS';
-    else if (ubicationSelected == 'PASILLO') ubicationSelected = 'PS';
-
-    if (subUbicationSelected == 'PALO') subUbicationSelected = 'PL';
-    else if (subUbicationSelected == 'ESTIBA') subUbicationSelected = 'ESTB';
-
-    cubeSelected = cubeSelected == '' ? `` : `_${cubeSelected.replace('CUBO', '').replace('P.', '')}`;
-
-    return `B${idStorehouseSelected}_${ubicationSelected}${idUbicationSelected}_${subUbicationSelected}${idSubUbicationSelected}${cubeSelected}`;
-  }
-
-  GetCantByUbication() {
-    this.storehouseService.GetCantidadRollosPorUbicacion().subscribe(data => {
+  selectedProduct() {
+    let idProduct: string = this.formStorehouse.value.reference;
+    let dataProduct: any = this.products.find(x => x.prod.prod_Id == idProduct);
+    this.formStorehouse.patchValue({
+      item: dataProduct.prod.prod_Id,
+      reference: dataProduct.prod.prod_Nombre,
     });
   }
 
   GetStoreByUbicationAndProducts() {
-    this.storehouseService.GetInventarioPorUbicacionYProductos().subscribe(data => {
-    });
+    let route: string = this.validateRoute();
+    this.storehouseService.GetInventarioPorUbicacionYProducto(route).subscribe(data => {
+      data.forEach(d => {
+        let ubication = document.getElementById((d.ubicacion).trim());
+        console.log(ubication)
+      });
+    }, error => this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+  }
+
+  validateRoute(): string {
+    let route: string = '';
+    let item = this.formStorehouse.value.item;
+    let numberProduction = this.formStorehouse.value.numberProuction;
+
+    if (item != null) route += `producto=${item}`;
+    if (numberProduction != null) route.length > 0 ? route += `&numeroRollo=${numberProduction}` : route += `numeroRollo=${numberProduction}`;
+    if (route.length > 0) route = `?${route}`;
+    return route;
   }
 
   GetStoreByUbication(ubication: string) {
@@ -167,7 +160,6 @@ export class InventarioBodegaDespachoComponent implements OnInit {
     });
     return data;
   }
-
 }
 
 interface StoreByUbication {
