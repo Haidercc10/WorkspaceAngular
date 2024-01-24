@@ -10,10 +10,22 @@ div[class*="B003"] {
     transition: all 1.5s;
 }
 
+.ubicationFound {
+    z-index: 5;
+}
+
 /* BODEGA 0031 */
 .B0031 {
     grid-template-columns: repeat(11, auto);
     grid-template-rows: repeat(11, 80px);
+}
+
+.B0031 .protectedPanel {
+    grid-column: 1 / 12;
+    grid-row: 1 / 12;
+    background: #0007;
+    z-index: 5;
+    margin: -1.5rem;
 }
 
 .B0031 span[class="title"] {
@@ -38,7 +50,6 @@ div[class*="B003"] {
 
 .B0031 div[class*="EST"],
 .B0032 div[class*="EST"] {
-    border: solid 1px #000;
     display: grid;
     gap: 5px;
     padding: 5px;
@@ -213,6 +224,14 @@ div[class*="PS"] span {
 .B0032 {
     grid-template-columns: repeat(16, auto);
     grid-template-rows: repeat(11, auto);
+}
+
+.B0032 .protectedPanel {
+    grid-column: 1 / 17;
+    grid-row: 1 / 12;
+    background: #0007;
+    z-index: 5;
+    margin: -1.5rem;
 }
 
 .B0032 span[class="title"] {

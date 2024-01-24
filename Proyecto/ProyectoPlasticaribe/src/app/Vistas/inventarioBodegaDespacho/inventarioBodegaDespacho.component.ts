@@ -57,10 +57,21 @@ export class InventarioBodegaDespachoComponent implements OnInit {
     this.products = [];
     this.dataSearched = [];
     this.showDataStore = false;
-    document.getElementsByClassName('B0031')[0].className = (document.getElementsByClassName('B0031')[0].className).replace(' searchStore', '');
-    document.getElementsByClassName('B0032')[0].className = (document.getElementsByClassName('B0032')[0].className).replace(' searchStore', '');
-    document.getElementsByClassName('B0033')[0].className = (document.getElementsByClassName('B0033')[0].className).replace(' searchStore', '');
-    document.getElementsByClassName('ubicationFound')[0].className = (document.getElementsByClassName('ubicationFound')[0].className).replace(' ubicationFound', '');
+    this.editClassProtectedPanel('');
+    this.clearUbicationsFound();
+  }
+
+  editClassProtectedPanel(newClass: string) {
+    document.getElementById('B0031_protectedPanel').className = newClass;
+    document.getElementById('B0032_protectedPanel').className = newClass;
+    // document.getElementById('B0033_protectedPanel').className = newClass;
+  }
+
+  clearUbicationsFound() {
+    let cantUbications: number = document.getElementsByClassName('ubicationFound').length;
+    for (let i = 0; i < cantUbications; i++) {
+      document.getElementsByClassName('ubicationFound')[i].className = (document.getElementsByClassName('ubicationFound')[i].className).replace(' ubicationFound', '');
+    }
   }
 
   searchProductByItem() {
@@ -92,9 +103,10 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   GetStoreByUbicationAndProducts() {
     let route: string = this.validateRoute();
     this.storehouseService.GetInventarioPorUbicacionYProducto(route).subscribe(data => {
+      this.clearUbicationsFound();
       data.forEach(d => {
-        let ubication = document.getElementById((d.ubicacion).trim());
-        console.log(ubication)
+        this.editClassProtectedPanel('protectedPanel');
+        document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
       });
     }, error => this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
@@ -123,7 +135,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   getConsolidateInformation(dataSearched: Array<any>): Array<StoreByUbication> {
     let data: Array<StoreByUbication> = [];
-    let items: Array<any> = dataSearched.reduce((a,b) => {
+    let items: Array<any> = dataSearched.reduce((a, b) => {
       if (!a.map(x => x.prod_Id).includes(b.prod_Id)) a.push(b);
       return a;
     }, []);
@@ -133,9 +145,9 @@ export class InventarioBodegaDespachoComponent implements OnInit {
         reference: d.prod_Nombre,
         ubication: d.ubicacion,
         countProduction: dataSearched.filter(x => x.prod_Id == d.prod_Id).length,
-        totalQuantity: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a,b) => a += b.cantTotal, 0),
+        totalQuantity: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a, b) => a += b.cantTotal, 0),
         presentation: d.presentacion,
-        subTotal: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a,b) => a += b.subTotal, 0),
+        subTotal: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a, b) => a += b.subTotal, 0),
         detailsProduction: this.getDetailsInformation(d.prod_Id, d.presentation, dataSearched),
       });
     });
