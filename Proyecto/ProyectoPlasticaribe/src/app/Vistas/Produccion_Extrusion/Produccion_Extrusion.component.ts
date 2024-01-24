@@ -86,11 +86,11 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.getProcess();
-    this.validarProceso();
     this.obtenerUnidadMedida();
     this.obtenerOperarios();
     this.obtenerConos();
+    this.getProcess();
+    this.validarProceso();
     setTimeout(() => this.buscarPuertos(), 1000);
   }
 
@@ -177,7 +177,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     while (port.readable && keepReading) {
       reader = port.readable.getReader();
       try {
-        while (true) {
+        while (!this.cargando) {
           const { value, done } = await reader.read();
           if (done) {
             reader.releaseLock();
@@ -404,7 +404,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
         this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
         this.cargando = false;
       }
-    }, 3000);
+    }, 1000);
   }
 
   datosProduccion() : modelProduccionProcesos {
