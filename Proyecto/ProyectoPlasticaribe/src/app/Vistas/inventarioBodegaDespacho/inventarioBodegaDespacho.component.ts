@@ -70,7 +70,8 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   clearUbicationsFound() {
     let cantUbications: number = document.getElementsByClassName('ubicationFound').length;
     for (let i = 0; i < cantUbications; i++) {
-      document.getElementsByClassName('ubicationFound')[i].className = (document.getElementsByClassName('ubicationFound')[i].className).replace(' ubicationFound', '');
+      let ubicationFound = document.getElementsByClassName('ubicationFound')[0];
+      if (ubicationFound) ubicationFound.className = (ubicationFound.className).replace(' ubicationFound', '');
     }
   }
 
@@ -102,13 +103,20 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   GetStoreByUbicationAndProducts() {
     let route: string = this.validateRoute();
+    this.clearUbicationsFound();
+    let ubicationIncluded: Array<string> = [];
     this.storehouseService.GetInventarioPorUbicacionYProducto(route).subscribe(data => {
-      this.clearUbicationsFound();
       data.forEach(d => {
         this.editClassProtectedPanel('protectedPanel');
-        document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
+        if (!ubicationIncluded.includes(d.ubicacion)) {
+          ubicationIncluded.push(d.ubicacion);
+          document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
+        }
       });
-    }, error => this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`));
+    }, error => {
+      this.editClassProtectedPanel('');
+      this.msg.mensajeError(`¡No se encontró información de ingresos a despacho con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`)
+    });
   }
 
   validateRoute(): string {
