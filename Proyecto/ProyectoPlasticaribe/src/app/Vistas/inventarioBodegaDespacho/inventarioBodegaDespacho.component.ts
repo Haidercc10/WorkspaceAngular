@@ -64,7 +64,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   editClassProtectedPanel(newClass: string) {
     document.getElementById('B0031_protectedPanel').className = newClass;
     document.getElementById('B0032_protectedPanel').className = newClass;
-    // document.getElementById('B0033_protectedPanel').className = newClass;
+    document.getElementById('B0033_protectedPanel').className = newClass;
   }
 
   clearUbicationsFound() {
