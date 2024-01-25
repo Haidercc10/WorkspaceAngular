@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
@@ -22,7 +22,7 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./Produccion_Extrusion.component.css']
 })
 
-export class Produccion_ExtrusionComponent implements OnInit {
+export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   cargando: boolean = false;
   storage_Id: number;
@@ -38,6 +38,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
   rollosPesados: Array<any> = [];
   datosOrdenTrabajo: Array<any> = [];
   showNameBussiness: boolean = true;
+  port: SerialPort;
+  reader: any;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -92,6 +94,12 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.getProcess();
     this.validarProceso();
     setTimeout(() => this.buscarPuertos(), 1000);
+  }
+
+  async ngOnDestroy() {
+    this.reader.releaseLock();
+    this.reader.cancel();
+    await this.port.close();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -161,26 +169,27 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   async buscarPuertos() {
+    this.port = await navigator.serial.requestPort();
     try {
-      const port: SerialPort = await navigator.serial.requestPort();
-      await port.open({ baudRate: 9600 });
-      this.chargeDataFromSerialPort(port);
+      await this.port.open({ baudRate: 9600 });
+      this.chargeDataFromSerialPort(this.port);
     } catch (ex) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
-      else this.msj.mensajeError(ex);
+      else {
+        this.msj.mensajeError(ex);
+      }
     }
   }
 
   async chargeDataFromSerialPort(port: SerialPort) {
-    let reader;
     let keepReading: boolean = true;
     while (port.readable && keepReading) {
-      reader = port.readable.getReader();
+      this.reader = port.readable.getReader();
       try {
         while (true) {
-          const { value, done } = await reader.read();
+          const { value, done } = await this.reader.read();
           if (done) {
-            reader.releaseLock();
+            this.reader.releaseLock();
             break;
           }
           if (value) {
@@ -198,7 +207,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       } catch (error) {
         console.log(error);
       } finally {
-        reader.releaseLock();
+        this.reader.releaseLock();
       }
     }
   }
@@ -325,7 +334,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
       this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
-        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => this.cargando = false, () => this.cargando = false);
+        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
+          this.cargando = false;
+          this.msj.mensajeError(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`);
+        }, () => this.cargando = false);
       });
     } else this.msj.mensajeAdvertencia(`¡Debe haber seleccionado un proceso previamente!`);
   }
@@ -382,9 +394,9 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   validarDatos() {
-    this.cargando = true;
     this.obtenerTurnos();
     this.buscraOrdenTrabajo();
+    this.cargando = true;
     // this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
@@ -504,6 +516,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
           showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
+          operator: data.operador,
         }
         this.createPDFService.createTagProduction(dataTagProduction);
       });
@@ -512,6 +525,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let data: Array<any> = this.rollosPesados.filter(data => data.item == code);
     let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
       item: this.formDatosProduccion.value.item,
@@ -532,6 +546,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
       showNameBussiness: this.showNameBussiness,
       copy: copy,
       showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
+      operator: data[0].operador,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
   }

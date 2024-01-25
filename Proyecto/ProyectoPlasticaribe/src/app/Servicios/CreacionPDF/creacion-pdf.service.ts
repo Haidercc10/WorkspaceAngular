@@ -1,8 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import JsBarcode from 'jsbarcode';
 import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
+import { ReImpresionEtiquetas, ReImpresionEtiquetasService } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +13,9 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 export class CreacionPdfService {
 
-    constructor() { }
+    constructor(private rePrintService: ReImpresionEtiquetasService,
+        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+        private encriptacion : EncriptacionService,) { }
 
     // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
     private formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -109,6 +114,7 @@ export class CreacionPdfService {
             content: this.contentPDF(dataTag),
         }
         pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => window.electron.send('print-pdf', buffer));
+        if (dataTag.copy) this.createRePrint(dataTag);
     }
 
     private contentPDF(dataTag: modelTagProduction) {
@@ -243,15 +249,43 @@ export class CreacionPdfService {
     }
 
     private footerPDF(productionProcess: 'EXTRUSION' | 'IMPRESION' | 'ROTOGRABADO' | 'LAMIMADO' | 'DOBLADO' | 'CORTE' | 'EMPAQUE' | 'SELLADO' | 'WIKETIADO', operator?: any) {
-        let width: number = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? operator.length > 30 ? 170 : operator.length >= 20 && operator.length < 30 ? 130 : 100 : 0;
-        let operative: string = productionProcess == 'SELLADO' || productionProcess == 'WIKETIADO' ? `${operator}` : '';
+        let width: number = operator.length > 30 ? 170 : operator.length >= 20 && operator.length < 30 ? 130 : 100;
         return {
             columns: [
                 { text: `${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'center', fontSize: 8, },
-                { text: operative, alignment: 'center', fontSize: 8, width: width, },
+                { text: operator, alignment: 'center', fontSize: 8, width: width, },
                 { text: productionProcess, alignment: 'center', fontSize: 8 },
             ]
         }
+    }
+
+    createRePrint(dataTag: modelTagProduction) {
+        if (dataTag.copy) {
+            let data: ReImpresionEtiquetas = {
+                Orden_Trabajo: parseInt(dataTag.orderProduction),
+                NumeroRollo_BagPro: dataTag.reel,
+                Proceso_Id: this.validateProcess(dataTag.productionProcess),
+                Fecha: moment().format('YYYY-MM-DD'),
+                Hora: moment().format('HH:mm:ss'),
+                Usua_Id: this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')),
+            }
+            this.rePrintService.insert(data).subscribe(null, error => console.log(error));
+        }
+    }
+
+    validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+      const processMapping = {
+        'EXTRUSION': 'EXT',
+        'IMPRESION': 'IMP',
+        'ROTOGRABADO': 'ROT',
+        'LAMINADO': 'LAM',
+        'DOBLADO': 'DBLD',
+        'CORTE': 'CORTE',
+        'EMPAQUE': 'EMP',
+        'SELLADO': 'SELLA',
+        'WIKETIADO': 'WIKE'
+      };
+      return processMapping[proceso] || proceso;
     }
 }
 

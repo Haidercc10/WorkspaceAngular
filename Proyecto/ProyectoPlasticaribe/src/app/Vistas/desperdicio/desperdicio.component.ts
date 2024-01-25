@@ -355,6 +355,7 @@ export class DesperdicioComponent implements OnInit {
   async getPuertoSerial() {
     try {
       const port = await navigator.serial.requestPort();
+      port.close();
       await port.open({ baudRate: 9600 });
       this.cargarDatosPuertoSerial(port);
     } catch (ex) {
