@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
@@ -10,6 +11,7 @@ import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Traba
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
@@ -40,6 +42,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   showNameBussiness: boolean = true;
   port: SerialPort;
   reader: any;
+  @ViewChild('dtProduccion') dtProduccion: Table | undefined;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -54,7 +57,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private createPDFService: CreacionPdfService,
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
-    private orderProductionsService: Orden_TrabajoService,) {
+    private orderProductionsService: Orden_TrabajoService,
+    private rePrintService: ReImpresionEtiquetasService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -102,7 +106,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     await this.port.close();
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
   lecturaStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
@@ -201,7 +206,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
                 pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
               });
             }
-            
           }
         }
       } catch (error) {
@@ -220,7 +224,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.cargando = false;
     let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
     this.formDatosProduccion.reset();
-    this.formDatosProduccion.patchValue({ mostratDatosProducto: mostratDatosProducto }); 
+    this.formDatosProduccion.patchValue({ mostratDatosProducto: mostratDatosProducto });
     this.obtenerTurnos();
     this.datosOrdenTrabajo = [];
     this.rollosPesados = [];
@@ -363,12 +367,21 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
             calibre: datos.calibre_Extrusion,
             material: datos.material.trim(),
             anchoProducto: datos.selladoCorte_Ancho,
-            presentacion: datos.presentacion
+            presentacion: datos.presentacion,
           });
           this.buscarDatosConoSeleccionado();
         });
       });
     });
+  }
+
+  validarPrecio(datosOrden: any): number {
+    let precio: number = 0;
+    let turno: string = this.formDatosProduccion.value.turno;
+
+    if (turno == 'DIA') precio = datosOrden.selladoCorte_PrecioSelladoDia;
+    else if (turno == 'NOCHE') precio = datosOrden.selladoCorte_PrecioSelladoNoche;
+    return precio;
   }
 
   buscarRollosPesados() {
@@ -378,7 +391,22 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
       this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
+      this.contarReImpresionesPorEtiquetas();
     }, () => this.cargando = false, () => this.cargando = false);
+  }
+
+  contarReImpresionesPorEtiquetas() {
+    let rollos: Array<number> = this.rollosPesados.map(x => x.item);
+    this.rePrintService.getCantidadReImpresionesPorEtiqueta(rollos).subscribe(data => {
+      data.forEach(d => {
+        let i: number = this.rollosPesados.findIndex(x => x.item == d.item);
+        this.rollosPesados[i].reImpresiones += d.cantidad;
+      });
+    }, () => {
+      for (let i = 0; i < this.rollosPesados.length; i++) {
+        this.rollosPesados[i].reImpresiones = 1;
+      }
+    });
   }
 
   sumarPesoBruto() {
@@ -422,7 +450,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  datosProduccion() : modelProduccionProcesos {
+  datosProduccion(): modelProduccionProcesos {
     let presentation = this.formDatosProduccion.value.presentacion;
     if (presentation == 'Kilo') presentation = 'Kg';
     else if (presentation == 'Unidad') presentation = 'Und';
@@ -445,7 +473,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Cantidad: presentation == 'Und' ? 1 : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
-      Precio: 0,
+      Precio: this.validarPrecio(this.datosOrdenTrabajo[0]),
       Presentacion: presentation,
       Proceso_Id: this.validateProcess(),
       Turno_Id: this.formDatosProduccion.value.turno,
@@ -455,7 +483,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Hora: moment().format('HH:mm:ss'),
       Creador_Id: this.storage_Id,
     }
-    return datos; 
+    return datos;
   }
 
   guardarProduccion() {
@@ -466,8 +494,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.limpiarCampos();
       this.formDatosProduccion.patchValue({
         ordenTrabajo: res.ot,
-        maquina : res.maquina,
-        operario : res.operario1_Id,
+        maquina: res.maquina,
+        operario: res.operario1_Id,
         cono: res.cono_Id,
       });
       this.buscraOrdenTrabajo();
@@ -494,7 +522,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number){
+  searchDataTagCreated(reel: number) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {

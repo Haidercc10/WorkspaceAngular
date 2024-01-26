@@ -7,6 +7,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -53,7 +54,8 @@ export class Produccion_SelladoComponent implements OnInit {
     private svcMsjs: MensajesAplicacionService,
     private svcProdProcesos: Produccion_ProcesosService,
     private svcCrearPDF: CreacionPdfService,
-    private svcSedes : SedeClienteService) {
+    private svcSedes : SedeClienteService,
+    private rePrintService: ReImpresionEtiquetasService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.inicializarForm();
   }
@@ -270,7 +272,21 @@ export class Produccion_SelladoComponent implements OnInit {
         this.formSellado.patchValue({ cantUnd: cantUnd });
       }
     }, () => this.svcMsjs.mensajeError(`La OT ${ot} no fue encontrada en el proceso de Sellado`));
-  } 
+  }
+
+  contarReImpresionesPorEtiquetas() {
+    let rollos: Array<number> = this.produccion.map(x => x.bulto);
+    this.rePrintService.getCantidadReImpresionesPorEtiqueta(rollos).subscribe(data => {
+      data.forEach(d => {
+        let i: number = this.produccion.findIndex(x => x.bulto == d.bulto);
+        this.produccion[i].reImpresiones = d.cantidad;
+      });
+    }, () => {
+      for (let i = 0; i < this.produccion.length; i++) {
+        this.produccion[i].reImpresiones = 1;
+      }
+    });
+  }
 
   //Función que calcula la cantidad de unidades/paquetes
   calcularCantidad = () => this.produccion.reduce((a, b) => a + b.cantidadUnd, 0);

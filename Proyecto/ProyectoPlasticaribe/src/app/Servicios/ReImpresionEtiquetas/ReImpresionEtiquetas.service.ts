@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,6 +14,8 @@ export class ReImpresionEtiquetasService {
   constructor(private http: HttpClient) { }
 
   insert = (data: ReImpresionEtiquetas) => this.http.post(`${this.rutaPlasticaribeAPI}/ReImpresionEtiquetas`, data);
+
+  getCantidadReImpresionesPorEtiqueta = (rollos: Array<number>): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/ReImpresionEtiquetas/getCantidadReImpresionesPorEtiqueta`, rollos);
 }
 
 export interface ReImpresionEtiquetas {
