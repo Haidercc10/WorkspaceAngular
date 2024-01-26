@@ -40,6 +40,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   datosOrdenTrabajo: Array<any> = [];
   showNameBussiness: boolean = true;
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
+  area : number;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -89,10 +90,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerUnidadMedida();
-    this.obtenerOperarios();
     this.obtenerConos();
     this.getProcess();
     this.validarProceso();
+    this.obtenerOperarios();
     setTimeout(() => this.buscarPuertos(), 1000);
   }
 
@@ -154,6 +155,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
         break;
     }
     if (this.ValidarRol != 1) this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
+    else {
+      this.validateProcess();
+      this.obtenerOperarios();
+    }
     this.obtenerTurnos();
   }
 
@@ -251,6 +256,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   obtenerTurnos() {
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     this.turnosService.srvObtenerLista().subscribe(data => this.turnos = data.map(x => x.turno_Id));
+    proceso == 'CORTE' ? proceso = 'EMPAQUE' : proceso;
     this.bagproService.GetHorarioProceso(proceso).subscribe(turno => {
       this.formDatosProduccion.patchValue({ turno: turno.toString() });
       if (this.datosOrdenTrabajo.length > 0) this.datosOrdenTrabajo[0].turno = turno.toString();
@@ -263,7 +269,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   obtenerOperarios() {
     this.operariosService.GetOperariosProduccion().subscribe(data => {
-      this.operarios = data;
+      this.operarios = [undefined, null].includes(this.area) ? data : data.filter(x => x.area_Id == this.area);
       this.operarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
     });
   }
@@ -470,18 +476,19 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
     const processMapping = {
-      'EXTRUSION': 'EXT',
-      'IMPRESION': 'IMP',
-      'ROTOGRABADO': 'ROT',
-      'LAMINADO': 'LAM',
-      'DOBLADO': 'DBLD',
-      'CORTE': 'CORTE',
-      'EMPAQUE': 'EMP',
-      'SELLADO': 'SELLA',
-      'WIKETIADO': 'WIKE'
+      'EXTRUSION': ['EXT', 3],
+      'IMPRESION': ['IMP', 19],
+      'ROTOGRABADO': ['ROT', 20],
+      'LAMINADO': ['LAM', 22],
+      'DOBLADO': ['DBLD', 25],
+      'CORTE': ['CORTE', 21],
+      'EMPAQUE': ['EMP', 11],
+      'SELLADO': ['SELLA', 10],
+      'WIKETIADO': ['WIKE', 31]
     };
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
-    return processMapping[proceso] || proceso;
+    this.area = processMapping[proceso][1];
+    return processMapping[proceso][0] || proceso;
   }
 
   searchDataTagCreated(reel: number){

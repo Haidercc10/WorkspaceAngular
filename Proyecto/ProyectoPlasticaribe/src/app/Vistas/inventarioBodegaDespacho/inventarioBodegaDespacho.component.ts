@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Table } from 'primeng/table';
+import { TabView } from 'primeng/tabview';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -28,6 +29,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   @ViewChild('consolidateTable') consolidateTable: Table | undefined;
   @ViewChild('detailsTable') detailsTable: Table | undefined;
   products: Array<any> = [];
+  ubicationModal : string = ``;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -69,7 +71,9 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   clearUbicationsFound() {
     let cantUbications: number = document.getElementsByClassName('ubicationFound').length;
+    console.log(cantUbications)
     for (let i = 0; i < cantUbications; i++) {
+      console.log(`for ${i}`)
       let ubicationFound = document.getElementsByClassName('ubicationFound')[0];
       if (ubicationFound) ubicationFound.className = (ubicationFound.className).replace(' ubicationFound', '');
     }
@@ -110,7 +114,10 @@ export class InventarioBodegaDespachoComponent implements OnInit {
         this.editClassProtectedPanel('protectedPanel');
         if (!ubicationIncluded.includes(d.ubicacion)) {
           ubicationIncluded.push(d.ubicacion);
+          console.log(ubicationIncluded)
+          console.log(d.ubicacion)
           document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
+          console.log(document.getElementById((d.ubicacion).trim()).className)
         }
       });
     }, error => {
@@ -132,6 +139,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   GetStoreByUbication(ubication: string) {
     this.load = true;
+    this.ubicationModal = document.getElementById(ubication).getAttribute('pTooltip');
     this.storehouseService.GetInventarioPorUbicacion(ubication).subscribe(data => {
       this.dataSearched = this.getConsolidateInformation(data);
       this.showDataStore = true;

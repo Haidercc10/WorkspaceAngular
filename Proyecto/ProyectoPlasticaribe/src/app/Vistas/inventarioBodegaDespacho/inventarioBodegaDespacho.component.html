@@ -885,7 +885,7 @@
     </p-tabView>
 </p-card>
 
-<p-dialog [(visible)]="showDataStore" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles del Inventario" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="showDataStore" [style]="{width: '70vw'}" [contentStyle]="{'overflow':'visible'}" [resizable]="true" header="Detalles del Inventario en {{ubicationModal}}" [modal]="true" styleClass="p-fluid">
     <ng-template pTemplate="content">
         <p-table
         #consolidateTable
