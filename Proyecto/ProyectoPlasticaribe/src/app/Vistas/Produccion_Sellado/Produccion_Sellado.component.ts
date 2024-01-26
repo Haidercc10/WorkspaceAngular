@@ -108,7 +108,7 @@ export class Produccion_SelladoComponent implements OnInit {
       await port.open({ baudRate: 9600 });
       this.cargarDatosPuertoSerial(port);
     } catch (ex) {
-      if (ex.name === 'NotFoundError') this.svcMsjs.mensajeError('¡No hay dispositivos conectados!');
+      if (ex.name === 'NotFoundError') this.svcMsjs.mensajeError('¡No se encontró una báscula conectada!');
       else this.svcMsjs.mensajeError(ex);
     }
   }
@@ -134,9 +134,7 @@ export class Produccion_SelladoComponent implements OnInit {
           if (value) {
             let valor = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
-            this.formSellado.patchValue({
-              cantKg: valor,
-            });
+            this.formSellado.patchValue({ cantKg: valor });
           }
         }
       } catch (error) {
@@ -186,10 +184,9 @@ export class Produccion_SelladoComponent implements OnInit {
   habilitarSaldo = () => this.esSoloLectura ? this.esSoloLectura = false : this.esSoloLectura = true;
 
   //Función que busca la orden de trabajo y carga la información
-  buscarOT() {
+  buscarOT(validacionDatos: boolean = false) {
     this.ordenesTrabajo = [];
     this.produccion = [];
-    this.cargando = true;
     this.cargarTurnoActual();
     this.svcBagPro.GetOrdenDeTrabajo(this.formSellado.value.ot).subscribe(data => {
       let nitCliente : any = data[0].nitCliente == null ? data[0].id_Cliente : data[0].nitCliente;
@@ -199,13 +196,15 @@ export class Produccion_SelladoComponent implements OnInit {
           this.ordenesTrabajo = data;
           this.ordenesTrabajo[0].nitCliente = sede[0].id_Cliente;
           this.cantBultoEstandar = data[0].selladoCorte_CantBolsasBulto;
-          let cantUnd: number = data[0].selladoCorte_CantBolsasBulto <= 0 ? this.formSellado.value.cantUnd : data[0].selladoCorte_CantBolsasBulto;
-          this.formSellado.patchValue({ cantUnd: cantUnd });
+          if (!validacionDatos) {
+            let cantUnd: number = data[0].selladoCorte_CantBolsasBulto <= 0 ? this.formSellado.value.cantUnd : data[0].selladoCorte_CantBolsasBulto;
+            this.formSellado.patchValue({ cantUnd: cantUnd });
+          }
           this.formSellado.get('saldo')?.enable();
           this.validarProceso();
           setTimeout(() => this.calcularPesoTeorico(), 500);
           this.claseCantidadRealizada(data[0]);
-          this.cargarProduccionSellado(this.formSellado.value.ot);
+          this.cargarProduccionSellado(this.formSellado.value.ot, validacionDatos);
         }
       }, () => {
         this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
@@ -213,7 +212,6 @@ export class Produccion_SelladoComponent implements OnInit {
       });
     }, () => {
       this.svcMsjs.mensajeError(`La OT ${this.formSellado.value.ot} no existe!`);
-      this.cargando = false;
     });
   }
 
@@ -228,7 +226,6 @@ export class Produccion_SelladoComponent implements OnInit {
   validarProceso() {
     if(this.ordenesTrabajo.length > 0) {
       let esWicket : boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
-
       if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' }); 
       else this.formSellado.patchValue({ proceso: 'SELLA' });
     }
@@ -258,9 +255,9 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Función que carga la producción de sellado para la OT consultada
-  cargarProduccionSellado(ot: any) {
+  cargarProduccionSellado(ot: any, validacionDatos: boolean) {
     this.svcBagPro.GetProduccionSellado(ot).subscribe(data => {
-      if (data.length > 0) {
+      if (data.length > 0 && !validacionDatos) {
         this.produccion = data;
         this.cantBultoEstandar = data[0].cantidadUnd;
         this.formSellado.patchValue({ cantUnd: data[data.length - 1].cantidadUnd });
@@ -269,7 +266,6 @@ export class Produccion_SelladoComponent implements OnInit {
         this.cargando = false;
         this.produccion.sort((a,b) => Number(b.bulto) - Number(a.bulto));
       } else {
-        this.cargando = false;
         let cantUnd: number = this.formSellado.value.cantUnd || 0;
         this.formSellado.patchValue({ cantUnd: cantUnd });
       }
@@ -284,9 +280,9 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que valida la entrada del registro
   validarEntrada() {
-    this.getPuertoSerial();
-    // this.buscarOT();
     this.cargando = true;
+    this.getPuertoSerial();
+    this.buscarOT(true);
     setTimeout(() => {
       if (this.formSellado.valid) {
         if (this.formSellado.value.ot != null && this.formSellado.value.ot != '') {
@@ -328,7 +324,7 @@ export class Produccion_SelladoComponent implements OnInit {
         this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
         this.cargando = false;
       }
-    }, 2000);
+    }, 500);
   }
 
   //Función que crea la entrada y alista el post.

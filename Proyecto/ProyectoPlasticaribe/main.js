@@ -23,7 +23,10 @@ function createWindow() {
     ipcMain.on('print-pdf', async (event, buffer) => {
         const pdfPath = path.join(Os.tmpdir(), 'output.pdf');
         fs.writeFile(pdfPath, buffer, async (error) => {
-            if (error) throw error;
+            if (error) {
+                log.error(error);
+                throw error;
+            }
             let options = {
                 paperSize: 'PLASTICARIBE',
                 orientation: 'landscape'
