@@ -513,3 +513,7 @@ td {
 .buttonBack:before {
   content: "Regresar";
 }
+
+.logOut:before {
+  content: "Salir";
+}
