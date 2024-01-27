@@ -54,7 +54,7 @@
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-box"></i> Bodegas</h4>
     </div>
 
-    <p-tabView>
+    <p-tabView (onChange)="changeTab($event.index)">
         <p-tabPanel header="Bodega 0031" leftIcon="pi pi-th-large">
             <div class="B0031">
                 <div id="B0031_protectedPanel"></div>
@@ -617,7 +617,7 @@
                 <div class="_B0033_FUERA"></div>
                 
                 <!-- ESTANTE 20 -->
-                <div class="_B0033_EST20">
+                <div class="_B0033_EST20" pTooltip="Estante 20" tooltipPosition="top" id="EST20">
                     <div class="_B0033_EST20_TXT ESTANTE"><b>EST 20</b></div>
                 </div>
                 <div class="_B0033_EST20_PAL1">
@@ -650,7 +650,7 @@
                 </div>
 
                 <!-- ESTANTE 21 -->
-                <div class="_B0033_EST21">
+                <div class="_B0033_EST21" pTooltip="Estante 21" tooltipPosition="top" id="EST21">
                     <div class="_B0033_EST21_TXT ESTANTE"><b>EST 21</b></div>
                 </div>
                 <div class="_B0033_EST21_PAL1">
@@ -664,7 +664,7 @@
                 </div>
 
                 <!--ESTANTE 22 -->
-                <div class="_B0033_EST22">
+                <div class="_B0033_EST22" pTooltip="Estante 22" tooltipPosition="top" id="EST22">
                     <div class="_B0033_EST22_TXT ESTANTE"><b>EST 22</b></div>
                 </div>
                 <div class="_B0033_EST22_PAL1">
@@ -705,7 +705,7 @@
                 </div>
 
                 <!-- ESTANTE 23 -->
-                <div class="_B0033_EST23">
+                <div class="_B0033_EST23" pTooltip="Estante 23" tooltipPosition="top" id="EST23">
                     <div class="_B0033_EST23_TXT ESTANTE"><b>EST 23</b></div>
                 </div>
                 <div class="_B0033_EST23_PAL1">
@@ -746,7 +746,7 @@
                 </div>
 
                 <!--ESTANTE 24 -->
-                <div class="_B0033_EST24">
+                <div class="_B0033_EST24" pTooltip="Estante 24" tooltipPosition="top" id="EST24">
                     <div class="_B0033_EST24_TXT ESTANTE"><b>EST 24</b></div>
                 </div>
                 <div class="_B0033_EST24_PAL1">
@@ -775,7 +775,7 @@
                 </div>
 
                 <!--ESTANTE 25 -->
-                <div class="_B0033_EST25">
+                <div class="_B0033_EST25" pTooltip="Estante 25" tooltipPosition="top" id="EST25">
                     <div class="_B0033_EST25_TXT ESTANTE"><b>EST 25</b></div>
                 </div>
                 <div class="_B0033_EST25_PAL1">
@@ -804,7 +804,7 @@
                 </div>
 
                 <!--ESTANTE 26 -->
-                <div class="_B0033_EST26">
+                <div class="_B0033_EST26" pTooltip="PASILLO 26" tooltipPosition="top" id="PS26">
                     <div class="_B0033_EST26_TXT ESTANTE"><b>EST 26</b></div>
                 </div>
                 <div class="_B0033_EST26_PAL1_A PALOS cursor" (click)="GetStoreByUbication('B0033_EST26_PL1_A')" id="B0033_EST26_PL1_A" pTooltip="ESTANTE 26 - PALO 1 - CUBO A" tooltipPosition="top">
@@ -817,7 +817,7 @@
                 </div>
 
                 <!--PASILLO 27-->
-                <div class="_B0033_PAS27">
+                <div class="_B0033_PAS27" pTooltip="PASILLO 27" tooltipPosition="top" id="PS27">
                     <div class="_B0033_PAS27_TXT PASILLOS"><b>PASILLO 27</b></div>
                 </div>
                 <div class="_B0033_PAS27_ESTB1 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS27_ESTB1')" id="B0033_PS27_ESTB1" pTooltip="PASILLO 27 - ESTIBA 1" tooltipPosition="top">
@@ -831,7 +831,7 @@
                 </div>
 
                  <!--PASILLO 28-->
-                 <div class="_B0033_PAS29">
+                 <div class="_B0033_PAS29" pTooltip="PASILLO 28" tooltipPosition="top" id="PS28">
                     <div class="_B0033_PAS28_TXT PASILLOS"><b>PASILLO 28</b></div>
                 </div>
                 <div class="_B0033_PAS28_ESTB4 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS28_ESTB4')" id="B0033_PS28_ESTB4" pTooltip="PASILLO 28 - ESTIBA 4" tooltipPosition="top">
@@ -842,7 +842,7 @@
                 </div>
 
                 <!--PASILLO 29-->
-                <div class="_B0033_PAS29">
+                <div class="_B0033_PAS29" pTooltip="PASILLO 29" tooltipPosition="top" id="PS29">
                     <div class="_B0033_PAS29_TXT PASILLOS"><b>PASILLO 29</b></div>
                 </div>
                 <div class="_B0033_PAS29_ESTB6 ESTIBAS_G10 cursor" (click)="GetStoreByUbication('B0033_PS29_ESTB6')" id="B0033_PS29_ESTB6" pTooltip="PASILLO 29 - ESTIBA 6" tooltipPosition="top">
@@ -865,7 +865,7 @@
                 </div>
 
                 <!--PASILLO 30-->
-                <div class="_B0033_PAS30">
+                <div class="_B0033_PAS30" pTooltip="PASILLO 30" tooltipPosition="top" id="PS30">
                     <div class="_B0033_PAS30_TXT PASILLOS"><b>PASILLO 30</b></div>
                 </div>
                 <div class="_B0033_PAS30_ESTB10 ESTIBAS cursor" (click)="GetStoreByUbication('B0033_PS30_ESTB10')" id="B0033_PS30_ESTB10" pTooltip="PASILLO 30 - ESTIBA 10" tooltipPosition="top">
@@ -879,7 +879,9 @@
                 <div class="_B0033_FORMA_DEGRADADO"></div>
                 <div class="_B0033_FORMA1_PAS29"></div>
                 <div class="_B0033_FORMA2_PAS29"></div>
-                <div class="_B0033_FORMA_GRIS"></div>
+                <div class="_B0033_FORMA_GRIS">
+                    <div class="_B0033_FORMA_GRIS2"></div>
+                </div>
               </div>
         </p-tabPanel>
     </p-tabView>

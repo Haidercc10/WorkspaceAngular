@@ -29,7 +29,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
   @ViewChild('consolidateTable') consolidateTable: Table | undefined;
   @ViewChild('detailsTable') detailsTable: Table | undefined;
   products: Array<any> = [];
-  ubicationModal : string = ``;
+  ubicationModal : string = `BODEGA 0031 - `;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -71,9 +71,7 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   clearUbicationsFound() {
     let cantUbications: number = document.getElementsByClassName('ubicationFound').length;
-    console.log(cantUbications)
     for (let i = 0; i < cantUbications; i++) {
-      console.log(`for ${i}`)
       let ubicationFound = document.getElementsByClassName('ubicationFound')[0];
       if (ubicationFound) ubicationFound.className = (ubicationFound.className).replace(' ubicationFound', '');
     }
@@ -114,10 +112,15 @@ export class InventarioBodegaDespachoComponent implements OnInit {
         this.editClassProtectedPanel('protectedPanel');
         if (!ubicationIncluded.includes(d.ubicacion)) {
           ubicationIncluded.push(d.ubicacion);
-          console.log(ubicationIncluded)
-          console.log(d.ubicacion)
           document.getElementById((d.ubicacion).trim()).className += ' ubicationFound';
-          console.log(document.getElementById((d.ubicacion).trim()).className)
+          let newUbication = document.getElementById((d.ubicacion).trim()).id;
+          let cutString : number = newUbication.indexOf('_PL') > 0 ? newUbication.indexOf('_PL') : newUbication.indexOf('_ESTB');
+          
+          if(newUbication.startsWith('B0033_')) {
+            newUbication = newUbication.substring(0, cutString);
+            newUbication = newUbication.replace('B0033_', '');
+            document.getElementById((newUbication).trim()).className += ' ubicationFound';
+          }
         }
       });
     }, error => {
@@ -139,7 +142,8 @@ export class InventarioBodegaDespachoComponent implements OnInit {
 
   GetStoreByUbication(ubication: string) {
     this.load = true;
-    this.ubicationModal = document.getElementById(ubication).getAttribute('pTooltip');
+    this.ubicationModal = this.ubicationModal.length >= 14 ? this.ubicationModal.substring(0, 14) : this.ubicationModal;
+    this.ubicationModal += document.getElementById(ubication).getAttribute('pTooltip');
     this.storehouseService.GetInventarioPorUbicacion(ubication).subscribe(data => {
       this.dataSearched = this.getConsolidateInformation(data);
       this.showDataStore = true;
@@ -187,6 +191,13 @@ export class InventarioBodegaDespachoComponent implements OnInit {
       });
     });
     return data;
+  }
+
+  changeTab(index : any) {
+    this.ubicationModal = ``;  
+    index == 0 ? this.ubicationModal = 'BODEGA 0031 - ' : 
+    index == 1 ? this.ubicationModal = 'BODEGA 0032 - ' :
+    index == 2 ? this.ubicationModal = 'BODEGA 0033 - ' : this.ubicationModal = 'BODEGA 0031 - ';
   }
 }
 
