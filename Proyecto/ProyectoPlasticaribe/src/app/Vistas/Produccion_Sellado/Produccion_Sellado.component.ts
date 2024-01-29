@@ -307,9 +307,9 @@ export class Produccion_SelladoComponent implements OnInit {
               if (this.formSellado.value.idOperario != null) {
                 if ((this.formSellado.value.idOperario).length < 5) {
                   if (this.formSellado.value.cantUnd > 0) {
-                    if (this.formSellado.value.cantKg > 0) this.crearEntrada(this.ordenesTrabajo[0]);
+                    if (this.formSellado.value.cantKg > 0 && this.formSellado.value.cantKg <= 50) this.crearEntrada(this.ordenesTrabajo[0]);
                     else {
-                      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en kilos debe ser mayor que '0'!`);
+                      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en kilos ser mayor a '0' y menor o igual a 50!`);
                       this.cargando = false;
                     }
                   } else {
