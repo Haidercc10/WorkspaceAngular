@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { Dt_OrdenFacturacionService } from 'src/app/Servicios/Dt_OrdenFacturacion/Dt_OrdenFacturacion.service';
@@ -49,7 +50,8 @@ export class Orden_FacturacionComponent implements OnInit {
     private orderFactService: OrdenFacturacionService,
     private dtOrderFactService: Dt_OrdenFacturacionService,
     private createPDFService: CreacionPdfService,
-    private invZeusService: InventarioZeusService,) {
+    private invZeusService: InventarioZeusService,
+    private bagproService : BagproService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
@@ -127,7 +129,20 @@ export class Orden_FacturacionComponent implements OnInit {
     this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
       this.selectedProductSaleOrder = null;
       this.products = data.filter(x => x.cant_Pendiente > 0);
+      this.getClientFromSaleOrder();
     });
+  }
+
+  getClientFromSaleOrder() {
+    let idthird: string = this.products[0].id_Cliente;
+    this.invZeusService.getClientByIdThird(idthird).subscribe(data => {
+      data.forEach(cli => {
+        this.formDataOrder.patchValue({
+          idClient: cli.idtercero,
+          client: cli.razoncial,
+        });
+      });
+    }, error => this.msj.mensajeError(`¡No se encontró información del cliente asociado al pedido!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   selectedClient() {
@@ -183,6 +198,26 @@ export class Orden_FacturacionComponent implements OnInit {
       });
       setTimeout(() => this.load = false, 50);
     }, error => this.msj.mensajeError(error));
+  }
+
+  searchProductionFromBagPro() {
+    let idProduct: number = this.formDataOrder.value.item;
+    this.dtOrderFactService.GetNotAvaibleProduction().subscribe(notAvaible => {
+      this.bagproService.getAvaibleProduction(idProduct.toString(), notAvaible).subscribe(data => {
+        data.forEach(dataProduction => {
+          if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.item)) {
+            this.production.push({
+              saleOrder: this.formDataOrder.value.saleOrder,
+              item: dataProduction.item,
+              reference: dataProduction.reference,
+              numberProduction: dataProduction.numberProduction,
+              quantity: dataProduction.quantity,
+              presentation: dataProduction.presentation
+            });
+          }
+        });
+      });
+    });
   }
 
   selectedProduction(production: production) {
@@ -315,6 +350,7 @@ export class Orden_FacturacionComponent implements OnInit {
         let totalQuantity: number = 0;
         data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
         consolidatedInformation.push({
+          "Pedido": prod.dtOrder.consecutivo_Pedido,
           "Item": prod.producto.prod_Id,
           "Referencia": prod.producto.prod_Nombre,
           "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
@@ -388,8 +424,8 @@ export class Orden_FacturacionComponent implements OnInit {
   }
 
   tableConsolidated(data) {
-    let columns: Array<string> = ['Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['10%', '40%', '20%', '20%', '10%'];
+    let columns: Array<string> = ['Pedido', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['10%', '10%', '40%', '10%', '20%', '10%'];
     return {
       table: {
         headerRows: 1,

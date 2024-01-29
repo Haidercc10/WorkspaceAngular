@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import JsBarcode from 'jsbarcode';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { EncriptacionService } from '../Encriptacion/Encriptacion.service';
+import { ReImpresionEtiquetasService, ReImpresionEtiquetas } from '../ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +14,9 @@ import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 export class CreacionPdfService {
 
-    constructor() { }
+    constructor(private rePrintService: ReImpresionEtiquetasService,
+        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+        private encriptacion : EncriptacionService,) { }
 
     // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
     private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -111,6 +116,7 @@ export class CreacionPdfService {
         let windoeFeatures = `height=500,width=500`;
         let win = window.open('', 'Print', windoeFeatures);
         pdfMake.createPdf(pdfDefinition).print({}, win);
+        if (dataTag.copy) this.createRePrint(dataTag);
         setTimeout(() => win.close(), 8000);
     }
 
@@ -255,6 +261,35 @@ export class CreacionPdfService {
                 { text: productionProcess, alignment: 'center', fontSize: 8 },
             ]
         }
+    }
+
+    createRePrint(dataTag: modelTagProduction) {
+        if (dataTag.copy) {
+            let data: ReImpresionEtiquetas = {
+                Orden_Trabajo: parseInt(dataTag.orderProduction),
+                NumeroRollo_BagPro: dataTag.reel,
+                Proceso_Id: this.validateProcess(dataTag.productionProcess),
+                Fecha: moment().format('YYYY-MM-DD'),
+                Hora: moment().format('HH:mm:ss'),
+                Usua_Id: this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')),
+            }
+            this.rePrintService.insert(data).subscribe(null, error => console.log(error));
+        }
+    }
+
+    validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+      const processMapping = {
+        'EXTRUSION': 'EXT',
+        'IMPRESION': 'IMP',
+        'ROTOGRABADO': 'ROT',
+        'LAMINADO': 'LAM',
+        'DOBLADO': 'DBLD',
+        'CORTE': 'CORTE',
+        'EMPAQUE': 'EMP',
+        'SELLADO': 'SELLA',
+        'WIKETIADO': 'WIKE'
+      };
+      return processMapping[proceso] || proceso;
     }
 }
 

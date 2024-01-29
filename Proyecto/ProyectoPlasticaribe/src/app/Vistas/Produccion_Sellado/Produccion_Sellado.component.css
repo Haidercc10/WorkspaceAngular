@@ -124,3 +124,11 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
   background-color: #F3FC20;
   font-size: calc(var(--font-size) * 15px);
 }
+
+.reImpresion {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; 
+  /* cursor: pointer; */
+}

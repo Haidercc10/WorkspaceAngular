@@ -189,4 +189,11 @@ export class InventarioZeusService {
   GetFactura_PorPedidos = (orderSales: Array<string>) => this.http.post(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura_PorPedidos`, orderSales);
 
   GetFactura = (orderSales: number): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura/${orderSales}`);
+
+  /*********************************************************************** Clientes ******************************************************************************/
+  getClientBtName = (name: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientBtName/${name}`);
+
+  getClientById = (id: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientById/${id}`);
+
+  getClientByIdThird = (id: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientByIdThird/${id}`);
 }

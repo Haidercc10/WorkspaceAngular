@@ -11,11 +11,14 @@ import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Traba
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { RePrint } from '../Produccion_Sellado/Produccion_Sellado.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-Produccion_Extrusion',
@@ -41,6 +44,10 @@ export class Produccion_ExtrusionComponent implements OnInit {
   showNameBussiness: boolean = true;
   @ViewChild('dtProduccion') dtProduccion: Table | undefined;
   area : number;
+  modalReImpresion: boolean = false;
+  dataRePrint: Array<RePrint> = [];
+  selectedMode: boolean = false;
+  @ViewChild('dtRePrint') dtRePrint: Table;
 
   constructor(private frmBuilder: FormBuilder,
     private appComponent: AppComponent,
@@ -55,7 +62,8 @@ export class Produccion_ExtrusionComponent implements OnInit {
     private createPDFService: CreacionPdfService,
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
-    private orderProductionsService: Orden_TrabajoService,) {
+    private orderProductionsService: Orden_TrabajoService,
+    private rePrintService: ReImpresionEtiquetasService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formDatosProduccion = this.frmBuilder.group({
@@ -98,7 +106,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
   }
 
   //Función que filtra la info de la tabla 
-  aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  aplicarfiltro = ($event, campo: any, data: Table) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
@@ -196,10 +204,13 @@ export class Produccion_ExtrusionComponent implements OnInit {
           if (value) {
             let valor = this.ab2str(value);
             valor = valor.replace(/[^\d.-]/g, '');
-            this.formDatosProduccion.patchValue({
-              pesoBruto: valor,
-              pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
-            });
+            if (!this.cargando) {
+              this.formDatosProduccion.patchValue({
+                pesoBruto: valor,
+                pesoNeto: valor - this.formDatosProduccion.value.pesoTara,
+              });
+            }
+            
           }
         }
       } catch (error) {
@@ -374,7 +385,27 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
       this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
+      this.contarReImpresionesPorEtiquetas();
     }, () => this.cargando = false, () => this.cargando = false);
+  }
+
+  contarReImpresionesPorEtiquetas() {
+    let rollos: Array<number> = this.rollosPesados.map(x => x.item);
+    this.rePrintService.getCantidadReImpresionesPorEtiqueta(rollos).subscribe(data => {
+      data.forEach((d: any) => {
+        let i: number = this.rollosPesados.findIndex(x => x.item == d.numeroRollo_BagPro);
+        this.rollosPesados[i].reImpresiones += d.cantidad;
+      });
+      this.rollosSinReImpresion(data.map((y: any) => y.numeroRollo_BagPro));
+    }, () => this.rollosSinReImpresion([]));
+  }
+
+  rollosSinReImpresion(data: Array<number>){
+    let rollosNoReimpresos: Array<any> = this.rollosPesados.filter(x => !data.includes(x.item));
+    rollosNoReimpresos.forEach(d => {
+      let i: number = this.rollosPesados.findIndex(x => x.item == d.item);
+      this.rollosPesados[i].reImpresiones = 1;
+    });
   }
 
   sumarPesoBruto() {
@@ -521,6 +552,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
 
   createTagProduction(code: number, quantity: number, quantity2: number, copy: boolean = false) {
     let proceso = this.eliminarDiacriticos(this.proceso).toUpperCase();
+    let data: Array<any> = this.rollosPesados.filter(data => data.item == code);
     let dataTagProduction: modelTagProduction = {
       client: this.formDatosProduccion.value.cliente,
       item: this.formDatosProduccion.value.item,
@@ -541,8 +573,22 @@ export class Produccion_ExtrusionComponent implements OnInit {
       showNameBussiness: this.showNameBussiness,
       copy: copy,
       showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
+      operator: data[0].operador,
     }
     this.createPDFService.createTagProduction(dataTagProduction);
+  }
+
+  showRePrints(reel: number) {
+    this.cargando = true;
+    this.rePrintService.getReImpresionesEtiquetaByRollo(reel).subscribe(data => {
+      this.modalReImpresion = true;
+      this.dataRePrint = data;
+    }, (error: HttpErrorResponse) => this.errorMessage(error), () => this.cargando = false);
+  }
+
+  errorMessage(error: HttpErrorResponse) {
+    this.msj.mensajeError(`No se encontró información del rollo consultado`, `Error: ${error.statusText} | Código: ${error.status}`);
+    this.cargando = false;
   }
 
 }

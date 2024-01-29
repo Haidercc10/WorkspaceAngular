@@ -17,13 +17,13 @@
 </div>
 
 <p-card>
-  <div class="mb-4">
-    <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
-  </div>
-  
   <p-tabView>
     <p-tabPanel header="Subir Producción" leftIcon="pi pi-upload">
-      <div class="row mb-5 g-4">
+      <div class="my-2">
+        <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+      </div>
+  
+      <div class="row my-5 g-4 justify-content-center">
         <div class="col-sm-12 col-md-2">
           <span class="p-float-label">
             <input type="text" id="RolloBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()"/>
@@ -116,6 +116,10 @@
           </tr>
         </ng-template>
       </p-table>
+    </p-tabPanel>
+
+    <p-tabPanel header="Toma Fisíca de Inventario" leftIcon="pi pi-upload">
+      <app-TomaFisicaInventario></app-TomaFisicaInventario>
     </p-tabPanel>
 
     <p-tabPanel header="Consultar Producción" leftIcon="pi pi-search">

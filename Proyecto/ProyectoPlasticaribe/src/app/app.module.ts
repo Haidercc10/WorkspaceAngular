@@ -206,6 +206,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/TomaFisicaInventario.component';
 
 @NgModule({
   declarations: [
@@ -334,6 +335,7 @@ import { AppComponent } from './app.component';
     MovimientosIngresosDespachoComponent,
     EliminarRollos_ProduccionComponent,
     InventarioBodegaDespachoComponent,
+    TomaFisicaInventarioComponent,
   ],
 
   imports: [

@@ -1,0 +1,128 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="mb-4">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar
+    Inventario</h4>
+</div>
+
+<div class="row my-5 g-4 justify-content-center">
+  <div class="col-sm-12 col-md-2">
+    <span class="p-float-label">
+      <input type="text" id="ReelBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()" />
+      <label for="ReelBarsCode">Rollo Leído</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false" [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"></p-dropdown>
+      <label for="bodegas">Bodega</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false" [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"></p-dropdown>
+      <label for="ubication">Ubicación</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion" [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getCubesBySubUbication()"></p-dropdown>
+      <label for="subUbication">Sub Ubicación</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
+      <label for="cube">Cubos</label>
+    </span>
+  </div>
+</div>
+
+<div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+  <button pButton class="p-button-success m-2" type="button" label="Subir Producción" icon="pi pi-send" [disabled]="sendProductionZeus.length == 0" (click)="confirmSendData()"></button>
+  <button pButton class="p-button-danger m-2" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="sendProductionZeus.length == 0" (click)="fillDataProductionIncome()"></button>
+  <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+</div>
+
+<p-table [value]="sendProductionZeus" columnResizeMode="expand" styleClass="p-datatable-sm p-datatable-gridlines"
+  responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
+  scrollHeight="50rem">
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="text-center">#</th>
+      <th class="text-center">Rollo</th>
+      <th class="text-center">OT</th>
+      <th class="text-center">Cliente</th>
+      <th class="text-center">Item</th>
+      <th class="text-center">Referencia</th>
+      <th class="text-center">Cantidad/Peso Neto</th>
+      <th class="text-center">Presentación</th>
+      <th class="text-center">Material</th>
+      <th class="text-center">Maquina</th>
+      <th class="text-center">Fecha</th>
+      <th class="text-center">Hora</th>
+      <th class="text-center">Turno</th>
+      <th class="text-center">Proceso</th>
+      <th class="text-center">Envío Zeus</th>
+      <!-- <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th> -->
+      <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+    <tr>
+      <td class="text-center">{{rowIndex + 1}}</td>
+      <td class="text-center">{{data.pp.numeroRollo_BagPro}}</td>
+      <td class="text-center">{{data.pp.ot}}</td>
+      <td class="text-center">{{data.clientes.cli_Nombre}}</td>
+      <td class="text-center">{{data.producto.prod_Id}}</td>
+      <td class="text-center">{{data.producto.prod_Nombre}}</td>
+      <td class="text-center">{{(['SELLA', 'WIKE'].includes(data.proceso.proceso_Id) ? data.pp.cantidad :
+        data.pp.peso_Neto) | number : '1.2-2'}}</td>
+      <td class="text-center">{{data.pp.presentacion}}</td>
+      <td class="text-center">{{data.dataExtrusion.material}}</td>
+      <td class="text-center">{{data.pp.maquina}}</td>
+      <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
+      <td class="text-center">{{data.pp.hora}}</td>
+      <td class="text-center">{{data.turno.turno_Nombre}}</td>
+      <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
+      <td class="text-center">{{data.pp.envio_Zeus ? 'SI' : 'NO'}}</td>
+      <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+                <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
+            </td> -->
+      <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+        <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-toast position="center" key="SaveData" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="sendDataToZeus()" icon="pi pi-check" label="Sí"
+            class="p-button-warning" pTooltip="Los rollos también serán eliminados de BagPro."></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"
+            class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

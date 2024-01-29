@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -116,20 +117,20 @@ export class LoginComponentComponent implements OnInit {
               this.mensajeService.mensajeError(`¡Error!`, `¡Error al registrar el inicio de sesión!`);
               this.cargando = false;
             });
-          }, () => {
-            this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con BagPro!`);
+          }, (error: HttpErrorResponse) => {
+            this.mensajeService.mensajeError(`¡Error al conectarse con BagPro!`, `Error: ${error.statusText} | Status: ${error.status}`);
             this.cargando = false;
           });
-        }, () => {
-          this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con Contabilidad de Zeus!`);
+        }, (error: HttpErrorResponse) => {
+          this.mensajeService.mensajeError(`¡Error al conectarse con Contabilidad de Zeus!`, `Error: ${error.statusText} | Status: ${error.status}`);
           this.cargando = false;
         });
-      }, () => {
-        this.mensajeService.mensajeError(`¡Error!`, `¡Error al conectarse con Inventario de Zeus!`);
+      }, (error: HttpErrorResponse) => {
+        this.mensajeService.mensajeError(`¡Error al conectarse con Inventario de Zeus!`, `Error: ${error.statusText} | Status: ${error.status}`);
         this.cargando = false;
       });
-    }, () => {
-      this.mensajeService.mensajeError(`¡Error!`, `¡No fue posible iniciar sesión!`);
+    }, (error: HttpErrorResponse) => {
+      this.mensajeService.mensajeError(`¡No fue posible iniciar sesión!`, `Error: ${error.statusText} | Status: ${error.status}`);
       this.cargando = false;
     });
   }

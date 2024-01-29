@@ -50,7 +50,7 @@
       <!-- Client -->
       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
         <span class="p-float-label">
-          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText required (keyup)="getClients()" (change)="selectedClient()"/>
+          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText required readonly (keyup)="getClients()" (change)="selectedClient()"/>
           <datalist id="clientes">
             <option value={{item.cli_Id}} *ngFor="let item of clients">{{item.cli_Nombre}}</option>
           </datalist>
