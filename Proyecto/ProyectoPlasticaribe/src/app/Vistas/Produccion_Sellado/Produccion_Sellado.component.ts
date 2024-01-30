@@ -309,35 +309,35 @@ export class Produccion_SelladoComponent implements OnInit {
                   if (this.formSellado.value.cantUnd > 0) {
                     if (this.formSellado.value.cantKg > 0 && this.formSellado.value.cantKg <= 50) this.crearEntrada(this.ordenesTrabajo[0]);
                     else {
-                      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en kilos ser mayor a '0' y menor o igual a 50!`);
+                      this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡La cantidad de kilos debe ser mayor a '0' y menor o igual a 50!`);
                       this.cargando = false;
                     }
                   } else {
-                    this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad en unidades/paquetes debe ser mayor a '0'!`);
+                    this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡La cantidad en unidades/paquetes debe ser mayor a '0'!`);
                     this.cargando = false;
                   }
                 } else {
-                  this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
+                  this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡Un rollo no puede ser pesado por más de 4 operarios, verifique!`);
                   this.cargando = false;
                 }
               } else {
-                this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar al menos un operario!`);
+                this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar al menos un operario!`);
                 this.cargando = false;
               }
             } else {
-              this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar una máquina válida!`);
+              this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡Debe seleccionar una máquina válida!`);
               this.cargando = false;
             }
           } else {
-            this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No hay ordenes de trabajo consultadas!`);
+            this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡No hay ordenes de trabajo consultadas!`);
             this.cargando = false;
           }
         } else {
-          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe consultar una orden de trabajo!`);
+          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡Debe consultar una orden de trabajo!`);
           this.cargando = false;
         }
       } else {
-        this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe llenar todos los campos!`);
+        this.svcMsjs.mensajeAdvertencia(`Advertencia`, `¡Debe llenar todos los campos!`);
         this.cargando = false;
       }
     }, 500);
