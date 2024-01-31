@@ -8,7 +8,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Ingreso Despacho</h2>
+      <h2 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }">Despacho</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -128,6 +128,10 @@
 
     <p-tabPanel header="Consultar Ingresos Realizados" leftIcon="pi pi-search">
       <app-Movimientos-IngresosDespacho></app-Movimientos-IngresosDespacho>
+    </p-tabPanel>
+
+    <p-tabPanel header="Inventario Bodegas" leftIcon="pi pi-th-large">
+      <app-inventarioBodegaDespacho></app-inventarioBodegaDespacho>
     </p-tabPanel>
 
   </p-tabView>

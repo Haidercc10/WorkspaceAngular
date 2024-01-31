@@ -205,8 +205,6 @@ export class TomaFisicaInventarioComponent implements OnInit {
                 turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
               },
             });
-            // let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
-            // this.updateProductionZeusByBagPro(this.sendProductionZeus[i]);
           });
         });
       } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
