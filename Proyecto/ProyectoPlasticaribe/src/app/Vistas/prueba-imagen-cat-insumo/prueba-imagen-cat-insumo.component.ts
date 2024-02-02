@@ -22,4 +22,5 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
 }

@@ -68,7 +68,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     this.consultarVendedores();
     this.consultarClientes();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
-    this.exportarExcelPorMeses();
   }
 
   tutorial(){

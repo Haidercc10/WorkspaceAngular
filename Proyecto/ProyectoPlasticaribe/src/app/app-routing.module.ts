@@ -44,6 +44,18 @@ export const routes: Routes = [
   { path: 'ordenes-trabajo', loadChildren: () => import('./Modules/orden-trabajo/orden-trabajo.module').then(m => m.OrdenTrabajoModule) },
   { path: 'reportes-procesos-ot', loadChildren: () => import('./Modules/reporte-procesos-ot/reporte-procesos-ot.module').then(m => m.ReporteProcesosOTModule) },
 
+  /*************************************************************** PRODUCCION *************************************************************************************************/
+  { path: 'produccion-procesos', loadChildren: () => import('./Modules/produccion-extrusion/produccion-extrusion.module').then(m => m.ProduccionExtrusionModule) },
+  { path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule) },
+  { path: 'ingreso-despacho', loadChildren: () => import('./Modules/ingreso-produccion-despacho/ingreso-produccion-despacho.module').then(m => m.IngresoProduccionDespachoModule) },
+  { path: 'despacho-mercancia', loadChildren: () => import('./Modules/salida-produccion-despacho/salida-produccion-despacho.module').then(m => m.SalidaProduccionDespachoModule) },
+  { path: 'orden-facturacion', loadChildren: () => import('./Modules/orden-facturacion/orden-facturacion.module').then(m => m.OrdenFacturacionModule) },
+  { path: 'movimientos-orden-facturacion', loadChildren: () => import('./Modules/movimientos-orden-facturacion/movimientos-orden-facturacion.module').then(m => m.MovimientosOrdenFacturacionModule) },
+  { path: 'devolucion-facturacion', loadChildren: () => import('./Modules/devolucion-orden-facturacion/devolucion-orden-facturacion.module').then(m => m.DevolucionOrdenFacturacionModule) },
+  { path: 'pre-ingreso-produccion', loadChildren: () => import('./Modules/pre-ingreso-produccion-despacho/pre-ingreso-produccion-despacho.module').then(m => m.PreIngresoProduccionDespachoModule) },
+  { path: 'mov-preingreso-produccion', loadChildren: () => import('./Modules/movimientos-preingreso-produccion/movimientos-preingreso-produccion.module').then(m => m.MovimientosPreingresoProduccionModule) },
+  { path: 'eliminar-rollos-produccion', loadChildren: () => import('./Modules/eliminar-rollos-produccion/eliminar-rollos-produccion.module').then(m => m.EliminarRollosProduccionModule) },
+
   /********************************** Ingreso de Rollos a Extrusion, Solicitudes y Salidas de Rollos a otros Procesos ******************************************/
   { path: 'IngresoRollos-Extrusion', loadChildren: () => import('./Modules/ingreso-rollos/ingreso-rollos.module').then(m => m.IngresoRollosModule) },
   { path: 'Solicitud-Rollos-Bodegas', loadChildren: () => import('./Modules/solicitud-rollos/solicitud-rollos.module').then(m => m.SolicitudRollosModule) },
@@ -125,29 +137,12 @@ export const routes: Routes = [
   /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
   { path: 'control-calidad', loadChildren: () => import('./Modules/control-calidad/control-calidad.module').then(m => m.ControlCalidadModule) },
 
-  /*************************************************************** CONTROLES DE CALIDAD *************************************************************************************************/
+  /***************************************************************  *************************************************************************************************/
   { path: 'costos-caja-menor', loadChildren: () => import('./Modules/costos-caja-menor/costos-caja-menor.module').then(m => m.CostosCajaMenorModule) },
-
-  /** */
   { path: 'facturacion-detallada', loadChildren: () => import('./Modules/reporte-facturacion-detallada/reporte-facturacion-detallada.module').then(m => m.ReporteFacturacionDetalladaModule) },
-
-  // 
   { path: 'reporte-produccion', loadChildren: () => import('./Modules/reporte-produccion/reporte-produccion.module').then(m => m.ReporteProduccionModule) },
-
-  // 
   { path: 'reportes-generales', loadChildren: () => import('./Modules/reportes-consolidados/reportes-consolidados.module').then(m => m.ReportesConsolidadosModule) },
-
-  /*************************************************************** PRODUCCION *************************************************************************************************/
-  { path: 'produccion-procesos', loadChildren: () => import('./Modules/produccion-extrusion/produccion-extrusion.module').then(m => m.ProduccionExtrusionModule) },
-  { path: 'produccion-sellado', loadChildren: () => import('./Modules/produccion-sellado/produccion-sellado.module').then(m => m.ProduccionSelladoModule) },
-  { path: 'ingreso-despacho', loadChildren: () => import('./Modules/ingreso-produccion-despacho/ingreso-produccion-despacho.module').then(m => m.IngresoProduccionDespachoModule) },
-  { path: 'despacho-mercancia', loadChildren: () => import('./Modules/salida-produccion-despacho/salida-produccion-despacho.module').then(m => m.SalidaProduccionDespachoModule) },
-  { path: 'orden-facturacion', loadChildren: () => import('./Modules/orden-facturacion/orden-facturacion.module').then(m => m.OrdenFacturacionModule) },
-  { path: 'movimientos-orden-facturacion', loadChildren: () => import('./Modules/movimientos-orden-facturacion/movimientos-orden-facturacion.module').then(m => m.MovimientosOrdenFacturacionModule) },
-  { path: 'devolucion-facturacion', loadChildren: () => import('./Modules/devolucion-orden-facturacion/devolucion-orden-facturacion.module').then(m => m.DevolucionOrdenFacturacionModule) },
-  { path: 'pre-ingreso-produccion', loadChildren: () => import('./Modules/pre-ingreso-produccion-despacho/pre-ingreso-produccion-despacho.module').then(m => m.PreIngresoProduccionDespachoModule) },
-  { path: 'mov-preingreso-produccion', loadChildren: () => import('./Modules/movimientos-preingreso-produccion/movimientos-preingreso-produccion.module').then(m => m.MovimientosPreingresoProduccionModule) },
-  { path: 'eliminar-rollos-produccion', loadChildren: () => import('./Modules/eliminar-rollos-produccion/eliminar-rollos-produccion.module').then(m => m.EliminarRollosProduccionModule) },
+  { path: 'reporte-facturacion-clientes', loadChildren: () => import('./Modules/reporte-facturacion-clientes/reporte-facturacion-clientes.module').then(m => m.ReporteFacturacionClientesModule) },
 ]
 
 @NgModule({

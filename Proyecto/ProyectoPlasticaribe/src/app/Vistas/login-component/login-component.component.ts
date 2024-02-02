@@ -13,6 +13,7 @@ import { AuthenticationService } from 'src/app/_Services/authentication.service'
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
 import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
+import { AppComponent } from 'src/app/app.component';
 
 /**
  * The `LoginComponentComponent` class handles the login functionality of the application.
@@ -28,33 +29,34 @@ import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_
 
 export class LoginComponentComponent implements OnInit {
 
-  cargando : boolean = false;
+  cargando: boolean = false;
   formularioUsuario !: FormGroup;
-  data:any=[];
-  ruta : any;
-  mostrarPass : boolean = false;
-  empresas: any [] = [];
-  ipAddress : any;
-  modoSeleccionado : boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
+  data: any = [];
+  ruta: any;
+  mostrarPass: boolean = false;
+  empresas: any[] = [];
+  ipAddress: any;
+  modoSeleccionado: boolean; //Variable para validar el tema seleccionado, si la variable es true estará en modo oscuro, si es false estará en modo claro
 
-  constructor(private empresaServices : EmpresaService,
-                private frmBuilderUsuario : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private authenticationService: AuthenticationService,
-                      private router: Router,
-                        private movAplicacionService : MovimientosAplicacionService,
-                          private authenticationInvZeusService : AuthenticationService_InvZeus,
-                            private authenticationContaZeusService : authentication_ContaZeus,
-                              private authenticationBagPro : authentication_BagPro,
-                                private encriptacion : EncriptacionService,
-                                  private cookiesServices : CookieService,
-                                    private mensajeService : MensajesAplicacionService,) {
+  constructor(private empresaServices: EmpresaService,
+    private frmBuilderUsuario: FormBuilder,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+    private authenticationService: AuthenticationService,
+    private router: Router,
+    private movAplicacionService: MovimientosAplicacionService,
+    private authenticationInvZeusService: AuthenticationService_InvZeus,
+    private authenticationContaZeusService: authentication_ContaZeus,
+    private authenticationBagPro: authentication_BagPro,
+    private encriptacion: EncriptacionService,
+    private cookiesServices: CookieService,
+    private mensajeService: MensajesAplicacionService,
+    private appComponent: AppComponent,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
-       && this.storage.get('Token_BagPro')
-       && this.storage.get('Token_Inv_Zeus')
-       && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
+      && this.storage.get('Token_BagPro')
+      && this.storage.get('Token_Inv_Zeus')
+      && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
 
     window.localStorage.setItem('theme', this.cookiesServices.get('theme'));
     this.modoSeleccionado = window.localStorage.getItem('theme') == 'dark' ? true : false;
@@ -70,12 +72,13 @@ export class LoginComponentComponent implements OnInit {
     this.cookiesServices.delete('MostrarEventosDia');
     localStorage.clear();
     this.cargaDatosComboBox();
+    this.appComponent.ValidarRol = undefined;
   }
 
   // Funcion que guardará informacion a en la sesion
   saveInLocal(key, val): void {
     this.storage.set(key, val);
-    this.data[key]= this.storage.get(key);
+    this.data[key] = this.storage.get(key);
   }
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
@@ -88,25 +91,25 @@ export class LoginComponentComponent implements OnInit {
   validarCamposVacios = () => this.formularioUsuario.valid ? this.consultaLogin() : this.mensajeService.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
-  consultaLogin(){
+  consultaLogin() {
     this.cargando = true;
-    let empresa : number = this.formularioUsuario.value.Empresa;
-    let idUsuario : number = this.formularioUsuario.value.Identificacion;
-    let contrasena : string = this.formularioUsuario.value.Contrasena;
-    let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
+    let empresa: number = this.formularioUsuario.value.Empresa;
+    let idUsuario: number = this.formularioUsuario.value.Identificacion;
+    let contrasena: string = this.formularioUsuario.value.Contrasena;
+    let data: any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
     this.authenticationService.login(data).subscribe(datos => {
       this.authenticationInvZeusService.login().subscribe(() => {
         this.authenticationContaZeusService.login().subscribe(() => {
           this.authenticationBagPro.login().subscribe(() => {
-            let idUsuario : number = datos.usua_Id;
+            let idUsuario: number = datos.usua_Id;
             let nombre: string = datos.usuario;
             let rol: number = datos.rolUsu_Id;
-            let infoMovimientoAplicacion : any = {
-              "Usua_Id" : idUsuario,
-              "MovApp_Nombre" : `Inicio de sesión`,
-              "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
-              "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
-              "MovApp_Hora" : moment().format('H:mm:ss'),
+            let infoMovimientoAplicacion: any = {
+              "Usua_Id": idUsuario,
+              "MovApp_Nombre": `Inicio de sesión`,
+              "MovApp_Descripcion": `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+              "MovApp_Fecha": moment().format('YYYY-MM-DD'),
+              "MovApp_Hora": moment().format('H:mm:ss'),
             }
             this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(() => {
               this.saveInLocal('Id', this.encriptacion.encrypt(idUsuario.toString()));

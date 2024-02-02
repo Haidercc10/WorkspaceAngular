@@ -207,6 +207,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/TomaFisicaInventario.component';
+import { ReporteFacturacionClientesComponent } from './Vistas/ReporteFacturacionClientes/ReporteFacturacionClientes.component';
 
 @NgModule({
   declarations: [
@@ -336,6 +337,7 @@ import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/Tom
     EliminarRollos_ProduccionComponent,
     InventarioBodegaDespachoComponent,
     TomaFisicaInventarioComponent,
+    ReporteFacturacionClientesComponent
   ],
 
   imports: [

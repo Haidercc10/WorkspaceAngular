@@ -12,7 +12,7 @@
 <div class="row my-5 g-4 justify-content-center">
   <div class="col-sm-12 col-md-2">
     <span class="p-float-label">
-      <input type="text" id="ReelBarsCode" pInputText pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()" />
+      <input type="text" id="ReelBarsCode" pInputText autocomplete="off" pAutoFocus [autofocus]="true" [(ngModel)]="productionSearched" (keyup.enter)="validateUbicationSelected()" />
       <label for="ReelBarsCode">Rollo Leído</label>
     </span>
   </div>
@@ -43,6 +43,16 @@
       <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
       <label for="cube">Cubos</label>
     </span>
+  </div>
+
+  <div class="col-sm-12 col-md-6 col-xl-2" id="iva">
+    <div class="field-checkbox my-2 mx-4">
+      <p-triStateCheckbox [(ngModel)]="searchIn" inputId="tricheckbox"></p-triStateCheckbox>
+      <label for="tricheckbox">
+        <p-chip [label]="searchIn == null ? 'Todos' : searchIn ? 'Extrusión/Empaque' : 'Sellado'"
+                [icon]="searchIn == null ? 'pi pi-sync' : searchIn ? 'pi pi-bolt' : 'pi pi-box'"></p-chip>
+      </label>
+    </div>
   </div>
 </div>
 

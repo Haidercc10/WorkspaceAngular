@@ -11,6 +11,8 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
 import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
+import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 
 @Component({
   selector: 'app-TomaFisicaInventario',
@@ -36,6 +38,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   productionSearched: any;
   sendProductionZeus: any[] = [];
   dataSearched: Array<dataDesp> = [];
+  searchIn: any = null;
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
@@ -45,7 +48,8 @@ export class TomaFisicaInventarioComponent implements OnInit {
     private entraceService: EntradaRollosService,
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
-    private messageService: MessageService,) {
+    private messageService: MessageService,
+    private clients: SedeClienteService,) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
@@ -159,51 +163,56 @@ export class TomaFisicaInventarioComponent implements OnInit {
   }
 
   lookingForDataInBagpro(production: number) {
-    this.bagproService.GetProductionByNumber(production).subscribe(prod => {
+    let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLADO' : 'EXTRUSION';
+    this.bagproService.GetProductionByNumber(production, searchInTable).subscribe(prod => {
       if (prod.length > 0) {
         this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
           data.forEach(res => {
-            this.sendProductionZeus.push({
-              pp: {
-                ot: prod[0].ot,
-                numero_Rollo: prod[0].item,
-                numeroRollo_BagPro: prod[0].item,
-                presentacion: res.presentacion == 'Kilo' ? 'Kg' : res.presentacion == 'Unidad' ? 'Und' : 'Paquete',
-                cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : prod[0].extnetokg,
-                peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
-                peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
-                maquina: prod[0].maquina,
-                fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
-                hora: prod[0].hora,
-                envio_Zeus: parseInt(prod[0].envioZeus),
-              },
-              producto: {
-                prod_Id: res.id_Producto,
-                prod_Nombre: res.producto,
-                prod_Ancho: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extancho : res.selladoCorte_Etiqueta_Ancho,
-                prod_Largo: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extlargo : res.selladoCorte_Etiqueta_Largo,
-                prod_Fuelle: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extfuelle : res.selladoCorte_Etiqueta_Fuelle,
-              },
-              clientes: {
-                cli_Nombre: res.cliente,
-              },
-              dataExtrusion: {
-                numero_RolloBagPro: prod[0].item,
-                extrusion_Ancho1: res.ancho1_Extrusion,
-                extrusion_Ancho2: res.ancho2_Extrusion,
-                extrusion_Ancho3: res.ancho3_Extrusion,
-                undMed_Id: res.und_Extrusion,
-                extrusion_Calibre: res.calibre_Extrusion,
-                material: prod[0].material,
-                precioProducto: res.presentacion == 'Kilo' ? res.valorKg : res.valorUnidad,
-              },
-              proceso: {
-                proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
-                proceso_Nombre: prod[0].nomStatus,
-              },
-              turno: {
-                turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
-              },
+            this.clients.GetSedeClientexNitBagPro(res.id_Cliente).subscribe(cli => {
+              this.sendProductionZeus.push({
+                pp: {
+                  ot: parseInt(prod[0].ot),
+                  numero_Rollo: prod[0].item,
+                  numeroRollo_BagPro: prod[0].item,
+                  presentacion: res.presentacion == 'Kilo' ? 'Kg' : res.presentacion == 'Unidad' ? 'Und' : 'Paquete',
+                  cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : prod[0].extnetokg,
+                  peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
+                  peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
+                  maquina: parseInt(prod[0].maquina),
+                  fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
+                  hora: prod[0].hora,
+                  envio_Zeus: parseInt(prod[0].envioZeus),
+                },
+                producto: {
+                  prod_Id: res.id_Producto,
+                  prod_Nombre: res.producto,
+                  prod_Ancho: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extancho : res.selladoCorte_Etiqueta_Ancho,
+                  prod_Largo: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extlargo : res.selladoCorte_Etiqueta_Largo,
+                  prod_Fuelle: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extfuelle : res.selladoCorte_Etiqueta_Fuelle,
+                },
+                clientes: {
+                  cli_Id: cli.length > 0 ? cli[0].id_Cliente : 1,
+                  cli_Nombre: res.cliente,
+                },
+                dataExtrusion: {
+                  numero_RolloBagPro: prod[0].item,
+                  extrusion_Ancho1: res.ancho1_Extrusion,
+                  extrusion_Ancho2: res.ancho2_Extrusion,
+                  extrusion_Ancho3: res.ancho3_Extrusion,
+                  undMed_Id: res.und_Extrusion,
+                  extrusion_Calibre: res.calibre_Extrusion,
+                  material: ['SELLADO','Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
+                  precioProducto: res.presentacion == 'Kilo' ? res.valorKg : res.valorUnidad,
+                },
+                proceso: {
+                  proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
+                  proceso_Nombre: prod[0].nomStatus,
+                },
+                turno: {
+                  turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
+                },
+                dataFromExtrusion: prod[0],
+              });
             });
           });
         });
@@ -229,24 +238,41 @@ export class TomaFisicaInventarioComponent implements OnInit {
   sendDataToZeus() {
     this.onReject();
     let count: number = 0;
-    this.load = true;
     let sendProductionEnvioZeus: Array<any> = this.sendProductionZeus.filter(x => x.pp.envio_Zeus == 0);
-    sendProductionEnvioZeus.forEach(data => {
-      let process: string = data.proceso.proceso_Nombre;
-      let ot: string = data.pp.ot;
-      let item: string = data.producto.prod_Id;
-      let presentation: string = this.validatePresentation(data.pp.presentacion);
-      let reel: number = data.pp.numero_Rollo;
-      let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
-      let price: number = data.dataExtrusion.precioProducto;
-      this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-        this.saveDataEntrace(data);
-        if (data.pp.numero_Rollo == data.pp.numero_RolloBagPro) this.updateProductionZeusByBagPro(reel, process);
-        else this.updateProductionZeus(reel);
-        count++;
-      }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
-      if (count == sendProductionEnvioZeus.length) this.messageConfirmationUpdateStore();
-    });
+    if (sendProductionEnvioZeus.length > 0) {
+      this.load = true;
+      sendProductionEnvioZeus.forEach(data => {
+        let process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' = this.validateProcess((data.proceso.proceso_Nombre).toUpperCase());
+        let ot: string = data.pp.ot;
+        let item: string = data.producto.prod_Id;
+        let presentation: string = this.validatePresentation(data.pp.presentacion);
+        let reel: number = data.pp.numero_Rollo;
+        let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
+        let price: number = data.dataExtrusion.precioProducto;
+        this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
+          this.saveDataEntrace(data);
+          if (data.pp.numero_Rollo == data.pp.numeroRollo_BagPro) this.saveInProductionProcess(reel, process);
+          else this.updateProductionZeus(reel);
+          count++;
+          if (count == sendProductionEnvioZeus.length) this.messageConfirmationUpdateStore();
+        }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
+      });
+    }
+  }
+
+  validateProcess(process: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' {
+    const processMapping = {
+      'EXTRUSION': 'EXT',
+      'IMPRESION': 'IMP',
+      'ROTOGRABADO': 'ROT',
+      'LAMINADO': 'LAM',
+      'DOBLADO': 'DBLD',
+      'CORTE': 'CORTE',
+      'EMPAQUE': 'EMP',
+      'SELLADO': 'SELLA',
+      'WIKETIADO': 'WIKE',
+    };
+    return processMapping[process] || process;
   }
 
   validatePresentation(presentation: string): 'UND' | 'KLS' | 'PAQ' {
@@ -263,16 +289,54 @@ export class TomaFisicaInventarioComponent implements OnInit {
     this.productionProcessSerivce.putSendZeus(reel).subscribe(null, error => this.errorMessageWhenTryUpdateReel(errorMessage, error));
   }
 
-  updateProductionZeusByBagPro(reel: number, process: string) {
-    let errorMessage: string = `¡Error al actualizar el inventario del rollo ${reel}!`;
-    if (['SELLADO', 'Wiketiado'].includes(process)) this.bagproService.EnvioZeusProcSellado(reel).subscribe(null, error => this.errorMessageWhenTryUpdateReel(errorMessage, error));
-    else this.bagproService.EnvioZeusProcExtrusion(reel).subscribe(null, error => this.errorMessageWhenTryUpdateReel(errorMessage, error));
+  createProduction(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE') : modelProduccionProcesos {
+    let data: any = this.sendProductionZeus.filter(x => x.pp.numero_Rollo == numberProduction && x.proceso.proceso_Id == process)[0];
+    let sellado: boolean = ['SELLA', 'WIKE'].includes(process);
+    let datos: modelProduccionProcesos = {
+      OT: data.pp.ot,
+      Numero_Rollo: 0,
+      Prod_Id: data.producto.prod_Id,
+      Cli_Id: data.clientes.cli_Id,
+      Operario1_Id: sellado ? 1523 : 1522,
+      Operario2_Id: 0,
+      Operario3_Id: 0,
+      Operario4_Id: 0,
+      Pesado_Entre: sellado ? data.dataFromExtrusion.divBulto : 1,
+      Maquina: data.pp.maquina,
+      Cono_Id: sellado ? 'N/A' : data.dataFromExtrusion.extCono2,
+      Ancho_Cono: sellado ? 0 : data.dataFromExtrusion.extConoC,
+      Tara_Cono: sellado ? 0 : data.dataFromExtrusion.extTara,
+      Peso_Bruto: sellado ? data.dataFromExtrusion.peso : data.dataFromExtrusion.extBruto,
+      Peso_Neto: sellado ? data.dataFromExtrusion.peso : data.dataFromExtrusion.extnetokg,
+      Cantidad: sellado ? data.dataFromExtrusion.qty : data.pp.presentacion == 'Kg' ? 0 : 1,
+      Peso_Teorico: sellado ? data.dataFromExtrusion.pesot : 0,
+      Desviacion: sellado ? data.dataFromExtrusion.desv : 0,
+      Precio: 0,
+      Presentacion: data.pp.presentacion,
+      Proceso_Id: process,
+      Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno ,
+      Envio_Zeus: true,
+      Datos_Etiqueta: sellado ? data.dataFromExtrusion.fechaCambio : '',
+      Fecha: sellado ? data.dataFromExtrusion.fechaEntrada : data.dataFromExtrusion.fecha,
+      Hora: data.dataFromExtrusion.hora,
+      Creador_Id: 123456789,
+      NumeroRollo_BagPro: data.dataFromExtrusion.item,
+    }
+    return datos; 
+  }
+
+  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE'){
+    this.productionProcessSerivce.Post(this.createProduction(numberProduction, process)).subscribe(null, error => {
+      let errorMessage: string = `¡No fue posible crear el registro del Rollo/Bulto #${numberProduction} proveniente de 'BagPro'!`;
+      this.errorMessageWhenTryUpdateReel(errorMessage, error);
+    });
   }
 
   messageConfirmationUpdateStore() {
     this.msj.mensajeConfirmacion('¡Los rollos se subieron al inventario de manera satisfactoria!');
     this.load = false;
     this.fillDataProductionIncome();
+    this.clearFields();
   }
 
   errorMessageWhenTryUpdateReel(message: string, error: HttpErrorResponse) {

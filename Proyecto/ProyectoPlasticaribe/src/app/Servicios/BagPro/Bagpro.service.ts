@@ -40,6 +40,8 @@ export class BagproService {
 
   GetEtiquetaBagpro = (rollo : any, reimpresion : any) => this.http.get<any>(this.rutaBagPro + `/ProcSellado/getEtiquetaBagpro/${rollo}/${reimpresion}`);
 
+  PutEnvioZeusSellado = (rollo: number) => this.http.get<any>(`${this.rutaBagPro}/ProcSellado/putEnvioZeus/${rollo}`);
+
   /***************************************************** PROCEXTRUSION ***************************************************************/
 
   srvObtenerListaProcExt = ():Observable<any[]> => this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
@@ -74,7 +76,7 @@ export class BagproService {
 
   GetDatosRollosPesados = (orden : string, proceso : string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getDatosRollosPesados/${orden}/${proceso}`);
 
-  GetProductionByNumber = (production : number) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionByNumber/${production}`);
+  GetProductionByNumber = (production : number, searchIn: string) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionByNumber/${production}/${searchIn}`);
 
   GetProductionForExitByNumber = (production : number) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionForExitByNumber/${production}`);
 
@@ -83,6 +85,8 @@ export class BagproService {
   GetProductionByProduction = (production : number) : Observable<any[]> => this.http.get<any>(`${this.rutaBagPro}/ProcExtrusion/getProductionByProduction/${production}`);
 
   getAvaibleProduction = (item: string, notAvaible: Array<number>): Observable<any> => this.http.post(`${this.rutaBagPro}/ProcExtrusion/getAvaibleProduction/${item}`, notAvaible);
+
+  PutEnvioZeusExtrusion = (rollo: number) => this.http.put<any>(`${this.rutaBagPro}/ProcExtrusion/putEnvioZeus/${rollo}`, rollo);
   /********************************************************** CLIENTESOT ****************************************************************/
 
   srvActualizar = (id:number|String, data:any, estado : any) => this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);

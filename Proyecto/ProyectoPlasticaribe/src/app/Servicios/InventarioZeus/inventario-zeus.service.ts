@@ -46,6 +46,10 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulosxId/${id}`);
   }
 
+  GetItemsByName = (name: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/getItemsByName/${name}`);
+
+  GetItemsByNumber = (number: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Articulos/getItemsByNumber/${number}`);
+
   /************************************************************ EXISTENCIAS **************************************************************/
   srvObtenerExistenciasZeus(): Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');
@@ -180,6 +184,8 @@ export class InventarioZeusService {
 
   getEstadisticaVentasAnio = (anio: any, ruta?: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getEstadisticaVentasAnio/${anio}${ruta}`);
 
+  GetBillsByClient = (route: string): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/MovimientoItems/getBillsByClient${route}`);
+
   //*********************************************************************** TRANSAC ******************************************************************************/
   GetRecibosCaja = (fecha1: any, fecha2: any): Observable<any> => this.http.get<any>(`${this.rutaInventarioZeusAPI}/Transac/getRecibosCaja/${fecha1}/${fecha2}`);
 
@@ -191,7 +197,7 @@ export class InventarioZeusService {
   GetFactura = (orderSales: number): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Cruce_DocumentosRelacionados/getFactura/${orderSales}`);
 
   /*********************************************************************** Clientes ******************************************************************************/
-  getClientBtName = (name: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientBtName/${name}`);
+  getClientByName = (name: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientByName/${name}`);
 
   getClientById = (id: string): Observable<any> => this.http.get(`${this.rutaInventarioZeusAPI}/Clientes/getClientById/${id}`);
 

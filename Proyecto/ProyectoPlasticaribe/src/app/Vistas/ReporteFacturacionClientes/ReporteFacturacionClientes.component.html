@@ -1,0 +1,217 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }">Facturación de Clientes</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card>
+  <div class="my-4">
+    <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-book"></i> Filtros de
+      Busqueda</h4>
+  </div>
+
+  <form [formGroup]="formClientFilters">
+    <div class="row my-5 g-4 justify-content-center">
+      <!-- START DATE -->
+      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-calendar formControlName="start" inputId="start" [showIcon]="true"></p-calendar>
+          <label for="start">Fecha Inicial</label>
+        </span>
+      </div>
+
+      <!-- END DATE -->
+      <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-calendar formControlName="end" inputId="end" [showIcon]="true"></p-calendar>
+          <label for="end">Fecha Final</label>
+        </span>
+      </div>
+
+      <!-- ID CLIENT -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 col-xxl-1">
+        <span class="p-float-label">
+          <input formControlName="idClient" id="idClient" type="number" pInputText (keyup.enter)="searchClients()" />
+          <label for="idClient">Id Cliente</label>
+        </span>
+      </div>
+
+      <!-- CLIENT -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-float-label">
+          <input formControlName="client" id="Cliente" list="clientes" type="text" autocomplete="off" pInputText (keyup)="searchClientsByName()" (change)="selectClient()" />
+          <datalist id="clientes">
+            <option value={{item.idcliente}} *ngFor="let item of clients">{{item.razoncial}}</option>
+          </datalist>
+          <label for="Cliente">Cliente</label>
+        </span>
+      </div>
+
+      <!-- ITEM -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2 col-xl-1 col-xxl-1">
+        <span class="p-float-label">
+          <input formControlName="item" id="Item" type="number" pInputText (keyup.enter)="searchItems()" />
+          <label for="Item">Item</label>
+        </span>
+      </div>
+
+      <!-- REFERENCE -->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 col-xxl-3">
+        <span class="p-float-label">
+          <input formControlName="reference" id="Referencia" list="items" type="text" autocomplete="off" pInputText (keyup)="searchItemsByName()" (change)="selectItem()" />
+          <datalist id="items">
+            <option value={{item.codigo}} *ngFor="let item of items">{{item.nombre}}</option>
+          </datalist>
+          <label for="Referencia">Referencia</label>
+        </span>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton id="consultar" class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="searchBillsFromClient()"></button>
+        <button pButton id="limpiarTodo" class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+      </div>
+    </div>
+  </form>
+
+  <p-table 
+    #billsClient 
+    [value]="billsPerClient" 
+    *ngIf="!load" 
+    [resizableColumns]="true" 
+    columnResizeMode="expand"
+    styleClass="p-datatable-sm" 
+    responsiveLayout="scroll" 
+    [rowHover]="true" 
+    dataKey="bill" 
+    [scrollable]="true"
+    scrollHeight="50rem">
+    <ng-template pTemplate="header">
+      <tr>
+        <th rowspan="2" colspan="2" class="text-center">#</th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'bill', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'id_Client', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'client', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'date', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotalDiscount', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotalIVA', billsClient)"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'finalSubTotal', billsClient)"></th>
+      </tr>
+      <tr>
+        <th class="text-center" pSortableColumn="bill"><p-sortIcon field="bill"></p-sortIcon> Factura</th>
+        <th class="text-center" pSortableColumn="id_Client"><p-sortIcon field="id_Client"></p-sortIcon> Id Cliente</th>
+        <th class="text-center" pSortableColumn="client"><p-sortIcon field="client"></p-sortIcon> Cliente</th>
+        <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
+        <th class="text-center" pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
+        <th class="text-center" pSortableColumn="subTotalDiscount"><p-sortIcon field="subTotalDiscount"></p-sortIcon> SubTotal Dcto</th>
+        <th class="text-center" pSortableColumn="subTotalIVA"><p-sortIcon field="subTotalIVA"></p-sortIcon> SubTotal IVA</th>
+        <th class="text-center" pSortableColumn="finalSubTotal"><p-sortIcon field="finalSubTotal"></p-sortIcon> Total</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowIndex="rowIndex" let-data let-expanded="expanded">
+      <tr>
+        <td>
+          <button type="button" pButton pRipple [pRowToggler]="data" class="p-button-text p-button-rounded p-button-plain" pTooltip="Haz clic para ver más detalles" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+        </td>
+        <td class="text-center">{{rowIndex + 1 | number}}</td>
+        <td class="text-center">{{data.bill}}</td>
+        <td class="text-center">{{data.id_Client}}</td>
+        <td class="text-center">{{data.client}}</td>
+        <td class="text-center">{{data.date}}</td>
+        <td class="text-right">{{data.subTotal | number : '1.2-2'}}</td>
+        <td class="text-right">{{data.subTotalDiscount | number : '1.2-2'}}</td>
+        <td class="text-right">{{data.subTotalIVA | number : '1.2-2'}}</td>
+        <td class="text-right">{{data.finalSubTotal | number : '1.2-2'}}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="6">Totales</td>
+        <td class="text-right">${{totalBillsClientSubTotal() | number : '1.2-2'}}</td>
+        <td class="text-right">${{totalBillsClientDiscount() | number : '1.2-2'}}</td>
+        <td class="text-right">${{totalBillsClientIVA() | number : '1.2-2'}}</td>
+        <td class="text-right">${{totalBillsClient() | number : '1.2-2'}}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="rowexpansion" let-data>
+      <tr>
+        <td colspan="10">
+          <p-table 
+            #detailsTable 
+            [value]="data.details" 
+            dataKey="numberProductionBagPro"
+            styleClass="p-datatable-gridlines p-datatable-sm" 
+            [scrollable]="true" 
+            scrollHeight="20rem">
+            <ng-template pTemplate="header">
+              <tr>
+                <th rowspan="2">#</th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'item', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'reference', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'quantity', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'presentation', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'price', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotal', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'percentageDiscount', detailsTable)">
+                </th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotalDiscount', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'percentageIVA', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'subTotalIVA', detailsTable)"></th>
+                <th><input pInputText style="width: 100%;" (input)="aplyFilter($event, 'finalSubTotal', detailsTable)"></th>
+              </tr>
+              <tr>
+                <th pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
+                <th pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
+                <th pSortableColumn="quantity"><p-sortIcon field="quantity"></p-sortIcon> Cantidad</th>
+                <th pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
+                <th pSortableColumn="price"><p-sortIcon field="price"></p-sortIcon> Precio</th>
+                <th pSortableColumn="subTotal"><p-sortIcon field="subTotal"></p-sortIcon> SubTotal</th>
+                <th pSortableColumn="percentageDiscount"><p-sortIcon field="percentageDiscount"></p-sortIcon> Porc. Dcto</th>
+                <th pSortableColumn="subTotalDiscount"><p-sortIcon field="subTotalDiscount"></p-sortIcon> SubTotal Dcto.</th>
+                <th pSortableColumn="percentageIVA"><p-sortIcon field="percentageIVA"></p-sortIcon> Porc. IVA</th>
+                <th pSortableColumn="subTotalIVA"><p-sortIcon field="subTotalIVA"></p-sortIcon> SubTotal IVA</th>
+                <th pSortableColumn="finalSubTotal"><p-sortIcon field="finalSubTotal"></p-sortIcon> Total</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowIndex="rowIndex" let-dataDetails>
+              <tr>
+                <td>{{rowIndex + 1}}</td>
+                <td>{{dataDetails.item}}</td>
+                <td>{{dataDetails.reference}}</td>
+                <td>{{dataDetails.quantity}}</td>
+                <td>{{dataDetails.presentation}}</td>
+                <td>{{dataDetails.price | number : '1.2-2'}}</td>
+                <td>{{dataDetails.subTotal | number : '1.2-2'}}</td>
+                <td>{{dataDetails.percentageDiscount | number : '1.2-2'}}</td>
+                <td>{{dataDetails.subTotalDiscount | number : '1.2-2'}}</td>
+                <td>{{dataDetails.percentageIVA | number : '1.2-2'}}</td>
+                <td>{{dataDetails.subTotalIVA | number : '1.2-2'}}</td>
+                <td>{{dataDetails.finalSubTotal | number : '1.2-2'}}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="10">No se encontraron registros</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </td>
+      <tr>
+    </ng-template>
+  </p-table>
+
+</p-card>

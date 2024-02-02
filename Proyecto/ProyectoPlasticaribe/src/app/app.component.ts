@@ -27,31 +27,31 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   providedIn: 'root'
 })
 
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
 
   user?: User | null;
   user_InvZeus?: User_Inv_Zeus | null;
   user_ContaZeus?: user_Conta_Zeus | null;
   user_BagPro?: User_BagPro | null;
   title = 'ProyectoPlasticaribe';
-  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  rutaCarpetaArchivos : string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
-  tamanoLetra : number = 1;
-  temaSeleccionado : boolean = false;
+  storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol: any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol !: number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  rutaCarpetaArchivos: string = 'D:\\Calidad'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
+  tamanoLetra: number = 1;
+  temaSeleccionado: boolean = false;
 
-  constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private authenticationService: AuthenticationService,
-                  private authenticationInvZeusService : AuthenticationService_InvZeus,
-                    private authenticationContaZeusService : authentication_ContaZeus,
-                      private authenticationBagProService : authentication_BagPro,
-                        private cookieService: CookieService,
-                          private config: PrimeNGConfig,
-                            private encriptacion : EncriptacionService,
-                              @Inject(DOCUMENT) private document : Document,) {
-                                
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+    private authenticationService: AuthenticationService,
+    private authenticationInvZeusService: AuthenticationService_InvZeus,
+    private authenticationContaZeusService: authentication_ContaZeus,
+    private authenticationBagProService: authentication_BagPro,
+    private cookieService: CookieService,
+    private config: PrimeNGConfig,
+    private encriptacion: EncriptacionService,
+    @Inject(DOCUMENT) private document: Document,) {
+
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
@@ -63,11 +63,11 @@ export class AppComponent implements OnInit{
   mostrar() {
     window.localStorage.setItem('theme', this.cookieService.get('theme'));
     let modo = window.localStorage.getItem("theme");
-    if(modo) this.temaSeleccionado = modo == 'dark' ? true : false;
+    if (modo) this.temaSeleccionado = modo == 'dark' ? true : false;
     this.cambiar(this.temaSeleccionado);
   }
 
-  cambiar(estado : boolean) {
+  cambiar(estado: boolean) {
     let tema = estado ? 'dark' : 'light';
     window.localStorage.setItem("theme", tema);
     let linkTema = this.document.getElementById('app-theme') as HTMLLinkElement;
@@ -112,7 +112,7 @@ export class AppComponent implements OnInit{
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
+  lecturaStorage() {
     this.storage_Id = this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id'));
     this.storage_Nombre = this.encriptacion.decrypt(this.storage.get('Nombre') == undefined ? '' : this.storage.get('Nombre'));
     this.ValidarRol = parseInt(this.encriptacion.decrypt(this.storage.get('Rol') == undefined ? '' : this.storage.get('Rol')));
@@ -121,15 +121,15 @@ export class AppComponent implements OnInit{
     if (tamanoLetraCambiado == '') this.cookieService.set('TamanoLetra', '0.90', { expires: 365, sameSite: 'Lax' });
     this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
     if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 0.90;
-    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    let fontSize: number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
     this.cookieService.set('tamanoLetraCambiado', 'true', { expires: 365, sameSite: 'Lax' });
   }
 
   //Funcion para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
-  inactividad(){
-    let t : any;
-    let treintaMinutos : number = 1800000; // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
+  inactividad() {
+    let t: any;
+    let treintaMinutos: number = 1800000; // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
     window.onload = reiniciarTiempo;
     document.onmousemove = reiniciarTiempo;
     document.onkeypress = reiniciarTiempo;
@@ -150,7 +150,7 @@ export class AppComponent implements OnInit{
     }
 
     function reiniciarTiempo() {
-      let estadoConexion : boolean = window.navigator.onLine;
+      let estadoConexion: boolean = window.navigator.onLine;
       if (window.location.pathname != '/' || !estadoConexion) tiempoExcedido;
       clearTimeout(t);
       t = setTimeout(tiempoExcedido, treintaMinutos);
