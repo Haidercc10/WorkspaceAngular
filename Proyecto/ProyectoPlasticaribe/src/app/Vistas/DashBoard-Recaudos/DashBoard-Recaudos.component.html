@@ -65,7 +65,7 @@
           <h3 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wallet"></i> Total Cartera</h3>
         </div>
         <div>
-          <h4><b>{{totalCartera | currency : ' COP $'}}</b></h4>
+          <h4><b>{{totalCartera() | currency : ' COP $'}}</b></h4>
         </div>
       </p-card>
     </div>

@@ -39,6 +39,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   nuevasFacturas : any = [];
   items = [];
   dataDevolucion = [];
+  devolutions : any = [];
 
   constructor(private AppComponent : AppComponent,
                 private frmBuilder : FormBuilder,
@@ -134,13 +135,20 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
       let fechaFinal : any = moment(this.formFiltros.value.rangoFechas[1]).format('YYYY-MM-DD');
 
       this.zeusService.getNuevaFacturacionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => { this.llenarDatosFacturas(res) });
-      this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
+      //this.zeusService.getNuevaDevolucionConsolidada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)).subscribe(res => this.llenarDatosDevoluciones(res))
+      
       this.cargarFacturacionDetallada(fechaInicial, fechaFinal, this.validarParametrosConsulta(true));
       if(item != null && item != undefined && item != '') this.cargarDevolucionesDetalladas2(fechaInicial, fechaFinal, this.validarParametrosConsulta(true)); 
-      else this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true)); 
-      
+      else {
+        //this.cargarDevolucionesDetalladas(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true));
+        this.editGroupedDevolutions(fechaInicial, fechaFinal, 1, this.validarParametrosConsulta(true))
+        this.editGroupedDevolutions(fechaInicial, fechaFinal, 2, this.validarParametrosConsulta(true))
+      }  
+
       this.colocarNombresVendedores();
-      setTimeout(() => this.cargando = false, 2000);
+      setTimeout(() =>  { 
+        this.cargando = false;
+      }, 2000);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar el rango de fechas a buscar!`);
   }
 
@@ -166,12 +174,13 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de llenar la guardar la información de las facturas
   llenarDatosFacturas(facturas : any []){
     let filtroFacturas : any = [];
-
+    
     facturas.forEach(fac => {
       if(!filtroFacturas.includes(fac.factura)) {
         filtroFacturas.push(fac.factura);
         this.dataFacturacion.push(fac);
       }
+      console.log(this.dataFacturacion)
       this.dataFacturacion.sort((a,b) => a.recibo.localeCompare(b.recibo));
     });
   }
@@ -179,7 +188,7 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
   // Funcion que se encargará de llenar la guardar la información de las devoluciones
   llenarDatosDevoluciones(devoluciones : any []){
     let filtroFacturas : any = [];
-
+    console.log(devoluciones)
     devoluciones.forEach(dev => {
       if(!filtroFacturas.includes(dev.factura)) {
         filtroFacturas.push(dev.factura);
@@ -608,4 +617,61 @@ export class ReporteFacturacionDetalladaComponent implements OnInit {
 
   //Función que cargará el total de facturas seleccionadas
   totalFacturasModal = () => this.facturasModal.reduce((a, b) => a + b.valorTotal, 0); 
+
+  //.Función que cargará las devoluciones agrupadas con o sin filtros de busqueda. 
+  editGroupedDevolutions(date1 : any, date2 : any, indCPI : number, ruta : any) {
+    this.zeusService.GetDevolucionesDetalladas(date1, date2, indCPI, ruta).subscribe(devolutions => {
+      devolutions.forEach(x => {
+        if(indCPI == 1) this.devolutionsIndicatorCPI1(x);
+        else if(indCPI == 2) this.devolutionsIndicatorCPI2(x);
+      });
+    });
+  }
+
+  //.Función que cargará el nombre del cliente en la tabla de devoluciones.
+  putNameClients = (idClient : any, info : any) => this.zeusService.getClientesxId(idClient).subscribe(data => { info.cliente = data[0].razoncial; });
+
+  //Devoluciones que tienen el indicador CPI 1 - Valor plano
+  devolutionsIndicatorCPI1(x : any){
+    let vendedoresDv : any = {
+      'idVendedor' : x.idvende,
+      'vendedor' : '',
+      'cliente' : x.descritra,
+      'fecha' : x.fechatra,
+      'factura' : x.numefac,
+      'factura2' : 'DV',
+      'item' : '',
+      'referencia' : '',
+      'presentacion' : '',
+      'cantidad' : 1,
+      'precio' : (-(x.valortra)),
+      'valorTotal' : (-(x.valortra)),
+    }
+    this.infoPdf.push(vendedoresDv); 
+    this.colocarNombresVendedores();
+    this.infoPdf.sort((a, b) => Number(parseInt(a.idVendedor)) - Number(parseInt(b.idVendedor)));
+  }
+
+  //Devoluciones que tienen el indicador CPI 2 - Valor con retenciones
+  devolutionsIndicatorCPI2(x : any){
+    let info : any = {
+      'idCliente' : x.cliprv,
+      'cliente' : '',
+      'item' : '',
+      'referencia' : '',
+      'cantidad' : 0,
+      'devolucion' : 1,
+      'presentacion' : '',
+      'precio' : 0,
+      'subTotal' : 0,
+      'suma' : x.valortra,
+      'idVendedor' : x.idvende,
+      'vendedor' : '',
+      'fecha' : x.fechatra,
+      'factura' : x.numefac,
+      'recibo' : 'DEVOLUCIÓN',
+     }
+     this.putNameClients(x.cliprv, info); 
+     setTimeout(() => { this.dataFacturacion.push(info); }, 500); 
+  }
 }

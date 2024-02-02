@@ -31,7 +31,7 @@ export class DashBoardRecaudosComponent implements OnInit {
   carteraAgrupadaClientes : any [] = []; //Variable que almacenará la información de la cartera agrupada por los clientes
   carteraAgrupadaVendedores : any [] = []; //Variable que almacenará la información de la cartera agrupada por vendedores
   cartera : any [] = []; //Variable que almacenará la información de la cartera, información detalla de cada una de las facturas en cartera
-  totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
+  //totalCartera : number = 0; //Variable que almacenará el valor total de la cartera
   vendedores : any [] = []; //Variable que almacenará la información de los vendedores
   clientes : any [] = []; //Variable que almacenará la información de los clientes
   FormFiltros : FormGroup;
@@ -102,7 +102,6 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.carteraAgrupadaClientes = [];
     this.carteraAgrupadaVendedores = [];
     this.cartera = [];
-    this.totalCartera = 0;
 
     if (vendedor != null) ruta += `vendedor=${vendedor}`;
     if (cliente != null) ruta.length > 0 ? ruta += `&cliente=${cliente}` : ruta += `cliente=${cliente}`;
@@ -110,10 +109,12 @@ export class DashBoardRecaudosComponent implements OnInit {
 
     this.zeusService.GetCarteraAgrupadaClientes(ruta).subscribe(data => this.carteraAgrupadaClientes = data);
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
-    this.zeusService.GetCartera(ruta).subscribe(data => this.totalCartera = data, err => this.msj.mensajeError(`${err.error}`));
-    this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data);
+    this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data.filter(x => x.saldo_Cartera > 0));
     setTimeout(() => this.cargando = false, 5000);
   }
+
+  
+  totalCartera = () => this.cartera.filter(x => x.saldo_Cartera > 0).reduce((acc, item) => acc + item.saldo_Cartera, 0);
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number : any) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
