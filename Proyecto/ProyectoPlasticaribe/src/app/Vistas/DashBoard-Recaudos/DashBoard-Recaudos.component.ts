@@ -121,20 +121,18 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   generarPDF(){
     this.cargando = true;
-    let t = setInterval(() => {
-      if (this.cartera.length > 0) {
-        let titulo : string = "Recaudos";
-        let content : any [] = this.contenidoPDF();
-        this.creacionPDFService.formatoPDF(titulo, content);
-        clearInterval(t);
-        setTimeout(() => this.cargando = false, 3000);
-      }
-    }, 1000);
+    if (this.cartera.length > 0) {
+      let informacionPDF = this.seleccionarInformacionPDf();
+      let titulo : string = "Cartera Plasticaribe";
+      let content : any [] = this.contenidoPDF(informacionPDF);
+      this.creacionPDFService.formatoPDF(titulo, content);
+      setTimeout(() => this.cargando = false, 3000);
+    }
   }
 
-  contenidoPDF(){
+  contenidoPDF(informacionPDF){
     let data : any [] = [];
-    let vendedores : any [] = this.obtenerVendedoresCartera();
+    let vendedores : any [] = this.obtenerVendedoresCartera(informacionPDF);
     for (let i = 0; i < vendedores.length; i++) {
       data.push([
         {
@@ -144,15 +142,15 @@ export class DashBoardRecaudosComponent implements OnInit {
           fontSize: 11,
           alignment: 'left'
         },
-        this.clientesVendedorPdf(vendedores[i].id),
+        this.clientesVendedorPdf(vendedores[i].id, informacionPDF),
       ]);
     }
-    data.push(this.totalCarteraPdf());
+    data.push(this.totalCarteraPdf(informacionPDF));
     return data;
   }
 
-  clientesVendedorPdf(vendedor : string){
-    let clientes : any [] = this.cartera.filter(x => x.id_Vendedor == vendedor);
+  clientesVendedorPdf(vendedor : string, informacionPDF){
+    let clientes : any [] = informacionPDF.filter(x => x.id_Vendedor == vendedor);
     clientes.sort((a,b) => a.nombre_CLiente.localeCompare(b.nombre_CLiente));
     let clientesIncluidos : any [] = [];
     let data : any [] = [];
@@ -163,8 +161,9 @@ export class DashBoardRecaudosComponent implements OnInit {
           margin: [5, 0, 5, 5],
           fontSize: 10,
           table: {
+            headerRows: 1,
             widths: ['12%', '60%', '15%', '13%'],
-            body: this.facturasClientes(clientes[i])
+            body: this.facturasClientes(clientes[i], informacionPDF)
           }
         });
       }
@@ -172,8 +171,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     return data;
   }
 
-  facturasClientes(cliente){
-    let facturas : any [] = this.cartera.filter(x => x.id_Cliente == cliente.id_Cliente);
+  facturasClientes(cliente, informacionPDF){
+    let facturas : any [] = informacionPDF.filter(x => x.id_Cliente == cliente.id_Cliente);
     facturas.sort((a,b) => a.id_Fecha.localeCompare(b.id_Fecha));
     let data : any [] = [];
     data.push(this.informacionClientePDF(cliente));
@@ -184,6 +183,7 @@ export class DashBoardRecaudosComponent implements OnInit {
         border: [true, false, true, true],
         table: {
           fontSize: 8,
+          headerRows: 1,
           dontBreakRows: true,
           widths : ['11%', '11%', '11%', '5%', '12%', '12%', '12%', '14%', '12%',],
           body: this.datosFacturasPdf(facturas)
@@ -257,7 +257,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     ]
   }
 
-  totalCarteraPdf(){
+  totalCarteraPdf(informacionPDF){
+    let totalCartera = informacionPDF.reduce((a,b) => a + b.saldo_Cartera, 0);
     return [
       {
         margin: [20, 5],
@@ -271,7 +272,7 @@ export class DashBoardRecaudosComponent implements OnInit {
                 alignment: 'right',
                 fontSize: 11,
                 bold: true,
-                text: `Total Cartera: $ ${this.formatonumeros((this.totalCartera))}`
+                text: `Total Cartera: $ ${this.formatonumeros((totalCartera).toFixed(2))}`
               }
             ]
           ],
@@ -280,9 +281,9 @@ export class DashBoardRecaudosComponent implements OnInit {
     ]
   }
 
-  obtenerVendedoresCartera(){
+  obtenerVendedoresCartera(informacionPDF){
     let vendedores : any [] = [];
-    this.cartera.forEach(factura => {
+    informacionPDF.forEach(factura => {
       if (!vendedores.map(x => x.nombre).includes(factura.nombre_Vendedor)) {
         vendedores.push({
           id : factura.id_Vendedor,
@@ -292,5 +293,12 @@ export class DashBoardRecaudosComponent implements OnInit {
     });
     vendedores.sort((a,b) => a.id - b.id);
     return vendedores;
+  }
+
+  seleccionarInformacionPDf() : any [] {
+    let informacion : any [] = this.cartera;
+    if (this.FormFiltros.value.Vendedor) informacion = informacion.filter(x => x.nombre_Vendedor == this.FormFiltros.value.Vendedor);
+    if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => x.nombre_CLiente == this.FormFiltros.value.Cliente);
+    return informacion;
   }
 }
