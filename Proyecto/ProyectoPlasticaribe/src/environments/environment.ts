@@ -7,9 +7,9 @@ export const environment = {
 
   // SERVIDOR
   rutaPlasticaribeAPI : "http://192.168.0.85:9085/api",
-  // rutaBagPro : "http://192.168.0.85:9095/api",
-  // rutaZeus : "http://192.168.0.85:9055/api",
-  // rutaZeusContabilidad : "http://192.168.0.85:9065/api",
+  rutaBagPro : "http://192.168.0.85:9095/api",
+  rutaZeus : "http://192.168.0.85:9055/api",
+  rutaZeusContabilidad : "http://192.168.0.85:9065/api",
 
   // LOCALES 1
   // rutaPlasticaribeAPI : "http://192.168.0.139:9085/api",
@@ -19,9 +19,9 @@ export const environment = {
 
   // LOCALES 2
   // rutaPlasticaribeAPI : "http://192.168.0.193:9085/api",
-  rutaBagPro : "http://192.168.0.193:9095/api",
-  rutaZeus : "http://192.168.0.193:9075/api",
-  rutaZeusContabilidad : "http://192.168.0.193:9055/api",
+  // rutaBagPro : "http://192.168.0.193:9095/api",
+  // rutaZeus : "http://192.168.0.193:9075/api",
+  // rutaZeusContabilidad : "http://192.168.0.193:9055/api",
 };
 
 /*
