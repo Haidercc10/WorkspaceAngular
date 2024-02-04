@@ -140,10 +140,11 @@ export class TomaFisicaInventarioComponent implements OnInit {
   getInformationProduction() {
     let production = parseInt(this.productionSearched);
     this.productionSearched = null;
+    let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLA' : 'EXT';
     let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
-      this.productionProcessSerivce.GetInformationAboutProductionBagPro(production).subscribe(data => {
+      this.productionProcessSerivce.GetInformationAboutProduction(production, searchInTable).subscribe(data => {
         this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
           this.sendProductionZeus.push(data[0]);
           let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
@@ -157,6 +158,8 @@ export class TomaFisicaInventarioComponent implements OnInit {
             extrusion_Calibre: res[0].calibre_Extrusion,
             material: res[0].material,
           }
+          this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
+          this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
         });
       }, () => this.lookingForDataInBagpro(production));
     }
@@ -168,14 +171,14 @@ export class TomaFisicaInventarioComponent implements OnInit {
       if (prod.length > 0) {
         this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
           data.forEach(res => {
-            this.clients.GetSedeClientexNitBagPro(res.id_Cliente).subscribe(cli => {
+            this.clients.GetSedeClientexNitBagPro(res.nitCliente).subscribe(cli => {
               this.sendProductionZeus.push({
                 pp: {
                   ot: parseInt(prod[0].ot),
                   numero_Rollo: prod[0].item,
                   numeroRollo_BagPro: prod[0].item,
                   presentacion: res.presentacion == 'Kilo' ? 'Kg' : res.presentacion == 'Unidad' ? 'Und' : 'Paquete',
-                  cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : prod[0].extnetokg,
+                  cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : res.presentacion == 'Kilo' ? 0 : 1,
                   peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
                   peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
                   maquina: parseInt(prod[0].maquina),
@@ -213,11 +216,14 @@ export class TomaFisicaInventarioComponent implements OnInit {
                 },
                 dataFromExtrusion: prod[0],
               });
+              let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
+              this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
+              this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
             });
           });
         });
       } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
-    });
+    }, () => this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`));
   }
 
   confirmSendData() {
@@ -249,13 +255,15 @@ export class TomaFisicaInventarioComponent implements OnInit {
         let reel: number = data.pp.numero_Rollo;
         let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
         let price: number = data.dataExtrusion.precioProducto;
-        this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
-          this.saveDataEntrace(data);
-          if (data.pp.numero_Rollo == data.pp.numeroRollo_BagPro) this.saveInProductionProcess(reel, process);
-          else this.updateProductionZeus(reel);
-          count++;
-          if (count == sendProductionEnvioZeus.length) this.messageConfirmationUpdateStore();
-        }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
+        setTimeout(() => {
+          this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, reel, quantity.toString(), price.toString()).subscribe(() => {
+            this.saveDataEntrace(data);
+            if (data.pp.numero_Rollo == data.pp.numeroRollo_BagPro) this.saveInProductionProcess(reel, process);
+            else this.updateProductionZeus(reel);
+            count++;
+            if (count == sendProductionEnvioZeus.length) this.messageConfirmationUpdateStore();
+          }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
+        }, 500);
       });
     }
   }

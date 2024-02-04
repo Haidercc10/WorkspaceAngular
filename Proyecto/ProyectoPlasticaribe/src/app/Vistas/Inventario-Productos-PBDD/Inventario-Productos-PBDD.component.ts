@@ -40,8 +40,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
     private stockService: ExistenciasProductosService,
-    private createExcelService: CreacionExcelService,
-    private bagProService: BagproService,) {
+    private createExcelService: CreacionExcelService,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
   }
 

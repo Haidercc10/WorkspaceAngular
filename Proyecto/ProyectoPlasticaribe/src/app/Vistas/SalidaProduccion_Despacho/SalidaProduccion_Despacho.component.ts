@@ -97,7 +97,10 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       this.production = [];
       let saleOrders: Array<number> = [];
       data.forEach(dataProduction => {
-        this.formProduction.patchValue({ fact: dataProduction.order.factura });
+        this.formProduction.patchValue({
+          fact: dataProduction.order.factura,
+          cli: dataProduction.order.clientes.cli_Id
+        });
         saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
         this.production.push({
           saleOrder: dataProduction.dtOrder.consecutivo_Pedido,
@@ -236,7 +239,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       AsigProdFV_Fecha: moment().format('YYYY-MM-DD'),
       AsigProdFV_Hora: moment().format('HH:mm:ss'),
       AsigProdFV_Observacion: this.formProduction.value.observation,
-      Cli_Id: cli,
+      Cli_Id: 1,
       Usua_Conductor: this.formProduction.value.driver,
       AsigProdFV_PlacaCamion: this.formProduction.value.car,
       AsigProdFV_FechaEnvio: moment().format('YYYY-MM-DD'),
@@ -260,7 +263,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.productionProcessSerivce.putChangeStateProduction(prod.pp.numero_Rollo).subscribe(() => {
           count++;
           if (count == this.sendProductionZeus.length) this.finishSaveData(AsigProdFV_Id);
-        });
+        }, error => this.errorMessage(`¡No se actualizó el estado del rollos!`, error));
       }, error => this.errorMessage(`¡Ocurrió un error al amarrar los rollos a la factura!`, error));
     });
   }
@@ -343,7 +346,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   datosProveedorPDF() {
     let fact = this.formProduction.value.fact;
     let driver = this.drivers.find(x => x.id == this.formProduction.value.driver);
-    let cli = this.formProduction.value.client;
+    let cli = this.sendProductionZeus[0].clientes.cli_Id;
     let nameCli = this.sendProductionZeus[0].clientes.cli_Nombre;
     let idCar = this.formProduction.value.car;
     return {
