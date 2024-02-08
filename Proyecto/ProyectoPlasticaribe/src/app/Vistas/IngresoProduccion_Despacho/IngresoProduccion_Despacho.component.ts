@@ -143,9 +143,9 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             extrusion_Calibre: res[0].calibre_Extrusion,
             material: res[0].material,
           }
-          this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
+          this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+          this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
           this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-          this.updateProductionZeus(this.sendProductionZeus[i]);
         });
       }, () => this.lookingForDataInBagpro(production));
     }
@@ -156,57 +156,55 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.bagproService.GetProductionByNumber(production, searchInTable).subscribe(prod => {
       if (prod.length > 0) {
         this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
-          data.forEach(res => {
-            this.clients.GetSedeClientexNitBagPro(res.nitCliente).subscribe(cli => {
-              this.sendProductionZeus.push({
-                pp: {
-                  ot: parseInt(prod[0].ot),
-                  numero_Rollo: prod[0].item,
-                  numeroRollo_BagPro: prod[0].item,
-                  presentacion: res.presentacion == 'Kilo' ? 'Kg' : res.presentacion == 'Unidad' ? 'Und' : 'Paquete',
-                  cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : res.presentacion == 'Kilo' ? 0 : 1,
-                  peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
-                  peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
-                  maquina: parseInt(prod[0].maquina),
-                  fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
-                  hora: prod[0].hora,
-                  envio_Zeus: parseInt(prod[0].envioZeus),
-                },
-                producto: {
-                  prod_Id: res.id_Producto,
-                  prod_Nombre: res.producto,
-                  prod_Ancho: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extancho : res.selladoCorte_Etiqueta_Ancho,
-                  prod_Largo: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extlargo : res.selladoCorte_Etiqueta_Largo,
-                  prod_Fuelle: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extfuelle : res.selladoCorte_Etiqueta_Fuelle,
-                },
-                clientes: {
-                  cli_Id: cli.length > 0 ? cli[0].id_Cliente : 1,
-                  cli_Nombre: res.cliente,
-                },
-                dataExtrusion: {
-                  numero_RolloBagPro: prod[0].item,
-                  extrusion_Ancho1: res.ancho1_Extrusion,
-                  extrusion_Ancho2: res.ancho2_Extrusion,
-                  extrusion_Ancho3: res.ancho3_Extrusion,
-                  undMed_Id: res.und_Extrusion,
-                  extrusion_Calibre: res.calibre_Extrusion,
-                  material: ['SELLADO','Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
-                  precioProducto: res.presentacion == 'Kilo' ? res.valorKg : res.valorUnidad,
-                },
-                proceso: {
-                  proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
-                  proceso_Nombre: prod[0].nomStatus,
-                },
-                turno: {
-                  turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
-                },
-                dataFromExtrusion: prod[0],
-              });
-              let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
-              this.sendProductionZeus[i].position = this.sendProductionZeus.length + 1;
-              this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-              this.updateProductionZeus(this.sendProductionZeus[i]);
+          this.clients.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(cli => {
+            this.sendProductionZeus.push({
+              pp: {
+                ot: parseInt(prod[0].ot),
+                numero_Rollo: prod[0].item,
+                numeroRollo_BagPro: prod[0].item,
+                presentacion: data[0].presentacion == 'Kilo' ? 'Kg' : data[0].presentacion == 'Unidad' ? 'Und' : 'Paquete',
+                cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : data[0].presentacion == 'Kilo' ? 0 : 1,
+                peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
+                peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
+                maquina: parseInt(prod[0].maquina),
+                fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
+                hora: prod[0].hora,
+                envio_Zeus: parseInt(prod[0].envioZeus),
+              },
+              producto: {
+                prod_Id: data[0].id_Producto,
+                prod_Nombre: data[0].producto,
+                prod_Ancho: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extancho : data[0].selladoCorte_Etiqueta_Ancho,
+                prod_Largo: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extlargo : data[0].selladoCorte_Etiqueta_Largo,
+                prod_Fuelle: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extfuelle : data[0].selladoCorte_Etiqueta_Fuelle,
+              },
+              clientes: {
+                cli_Id: cli.length > 0 ? cli[0].id_Cliente : 1,
+                cli_Nombre: data[0].cliente,
+              },
+              dataExtrusion: {
+                numero_RolloBagPro: prod[0].item,
+                extrusion_Ancho1: data[0].ancho1_Extrusion,
+                extrusion_Ancho2: data[0].ancho2_Extrusion,
+                extrusion_Ancho3: data[0].ancho3_Extrusion,
+                undMed_Id: data[0].und_Extrusion,
+                extrusion_Calibre: data[0].calibre_Extrusion,
+                material: ['SELLADO','Wiketiado'].includes(prod[0].nomStatus) ? prod[0].estado : prod[0].material,
+                precioProducto: data[0].presentacion == 'Kilo' ? data[0].valorKg : data[0].valorUnidad,
+              },
+              proceso: {
+                proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
+                proceso_Nombre: prod[0].nomStatus,
+              },
+              turno: {
+                turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
+              },
+              dataFromExtrusion: prod[0],
             });
+            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
+            this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+            this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+            this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           });
         });
       } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
@@ -270,7 +268,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Operario2_Id: 0,
       Operario3_Id: 0,
       Operario4_Id: 0,
-      Pesado_Entre: sellado ? data.dataFromExtrusion.divBulto : 1,
+      Pesado_Entre: sellado ? data.dataFromExtrusion.divBulto == null ? 1 : data.dataFromExtrusion.divBulto : 1,
       Maquina: data.pp.maquina,
       Cono_Id: sellado ? 'N/A' : data.dataFromExtrusion.extCono2,
       Ancho_Cono: sellado ? 0 : data.dataFromExtrusion.extConoC,

@@ -15,9 +15,13 @@ export class Dt_OrdenFacturacionService {
 
     GetInformacionOrderFact = (id: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFact/${id}`);
 
+    GetInformacionOrderFactToSend = (id: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFactToSend/${id}`);
+
     GetInformationOrderFactByFactForDevolution = (id: number) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getInformationOrderFactByFactForDevolution/${id}`);
 
     GetOrders = (startDate: any, endsDate, ruote: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getOrders/${startDate}/${endsDate}${ruote}`);
+
+    GetSendOrders = (startDate: any, endsDate, ruote: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getSendOrders/${startDate}/${endsDate}${ruote}`);
 
     GetNotAvaibleProduction = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/getNotAvaibleProduction`);
 

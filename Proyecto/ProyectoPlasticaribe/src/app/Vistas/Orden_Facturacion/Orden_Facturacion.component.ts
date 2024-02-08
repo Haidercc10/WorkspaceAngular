@@ -51,7 +51,7 @@ export class Orden_FacturacionComponent implements OnInit {
     private dtOrderFactService: Dt_OrdenFacturacionService,
     private createPDFService: CreacionPdfService,
     private invZeusService: InventarioZeusService,
-    private bagproService : BagproService,) {
+    private bagproService: BagproService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
 
@@ -101,6 +101,8 @@ export class Orden_FacturacionComponent implements OnInit {
           if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
             this.production.push({
               saleOrder: this.formDataOrder.value.saleOrder,
+              client: dataProduction.clientes.cli_Id,
+              nameClient: dataProduction.clientes.cli_Nombre,
               item: dataProduction.prod.prod_Id,
               reference: dataProduction.prod.prod_Nombre,
               numberProduction: dataProduction.pp.numeroRollo_BagPro,
@@ -124,13 +126,14 @@ export class Orden_FacturacionComponent implements OnInit {
     });
   }
 
-  getSalesOrders(){
-    let saleOrder : number = this.formDataOrder.value.saleOrder;
+  getSalesOrders() {
+    let saleOrder: number = this.formDataOrder.value.saleOrder;
     this.invZeusService.getPedidosXConsecutivo(saleOrder).subscribe(data => {
       this.selectedProductSaleOrder = null;
       this.products = data.filter(x => x.cant_Pendiente > 0);
-      this.getClientFromSaleOrder();
-    });
+      if (this.products.length > 0) this.getClientFromSaleOrder();
+      else this.msj.mensajeAdvertencia(`¡El pedido #${saleOrder} no tiene cantidades pendientes!`);
+    }, error => this.msj.mensajeError(`¡No se encontró información del pedido consultado!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   getClientFromSaleOrder() {
@@ -188,12 +191,15 @@ export class Orden_FacturacionComponent implements OnInit {
         if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
           this.production.push({
             saleOrder: this.formDataOrder.value.saleOrder,
+            client: dataProduction.clientes.cli_Id,
+            nameClient: dataProduction.clientes.cli_Nombre,
             item: dataProduction.prod.prod_Id,
             reference: dataProduction.prod.prod_Nombre,
             numberProduction: dataProduction.pp.numeroRollo_BagPro,
             quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
             presentation: dataProduction.pp.presentacion
           });
+          console.log(this.production)
         }
       });
       setTimeout(() => this.load = false, 50);
@@ -259,9 +265,9 @@ export class Orden_FacturacionComponent implements OnInit {
     }, []);
   }
 
-  totalProduccionSearched(): number{
+  totalProduccionSearched(): number {
     let total: number = 0;
-    total = this.production.reduce((a,b) => a += b.quantity, 0);
+    total = this.production.reduce((a, b) => a += b.quantity, 0);
     return total;
   }
 
@@ -292,17 +298,18 @@ export class Orden_FacturacionComponent implements OnInit {
       Usua_Id: this.storage_Id,
       Fecha: moment().format('YYYY-MM-DD'),
       Hora: moment().format('HH:mm:ss'),
-      Observacion: !this.formDataOrder.value.observation ? '' : this.formDataOrder.value.observation,
+      Observacion: !this.formDataOrder.value.observation ? '' : (this.formDataOrder.value.observation).toUpperCase(),
       Estado_Id: 19
     }
-    this.orderFactService.Post(orderFact).subscribe(data => this.saveDetailsOrderFact(data));
+    this.orderFactService.Post(orderFact).subscribe(data => this.saveDetailsOrderFact(data), error => this.msj.mensajeError(`¡Ocurrió un error al crear la orden de facturación!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   saveDetailsOrderFact(data: any) {
     let count: number = 0;
+    let order = data.id;
     this.productionSelected.forEach(production => {
       let dtOrderFact: modelDt_OrdenFacturacion = {
-        Id_OrdenFacturacion: data.id,
+        Id_OrdenFacturacion: order,
         Numero_Rollo: production.numberProduction,
         Prod_Id: production.item,
         Cantidad: production.quantity,
@@ -311,13 +318,17 @@ export class Orden_FacturacionComponent implements OnInit {
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) {
-          this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
-          this.createPDF(data.id, data.factura);
-          this.clearFields();
-        }
-      });
+        if (count == this.productionSelected.length) this.putStatusReels(order, data.factura);
+      }, error => this.msj.mensajeError(`¡Ocurrió un error al crear los detalles de la orden de facturación!`, `Error: ${error.error.title} | Status: ${error.status}`));
     });
+  }
+
+  putStatusReels(order: number, fact: string) {
+    this.productionProcessService.putStateForSend(order).subscribe(() => {
+      this.msj.mensajeConfirmacion('Orden de Facturacion Guardada');
+      this.createPDF(order, fact);
+      this.clearFields();
+    }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   createPDF(id_OrderFact: number, fact: string) {
@@ -335,25 +346,26 @@ export class Orden_FacturacionComponent implements OnInit {
     let informationProducts: Array<any> = this.getInformationProducts(data);
     content.push(this.informationClientPDF(data[0]));
     content.push(this.observationPDF(data[0]));
-    content.push(this.informationConsolidatedProducts());
     content.push(this.tableConsolidated(consolidatedInformation));
-    content.push(this.informationProducts());
     content.push(this.tableProducts(informationProducts));
     return content;
   }
 
   consolidatedInformation(data: any): Array<any> {
     let consolidatedInformation: Array<any> = [];
+    let count: number = 0;
     data.forEach(prod => {
+      count++;
       if (!consolidatedInformation.map(x => x.Item).includes(prod.producto.prod_Id)) {
         let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
         let totalQuantity: number = 0;
         data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
         consolidatedInformation.push({
+          "#" : count,
           "Pedido": prod.dtOrder.consecutivo_Pedido,
           "Item": prod.producto.prod_Id,
           "Referencia": prod.producto.prod_Nombre,
-          "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
+          "Cant. Rollos": this.formatNumbers((cuontProduction)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
           "Presentación": prod.dtOrder.presentacion
         });
@@ -364,25 +376,22 @@ export class Orden_FacturacionComponent implements OnInit {
 
   getInformationProducts(data: any): Array<any> {
     let informationProducts: Array<any> = [];
+    let count: number = 0;
+    data.sort((a, b) => Number(a.dtOrder.numero_Rollo) - Number(b.dtOrder.numero_Rollo));
+    data.sort((a, b) => Number(a.producto.prod_Id) - Number(b.producto.prod_Id));
     data.forEach(prod => {
+      count++;
       informationProducts.push({
+        "#" : count,
         "Rollo": prod.dtOrder.numero_Rollo,
         "Item": prod.producto.prod_Id,
         "Referencia": prod.producto.prod_Nombre,
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
+        "Ubicación": prod.ubication,
       });
     });
     return informationProducts;
-  }
-
-  titleInformationClientPDF(): {} {
-    return {
-      text: `\n Información detallada del Cliente \n \n`,
-      alignment: 'center',
-      fontSize: 10,
-      bold: true
-    };
   }
 
   informationClientPDF(data): {} {
@@ -402,6 +411,13 @@ export class Orden_FacturacionComponent implements OnInit {
             { text: `Telefono: ${data.clientes.cli_Telefono}` },
             { text: `E-mail: ${data.clientes.cli_Email}`, colSpan: 2 },
             {}
+          ],
+          data.datosEnvio != null ? [
+            { text: `Conductor: ${data.datosEnvio.conductor}` },
+            { text: `Placa: ${data.datosEnvio.placa}` },
+            { text: `Despachado Por: ${data.datosEnvio.creadoPor}` },
+          ] : [
+            { border: [false, false, false, false], colSpan: 3, text: '' }, {}, {}
           ]
         ]
       },
@@ -414,62 +430,46 @@ export class Orden_FacturacionComponent implements OnInit {
     }
   }
 
-  informationConsolidatedProducts() {
-    return {
-      text: `\n\n Consolidado de producto(s) \n `,
-      alignment: 'center',
-      style: 'header',
-      fontSize: 10,
-    };
-  }
-
   tableConsolidated(data) {
-    let columns: Array<string> = ['Pedido', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['10%', '10%', '40%', '10%', '20%', '10%'];
+    let columns: Array<string> = ['#', 'Pedido', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['5%', '7%', '8%', '40%', '10%', '20%', '10%'];
     return {
       table: {
-        headerRows: 1,
+        headerRows: 2,
         widths: widths,
-        body: this.buildTableBody(data, columns),
+        body: this.buildTableBody(data, columns, 'Consolidado de producto(s)'),
       },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null;
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
         }
       }
-    };
-  }
-
-  informationProducts() {
-    return {
-      text: `\n Rollos Seleccionados \n `,
-      alignment: 'center',
-      style: 'header',
-      fontSize: 10,
     };
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['15%', '15%', '40%', '20%', '10%'];
+    let columns: Array<string> = ['#', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación', 'Ubicación'];
+    let widths: Array<string> = ['3%', '8%', '8%', '37%', '10%', '10%', '24%'];
     return {
+      margin: [0, 10],
       table: {
-        headerRows: 1,
+        headerRows: 2,
         widths: widths,
-        body: this.buildTableBody(data, columns),
+        body: this.buildTableBody(data, columns, 'Rollos Seleccionados'),
       },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null;
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
         }
       }
     };
   }
 
-  buildTableBody(data, columns) {
+  buildTableBody(data, columns, title) {
     var body = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -485,8 +485,10 @@ export class Orden_FacturacionComponent implements OnInit {
       table: {
         widths: ['*'],
         body: [
-          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
-          [{ border: [true, false, true, true], text: `${data.order.observacion.toString().trim()}` }]
+          [{ border: [true, true, true, false], text: `Observación Orden:`, style: 'subtitulo', bold: true }],
+          [{ border: [true, false, true, true], text: `${data.order.observacion.toString().trim()}` }],
+          data.datosEnvio != null ?[{ border: [true, true, true, false], text: `Observación Despacho:`, style: 'subtitulo', bold: true }] : [{ border: [false, false, false, false], text: '' }],
+          data.datosEnvio != null ? [{ border: [true, false, true, true], text: `${data.datosEnvio.observacion.toString().trim()}` }] : [{ border: [false, false, false, false], text: '' }]
         ]
       },
       fontSize: 9,
@@ -497,6 +499,8 @@ export class Orden_FacturacionComponent implements OnInit {
 
 interface production {
   saleOrder: number;
+  client?: number;
+  nameClient?: string;
   item: number;
   reference: string;
   numberProduction?: number;

@@ -163,8 +163,8 @@ export class InventarioBodegaDespachoComponent implements OnInit {
         item: d.prod_Id,
         reference: d.prod_Nombre,
         ubication: d.ubicacion,
-        countProduction: dataSearched.filter(x => x.prod_Id == d.prod_Id).length,
-        totalQuantity: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a, b) => a += b.cantTotal, 0),
+        countProduction: this.countProduction(dataSearched.filter(x => x.prod_Id == d.prod_Id)),
+        totalQuantity: this.totalQuantity(dataSearched.filter(x => x.prod_Id == d.prod_Id)),
         presentation: d.presentacion,
         subTotal: dataSearched.filter(x => x.prod_Id == d.prod_Id).reduce((a, b) => a += b.subTotal, 0),
         detailsProduction: this.getDetailsInformation(d.prod_Id, d.presentation, dataSearched),
@@ -173,21 +173,49 @@ export class InventarioBodegaDespachoComponent implements OnInit {
     return data;
   }
 
+  countProduction(dataSearched: any):number {
+    let count : number = 0;
+    let productionIncluded: Array<number> = [];
+    dataSearched.forEach(d => {
+      if (!productionIncluded.includes(d.numeroRollo_BagPro)) {
+        productionIncluded.push(d.numeroRollo_BagPro);
+        count += 1;
+      }
+    });
+    return count;
+  }
+
+  totalQuantity(dataSearched: any):number {
+    let count : number = 0;
+    let productionIncluded: Array<number> = [];
+    dataSearched.forEach(d => {
+      if (!productionIncluded.includes(d.numeroRollo_BagPro)) {
+        productionIncluded.push(d.numeroRollo_BagPro);
+        count += d.cantTotal;
+      }
+    });
+    return count;
+  }
+
   getDetailsInformation(item: number, presentation: string, dataSearched: Array<any>): Array<DetailsStoreByProducts> {
     let data: Array<DetailsStoreByProducts> = [];
+    let productionIncluded: Array<number> = [];
     dataSearched.filter(x => x.prod_Id == item).forEach(d => {
-      data.push({
-        orderProduction: d.ot,
-        numberProduction: d.numero_Rollo,
-        numberProductionBagPro: d.numeroRollo_BagPro,
-        weight: d.peso,
-        quantity: d.cantTotal,
-        presentation: d.presentacion,
-        date: d.fecha.replace('T00:00:00', ''),
-        hour: d.hora,
-        price: d.precioVenta_Producto,
-        subTotal: d.subTotal,
-      });
+      if (!productionIncluded.includes(d.numeroRollo_BagPro)) {
+        productionIncluded.push(d.numeroRollo_BagPro);
+        data.push({
+          orderProduction: d.ot,
+          numberProduction: d.numero_Rollo,
+          numberProductionBagPro: d.numeroRollo_BagPro,
+          weight: d.peso,
+          quantity: d.cantTotal,
+          presentation: d.presentacion,
+          date: d.fecha.replace('T00:00:00', ''),
+          hour: d.hora,
+          price: d.precioVenta_Producto,
+          subTotal: d.subTotal,
+        });
+      }
     });
     return data;
   }

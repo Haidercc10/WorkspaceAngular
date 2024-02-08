@@ -15,6 +15,7 @@ import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/Orde
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
+import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 
 @Component({
   selector: 'app-SalidaProduccion_Despacho',
@@ -47,7 +48,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
     private bagproService: BagproService,
     private orderFactService: OrdenFacturacionService,
     private dtOrderFactService: Dt_OrdenFacturacionService,
-    private zeusService: InventarioZeusService,) {
+    private zeusService: InventarioZeusService,
+    private orden_FacturacionComponent : Orden_FacturacionComponent,) {
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formProduction = this.frmBuilder.group({
       orderFact: ['', Validators.required],
@@ -92,14 +94,14 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
 
   getInformationOrderFact(){
     let orderFact = this.formProduction.value.orderFact;
-    this.dtOrderFactService.GetInformacionOrderFact(orderFact).subscribe(data => {
+    this.dtOrderFactService.GetInformacionOrderFactToSend(orderFact).subscribe(data => {
       this.load = true;
       this.production = [];
       let saleOrders: Array<number> = [];
       data.forEach(dataProduction => {
         this.formProduction.patchValue({
           fact: dataProduction.order.factura,
-          cli: dataProduction.order.clientes.cli_Id
+          client: dataProduction.clientes.cli_Id
         });
         saleOrders.push(dataProduction.dtOrder.consecutivo_Pedido);
         this.production.push({
@@ -153,7 +155,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           undMed_Id: res[0].und_Extrusion,
           extrusion_Calibre: res[0].calibre_Extrusion,
           material: res[0].material,
-        }
+        };
+        this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+        this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
       });
     }, () => this.lookingForDataInBagpro(production));
   }
@@ -205,6 +209,9 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
                 turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
               },
             });
+            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
+            this.sendProductionZeus[i].position = this.sendProductionZeus.length;
+            this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
             // let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
             // this.updateProductionZeusByBagPro(this.sendProductionZeus[i]);
           });
@@ -230,16 +237,17 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   }
 
   saveAsgFact() {
+    let orderFact = this.formProduction.value.orderFact;
     this.load = true;
     let cli = this.formProduction.value.client;
     let data: modelAsigProductosFacturas = {
       FacturaVta_Id: this.formProduction.value.fact,
-      NotaCredito_Id: '',
+      NotaCredito_Id: `Orden de Facturación #${orderFact}`,
       Usua_Id: this.storage_Id,
       AsigProdFV_Fecha: moment().format('YYYY-MM-DD'),
       AsigProdFV_Hora: moment().format('HH:mm:ss'),
-      AsigProdFV_Observacion: this.formProduction.value.observation,
-      Cli_Id: 1,
+      AsigProdFV_Observacion: !this.formProduction.value.observation ? '' : (this.formProduction.value.observation).toUpperCase(),
+      Cli_Id: cli,
       Usua_Conductor: this.formProduction.value.driver,
       AsigProdFV_PlacaCamion: this.formProduction.value.car,
       AsigProdFV_FechaEnvio: moment().format('YYYY-MM-DD'),
@@ -257,26 +265,30 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         DtAsigProdFV_Cantidad: prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad,
         UndMed_Id: prod.pp.presentacion,
         Rollo_Id: prod.pp.numero_Rollo,
-        Prod_CantidadUnidades: prod.pp.cantidad,
+        Prod_CantidadUnidades: prod.pp.presentacion == 'Kg' ? prod.pp.peso_Neto : prod.pp.cantidad,
       }
       this.dtAsgProdFacturaService.srvGuardar(data).subscribe(() => {
-        this.productionProcessSerivce.putChangeStateProduction(prod.pp.numero_Rollo).subscribe(() => {
-          count++;
-          if (count == this.sendProductionZeus.length) this.finishSaveData(AsigProdFV_Id);
-        }, error => this.errorMessage(`¡No se actualizó el estado del rollos!`, error));
+        count++;
+        if (count == this.sendProductionZeus.length) this.finishSaveData(AsigProdFV_Id);
       }, error => this.errorMessage(`¡Ocurrió un error al amarrar los rollos a la factura!`, error));
     });
   }
 
   finishSaveData(AsigProdFV_Id: number) {
     let orderFact = this.formProduction.value.orderFact;
-    this.orderFactService.PutStatusOrder(orderFact).subscribe(() => {
-      this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
-      this.createPDF();
-    }, error => {
+    this.orderFactService.PutStatusOrder(orderFact).subscribe(() => this.putStateReels(), error => {
       this.msj.mensajeError(`¡No se actualizó el estado de la orden de facturación ${AsigProdFV_Id}!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
     });
+  }
+
+  putStateReels() {
+    let orderFact = this.formProduction.value.orderFact;
+    this.productionProcessSerivce.putStateNotAvaible(orderFact).subscribe(() => {
+      this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
+      let fact = this.formProduction.value.fact;
+      this.orden_FacturacionComponent.createPDF(orderFact, fact);
+    }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 
   printTag(data: any) {

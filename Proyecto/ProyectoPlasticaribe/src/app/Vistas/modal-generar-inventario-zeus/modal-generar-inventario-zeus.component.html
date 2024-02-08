@@ -72,6 +72,7 @@
             <!--Headers Tabla-->
             <ng-template pTemplate="header">
               <tr id="filtros">
+                <th rowspan="2">#</th>
                 <th style="width: 150px" pResizableColumn>
                   <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
                 </th>
@@ -145,8 +146,9 @@
             </ng-template>
 
             <!--Cuerpo Tabla-->
-            <ng-template pTemplate="body" let-ArrayProductoZeus>
+            <ng-template pTemplate="body" let-ArrayProductoZeus let-rowIndex="rowIndex">
               <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
+                <td>{{rowIndex + 1}}</td>
                 <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
                 <td>{{ArrayProductoZeus.Cliente}}</td>
                 <td>{{ArrayProductoZeus.Nombre}}</td>
@@ -243,6 +245,7 @@
         <!--Headers Tabla-->
         <ng-template pTemplate="header">
           <tr id="filtros">
+            <th rowspan="2">#</th>
             <th style="width: 150px" pResizableColumn>
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
             </th>
@@ -316,8 +319,9 @@
         </ng-template>
 
         <!--Cuerpo Tabla-->
-        <ng-template pTemplate="body" let-ArrayProductoZeus>
+        <ng-template pTemplate="body" let-ArrayProductoZeus let-rowIndex="rowIndex">
           <tr class="tamanoTextosTabla cursor" (click)="mostrarModalCrearEditar(ArrayProductoZeus)" id="editarReceta" pTooltip="¡Podemos ver o editar la información de una receta si presionamos click aquí!">
+            <td>{{rowIndex + 1}}</td>
             <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
             <td>{{ArrayProductoZeus.Cliente}}</td>
             <td>{{ArrayProductoZeus.Nombre}}</td>

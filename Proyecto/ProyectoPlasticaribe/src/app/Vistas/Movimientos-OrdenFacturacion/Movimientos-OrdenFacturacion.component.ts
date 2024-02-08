@@ -7,6 +7,7 @@ import { AppComponent } from 'src/app/app.component';
 import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturacion.component';
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -22,6 +23,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   storage_Id : number;
   storage_Nombre : any;
   serchedData: any[] = [];
+  @ViewChild('dt') dt: Table;
 
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -53,6 +55,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     this.load = false;
     this.serchedData = [];
     this.formFilters.reset();
+    this.dt.clear();
   }
 
   searchData(){
@@ -69,6 +72,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       this.msg.mensajeError(`¡No se encontró información de ordenes realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
     });
     this.searchDataDevolutions(startDate, endDate, route);
+    // this.searchSendOrders(startDate, endDate, route);
   }
 
   searchDataDevolutions(startDate: any, endDate: any, route: string){
@@ -77,6 +81,15 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     }, error => {
       this.load = false;
       this.msg.mensajeError(`¡No se encontró información de devoluciones realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
+    });
+  }
+
+  searchSendOrders(startDate: any, endDate: any, route: string){
+    this.dtOrderFactService.GetSendOrders(startDate, endDate, route).subscribe(data => {
+      data.forEach(dataOrder => this.serchedData.push(dataOrder));
+    }, error => {
+      this.load = false;
+      this.msg.mensajeError(`¡No se encontró información de ordenes enviadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
     });
   }
 

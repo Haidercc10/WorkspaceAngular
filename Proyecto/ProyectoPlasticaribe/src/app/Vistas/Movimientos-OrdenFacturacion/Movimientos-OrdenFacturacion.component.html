@@ -28,7 +28,7 @@
         <span class="p-input-icon-left p-float-label">
           <i class="pi pi-search"></i>
           <input formControlName="orderFact" id="orden" type="text" pInputText required/>
-          <label for="orden">Orden de Compra</label>
+          <label for="orden">Documento</label>
         </span>
       </div>
 
@@ -79,6 +79,10 @@
     scrollHeight="50rem">
     <ng-template pTemplate="header">
       <tr>
+        <th class="text-center" pSortableColumn="or.id">
+          <p-sortIcon field="or.id"></p-sortIcon> Id
+          <p-columnFilter type="text" field="or.id" display="menu"></p-columnFilter>
+        </th>
         <th class="text-center" pSortableColumn="or.factura">
           <p-sortIcon field="or.factura"></p-sortIcon> Código
           <p-columnFilter type="text" field="or.factura" display="menu"></p-columnFilter>
@@ -104,6 +108,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-data>
       <tr>
+        <td>{{data.or.id}}</td>
         <td>{{data.or.factura}}</td>
         <td>{{data.or.cli_Id}}</td>
         <td>{{data.clientes.cli_Nombre}}</td>
