@@ -63,7 +63,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let dateLastMonth : any = moment().subtract(1, 'M').format('YYYY-MM-DD');
     let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD') == 'Fecha inválida' ? dateLastMonth : moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
-    let route : string = orderNum != null ? `&order=${orderNum}` : '';
+    let route : string = orderNum != null ? `?order=${orderNum}` : '';
     this.clearFields();
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
       data.forEach(dataOrder => this.serchedData.push(dataOrder));
@@ -78,10 +78,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   searchDataDevolutions(startDate: any, endDate: any, route: string){
     this.dtDevolutionsService.GetDevolutions(startDate, endDate, route).subscribe(data => {
       data.forEach(dataDevolution => this.serchedData.push(dataDevolution));
-    }, error => {
-      this.load = false;
-      this.msg.mensajeError(`¡No se encontró información de devoluciones realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
-    });
+    }, () => this.load = false);
   }
 
   searchSendOrders(startDate: any, endDate: any, route: string){

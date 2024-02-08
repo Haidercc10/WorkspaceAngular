@@ -249,7 +249,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       AsigProdFV_Observacion: !this.formProduction.value.observation ? '' : (this.formProduction.value.observation).toUpperCase(),
       Cli_Id: cli,
       Usua_Conductor: this.formProduction.value.driver,
-      AsigProdFV_PlacaCamion: this.formProduction.value.car,
+      AsigProdFV_PlacaCamion: (this.formProduction.value.car).toUpperCase(),
       AsigProdFV_FechaEnvio: moment().format('YYYY-MM-DD'),
       AsigProdFV_HoraEnvio: moment().format('HH:mm:ss')
     }
