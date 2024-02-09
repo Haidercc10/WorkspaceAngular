@@ -161,9 +161,9 @@
           <p-tableCheckbox [value]="data" (click)="selectedProduction(data)"></p-tableCheckbox>
         </td>
         <td>{{rowIndex + 1}}</td>
-        <td>{{data.client}}</td>
-        <td>{{data.nameClient}}</td>
         <td>{{data.numberProduction}}</td>
+        <td>{{data.client }}</td>
+        <td>{{data.nameClient}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
         <td>{{data.quantity | number : '1.2-2'}}</td>
@@ -240,8 +240,8 @@
         </td>
         <td>{{rowIndex + 1}}</td>
         <td>{{data.numberProduction}}</td>
+        <td>{{data.client}}</td>
         <td>{{data.nameClient}}</td>
-        <td>{{data.numberProduction}}</td>
         <td>{{data.item}}</td>
         <td>{{data.reference}}</td>
         <td>{{data.quantity | number : '1.2-2'}}</td>
