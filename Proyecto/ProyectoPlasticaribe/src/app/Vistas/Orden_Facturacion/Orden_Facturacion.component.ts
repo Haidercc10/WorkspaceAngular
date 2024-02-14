@@ -355,8 +355,8 @@ export class Orden_FacturacionComponent implements OnInit {
     let consolidatedInformation: Array<any> = [];
     let count: number = 0;
     data.forEach(prod => {
-      count++;
       if (!consolidatedInformation.map(x => x.Item).includes(prod.producto.prod_Id)) {
+        count++;
         let cuontProduction: number = data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).length;
         let totalQuantity: number = 0;
         data.filter(x => x.producto.prod_Id == prod.producto.prod_Id).forEach(x => totalQuantity += x.dtOrder.cantidad);
@@ -388,7 +388,7 @@ export class Orden_FacturacionComponent implements OnInit {
         "Referencia": prod.producto.prod_Nombre,
         "Cantidad": this.formatNumbers((prod.dtOrder.cantidad).toFixed(2)),
         "Presentación": prod.dtOrder.presentacion,
-        "Ubicación": prod.ubication,
+        "Ubicación": prod.ubication == null ? '' : prod.ubication,
       });
     });
     return informationProducts;

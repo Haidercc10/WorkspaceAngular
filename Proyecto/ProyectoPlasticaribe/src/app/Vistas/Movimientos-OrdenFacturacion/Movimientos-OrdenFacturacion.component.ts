@@ -24,6 +24,7 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   storage_Nombre : any;
   serchedData: any[] = [];
   @ViewChild('dt') dt: Table;
+  states: Array<string> = ['PENDIENTE','DESPACHADO'];
 
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,

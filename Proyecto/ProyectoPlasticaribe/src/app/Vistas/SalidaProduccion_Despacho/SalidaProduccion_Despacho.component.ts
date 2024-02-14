@@ -116,6 +116,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
           setTimeout(() => this.load = false, 50);
           this.zeusService.GetFactura(saleOrders[saleOrders.length - 1]).subscribe(factura => {
             this.orderFactService.PutFactOrder(orderFact, factura.documento).subscribe(() => {
+              this.formProduction.patchValue({ fact: factura.documento });
               this.msj.mensajeConfirmacion(`¡Orden de facturación consultada!`, `¡Continue ingresando los rollos que van a ser despachados!`);
             }, error => this.errorMessage(`¡No se pudo actualizar la factura de la orden #${orderFact}!`, error));
           }, error => this.errorMessage(`¡No se encontró una factura asociada a los pedidos de la orden #${orderFact}!`, error));
@@ -142,7 +143,8 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   }
 
   getDataProduction(production: number) {
-    this.productionProcessSerivce.GetInformationAboutProductionBagPro(production).subscribe(data => {
+    let orderFact = this.formProduction.value.orderFact;
+    this.productionProcessSerivce.GetInformationAboutProductionToSend(production, orderFact).subscribe(data => {
       this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
         this.sendProductionZeus.push(data[0]);
         let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
@@ -159,65 +161,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
         this.sendProductionZeus[i].position = this.sendProductionZeus.length;
         this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
       });
-    }, () => this.lookingForDataInBagpro(production));
-  }
-
-  lookingForDataInBagpro(production: number) {
-    this.bagproService.GetProductionForExitByNumber(production).subscribe(prod => {
-      if (prod.length > 0) {
-        this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
-          data.forEach(res => {
-            this.sendProductionZeus.push({
-              pp: {
-                ot: prod[0].ot,
-                numero_Rollo: prod[0].item,
-                numeroRollo_BagPro: prod[0].item,
-                presentacion: res.presentacion == 'Kilo' ? 'Kg' : res.presentacion == 'Unidad' ? 'Und' : 'Paquete',
-                cantidad: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].qty : prod[0].extnetokg,
-                peso_Bruto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extBruto,
-                peso_Neto: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].peso : prod[0].extnetokg,
-                maquina: prod[0].maquina,
-                fecha: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].fechaEntrada.replace('T00:00:00', '') : prod[0].fecha.replace('T00:00:00', ''),
-                hora: prod[0].hora,
-                envio_Zeus: parseInt(prod[0].envioZeus),
-              },
-              producto: {
-                prod_Id: res.id_Producto,
-                prod_Nombre: res.producto,
-                prod_Ancho: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extancho : res.selladoCorte_Etiqueta_Ancho,
-                prod_Largo: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extlargo : res.selladoCorte_Etiqueta_Largo,
-                prod_Fuelle: ['EMPAQUE'].includes(prod[0].nomStatus) ? prod[0].extfuelle : res.selladoCorte_Etiqueta_Fuelle,
-              },
-              clientes: {
-                cli_Nombre: res.cliente,
-              },
-              dataExtrusion: {
-                numero_RolloBagPro: prod[0].item,
-                extrusion_Ancho1: res.ancho1_Extrusion,
-                extrusion_Ancho2: res.ancho2_Extrusion,
-                extrusion_Ancho3: res.ancho3_Extrusion,
-                undMed_Id: res.und_Extrusion,
-                extrusion_Calibre: res.calibre_Extrusion,
-                material: prod[0].material,
-                precioProducto: res.presentacion == 'Kilo' ? res.valorKg : res.valorUnidad,
-              },
-              proceso: {
-                proceso_Id: prod[0].nomStatus == 'SELLADO' ? 'SELLA' : prod[0].nomStatus == 'Wiketiado' ? 'WIKE' : 'EMP',
-                proceso_Nombre: prod[0].nomStatus,
-              },
-              turno: {
-                turno_Nombre: ['SELLADO', 'Wiketiado'].includes(prod[0].nomStatus) ? prod[0].turnos : prod[0].turno,
-              },
-            });
-            let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
-            this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-            this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
-            // let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
-            // this.updateProductionZeusByBagPro(this.sendProductionZeus[i]);
-          });
-        });
-      } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
-    });
+    }, error => this.errorMessage(`¡No se encontró información del Rollo/Bulto/Paquete consultado #${orderFact}!`,error));
   }
 
   validateDataToSave(){
@@ -316,7 +260,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
   }
 
   removeProduction(data: any) {
-    let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
+    let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data.pp.numero_Rollo);
     this.sendProductionZeus.splice(i, 1);
   }
 

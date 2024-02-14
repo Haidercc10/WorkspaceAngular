@@ -119,7 +119,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     if (this.ValidarRol == 3 || this.ValidarRol ==  7) {
       this.area = "EXT";
       this.titulo = `Inventario Extrusión`;
-    } else if (this.ValidarRol == 8) { 
+    } else if ([8,86].includes(this.ValidarRol)) { 
       this.area = "SELLA";
       this.titulo = `Inventario Sellado`;
     } else if (this.ValidarRol == 63) { 

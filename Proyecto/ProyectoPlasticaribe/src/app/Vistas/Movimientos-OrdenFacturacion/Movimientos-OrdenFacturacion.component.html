@@ -103,17 +103,22 @@
           <p-sortIcon field="type"></p-sortIcon> Tipo de Documento
           <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
         </th>
+        <th class="text-center" pSortableColumn="estado">
+          <p-sortIcon field="estado"></p-sortIcon> Estado
+          <p-columnFilter type="text" field="estado" display="menu"></p-columnFilter>
+        </th>
         <th id="ver3">Ver</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data>
       <tr>
-        <td>{{data.or.id}}</td>
-        <td>{{data.or.factura}}</td>
-        <td>{{data.or.cli_Id}}</td>
-        <td>{{data.clientes.cli_Nombre}}</td>
-        <td>{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
-        <td>{{data.type | uppercase}}</td>
+        <td class="text-center">{{data.or.id}}</td>
+        <td class="text-center">{{data.or.factura}}</td>
+        <td class="text-center">{{data.or.cli_Id}}</td>
+        <td class="text-center">{{data.clientes.cli_Nombre}}</td>
+        <td class="text-center">{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
+        <td class="text-center">{{data.type | uppercase}}</td>
+        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.or.estado_Id == 19, 'bg-success1': data.or.estado_Id == 21}">{{data.estado}}</span></td>
         <td class="text-center">
           <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type)"></p-button>
         </td>

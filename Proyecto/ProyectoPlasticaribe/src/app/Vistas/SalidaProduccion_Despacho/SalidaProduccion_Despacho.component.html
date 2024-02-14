@@ -83,8 +83,11 @@
         <th class="text-center">OT</th>
         <th class="text-center">Cliente</th>
         <th class="text-center">Rollo</th>
-        <th class="text-center">Peso Bruto/Cantidad</th>
+        <th class="text-center">Item</th>
+        <th class="text-center">Referencia</th>
+        <th class="text-center">Peso Bruto</th>
         <th class="text-center">Peso Neto</th>
+        <th class="text-center">Presentación</th>
         <th class="text-center">Material</th>
         <th class="text-center">Maquina</th>
         <th class="text-center">Fecha</th>
@@ -97,12 +100,15 @@
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
-        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.position}}</td>
         <td class="text-center">{{data.pp.ot}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
-        <td class="text-center">{{data.pp.numeroRollo_BagPro}}</td>
-        <td class="text-center">{{(['SELLA', 'WIKE'].includes(data.proceso.proceso_Id) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.dataExtrusion.numero_RolloBagPro}}</td>
+        <td class="text-center">{{data.producto.prod_Id}}</td>
+        <td class="text-center">{{data.producto.prod_Nombre}}</td>
+        <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
         <td class="text-center">{{data.pp.peso_Neto | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.pp.presentacion}}</td>
         <td class="text-center">{{data.dataExtrusion.material}}</td>
         <td class="text-center">{{data.pp.maquina}}</td>
         <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
@@ -119,10 +125,10 @@
     </ng-template>
     <ng-template pTemplate="footer">
       <tr>
-        <td class="text-center" colspan="4">Totales</td>
+        <td class="text-center" colspan="6">Totales</td>
         <td class="text-center">{{totalQuantity() | number : '1.2-2'}}</td>
         <td class="text-center">{{totalWeight() | number : '1.2-2'}}</td>
-        <td colspan="8"></td>
+        <td colspan="9"></td>
       </tr>
     </ng-template>
   </p-table>

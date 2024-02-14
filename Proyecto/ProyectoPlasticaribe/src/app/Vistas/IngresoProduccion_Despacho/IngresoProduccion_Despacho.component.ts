@@ -1,5 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment';
+import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
 import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
@@ -10,8 +12,6 @@ import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Proceso
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { AppComponent } from 'src/app/app.component';
 import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
-import { HttpErrorResponse } from '@angular/common/http';
-import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 
 @Component({
   selector: 'app-IngresoProduccion_Despacho',
@@ -129,6 +129,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
+      this.load = true;
       this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, searchInTable).subscribe(data => {
         this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
           this.sendProductionZeus.push(data[0]);
@@ -202,17 +203,17 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
               dataFromExtrusion: prod[0],
             });
             let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == prod[0].item);
+            let process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' = this.validateProcess((this.sendProductionZeus[i].proceso.proceso_Nombre).toUpperCase());
             this.sendProductionZeus[i].position = this.sendProductionZeus.length;
-            this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+            this.saveInProductionProcess(this.sendProductionZeus[i].pp.numero_Rollo, process, i);
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           });
         });
-      } else this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
-    }, () => this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`));
+      } else this.warningNotFound(production);
+    }, () => this.warningNotFound(production));
   }
 
   updateProductionZeus(data: any) {
-    let process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE' = this.validateProcess((data.proceso.proceso_Nombre).toUpperCase());
     let ot: string = data.pp.ot;
     let item: string = data.producto.prod_Id;
     let presentation: string = this.validatePresentation(data.pp.presentacion);
@@ -220,9 +221,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
     let price: number = data.dataExtrusion.precioProducto;
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, data.pp.numeroRollo_BagPro, quantity.toString(), price.toString()).subscribe(() => {
+      this.updateProductionSendZeus(reel);
       this.saveDataEntrace(data);
-      if (data.pp.numero_Rollo == data.pp.numeroRollo_BagPro) this.saveInProductionProcess(reel, process);
-      else this.updateProductionSendZeus(reel);
       this.messageConfirmationUpdateStore();
     }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
   }
@@ -282,7 +282,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Presentacion: data.pp.presentacion,
       Proceso_Id: process,
       Turno_Id: sellado ? data.dataFromExtrusion.turnos : data.dataFromExtrusion.turno ,
-      Envio_Zeus: true,
+      Envio_Zeus: false,
       Datos_Etiqueta: sellado ? data.dataFromExtrusion.fechaCambio : '',
       Fecha: sellado ? data.dataFromExtrusion.fechaEntrada : data.dataFromExtrusion.fecha,
       Hora: data.dataFromExtrusion.hora,
@@ -292,8 +292,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     return datos; 
   }
 
-  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE'){
-    this.productionProcessSerivce.Post(this.createProduction(numberProduction, process)).subscribe(null, error => {
+  saveInProductionProcess(numberProduction: number, process: 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' | 'SELLA' | 'WIKE', i: number){
+    this.productionProcessSerivce.Post(this.createProduction(numberProduction, process)).subscribe(data => {
+      this.sendProductionZeus[i].pp.numero_Rollo = data.numero_Rollo;
+      this.updateProductionZeus(this.sendProductionZeus[this.sendProductionZeus[i].position - 1]);
+    }, error => {
       let errorMessage: string = `¡No fue posible crear el registro del Rollo/Bulto #${numberProduction} proveniente de 'BagPro'!`;
       this.errorMessageWhenTryUpdateReel(errorMessage, error);
     });
@@ -307,6 +310,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
   errorMessageWhenTryUpdateReel(message: string, error: HttpErrorResponse) {
     this.load = false;
     this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
+  }
+
+  warningNotFound(production: number){
+    this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
+    this.load = false;
   }
 
   setUbication(): string {

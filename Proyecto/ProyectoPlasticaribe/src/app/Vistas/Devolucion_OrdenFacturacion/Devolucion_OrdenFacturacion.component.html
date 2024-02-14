@@ -46,23 +46,6 @@
         </span>
       </div>
 
-      <!-- Item -->
-      <!-- <div class="col-xs-12 col-sm-12 col-md-3 col-lg-2 col-xl-2 col-xxl-2">
-        <span class="p-input-icon-left p-float-label">
-          <i class="pi pi-search"></i>
-          <input formControlName="item" id="IdProducto" type="text" pInputText required [readOnly]="true"/>
-          <label for="IdProducto">Item</label>
-        </span>
-      </div> -->
-
-      <!-- Reference -->
-      <!-- <div class="col-xs-12 col-sm-12 col-md-9 col-lg-3 col-xl-3 col-xxl-3">
-        <span class="p-float-label">
-          <input formControlName="reference" id="reference" type="text" pInputText required readonly/>
-          <label for="reference">Referencia</label>
-        </span>
-      </div> -->
-
       <!-- Observacion -->
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
         <span class="p-float-label">
@@ -108,12 +91,6 @@
         <td>{{data.reference}}</td>
         <td>{{data.quantity | number : '1.2-2'}}</td>
         <td>{{data.presentation}}</td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="footer">
-      <tr>
-        <td colspan="4">Total</td>
-        <td colspan="2"></td>
       </tr>
     </ng-template>
   </p-table>
@@ -184,12 +161,6 @@
         <td>{{totalQuantityByProduct(data.item) | number : '1.2-2'}}</td>
         <td>{{totalCountProductionByProduct(data.item) | number : '1.2-2'}}</td>
         <td>{{data.presentation}}</td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="footer">
-      <tr>
-        <td colspan="3">Total</td>
-        <td colspan="2">{{productionSelected.length | number : '1.2-2'}}</td>
       </tr>
     </ng-template>
   </p-table>

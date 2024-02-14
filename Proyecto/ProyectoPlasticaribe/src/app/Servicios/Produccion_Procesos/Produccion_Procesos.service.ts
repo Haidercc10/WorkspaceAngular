@@ -22,6 +22,8 @@ export class Produccion_ProcesosService {
 
   GetInformationAboutProductionBagPro = (production: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionBagPro/${production}`);
 
+  GetInformationAboutProductionToSend = (production: number, orderFact: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionToSend/${production}/${orderFact}`);
+
   GetInformationAboutProductionToUpdateZeus = (production: number, process: string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionToUpdateZeus/${production}/${process}`);
 
   GetAvaibleProduction = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getAvaibleProduction/${item}`);
