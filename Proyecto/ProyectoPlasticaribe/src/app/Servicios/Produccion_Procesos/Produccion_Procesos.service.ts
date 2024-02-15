@@ -42,6 +42,8 @@ export class Produccion_ProcesosService {
 
   putSendZeus = (production: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEnvioZeus/${production}`, production);
 
+  putStateAvaible = (orderFac: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoDisponible/${orderFac}`, orderFac);
+
   Post = (body: modelProduccionProcesos): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
 
   Delete = (id: number|string): Observable<any> => this.http.delete(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);

@@ -27,4 +27,5 @@ export class Dt_OrdenFacturacionService {
 
     Post = (data: modelDt_OrdenFacturacion) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion`, data);
 
+    PutStatusProduction = (data: Array<number>, order: number) => this.http.post(`${this.rutaPlasticaribeAPI}/Detalles_OrdenFacturacion/putStatusProduction/${order}`, data);
 }

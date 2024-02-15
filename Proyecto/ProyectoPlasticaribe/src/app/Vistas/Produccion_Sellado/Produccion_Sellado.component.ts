@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { CreacionPdfService, TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
@@ -58,7 +58,7 @@ export class Produccion_SelladoComponent implements OnInit {
     private svcBagPro: BagproService,
     private svcMsjs: MensajesAplicacionService,
     private svcProdProcesos: Produccion_ProcesosService,
-    private svcCrearPDF: CreacionPdfService,
+    private svcCrearPDF: TagProduction_2,
     private svcSedes : SedeClienteService,
     private rePrintService: ReImpresionEtiquetasService,) {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -453,11 +453,11 @@ export class Produccion_SelladoComponent implements OnInit {
         'cal': this.ordenesTrabajo[0].calibre_Extrusion,
         'orderProduction': this.formSellado.value.ot,
         'material': this.ordenesTrabajo[0].material,
-        'quantity': medida == 'Kg' ? cantUnd : Math.trunc(cantUnd),
-        'quantity2': cantKg,
+        'quantity': cantKg,
+        'quantity2': medida == 'Kg' ? cantUnd : Math.trunc(cantUnd),
         'reel': data[0].bulto,
-        'presentationItem1': medida != 'Kg' ? `${medida}(s)` : 'Kg',
-        'presentationItem2': 'Kg',
+        'presentationItem1': 'Kg',
+        'presentationItem2': medida != 'Kg' ? `${medida}(s)` : 'Kg',
         'productionProcess': proceso.Nombre,
         'showNameBussiness': true,
         'operator': operario[0].usua_Nombre,

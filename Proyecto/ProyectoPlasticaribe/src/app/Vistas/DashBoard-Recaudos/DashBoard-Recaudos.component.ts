@@ -17,6 +17,7 @@ import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes
   templateUrl: './DashBoard-Recaudos.component.html',
   styleUrls: ['./DashBoard-Recaudos.component.css']
 })
+
 export class DashBoardRecaudosComponent implements OnInit {
 
   @ViewChild('dt1') dt1: Table | undefined;
@@ -50,6 +51,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     this.FormFiltros = this.frmBuilder.group({
       Cliente : [null],
       Vendedor : [null],
+      CarteraOriginal: [false]
     });
   }
 
@@ -98,6 +100,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     let ruta : string = "";
     let cliente : string = this.FormFiltros.value.Cliente;
     let vendedor : string = this.FormFiltros.value.Vendedor;
+    let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
 
     this.carteraAgrupadaClientes = [];
     this.carteraAgrupadaVendedores = [];
@@ -109,10 +112,12 @@ export class DashBoardRecaudosComponent implements OnInit {
 
     this.zeusService.GetCarteraAgrupadaClientes(ruta).subscribe(data => this.carteraAgrupadaClientes = data);
     this.zeusService.GetCarteraAgrupadaVendedores(ruta).subscribe(data => this.carteraAgrupadaVendedores = data);
-    this.zeusService.GetCarteraTotal(ruta).subscribe(data => this.cartera = data.filter(x => x.saldo_Cartera > 0));
+    this.zeusService.GetCarteraTotal(ruta).subscribe(data => {
+      this.cartera = data.filter(x => x.saldo_Cartera > 0);
+      if (carteraOriginal) this.cartera = this.cartera.filter(x => x.cantidad_Dias < 1000);
+    });
     setTimeout(() => this.cargando = false, 5000);
   }
-
   
   totalCartera = () => this.cartera.filter(x => x.saldo_Cartera > 0).reduce((acc, item) => acc + item.saldo_Cartera, 0);
 
@@ -136,7 +141,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     for (let i = 0; i < vendedores.length; i++) {
       data.push([
         {
-          margin: [5, 5],
+          margin: [5, -10, 5, 5],
           text: `${vendedores[i].id} - ${vendedores[i].nombre}`,
           bold: true,
           fontSize: 11,
@@ -159,10 +164,9 @@ export class DashBoardRecaudosComponent implements OnInit {
         clientesIncluidos.push(clientes[i].id_Cliente);
         data.push({
           margin: [5, 0, 5, 5],
-          fontSize: 10,
           table: {
             headerRows: 1,
-            widths: ['12%', '60%', '15%', '13%'],
+            widths: ['10%', '45%', '15%', '15%', '15%'],
             body: this.facturasClientes(clientes[i], informacionPDF)
           }
         });
@@ -178,8 +182,8 @@ export class DashBoardRecaudosComponent implements OnInit {
     data.push(this.informacionClientePDF(cliente));
     data.push([
       {
-        margin: [3, 3, 3, 0],
-        colSpan: 4,
+        // margin: [3, 3, 3, 0],
+        colSpan: 5,
         border: [true, false, true, true],
         table: {
           fontSize: 8,
@@ -192,6 +196,7 @@ export class DashBoardRecaudosComponent implements OnInit {
       {},
       {},
       {},
+      {}
     ]);
     data.push(this.totalClientePdf(facturas));
     return data;
@@ -199,10 +204,11 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   informacionClientePDF(cliente) {
     return [
-      { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true },
-      { border: [false, true, false, true], text: `${cliente.nombre_CLiente}`, fillColor: '#ccc', bold: true },
-      { border: [false, true, false, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true },
-      { border: [false, true, true, true], text: `Plazo: ${cliente.plazo_De_Pago} Días`, fillColor: '#ccc', bold: true },
+      { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'left' },
+      { border: [false, true, false, true], text: `${cliente.nombre_CLiente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'left' },
+      { border: [false, true, false, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'center' },
+      { border: [false, true, false, true], text: `${cliente.telefono_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'center' },
+      { border: [false, true, true, true], text: `Plazo: ${cliente.plazo_De_Pago} Días`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'right' },
     ]
   }
 
@@ -211,31 +217,43 @@ export class DashBoardRecaudosComponent implements OnInit {
     data.push(this.titulosFacturasPdf());
     for (let i = 0; i < facturas.length; i++) {
       data.push([
-        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].num_Factura}`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].id_Fecha}`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].fecha_Vencimiento}`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${facturas[i].cantidad_Dias}`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo1)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo1).toFixed(2)) }`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo2)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo2).toFixed(2)) }`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo3)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo3).toFixed(2)) }`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo4)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo4).toFixed(2)) }`, alignment: 'center' },
-        { border: [false, false, false, false], fontSize: 8, text: `${this.formatonumeros((facturas[i].saldoPlazo5)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo5).toFixed(2)) }`, alignment: 'center' },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${facturas[i].num_Factura}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${facturas[i].id_Fecha}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${facturas[i].fecha_Vencimiento}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `${facturas[i].cantidad_Dias}` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: `${this.formatonumeros((facturas[i].saldoPlazo1)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo1).toFixed(2)) }` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: `${this.formatonumeros((facturas[i].saldoPlazo2)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo2).toFixed(2)) }` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: `${this.formatonumeros((facturas[i].saldoPlazo3)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo3).toFixed(2)) }` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: `${this.formatonumeros((facturas[i].saldoPlazo4)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo4).toFixed(2)) }` },
+        { border: [false, false, false, false], fontSize: 7, alignment: 'right', text: `${this.formatonumeros((facturas[i].saldoPlazo5)) == -1 ? '' : this.formatonumeros((facturas[i].saldoPlazo5).toFixed(2)) }` },
       ]);
     }
+
+    data.push([
+      { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `` },
+      { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `` },
+      { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `` },
+      { border: [false, false, false, false], fontSize: 7, alignment: 'center', text: `` },
+      { border: [false, false, false, facturas.reduce((a,b) => a += b.saldoPlazo1, 0) > 0], bold: true, fontSize: 8, alignment: 'right', text: `${facturas.reduce((a,b) => a += b.saldoPlazo1, 0) <= 0 ? '' : this.formatonumeros((facturas.reduce((a,b) => a += b.saldoPlazo1, 0)).toFixed(2)) }` },
+      { border: [false, false, false, facturas.reduce((a,b) => a += b.saldoPlazo2, 0) > 0], bold: true, fontSize: 8, alignment: 'right', text: `${facturas.reduce((a,b) => a += b.saldoPlazo2, 0) <= 0 ? '' : this.formatonumeros((facturas.reduce((a,b) => a += b.saldoPlazo2, 0)).toFixed(2)) }` },
+      { border: [false, false, false, facturas.reduce((a,b) => a += b.saldoPlazo3, 0) > 0], bold: true, fontSize: 8, alignment: 'right', text: `${facturas.reduce((a,b) => a += b.saldoPlazo3, 0) <= 0 ? '' : this.formatonumeros((facturas.reduce((a,b) => a += b.saldoPlazo3, 0)).toFixed(2)) }` },
+      { border: [false, false, false, facturas.reduce((a,b) => a += b.saldoPlazo4, 0) > 0], bold: true, fontSize: 8, alignment: 'right', text: `${facturas.reduce((a,b) => a += b.saldoPlazo4, 0) <= 0 ? '' : this.formatonumeros((facturas.reduce((a,b) => a += b.saldoPlazo4, 0)).toFixed(2)) }` },
+      { border: [false, false, false, facturas.reduce((a,b) => a += b.saldoPlazo5, 0) > 0], bold: true, fontSize: 8, alignment: 'right', text: `${facturas.reduce((a,b) => a += b.saldoPlazo5, 0) <= 0 ? '' : this.formatonumeros((facturas.reduce((a,b) => a += b.saldoPlazo5, 0)).toFixed(2)) }` },
+    ]);
     return data;
   }
 
   titulosFacturasPdf(){
     return [
-      { border: [false, false, false, false], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `Fecha`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `F. Vence`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `Días`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `1-30 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `31-60 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `61-90 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `91-120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
-      { border: [false, false, false, false], text: `+120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center' },
+      { border: [false, false, false, false], text: `Factura`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `Fecha`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `F. Vence`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `Días`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `1-30 Dias`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `31-60 Dias`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `61-90 Dias`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `91-120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
+      { border: [false, false, false, false], text: `+120 Dias`, fillColor: '#ccc', bold: true, alignment: 'center', fontSize: 8 },
     ];
   }
 
@@ -244,13 +262,14 @@ export class DashBoardRecaudosComponent implements OnInit {
     return [
       {
         margin: [5, 5, 5, 0],
-        colSpan: 4,
+        colSpan: 5,
         alignment: 'right',
         fontSize: 10,
         bold: true,
         border: [false, true, false, false],
         text: `Total Cliente: $ ${this.formatonumeros((total).toFixed(2))}`,
       },
+      {},
       {},
       {},
       {}
@@ -297,6 +316,8 @@ export class DashBoardRecaudosComponent implements OnInit {
 
   seleccionarInformacionPDf() : any [] {
     let informacion : any [] = this.cartera;
+    let carteraOriginal: boolean = this.FormFiltros.value.CarteraOriginal;
+    if (carteraOriginal) informacion = this.cartera.filter(x => x.cantidad_Dias < 1000);
     if (this.FormFiltros.value.Vendedor) informacion = informacion.filter(x => x.nombre_Vendedor == this.FormFiltros.value.Vendedor);
     if (this.FormFiltros.value.Cliente) informacion = informacion.filter(x => x.nombre_CLiente == this.FormFiltros.value.Cliente);
     return informacion;

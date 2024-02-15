@@ -107,6 +107,7 @@
           <p-sortIcon field="estado"></p-sortIcon> Estado
           <p-columnFilter type="text" field="estado" display="menu"></p-columnFilter>
         </th>
+        <th class="text-center" *ngIf="[1].includes(validateRole)">Anular Orden</th>
         <th id="ver3">Ver</th>
       </tr>
     </ng-template>
@@ -118,7 +119,10 @@
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
         <td class="text-center">{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
         <td class="text-center">{{data.type | uppercase}}</td>
-        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.or.estado_Id == 19, 'bg-success1': data.or.estado_Id == 21}">{{data.estado}}</span></td>
+        <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.or.estado_Id == 19, 'bg-success1': data.or.estado_Id == 21, 'bg-warning': data.or.estado_Id == 3}">{{data.estado}}</span></td>
+        <td class="text-center" *ngIf="[1].includes(validateRole)">
+          <p-button icon="pi pi-ban" styleClass="p-button-rounded p-button-danger" (onClick)="confirmSendData(data.or.id)"></p-button>
+        </td>
         <td class="text-center">
           <p-button id="botonPdf" icon="pi pi-file-pdf" styleClass="p-button-rounded p-button-success" (onClick)="createPDF(data.or.id, data.or.factura, data.type)"></p-button>
         </td>
@@ -127,3 +131,25 @@
   </p-table>
 
 </p-card>
+
+<p-toast position="center" key="confirmation" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="PutStatusOrderAnulled()" icon="pi pi-check" label="Sí"
+            class="p-button-warning" pTooltip="Los rollos también serán eliminados de BagPro."></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No"
+            class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

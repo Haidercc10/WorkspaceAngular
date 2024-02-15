@@ -18,5 +18,7 @@ export class OrdenFacturacionService {
 
     PutStatusOrder = (fact: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrder/${fact}`, fact);
 
+    PutStatusOrderAnulled = (order: number) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putStatusOrderAnulled/${order}`, order)
+
     PutFactOrder = (order: number, fact: string) => this.http.put(`${this.rutaPlasticaribeAPI}/OrdenFacturacion/putFactOrder/${order}/${fact}`, fact);
 }

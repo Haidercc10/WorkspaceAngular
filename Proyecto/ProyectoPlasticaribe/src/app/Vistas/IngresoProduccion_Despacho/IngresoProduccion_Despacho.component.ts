@@ -129,7 +129,6 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let productionSearched = this.sendProductionZeus.map(prod => prod.pp).map(x => x.numeroRollo_BagPro);
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
-      this.load = true;
       this.productionProcessSerivce.GetInformationAboutProductionToUpdateZeus(production, searchInTable).subscribe(data => {
         this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
           this.sendProductionZeus.push(data[0]);

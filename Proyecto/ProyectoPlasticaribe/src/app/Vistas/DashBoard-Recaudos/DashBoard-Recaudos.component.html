@@ -13,16 +13,16 @@
   <div class="row m-3">
     <p-toolbar class="m-3">
       <div class="row g-3" style="width: 100%;">
-        <div class="col-md-3 m-auto text-center">
+        <div class="col-md-12 m-auto text-center">
           <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-filter"></i> Filtros de Busqueda</h4>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-12">
           <!-- FILTROS -->
           <form [formGroup]="FormFiltros" (ngSubmit)="tiempoExcedido()">
             <div class="row g-4 my-3">
               <!-- CLIENTES -->
-              <div class="col-sm-12 col-md-12 col-lg-4">
+              <div class="col-sm-12 col-md-12 col-lg-3">
                 <span class="p-float-label">
                   <input formControlName="Cliente" autocomplete="off" id="Nombre" list="clientes" type="text" pInputText required/>
                   <datalist id="clientes">
@@ -33,11 +33,18 @@
               </div>
         
               <!-- VENDEDORES -->
-              <div class="col-sm-12 col-md-12 col-lg-4">
+              <div class="col-sm-12 col-md-12 col-lg-3">
                 <span class="p-float-label">
                   <p-dropdown formControlName="Vendedor" id="Nombre" [autoDisplayFirst]="false" appendTo="body" [options]="vendedores" [showClear]="true"></p-dropdown>
                   <label for="Nombre">Vendedor</label>
                 </span>
+              </div>
+
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2 col-xxl-2" id="iva">
+                <div class="field-checkbox">
+                  <p-checkbox formControlName="CarteraOriginal" [binary]="true" inputId="iva"></p-checkbox>
+                  <label for="iva"><p-chip label="Cartera Original" icon="pi pi-money-bill"></p-chip></label>
+                </div>
               </div>
         
               <!-- Botones -->

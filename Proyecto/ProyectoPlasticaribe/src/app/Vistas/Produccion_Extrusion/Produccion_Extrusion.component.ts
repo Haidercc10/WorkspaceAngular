@@ -5,7 +5,7 @@ import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
-import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { CreacionPdfService, TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -59,7 +59,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     private bagproService: BagproService,
     private msj: MensajesAplicacionService,
     private produccionProcesosService: Produccion_ProcesosService,
-    private createPDFService: CreacionPdfService,
+    private createPDFService: TagProduction_2,
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
     private orderProductionsService: Orden_TrabajoService,

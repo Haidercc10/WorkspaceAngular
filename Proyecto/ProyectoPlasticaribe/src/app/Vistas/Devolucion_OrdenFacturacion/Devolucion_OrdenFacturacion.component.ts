@@ -161,8 +161,9 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
 
   saveDev() {
     this.load = true;
+    let order: number = this.formDataOrder.value.fact;
     let info: modelDevolucionProductos = {
-      FacturaVta_Id: this.formDataOrder.value.fact,
+      FacturaVta_Id: `Orden de Facturación #${order}`,
       Cli_Id: this.formDataOrder.value.idClient,
       DevProdFact_Fecha: moment().format('YYYY-MM-DD'),
       DevProdFact_Hora: moment().format('HH:mm:ss'),
@@ -185,9 +186,17 @@ export class Devolucion_OrdenFacturacionComponent implements OnInit {
       }
       this.dtDevService.srvGuardar(info).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) this.createPDF(data.devProdFact_Id, this.formDataOrder.value.fact);
+        if (count == this.productionSelected.length) this.changeStatus(data);
       }, error => this.errorMessage(`¡Ocurrió un error guardar los detalles de la devolución!`, error));
     });
+  }
+
+  changeStatus(data: any){
+    let order: number = this.formDataOrder.value.fact;
+    let reels: Array<number> = this.productionSelected.map(x => x.numberProduction);
+    this.dtOrderFactService.PutStatusProduction(reels, order).subscribe(() => {
+      this.createPDF(data.devProdFact_Id, this.formDataOrder.value.fact);
+    }, (error) => this.errorMessage(`¡Ocurrió un error al cambiar el estado de los rollos a devolver #${order}!`, error));
   }
 
   createPDF(idDev: number, fact: string) {

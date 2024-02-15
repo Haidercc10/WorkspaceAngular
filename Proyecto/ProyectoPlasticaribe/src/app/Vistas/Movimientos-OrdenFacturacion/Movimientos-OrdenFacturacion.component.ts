@@ -8,6 +8,10 @@ import { Orden_FacturacionComponent } from '../Orden_Facturacion/Orden_Facturaci
 import { Devolucion_OrdenFacturacionComponent } from '../Devolucion_OrdenFacturacion/Devolucion_OrdenFacturacion.component';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { Table } from 'primeng/table';
+import { OrdenFacturacionService } from 'src/app/Servicios/OrdenFacturacion/OrdenFacturacion.service';
+import { MessageService } from 'primeng/api';
+import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-Movimientos-OrdenFacturacion',
@@ -19,12 +23,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   formFilters !: FormGroup;
   load: boolean = false;
   modoSeleccionado: boolean;
-  ValidarRol: number;
+  validateRole: number;
   storage_Id : number;
   storage_Nombre : any;
   serchedData: any[] = [];
   @ViewChild('dt') dt: Table;
   states: Array<string> = ['PENDIENTE','DESPACHADO'];
+  anulledOrder: number | undefined;
 
   constructor(private appComponent : AppComponent,
     private frmBuilder : FormBuilder,
@@ -32,7 +37,10 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     private msg : MensajesAplicacionService,
     private orden_FacturacionComponent : Orden_FacturacionComponent,
     private devolucion_OrdenFacturacionComponent : Devolucion_OrdenFacturacionComponent,
-    private dtDevolutionsService : DetallesDevolucionesProductosService,) {
+    private dtDevolutionsService : DetallesDevolucionesProductosService,
+    private orderFactService: OrdenFacturacionService,
+    private messageService: MessageService,
+    private productionProcessService : Produccion_ProcesosService,) {
 
     this.modoSeleccionado = this.appComponent.temaSeleccionado;
     this.formFilters = this.frmBuilder.group({
@@ -43,13 +51,13 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.lecturaStorage();
+    this.readStorage();
   }
 
-  lecturaStorage(){
+  readStorage(){
     this.storage_Id = this.appComponent.storage_Id;
     this.storage_Nombre = this.appComponent.storage_Nombre;
-    this.ValidarRol = this.appComponent.storage_Rol;
+    this.validateRole = this.appComponent.storage_Rol;
   }
 
   clearFields(){
@@ -73,7 +81,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
       this.msg.mensajeError(`¡No se encontró información de ordenes realizadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
     });
     this.searchDataDevolutions(startDate, endDate, route);
-    // this.searchSendOrders(startDate, endDate, route);
   }
 
   searchDataDevolutions(startDate: any, endDate: any, route: string){
@@ -98,4 +105,36 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     setTimeout(() => this.load = false, 3000);
   }
 
+  confirmSendData(order: number) {
+    this.anulledOrder = order;
+    this.messageService.add({
+      severity: 'warn',
+      key: 'confirmation',
+      summary: 'Confirmación',
+      detail: `Se anulará la orden #${order}, los rollos de está orden estarán nuevamente disponibles y la orden no se podrá despachar. ¿Desea continuar?`,
+      sticky: true
+    });
+  }
+
+  onReject = () => this.messageService.clear('confirmation');
+
+  errorMessage(message: string, error: HttpErrorResponse) {
+    this.load = false;
+    this.msg.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
+  }
+
+  PutStatusOrderAnulled() {
+    this.onReject();
+    this.load = true;
+    this.orderFactService.PutStatusOrderAnulled(this.anulledOrder).subscribe(() => {
+      this.PutStatusDetailsOrder();
+    }, error => this.errorMessage(`¡Ocurrió un error al intentar anular la orden #${this.anulledOrder}!`, error));
+  }
+
+  PutStatusDetailsOrder(){
+    this.productionProcessService.putStateAvaible(this.anulledOrder).subscribe(() => {
+      this.msg.mensajeConfirmacion(`¡Orden de facturación anulada con éxito!`);
+      this.load = false;
+    }, error => this.errorMessage(`¡Ocurrió un error al colocar en disponible los rollos de la orden #${this.anulledOrder}!`, error));
+  }
 }
