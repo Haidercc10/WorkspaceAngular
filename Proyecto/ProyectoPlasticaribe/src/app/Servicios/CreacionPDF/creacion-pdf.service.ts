@@ -289,6 +289,250 @@ export class CreacionPdfService {
     }
 }
 
+@Injectable({
+    providedIn: 'root'
+})
+
+export class TagProduction_2 {
+    
+    constructor(private rePrintService: ReImpresionEtiquetasService,
+        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+        private encriptacion : EncriptacionService,) { }
+
+        // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+    private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+    createTagProduction(dataTag: modelTagProduction) {
+        let code: number = dataTag.reel;
+        const pdfDefinition: any = {
+            pageOrientation: 'portrait',
+            info: { title: `Etiqueta ${code}` },
+            pageSize: { width: 377.95280352, height: 188.97640176 },
+            pageMargins: [10, 10, 10, 10],
+            content: this.contentPDF(dataTag),
+        }
+        pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => window.electron.send('print-pdf', buffer));
+        if (dataTag.copy) this.createRePrint(dataTag);
+    }
+
+    private contentPDF(dataTag: modelTagProduction) {
+        return [
+            {
+                table: {
+                    widths: ['50%', '50%'],
+                    body: this.contentPrincipalTablePDF(dataTag)
+                },
+            }
+        ]
+    }
+
+    private contentPrincipalTablePDF(dataTag: modelTagProduction): any[] {
+        let content = [];
+        if (dataTag.showNameBussiness) content.push(this.dataBussiness());
+        content.push(
+            this.adictionalInformationTag(),
+            this.infoClient(dataTag),
+            this.dataOrderAndItem(dataTag),
+            this.nameReference(dataTag),
+            this.nameMaterial(dataTag),
+            this.createBarcode(dataTag),
+            this.quantity(dataTag),
+            this.presentationsTag(dataTag),
+            this.processAndDate(dataTag),
+            this.opertaros(dataTag),
+        );
+        
+        return content;
+    }
+
+    private dataBussiness(): any[] {
+        return [
+            {
+                colSpan: 2,
+                margin: [0, 3],
+                table: {
+                    widths: ['100%'],
+                    body: [
+                        [{ border: [false, false, false, false], bold: true, alignment: 'center', fontSize: 15, text: 'PLASTICARIBE S.A.S' }],
+                        [{ border: [false, false, false, false], alignment: 'center', fontSize: 8, margin: [0, -3, 0, 0], text: 'CALLE 42 #52-105 BARRANQUILLA' }]
+                    ]
+                }
+            },
+            {}
+        ];
+    }
+
+    private adictionalInformationTag(): any[] {
+        return [
+            { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 7, alignment: 'center', colSpan: 2 },
+            {}
+        ];
+    }
+
+    private infoClient(dataTag: modelTagProduction): any[] {
+        return [
+            {
+                colSpan: 2,
+                margin: [0, 3],
+                columns: [
+                    { width: '23%', text: 'CLIENTE:', bold: true, fontSize: 8, alignment: 'left' },
+                    { width: '77%', text: (dataTag.client).toUpperCase(), fontSize: 9, alignment: 'left' },
+                ]
+            },
+            {}
+        ];
+    }
+
+    private dataOrderAndItem(dataTag: modelTagProduction): any[] {
+        return [
+            {
+                margin: [0, 3],
+                columns: [
+                    { width: '25%', text: 'OT:', bold: true, fontSize: 10, alignment: 'left' },
+                    { width: '75%', text: (dataTag.orderProduction), fontSize: 10, alignment: 'left' },
+                ]
+            },
+            {
+                margin: [0, 3],
+                columns: [
+                    { width: '35%', text: 'ITEM:', bold: true, fontSize: 10, alignment: 'left' },
+                    { width: '65%', text: dataTag.item, fontSize: 10, alignment: 'left' },
+                ]
+            }
+        ]
+    }
+
+    private nameReference(dataTag: modelTagProduction): any[] {
+        return [
+            {
+                colSpan: 2,
+                margin: [0, 3],
+                columns: [
+                    { width: '13%', text: 'REF.:', bold: true, fontSize: 8, alignment: 'left' },
+                    { width: '87%', text: (dataTag.reference).toUpperCase(), fontSize: 8, alignment: 'left' },
+                ]
+            },
+            {}
+        ];
+    }
+
+    private nameMaterial(dataTag: modelTagProduction): any[] {
+        return [
+            {
+                margin: [-2, -3],
+                colSpan: 2,
+                table: {
+                    widths: ['60%','40%'],
+                    margin: [0, 3],
+                    body:[
+                        [
+                            {
+                                border: [false, false, true, false],
+                                columns: [
+                                    { width: '42%', text: 'MATERIAL:', bold: true, fontSize: 7, alignment: 'left' },
+                                    { width: '58%', text: (dataTag.material).toUpperCase(), fontSize: 7, alignment: 'left' },
+                                ]
+                            },
+                            {
+                                border: [false, false, false, false],
+                                columns: [
+                                    { width: '52%', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
+                                    { width: '48%', text: dataTag.reel, fontSize: 8, alignment: 'left' },
+                                ]
+                            }
+                        ]
+                    ]
+                }
+            },
+            {}
+        ]
+    }
+
+    private createBarcode(dataTag: modelTagProduction) {
+        let size: number = this.sizeBarcode(dataTag);
+        const imageBarcode = document.createElement('img');
+        imageBarcode.id = 'barcode';
+        document.body.appendChild(imageBarcode);
+        JsBarcode("#barcode", (dataTag.reel).toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
+        let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center' };
+        imageBarcode.remove();
+        return [imagePDF, {}];
+    }
+
+    private sizeBarcode(dataTag: modelTagProduction): number {
+        let sizeClient: number = dataTag.client.length;
+        let sizeReference: number = dataTag.reference.length;
+        let size: number = 90;
+        if (sizeClient < 20) size += 14;
+        if (sizeReference < 29) size += 14;
+        return size;
+    }
+
+    private quantity(dataTag: modelTagProduction) {
+        let data = [];
+        data.push(this.tableWithQuantity(dataTag.quantity));
+        data.push(this.tableWithQuantity(dataTag.quantity2));
+        return data;
+    }
+
+    private tableWithQuantity(quantity: number) {
+        let roundedquantity = Math.round(quantity);
+        let finalQuantity: string = quantity == roundedquantity ? `${roundedquantity}` : quantity.toFixed(2);
+        let size: number = finalQuantity.length > 6 ? 18 : finalQuantity.length > 8 ? 20 : 22;
+        return { text: `${this.formatNumbers((finalQuantity))}`, bold: true, fontSize: size, alignment: 'center', margin: [0, 5] };
+    }
+
+    private presentationsTag(dataTag: modelTagProduction): any[] {
+        return [
+            { text: dataTag.presentationItem1, bold: true, fontSize: 10, alignment: 'center' },
+            { text: dataTag.presentationItem2, bold: true, fontSize: 10, alignment: 'center' },
+        ];
+    }
+
+    private processAndDate(dataTag: modelTagProduction): Array<any> {
+        return [
+            { text: dataTag.productionProcess, alignment: 'center', fontSize: 8, bold: true },
+            { text: `${moment().format('YYYY-MM-DD HH:mm:ss')}`, alignment: 'center', fontSize: 7 },
+        ]
+    }
+
+    private opertaros(dataTag): Array<any> {
+        return [
+            { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: 9 },
+            {},
+        ]
+    }
+
+    private createRePrint(dataTag: modelTagProduction) {
+        if (dataTag.copy) {
+            let data: ReImpresionEtiquetas = {
+                Orden_Trabajo: parseInt(dataTag.orderProduction),
+                NumeroRollo_BagPro: dataTag.reel,
+                Proceso_Id: this.validateProcess(dataTag.productionProcess),
+                Fecha: moment().format('YYYY-MM-DD'),
+                Hora: moment().format('HH:mm:ss'),
+                Usua_Id: this.encriptacion.decrypt(this.storage.get('Id') == undefined ? '' : this.storage.get('Id')),
+            }
+            this.rePrintService.insert(data).subscribe(null, error => console.log(error));
+        }
+    }
+
+    validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
+        const processMapping = {
+            'EXTRUSION': 'EXT',
+            'IMPRESION': 'IMP',
+            'ROTOGRABADO': 'ROT',
+            'LAMINADO': 'LAM',
+            'DOBLADO': 'DBLD',
+            'CORTE': 'CORTE',
+            'EMPAQUE': 'EMP',
+            'SELLADO': 'SELLA',
+            'WIKETIADO': 'WIKE'
+        };
+        return processMapping[proceso] || proceso;
+    }
+}
+
 export interface modelTagProduction {
     client: string;
     item: number;

@@ -5,7 +5,7 @@ import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ConosService } from 'src/app/Servicios/Conos/conos.service';
-import { CreacionPdfService, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -54,7 +54,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     private bagproService: BagproService,
     private msj: MensajesAplicacionService,
     private produccionProcesosService: Produccion_ProcesosService,
-    private createPDFService: CreacionPdfService,
+    private createPDFService: TagProduction_2,
     private clientsService: SedeClienteService,
     private processService: ProcesosService,
     private orderProductionsService: Orden_TrabajoService,
@@ -391,22 +391,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
       this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
-      this.contarReImpresionesPorEtiquetas();
     }, () => this.cargando = false, () => this.cargando = false);
-  }
-
-  contarReImpresionesPorEtiquetas() {
-    let rollos: Array<number> = this.rollosPesados.map(x => x.item);
-    this.rePrintService.getCantidadReImpresionesPorEtiqueta(rollos).subscribe(data => {
-      data.forEach(d => {
-        let i: number = this.rollosPesados.findIndex(x => x.item == d.item);
-        this.rollosPesados[i].reImpresiones += d.cantidad;
-      });
-    }, () => {
-      for (let i = 0; i < this.rollosPesados.length; i++) {
-        this.rollosPesados[i].reImpresiones = 1;
-      }
-    });
   }
 
   sumarPesoBruto() {
@@ -425,7 +410,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.obtenerTurnos();
     this.buscraOrdenTrabajo();
     this.cargando = true;
-    // this.buscarPuertos();
     setTimeout(() => {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
@@ -447,7 +431,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
         this.cargando = false;
       }
-    }, 1000);
+    }, 500);
   }
 
   datosProduccion(): modelProduccionProcesos {

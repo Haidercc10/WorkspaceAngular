@@ -1,6 +1,6 @@
 {
   "name": "plasticaribe",
-  "version": "3.3",
+  "version": "4.0.0",
   "main": "main.js",
   "icon": "/assets/Plascaribe_Icono.ico",
   "scripts": {

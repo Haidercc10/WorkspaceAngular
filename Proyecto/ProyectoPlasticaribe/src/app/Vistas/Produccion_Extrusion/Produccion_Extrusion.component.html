@@ -205,7 +205,6 @@
               <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
               <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'hora', 'contains')"></th>
               <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'turno', 'contains')"></th>
-              <th *ngIf="[1, 86].includes(ValidarRol)"><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'reImpresiones', 'contains')"></th>
               <th *ngIf="[1, 86].includes(ValidarRol)"></th>
             </tr>
             <tr>
@@ -218,7 +217,6 @@
                 <th class="text-center">Fecha</th>
                 <th class="text-center">Hora</th>
                 <th class="text-center">Turno</th>
-                <th class="text-center" *ngIf="[1].includes(ValidarRol)">Cant. Impresiones</th>
                 <th class="text-center" *ngIf="[1].includes(ValidarRol)">Imprimir</th>
             </tr>
         </ng-template>
@@ -233,7 +231,6 @@
                 <td class="text-center">{{data.fecha | date : 'YYYY-MM-dd'}}</td>
                 <td class="text-center">{{data.hora}}</td>
                 <td class="text-center">{{data.turno}}</td>
-                <td class="text-center" *ngIf="[1].includes(ValidarRol)">{{data.reImpresiones | number}}</td>
                 <td *ngIf="[1].includes(ValidarRol)">
                     <button class="buttonPrint"
                         (click)="createTagProduction(data.item, data.extBruto, data.extnetokg, true)">

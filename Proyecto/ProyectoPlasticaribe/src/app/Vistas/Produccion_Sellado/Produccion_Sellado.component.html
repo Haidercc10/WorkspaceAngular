@@ -220,8 +220,6 @@
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion2', 'contains')"></th>
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
-        <th *ngIf="[1, 86].includes(ValidarRol)"><input pInputText style="width: 100%;"
-            (input)="aplicarfiltro($event, 'reImpresiones', 'contains')"></th>
         <th *ngIf="[1, 86].includes(ValidarRol)"></th>
       </tr>
       <tr>
@@ -233,7 +231,6 @@
         <th class="text-center">Peso</th>
         <th class="text-center">Und</th>
         <th class="text-center">Fecha</th>
-        <th class="text-center" *ngIf="[1,86].includes(ValidarRol)">Cant. Impresiones</th>
         <th class="text-center" *ngIf="[1, 86].includes(ValidarRol)">Imprimir</th>
       </tr>
     </ng-template>
@@ -262,7 +259,6 @@
         <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
         <td class="text-center">{{data.presentacion2}}</td>
         <td class="text-center">{{data.fecha}} - {{data.hora}}</td>
-        <td class="text-center" *ngIf="[1, 86].includes(ValidarRol)">{{data.reImpresiones | number}}</td>
         <td class="text-center" *ngIf="[1, 86].includes(ValidarRol)">
           <button class="buttonPDF"
             (click)="crearEtiqueta(data.bulto, data.peso, data.cantidadUnd, data.presentacion1, 1, data.operario1)">
