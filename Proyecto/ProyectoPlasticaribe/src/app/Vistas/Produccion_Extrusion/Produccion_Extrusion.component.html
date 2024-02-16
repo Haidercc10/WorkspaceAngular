@@ -216,7 +216,7 @@
                 <td class="text-center">{{data.fecha | date : 'YYYY-MM-dd'}}</td>
                 <td class="text-center">{{data.hora}}</td>
                 <td class="text-center">{{data.turno}}</td>
-                <td class="text-center" *ngIf="[1].includes(ValidarRol)">{{data.reImpresiones | number}}</td>
+                <td class="text-center" *ngIf="[1].includes(ValidarRol)" (click)="showRePrints(data.item)">{{data.reImpresiones | number}}</td>
                 <td *ngIf="[1].includes(ValidarRol)">
                     <button class="buttonPrint"
                         (click)="createTagProduction(data.item, data.extBruto, data.extnetokg, true)">

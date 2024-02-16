@@ -394,7 +394,7 @@ export class Produccion_ExtrusionComponent implements OnInit {
     this.rePrintService.getCantidadReImpresionesPorEtiqueta(rollos).subscribe(data => {
       data.forEach((d: any) => {
         let i: number = this.rollosPesados.findIndex(x => x.item == d.numeroRollo_BagPro);
-        this.rollosPesados[i].reImpresiones += d.cantidad;
+        this.rollosPesados[i].reImpresiones = d.cantidad;
       });
       this.rollosSinReImpresion(data.map((y: any) => y.numeroRollo_BagPro));
     }, () => this.rollosSinReImpresion([]));

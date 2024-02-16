@@ -445,7 +445,7 @@ export class TagProduction_2 {
                                 border: [false, false, false, false],
                                 columns: [
                                     { width: 'auto', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
-                                    { width: 'auto', text: dataTag.reel, fontSize: 9, alignment: 'left' },
+                                    { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 9, alignment: 'left' },
                                 ]
                             }
                         ]

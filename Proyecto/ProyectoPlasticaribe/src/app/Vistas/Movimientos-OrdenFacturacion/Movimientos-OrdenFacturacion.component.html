@@ -95,9 +95,9 @@
           <p-sortIcon field="clientes.cli_Nombre"></p-sortIcon> Cliente
           <p-columnFilter type="text" field="clientes.cli_Nombre" display="menu"></p-columnFilter>
         </th>
-        <th class="text-center" pSortableColumn="or.fecha">
-          <p-sortIcon field="or.fecha"></p-sortIcon> Fecha
-          <p-columnFilter type="text" field="or.fecha" display="menu"></p-columnFilter>
+        <th class="text-center" pSortableColumn="fechaHora">
+          <p-sortIcon field="fechaHora"></p-sortIcon> Fecha
+          <p-columnFilter type="text" field="fechaHora" display="menu"></p-columnFilter>
         </th>
         <th class="text-center" pSortableColumn="type">
           <p-sortIcon field="type"></p-sortIcon> Tipo de Documento
@@ -117,7 +117,7 @@
         <td class="text-center">{{data.or.factura}}</td>
         <td class="text-center">{{data.or.cli_Id}}</td>
         <td class="text-center">{{data.clientes.cli_Nombre}}</td>
-        <td class="text-center">{{data.or.fecha | date : 'yyyy-MM-dd'}}</td>
+        <td class="text-center">{{data.fechaHora}}</td>
         <td class="text-center">{{data.type | uppercase}}</td>
         <td class="text-center"><span class="badge" [ngClass]="{'bg-danger1': data.or.estado_Id == 19, 'bg-success1': data.or.estado_Id == 21, 'bg-warning': data.or.estado_Id == 3}">{{data.estado}}</span></td>
         <td class="text-center" *ngIf="[1].includes(validateRole)">

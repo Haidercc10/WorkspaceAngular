@@ -89,15 +89,6 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     }, () => this.load = false);
   }
 
-  searchSendOrders(startDate: any, endDate: any, route: string){
-    this.dtOrderFactService.GetSendOrders(startDate, endDate, route).subscribe(data => {
-      data.forEach(dataOrder => this.serchedData.push(dataOrder));
-    }, error => {
-      this.load = false;
-      this.msg.mensajeError(`¡No se encontró información de ordenes enviadas con los parametros consultados!`, `Error: ${error.error.title} | Status: ${error.status}`);
-    });
-  }
-
   createPDF(id : number, fact: string, type : string){
     this.load = true;
     if (type == 'Orden') this.orden_FacturacionComponent.createPDF(id, fact);
