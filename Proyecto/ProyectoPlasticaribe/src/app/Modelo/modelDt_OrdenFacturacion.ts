@@ -6,4 +6,5 @@ export interface modelDt_OrdenFacturacion {
     Cantidad: number;
     Presentacion: string;
     Consecutivo_Pedido?: string;
+    Estado_Id: number;
 }

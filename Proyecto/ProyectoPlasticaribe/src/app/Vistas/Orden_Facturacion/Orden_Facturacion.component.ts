@@ -315,6 +315,7 @@ export class Orden_FacturacionComponent implements OnInit {
         Cantidad: production.quantity,
         Presentacion: production.presentation,
         Consecutivo_Pedido: (production.saleOrder).toString(),
+        Estado_Id: 19
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         count++;
