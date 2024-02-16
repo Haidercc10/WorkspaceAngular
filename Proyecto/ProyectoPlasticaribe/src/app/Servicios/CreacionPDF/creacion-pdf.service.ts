@@ -15,7 +15,7 @@ export class CreacionPdfService {
 
     constructor(private rePrintService: ReImpresionEtiquetasService,
         @Inject(SESSION_STORAGE) private storage: WebStorageService,
-        private encriptacion : EncriptacionService,) { }
+        private encriptacion: EncriptacionService,) { }
 
     // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
     private formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -190,10 +190,10 @@ export class CreacionPdfService {
                     body: [
                         [
                             { text: `OT: ${dataTag.orderProduction}`, bold: true, fontSize: 10, alignment: 'center', colSpan: dataTag.showDataTagForClient ? 4 : 1 },
-                            !dataTag.showDataTagForClient ? { 
-                                text: infoTag, 
-                                bold: true, 
-                                fontSize: 9, 
+                            !dataTag.showDataTagForClient ? {
+                                text: infoTag,
+                                bold: true,
+                                fontSize: 9,
                                 alignment: 'center',
                                 colSpan: 3,
                             } : {},
@@ -274,18 +274,18 @@ export class CreacionPdfService {
     }
 
     validateProcess(proceso: string): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
-      const processMapping = {
-        'EXTRUSION': 'EXT',
-        'IMPRESION': 'IMP',
-        'ROTOGRABADO': 'ROT',
-        'LAMINADO': 'LAM',
-        'DOBLADO': 'DBLD',
-        'CORTE': 'CORTE',
-        'EMPAQUE': 'EMP',
-        'SELLADO': 'SELLA',
-        'WIKETIADO': 'WIKE'
-      };
-      return processMapping[proceso] || proceso;
+        const processMapping = {
+            'EXTRUSION': 'EXT',
+            'IMPRESION': 'IMP',
+            'ROTOGRABADO': 'ROT',
+            'LAMINADO': 'LAM',
+            'DOBLADO': 'DBLD',
+            'CORTE': 'CORTE',
+            'EMPAQUE': 'EMP',
+            'SELLADO': 'SELLA',
+            'WIKETIADO': 'WIKE'
+        };
+        return processMapping[proceso] || proceso;
     }
 }
 
@@ -294,12 +294,12 @@ export class CreacionPdfService {
 })
 
 export class TagProduction_2 {
-    
+
     constructor(private rePrintService: ReImpresionEtiquetasService,
         @Inject(SESSION_STORAGE) private storage: WebStorageService,
-        private encriptacion : EncriptacionService,) { }
+        private encriptacion: EncriptacionService,) { }
 
-        // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+    // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
     private formatNumbers = (number: string) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
     createTagProduction(dataTag: modelTagProduction) {
@@ -341,7 +341,7 @@ export class TagProduction_2 {
             this.processAndDate(dataTag),
             this.opertaros(dataTag),
         );
-        
+
         return content;
     }
 
@@ -422,9 +422,9 @@ export class TagProduction_2 {
                 margin: [-5, -3],
                 colSpan: 2,
                 table: {
-                    widths: ['59%','41%'],
+                    widths: ['59%', '41%'],
                     margin: [0, 3],
-                    body:[
+                    body: [
                         [
                             {
                                 border: [false, false, true, false],
@@ -437,7 +437,7 @@ export class TagProduction_2 {
                                 border: [false, false, false, false],
                                 columns: [
                                     { width: 'auto', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
-                                    { width: 'auto', text: dataTag.reel, fontSize: 9, alignment: 'left' },
+                                    { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 9, alignment: 'left' },
                                 ]
                             }
                         ]
