@@ -23,9 +23,9 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   ngOnInit(): void {
     let dataTagProduction: modelTagProduction = {
-      client: 'COOPERATIVA DE PRODUCTORES DE LECHE LTDA S.A.S',
+      client: '123456789012345678901',
       item: 102226,
-      reference: 'INTERASEO 65 X 85 BCA NAT ATESA',
+      reference: '123456789012345678901234',
       width: 10,
       height: 10,
       bellows: 10,
@@ -35,7 +35,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       material: 'recuperado',
       quantity: 20,
       quantity2: 25,
-      reel: 123456,
+      reel: 1234567,
       presentationItem1: 'Kg Bruto',
       presentationItem2: 'Kg Neto',
       productionProcess: 'EMPAQUE',

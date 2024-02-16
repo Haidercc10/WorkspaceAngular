@@ -315,6 +315,7 @@ export class TagProduction_2 {
             pageMargins: [10, 10, 10, 10],
             content: this.contentPDF(dataTag),
         }
+        // pdfMake.createPdf(pdfDefinition).open();
         let windoeFeatures = `height=500,width=500`;
         let win = window.open('', 'Print', windoeFeatures);
         pdfMake.createPdf(pdfDefinition).print({}, win);
@@ -383,7 +384,7 @@ export class TagProduction_2 {
                 margin: [0, 3],
                 columns: [
                     { width: '23%', text: 'CLIENTE:', bold: true, fontSize: 8, alignment: 'left' },
-                    { width: '77%', text: (dataTag.client).toUpperCase(), fontSize: 9, alignment: 'left' },
+                    { width: '77%', text: (dataTag.client).toUpperCase(), fontSize: 10, alignment: 'left' },
                 ]
             },
             {}
@@ -416,7 +417,7 @@ export class TagProduction_2 {
                 margin: [0, 3],
                 columns: [
                     { width: '13%', text: 'REF.:', bold: true, fontSize: 8, alignment: 'left' },
-                    { width: '87%', text: (dataTag.reference).toUpperCase(), fontSize: 8, alignment: 'left' },
+                    { width: '87%', text: (dataTag.reference).toUpperCase(), fontSize: 10, alignment: 'left' },
                 ]
             },
             {}
@@ -426,25 +427,25 @@ export class TagProduction_2 {
     private nameMaterial(dataTag: modelTagProduction): any[] {
         return [
             {
-                margin: [-2, -3],
+                margin: [-5, -3],
                 colSpan: 2,
                 table: {
-                    widths: ['60%','40%'],
+                    widths: ['59%','41%'],
                     margin: [0, 3],
                     body:[
                         [
                             {
                                 border: [false, false, true, false],
                                 columns: [
-                                    { width: '42%', text: 'MATERIAL:', bold: true, fontSize: 7, alignment: 'left' },
-                                    { width: '58%', text: (dataTag.material).toUpperCase(), fontSize: 7, alignment: 'left' },
+                                    { width: 'auto', text: 'MATERIAL:', bold: true, fontSize: 7, alignment: 'left' },
+                                    { width: 'auto', text: (dataTag.material).toUpperCase(), fontSize: 7, alignment: 'left' },
                                 ]
                             },
                             {
                                 border: [false, false, false, false],
                                 columns: [
-                                    { width: '52%', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
-                                    { width: '48%', text: dataTag.reel, fontSize: 8, alignment: 'left' },
+                                    { width: 'auto', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
+                                    { width: 'auto', text: dataTag.reel, fontSize: 9, alignment: 'left' },
                                 ]
                             }
                         ]
@@ -469,9 +470,9 @@ export class TagProduction_2 {
     private sizeBarcode(dataTag: modelTagProduction): number {
         let sizeClient: number = dataTag.client.length;
         let sizeReference: number = dataTag.reference.length;
-        let size: number = 90;
-        if (sizeClient < 20) size += 14;
-        if (sizeReference < 29) size += 14;
+        let size: number = 95;
+        if (sizeClient < 22) size += 13;
+        if (sizeReference < 25) size += 13;
         return size;
     }
 
@@ -499,7 +500,7 @@ export class TagProduction_2 {
     private processAndDate(dataTag: modelTagProduction): Array<any> {
         return [
             { text: dataTag.productionProcess, alignment: 'center', fontSize: 8, bold: true },
-            { text: `${moment().format('YYYY-MM-DD HH:mm:ss')}`, alignment: 'center', fontSize: 7 },
+            { text: `${moment().format('YYYY-MM-DD HH:mm:ss')}`, alignment: 'center', fontSize: 8 },
         ]
     }
 
