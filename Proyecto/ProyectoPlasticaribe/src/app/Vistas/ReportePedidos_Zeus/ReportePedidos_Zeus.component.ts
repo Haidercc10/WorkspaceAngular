@@ -40,6 +40,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente.
   infoColor : string = ''; //Varable que almcanerá la descripcion del un color
+  pedidosOriginales: Array<any> = [];
   ArrayPedidos = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   virtualPedidos !: any[];
   modalEditar : boolean = false; //Variable que validará si el pedido está en edición o no
@@ -108,6 +109,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   // Funcion que consultará los departamentos de colombia
   consultarDepartamentos(){
     this.deparMuniciosColService.getDepartamentos().subscribe(res => {
+      res.push(this.agregarMunicipio());
       this.departamentos = res.reduce((a,b) => {
         if (!a.map(x => x.departamento).includes(b.departamento)) a = [...a, b];
         return a;
@@ -116,17 +118,24 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     });
   }
 
+  agregarMunicipio(){
+    return {"region":"Región Caribe","c_digo_dane_del_departamento":"0","departamento":"Bolívar","c_digo_dane_del_municipio":"0","municipio":"Cartagena"}
+  }
+
   // Funcion que devolverá los municipios de los departamentos seleccionados
   consultarMunicipios(){
     this.municipios = [];
     this.deparMuniciosColService.getDepartamentos().subscribe(res => {
+      res.push(this.agregarMunicipio());
       this.departamentoSeleccionado.forEach(depar => this.municipios = this.municipios.concat(res.filter(x => x.departamento == depar.departamento)));
     });
+    // this.filtrarPedidos();
   }
 
   // Funcion que va a consultar los pedidos de zeus
   consultarPedidosZeus(){
     this.cargando = true;
+    this.pedidosOriginales = [];
     this.ArrayPedidos = [];
     this.datosExcel = [];
 
@@ -298,6 +307,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         this.ArrayPedidos[posicion].color = 'blanco';
       }
     }
+    this.pedidosOriginales = this.ArrayPedidos;
   }
 
   // Funcion que va a llenar el array que se mostrará en la tabla con la informacion consultada de los pedidos
@@ -340,6 +350,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.ArrayPedidos.push(info);
     this.datosExcel = this.ArrayPedidos;
     this.ArrayPedidos.sort((a,b) => Number(a.id) - Number(b.id));
+    this.pedidosOriginales = this.ArrayPedidos;
+  }
+
+  filtrarPedidos() {
+    this.ArrayPedidos = this.seleccionarInformacionPDf();
+    this.ArrayPedidos.sort((a,b) => Number(a.id) - Number(b.id));
+    this.cargando = false;
+    this.dt.value.sort((a,b) => Number(a.id_color) - Number(b.id_color));
+    const thisRef = this;
+    this.ArrayPedidos.forEach((pedido) => thisRef.expandedRows[pedido.consecutivo] = true);
   }
 
   // Funcion que va a calcular el costo total del pedido
@@ -1125,7 +1145,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   seleccionarInformacionPDf() : any [] {
     let informacion : any [] = [];
-    informacion = this.ArrayPedidos.filter(x => x.Zeus == 1);
+    informacion = this.pedidosOriginales.filter(x => x.Zeus == 1);
 
     if (this.vendedorSeleccionado) informacion = informacion.filter(x => x.idVendedor == this.vendedorSeleccionado && x.Zeus == 1);
 

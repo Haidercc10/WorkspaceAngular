@@ -31,7 +31,7 @@ export class ExistenciasProductosService {
 
   srvActualizarProductoPresentacion = (prod : any, presentacion : any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionProducto/${prod}/${presentacion}`, datos_Productos);
 
-  srvActualizarExistenciaCantidadMinima = (id : any, datos_Productos:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionCantMinima/${id}`, datos_Productos);;
+  srvActualizarExistenciaCantidadMinima = (id : any, cantMinima:any) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionCantMinima/${id}/${cantMinima}`, cantMinima);
 
   PutExistencia = (item: number, presentation: string, quantity: number, price: number) => this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/tutExistencia`, null);
 

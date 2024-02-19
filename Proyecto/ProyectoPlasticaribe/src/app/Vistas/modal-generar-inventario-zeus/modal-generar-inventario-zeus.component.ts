@@ -269,34 +269,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   //
-  actualizarCantMinima(fila){
-    for (let index = 0; index < this.ArrayProductoZeus.length; index++) {
-      if(fila.codigoItem == this.ArrayProductoZeus[index].codigoItem) {
-        this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
-          for (let i = 0; i < datos_existencias.length; i++) {
-            const datosExistencias = {
-              Prod_Id: this.numeroIdProd,
-              exProd_Id: datos_existencias[i].exProd_Id,
-              ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
-              UndMed_Id: datos_existencias[i].undMed_Id,
-              TpBod_Id: datos_existencias[i].tpBod_Id,
-              ExProd_Precio: datos_existencias[i].exProd_Precio,
-              ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-              ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-              ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-              TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
-              exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-              ExProd_CantMinima : this.ArrayProductoZeus[index].cantMinima,
-              ExProd_Fecha : this.ArrayProductoZeus[i].exProd_Fecha,
-              ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
-            }
-            this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-              this.invetarioProductos();
-              this.confirmUsuarioCreado(fila.nombreItem);
-            });
-          }
-        });
-      }
+  actualizarCantMinima(fila, $event){
+    if ($event.key == 'Enter') {
+      this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(fila.Id, fila.Cant_Minima).subscribe(() => {
+        this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${fila.nombreItem} actualizada con éxito!`);
+      }, error => this.mensajeService.mensajeError(`¡Ocurrió un error al actualizar la cantidad minima!`,``));
     }
   }
 
@@ -305,15 +282,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   //
   aplicarfiltroGlobal = ($event, valorCampo : string) => this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
-
-  /** */
-  confirmUsuarioCreado(nombre) {
-    this.load = false
-    setTimeout(() => {
-      this.load = true;
-      this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${nombre} actualizada con éxito!`);
-    }, 5500);
-  }
 
   // Funcion que permitirá mostrar el modal de la creación y edición de la receta
   mostrarModalCrearEditar(data : any = "") {

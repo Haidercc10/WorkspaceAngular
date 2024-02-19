@@ -220,9 +220,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     let quantity: number = presentation != 'KLS' ? data.pp.cantidad : data.pp.peso_Neto;
     let price: number = data.dataExtrusion.precioProducto;
     this.productionProcessSerivce.sendProductionToZeus(ot, item, presentation, data.pp.numeroRollo_BagPro, quantity.toString(), price.toString()).subscribe(() => {
-      this.updateProductionSendZeus(reel);
       this.saveDataEntrace(data);
-      this.messageConfirmationUpdateStore();
     }, error => this.errorMessageWhenTryUpdateReel(`¡Error al actualizar el inventario del rollo ${reel}!`, error));
   }
 
@@ -364,7 +362,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
       Prod_CantBolsasFacturadas: 0,
       Proceso_Id: data.proceso.proceso_Id,
     }
-    this.dtEntracesService.srvGuardar(info).subscribe(null, () => {
+    this.dtEntracesService.srvGuardar(info).subscribe(() => this.messageConfirmationUpdateStore(), () => {
       this.load = false;
       this.msj.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
     });
