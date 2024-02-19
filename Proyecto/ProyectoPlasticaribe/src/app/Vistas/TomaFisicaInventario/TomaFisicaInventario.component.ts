@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -13,6 +13,7 @@ import { AppComponent } from 'src/app/app.component';
 import { dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-TomaFisicaInventario',
@@ -39,6 +40,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
   sendProductionZeus: any[] = [];
   dataSearched: Array<dataDesp> = [];
   searchIn: any = null;
+  @ViewChild('dtDetailed') dtDetailed: Table | undefined;
 
   constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
@@ -50,7 +52,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
     private storehouseService: BodegasDespachoService,
     private messageService: MessageService,
     private clients: SedeClienteService,) {
-    this.selectedMode = this.appComponent.temaSeleccionado;
+    this.selectedMode = this.appComponent.temaSeleccionado; 
   }
 
   ngOnInit(): void {
@@ -405,6 +407,9 @@ export class TomaFisicaInventarioComponent implements OnInit {
           user: (this.storage_Name).toString().toUpperCase(),
           process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
           ubication: (this.setUbication()).toString().toUpperCase(),
+          productionPL : data.dataExtrusion.numero_Rollo,
+          stateRollPP : '',
+          price : 0,
         });
         this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
         this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
@@ -588,4 +593,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
       { border: [true, true, true, true], alignment: 'center', text: `Ubicación`, fillColor: '#eee', bold: true },
     ]
   }
+
+  //Función para filtrar la tabla de rollos a eliminar.
+  applyFilter = ($event, campo : any, valorCampo : string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 }

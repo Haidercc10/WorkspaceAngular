@@ -1,0 +1,199 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div *ngIf="!traslate">
+  <!--Campos-->
+  <div class="row my-5 g-4 justify-content-center">
+
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false" [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"></p-dropdown>
+        <label for="bodegas">Bodega</label>
+      </span>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false" [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"></p-dropdown>
+        <label for="ubication">Ubicación</label>
+      </span>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion" [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getCubesBySubUbication()"></p-dropdown>
+        <label for="subUbication">Sub Ubicación</label>
+      </span>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+      <span class="p-float-label">
+        <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
+        <label for="cube">Cubos</label>
+      </span>
+    </div>
+    
+  </div>
+
+  <!--Botones-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+    <button pButton class="p-button-danger m-2" type="button" label="Reubicar Rollos" icon="pi pi-send" (click)="validateUbicationSelected()"></button>
+    <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+  </div>
+</div>
+
+<!-- Titulo Tabla 1 -->
+<div class="mb-4">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-table"></i> Consolidado de Productos</h4>
+</div>
+
+<!-- Tabla 1 -->
+<div class="mb-4" >
+  <div class="row g-3" id="tabla3">
+    <div class="table-responsive">
+      <p-table
+      #dtGrouped
+      *ngIf="!load"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+      responsiveLayout="scroll"
+      [value]="groupedInfo"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      dataKey="prod_Id">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center" scope="col">OT</th>
+          <th class="text-center" scope="col">Item</th>
+          <th class="text-center" scope="col">Referencia</th>
+          <th class="text-center" scope="col">Cantidad</th>
+          <th class="text-center" scope="col">N° Rollos</th>
+          <th class="text-center" scope="col">Presentación</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-info>
+        <tr>
+          <td class="text-center">{{info.pp.ot}}</td>
+          <td class="text-center">{{info.producto.prod_Id}}</td>
+          <td>{{info.producto.prod_Nombre}}</td>
+          <td class="text-center">{{totalQuantityByItem(info.producto.prod_Id) | number : '1.2-2'}}</td>
+          <td class="text-center">{{totalRollsByItem(info.producto.prod_Id) }}</td>
+          <td class="text-center">{{info.pp.presentacion}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="3" class="text-right">Totales</td>
+          <td class="text-center">{{totalQuantityConsolidated() | number: '1.2-2'}}</td> 
+          <td class="text-center">{{totalRollsConsolidated() | number}}</td> 
+          <td></td>
+        </tr>
+      </ng-template>
+    </p-table>
+    </div>
+  </div>
+</div>
+
+<!--Botones-->
+<div class="d-grid gap-2 d-md-flex justify-content-md-center my-2" *ngIf="traslate">
+  <button pButton class="p-button-danger m-2" type="button" label="Confirmar Traslado/Salida" icon="pi pi-send" [disabled]="groupedInfo.length != 1" (click)="viewConfirmMessage('traslate')"></button>
+  <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+</div>
+
+<!--Linea-->
+<div class="mb-4">
+  <hr class="colorLinea">
+</div>
+
+<!-- Titulo Tabla 2 -->
+<div class="mb-4">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-list"></i> Rollos seleccionados</h4>
+</div>
+
+<!-- Tabla 2 -->
+<div class="mb-4">
+  <p-table 
+    #dtDetailed 
+    [value]="sendProductionZeus" 
+    columnResizeMode="expand" 
+    styleClass="p-datatable-sm p-datatable-gridlines"
+    responsiveLayout="scroll" 
+    [rowHover]="true" 
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" 
+    [scrollable]="true"
+    scrollHeight="50rem" 
+    [resizableColumns]="true">
+    <ng-template pTemplate="header">
+      <tr id="filtros">
+        <th></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.numeroRollo_BagPro', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.ot', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Id', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.cantidad', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.presentacion', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.fecha', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.hora', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'proceso.proceso_Nombre', 'contains')"></th>
+        <th></th>
+      </tr>
+      <tr>
+        <th class="text-center">#</th>
+        <th class="text-center">Rollo</th>
+        <th class="text-center">OT</th>
+        <th class="text-center">Item</th>
+        <th class="text-center">Referencia</th>
+        <th class="text-center">Cantidad/Peso Neto</th>
+        <th class="text-center">Presentación</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Hora</th>
+        <th class="text-center">Proceso</th>
+        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+      <tr>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.pp.numeroRollo_BagPro}}</td>
+        <td class="text-center">{{data.pp.ot}}</td>
+        <td class="text-center">{{data.producto.prod_Id}}</td>
+        <td class="text-center">{{data.producto.prod_Nombre}}</td>
+        <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.pp.presentacion}}</td>
+        <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
+        <td class="text-center">{{data.pp.hora}}</td>
+        <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
+        <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+          <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!--Confirmacion-->
+<p-toast position="center" key="{{action}}" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" *ngIf="action == 'traslate'" pButton icon="pi pi-check" label="Sí" (click)="sendNegativeAdjustmentZeus()" class="p-button-warning" pTooltip="{{msgTooltip}}"></button>
+          <button type="button" *ngIf="action == 'reubication'" pButton icon="pi pi-check" label="Sí" (click)="changeUbication()" class="p-button-warning" pTooltip="{{msgTooltip}}"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton icon="pi pi-times" label="No" (click)="onReject()" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

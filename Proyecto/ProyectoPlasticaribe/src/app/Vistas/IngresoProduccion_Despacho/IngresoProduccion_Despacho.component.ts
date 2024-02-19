@@ -416,8 +416,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
           user: (this.storage_Name).toString().toUpperCase(),
           process: (data.proceso.proceso_Nombre).toString().toUpperCase(),
           ubication: (this.setUbication()).toString().toUpperCase(),
+          productionPL : 0,
+          stateRollPP : '',
+          price : 0,
         });
-
+        
         this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
         this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
       }

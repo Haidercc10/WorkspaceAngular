@@ -55,6 +55,9 @@
       <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
       <button pButton class="p-button-danger" type="button" label="Exportar PDF" icon="pi pi-file-pdf" [disabled]="dataSearched.length == 0" (click)="createPDF()"></button>
+      <button pButton class="p-button-success p-button-outlined" type="button" label="Cambiar ubicación" (click)="loadModal(false)" icon="pi pi-arrow-right-arrow-left" *ngIf="validateRole == 1" [disabled]="dataSelected.length == 0" pTooltip="Desde aquí podrás cambiar la ubicación de los rollos que selecciones en la tabla"></button>
+      <button pButton class="p-button-danger p-button-outlined" type="button" label="Trasladar/Sacar Rollos" (click)="loadModal(true)" icon="pi pi-sort-alt" *ngIf="validateRole == 1" [disabled]="dataSelected.length == 0" pTooltip="Aquí podrás trasladar o sacar de la bódega de despacho los rollos que selecciones en la tabla"></button>
+
     </div>
   </div>
 </form>
@@ -63,16 +66,20 @@
   #table
   [value]="dataSearched"
   columnResizeMode="expand"
+  [resizableColumns]="true"
   styleClass="p-datatable-sm"
   responsiveLayout="scroll"
   [rowHover]="true"
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
   [scrollable]="true"
-  scrollHeight="50rem">
+  scrollHeight="50rem"
+  [(selection)]="dataSelected" 
+  dataKey="production">
   <ng-template pTemplate="header">
     <tr class="font-size-16">
-      <th rowspan="2">#</th>
+      <th></th>
+      <th></th>
       <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'orderProduction')"></th>
       <th><input pInputText type="number" style="width: 100%;" (input)="applyFilter($event, 'item')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'reference')"></th>
@@ -81,10 +88,13 @@
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentation')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'process')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'ubication')"></th>
+      <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'stateRollPP')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'date')"></th>
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
     </tr>
     <tr>
+      <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+      <th>#</th>
       <th class="text-center" pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT</th>
       <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>
       <th class="text-center" pSortableColumn="reference"><p-sortIcon field="reference"></p-sortIcon> Referencia</th>
@@ -93,14 +103,16 @@
       <th class="text-center" pSortableColumn="presentation"><p-sortIcon field="presentation"></p-sortIcon> Presentación</th>
       <th class="text-center" pSortableColumn="process"><p-sortIcon field="process"></p-sortIcon> Proceso</th>
       <th class="text-center" pSortableColumn="ubication"><p-sortIcon field="ubication"></p-sortIcon> Ubicación</th>
+      <th class="text-center" pSortableColumn="stateRollPP"><p-sortIcon field="stateRollPP"></p-sortIcon> Estado</th>
       <th class="text-center" pSortableColumn="date"><p-sortIcon field="date"></p-sortIcon> Fecha</th>
       <th class="text-center" pSortableColumn="hour"><p-sortIcon field="hour"></p-sortIcon> Hora</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
     <tr>
+      <td><p-tableCheckbox [value]="data" *ngIf="data.stateRollPP == 'DISPONIBLE'" ></p-tableCheckbox></td>
       <td class="text-center">{{rowIndex + 1 | number}}</td>
-      <td class="text-center">{{data.orderProduction}}</td>
+      <td class="text-center"><b>{{data.orderProduction}}</b></td>
       <td class="text-center">{{data.item}}</td>
       <td>{{data.reference}}</td>
       <td class="text-center">{{data.production}}</td>
@@ -108,8 +120,15 @@
       <td class="text-center">{{data.presentation}}</td>
       <td class="text-center">{{data.process}}</td>
       <td class="text-center">{{data.ubication}}</td>
-      <td class="text-center">{{data.date}}</td>
+      <td class="text-center">
+        <span class="badge" [ngClass]="{'bg-success1': data.stateRollPP == 'DISPONIBLE', 'bg-danger1': data.stateRollPP == 'NO DISPONIBLE', 'bg-azul': data.stateRollPP == 'FACTURADO', }">{{data.stateRollPP}}</span>
+      </td>
+      <td class="text-center"> {{data.date}}</td>
       <td class="text-center">{{data.hour}}</td>
     </tr>
   </ng-template>
 </p-table>
+
+<p-dialog header="Actualizar ubicaciones" [(visible)]="modal" [modal]="true" [style]="{ width: '85vw' }" [resizable]="false">
+  <app-Ubicaciones_Rollos></app-Ubicaciones_Rollos>
+</p-dialog>      

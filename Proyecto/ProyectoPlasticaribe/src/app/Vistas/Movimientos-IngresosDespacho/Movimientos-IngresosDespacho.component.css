@@ -2,3 +2,27 @@ p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-in
     display: flex;
     width: 100%;
 }
+
+.bg-danger1 {
+    color: white;
+    background-color: palevioletred;
+    font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-success1 {
+    color: rgb(11, 82, 0);
+    background-color: palegreen;
+    font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-azul {
+    color: rgb(9, 0, 104);
+    background-color: #83D3FF;
+    font-size: calc(var(--font-size) * 15px);
+  }
+
+.bg-rojo {
+  color: rgb(27, 4, 0);
+  background-color: #ff5656;
+  font-size: calc(var(--font-size) * 15px);
+}

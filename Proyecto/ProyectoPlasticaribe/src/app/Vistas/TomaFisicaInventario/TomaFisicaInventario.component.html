@@ -5,8 +5,7 @@
 </div>
 
 <div class="mb-4">
-  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar
-    Inventario</h4>
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar Inventario</h4>
 </div>
 
 <div class="row my-5 g-4 justify-content-center">
@@ -62,57 +61,77 @@
   <button pButton class="p-button-secondary m-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
 </div>
 
-<p-table [value]="sendProductionZeus" columnResizeMode="expand" styleClass="p-datatable-sm p-datatable-gridlines"
-  responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
-  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
-  scrollHeight="50rem">
-  <ng-template pTemplate="header">
-    <tr>
-      <th class="text-center">#</th>
-      <th class="text-center">Rollo</th>
-      <th class="text-center">OT</th>
-      <th class="text-center">Cliente</th>
-      <th class="text-center">Item</th>
-      <th class="text-center">Referencia</th>
-      <th class="text-center">Cantidad/Peso Neto</th>
-      <th class="text-center">Presentación</th>
-      <th class="text-center">Material</th>
-      <th class="text-center">Maquina</th>
-      <th class="text-center">Fecha</th>
-      <th class="text-center">Hora</th>
-      <th class="text-center">Turno</th>
-      <th class="text-center">Proceso</th>
-      <th class="text-center">Envío Zeus</th>
-      <!-- <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th> -->
-      <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
-    <tr>
-      <td class="text-center">{{rowIndex + 1}}</td>
-      <td class="text-center">{{data.pp.numeroRollo_BagPro}}</td>
-      <td class="text-center">{{data.pp.ot}}</td>
-      <td class="text-center">{{data.clientes.cli_Nombre}}</td>
-      <td class="text-center">{{data.producto.prod_Id}}</td>
-      <td class="text-center">{{data.producto.prod_Nombre}}</td>
-      <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
-      <td class="text-center">{{data.pp.presentacion}}</td>
-      <td class="text-center">{{data.dataExtrusion.material}}</td>
-      <td class="text-center">{{data.pp.maquina}}</td>
-      <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
-      <td class="text-center">{{data.pp.hora}}</td>
-      <td class="text-center">{{data.turno.turno_Nombre}}</td>
-      <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
-      <td class="text-center">{{data.pp.envio_Zeus ? 'SI' : 'NO'}}</td>
-      <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-                <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
-            </td> -->
-      <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-        <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+<div class="mb-4">
+  <p-table #dtDetailed [value]="sendProductionZeus" columnResizeMode="expand" styleClass="p-datatable-sm p-datatable-gridlines"
+    responsiveLayout="scroll" [rowHover]="true" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos" [scrollable]="true"
+    scrollHeight="50rem" [resizableColumns]="true">
+    <ng-template pTemplate="header">
+      <tr id="filtros">
+        <th></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.numeroRollo_BagPro', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.ot', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'clientes.cli_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Id', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto.prod_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.cantidad', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.presentacion', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'dataExtrusion.material', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.maquina', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.fecha', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'pp.hora', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'turno.turno_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'proceso.proceso_Nombre', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'envio_Zeus', 'contains')"></th>
+        <th></th>
+      </tr>
+      <tr>
+        <th class="text-center">#</th>
+        <th class="text-center">Rollo</th>
+        <th class="text-center">OT</th>
+        <th class="text-center">Cliente</th>
+        <th class="text-center">Item</th>
+        <th class="text-center">Referencia</th>
+        <th class="text-center">Cantidad/Peso Neto</th>
+        <th class="text-center">Presentación</th>
+        <th class="text-center">Material</th>
+        <th class="text-center">Maquina</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Hora</th>
+        <th class="text-center">Turno</th>
+        <th class="text-center">Proceso</th>
+        <th class="text-center">Envío Zeus</th>
+        <!-- <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Imprimir</th> -->
+        <th class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">Quitar</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+      <tr>
+        <td class="text-center">{{rowIndex + 1}}</td>
+        <td class="text-center">{{data.pp.numeroRollo_BagPro}}</td>
+        <td class="text-center">{{data.pp.ot}}</td>
+        <td class="text-center">{{data.clientes.cli_Nombre}}</td>
+        <td class="text-center">{{data.producto.prod_Id}}</td>
+        <td class="text-center">{{data.producto.prod_Nombre}}</td>
+        <td class="text-center">{{(['Und', 'Paquete'].includes(data.pp.presentacion) ? data.pp.cantidad : data.pp.peso_Bruto) | number : '1.2-2'}}</td>
+        <td class="text-center">{{data.pp.presentacion}}</td>
+        <td class="text-center">{{data.dataExtrusion.material}}</td>
+        <td class="text-center">{{data.pp.maquina}}</td>
+        <td class="text-center">{{data.pp.fecha | date : 'YYYY-MM-dd'}}</td>
+        <td class="text-center">{{data.pp.hora}}</td>
+        <td class="text-center">{{data.turno.turno_Nombre}}</td>
+        <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
+        <td class="text-center">{{data.pp.envio_Zeus ? 'SI' : 'NO'}}</td>
+        <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+                  <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
+              </td> -->
+        <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
+          <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
 
 <p-toast position="center" key="SaveData" (onClose)="onReject()" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">

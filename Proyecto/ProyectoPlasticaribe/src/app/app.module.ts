@@ -208,6 +208,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/TomaFisicaInventario.component';
 import { ReporteFacturacionClientesComponent } from './Vistas/ReporteFacturacionClientes/ReporteFacturacionClientes.component';
+import { Ubicaciones_RollosComponent } from './Vistas/Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 
 @NgModule({
   declarations: [
@@ -337,7 +338,8 @@ import { ReporteFacturacionClientesComponent } from './Vistas/ReporteFacturacion
     EliminarRollos_ProduccionComponent,
     InventarioBodegaDespachoComponent,
     TomaFisicaInventarioComponent,
-    ReporteFacturacionClientesComponent
+    ReporteFacturacionClientesComponent, 
+    Ubicaciones_RollosComponent,
   ],
 
   imports: [

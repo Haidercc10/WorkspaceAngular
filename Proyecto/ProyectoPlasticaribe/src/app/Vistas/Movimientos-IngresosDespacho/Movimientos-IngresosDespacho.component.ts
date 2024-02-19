@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -7,6 +7,11 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
+import { Ubicaciones_RollosComponent } from '../Ubicaciones_Rollos/Ubicaciones_Rollos.component';
+
+@Injectable({
+  providedIn : 'root'
+})
 
 @Component({
   selector: 'app-Movimientos-IngresosDespacho',
@@ -24,6 +29,10 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
   products: any[] = [];
   dataSearched: Array<dataDesp> = [];
   @ViewChild('table') table: Table | undefined;
+  modal : boolean = false;
+  dataSelected : any = [];
+  
+  @ViewChild(Ubicaciones_RollosComponent) ubicationRolls : Ubicaciones_RollosComponent;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -85,6 +94,7 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     let route: string = this.validateRoute();
     this.load = true;
     this.dataSearched = [];
+    this.dataSelected = [];
     this.table.clear();
 
     this.detailsProductionIncomeService.GetDataProductionIncome(startDate, endDate, route).subscribe(data => {
@@ -123,8 +133,10 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
         user: (data.user.usua_Nombre).toString().toUpperCase(),
         process: (data.process.proceso_Nombre).toString().toUpperCase(),
         ubication: (data.ent.entRolloProd_Observacion).toString().toUpperCase(),
+        productionPL : data.detailsProduction.numero_Rollo,
+        stateRollPP : data.state.estado_Nombre,
+        price : data.detailsProduction.precioVenta_Producto,
       });
-
       this.dataSearched.sort((a, b) => a.hour.localeCompare(b.hour));
       this.dataSearched.sort((a, b) => a.date.localeCompare(b.date));
     }
@@ -363,6 +375,13 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
       { border: [true, true, true, true], alignment: 'center', text: `Ubicación`, fillColor: '#eee', bold: true },
     ]
   }
+
+  //Función que cargará el modal de traslados/reubicaciones
+  loadModal(validateTraslate : boolean) {
+    this.modal = true;
+    validateTraslate ? this.ubicationRolls.traslate = true : this.ubicationRolls.traslate = false; 
+    this.ubicationRolls.loadRolls();
+  }
 }
 
 export interface dataDesp {
@@ -377,4 +396,7 @@ export interface dataDesp {
   user: string;
   process: string;
   ubication: string;
+  productionPL : number;
+  stateRollPP : string;
+  price : number;
 }

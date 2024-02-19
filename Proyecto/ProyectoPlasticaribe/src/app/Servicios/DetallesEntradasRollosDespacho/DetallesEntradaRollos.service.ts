@@ -30,4 +30,9 @@ export class DetallesEntradaRollosService {
   srvActualizar = (id:number|string, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
 
   srvGuardar = (data : modelDtEntradaRollos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto', data);
+
+  PutChangeUbicationRoll = (data : any[], ubication : string) => this.http.post(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/putChangeUbicationRoll/${ubication}`, data);
+
+  putStateReturnedRoll = (rollos : any[]) => this.http.post(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/putStateReturnedRoll`, rollos);
+
 }
