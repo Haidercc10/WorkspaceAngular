@@ -64,7 +64,7 @@
                             {{rowIndex + 1}}
                         </span>
                     </td>
-                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                    <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="rowexpansion" let-data>
@@ -181,7 +181,7 @@
                             {{rowIndex + 1}}
                         </span>
                     </td>
-                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                    <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="rowexpansion" let-data>
@@ -298,7 +298,7 @@
                             {{rowIndex + 1}}
                         </span>
                     </td>
-                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                    <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="rowexpansion" let-data>
@@ -417,7 +417,7 @@
                             {{rowIndex + 1}}
                         </span>
                     </td>
-                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                    <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="rowexpansion" let-data>
@@ -536,7 +536,7 @@
                             {{rowIndex + 1}}
                         </span>
                     </td>
-                    <td *ngFor="let col of selectedColumns">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
+                    <td *ngFor="let col of selectedColumns" [ngClass]="{'colorExis': col.header == 'Existencia'}">{{col.type == 'number' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="rowexpansion" let-data>

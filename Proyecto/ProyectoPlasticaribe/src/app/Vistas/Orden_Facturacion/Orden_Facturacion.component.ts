@@ -18,7 +18,7 @@ import { AppComponent } from 'src/app/app.component';
 @Component({
   selector: 'app-Orden_Facturacion',
   templateUrl: './Orden_Facturacion.component.html',
-  styleUrls: ['./Orden_Facturacion.component.css']
+  styleUrls: ['./Orden_Facturacion.component.css'],
 })
 
 @Injectable({
@@ -39,6 +39,7 @@ export class Orden_FacturacionComponent implements OnInit {
   production: Array<production> = [];
   productionSelected: Array<production> = [];
   consolidatedProduction: Array<production> = [];
+  qtyToSend: number = 0;
 
   constructor(private appComponent: AppComponent,
     private frmBuilder: FormBuilder,
@@ -199,7 +200,6 @@ export class Orden_FacturacionComponent implements OnInit {
             quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
             presentation: dataProduction.pp.presentacion
           });
-          console.log(this.production)
         }
       });
       setTimeout(() => this.load = false, 50);
@@ -226,10 +226,34 @@ export class Orden_FacturacionComponent implements OnInit {
     });
   }
 
+  selectByQuantity() {
+    this.load = true;
+    let finalArray: Array<production> = [];
+    let sumQuantity: number = 0;
+    let totalQuantity: number = this.totalProduccionSearched();
+    this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
+    if (totalQuantity >= this.qtyToSend) {
+      this.production.forEach(d => {
+        if (sumQuantity < this.qtyToSend) {
+          finalArray.push(d);
+          sumQuantity += d.quantity;
+        }
+      });
+      this.productionSelected = [this.productionSelected, finalArray].reduce((a,b) => a.concat(b));
+      finalArray.forEach(d => {
+        setTimeout(() => this.selectedProduction(d), 500);
+      });
+    } else {
+      this.load = false;
+      this.msj.mensajeError(`¡La cantidad digitada es superior a la cantidad disponible!`);
+    }
+  }
+
   selectedProduction(production: production) {
     this.load = true;
     let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
     this.production.splice(index, 1);
+    this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
   }
@@ -238,6 +262,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.load = true;
     let index = this.productionSelected.findIndex(x => x.numberProduction == production.numberProduction);
     this.productionSelected.splice(index, 1);
+    this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
   }
@@ -246,6 +271,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.load = true;
     this.productionSelected = this.productionSelected.concat(this.production);
     this.production = [];
+    this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
   }
@@ -254,6 +280,7 @@ export class Orden_FacturacionComponent implements OnInit {
     this.load = true;
     this.production = this.production.concat(this.productionSelected);
     this.productionSelected = [];
+    this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
     this.getConsolidateProduction();
     setTimeout(() => this.load = false, 5);
   }
@@ -315,7 +342,7 @@ export class Orden_FacturacionComponent implements OnInit {
         Cantidad: production.quantity,
         Presentacion: production.presentation,
         Consecutivo_Pedido: (production.saleOrder).toString(),
-        Estado_Id: 19
+        Estado_Id: 20
       }
       this.dtOrderFactService.Post(dtOrderFact).subscribe(() => {
         count++;

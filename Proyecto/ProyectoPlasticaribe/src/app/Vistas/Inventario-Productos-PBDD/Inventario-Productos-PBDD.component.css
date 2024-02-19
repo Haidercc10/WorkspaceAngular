@@ -66,3 +66,9 @@
 .svgIconPDF path, .svgIconExcel path {
   fill: white;
 }
+
+.colorExis {
+  background-color: rgb(155, 198, 255);
+  text-align: center;
+  font-weight: bold;
+}
