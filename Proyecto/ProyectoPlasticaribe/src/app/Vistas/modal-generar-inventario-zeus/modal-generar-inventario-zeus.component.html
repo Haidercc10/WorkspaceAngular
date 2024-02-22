@@ -42,7 +42,7 @@
             <ng-template pTemplate="right">
               <div class="mb-3" *ngIf="ValidarRol != 6">
                 <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
-                  <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+                  <p-chip label="Total Stock ${{precioTotalExistencia() | number : '1.2-2'}}"  class="mr-2"></p-chip>
                 </div>
               </div>
             </ng-template>
@@ -154,7 +154,7 @@
                 <td (click)="mostrarModalCrearEditar(ArrayProductoZeus)">{{ArrayProductoZeus.Nombre}}</td>
                 <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
                 <ng-template #rojo>
-                  <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+                  <td class="text-center" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
                 </ng-template>
                 <ng-template #azul>
                   <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
@@ -182,7 +182,7 @@
             <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
               <tr>
                 <td colspan="6" class="text-right">Totales</td>
-                <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
+                <td colspan="4" class="text-right">{{precioTotalExistencia() | currency: 'COP $'}}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -215,7 +215,7 @@
         <ng-template pTemplate="right">
           <div class="mb-3" *ngIf="ValidarRol != 6">
             <div class="gap-2 d-grid d-md-flex justify-content-md-end" id="costoTotal">
-              <p-chip label="Total Stock ${{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+              <p-chip label="Total Stock ${{precioTotalExistencia() | number : '1.2-2'}}"  class="mr-2"></p-chip>
             </div>
           </div>
         </ng-template>
@@ -355,7 +355,7 @@
         <ng-template pTemplate="footer" *ngIf="ValidarRol != 6">
           <tr>
             <td colspan="6" class="text-right">Totales</td>
-            <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
+            <td colspan="4" class="text-right">{{precioTotalExistencia() | currency: 'COP $'}}</td>
           </tr>
         </ng-template>
       </p-table>

@@ -159,106 +159,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             if (datos_Existencias[i].presentacion == 'PAQ') presentacion = 'Paquete';
             this.invMesProductoService.GetCantidadMes_Producto(datos_Cliente[j].clienteItems, presentacion).subscribe(datos_Inventario => {
               for (let k = 0; k < datos_Inventario.length; k++) {
-                let info : any = {
-                  Id : datos_Inventario[k].id,
-                  Nombre : datos_Inventario[k].nombre,
-                  Cliente : datos_Cliente[j].clienteNom,
-                  Precio : datos_Existencias[i].precioVenta,
-                  Cantidad : datos_Existencias[i].existencias,
-                  Presentacion : datos_Inventario[k].und,
-                  Precio_Total : datos_Existencias[i].precio_Total,
-                  Cant_Minima : datos_Inventario[k].cant_Minima,
-                  Vendedor : datos_Cliente[j].nombreCompleto,
-                  Mes_Actual : 0,
-                  Enero : datos_Inventario[k].enero,
-                  Febrero : datos_Inventario[k].febrero,
-                  Marzo : datos_Inventario[k].marzo,
-                  Abril : datos_Inventario[k].abril,
-                  Mayo : datos_Inventario[k].mayo,
-                  Junio : datos_Inventario[k].junio,
-                  Julio : datos_Inventario[k].julio,
-                  Agosto : datos_Inventario[k].agosto,
-                  Septiembre : datos_Inventario[k].septiembre,
-                  Octubre : datos_Inventario[k].octubre,
-                  Noviembre : datos_Inventario[k].noviembre,
-                  Diciembre : datos_Inventario[k].diciembre,
-                }
-
-                switch (mes) {
-                  case 0:
-                    this.mesActual = 'Enero';
-                    info.Mes_Actual = datos_Inventario[k].enero;
-                    break;
-                  case 1:
-                    this.mesActual = 'Febrero';
-                    info.Mes_Actual = datos_Inventario[k].febrero;
-                    break;
-                  case 2:
-                    this.mesActual = 'Marzo';
-                    info.Mes_Actual = datos_Inventario[k].marzo;
-                    break;
-                  case 3:
-                    this.mesActual = 'Abril';
-                    info.Mes_Actual = datos_Inventario[k].abril;
-                    break;
-                  case 4:
-                    this.mesActual = 'Mayo';
-                    info.Mes_Actual = datos_Inventario[k].mayo;
-                    break;
-                  case 5:
-                    this.mesActual = 'Junio';
-                    info.Mes_Actual = datos_Inventario[k].junio;
-                    break;
-                  case 6:
-                    this.mesActual = 'Julio';
-                    info.Mes_Actual = datos_Inventario[k].julio;
-                    break;
-                  case 7:
-                    this.mesActual = 'Agosto';
-                    info.Mes_Actual = datos_Inventario[k].agosto;
-                    break;
-                  case 8:
-                    this.mesActual = 'Septiembre';
-                    info.Mes_Actual = datos_Inventario[k].septiembre;
-                    break;
-                  case 9:
-                    this.mesActual = 'Octubre';
-                    info.Mes_Actual = datos_Inventario[k].Octubre;
-                    break;
-                  case 10:
-                    this.mesActual = 'Noviembre';
-                    info.Mes_Actual = datos_Inventario[k].noviembre;
-                    break;
-                  case 11:
-                    this.mesActual = 'Diciembre';
-                    info.Mes_Actual = datos_Inventario[k].diciembre;
-                    break;                
-                  default:
-                    break;
-                }
-
-                this.columnas = [
-                  { header: 'Enero', field: 'Enero'},
-                  { header: 'Febrero', field: 'Febrero'},
-                  { header: 'Marzo', field: 'Marzo'},
-                  { header: 'Abril', field: 'Abril'},
-                  { header: 'Mayo', field: 'Mayo'},
-                  { header: 'Junio', field: 'Junio'},
-                  { header: 'Julio', field: 'Julio'},
-                  { header: 'Agosto', field: 'Agosto'},
-                  { header: 'Septiembre', field: 'Septiembre'},
-                  { header: 'Octubre', field: 'Octubre'},
-                  { header: 'Noviembre', field: 'Noviembre'},
-                  { header: 'Diciembre', field: 'Diciembre'},
-                ];
-
+                this.llenarArrayProductos(i, datos_Inventario[k], datos_Existencias[i], datos_Cliente[j], mes);
+                this.llenarColumnas();
                 // for (let l = 0; l < this.columnas.length; l++) {
                 //   if (this.columnas[l].header == this.mesActual) this.columnas.splice(l,1);
                 // }
-
-                this.ArrayProductoZeus.push(info);
-                this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-                this.totalProductos += datos_Existencias[i].precio_Total;
               }
             });
           }
@@ -268,13 +173,115 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     setTimeout(() => this.load = true, 3000);
   }
 
+  llenarArrayProductos(i, datos_Inventario, datos_Existencias, datos_Cliente, mes) {
+    let info : any = {
+      Numero: i + 1,
+      Id : datos_Inventario.id,
+      Nombre : datos_Inventario.nombre,
+      Cliente : datos_Cliente.clienteNom,
+      Precio : datos_Existencias.precioVenta,
+      Cantidad : datos_Existencias.existencias,
+      Presentacion : datos_Inventario.und,
+      Precio_Total : datos_Existencias.precio_Total,
+      Cant_Minima : datos_Inventario.cant_Minima,
+      Vendedor : datos_Cliente.nombreCompleto,
+      Mes_Actual : this.llenarMesActual(mes, datos_Inventario),
+      Enero : datos_Inventario.enero,
+      Febrero : datos_Inventario.febrero,
+      Marzo : datos_Inventario.marzo,
+      Abril : datos_Inventario.abril,
+      Mayo : datos_Inventario.mayo,
+      Junio : datos_Inventario.junio,
+      Julio : datos_Inventario.julio,
+      Agosto : datos_Inventario.agosto,
+      Septiembre : datos_Inventario.septiembre,
+      Octubre : datos_Inventario.octubre,
+      Noviembre : datos_Inventario.noviembre,
+      Diciembre : datos_Inventario.diciembre,
+      ValidarCantMinima: datos_Existencias.existencias <= datos_Inventario.cant_Minima ? 1 : 0,
+    }
+    this.ArrayProductoZeus.push(info);
+    this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+    this.ArrayProductoZeus.sort((a,b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
+  }
+
+  llenarMesActual(mes: number, datos_Inventario: any): number {
+    switch (mes) {
+      case 0:
+        this.mesActual = 'Enero';
+        return datos_Inventario.enero;
+      case 1:
+        this.mesActual = 'Febrero';
+        return datos_Inventario.febrero;
+      case 2:
+        this.mesActual = 'Marzo';
+        return datos_Inventario.marzo;
+      case 3:
+        this.mesActual = 'Abril';
+        return datos_Inventario.abril;
+      case 4:
+        this.mesActual = 'Mayo';
+        return datos_Inventario.mayo;
+      case 5:
+        this.mesActual = 'Junio';
+        return datos_Inventario.junio;
+      case 6:
+        this.mesActual = 'Julio';
+        return datos_Inventario.julio;
+      case 7:
+        this.mesActual = 'Agosto';
+        return datos_Inventario.agosto;
+      case 8:
+        this.mesActual = 'Septiembre';
+        return datos_Inventario.septiembre;
+      case 9:
+        this.mesActual = 'Octubre';
+        return datos_Inventario.Octubre;
+      case 10:
+        this.mesActual = 'Noviembre';
+        return datos_Inventario.noviembre;
+      case 11:
+        this.mesActual = 'Diciembre';
+        return datos_Inventario.diciembre;            
+      default:
+        return 0;
+    }
+  }
+
+  llenarColumnas() {
+    this.columnas = [
+      { header: 'Enero', field: 'Enero'},
+      { header: 'Febrero', field: 'Febrero'},
+      { header: 'Marzo', field: 'Marzo'},
+      { header: 'Abril', field: 'Abril'},
+      { header: 'Mayo', field: 'Mayo'},
+      { header: 'Junio', field: 'Junio'},
+      { header: 'Julio', field: 'Julio'},
+      { header: 'Agosto', field: 'Agosto'},
+      { header: 'Septiembre', field: 'Septiembre'},
+      { header: 'Octubre', field: 'Octubre'},
+      { header: 'Noviembre', field: 'Noviembre'},
+      { header: 'Diciembre', field: 'Diciembre'},
+    ];
+  }
+
   //
   actualizarCantMinima(fila, $event){
     if ($event.key == 'Enter') {
       this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(fila.Id, fila.Cant_Minima).subscribe(() => {
         this.mensajeService.mensajeConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${fila.nombreItem} actualizada con éxito!`);
-      }, error => this.mensajeService.mensajeError(`¡Ocurrió un error al actualizar la cantidad minima!`,``));
+        let i: number = this.ArrayProductoZeus.findIndex(x => x.Numero == fila.Numero);
+        this.ArrayProductoZeus[i].ValidarCantMinima = fila.Cantidad <= fila.Cant_Minima ? 1 : 0;
+        this.ArrayProductoZeus.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayProductoZeus.sort((a,b) => Number(b.ValidarCantMinima) - Number(a.ValidarCantMinima));
+      }, () => this.mensajeService.mensajeError(`¡Ocurrió un error al actualizar la cantidad minima!`,``));
     }
+  }
+
+  precioTotalExistencia(): number {
+    let total: number = 0;
+    this.ArrayProductoZeus.forEach(d => total += d.Precio_Total);
+    return total;
   }
 
   // Funcion que permitirá filtrar la información de la tabla
