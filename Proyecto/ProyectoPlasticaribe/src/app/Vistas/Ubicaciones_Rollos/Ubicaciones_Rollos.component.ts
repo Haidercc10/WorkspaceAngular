@@ -148,6 +148,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
   //Función que cargará los rollos a los que se desea actualizar la ubication en la tabla del modal. 
   loadRolls(){
     this.sendProductionZeus = [];
+    console.log(this.compMovInDespacho.dataSelected)
     this.compMovInDespacho.dataSelected.forEach(x => {
       this.sendProductionZeus.push(
         { pp : 
@@ -155,6 +156,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
             'numeroRollo_BagPro' : x.production, 
             'ot' : x.orderProduction,
             'cantidad' : x.quantity, 
+            'peso_Bruto' : x.quantity,
             'presentacion' : x.presentation,
             'fecha' : x.date,
             'hora' : x.hour,
@@ -215,7 +217,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
       this.load = true
       this.groupedInfo.forEach(x => {
         let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
-        let detailAdjustment : string = `Ajuste desde App Plasticaribe para la OT N° ${x.pp.ot}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}(s)`;
+        let detailAdjustment : string = `Ajuste desde App Plasticaribe para la OT N° ${x.pp.ot}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}`;
         this.productionProcessSerivce.sendProductionToZeus(
           detailAdjustment, 
           x.producto.prod_Id, 

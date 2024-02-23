@@ -382,6 +382,12 @@ export class MovimientosIngresosDespachoComponent implements OnInit {
     validateTraslate ? this.ubicationRolls.traslate = true : this.ubicationRolls.traslate = false; 
     this.ubicationRolls.loadRolls();
   }
+
+  loadRollsAvailables(){
+    this.load = true;
+    this.dataSelected = this.dataSearched.filter(x => x.stateRollPP == 'DISPONIBLE');
+    setTimeout(() => { this.load = false; }, 50);
+  }
 }
 
 export interface dataDesp {

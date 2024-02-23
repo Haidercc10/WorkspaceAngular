@@ -209,6 +209,7 @@ import { AppComponent } from './app.component';
 import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/TomaFisicaInventario.component';
 import { ReporteFacturacionClientesComponent } from './Vistas/ReporteFacturacionClientes/ReporteFacturacionClientes.component';
 import { Ubicaciones_RollosComponent } from './Vistas/Ubicaciones_Rollos/Ubicaciones_Rollos.component';
+import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.component';
 
 @NgModule({
   declarations: [
@@ -340,6 +341,7 @@ import { Ubicaciones_RollosComponent } from './Vistas/Ubicaciones_Rollos/Ubicaci
     TomaFisicaInventarioComponent,
     ReporteFacturacionClientesComponent, 
     Ubicaciones_RollosComponent,
+    Reporte_NominaComponent
   ],
 
   imports: [

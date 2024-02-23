@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 import * as fs from 'file-saver';
 import { Workbook } from 'exceljs';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { CreacionExcelService } from 'src/app/Servicios/CreacionExcel/CreacionExcel.service';
 
 Injectable({
   providedIn: 'root'
@@ -52,17 +55,23 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
   subtitulo : any = ``; //Variable que guardará el subtitulo del modulo.
   urlItems = `/inventario-areas/items`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de items
   urlMateriales = `/inventario-areas/materiales`; //Variable que guardará la ruta del modulo cuando se desee crear el inventario de materias primas
+  categoriesMP : any = [];
+  categoriesBOPP : any = [];
+  categoriesTintas : any = [];
 
   constructor(private AppComponent : AppComponent,
                private frmBuilder : FormBuilder, 
                 private svcMatPrimas : MateriaPrimaService,
-                  private svcBagPro : BagproService,
-                    private svcProcesos : ProcesosService, 
-                      private svcMsjs : MensajesAplicacionService, 
-                        private svcInventario : Inventario_AreasService, 
-                          private msg : MessageService, 
-                            private router : Router,
-                              private cdRef : ChangeDetectorRef) {
+                  private svcBopp : EntradaBOPPService,
+                    private svcTintas : TintasService,
+                      private svcBagPro : BagproService,
+                        private svcProcesos : ProcesosService, 
+                          private svcMsjs : MensajesAplicacionService, 
+                            private svcInventario : Inventario_AreasService, 
+                              private msg : MessageService, 
+                                private router : Router,
+                                  private cdRef : ChangeDetectorRef, 
+                                    private svcExcel : CreacionExcelService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.formulario = this.frmBuilder.group({
@@ -73,6 +82,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       cantidad : [null, Validators.required],
       precio : [null, Validators.required],
       proceso : [null, Validators.required],
+      category : [null, Validators.required],
       observacion : [null, ],
     });
   }
@@ -84,6 +94,9 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     this.url = this.router.url;
     this.cargarLabels(this.url);
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+    this.getCategoriesMP();
+    this.getCategoriesTintas();
+    this.getCategoriesBopp();
   }
 
   ngAfterViewChecked() {
@@ -116,16 +129,16 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
 
   //Función que cargará el area del usuario logueado
   filtrarArea(){
-    if (this.ValidarRol == 3 || this.ValidarRol ==  7) {
+    if ([85,7,3].includes(this.ValidarRol)) {
       this.area = "EXT";
       this.titulo = `Inventario Extrusión`;
     } else if ([8,86].includes(this.ValidarRol)) { 
       this.area = "SELLA";
       this.titulo = `Inventario Sellado`;
-    } else if (this.ValidarRol == 63) { 
+    } else if ([63,89].includes(this.ValidarRol)) { 
       this.area = "ROT";
       this.titulo = `Inventario Rotograbado`;
-    } else if (this.ValidarRol == 62 || this.ValidarRol == 4) {
+    } else if ([62,4,88].includes(this.ValidarRol)) {
       this.area = "IMP";
       this.titulo = `Inventario Impresión`;
     } else {
@@ -177,6 +190,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       referencia : data.clienteItemsNom,
       cantidad : null,
       precio : data.datosValorKg != null || data.datosValorKg == '' ? data.datosValorKg : 0,
+      category : data.categoria,
     });
     this.load = false;
   }
@@ -184,11 +198,13 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
   //Función que cargará la info de las materias primas consultadas por Id en los campos del formulario
   cargarCamposMateriaPrima(data : any) {
     this.formulario.patchValue({
-      item : data.matPri_Id,
-      referencia : data.matPri_Nombre,
+      item : data.id,
+      referencia : data.nombre,
       cantidad : null,
-      precio : data.matPri_Precio,
+      precio : data.precio,
+      category : data.categoria,
     });
+    this.load = false;
   }
 
    //Función que cargará la info de las materias primas/productos consultadas por referencia en los campos del formulario
@@ -198,6 +214,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       referencia : data.referencia.trim(),
       cantidad : null,
       precio : data.precioKg != null ? data.precioKg : 0,
+      category : data.categoria,
     });
   }
 
@@ -207,33 +224,38 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
     let precio : number = this.formulario.value.precio;
     let proceso : any = this.formulario.value.proceso;
     let id : any = this.formulario.value.item;
+    let category : any = this.formulario.value.category;
     let ot : any = this.formulario.value.ot == null || this.formulario.value.ot == '' ? 0 : this.formulario.value.ot;
     if(this.formulario.valid) {
       if(cantidad > 0) {
-        if(proceso != null) this.cargarTabla(ot, id, cantidad, precio, proceso);
+        if(proceso != null) this.cargarTabla(ot, id, cantidad, precio, proceso, category);
         else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe seleccionar un proceso válido!`);
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La cantidad no puede ser 0.00, por favor verifique!`);
     } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `Debe diligenciar los campos vacíos!`);
   }
 
   //Función que cargará la tabla con el inventario de cada área
-  cargarTabla(ot : number, id : number, cantidad : number, precio : number, proceso : any){
+  cargarTabla(ot : number, id : number, cantidad : number, precio : number, proceso : any, category : number){
+    console.log(id)
     let info : modelInventario_Areas = {
-      'InvCodigo' : this.contador += 1,
-      'OT' : ot,
-      'Prod_Id' : this.url == this.urlItems ? id : 1,
-      'Referencia' : this.formulario.value.referencia,
-      'MatPri_Id' : this.url == this.urlMateriales ? id : 84,
+      'InvCodigo': this.contador += 1,
+      'OT': ot,
+      'Prod_Id': this.url == this.urlItems ? id : 1,
+      'Item': id,
+      'Referencia': this.formulario.value.referencia,
+      'MatPri_Id': this.url == this.urlMateriales ? this.validateMaterial(id, category)[0] : 84,
       'UndMed_Id': 'Kg',
-      'InvStock' : cantidad,
-      'InvPrecio' : precio,
-      'Subtotal' : (precio * cantidad),
+      'InvStock': cantidad,
+      'InvPrecio': precio,
+      'Subtotal': (precio * cantidad),
       'Proceso_Id': proceso,
       'InvFecha_Inventario': moment(this.formulario.value.fecha).format('YYYY-MM-DD'),
       'InvFecha_Registro': this.today,
       'InvHora_Registro': this.hora,
       'Usua_Id': this.storage_Id,
       'InvObservacion': this.formulario.value.observacion == null ? '' : this.formulario.value.observacion,
+      'BoppGen_Id': this.url == this.urlMateriales ? this.validateMaterial(id, category)[2] : 1,
+      'Tinta_Id': this.url == this.urlMateriales ? this.validateMaterial(id, category)[1] : 2001,
     };
     if(this.url == this.urlItems) {
       if (!this.ordenes_trabajos.includes(info.OT)) {
@@ -243,8 +265,8 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
         if(this.ordenes_trabajos.includes(0)) this.ordenes_trabajos.pop();
       } else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `La OT N° ${info.OT} ya existe en la tabla!`);
     } else if (this.url == this.urlMateriales) {
-      if (!this.polietilenos.includes(info.MatPri_Id)) {
-        this.polietilenos.push(info.MatPri_Id);
+      if (!this.polietilenos.includes(info.Item)) {
+        this.polietilenos.push(info.Item);
         this.inventario.push(info);
         this.limpiarCampos();
         if(this.polietilenos.includes(0)) this.polietilenos.pop();
@@ -283,6 +305,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       precio : null,
       observacion : null,
       cantidad : null, 
+      category : null,
     });
   }  
 
@@ -294,12 +317,12 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       x.InvFecha_Registro = this.today;
       x.InvHora_Registro = this.hora;
       x.InvCodigo = 0;
-      delete x.Subtotal, x.Referencia;
+      delete x.Item, x.Subtotal, x.Referencia;
       this.svcInventario.Post(x).subscribe(() => esError = false, () => esError = true);
     });
     setTimeout(() => {
       this.load = false;
-      (esError) ? this.svcMsjs.mensajeError(`Error`, `No se pudo crear la entrada de inventario!`) : this.svcMsjs.mensajeConfirmacion(`¡Sí!`, `Se creó la entrada de inventario de forma exitosa!`);
+      (esError) ? this.svcMsjs.mensajeError(`Error`, `No se pudo crear la entrada de inventario!`) : this.svcMsjs.mensajeConfirmacion(`¡Sí!`, `Entrada de inventario exitosa!`);
       this.limpiarTodo();
     }, 1000);
   }
@@ -328,27 +351,16 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
   //Función que consultará las referencias de productos/materias primas por Id
   consultarItem(){
     let item : any = this.formulario.value.item;
-    if(this.url == this.urlItems) {
-      if(item != null) {
-        this.load = true;
-        this.svcBagPro.srvObtenerItemsBagproXClienteItem(item).subscribe(data => {
-          if(data.length != null) this.cargarCamposBagPro(data[0]); 
-          else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El item ${item} no existe!`);
-          this.load = false;
-        }, () => {
-          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el item ${item}!`);
+    if(item != null) {
+      this.load = true;
+      if(this.url == this.urlItems) {
+        this.svcBagPro.srvObtenerItemsBagproXClienteItem(item).subscribe(data => { this.cargarCamposBagPro(data[0]); }, error => {
+          this.svcMsjs.mensajeError(`Error`, `El item ${item} no existe!`);
           this.load = false;
         });
-      }
-    } else if(this.url == this.urlMateriales) {
-      if(item != null) {
-        this.load = true;
-        this.svcMatPrimas.srvObtenerListaPorId(item).subscribe(data => {
-          if(typeof(data) == 'object') this.cargarCamposMateriaPrima(data);
-          else this.svcMsjs.mensajeAdvertencia(`Advertencia`, `El Id de material ${item} no existe!`);
-          this.load = false;
-        }, () => {
-          this.svcMsjs.mensajeAdvertencia(`Advertencia`, `No se encontró el Id de material ${item}!`);
+      } else if(this.url == this.urlMateriales) {
+        this.svcMatPrimas.getInfoMpTintaBopp(item).subscribe(data => { this.cargarCamposMateriaPrima(data[0]); }, error => {
+          this.svcMsjs.mensajeError(`Error`, `El Id de material ${item} no existe!`);
           this.load = false;
         });
       }
@@ -380,7 +392,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
         for (const item of this.inventario) {
           const datos1  : any = [item.OT, item.Prod_Id, item.Referencia, item.InvStock, item.InvPrecio, item.Subtotal, item.Proceso_Id, item.InvObservacion];
           if(this.url == this.urlItems) datos1[1] = item.Prod_Id;
-          if(this.url == this.urlMateriales) datos1[1] = item.MatPri_Id;
+          if(this.url == this.urlMateriales) datos1[1] = item.Item;
           datos.push(datos1);
         } 
         let workbook = new Workbook();
@@ -388,7 +400,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
         let worksheet = workbook.addWorksheet(`${this.titulo} - ${this.today}`);
         worksheet.addImage(imageId1, 'A1:B2');
         worksheet.addRow([]);
-        worksheet.addRow([]);
+       
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell) => {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
@@ -428,4 +440,22 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       }, 2000);
     }
   }
+
+  //Validar material a cargar en la tabla.
+  validateMaterial(id : number, category : number){
+    let material : number[] = [];
+
+    (this.categoriesMP.includes(category)) ? material[0] = id : material[0] = 84;
+    (this.categoriesTintas.includes(category)) ? material[1] = id : material[1] = 2001;
+    (this.categoriesBOPP.includes(category)) ? material[2] = id : material[2] = 1;
+    console.log(material)
+    return material;
+  }
+
+  /** Cargar categorias de materiales */
+  getCategoriesMP = () => this.svcMatPrimas.GetCategoriasMateriaPrima().subscribe(data => { this.categoriesMP = data }, error => this.svcMsjs.mensajeError(error));
+
+  getCategoriesTintas = () => this.svcTintas.GetCategoriasTintas().subscribe(data => { this.categoriesTintas = data }, error => this.svcMsjs.mensajeError(error));
+
+  getCategoriesBopp = () => this.svcBopp.GetCategoriasBOPP().subscribe(data => { this.categoriesBOPP = data }, error => this.svcMsjs.mensajeError(error));
 }

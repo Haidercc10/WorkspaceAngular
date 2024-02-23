@@ -1,0 +1,51 @@
+span{
+    color: #db4149;
+  }
+  
+  .columnaCantidad {
+    background-color: #75baff;
+  }
+  
+  #table td, th{
+    font-size: calc(var(--font-size) * 14px);
+  }
+  
+  p-calendar ::ng-deep span button {
+    background-color: var(--rojo);
+    border: 0;
+    transition: all 1s;
+  }
+  
+  p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+    background: var(--rojoHover);
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button {
+    background: #fff0;
+  }
+  
+  p-calendar ::ng-deep .p-datepicker-header button:hover {
+    background: #fff0;
+  }
+
+  .textRed {
+    color : palevioletred
+  }
+
+  .textBlue {
+    color: rgb(0, 153, 255);
+  }
+
+  .textGreen {
+    color: rgb(0, 216, 0);
+  }
+
+  ::ng-deep .p-column-filter-menu-button {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  ::ng-deep .p-icon {
+    width : 0.8rem;
+    height : 0.8rem;
+  }

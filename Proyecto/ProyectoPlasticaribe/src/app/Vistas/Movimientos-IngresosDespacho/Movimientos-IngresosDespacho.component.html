@@ -93,7 +93,7 @@
       <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hour')"></th>
     </tr>
     <tr>
-      <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+      <th style="width: 4rem"><p-tableHeaderCheckbox (click)="loadRollsAvailables()"></p-tableHeaderCheckbox></th>
       <th>#</th>
       <th class="text-center" pSortableColumn="orderProduction"><p-sortIcon field="orderProduction"></p-sortIcon> OT</th>
       <th class="text-center" pSortableColumn="item"><p-sortIcon field="item"></p-sortIcon> Item</th>

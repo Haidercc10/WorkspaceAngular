@@ -1,0 +1,193 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 id="nomina" [ngClass]="{'tituloRojo': !modeSelected, 'tituloClaro': modeSelected}">Reporte de Nómina</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card class="font-size-14">
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" (click)="viewTutorial()" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
+  <!--Subtitulo-->
+  <div class="mb-5">
+    <h2 [ngClass]="{'tituloRojo': !modeSelected, 'tituloClaro': modeSelected}"><i class="pi pi-search"></i> Busqueda de registros</h2>
+  </div>
+
+  <!--Formulario-->
+  <form [formGroup]="form">
+    <div class="mb-3" id="formulario">
+      <div class="row g-4">
+
+        <!-- Fechas -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+          <span class="p-float-label" id="rank-dates">
+            <p-calendar id="rango" inputId="dates" formControlName="dates" selectionMode="range" [showIcon]="true"></p-calendar>
+            <label for="date">Rango de Fechas</label>
+          </span>
+        </div>
+
+        <!--Cedula-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="id" id="id" (keyup.enter)="getEmployee('id')" [useGrouping]="false"></p-inputNumber>
+            <label for="id">Cedula</label>
+          </span>
+        </div>
+
+        <!--Nombre-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-5 col-xxl-5">
+          <span class="p-float-label">
+            <input formControlName="name" id="emp" list="employees" autocomplete="off" type="text" pInputText (keyup)="getEmployee('name')" (change)="selectEmployee('name')" tooltipPosition="top">
+            <datalist id="employees">
+              <option *ngFor="let item of employees">{{item.usua_Nombre}}</option>
+            </datalist>
+            <label for="emp">Empleado</label>
+          </span>
+        </div>
+
+        <!--Areas-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="areas" inputId="areas" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="proceso_Nombre"></p-dropdown>
+            <label for="areas">Área</label>
+          </span>
+        </div>
+
+      </div>  
+    </div>  
+
+      <!--Botones-->
+      <div class="mb-4" id="buttons">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="getUrlAPI()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"> </button>
+        </div>
+      </div>
+      
+  </form>
+
+  <!--Linea-->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!--Titulo tabla-->
+  <div class="mb-5">
+    <h2 [ngClass]="{'tituloRojo': !modeSelected, 'tituloClaro': modeSelected}"><i class="pi pi-table"></i> Tabla de registros</h2>
+  </div>
+
+  <!-- Tabla registros -->
+  <div class="row g-3" id="tabla">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [value]="dataReport"
+      [scrollable]="true"
+      scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-users"></i> Información Empleado</th>
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="5"><i class="pi pi-dollar"></i> Devengos</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calculator"></i> Deducciones</th>
+            <th style="font-weight: 800;" class="text-center"></th>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Cedula 
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Nombre
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Cargo
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col" pTooltip="Horas ordinarias" tooltipPosition="top"><p-sortIcon field=""></p-sortIcon> Horas ord.
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col" pTooltip="Incapacidades" tooltipPosition="top"><p-sortIcon field=""></p-sortIcon> Incap.
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col" pTooltip="Horas extras" tooltipPosition="top"><p-sortIcon field=""></p-sortIcon> Horas ext.
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th class="text-center" scope="col" pTooltip="Auxilio de transporte" tooltipPosition="top">Aux. Transp.
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Devengo
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th class="text-center" scope="col">EPS
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th class="text-center" scope="col">Pensión
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th class="text-center" scope="col">Ahorro
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col" pTooltip="Prestamo/Anticipo" tooltipPosition="top"><p-sortIcon field=""></p-sortIcon> Prest/Antic.
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Total a pagar
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
+          <tr>
+            <td class="text-center">{{rowIndex + 1}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center textBlue" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-center" colspan="5" class="text-right">Totales</td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center" id="total">{{calculateTotal()}} </td>
+            <td class="text-center textBlue" id="total">{{calculateTotal()}} COP</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-card>
+

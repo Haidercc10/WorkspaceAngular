@@ -119,6 +119,7 @@ export const routes: Routes = [
   /*************************************************************** DASBOARD **************************************************************************/
   { path: 'nomina', loadChildren: () => import('./Modules/nomina/nomina.module').then(m => m.NominaModule) },
   { path: 'ingreso-nomina', loadChildren: () => import('./Modules/ingreso-nomina/ingreso-nomina.module').then(m => m.IngresoNominaModule) },
+  { path: 'reporte-nomina', loadChildren: () => import('./Modules/reporte-nomina/reporte-nomina.module').then(m => m.ReporteNominaModule) },
 
   /*************************************************************** SOLICITUDES DE MATERIA PRIMA A EXTRUSION **************************************************************************/
   { path: 'solicitud-mp-extrusion', loadChildren: () => import('./Modules/solicitud-mp-extrusion/solicitud-mp-extrusion.module').then(m => m.SolicitudMPExtrusionModule) },

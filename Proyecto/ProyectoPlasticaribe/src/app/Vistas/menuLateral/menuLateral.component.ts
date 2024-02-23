@@ -90,12 +90,13 @@ export class MenuLateralComponent implements OnInit {
   /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 
   materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
   mostrarMenuLateral() {
-    let ruta : any = this.router.url
+    let ruta : any = this.router.url;
     this.display = true;
-    if([8, 4, 63, 62].includes(this.ValidarRol)) {
+    console.log(this.ValidarRol)
+    if([85,7,3,8,86,63,89,62,4,88].includes(this.ValidarRol)) {
       setTimeout(() => {
         this.categorias.forEach(x => {
-          if([8, 4, 63, 62].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
+          if([85,7,3,8,86,63,89,62,4,88].includes(this.ValidarRol) && x.items != undefined && x.items.length == 0) this.categorias.splice(this.categorias.indexOf(x), 1);
         });
         this.router.navigate([ruta]);
       }, 20);
@@ -213,7 +214,7 @@ export class MenuLateralComponent implements OnInit {
           } 
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
-        if(![1, 3, 7, 61].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1); 
+        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1); 
         count++;
         if (count == this.categorias.length) this.cargando = false;
       });
