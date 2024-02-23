@@ -73,7 +73,9 @@ export class MovimientosOrdenFacturacionComponent implements OnInit {
     let startDate : any = moment(this.formFilters.value.startDate).format('YYYY-MM-DD') == 'Fecha inválida' ? dateLastMonth : moment(this.formFilters.value.startDate).format('YYYY-MM-DD');
     let endDate : any = moment(this.formFilters.value.endDate).format('YYYY-MM-DD') == 'Fecha inválida' ? moment().format('YYYY-MM-DD') : moment(this.formFilters.value.endDate).format('YYYY-MM-DD');
     let route : string = orderNum != null ? `?order=${orderNum}` : '';
-    this.clearFields();
+    this.load = true;
+    this.serchedData = [];
+    this.dt.clear();
     this.dtOrderFactService.GetOrders(startDate, endDate, route).subscribe(data => {
       data.forEach(dataOrder => this.serchedData.push(dataOrder));
     }, error => {

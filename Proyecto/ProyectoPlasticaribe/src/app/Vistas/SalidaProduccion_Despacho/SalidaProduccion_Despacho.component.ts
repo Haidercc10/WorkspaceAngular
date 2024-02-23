@@ -213,15 +213,15 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       }
       this.dtAsgProdFacturaService.srvGuardar(data).subscribe(() => {
         count++;
-        if (count == this.sendProductionZeus.length) this.finishSaveData(AsigProdFV_Id);
+        if (count == this.sendProductionZeus.length) this.finishSaveData();
       }, error => this.errorMessage(`¡Ocurrió un error al amarrar los rollos a la factura!`, error));
     });
   }
 
-  finishSaveData(AsigProdFV_Id: number) {
+  finishSaveData() {
     let orderFact = this.formProduction.value.orderFact;
     this.orderFactService.PutStatusOrder(orderFact).subscribe(() => this.putStateReels(), error => {
-      this.msj.mensajeError(`¡No se actualizó el estado de la orden de facturación ${AsigProdFV_Id}!`, `Error: ${error.error.title} | Status: ${error.status}`);
+      this.msj.mensajeError(`¡No se actualizó el estado de la orden de facturación ${orderFact}!`, `Error: ${error.error.title} | Status: ${error.status}`);
       this.load = false;
     });
   }
@@ -232,6 +232,7 @@ export class SalidaProduccion_DespachoComponent implements OnInit {
       this.msj.mensajeConfirmacion(`¡Se ingresaron todos los rollos!`);
       let fact = this.formProduction.value.fact;
       this.orden_FacturacionComponent.createPDF(orderFact, fact);
+      this.clearFields();
     }, error => this.msj.mensajeError(`¡Ocurrió un error al actualizar el estado de los rollo seleccionados!`, `Error: ${error.error.title} | Status: ${error.status}`));
   }
 

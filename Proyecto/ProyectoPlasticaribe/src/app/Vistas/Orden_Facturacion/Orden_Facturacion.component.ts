@@ -448,10 +448,10 @@ export class Orden_FacturacionComponent implements OnInit {
             { border: [false, false, false, false], colSpan: 3, text: '' }, {}, {}
           ],
           data.datosEnvio != null ? [
-            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')}` },
-            { text: `Fecha de Despacho: ${(data.datosEnvio.fecha).replace('T00:00:00','')}`, colSpan: 2 }, {}
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')} ${data.order.hora}` },
+            { text: `Fecha de Despacho: ${(data.datosEnvio.fecha).replace('T00:00:00','')} ${(data.datosEnvio.hora)}`, colSpan: 2 }, {}
           ] : [
-            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')}`, colSpan: 3,  }, {}, {}
+            { text: `Fecha de Orden: ${(data.order.fecha).replace('T00:00:00','')} ${data.order.hora}`, colSpan: 3, }, {}, {}
           ]
         ]
       },

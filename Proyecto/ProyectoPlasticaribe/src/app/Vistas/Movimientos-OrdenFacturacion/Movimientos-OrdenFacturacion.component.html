@@ -51,7 +51,7 @@
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search" [disabled]="load"></button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" [disabled]="load" (click)="clearFields()"></button>
       </div>
     </div>
   </form>
