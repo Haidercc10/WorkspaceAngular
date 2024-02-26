@@ -199,15 +199,15 @@
   </div>
 
   <!--Tabla Produccion-->
-  <p-table #dtProduccion 
-    [resizableColumns]="true" 
-    columnResizeMode="expand" 
-    responsiveLayout="scroll" 
+  <p-table #dtProduccion
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    responsiveLayout="scroll"
     [rowHover]="true"
-    [scrollable]="true" 
-    scrollHeight="50rem" 
-    *ngIf="!cargando" 
-    styleClass="p-datatable-gridlines" 
+    [scrollable]="true"
+    scrollHeight="50rem"
+    *ngIf="!cargando"
+    styleClass="p-datatable-gridlines"
     [value]="produccion"
     [rowHover]="true">
     <ng-template pTemplate="header">
@@ -220,6 +220,7 @@
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion2', 'contains')"></th>
         <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
+        <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'proceso', 'contains')"></th>
         <th *ngIf="[1, 86].includes(ValidarRol)"></th>
       </tr>
       <tr>
@@ -231,6 +232,7 @@
         <th class="text-center">Peso</th>
         <th class="text-center">Und</th>
         <th class="text-center">Fecha</th>
+        <th class="text-center">Procesos</th>
         <th class="text-center" *ngIf="[1, 86].includes(ValidarRol)">Imprimir</th>
       </tr>
     </ng-template>
@@ -259,6 +261,7 @@
         <td class="text-center">{{data.peso | number : '1.2-2'}}</td>
         <td class="text-center">{{data.presentacion2}}</td>
         <td class="text-center">{{data.fecha}} - {{data.hora}}</td>
+        <td class="text-center">{{data.proceso}}</td>
         <td class="text-center" *ngIf="[1, 86].includes(ValidarRol)">
           <button class="buttonPDF"
             (click)="crearEtiqueta(data.bulto, data.peso, data.cantidadUnd, data.presentacion1, 1, data.operario1)">
@@ -272,7 +275,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="10">
+        <td colspan="12">
           <h6 class="bold">No existen registros de Producción.</h6>
         </td>
       </tr>
@@ -284,7 +287,7 @@
         <td class="text-center">{{medida}}</td>
         <td class="text-center">{{calcularPeso() | number}}</td>
         <td class="text-center">{{'Kg'}}</td>
-        <td colspan="2" class="text-center"></td>
+        <td colspan="4" class="text-center"></td>
       </tr>
     </ng-template>
   </p-table>
