@@ -315,6 +315,25 @@ a {
   box-shadow: inset 0 0 0 0.2rem #febfbf;
 }
 
+p-multiselect div[class*="p-multiselect p-component"] {
+  width: 100%;
+}
+
+.p-multiselect:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem #febfbf;
+  border-color: #f63b3b;
+}
+
+.p-multiselect:not(.p-disabled):hover {
+  border-color: #f63b3b;
+}
+
+p-multiselect div searchicon[class*="p-element p-icon-wrapper"] {
+  display: block;
+}
+
 p-dropdown .p-dropdown {
   display: flex;
   width: auto;
@@ -329,7 +348,7 @@ p-table p-dropdown {
   display: contents;
 }
 
-.p-multiselect-items-wrapper ol, .p-multiselect-items-wrapper ul {  
+.p-multiselect-items-wrapper ol, .p-multiselect-items-wrapper ul {
   padding-left: 0;
 }
 

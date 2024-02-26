@@ -210,6 +210,7 @@ import { TomaFisicaInventarioComponent } from './Vistas/TomaFisicaInventario/Tom
 import { ReporteFacturacionClientesComponent } from './Vistas/ReporteFacturacionClientes/ReporteFacturacionClientes.component';
 import { Ubicaciones_RollosComponent } from './Vistas/Ubicaciones_Rollos/Ubicaciones_Rollos.component';
 import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.component';
+import { NominaDetallada_PlasticaribeComponent } from './Vistas/NominaDetallada_Plasticaribe/NominaDetallada_Plasticaribe.component';
 
 @NgModule({
   declarations: [
@@ -302,17 +303,17 @@ import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.
     Dashboard_CostosComponent,
     Ingreso_NominaComponent,
     Dashboard_ComprasComponent,
-    Gestion_VistasComponent, 
+    Gestion_VistasComponent,
     Reporte_CertificadosCalidadComponent,
     CertificadoCalidadComponent,
-    ControlCalidad_ExtrusionComponent, 
+    ControlCalidad_ExtrusionComponent,
     ControlCalidad_SelladoComponent,
     ControlCalidadComponent,
     Informe_ConsumosComponent,
-    Costos_CajaMenorComponent, 
+    Costos_CajaMenorComponent,
     CrearTipoSalida_CajaMenorComponent,
     Kardex_MateriasPrimasComponent,
-    Recetas_ProductosComponent, 
+    Recetas_ProductosComponent,
     Inventario_AreasComponent,
     Reporte_InventarioAreasComponent,
     Dashboard_AreasComponent,
@@ -321,14 +322,14 @@ import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.
     ReporteFacturacionDetalladaComponent,
     ReporteProduccionComponent,
     ReportesConsolidadosComponent,
-    Busqueda_OrdenesTrabajoComponent, 
+    Busqueda_OrdenesTrabajoComponent,
     Produccion_SelladoComponent,
     Produccion_ExtrusionComponent,
     Correos_PaginaWebComponent,
     IngresoProduccion_DespachoComponent,
     SalidaProduccion_DespachoComponent,
     Movimientos_DespachoComponent,
-    Crear_ConceptosComponent, 
+    Crear_ConceptosComponent,
     Reporte_EstadisticasVentasComponent,
     Orden_FacturacionComponent,
     MovimientosOrdenFacturacionComponent,
@@ -339,9 +340,10 @@ import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.
     EliminarRollos_ProduccionComponent,
     InventarioBodegaDespachoComponent,
     TomaFisicaInventarioComponent,
-    ReporteFacturacionClientesComponent, 
+    ReporteFacturacionClientesComponent,
     Ubicaciones_RollosComponent,
-    Reporte_NominaComponent
+    Reporte_NominaComponent,
+    NominaDetallada_PlasticaribeComponent,
   ],
 
   imports: [

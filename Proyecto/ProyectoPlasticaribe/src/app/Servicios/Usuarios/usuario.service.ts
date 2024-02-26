@@ -8,7 +8,7 @@ import { modelUsuario } from '../../Modelo/modelUsuario';
   providedIn: 'root'
 })
 export class UsuarioService {
-  
+
   readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient,) { }
@@ -29,8 +29,10 @@ export class UsuarioService {
 
   GetVendedores = () => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Usuarios/getVendedores`);
 
+  GetWorkers = (start: any, end: any, areas: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Usuarios/getTrabajadores/${start}/${end}/${areas}`);
+
   srvActualizarUsuario = (id:number|String, data:any) => this.http.put(this.rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
-  
+
   srvEliminarUsuario = (id:number|String) => this.http.delete(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
 
   srvGuardarUsuario = (data : modelUsuario): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data);

@@ -24,4 +24,3 @@ export class AreaService {
 
   likeGetNombreArea = (dato : any) : Observable<any> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Areas/getNombreAreaXLike/${dato}`);
 }
-
