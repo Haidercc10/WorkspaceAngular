@@ -82,7 +82,7 @@ export class Inventario_AreasComponent implements AfterViewChecked, OnInit {
       cantidad : [null, Validators.required],
       precio : [null, Validators.required],
       proceso : [null, Validators.required],
-      category : [null, Validators.required],
+      category : [null],
       observacion : [null, ],
     });
   }
