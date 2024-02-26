@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Table } from 'primeng/table';
 import { modelProduccionProcesos } from 'src/app/Modelo/modelProduccionProcesos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { CreacionPdfService, TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
+import { TagProduction_2, modelTagProduction } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { ReImpresionEtiquetasService } from 'src/app/Servicios/ReImpresionEtiquetas/ReImpresionEtiquetas.service';
@@ -22,7 +22,7 @@ import { AppComponent } from 'src/app/app.component';
 
 export class Produccion_SelladoComponent implements OnInit {
 
-  cargando: boolean = false; //Variable de carga 
+  cargando: boolean = false; //Variable de carga
   modoSeleccionado: boolean = false; //Variable de modo de seleccion
   formSellado !: FormGroup; //Formulario de sellado
   turnos: any[] = []; //array que contiene los diferentes turnos
@@ -38,7 +38,7 @@ export class Produccion_SelladoComponent implements OnInit {
   clase: any = ``; //Variable que guardará la clase que tendrá el campo cantidad realizada de la tabla
   cantBultoEstandar: number = 0; //Guardará la cantidad estandar de unidades/paquetes/kilos del bulto del item de la ot consultada
   cantActual: number = 0; //Guardará la cantidad pesada de unidades/paquetes/kilos del bulto del item de la ot consultada
-  pesoActual: number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada  
+  pesoActual: number = 0; //Guardará el peso actual de unidades/paquetes/kilos del bulto del item de la ot consultada
   medida: string = '';
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -172,7 +172,7 @@ export class Produccion_SelladoComponent implements OnInit {
   limpiarCampos() {
     let mostratDatosProducto: boolean = this.formSellado.value.mostratDatosProducto;
     this.formSellado.reset();
-    this.formSellado.patchValue({ mostratDatosProducto: mostratDatosProducto }); 
+    this.formSellado.patchValue({ mostratDatosProducto: mostratDatosProducto });
     this.ordenesTrabajo = [];
     this.produccion = [];
     this.cargando = false;
@@ -184,10 +184,10 @@ export class Produccion_SelladoComponent implements OnInit {
     this.medida = '';
   }
 
-  //Función que filtra la info de la tabla 
+  //Función que filtra la info de la tabla
   aplicarfiltro = ($event, campo: any, data: Table) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
 
-  //Función que habilita/Deshabilita el campo Cantidad de unidades/paquetes para agregar saldos 
+  //Función que habilita/Deshabilita el campo Cantidad de unidades/paquetes para agregar saldos
   habilitarSaldo = () => this.esSoloLectura ? this.esSoloLectura = false : this.esSoloLectura = true;
 
   //Función que busca la orden de trabajo y carga la información
@@ -222,18 +222,18 @@ export class Produccion_SelladoComponent implements OnInit {
     });
   }
 
-  //Función que cargará los campos 
+  //Función que cargará los campos
   cargarCamposUltimaOT(){
     this.ordenConsultada = this.formSellado.value.ot;
     this.maquinaConsultada = this.formSellado.value.maquina;
     this.operariosConsultados = this.formSellado.value.idOperario;
   }
 
-  //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo. 
+  //Función que validará el proceso de sellado según la maquina y el item de la orden de trabajo.
   validarProceso() {
     if(this.ordenesTrabajo.length > 0) {
       let esWicket : boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
-      if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' }); 
+      if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' });
       else this.formSellado.patchValue({ proceso: 'SELLA' });
     }
   }
@@ -287,7 +287,7 @@ export class Produccion_SelladoComponent implements OnInit {
         let i: number = this.produccion.findIndex(x => x.bulto == d.numeroRollo_BagPro);
         this.produccion[i].reImpresiones = d.cantidad;
       });
-      this.rollosSinReImpresion(data.map(x => x.numeroRollo_BagPro));      
+      this.rollosSinReImpresion(data.map(x => x.numeroRollo_BagPro));
     }, () => this.rollosSinReImpresion([]));
   }
 
@@ -436,11 +436,11 @@ export class Produccion_SelladoComponent implements OnInit {
 
   //Función que crea el pdf de la etiqueta
   crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion : number, operador : any, datosEtiqueta: string = '') {
-    let proceso: any = this.procesos.find(x => x.Id == this.formSellado.value.proceso);
+    let dataRollo: any = this.produccion.find(x => x.bulto == rollo);
     let operario : any;
     if(reimpresion == 0) operario = this.operarios.filter(x => x.usua_Id == operador);
     else if(reimpresion == 1) operario = this.operarios.filter(x => x.usua_Nombre == operador);
-    
+
     this.svcBagPro.GetEtiquetaBagpro(rollo, reimpresion).subscribe(data => {
       let etiqueta: modelTagProduction = {
         'client': this.ordenesTrabajo[0].cliente,
@@ -458,7 +458,7 @@ export class Produccion_SelladoComponent implements OnInit {
         'reel': data[0].bulto,
         'presentationItem1': 'Kg',
         'presentationItem2': medida != 'Kg' ? `${medida}(s)` : 'Kg',
-        'productionProcess': proceso.Nombre,
+        'productionProcess': (dataRollo.proceso).toUpperCase(),
         'showNameBussiness': true,
         'operator': operario[0].usua_Nombre,
         'copy': reimpresion == 0 ? false : true,

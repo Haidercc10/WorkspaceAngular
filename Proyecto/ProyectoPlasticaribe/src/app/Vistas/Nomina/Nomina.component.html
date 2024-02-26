@@ -317,7 +317,7 @@
         columnResizeMode="expand"
         styleClass="p-datatable-sm p-datatable-gridlines p-datatable-striped"
         responsiveLayout="scroll"
-        [rowHover]="true"        
+        [rowHover]="true"
         [scrollable]="true"
         scrollHeight="50rem"
         editMode="row">
@@ -338,7 +338,7 @@
           <tr [pEditableRow]="nomina">
             <td>{{rowIndex + 1}}</td>
             <td>{{nomina.fechaRegistro | date:"MM/dd/yyyy"}}</td>
-            <td>{{nomina.registradoPor}}</td>            
+            <td>{{nomina.registradoPor}}</td>
             <td>
               <p-cellEditor>
                 <ng-template pTemplate="input">

@@ -77,8 +77,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   getStockInformation() {
+    this.load = true;
     this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
-      this.load = true;
       this.getStockProcess();
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
@@ -90,10 +90,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
   }
 
   getStockProcess(){
-    ['EMP', 'SELLA', 'WIKE'].forEach((process: 'EMP' | 'SELLA' | 'WIKE') => {
+    ['EMP', 'SELLA'].forEach((process: 'EMP' | 'SELLA') => {
       this.stockService.GetStockProducts_Process(process).subscribe(data => {
         if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
-        if (process == 'SELLA' || process == 'WIKE') this.stockSellado = this.fillStockInformation(data);
+        if (process == 'SELLA') this.stockSellado = this.fillStockInformation(data);
       });
     });
   }
@@ -101,31 +101,33 @@ export class InventarioProductosPBDDComponent implements OnInit {
   fillStockInformation(data: any): Array<StockInformation> {
     let stockInformation: Array<StockInformation> = [];
     data.forEach(stock => {
-      stockInformation.push({
-        item: stock.product.item,
-        reference: stock.product.reference,
-        client: stock.client.length > 0 ? stock.client[0].cli.client : '',
-        stock: stock.stock.stock,
-        price: stock.stock.price,
-        presentation: stock.stock.presentation,
-        // subTotal: stock.stock.stockPrice,
-        subTotal: (stock.stock.stock * stock.stock.price),
-        seller: stock.client.length > 0 ? stock.client[0].vende.name_Vende : '',
-        AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
-        actualMonth: this.fillActualMonth(stock.stock_MonthByMonth[0]),
-        junuary: stock.stock_MonthByMonth[0].enero,
-        february: stock.stock_MonthByMonth[0].febrero,
-        march: stock.stock_MonthByMonth[0].marzo,
-        april: stock.stock_MonthByMonth[0].abril,
-        may: stock.stock_MonthByMonth[0].mayo,
-        june: stock.stock_MonthByMonth[0].junio,
-        july: stock.stock_MonthByMonth[0].julio,
-        august: stock.stock_MonthByMonth[0].agosto,
-        september: stock.stock_MonthByMonth[0].septiembre,
-        october: stock.stock_MonthByMonth[0].octubre,
-        november: stock.stock_MonthByMonth[0].noviembre,
-        december: stock.stock_MonthByMonth[0].diciembre,
-      });
+      if (!stockInformation.map(x => x.item).includes(stock.product.item)) {
+        stockInformation.push({
+          item: stock.product.item,
+          reference: stock.product.reference,
+          client: stock.client.cli.client,
+          stock: stock.stock.stock,
+          price: stock.stock.price,
+          presentation: stock.stock.presentation,
+          // subTotal: stock.stock.stockPrice,
+          subTotal: (stock.stock.stock * stock.stock.price),
+          seller: stock.client.vende.name_Vende,
+          AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
+          actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
+          junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
+          february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
+          march: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].marzo,
+          april: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].abril,
+          may: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].mayo,
+          june: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].junio,
+          july: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].julio,
+          august: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].agosto,
+          september: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].septiembre,
+          october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
+          november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
+          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,
+        });
+      }
     });
     return stockInformation;
   }

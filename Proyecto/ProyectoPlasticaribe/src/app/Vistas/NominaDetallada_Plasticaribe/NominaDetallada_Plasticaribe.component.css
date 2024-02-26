@@ -1,0 +1,44 @@
+.colorBadgeWorker {
+  color: #000;
+  background-color: rgb(242, 222, 107);
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.colorBadgeAccrued {
+  color: white;
+  background-color: Tomato;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.colorBadgeDeductions {
+  color: white;
+  background-color: palevioletred;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.colorBadgeTotalPay {
+  color: black;
+  background-color: SpringGreen;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.no-selected {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-inputnumber ::ng-deep input, p-inputnumber ::ng-deep input, p-calendar, p-calendar ::ng-deep span {
+  display: flex;
+  width: 100%;
+}
+
+p-divider ::ng-deep span {
+  color: white !important;
+  background-color: var(--rojo);
+}
