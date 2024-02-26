@@ -42,6 +42,7 @@ export class Reporte_NominaComponent implements OnInit {
 
   ngOnInit() {
     this.loadAreas();
+    this.loadTest();
   }
 
   viewTutorial(){}
@@ -83,7 +84,23 @@ export class Reporte_NominaComponent implements OnInit {
 
   loadTest(){
     this.dataReport.push({
-
+      'IdEmployee' : 1234567890,
+      'CardEmployee' : 1234567890,
+      'Employee' : 'PRUEBA PRUEBA PRUEBA PRUEBA',
+      'Rol' : 1,
+      'Ocupation' : 'OPERARIO SELLADO',
+      'IdArea' : 1,
+      'Area' : 'SELLADO',
+      'Days_Labor' : 8,
+      'Value_Inability' : 0,
+      'Value_HoursExtras' : 0,
+      'Value_AuxTransport' : 0,
+      'Remuneration' : 100000,
+      'Eps' : 13000,
+      'Afp' : 13000,
+      'Saving' : 20000,
+      'Loan' : 5000,
+      'Advance' : 50000,
     });
   }
 

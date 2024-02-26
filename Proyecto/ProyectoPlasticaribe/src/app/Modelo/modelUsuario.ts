@@ -17,5 +17,6 @@ export interface modelUsuario{
     fPen_Id: number;
     Usua_Fecha: string;
     Usua_Hora: string;
+    Usua_Cedula : string;
 }
 

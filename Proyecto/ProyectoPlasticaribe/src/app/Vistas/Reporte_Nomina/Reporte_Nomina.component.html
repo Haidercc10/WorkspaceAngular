@@ -112,11 +112,11 @@
             <th style="font-weight: 800;" class="text-center"></th>
           </tr>
           <tr>
-            <th>#</th>
-            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Cedula 
+            <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+            <th pSortableColumn="" class="text-center" scope="col" pFrozenColumn alignFrozen="left" [frozen]="true"><p-sortIcon field=""></p-sortIcon> Cedula 
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
             </th>
-            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Nombre
+            <th pSortableColumn="" class="text-center" scope="col" pFrozenColumn alignFrozen="left" [frozen]="true"><p-sortIcon field=""></p-sortIcon> Nombre
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
             </th>
             <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Cargo
@@ -149,27 +149,28 @@
             <th pSortableColumn="" class="text-center" scope="col" pTooltip="Prestamo/Anticipo" tooltipPosition="top"><p-sortIcon field=""></p-sortIcon> Prest/Antic.
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
             </th>
-            <th pSortableColumn="" class="text-center" scope="col"><p-sortIcon field=""></p-sortIcon> Total a pagar
+            <th pSortableColumn="" class="text-center" scope="col" pFrozenColumn alignFrozen="right" [frozen]="true"><p-sortIcon field=""></p-sortIcon> Total a pagar
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+              
             </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
           <tr>
-            <td class="text-center">{{rowIndex + 1}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
-            <td class="text-center textBlue" ><p-sortIcon field=""></p-sortIcon>{{''}}</td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.CardEmployee}}</td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.Employee}}</td>
+            <td class="text-center" >{{nomina.Ocupation}}</td>
+            <td class="text-center" >{{nomina.Days_Labor}}</td>
+            <td class="text-center" >{{nomina.Value_Inability | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Value_HoursExtras | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Value_AuxTransport | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Remuneration | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Eps | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Afp | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Saving | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.Loan + nomina.Advance | number : '1.2-2'}}</td>
+            <td class="text-center textBlue" pFrozenColumn alignFrozen="right" [frozen]="true">{{10000 | number : '1.2-2'}}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -183,7 +184,7 @@
             <td class="text-center" id="total">{{calculateTotal()}} </td>
             <td class="text-center" id="total">{{calculateTotal()}} </td>
             <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center textBlue" id="total">{{calculateTotal()}} COP</td>
+            <td class="text-center textBlue" id="total" pFrozenColumn alignFrozen="right" [frozen]="true">{{calculateTotal()}} COP</td>
           </tr>
         </ng-template>
       </p-table>

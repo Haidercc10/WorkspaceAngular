@@ -80,6 +80,7 @@ export class RegistroComponentComponent implements OnInit {
       usuRol: null,
       usuEstado: null,
       usuPassword: null,
+      usuCedula : [null]
     });
 
     this.inicializarFormularioRoles();
@@ -133,7 +134,8 @@ export class RegistroComponentComponent implements OnInit {
           EPS : dataUsuarios[index].eps_Nombre,
           FondoP : dataUsuarios[index].fPen_Nombre,
           Fecha : dataUsuarios[index].usua_Fecha,
-          Hora : dataUsuarios[index].usua_Hora
+          Hora : dataUsuarios[index].usua_Hora, 
+          Cedula : dataUsuarios[index].usua_Cedula == null ? '' : dataUsuarios[index].usua_Cedula,
         }
         infoUsuarios.Id = `${infoUsuarios.Id}`;
         if(infoUsuarios.Id.length == 1) infoUsuarios.Id = `00${infoUsuarios.Id}`
@@ -165,6 +167,7 @@ export class RegistroComponentComponent implements OnInit {
           fPen_Id : dataUsuarios[index].fPen_Id,
           Usua_Fecha : this.fechaActual,
           Usua_Hora : this.HoraActual,
+          Usua_Cedula : this.FormUsuarios.value.usuCedula
         }
         this.dialogUsuarios = false;
         this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(() => {
@@ -177,6 +180,7 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que cargará la informacion del usuario seleccionado en el modal donde se podrá editar
   cargarModalEditarUsuario(item) {
+    console.log(item)
     this.dialogUsuarios = true;
     this.accion = 'Editar'
     this.servicioUsuarios.getUsuariosxId(item.Id).subscribe(dataUsuarios => {
@@ -188,6 +192,7 @@ export class RegistroComponentComponent implements OnInit {
         usuRol: dataUsuarios[0].rolUsu_Id,
         usuEstado: dataUsuarios[0].estado_Id,
         usuPassword: dataUsuarios[0].usua_Contrasena,
+        usuCedula : dataUsuarios[0].usua_Cedula
       });
     });
   }
@@ -222,11 +227,12 @@ export class RegistroComponentComponent implements OnInit {
             eps_Id: 0,
             fPen_Id: 0,
             Usua_Fecha: this.fechaActual,
-            Usua_Hora: this.HoraActual
+            Usua_Hora: this.HoraActual, 
+            Usua_Cedula : this.FormUsuarios.value.usuCedula
           }
           this.dialogUsuarios = false;
           this.servicioUsuarios.srvGuardarUsuario(data).subscribe(() => {
-            this.msj.mensajeConfirmacion(`¡Usuairo creado!`, `¡Se ha creado un nuevo usuario!`);
+            this.msj.mensajeConfirmacion(`¡Usuario creado!`, `¡Se ha creado un nuevo usuario!`);
             this.cargarUsuarios();
           }, () => { this.msj.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
         }
@@ -599,5 +605,11 @@ export class RegistroComponentComponent implements OnInit {
         });
       });
     }, () => this.insertarPermisos(this.editarRol));
+  }
+
+  loadIdInCardId(){
+    this.FormUsuarios.patchValue({
+      usuCedula: this.FormUsuarios.value.usuId,
+    })
   }
 }
