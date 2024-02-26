@@ -62,7 +62,7 @@
         <!--Areas-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="areas" inputId="areas" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="proceso_Nombre"></p-dropdown>
+            <p-dropdown formControlName="areas" inputId="areas" optionValue="area_Id" [autoDisplayFirst]="false" [options]="areas" optionLabel="area_Nombre"></p-dropdown>
             <label for="areas">Área</label>
           </span>
         </div>
@@ -73,7 +73,7 @@
       <!--Botones-->
       <div class="mb-4" id="buttons">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="getUrlAPI()"></button>
+          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="searchPayRoll()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"> </button>
         </div>
       </div>
@@ -140,7 +140,7 @@
             <th class="text-center" scope="col">EPS
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
             </th>
-            <th class="text-center" scope="col">Pensión
+            <th class="text-center" scope="col" pTooltip="Pensión" tooltipPosition="top">AFP
               <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
             </th>
             <th class="text-center" scope="col">Ahorro

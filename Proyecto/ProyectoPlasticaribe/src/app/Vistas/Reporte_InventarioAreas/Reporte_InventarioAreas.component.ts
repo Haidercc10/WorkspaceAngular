@@ -44,6 +44,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   categoriasTinta : any = []; //Variable que guardará las categorias de las tintas
   categoriasBopp : any = []; //Variable que guardará las categorias de los bopp
   loading : boolean = false;
+  invImpresionMP : any = []; //Variable que guardará el inventario de las materias primas de impresion
+  invRotograbadoMP : any = []; //Variable que guardará el inventario de las materias primas de rotograbado 
   
   @ViewChild('dtExt') dtExt: Table | undefined; //Tabla que representa el inventario de extrusión
   @ViewChild('dtMat') dtMat: Table | undefined; //Tabla que representa el inventario de materiales en proceso
@@ -54,6 +56,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
   @ViewChild('dtReciclados') dtReciclados: Table | undefined; //Tabla que representa el inventario de reciclados
   @ViewChild('dtPT') dtPT: Table | undefined; //Tabla que representa el inventario de productos terminados
   @ViewChild('dtBopp') dtBopp: Table | undefined; //Tabla que representa el inventario de bopps
+  @ViewChild('dtImpMP') dtImpMP: Table | undefined; //Tabla que representa el inventario de productos terminados
+  @ViewChild('dtRotMP') dtRotMP: Table | undefined; //Tabla que representa el inventario de bopps
 
 
   constructor(private AppComponent : AppComponent, 
@@ -94,6 +98,8 @@ export class Reporte_InventarioAreasComponent implements OnInit {
     this.invMatPrimas = [];
     this.invReciclados = [];
     this.invBopp = [];
+    this.invImpresionMP = [];
+    this.invRotograbadoMP = [];
     let fecha1 : any = this.rangoFechas.length > 0 ? moment(this.rangoFechas[0]).format('YYYY-MM-DD') : null;
     let fecha2 : any = this.rangoFechas[1] != undefined && this.rangoFechas[1] != null ? moment(this.rangoFechas[1]).format('YYYY-MM-DD') : null;
     
@@ -102,11 +108,13 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         if(data.length > 0) {
           this.load = true;
           data.forEach(x => {
-            if(x.id_Area == `EXT` && x.esMaterial == false && [1, 3, 7, 61].includes(this.ValidarRol)) this.invExtrusion.push(x);
-            if(x.id_Area == `EXT` && x.esMaterial == true && [1, 3, 7, 61].includes(this.ValidarRol)) this.invMateriales.push(x);
-            if(x.id_Area == `ROT` && [1, 63, 61].includes(this.ValidarRol)) this.invRotograbado.push(x);
-            if(x.id_Area == `SELLA` && [1, 8, 61].includes(this.ValidarRol)) this.invSellado.push(x);
-            if(x.id_Area == `IMP` && [1, 4, 61, 62].includes(this.ValidarRol)) this.invImpresion.push(x);
+            if(x.id_Area == `EXT` && !x.esMaterial && [1, 3, 7, 61, 85].includes(this.ValidarRol)) this.invExtrusion.push(x);
+            if(x.id_Area == `EXT` && x.esMaterial && [1, 3, 7, 61, 85].includes(this.ValidarRol)) this.invMateriales.push(x);
+            if(x.id_Area == `ROT` && !x.esMaterial && [1, 63, 61, 89].includes(this.ValidarRol)) this.invRotograbado.push(x);
+            if(x.id_Area == `ROT` && x.esMaterial && [1, 63, 61, 89].includes(this.ValidarRol)) this.invRotograbadoMP.push(x);
+            if(x.id_Area == `SELLA` && !x.esMaterial && [1, 8, 61, 86].includes(this.ValidarRol)) this.invSellado.push(x);
+            if(x.id_Area == `IMP` && !x.esMaterial && [1, 4, 61, 62, 75].includes(this.ValidarRol)) this.invImpresion.push(x);
+            if(x.id_Area == `IMP` && x.esMaterial && [1, 4, 61, 62, 75].includes(this.ValidarRol)) this.invImpresionMP.push(x);
           });
           if ([1, 3, 7, 61].includes(this.ValidarRol)) this.inventarioMateriasPrimas(fecha2); 
           if(this.ValidarRol == 1) this.inventarioProductosTerminados(fecha2); 
@@ -218,6 +226,10 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   calcularTotalBopp = () => this.invBopp.reduce((acum, valor) => (acum + valor.subtotal), 0);
 
+  calcularTotalRotograbadoMP = () => this.invRotograbadoMP.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
+  calcularTotalImpresionMP = () => this.invImpresionMP.reduce((acum, valor) => (acum + valor.subtotal), 0);
+
   //Funciones que permitiran realizar filtros en la tabla.
   aplicarfiltroExt = ($event, campo : any, valorCampo : string) => this.dtExt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
@@ -237,16 +249,23 @@ export class Reporte_InventarioAreasComponent implements OnInit {
 
   aplicarfiltroBopp = ($event, campo : any, valorCampo : string) => this.dtBopp!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+  aplicarfiltroRotMP = ($event, campo : any, valorCampo : string) => this.dtRotMP!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+  aplicarfiltroImpMP = ($event, campo : any, valorCampo : string) => this.dtImpMP!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  
+
   // Funcion que va a crear un excel con la información de los inventarios de cada area
   exportarExcel(){
-    let inventario : any = [...this.invExtrusion, ...this.invMateriales, ...this.invMatPrimas, ...this.invPT, ...this.invImpresion, ...this.invRotograbado, ...this.invSellado, ...this.invReciclados];
+    let inventario : any = [...this.invExtrusion, ...this.invMateriales, ...this.invMatPrimas, ...this.invPT, ...this.invImpresion, ...this.invRotograbado, ...this.invSellado, ...this.invReciclados, ...this.invImpresionMP, this.invRotograbadoMP];
     if(inventario.length > 0) {
       this.load = true;
       let tituloTotal : string = `INVENTARIO TOTAL`;
       let tituloExtrusion : string = `INVENTARIO EXTRUSIÓN`;
       let tituloRotograbado : string = `INVENTARIO ROTOGRABADO`;
+      let tituloRotograbadoMP : string = `INVENTARIO MATERIALES ROTOGRABADO`;
       let tituloSellado : string = `INVENTARIO SELLADO`;
       let tituloImpresion : string = `INVENTARIO IMPRESIÓN`;
+      let tituloImpresionMP : string = `INVENTARIO MATERIALES IMPRESIÓN`;
       let tituloMateriales : string = `MATERIALES EN EXTRUSIÓN`;
       let tituloMatPrimas : string = `INVENTARIO DE MATERIA PRIMA`;
       let tituloReciclados : string = `INVENTARIO DE RECICLADOS`;
@@ -415,6 +434,36 @@ export class Reporte_InventarioAreasComponent implements OnInit {
         } 
       }
 
+      // HOJA 11, INVENTARIO MATERIALES IMPRESION
+      if([1, 62, 61, 4].includes(this.ValidarRol)) {
+        let worksheetImpresionMP = workbook.addWorksheet(`Inventario Materiales Impresión`);
+        this.formatoTitulos(worksheetImpresionMP, tituloImpresionMP, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowImpresion = worksheetImpresionMP.addRow(header);
+        this.formatoEncabezado(headerRowImpresion);
+        this.formatoCuerpo(this.calcularInvImpresionMP(), worksheetImpresionMP);
+        if(this.ValidarRol != 1) {
+          worksheetImpresionMP.spliceColumns(6,2);
+          worksheetImpresionMP.addRow([]);
+          worksheetImpresionMP.getCell('A1').value = tituloImpresionMP;
+        } 
+      }
+
+      // HOJA 12, INVENTARIO MATERIALES ROTOGRABADO
+      if([1, 63, 61].includes(this.ValidarRol)) {
+        let worksheetRotograbadoMP = workbook.addWorksheet(`Inventario Materiales Rotograbado`);
+        this.formatoTitulos(worksheetRotograbadoMP, tituloRotograbadoMP, image);
+        header = ['Fecha', 'OT', 'Item', 'Referencia', 'Kg', 'Precio', 'SubTotal'];
+        let headerRowRotograbado = worksheetRotograbadoMP.addRow(header);
+        this.formatoEncabezado(headerRowRotograbado);
+        this.formatoCuerpo(this.calcularInvRotograbadoMP(), worksheetRotograbadoMP);
+        if(this.ValidarRol != 1) {
+          worksheetRotograbadoMP.spliceColumns(6,2);
+          worksheetRotograbadoMP.addRow([]);
+          worksheetRotograbadoMP.getCell('A1').value = tituloRotograbadoMP;
+        } 
+      }
+
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, `Inventarios_Areas.xlsx`);
@@ -485,7 +534,9 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       ['ROTOGRABADO', this.calcularTotalRotograbado()],
       ['DESPACHO', this.calcularTotalPT()],
       ['BIORIENTADOS', this.calcularTotalBopp()],
-      ['TOTAL', this.calcularTotalReciclados() + this.calcularTotalMatPrimas() + this.calcularTotalMateriales() + this.calcularTotalExtrusion() + this.calcularTotalImpresion() + this.calcularTotalSellado() + this.calcularTotalRotograbado() + this.calcularTotalPT() + this.calcularTotalBopp()],
+      ['MATERIALES IMPRESIÓN', this.calcularTotalImpresionMP()],
+      ['MATERIALES ROTOGRABADO', this.calcularTotalRotograbadoMP()],
+      ['TOTAL', this.calcularTotalReciclados() + this.calcularTotalMatPrimas() + this.calcularTotalMateriales() + this.calcularTotalExtrusion() + this.calcularTotalImpresion() + this.calcularTotalSellado() + this.calcularTotalRotograbado() + this.calcularTotalPT() + this.calcularTotalBopp() + this.calcularTotalImpresionMP() + this.calcularTotalRotograbadoMP()],
     ];
     return datos;
   }
@@ -720,6 +771,58 @@ export class Reporte_InventarioAreasComponent implements OnInit {
       this.invBopp.reduce((a,b) => a + b.stock, 0),
       '',
       this.invBopp.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+   // Funcion que va a calcular el total del inventario de materiales de impresion
+   calcularInvImpresionMP() : any [] {
+    let datos : any [] = [];
+    this.invImpresionMP.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invImpresionMP.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invImpresionMP.reduce((a,b) => a + b.subtotal, 0)
+    ]);
+    return datos;
+  }
+
+  // Funcion que va a calcular el total del inventario de materiales de rotograbado
+  calcularInvRotograbadoMP() : any [] {
+    let datos : any [] = [];
+    this.invRotograbadoMP.forEach(ext => {
+      datos.push([
+        ext.fecha_Inventario.replace('T00:00:00', ''),
+        ext.ot,
+        ext.item,
+        ext.referencia,
+        ext.stock,
+        ext.precio,
+        ext.subtotal
+      ]);
+    });
+    datos.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      this.invRotograbadoMP.reduce((a,b) => a + b.stock, 0),
+      '',
+      this.invRotograbadoMP.reduce((a,b) => a + b.subtotal, 0)
     ]);
     return datos;
   }
