@@ -97,7 +97,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     this.validateRole = this.appComponent.ValidarRol;
   }
 
-  getArea = () => this.areaService.srvObtenerLista().subscribe(data => this.areas = data.filter(x => [1,3,4,6,7,8,9,10,11,12,19,20,21,22,25,28,29,30,31,32].includes(x.area_Id)));
+  getArea = () => this.areaService.srvObtenerLista().subscribe(data => this.areas = data.filter(x => [1, 3, 4, 6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 22, 25, 28, 29, 30, 31, 32].includes(x.area_Id)));
 
   getWorkers() {
     if (this.rangeDates.length == 2) {
@@ -108,7 +108,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         this.selectedAreas.forEach(d => areas += `${d}|`);
         let start: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
         let end: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
-        this.userService.GetWorkers(start,end,areas).subscribe(data => this.calculatePayroll(data));
+        this.userService.GetWorkers(start, end, areas).subscribe(data => this.calculatePayroll(data));
       } else this.msj.mensajeAdvertencia(`¡Debe seleccionar minimo un área!`);
     } else this.msj.mensajeAdvertencia(`¡Debes seleccionar un rango de fechas!`);
   }
@@ -151,7 +151,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         valueSurchagedHours100: 0,
         adictionalFee: 0,
         totalValueAdictionalFee: 0,
-        transpotationAssitance: 0,
+        transpotationAssitance: d.transportAsistance,
         productivitySella: 0,
         productivityExt: 0,
         productivityMntj: 0,
@@ -170,6 +170,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       };
       count++;
       this.payroll.push(data);
+      let i: number = this.payroll.findIndex(x => x.idWorker == d.identification);
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
       if (count == this.payroll.length) this.load = false;
     });
   }
@@ -209,23 +212,10 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   diffDaysDisability(d: any, valueDay: number): {} {
     let diffDays: number = 0;
-    let daysBetweenDisablityAndPayroll: number = 0;
     let total: number = 0;
-    let startDate: any = moment(d.startDate).format('YYYY-MM-DD');
-    let start: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
-    let end: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
-    if (moment(startDate).isBefore(start)) {
-      let data: any = this.disabilityBeforePayroll(d, valueDay);
-      daysBetweenDisablityAndPayroll = data.daysBetweenDisablityAndPayroll;
-      diffDays = data.daysBetweenPayroll;
-      total = data.total;
-    } else if (moment(startDate).isSameOrAfter(start)) {
-      let a = moment([parseInt(startDate.substring(0,4)), parseInt(startDate.substring(5,7)), parseInt(startDate.substring(8,10))]);
-      let b = moment([parseInt(end.substring(0,4)), parseInt(end.substring(5,7)), parseInt(end.substring(8,10))]);
-      diffDays = a.diff(b, 'days');
-      daysBetweenDisablityAndPayroll = 0;
-      total = this.valueDisablity(d.id_TypeDisability, diffDays, daysBetweenDisablityAndPayroll, valueDay);
-    }
+    let data: any = this.disabilityBeforePayroll(d, valueDay);
+    diffDays = data.disabilityDays;
+    total = data.total;
     return {
       diffDays: diffDays,
       total: total
@@ -233,26 +223,50 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   }
 
   disabilityBeforePayroll(d: any, valueDay: number) {
-    let diffDays: number = 0;
-    let startDate: any = moment(d.startDate).format('YYYY-MM-DD');
-    let start: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
-    let end: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
-    let a = moment([parseInt(startDate.substring(0,4)), parseInt(startDate.substring(5,7)), parseInt(startDate.substring(8,10))]);
-    let b = moment([parseInt(start.substring(0,4)), parseInt(start.substring(5,7)), parseInt(start.substring(8,10))]);
-    let c = moment([parseInt(end.substring(0,4)), parseInt(end.substring(5,7)), parseInt(end.substring(8,10))]);
-    let daysBetweenDisablityAndPayroll: number = c.diff(a, 'days');
-    let daysBetweenPayroll: number = c.diff(b, 'days');
-    let daysBetweenDisablityAndStartPeyroll: number = b.diff(a, 'days');
-    diffDays = daysBetweenDisablityAndPayroll - daysBetweenPayroll;
+    let _startDisability: any = moment(d.startDate).format('YYYY-MM-DD');
+    let _endDisability: any = moment(d.endDate).format('YYYY-MM-DD');
+    let _startPayroll: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
+    let _endPayroll: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
+    let startDisability = moment([parseInt(_startDisability.substring(0, 4)), parseInt(_startDisability.substring(5, 7)), parseInt(_startDisability.substring(8, 10))]);
+    let startPayroll = moment([parseInt(_startPayroll.substring(0, 4)), parseInt(_startPayroll.substring(5, 7)), parseInt(_startPayroll.substring(8, 10))]);
+    let endPayroll = moment([parseInt(_endPayroll.substring(0, 4)), parseInt(_endPayroll.substring(5, 7)), parseInt(_endPayroll.substring(8, 10))]);
+    let endDisability = moment([parseInt(_endDisability.substring(0, 4)), parseInt(_endDisability.substring(5, 7)), parseInt(_endDisability.substring(8, 10))]);
+    let disabilityBeforePayroll: number = startPayroll.diff(startDisability, 'days');
+    let disabilityAfterPayroll: number = endDisability.diff(endPayroll, 'days');
+    let daysBetweenPayroll: number = endPayroll.diff(startPayroll, 'days');
+    let disabilityDays: number = daysBetweenPayroll + (disabilityAfterPayroll < 0 ? disabilityAfterPayroll : 0);
+    let total: number = this.valueDisablityBeforePayroll(disabilityBeforePayroll, valueDay, disabilityDays);
+    console.log('Incapacidad antes de nomina --> ', disabilityBeforePayroll,
+      '\nIncapacidad despues de nomina --> ', disabilityAfterPayroll,
+      '\nDias Incapacitado en nomina --> ', disabilityDays,
+      '\nCantidad de Dias nomina --> ', daysBetweenPayroll,
+      '\nTotal nomina --> ', total);
     return {
-      daysBetweenDisablityAndPayroll: daysBetweenDisablityAndPayroll,
-      daysBetweenPayroll: diffDays,
-      total: this.valueDisablity(d.id_TypeDisability, diffDays, daysBetweenPayroll, valueDay)
+      disabilityDays: disabilityDays,
+      daysBetweenPayroll: daysBetweenPayroll,
+      total: total
     };
   }
 
+  disabilityAfterPayroll() {
+
+  }
+
+  valueDisablityBeforePayroll(disabilityBeforePayroll: number, valueDay: number, disabilityDays: number): number {
+    let total: number = 0;
+    if (disabilityBeforePayroll < 2) {
+      console.log('Entrada --> 0')
+      let days: number = (disabilityDays - disabilityBeforePayroll);
+      if (disabilityDays <= 2) total = valueDay * days;
+      else if (disabilityDays => 3 && disabilityDays <= 90) total = (2 * valueDay) + ((disabilityDays - 2) * ((valueDay * 66.667) / 100));
+      else if (disabilityDays > 90) total = (2 * valueDay) + (88 * ((valueDay * 66.667) / 100)) + ((disabilityDays - 90) * ((valueDay * 50) / 100));
+    } else if (disabilityBeforePayroll >= 2 && disabilityBeforePayroll < 91) total = ((valueDay * 66.667) / 100) * disabilityDays;
+    else if (disabilityBeforePayroll >= 91) total = ((valueDay * 50) / 100) * disabilityDays;
+    return total;
+  }
+
   valueDisablity(id_TypeDisability: number, diffDays: number, daysBetweenDisablityAndPayroll: number, valueDay: number): number {
-    console.clear();
+    // console.clear();
     let total: number = 0;
     if (id_TypeDisability != 1) total = valueDay * diffDays;
     else {
@@ -261,30 +275,51 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         else if (diffDays => 3 && diffDays <= 90) total = (2 * valueDay) + ((diffDays - 2) * ((valueDay * 66.667) / 100));
         else if (diffDays > 90) total = (2 * valueDay) + (88 * ((valueDay * 66.667) / 100)) + ((diffDays - 90) * ((valueDay * 50) / 100));
         console.log('Entrada --> 1',
-        '\nDías Diferencia -->', diffDays,
-        '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
-        '\nValor Día', valueDay,
-        '\nPago Total Incapacidad', total);
+          '\nDías Diferencia -->', diffDays,
+          '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
+          '\nValor Día', valueDay,
+          '\nPago Total Incapacidad', total);
       } else {
         if (daysBetweenDisablityAndPayroll >= 3 && daysBetweenDisablityAndPayroll <= 90) {
           total = ((valueDay * 66.667) / 100) * diffDays;
           console.log('Entrada --> 2',
-          '\nDías Diferencia -->', diffDays,
-          '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
-          '\nValor Día', ((valueDay * 66.667) / 100),
-          '\nPago Total Incapacidad', total);
+            '\nDías Diferencia -->', diffDays,
+            '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
+            '\nValor Día', ((valueDay * 66.667) / 100),
+            '\nPago Total Incapacidad', total);
         }
         else if (daysBetweenDisablityAndPayroll >= 91) {
           total = ((valueDay * 50) / 100) * diffDays;
           console.log('Entrada --> 3',
-          '\nDías Diferencia -->', diffDays,
-          '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
-          '\nValor Día', ((valueDay * 50) / 100),
-          '\nPago Total Incapacidad', total);
+            '\nDías Diferencia -->', diffDays,
+            '\nDias Inicio Incapacidad y Fin Nomina -->', daysBetweenDisablityAndPayroll,
+            '\nValor Día', ((valueDay * 50) / 100),
+            '\nPago Total Incapacidad', total);
         }
       }
     }
     return total;
+  }
+
+  calculateValueAdictionalDaytimeHours() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.adictionalDaytimeHours;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 1.25) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueAdictionalDaytimeHours: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].adictionalDaytimeHours = extraHours;
+      this.payroll[i].valueAdictionalDaytimeHours = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
   }
 
   totalDisabilityByWorker(data: Payroll): number {
@@ -299,10 +334,22 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     return total;
   }
 
+  totalFee(data: Payroll): number {
+    let total: number = 0;
+    total = data.valueAdictionalDaytimeHours + data.valueAdictionalNightHours +
+    data.valueExtraHoursDaytimeSunday + data.valueSurchagedHours035 + data.valueExtraHoursNightSunday + data.valueSurchagedHours075 + data.valueSurchagedHours100 + data.adictionalFee;
+    return total;
+  }
+
+  totalAccrued(data: Payroll): number {
+    let total: number = 0;
+    total = data.totalValueAdictionalFee + data.transpotationAssitance;
+    return total;
+  }
+
   editPayrollByWorker(data: Payroll) {
     this.modalPayroll = true;
     this.formPayrollWorker.patchValue(data);
-    console.log(this.formPayrollWorker.value)
   }
 }
 

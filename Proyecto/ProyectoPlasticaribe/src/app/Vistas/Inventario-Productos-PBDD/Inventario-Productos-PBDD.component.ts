@@ -22,6 +22,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   modoSeleccionado: boolean = false;
   columns: Array<Columns> = [];
   selectedColumns: Array<Columns> = [];
+  selectedColumnsComparative: Array<Columns> = [];
   expandedRows: {} = {};
   stockInformation_Kg: Array<StockInformation> = [];
   stockInformation_UndPaq: Array<StockInformation> = [];
@@ -31,11 +32,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
   @ViewChild('tableStock_UndPaq') tableStock_UndPaq: Table | undefined;
   @ViewChild('tableStockEmp') tableStockEmp: Table | undefined;
   @ViewChild('tableStockSella') tableStockSella: Table | undefined;
+  @ViewChild('comparativeTable') comparativeTable: Table | undefined;
+  @ViewChild('tableStockDelivered_NoAvaible') tableStockDelivered_NoAvaible: Table | undefined;
   recetaProducto: boolean = false;
   @ViewChild(Recetas_ProductosComponent) recetas_ProductosComponent: Recetas_ProductosComponent | undefined;
   stockEmpaque: Array<StockInformation> = [];
   stockSellado: Array<StockInformation> = [];
-  stockWiketiado: Array<StockInformation> = [];
+  comparativeStock: Array<StockInformation> = [];
+  stockDelivered_NoAvaible: Array<StockInformation> = [];
 
   constructor(private appComponent: AppComponent,
     private msg: MensajesAplicacionService,
@@ -54,6 +58,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Cliente', field: 'client', type: '' },
       { header: 'Referencia', field: 'reference', type: '' },
       { header: 'Existencia', field: 'stock', type: 'number' },
+      { header: 'Área', field: 'stockInProcess', type: 'number' },
+      { header: 'Exis. Total', field: 'totalStock', type: 'number' },
       { header: 'Precio', field: 'price', type: 'number' },
       { header: 'Presentación', field: 'presentation', type: '' },
       { header: 'SubTotal', field: 'subTotal', type: 'number' },
@@ -73,15 +79,21 @@ export class InventarioProductosPBDDComponent implements OnInit {
       { header: 'Diciembre', field: 'december', type: 'number' },
     ];
     this.selectedColumns = [...this.columns];
-    this.selectedColumns.splice(9, 12);
+    this.selectedColumnsComparative = [...this.columns];
+    this.selectedColumnsComparative.splice(10, 13);
+    this.selectedColumns.splice(10, 13);
+    this.selectedColumns.splice(4, 1);
+    this.selectedColumns.splice(4, 1);
   }
 
   getStockInformation() {
     this.load = true;
     this.stockService.GetStockProducts_AvaibleProduction().subscribe(data => {
       this.getStockProcess();
+      this.getStockDeliveredNotAvaible();
       this.fillColumns();
       this.stockInformation = this.fillStockInformation(data);
+      this.fillComparativeStock(data, true);
       this.stockInformation_Kg = this.stockInformation.filter(stock => stock.presentation == 'Kg');
       this.stockInformation_UndPaq = this.stockInformation.filter(stock => ['Und', 'Paquete'].includes(stock.presentation));
       this.stockInformation.forEach((stock) => this.expandedRows[stock.item] = true);
@@ -94,7 +106,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.stockService.GetStockProducts_Process(process).subscribe(data => {
         if (process == 'EMP') this.stockEmpaque = this.fillStockInformation(data);
         if (process == 'SELLA') this.stockSellado = this.fillStockInformation(data);
+        this.fillComparativeStock(data, false);
       });
+    });
+  }
+
+  getStockDeliveredNotAvaible() {
+    this.stockService.GetStockDelivered_NoAvaible().subscribe(data => {
+      this.stockDelivered_NoAvaible = this.fillStockInformation(data);
     });
   }
 
@@ -169,6 +188,45 @@ export class InventarioProductosPBDDComponent implements OnInit {
       "11": data.diciembre,
     }
     return stockMonths[month];
+  }
+
+  fillComparativeStock(data: any, avaible: boolean) {
+    data.forEach(stock => {
+      if (!this.comparativeStock.map(x => x.item).includes(stock.product.item)) {
+        this.comparativeStock.push({
+          item: stock.product.item,
+          reference: stock.product.reference,
+          client: stock.client.cli.client,
+          stock: avaible ? stock.stock.stock : 0,
+          stockInProcess: !avaible ? stock.stock.stock : 0,
+          totalStock: stock.stock.stock,
+          price: stock.stock.price,
+          presentation: stock.stock.presentation,
+          subTotal: (stock.stock.stock * stock.stock.price),
+          seller: stock.client.vende.name_Vende,
+          AvaibleProdution: this.fillAvaibleProduction(stock.avaible_Production),
+          actualMonth: (stock.stock_MonthByMonth).length == 0 ? 0 : this.fillActualMonth(stock.stock_MonthByMonth[0]),
+          junuary: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].enero,
+          february: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].febrero,
+          march: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].marzo,
+          april: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].abril,
+          may: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].mayo,
+          june: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].junio,
+          july: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].julio,
+          august: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].agosto,
+          september: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].septiembre,
+          october: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].octubre,
+          november: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].noviembre,
+          december: (stock.stock_MonthByMonth).length == 0 ? 0 : stock.stock_MonthByMonth[0].diciembre,
+        });
+      } else {
+        let i: number = this.comparativeStock.findIndex(x => x.item == stock.product.item);
+        this.comparativeStock[i].stock += avaible ? stock.stock.stock : 0;
+        this.comparativeStock[i].stockInProcess += !avaible ? stock.stock.stock : 0;
+        this.comparativeStock[i].totalStock += stock.stock.stock;
+        this.comparativeStock[i].subTotal += (stock.stock.stock * stock.stock.price);
+      }
+    });
   }
 
   apliedFilters = (data: Table, $event, campo: any) => data!.filter(($event.target as HTMLInputElement).value, campo, 'contains');
@@ -273,6 +331,8 @@ interface StockInformation {
   reference: string,
   client: string,
   stock: number,
+  stockInProcess?: number,
+  totalStock?: number,
   price: number,
   presentation: string,
   subTotal: number,

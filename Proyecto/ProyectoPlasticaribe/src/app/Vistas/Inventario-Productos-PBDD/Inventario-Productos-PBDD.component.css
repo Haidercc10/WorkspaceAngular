@@ -67,8 +67,19 @@
   fill: white;
 }
 
-.colorExis {
-  background-color: rgb(155, 198, 255);
+.colorExis, .colorQuantityProduction, .colorTotalQuantity {
   text-align: center;
   font-weight: bold;
+}
+
+.colorExis {
+  background-color: rgb(155, 198, 255);
+}
+
+.colorQuantityProduction {
+  background-color: Khaki;
+}
+
+.colorTotalQuantity {
+  background-color: LightGreen;
 }

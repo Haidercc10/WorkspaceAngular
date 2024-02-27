@@ -147,7 +147,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
     if (productionSearched.includes(production)) this.msj.mensajeAdvertencia(`El rollo ya ha sido registrado`);
     else {
       this.productionProcessSerivce.GetInformationAboutProduction(production, searchInTable).subscribe(data => {
-        if (data[0].proceso.proceso_Id == 'SELLA') {
+        if (data[0].proceso.proceso_Id != 'WIKE') {
           this.bagproService.GetOrdenDeTrabajo(data[0].pp.ot).subscribe(res => {
             this.sendProductionZeus.push(data[0]);
             let i: number = this.sendProductionZeus.findIndex(x => x.pp.numero_Rollo == data[0].pp.numero_Rollo);
@@ -173,7 +173,7 @@ export class TomaFisicaInventarioComponent implements OnInit {
     let searchInTable: string = this.searchIn == null ? 'TODO' : !this.searchIn ? 'SELLADO' : 'EXTRUSION';
     this.bagproService.GetProductionByNumber(production, searchInTable).subscribe(prod => {
       if (prod.length > 0) {
-        if (prod[0].nomStatus == 'SELLADO') {
+        if (prod[0].nomStatus != 'Wiketiado') {
           this.bagproService.GetOrdenDeTrabajo(prod[0].ot).subscribe(data => {
             this.clients.GetSedeClientexNitBagPro(data[0].nitCliente).subscribe(cli => {
               this.sendProductionZeus.push({

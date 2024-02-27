@@ -13,7 +13,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { Vistas_PermisosService } from 'src/app/Servicios/Vistas_Permisos/Vistas_Permisos.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import { AppComponent } from 'src/app/app.component';
-import { collection, getDocs, doc, setDoc } from "firebase/firestore"; 
+import { collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { db } from 'src/app/conexionFirebase';
 
 Injectable({
@@ -87,12 +87,11 @@ export class MenuLateralComponent implements OnInit {
     this.abrirModalUsuario();
   }
 
-  /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria 
+  /*Función que cargará el menú lateral y quitará el enlace "Inventario Areas" en la categoria
   materias primas  para los usuarios con roles de bopp, sellado, rotograbado e impresión */
   mostrarMenuLateral() {
     let ruta : any = this.router.url;
     this.display = true;
-    console.log(this.ValidarRol)
     if([85,7,3,8,86,63,89,62,4,88].includes(this.ValidarRol)) {
       setTimeout(() => {
         this.categorias.forEach(x => {
@@ -164,8 +163,8 @@ export class MenuLateralComponent implements OnInit {
 
   agregarOpcionesAdiciones(){
     this.categorias.unshift({
-      label: `Inicio`, 
-      icon: 'pi pi-home', 
+      label: `Inicio`,
+      icon: 'pi pi-home',
       command: () => {
         this.router.navigate(['/home']);
         this.display = false;
@@ -174,16 +173,16 @@ export class MenuLateralComponent implements OnInit {
 
     if (this.storage_Id == 123456789) {
       this.categorias.unshift({
-        label: `Vistas`, 
-        icon: 'pi pi-eye', 
+        label: `Vistas`,
+        icon: 'pi pi-eye',
         command: () => {
           this.router.navigate(['/gestion-vistas']);
           this.display = false;
         }
       });
       this.categorias.unshift({
-        label: `Pruebas`, 
-        icon: 'pi pi-wrench', 
+        label: `Pruebas`,
+        icon: 'pi pi-wrench',
         command: () => {
           this.router.navigate(['/pruebas']);
           this.display = false;
@@ -192,34 +191,34 @@ export class MenuLateralComponent implements OnInit {
     }
   }
 
-  cargarOpcionesMenu(){ 
+  cargarOpcionesMenu(){
     let count : number = 0;
     this.categorias.forEach(element => {
       this.vistasPermisosService.Get_Vistas_Rol(this.ValidarRol, element.label).subscribe(data => {
         for (let i = 0; i < data.length; i++){
           if (element.items) {
             element.items.push(
-            { 
-              label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu, 
-              command: () => { 
+            {
+              label: data[i].vp_Nombre, icon: data[i].vp_Icono_Menu,
+              command: () => {
                 this.router.navigate([data[i].vp_Ruta]);
                 if(element.label == `Materia Prima`) {
                   if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/materiales`]);
                 } else if (element.label == `Productos`) {
-                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]); 
+                  if(data[i].vp_Ruta == `/inventario-areas`) this.router.navigate([`${data[i].vp_Ruta}/items`]);
                 }
                 this.display = false;
               }
             });
-          } 
+          }
         }
         if (element.items) element.items.sort((a, b) => a.label.localeCompare(b.label));
-        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1); 
+        if(![1, 3, 7, 61, 85, 63, 89, 62, 4, 88].includes(this.ValidarRol) && element.label == `Materia Prima`) element.items.splice(element.items.findIndex(x => x.label == `Inventario Areas`), 1);
         count++;
         if (count == this.categorias.length) this.cargando = false;
       });
     });
-  }  
+  }
 
   mostrarMenuUsuario = () => this.menuUsuario = true;
 
@@ -281,9 +280,9 @@ export class MenuLateralComponent implements OnInit {
         });
         if (this.cookieService.get('MostrarEventosDia') == 'no' || this.cookieService.get('MostrarEventosDia') == undefined) this.eventosDia = false;
         else this.eventosDia = true;
-      }      
+      }
     });
-    
+
   }
 
   consultarEventosMes(){
@@ -331,7 +330,7 @@ export class MenuLateralComponent implements OnInit {
       accept: () => this.authenticationService.logout(),
     });
   }
-  
+
   // Funcion que cambiará el tema de la aplicación
   mostrar() {
     let modo = window.localStorage.getItem("theme");

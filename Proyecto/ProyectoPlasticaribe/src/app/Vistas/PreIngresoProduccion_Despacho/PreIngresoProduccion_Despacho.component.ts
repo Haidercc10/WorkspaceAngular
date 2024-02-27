@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -16,6 +17,7 @@ import { AppComponent } from 'src/app/app.component';
   templateUrl: './PreIngresoProduccion_Despacho.component.html',
   styleUrls: ['./PreIngresoProduccion_Despacho.component.css']
 })
+
 export class PreIngresoProduccion_DespachoComponent implements OnInit {
 
   storage_Id: number;
@@ -40,8 +42,6 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.modoSeleccionado = appComponent.temaSeleccionado;
     this.formData = this.formBuilder.group({
       orderProduction: [null],
-      startDate: [null],
-      endDate: [null],
       process: [null, Validators.required],
       observation: [null],
     });
@@ -55,6 +55,11 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   readStorage() {
     this.storage_Id = this.appComponent.storage_Id;
     this.ValidarRol = this.appComponent.storage_Rol;
+  }
+
+  errorMessage(message: string, error: HttpErrorResponse) {
+    this.load = false;
+    this.msg.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
   }
 
   formatNumbers = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -75,22 +80,12 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 
   validateProcess(): 'EMP' | 'SELLA' | 'EXT' {
-    let process: 'EMP' | 'SELLA' | 'EXT';
-    switch (this.ValidarRol) {
-      case 9:
-        process = 'EMP';
-        break;
-      case 8:
-        process = 'SELLA';
-        break;
-      case 7:
-        process = 'EXT';
-        break;
-      default:
-        process = 'EMP';
-        break;
+    let process = {
+      '87': 'EMP',
+      '86': 'SELLA',
+      '85': 'EXT',
     }
-    return process;
+    return process[(this.ValidarRol).toString()];
   }
 
   searchDataOrderProduction(){
@@ -98,7 +93,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     let process: string = this.formData.value.process;
     this.productionProcessService.GetInformationAboutProductionByOrderProduction_Process(orderProduction, process).subscribe(data => {
       this.production = this.fillDataOrderProduction(data);
-    }, error => this.msg.mensajeError(error));
+    }, error => this.errorMessage(`¡Error al consultar la producción!`, error));
   }
 
   fillDataOrderProduction(data : any): Array<OrderProduction>{
@@ -108,7 +103,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
         orderProduction : dataProduction.pp.ot,
         item: dataProduction.producto.prod_Id,
         reference: dataProduction.producto.prod_Nombre,
-        numberProduction: dataProduction.pp.numero_Rollo,
+        numberProduction: dataProduction.pp.numeroRollo_BagPro,
         quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
         presentation: dataProduction.pp.presentacion,
         date: dataProduction.pp.fecha,
@@ -123,7 +118,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     let index = this.production.findIndex(x => x.numberProduction == production.numberProduction);
     this.production.splice(index, 1);
     this.getConsolidateProduction();
-    setTimeout(() => this.load = false, 50);
+    setTimeout(() => this.load = false, 5);
   }
 
   deselectedProduction(production: OrderProduction) {
@@ -131,7 +126,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     let index = this.productionSelected.findIndex(x => x.numberProduction == production.numberProduction);
     this.productionSelected.splice(index, 1);
     this.getConsolidateProduction();
-    setTimeout(() => this.load = false, 50);
+    setTimeout(() => this.load = false, 5);
   }
 
   selectedAllProduction() {
@@ -139,7 +134,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.productionSelected = this.productionSelected.concat(this.production);
     this.production = [];
     this.getConsolidateProduction();
-    setTimeout(() => this.load = false, 50);
+    setTimeout(() => this.load = false, 5);
   }
 
   deselectedAllProduction() {
@@ -147,12 +142,12 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.production = this.production.concat(this.productionSelected);
     this.productionSelected = [];
     this.getConsolidateProduction();
-    setTimeout(() => this.load = false, 50);
+    setTimeout(() => this.load = false, 5);
   }
 
   getConsolidateProduction() {
     this.consolidatedProduction = this.productionSelected.reduce((a, b) => {
-      if (!a.map(x => x.item).includes(b.item)) a = [...a, b];
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
       return a;
     }, []);
   }
@@ -185,10 +180,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
       Usua_Id : this.storage_Id,
       PreEntRollo_Hora : moment().format('H:mm:ss'),
     }
-    this.preInService.srvGuardar(data).subscribe(data => this.saveDetailsPreIn(data.preEntRollo_Id), error => {
-      this.load = false;
-      this.msg.mensajeError(`¡Ocurrió un error al crear el Pre Ingreso!`, error);
-    });
+    this.preInService.srvGuardar(data).subscribe(data => this.saveDetailsPreIn(data.preEntRollo_Id), error => this.errorMessage(`¡Ocurrió un error al crear el Pre Ingreso!`, error));
   }
 
   saveDetailsPreIn(idPreIn: number){
@@ -205,14 +197,18 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
         Prod_Id : pp.item,
         UndMed_Producto : pp.presentation,
       }
-      this.detailsPreInService.srvGuardar(data).subscribe(data => {
+      this.detailsPreInService.srvGuardar(data).subscribe(() => {
         count++;
-        if (count == this.productionSelected.length) {
-          this.msg.mensajeConfirmacion(`¡Pre Ingreso creado correctamente!`);
-          this.createPDF(idPreIn);
-        }
-      });
+        if (count == this.productionSelected.length) this.PutDelivered_NoAvaible(idPreIn);
+      }, error => this.errorMessage(`¡Ocurrió un error al crear los detalles del Pre Ingreso!`, error));
     });
+  }
+
+  PutDelivered_NoAvaible(idPreIn: number) {
+    this.productionProcessService.PutDelivered_NoAvaible(idPreIn).subscribe(() => {
+      this.msg.mensajeConfirmacion(`¡Pre Ingreso creado correctamente!`);
+      this.createPDF(idPreIn);
+    }, error => this.errorMessage(`¡Ocurrió un error al cambiar el estado de los rollos/bultos!`, error));
   }
 
   createPDF(idPreIn: number) {
@@ -222,34 +218,36 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
       let content: any[] = this.contentPDF(data);
       this.createPDFService.formatoPDF(title, content);
       setTimeout(() => this.clearFields(), 3000);
-    }, error => this.msg.mensajeError(error));
+    }, error => this.errorMessage(`¡Se guardó la información del Pre Ingreso pero no se puedo crear el PDF!`, error));
   }
 
   contentPDF(data): any[] {
     let content: any[] = [];
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
     let informationProducts: Array<any> = this.getInformationProducts(data);
-    content.push(this.informationConsolidatedProducts());
+    content.push(this.tableInformationPreIn(data[0]));
     content.push(this.tableConsolidated(consolidatedInformation));
-    content.push(this.informationProducts());
     content.push(this.tableProducts(informationProducts));
-    content.push(this.observationPDF(data[0]));
     return content;
   }
 
   consolidatedInformation(data: any): Array<any> {
     let consolidatedInformation: Array<any> = [];
+    let count: number = 0;
     data.forEach(prod => {
-      if (!consolidatedInformation.map(x => x.Item).includes(prod.prod.prod_Id)) {
-        let cuontProduction: number = data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).length;
+      if (!consolidatedInformation.map(x => x.Item).includes(prod.details.item)) {
+        count++;
+        let cuontProduction: number = data.filter(x => x.details.item == prod.details.item).length;
         let totalQuantity: number = 0;
-        data.filter(x => x.prod.prod_Id == prod.prod.prod_Id).forEach(x => totalQuantity += x.dtPre.dtlPreEntRollo_Cantidad);
+        data.filter(x => x.details.item == prod.details.item).forEach(x => totalQuantity += x.details.quantity);
         consolidatedInformation.push({
-          "Item": prod.prod.prod_Id,
-          "Referencia": prod.prod.prod_Nombre,
+          "#": count,
+          "OT": prod.details.orderProduction,
+          "Item": prod.details.item,
+          "Referencia": prod.details.reference,
           "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
-          "Presentación": prod.dtPre.undMed_Rollo
+          "Presentación": prod.details.presentation
         });
       }
     });
@@ -258,74 +256,91 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
 
   getInformationProducts(data: any): Array<any> {
     let informationProducts: Array<any> = [];
+    let count: number = 0;
     data.forEach(prod => {
+      count++;
       informationProducts.push({
-        "Rollo": prod.dtPre.rollo_Id,
-        "Item": prod.prod.prod_Id,
-        "Referencia": prod.prod.prod_Nombre,
-        "Cantidad": this.formatNumbers((prod.dtPre.dtlPreEntRollo_Cantidad).toFixed(2)),
-        "Presentación": prod.dtPre.undMed_Rollo,
+        "#": count,
+        "OT": prod.details.orderProduction,
+        "Rollo": prod.details.production,
+        "Item": prod.details.item,
+        "Referencia": prod.details.reference,
+        "Cantidad": this.formatNumbers((prod.details.quantity).toFixed(2)),
+        "Presentación": prod.details.presentation,
       });
     });
     return informationProducts;
   }
 
-  informationConsolidatedProducts() {
+  tableInformationPreIn(data: any): {} {
     return {
-      text: `Consolidado de producto(s) \n `,
-      alignment: 'center',
-      style: 'header',
-      fontSize: 10,
-    };
-  }
-
-  tableConsolidated(data) {
-    let columns: Array<string> = ['Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['10%', '40%', '20%', '20%', '10%'];
-    return {
+      margin: [0, 10],
       table: {
-        headerRows: 1,
-        widths: widths,
-        body: this.buildTableBody(data, columns),
+        widths: ['50%', '20%', '30%'],
+        body: [
+          [
+            { text: `Información General Pre Ingreso`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+          ],
+          [
+            { text: `Nombre: ${data.pre.user_Name}`, colSpan: 2 },
+            {},
+            { text: `Fecha: ${data.pre.date}` }
+          ],
+          [
+            { text: `Observación: ${(data.pre.observation).toUpperCase()}`, colSpan: 3 }, {}, {}
+          ],
+        ]
       },
-      fontSize: 8,
+      fontSize: 9,
       layout: {
         fillColor: function (rowIndex) {
           return (rowIndex == 0) ? '#DDDDDD' : null;
         }
       }
-    };
+    }
   }
 
-  informationProducts() {
+  tableConsolidated(data) {
+    let columns: Array<string> = ['#', 'OT', 'Item', 'Referencia', 'Cant. Rollos', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['8%', '10%', '10%', '40%', '10%', '12%', '10%'];
     return {
-      text: `\n Rollos Seleccionados \n `,
-      alignment: 'center',
-      style: 'header',
-      fontSize: 10,
+      margin: [0, 10],
+      table: {
+        headerRows: 2,
+        widths: widths,
+        body: this.buildTableBody(data, columns, 'Consolidado de producto(s)'),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex) {
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
+        }
+      }
     };
   }
 
   tableProducts(data) {
-    let columns: Array<string> = ['Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación'];
-    let widths: Array<string> = ['15%', '15%', '40%', '20%', '10%'];
+    let columns: Array<string> = ['#', 'OT', 'Rollo', 'Item', 'Referencia', 'Cantidad', 'Presentación'];
+    let widths: Array<string> = ['8%', '10%', '10%', '10%', '40%', '12%', '10%'];
     return {
+      margin: [0, 10],
       table: {
-        headerRows: 1,
+        headerRows: 2,
         widths: widths,
-        body: this.buildTableBody(data, columns),
+        body: this.buildTableBody(data, columns, 'Rollos Seleccionados'),
       },
       fontSize: 8,
       layout: {
         fillColor: function (rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null;
+          return (rowIndex == 0 || rowIndex == 1) ? '#DDDDDD' : null;
         }
       }
     };
   }
 
-  buildTableBody(data, columns) {
+  buildTableBody(data, columns, title) {
     var body = [];
+    body.push([{ colSpan: 7, text: title, bold: true, alignment: 'center', fontSize: 10 }, '', '', '', '', '', '']);
     body.push(columns);
     data.forEach(function (row) {
       var dataRow = [];
@@ -334,21 +349,6 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     });
     return body;
   }
-
-  observationPDF(data) {
-    return {
-      margin: [0, 20],
-      table: {
-        widths: ['*'],
-        body: [
-          [{ border: [true, true, true, false], text: `Observación: `, style: 'subtitulo' }],
-          [{ border: [true, false, true, true], text: `${data.pre.preEntRollo_Observacion.toString().trim()}` }]
-        ]
-      },
-      fontSize: 9,
-    }
-  }
-
 }
 
 interface OrderProduction{

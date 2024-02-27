@@ -300,6 +300,114 @@
               </p-divider>
               <br>
             </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="adictionalDaytimeHours" inputId="adictionalDaytimeHours" [required]="true" (onKeyDown)="calculateValueAdictionalDaytimeHours()"></p-inputNumber>
+                <label for="adictionalDaytimeHours">Horas ADC Diurnas</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueAdictionalDaytimeHours" inputId="valueAdictionalDaytimeHours" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueAdictionalDaytimeHours">Valor Horas ADC Diurnas</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="adictionalNightHours" inputId="adictionalNightHours" [required]="true"></p-inputNumber>
+                <label for="adictionalNightHours">Horas ADC Nocturnas</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueAdictionalNightHours" inputId="valueAdictionalNightHours" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueAdictionalNightHours">Valor Horas ADC Nocturnas</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="extraHoursDaytimeSunday" inputId="extraHoursDaytimeSunday" [required]="true"></p-inputNumber>
+                <label for="extraHoursDaytimeSunday">Horas Ext Diurnas Dom</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueExtraHoursDaytimeSunday" inputId="valueExtraHoursDaytimeSunday" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueExtraHoursDaytimeSunday">Valor Horas Ext Diurnas Dom</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="surchagedHours035" inputId="surchagedHours035" [required]="true"></p-inputNumber>
+                <label for="surchagedHours035">Horas Recargo 35%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueSurchagedHours035" inputId="valueSurchagedHours035" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueSurchagedHours035">Valor Horas Recargo 35%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="extraHoursNightSunday" inputId="extraHoursNightSunday" [required]="true"></p-inputNumber>
+                <label for="extraHoursNightSunday">Horas Ext Noct Dom</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueExtraHoursNightSunday" inputId="valueExtraHoursNightSunday" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueExtraHoursNightSunday">Valor Horas Ext Noct Dom</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="surchagedHours075" inputId="surchagedHours075" [required]="true"></p-inputNumber>
+                <label for="surchagedHours075">Horas ADC 75%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueSurchagedHours075" inputId="valueSurchagedHours075" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueSurchagedHours075">Valor Horas ADC 75%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="surchagedHours100" inputId="surchagedHours100" [required]="true"></p-inputNumber>
+                <label for="surchagedHours100">Horas ADC 100%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="valueSurchagedHours100" inputId="valueSurchagedHours100" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="valueSurchagedHours100">Valor Horas ADC 100%</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="adictionalFee" inputId="adictionalFee" [required]="true"></p-inputNumber>
+                <label for="adictionalFee">Tarifa ADC</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="totalValueAdictionalFee" inputId="totalValueAdictionalFee" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="totalValueAdictionalFee">Total Valor ADC COMP</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="transpotationAssitance" inputId="transpotationAssitance" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="transpotationAssitance">Aux Transporte</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="accrued" inputId="accrued" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="accrued">Devengado</label>
+              </span>
+            </div>
           </div>
         </ng-template>
       </p-accordionTab>
