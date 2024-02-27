@@ -158,19 +158,19 @@
         <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
           <tr>
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.CardEmployee}}</td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{nomina.CardEmployee}}</b></td>
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.Employee}}</td>
-            <td class="text-center" >{{nomina.Ocupation}}</td>
+            <td class="text-center" ><b>{{nomina.Ocupation}}</b></td>
             <td class="text-center" >{{nomina.Days_Labor}}</td>
             <td class="text-center" >{{nomina.Value_Inability | number : '1.2-2'}}</td>
             <td class="text-center" >{{nomina.Value_HoursExtras | number : '1.2-2'}}</td>
             <td class="text-center" >{{nomina.Value_AuxTransport | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Remuneration | number : '1.2-2'}}</td>
+            <td class="text-center" ><b>{{nomina.Remuneration | number : '1.2-2'}}</b></td>
             <td class="text-center" >{{nomina.Eps | number : '1.2-2'}}</td>
             <td class="text-center" >{{nomina.Afp | number : '1.2-2'}}</td>
             <td class="text-center" >{{nomina.Saving | number : '1.2-2'}}</td>
             <td class="text-center" >{{nomina.Loan + nomina.Advance | number : '1.2-2'}}</td>
-            <td class="text-center textBlue" pFrozenColumn alignFrozen="right" [frozen]="true">{{10000 | number : '1.2-2'}}</td>
+            <td class="text-center textBlue" pFrozenColumn alignFrozen="right" [frozen]="true"><b>{{nomina.TotalPay | number : '1.2-2'}}</b></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">

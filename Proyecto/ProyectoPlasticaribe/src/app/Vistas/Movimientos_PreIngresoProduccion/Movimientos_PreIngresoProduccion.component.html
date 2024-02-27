@@ -33,8 +33,16 @@
         </span>
       </div>
 
+      <!--Fecha 1-->
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
+        <span class="p-float-label">
+          <p-calendar formControlName="rank" inputId="fecha" [(ngModel)]="date" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
+          <label for="fecha">Rango de Fechas</label>
+        </span>
+      </div>
+
       <!--OT-->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-1">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="ot" id="ot" [useGrouping]="false" />
           <label for="ot">OT</label>
@@ -42,7 +50,7 @@
       </div>
 
       <!--Item-->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-1">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
         <span class="p-float-label">
           <p-inputNumber formControlName="item" id="item" [useGrouping]="false" />
           <label for="item">Item</label>
@@ -60,22 +68,6 @@
         </span>
       </div>
 
-      <!--Fecha 1-->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-calendar formControlName="startDate" inputId="startDate" [showIcon]="true"></p-calendar>
-          <label for="startDate">Fecha Inicial</label>
-        </span>
-      </div>
-
-      <!--Fecha 2-->
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-2 col-xxl-2">
-        <span class="p-float-label">
-          <p-calendar formControlName="endDate" inputId="endDate" [showIcon]="true"></p-calendar>
-          <label for="endDate">Fecha Final</label>
-        </span>
-      </div>
-
     </div>
 
     <!--Botones-->
@@ -83,7 +75,6 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center" id="botones1">
         <button pButton class="p-button-danger" type="submit" label="Consultar" icon="pi pi-search"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearLabels()"></button>
-        <button pButton class="p-button-danger p-button-outlined" (click)="newPdf()" type="button" [disabled]="movements.length == 0" label="Exportar PDF" icon="pi pi-file-pdf"></button>
       </div>
     </div>
   </form>
@@ -110,44 +101,36 @@
     currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
     [rowHover]="true"
     [value]="movements"
-    dataKey="orden"
     [scrollable]="true"
     scrollHeight="50rem">
     <ng-template pTemplate="header">
       <tr class="font-size-16">
         <th></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'orden', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'rollo', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'id_Producto', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'producto', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'id_PreIngreso', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'usuario', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'fecha_Ingreso', 'contains')"></th>
+        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hora_Ingreso', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'cantidad', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'presentacion', 'contains')"></th>
-        <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'proceso', 'contains')"></th>
       </tr>
       <tr>
         <th class="text-center font-size-16">#</th>
-        <th class="text-center font-size-16">OT</th>
-        <th class="text-center font-size-16">Id Producto</th>
-        <th class="text-center font-size-16">Producto</th>
-        <th class="text-center font-size-16">Rollo</th>
-        <th class="text-center font-size-16">Cantidad</th>
-        <th class="text-center font-size-16">Presentación</th>
-        <th class="text-center font-size-16">Proceso</th>
-        <th class="text-center font-size-16">Fecha PreIngreso</th>
+        <th class="text-center font-size-16">Id Pre-Ingreso</th>
+        <th class="text-center font-size-16">Usuario</th>
+        <th class="text-center font-size-16">Fecha</th>
+        <th class="text-center font-size-16">Hora</th>
+        <th class="text-center font-size-16" pTooltip="Cantidad de rollos Preingresados" pTooltipPosition="top">Cant. Rollos</th>
+        <th class="text-center font-size-16">Ver PDF</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr>
         <td class="text-center">{{rowIndex + 1}}</td>
-        <td class="text-center">{{data.OT}}</td>
-        <td class="text-center">{{data.Item}}</td>
-        <td class="text-center">{{data.Referencia}}</td>
-        <td class="text-center">{{data.Rollo_Bagpro}}</td>
-        <td class="text-center">{{data.Cantidad | number : '1.2-2' }}</td>
-        <td class="text-center">{{data.Und}}</td>
-        <td class="text-center">{{data.Proceso}}</td>
-        <td class="text-center">{{data.Fecha_Ingreso}}</td>
+        <td class="text-center"><b>{{data.id_PreIngreso}}</b></td>
+        <td class="text-center">{{data.usuario}}</td>
+        <td class="text-center"><b>{{data.fecha_Ingreso | date : 'dd/MM/yyyy'}}</b></td>
+        <td class="text-center">{{data.hora_Ingreso}}</td>
+        <td class="text-center textBlue"><b>{{ data.cantidad | number }}</b></td>
+        <td class="text-center"><p-button icon="pi pi-file-pdf" [rounded]="true" severity="danger" (onClick)="viewPDF(data.id_PreIngreso)"></p-button></td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
@@ -157,9 +140,9 @@
     </ng-template>  
     <ng-template pTemplate="footer" >
       <tr id="totales">
-        <td colspan="5" class="text-right">Totales</td>
-        <td class="text-center">{{calculateTotal() | number}}</td>
-        <td colspan="3" class="text-center"></td>
+        <td colspan="5" class="text-right">Total Rollos Preingresados</td>
+        <td class="text-center textBlue">{{calculateTotal() | number}}</td>
+        <td colspan="1" class="text-center"></td>
       </tr>
     </ng-template>
   </p-table>

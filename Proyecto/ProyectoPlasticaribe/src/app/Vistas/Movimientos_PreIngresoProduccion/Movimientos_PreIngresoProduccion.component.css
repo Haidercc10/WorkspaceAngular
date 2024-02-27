@@ -65,4 +65,13 @@ span{
   box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 5%;
   }
+
+  p-button ::ng-deep .p-button.p-button-icon-only.p-button-rounded {
+    width: 2rem;
+    height: 2rem
+  }
+
+  ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.50rem 0.50rem;
+  }
   

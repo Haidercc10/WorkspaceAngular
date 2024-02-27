@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { modelDtPreEntregaRollos } from 'src/app/Modelo/modelDtPreEntregaRollo';
@@ -16,6 +16,10 @@ import { AppComponent } from 'src/app/app.component';
   selector: 'app-PreIngresoProduccion_Despacho',
   templateUrl: './PreIngresoProduccion_Despacho.component.html',
   styleUrls: ['./PreIngresoProduccion_Despacho.component.css']
+})
+
+@Injectable({
+  providedIn: 'root'
 })
 
 export class PreIngresoProduccion_DespachoComponent implements OnInit {
@@ -212,6 +216,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 
   createPDF(idPreIn: number) {
+    console.log(`1: ${1}`)
     this.detailsPreInService.GetInformactionAboutPreIn_ById(idPreIn).subscribe(data => {
       this.load = true;
       let title: string = `Pre Ingreso N° ${idPreIn}`;

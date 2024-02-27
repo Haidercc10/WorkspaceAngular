@@ -138,7 +138,7 @@
                 <td class="text-center">{{roll.numeroRollo_BagPro}}</td>
                 <td class="text-center">{{roll.prod_Id}}</td>
                 <td>{{roll.prod_Nombre}}</td>
-                <td class="text-center">{{ ['Sellado', 'Wiketiado'].includes(roll.proceso_Nombre) ? roll.cantidad : roll.peso_Neto | number: '1.2-2'}}</td>
+                <td class="text-center">{{ ['Paquete', 'Und'].includes(roll.presentacion) ? roll.cantidad : roll.peso_Neto | number: '1.2-2'}}</td>
                 <td class="text-center">{{roll.presentacion}}</td>
                 <td class="text-center">{{roll.fecha | date : 'dd/MM/YYYY'}}</td>
                 <td class="text-center">{{roll.proceso_Nombre}}</td>

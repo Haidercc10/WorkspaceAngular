@@ -29,5 +29,5 @@ export class DtPreEntregaRollosService {
 
   srvGuardar = (data : modelDtPreEntregaRollos): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho', data);
 
-  GetDataPreInProduction = (date1 : any, date2 : any, url : string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetallePreEntrega_RolloDespacho/GetDataPreInProduction/${date1}/${date2}${url}`);
+  GetPreInProduction = (date1 : any, date2 : any, url : string): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetallePreEntrega_RolloDespacho/GetPreInProduction/${date1}/${date2}${url}`);
 }

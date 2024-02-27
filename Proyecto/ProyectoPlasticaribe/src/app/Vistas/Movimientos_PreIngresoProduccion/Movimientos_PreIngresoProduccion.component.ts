@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -9,12 +9,14 @@ import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { AppComponent } from 'src/app/app.component';
+import { PreIngresoProduccion_DespachoComponent } from '../PreIngresoProduccion_Despacho/PreIngresoProduccion_Despacho.component';
 
 @Component({
   selector: 'app-Movimientos_PreIngresoProduccion',
   templateUrl: './Movimientos_PreIngresoProduccion.component.html',
   styleUrls: ['./Movimientos_PreIngresoProduccion.component.css']
 })
+
 export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   load : boolean = false;
   modeSelected: boolean;
@@ -29,7 +31,8 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   @ViewChild('dt') dt : Table | undefined;
   infoTable : any = [];
   medida : string = '';
- 
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  date : any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
 
   constructor(private AppComponent : AppComponent, 
     private frmBuild : FormBuilder, 
@@ -37,8 +40,8 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     private svcProducts : ProductoService, 
     private svcPreInProduction : DtPreEntregaRollosService, 
     private svcMsjs : MensajesAplicacionService, 
-    private svcPDF : CreacionPdfService, 
-    private svcBagpro : BagproService,) {
+    private cmpPreInProduction : PreIngresoProduccion_DespachoComponent,
+    ) {
     this.modeSelected = this.AppComponent.temaSeleccionado;
     this.initForm();
    }
@@ -54,8 +57,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     this.form = this.frmBuild.group({
       ot : [null,],
       process : [null,],
-      startDate : [null,],
-      endDate : [null,],
+      rank : [null,],
       item : [null,],
       reference : [null,],
     });
@@ -73,9 +75,9 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
 
   //. Cargar el proceso dependiendo el rol. 
   loadProcessByRol(){
-    if(this.rol == 7) this.form.patchValue({ process : 'EXT' });
-    else if(this.rol == 8) this.form.patchValue({ process : 'SELLA' });
-    else if(this.rol == 9) this.form.patchValue({ process : 'EMP' });
+    if([7,85].includes(this.rol)) this.form.patchValue({ process : 'EXT' });
+    else if([8,86].includes(this.rol)) this.form.patchValue({ process : 'SELLA' });
+    else if([9,87].includes(this.rol)) this.form.patchValue({ process : 'EMP' });
     else this.form.patchValue({ process : null });
   }
 
@@ -83,43 +85,25 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   searchMovements(){
     this.movements = [];
     this.infoTable = [];
-    let startDate : any = this.form.value.startDate;
-    let endDate : any = this.form.value.endDate;
-    let root : any = this.validateRoot(); 
+    let rank : any = this.form.value.rank;
+    let date1 : any = rank == null ? this.today : moment(this.form.value.rank[0]).format('YYYY-MM-DD');
+    let date2 : any = ['Fecha inválida', null, undefined, ''].includes(rank == null ? rank : rank[1]) ? this.today : moment(this.form.value.rank[1]).format('YYYY-MM-DD');
+     let root : any = this.validateRoot(); 
     this.load = true;
-    startDate == null ? startDate = moment().format('YYYY-MM-DD') : startDate = moment(startDate).format('YYYY-MM-DD');
-    endDate == null ? endDate = startDate : endDate = moment(endDate).format('YYYY-MM-DD');
 
-    this.svcPreInProduction.GetDataPreInProduction(startDate, endDate, root).subscribe(data => { 
-      data.forEach(x => { 
-        this.svcBagpro.GetInformactionProductionForTag(x.rollo).subscribe(dataBp => { this.loadDataTable(x, dataBp); }, 
-        error => {});
-      });
-      this.load = false; 
-    }, error => { 
-      this.svcMsjs.mensajeAdvertencia(`No se encontraron resultados de búsqueda`);
-      this.load = false; 
-    });
+    this.svcPreInProduction.GetPreInProduction(date1, date2, root).subscribe(data => { 
+      if(data.length > 0){
+        this.movements = data;
+        this.infoTable = data;
+        this.load = false; 
+      } else {
+        this.svcMsjs.mensajeAdvertencia(`No se encontraron resultados de búsqueda`);
+        this.load = false;
+      } 
+    }, error => {});
   }
 
-  //. Cargar datos de preingreso de producción en la tabla.
-  loadDataTable(dataApp : any, dataBagpro : any) {
-    let completeData : any = {
-      'OT' : dataApp.orden, 
-      'Item' : dataApp.id_Producto, 
-      'Referencia' : dataApp.producto, 
-      'Rollo' : dataApp.rollo, 
-      'Rollo_Bagpro' : dataBagpro[0].item,
-      'Cantidad' : dataApp.cantidad, 
-      'Und' : dataApp.presentacion, 
-      'Proceso' : dataApp.nombreProceso, 
-      'Fecha_Ingreso' : dataApp.fecha_Ingreso.replace('T00:00:00', ` - ${dataApp.hora_Ingreso}`),
-    }
-    this.movements.push(completeData);
-    this.infoTable.push(completeData);
-  }
-
-  //.
+  //.Validar la ruta que tendrá la consulta en el API
   validateRoot(){
     let process : any = this.form.value.process;
     let ot : any = this.form.value.ot;
@@ -134,6 +118,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     return root;
   }
 
+  //Función para limpiar campos
   clearLabels(){
     this.form.reset();
     this.movements = [];
@@ -141,10 +126,13 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     this.load = false;
   }
 
+  //. Función para cargar los procesos dependiendo el rol.
   getProcess = () => this.svcProcess.srvObtenerLista().subscribe(data => this.process = data.filter(x => ['EMP','SELLA','EXT'].includes(x.proceso_Id)));
 
+  //. Función para obtener el nombre de los items
   getItems = () => this.svcProducts.obtenerItemsLike(this.form.value.reference).subscribe(data => this.products = data);
 
+  //. Función para cargar la info del item dependiendo el que se elija.
   selectedItem(){
     this.getItems();
     this.form.patchValue({
@@ -153,165 +141,16 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     });
   }
 
-  //. Función para filtrar la tabla. 
+  //. Función para filtrar la tabla. (FILTRO)
   applyFilter($event, campo : any, valorCampo : string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     setTimeout(() => { if(this.dt.filteredValue) this.movements = this.dt!.filteredValue; }, 500); 
     if(!this.dt.filteredValue) this.movements = this.infoTable;  
   }
 
-  calculateTotal = () => this.movements.reduce((a, b) => a + b.Cantidad, 0);
+  //Función para calcular el total de rollos pre ingresados
+  calculateTotal = () => this.movements.reduce((a, b) => a + b.cantidad, 0);
 
-  newPdf(){
-    let data : any = this.movements;
-    let title : string = `Reporte Preingreso Producción`;
-    let content: any[] = this.contentPDF(data);
-    this.svcPDF.formatoPDF(title, content);
-  }
-
-  //Adición de contenido al pdf. 
-  contentPDF(data : any) : any {
-    let content : any[] = [];
-    let groupedInformation : any = this.groupedInfo(data);
-    let detailedInformation : any = this.detailedInfo(data);
-    content.push(this.titleInfoConsolidated());
-    content.push(this.headerTableConsolidated(groupedInformation));
-    content.push(this.tableTotalsConsolidated());
-    content.push(this.titleInfoDetails());
-    content.push(this.headerTableDetails(detailedInformation));
-    return content;
-  }
-
-  //Titulo de información consolidada en el pdf.
-  titleInfoConsolidated(){
-    return {
-      text: `Información consolidada de Preingreso\n `,
-      alignment: 'center',
-      style: 'header', 
-      fontSize : 10, 
-      bold : true,
-    };
-  }
-
-  //Encabezado de tabla consolidada en el pdf.
-  headerTableConsolidated(data : any) {
-    let columns : any[] = ['OT', 'Item', 'Referencia', 'Rollos', 'Cantidad', 'Und'];
-    let widths: Array<string> = ['10%', '10%', '50%', '10%', '10%', '10%'];
-    return {
-      margin: [0, 0, 0, 10],
-      
-      table : {
-        headerRows : 1,
-        widths : widths, 
-        body : this.builderTableBody(data, columns),
-      },
-      fontSize : 8,
-      layout : {
-        fillColor : function(rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null; 
-        },
-      }
-    }
-  }
-
-  //Información consolidada de la orden agrupada por OT en el pdf..
-  groupedInfo(data : any){
-    let info : any = [];
-    data.forEach(x => {
-      if(!info.map(y => y.OT).includes(x.OT)) {
-        let countOrders : number = data.filter(z => z.OT == x.OT).length;
-        let total : number = data.filter(z => z.OT == x.OT).reduce((a, b) => a + b.Cantidad, 0);
-        let object : any = {
-          'OT' : x.OT,
-          'Item' : x.Item, 
-          'Referencia' : x.Referencia,
-          'Rollos' : countOrders,
-          'Cantidad' : this.formatonumeros(total.toFixed(2)),
-          'Und' : x.Und 
-        }
-        info.push(object);
-      }
-    });
-    return info;
-  }
-
-  //.Función que retornará el total de kilos, unidades y paquetes consolidados en el pdf.
-  tableTotalsConsolidated(){
-    let info : any = [];
-    info.push([
-      { margin: [0, 1, 0, 15], border: [false, true, false, false], alignment: 'right', fontSize: 9, bold: true, text: `Cantidad Total KLS: ${ this.formatonumeros(this.calculateKls())} | UND: ${ this.formatonumeros(this.calculateUnds())} | PAQ: ${ this.formatonumeros(this.calculatePacks())}`, }
-    ])
-    return info;
-  }
-  
-  //Titulo de información consolidada en el pdf.
-  titleInfoDetails(){
-    return {
-      text: `Información detallada de Preingreso\n `,
-      alignment: 'center',
-      style: 'header', 
-      fontSize : 10, 
-      bold : true,
-    };
-  }
-
-  //Encabezado de tabla consolidada en el pdf.
-  headerTableDetails(data :any) {
-    let columns : any[] = ['OT', 'Item', 'Referencia', 'Rollo', 'Cantidad', 'Und', 'Proceso', 'Fecha Ingreso',];
-    let widths: Array<string> = ['6%','6%','42%','7%','7%','7%','8%','17%'];
-    return {
-      margin: [0, 0, 0, 0],
-      table : {
-        headerRows : 1,
-        widths : widths, 
-        body : this.builderTableBody(data, columns),
-      },
-      fontSize : 8,
-      layout : {
-        fillColor : function(rowIndex) {
-          return (rowIndex == 0) ? '#DDDDDD' : null; 
-        },
-      }
-    }
-  }
-
-  //Información detallada del preingreso de producción en el pdf.
-  detailedInfo(data : any){
-    let info : any = [];
-    data.forEach(x => {
-      const completeData : any = {
-        'OT' : x.OT, 
-        'Item' : x.Item, 
-        'Referencia' : x.Referencia, 
-        'Rollo' : x.Rollo_Bagpro, 
-        'Cantidad' : x.Cantidad, 
-        'Und' : x.Und, 
-        'Proceso' : x.Proceso, 
-        'Fecha Ingreso' : x.Fecha_Ingreso,
-      }
-      info.push(completeData);
-    });
-    return info;
-  }
-
-  //Construir tabla.
-  builderTableBody(data, columns) {
-    var body = [];
-    body.push(columns);
-    data.forEach(function (row) {
-      var dataRow = [];
-      columns.forEach((column) => dataRow.push(row[column].toString()));
-      body.push(dataRow);
-    });
-    return body;
-  }
-
-  //. Calcula la cantidades en Kilos en la tabla detallada por OT y presentación 
-  calculateKls = () => this.movements.filter(x => x.Und == 'Kg').reduce((a, b) => a + b.Cantidad, 0)
-
-  //. Calcula la cantidades en Unidades en la tabla detallada por OT y presentación 
-  calculateUnds = () => this.movements.filter(x => x.Und == 'Und').reduce((a, b) => a + b.Cantidad, 0)
-
-  //. Calcula la cantidades en Paquetes en la tabla detallada por OT y presentación 
-  calculatePacks = () => this.movements.filter(x => x.Und == 'Paquete').reduce((a, b) => a + b.Cantidad, 0)
+  //Función que mostrará el formato PDF.
+  viewPDF = (id : number) => this.cmpPreInProduction.createPDF(id);
 }

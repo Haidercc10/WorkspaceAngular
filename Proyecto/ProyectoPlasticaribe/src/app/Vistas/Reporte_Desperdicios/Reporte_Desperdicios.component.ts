@@ -115,7 +115,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     } else this.msj.mensajeAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
   }
 
-  /** Función que consultará según los campos de busqueda diferentes de vacio. */
+  /** Función que consultará según los campos de busqueda diferentes de vacio. (FECHAS)*/
   Consultar() {
     let fecha : any = this.formFiltros.value.RangoFechas;
     let fecha1 : any = fecha == null ? this.today : moment(this.formFiltros.value.RangoFechas[0]).format('YYYY-MM-DD');
