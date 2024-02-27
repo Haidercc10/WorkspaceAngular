@@ -414,9 +414,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       if (this.datosOrdenTrabajo.length > 0) {
         if (this.formDatosProduccion.valid) {
           if (this.formDatosProduccion.value.maquina > 0) {
-            if (this.formDatosProduccion.value.pesoNeto > 0) this.guardarProduccion();
+            if (this.formDatosProduccion.value.pesoNeto > 1) this.guardarProduccion();
             else {
-              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a cero (0)!`);
+              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a uno (1)!`);
               this.cargando = false;
             }
           } else {
