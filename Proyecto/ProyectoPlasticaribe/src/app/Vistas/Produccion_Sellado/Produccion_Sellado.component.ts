@@ -397,7 +397,7 @@ export class Produccion_SelladoComponent implements OnInit {
   //Función que guarda el registro del rollo en la BD
   guardarRegistroEntrada(entrada: any) {
     this.svcProdProcesos.Post(entrada).subscribe(data => {
-      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, 0, data.operario1_Id, data.datos_Etiqueta);
+      this.crearEtiqueta(data.numero_Rollo, data.peso_Bruto, data.cantidad, data.presentacion, false, data.operario1_Id, data.datos_Etiqueta);
       setTimeout(() => {
         if (entrada.Desviacion < 0) this.svcMsjs.mensajeAdvertencia(`¡La cantidad pesada es menor a la esperada!`, `!Registro de rollo de producción creado con éxito¡`, 1200000);
         else this.svcMsjs.mensajeConfirmacion('Confirmación', `Registro de rollo de producción creado con éxito!`);
@@ -410,13 +410,13 @@ export class Produccion_SelladoComponent implements OnInit {
   }
 
   //Función que crea el pdf de la etiqueta
-  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion : number, operador : any, datosEtiqueta: string = '') {
-    let dataRollo: any = this.produccion.find(x => x.bulto == rollo);
+  crearEtiqueta(rollo: any, cantKg: number, cantUnd: number, medida: any, reimpresion : boolean, operador : any, datosEtiqueta: string = '') {
+    let dataRollo: any = reimpresion ? this.produccion.find(x => x.bulto == rollo).proceso : this.procesos.find(x => x.Id == this.formSellado.value.proceso).Nombre;
     let operario : any;
-    if(reimpresion == 0) operario = this.operarios.filter(x => x.usua_Id == operador);
-    else if(reimpresion == 1) operario = this.operarios.filter(x => x.usua_Nombre == operador);
+    if(!reimpresion) operario = this.operarios.filter(x => x.usua_Id == operador);
+    else if(reimpresion) operario = this.operarios.filter(x => x.usua_Nombre == operador);
 
-    this.svcBagPro.GetEtiquetaBagpro(rollo, reimpresion).subscribe(data => {
+    this.svcBagPro.GetEtiquetaBagpro(rollo, !reimpresion ? 0 : 1).subscribe(data => {
       let etiqueta: modelTagProduction = {
         'client': this.ordenesTrabajo[0].cliente,
         'item': this.ordenesTrabajo[0].id_Producto,
@@ -433,10 +433,10 @@ export class Produccion_SelladoComponent implements OnInit {
         'reel': data[0].bulto,
         'presentationItem1': 'Kg',
         'presentationItem2': medida != 'Kg' ? `${medida}(s)` : 'Kg',
-        'productionProcess': (dataRollo.proceso).toUpperCase(),
+        'productionProcess': (dataRollo).toUpperCase(),
         'showNameBussiness': true,
         'operator': operario[0].usua_Nombre,
-        'copy': reimpresion == 0 ? false : true,
+        'copy': reimpresion,
         'dataTagForClient': datosEtiqueta == '' ? `${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Ancho} X ${this.ordenesTrabajo[0].selladoCorte_Etiqueta_Largo}` : datosEtiqueta,
         showDataTagForClient: this.formSellado.value.mostratDatosProducto,
       }
