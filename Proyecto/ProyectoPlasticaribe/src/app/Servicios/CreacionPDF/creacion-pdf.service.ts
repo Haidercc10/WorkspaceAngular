@@ -354,8 +354,8 @@ export class TagProduction_2 {
         table: {
           widths: ['100%'],
           body: [
-            [{ border: [false, false, false, false], bold: true, alignment: 'center', fontSize: 15, text: 'PLASTICARIBE S.A.S' }],
-            [{ border: [false, false, false, false], alignment: 'center', fontSize: 8, margin: [0, -3, 0, 0], text: 'CALLE 42 #52-105 BARRANQUILLA' }]
+            [{ border: [false, false, false, false], bold: true, alignment: 'center', fontSize: 15, margin: [0, -5, 0, 0], text: 'PLASTICARIBE S.A.S' }],
+            [{ border: [false, false, false, false], alignment: 'center', fontSize: 8, margin: [0, -5, 0, -5], text: 'CALLE 42 #52-105 BARRANQUILLA' }]
           ]
         }
       },
@@ -387,14 +387,14 @@ export class TagProduction_2 {
   private dataOrderAndItem(dataTag: modelTagProduction): any[] {
     return [
       {
-        margin: [0, 3],
+        margin: [-3, 3],
         columns: [
           { width: '25%', text: 'OT:', bold: true, fontSize: 10, alignment: 'left' },
           { width: '75%', text: (dataTag.orderProduction), fontSize: 10, alignment: 'left' },
         ]
       },
       {
-        margin: [0, 3],
+        margin: [-3, 3],
         columns: [
           { width: '35%', text: 'ITEM:', bold: true, fontSize: 10, alignment: 'left' },
           { width: '65%', text: dataTag.item, fontSize: 10, alignment: 'left' },
@@ -461,8 +461,21 @@ export class TagProduction_2 {
       return [imagePDF, {}];
     } else {
       let imagePDF = { image: referenceWike, width: 170, height: size, colSpan: 2, alignment: 'center' };
+      // let imagePDF = { image: `data:image/png;base64,${this.getBase64Image()}`, width: 170, height: size, colSpan: 2, alignment: 'center' };
       return [imagePDF, {}];
     }
+  }
+
+  private getBase64Image(): string {
+    let img = document.createElement('img');
+    document.body.appendChild(img);
+    img.src = 'assets/Referencia Wicket/Etiqueta Wicket.png';
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    let dataURL = canvas.toDataURL("image/png");
+    document.body.appendChild(canvas);
+    return dataURL.replace(/^data:image\/?[A-z]*;base64,/,'');
   }
 
   private sizeBarcode(dataTag: modelTagProduction): number {
@@ -485,7 +498,7 @@ export class TagProduction_2 {
     let roundedquantity = Math.round(quantity);
     let finalQuantity: string = quantity == roundedquantity ? `${roundedquantity}` : quantity.toFixed(2);
     let size: number = finalQuantity.length > 6 ? 18 : finalQuantity.length > 8 ? 20 : 22;
-    return { text: `${this.formatNumbers((finalQuantity))}`, bold: true, fontSize: size, alignment: 'center', margin: [0, 5] };
+    return { text: `${this.formatNumbers((finalQuantity))}`, bold: true, fontSize: size, alignment: 'center', margin: [-10, 5] };
   }
 
   private presentationsTag(dataTag: modelTagProduction): any[] {
@@ -504,7 +517,7 @@ export class TagProduction_2 {
 
   private opertaros(dataTag): Array<any> {
     return [
-      { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: 9 },
+      { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.operator.length > 28 ? 7 : 9, margin: [-5, 0] },
       {},
     ]
   }
