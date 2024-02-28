@@ -31,6 +31,7 @@ function createWindow() {
                 paperSize: 'PLASTICARIBE',
                 orientation: 'landscape'
             }
+            
             print.print(pdfPath, options).then(log.info(pdfPath)).catch(error => log.error(error));
         });
     });
