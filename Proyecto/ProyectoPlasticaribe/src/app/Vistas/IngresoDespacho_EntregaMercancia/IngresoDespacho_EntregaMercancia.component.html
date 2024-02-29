@@ -6,7 +6,7 @@
   <div class="col-sm-12 col-md-2">
     <span class="p-float-label">
       <input type="text" id="preInBarsCode" pInputText autocomplete="off" pAutoFocus [autofocus]="true" [(ngModel)]="barCode" (keyup.enter)="validateUbicationSelected()"/>
-      <label for="Rollo"></label>
+      <label for="preInBarsCode">N° Entrada Mercancia</label>
     </span>
   </div>
 
@@ -37,6 +37,10 @@
       <label for="cube">Cubos</label>
     </span>
   </div>
+</div>
+
+<div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+  <button pButton class="p-button-secondary mx-2" id="limpiar" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
 </div>
 
 <div class="my-5">

@@ -73,6 +73,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
 
   clearFields() {
     this.barCode = null;
+    this.dataSearched = [];
     this.ubicationsStorehouse = [];
     this.ubicationSelected = null;
     this.subUbicationsStorehouse = [];
@@ -207,8 +208,8 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
 
   PutDelivered_Avaible(idEntrace: number) {
     this.produccionProcessService.PutDelivered_Avaible(idEntrace).subscribe(() => {
-      this.clearFields();
-      this.msg.mensajeConfirmacion(`¡Registro Exitoso!`, `¡!`);
+      this.barCode = null;
+      this.msg.mensajeConfirmacion(`¡Registro Exitoso!`, `¡Se ingresaron exitosamente todos los rollos/bultos!`);
     }, (error: HttpErrorResponse) => this.errorMessage(`¡Ocurrió un error al actualizar el estado de los rollos/bultos!`, error));
   }
 
