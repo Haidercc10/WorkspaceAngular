@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { X } from '@fullcalendar/core/internal-common';
+import { info } from 'console';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
@@ -44,7 +46,7 @@ export class Reporte_NominaComponent implements OnInit {
 
   ngOnInit() {
     this.loadAreas();
-    this.loadTest();
+    //this.loadTest();
     this.exportToExcel();
   }
 
@@ -65,7 +67,6 @@ export class Reporte_NominaComponent implements OnInit {
   loadAreas() {
     this.svAreas.srvObtenerLista().subscribe(data => { this.areas = data.filter(x => [1,3,4,6,7,8,9,10,11,12,19,20,21,22,25,28,29,30,31,32].includes(x.area_Id)); }, () => this.msj.mensajeError(`Error al cargar las áreas`)); 
   } 
-
   
   //.Función que limpiará los campos del formulario y los datos del reporte
   clearFields(){
@@ -75,36 +76,19 @@ export class Reporte_NominaComponent implements OnInit {
 
   //.Función que cargará el reporte de nomina.
   searchPayRoll(){
+    this.load = true;
     let fmt : string = 'YYYY-MM-DD';
     let dates : any = this.form.value.dates;
     let date1 : any = dates == null ? this.today : moment(this.form.value.dates[0]).format(fmt);
     let date2 : any = ['Fecha inválida', null, undefined, ''].includes(dates == null ? dates : dates[1]) ? this.today : moment(this.form.value.dates[1]).format(fmt);
   
-    this.svPayRoll.getPayroll(date1, date2, this.urlAPI()).subscribe(data => { this.dataReport = data; }, error => {
+    this.svPayRoll.getReportPayroll(date1, date2, this.urlAPI()).subscribe(data => { 
+      if (data.length > 0) { this.dataReport = data; console.log(data); }
+      else this.msj.mensajeAdvertencia(`No se encontraron resultados de búsqueda!`);
+      this.load = false;
+    }, error => {
       this.msj.mensajeError(`Error al cargar el reporte`, `Status: ${error.status} | Message: ${console.error()}`);
-    });
-  }
-
-  loadTest(){
-    this.dataReport.push({
-      'IdEmployee' : 1234567890,
-      'CardEmployee' : 1234567890,
-      'Employee' : 'PRUEBA PRUEBA PRUEBA PRUEBA',
-      'Rol' : 1,
-      'Ocupation' : 'OPERARIO SELLADO',
-      'IdArea' : 1,
-      'Area' : 'SELLADO',
-      'Days_Labor' : 8,
-      'Value_Inability' : 0,
-      'Value_HoursExtras' : 0,
-      'Value_AuxTransport' : 0,
-      'Remuneration' : 100000,
-      'Eps' : 13000,
-      'Afp' : 13000,
-      'Saving' : 20000,
-      'Loan' : 5000,
-      'Advance' : 50000,
-      'TotalPay' : 98000,
+      this.load = false;
     });
   }
 
@@ -143,37 +127,56 @@ export class Reporte_NominaComponent implements OnInit {
   //Función para filtrar la tabla de empleados.
   applyFilter = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
-  //Función para calcular el total de la nomina.
-  calculateTotal(){}
+  //Funciones para calcular totales de la nomina.
+  calcTotalDaysPay = () => this.dataReport.reduce((a, b) => a + b.payRoll.valorDiasPagar, 0);T
+
+  calcTotalInabilities = () => this.dataReport.reduce((a, b) => a + (b.payRoll.valorIncapEG + b.payRoll.valorIncapAT + b.payRoll.valorIncapPATMAT), 0);
+
+  calcTotalAditionals = () => this.dataReport.reduce((a, b) => a + b.payRoll.valorTotalADCComp, 0);
+
+  calcTotalAuxTransport = () => this.dataReport.reduce((a, b) => a + b.payRoll.auxTransporte, 0);
+
+  calcTotalRemunerations = () => this.dataReport.reduce((a, b) => a + b.payRoll.devengado, 0);
+
+  calcTotalEps = () => this.dataReport.reduce((a, b) => a + b.payRoll.eps, 0);
+
+  calcTotalAfp = () => this.dataReport.reduce((a, b) => a + b.payRoll.afp, 0);
+
+  calcTotalSaving = () => this.dataReport.reduce((a, b) => a + b.payRoll.ahorro, 0);
+
+  calcTotalLoan_Advance = () => this.dataReport.reduce((a, b) => a + (b.payRoll.prestamo + b.payRoll.anticipo), 0);
+
+  calcTotalPayRoll = () => this.dataReport.reduce((a, b) => a + b.payRoll.totalPagar, 0);
   
   //Función para exportar el reporte a excel.
   exportToExcel(){
     if(this.dataReport.length > 0) {
       this.load = true;
       setTimeout(() => { this.loadSheetAndStyles(); }, 2000);
-    } else this.msj.mensajeAdvertencia(`No hay datos para exportar`);
+    } else this.msj.mensajeAdvertencia(`No hay datos para exportar`, `Debe haber al menos un registro en la tabla!`);
   }
 
   //Función que cargará la hoja de cálculo y los estilos.
   loadSheetAndStyles(){ 
-    let title : any = `Reporte de Nomina desde ${this.form.value.dates} hasta ${this.form.value.dates}`;  
+    let title : any = `Reporte Nomina de ${moment(this.form.value.dates[0]).format('DD-MM-YYYY') } a ${moment(this.form.value.dates[1]).format('DD-MM-YYYY')}`;  
     let fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } };
     let border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }, };
     let font = { name: 'Calibri', family: 4, size: 11, bold: true };
     let alignment = { vertical: 'middle', horizontal: 'center', wrapText: true};
     let workbook = this.svExcel.formatoExcel(title, true);
 
-    this.addNewSheet(workbook, title, fill, border, font, alignment, this.dataReport);
+    this.addNewSheet(workbook, title, fill, border, font, alignment);
     this.svExcel.creacionExcel(title, workbook);
     this.load = false;
   }
 
   //Función para agregar una nueva hoja de calculo.
-  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any, data : any){
-    let fontTitle = { name: 'Calibri', family: 4, size: 20, bold: true };
+  addNewSheet(wb : any, title : any, fill : any, border : any, font : any, alignment : any){
+    let fontTitle = { name: 'Calibri', family: 4, size: 15, bold: true };
     let worksheet : any = wb.worksheets[0];
     this.loadStyleTitle(worksheet, title, fontTitle, alignment);
     this.loadHeader(worksheet, fill, border, font, alignment);
+    this.loadInfoExcel(worksheet, this.dataExcel(), border,  alignment);
   }
 
   //Cargar estilos del titulo de la hoja.
@@ -185,23 +188,38 @@ export class Reporte_NominaComponent implements OnInit {
 
   //Función para cargar los titulos de el header y los estilos.
   loadHeader(ws : any, fill : any, border : any, font : any, alignment : any){
-    let columnsAlphabetize1 : any = ['A5','B5','C5','D5','E5','F5','G5','H5','I5','J5','K5','L5','M5','N5','O5','P5','Q5','R5','S5','T5','U5','V5','W5','X5','Y5','Z5'] 
-    let columnsAlphabetize2 : any = ['AA5','AB5','AC5','AD5','AE5','AF5','AG5','AH5','AI5','AJ5','AK5','AL5','AM5','AN5','AO5','AP5','AQ5','AR5','AS5','AT5','AU5','AV5','AW5','AX5','AY5', 'AZ5', 'BA5']; 
-    let rowHeader : any = columnsAlphabetize1.concat(columnsAlphabetize2);
+    let rowHeader : any = ['A6','B6','C6','D6','E6','F6','G6','H6','I6','J6','K6','L6','M6','N6','O6','P6','Q6','R6','S6','T6','U6','V6','W6','X6','Y6','Z6','AA6','AB6','AC6','AD6','AE6','AF6','AG6','AH6','AI6','AJ6','AK6','AL6','AM6','AN6','AO6','AP6','AQ6','AR6','AS6','AT6','AU6','AV6','AW6','AX6','AY6', 'AZ6', 'BA6']; 
+    ws.addRow([]);
     ws.addRow(this.loadFieldsHeader());
     
     rowHeader.forEach(x => ws.getCell(x).fill = fill);
     rowHeader.forEach(x => ws.getCell(x).alignment = alignment);
     rowHeader.forEach(x => ws.getCell(x).border = border);
     rowHeader.forEach(x => ws.getCell(x).font = font);
-    
     ws.mergeCells('A1:BA3');
-    this.loadMergeCells(ws)
+
+    this.loadMergeCells(ws, alignment, border, font);
     this.loadSizeHeader(ws);
   }
 
-  loadMergeCells(ws : any){
-    let cells : any = ['', '', '', '', ''];
+  //Función que combinará las filas que sean necesarias
+  loadMergeCells(ws : any, alignment : any, border : any, font : any){
+    let cells : any = ['A5:G5', 'H5:I5', 'J5:M5', 'N5:S5', 'T5:AI5', 'AK5:AM5', 'AO5:AT5', 'AU5:AV5', 'AW5:AX5', 'AY5:AZ5'];
+    let subtitles : any = ['INFORMACIÓN EMPLEADO', 'PERIODO', 'DIAS/HORAS/VALOR', 'INCAPACIDADES', 'HORAS EXTRAS/ADICIONALES', 'PRODUCTIVIDAD', 'DEDUCCIONES', 'EVENTUALIDADES', 'VALORES', 'NOMINA'];
+    let emptys : any = ['AJ5', 'AN5', 'BA5']
+    let index : number = 0;
+
+    emptys.forEach(e => { ws.getCell(e).border = border; });
+    
+    cells.forEach(c => { 
+      ws.mergeCells(c);
+      ws.getCell(`${c.slice(0, c.indexOf(':'))}`).value = subtitles[index]; 
+      ws.getCell(`${c.slice(0, c.indexOf(':'))}`).font = font;
+      ws.getCell(`${c.slice(0, c.indexOf(':'))}`).alignment = alignment;
+      ws.getCell(`${c.slice(0, c.indexOf(':'))}`).border = border;
+      index++;
+    });
+    ws.getCell('A1').value = ``;
   }
 
   //Función para cargar el tamaño y el alto de las columnas del header.
@@ -209,26 +227,46 @@ export class Reporte_NominaComponent implements OnInit {
     [8,9].forEach(x => ws.getColumn(x).width = 12);
     [10].forEach(x => ws.getColumn(x).width = 9);
     [11,12,14,16,18,22,28,30,32].forEach(x => ws.getColumn(x).width = 7);
-    [2,4,6,7,13,15,17,19,21,23,25,27,29,31,33,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52].forEach(x => ws.getColumn(x).width = 16);
+    [2,6,7,13,15,17,19,21,23,25,27,29,31,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52].forEach(x => ws.getColumn(x).width = 16);
     [1,5,20,24,26].forEach(x => ws.getColumn(x).width = 8);
     [3,53].forEach(x => ws.getColumn(x).width = 50);
+    [4,51,52].forEach(x => ws.getColumn(x).width = 25);
     [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,37,38,39,40,42,43,44,45,46,47,48,49,50,51,52,53].forEach(x => ws.getColumn(x).height = 40);
   }
-  
-  //.Función para cargar la info al documento excel. 
-  loadInfoExcel(){
+
+  //
+  loadInfoExcel(ws : any, data : any, border : any, alignment : any){
+    let formatNumber: Array<number> = [7,13,15,17,19,21,23,25,27,29,31,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50];
+    let contador : any = 7;
+    let row : any = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY', 'AZ', 'BA']; 
+
+    formatNumber.forEach(x => ws.getColumn(x).numFmt = '""#,##0.00;[Red]\-""#,##0.00');
+    data.forEach(x => {
+      ws.addRow(x);
+      row.forEach(r => {
+        ws.getCell(`${r}${contador}`).border = border;
+        ws.getCell(`${r}${contador}`).font = { name: 'Calibri', family: 4, size: 10 };
+        ws.getCell(`${r}${contador}`).alignment = alignment;
+      });
+      contador++
+    });
+  }
+
+  //.Función que contendrá la info al documento excel. 
+  dataExcel(){
     let info : any = [];
+    let count : number = 1;
     this.dataReport.forEach(x => {
       info.push([
-        x.length + 1,
+        count++,
         x.user.usua_Cedula,
         x.user.usua_Nombre,
         x.role.rolUsu_Nombre,  
-        x.areas.area_nombre,
         '',
+        x.areas.area_Nombre,
         x.payRoll.salarioBase,
-        x.payRoll.periodoInicio,
-        x.payRoll.periodoFin,
+        x.payRoll.periodoInicio.replace('T00:00:00', ''),
+        x.payRoll.periodoFin.replace('T00:00:00', ''),
         x.payRoll.diasAusente,
         x.payRoll.diasPagar,
         x.payRoll.horasPagar,
@@ -270,9 +308,8 @@ export class Reporte_NominaComponent implements OnInit {
         x.payRoll.dctos,  
         x.payRoll.deducciones,
         x.payRoll.totalPagar,
-        x.payRoll.totalPagar,
+        x.payRollType.tpNomina_Nombre.replace('NOMINA ', ''),
         x.status.estado_Nombre,
-        x.payRollType.tpNomina_Nombre,
         x.payRoll.novedades,
       ]);
     });

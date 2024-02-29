@@ -75,6 +75,8 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="searchPayRoll()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"> </button>
+          <button (click)="exportToExcel()" pButton id="exportExcel" class="p-button-success p-button-outlined" type="button" [disabled]="dataReport.length == 0" label="Exportar Excel" icon="pi pi-file-excel"></button>
+
         </div>
       </div>
       
@@ -109,7 +111,7 @@
             <th style="font-weight: 800;" class="text-center" colspan="3"><i class="pi pi-users"></i> Información Empleado</th>
             <th style="font-weight: 800;" class="text-center textGreen" colspan="5"><i class="pi pi-dollar"></i> Devengos</th>
             <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calculator"></i> Deducciones</th>
-            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center textBlue"><i class="pi pi-money-bill"></i> Pagos</th>
           </tr>
           <tr>
             <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
@@ -158,33 +160,34 @@
         <ng-template pTemplate="body" let-nomina let-rowIndex="rowIndex">
           <tr>
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
-            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{nomina.CardEmployee}}</b></td>
-            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.Employee}}</td>
-            <td class="text-center" ><b>{{nomina.Ocupation}}</b></td>
-            <td class="text-center" >{{nomina.Days_Labor}}</td>
-            <td class="text-center" >{{nomina.Value_Inability | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Value_HoursExtras | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Value_AuxTransport | number : '1.2-2'}}</td>
-            <td class="text-center" ><b>{{nomina.Remuneration | number : '1.2-2'}}</b></td>
-            <td class="text-center" >{{nomina.Eps | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Afp | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Saving | number : '1.2-2'}}</td>
-            <td class="text-center" >{{nomina.Loan + nomina.Advance | number : '1.2-2'}}</td>
-            <td class="text-center textBlue" pFrozenColumn alignFrozen="right" [frozen]="true"><b>{{nomina.TotalPay | number : '1.2-2'}}</b></td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{nomina.user.usua_Cedula}}</b></td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{nomina.user.usua_Nombre}}</td>
+            <td class="text-center" ><b>{{nomina.role.rolUsu_Nombre}}</b></td>
+            <td class="text-center" >{{nomina.payRoll.valorDiasPagar | number : '1.2-2'}}</td>
+            <td class="text-center" >{{(nomina.payRoll.valorIncapEG + nomina.payRoll.valorIncapAT + nomina.payRoll.valorIncapPATMAT) | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.payRoll.valorTotalADCComp | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.payRoll.auxTransporte | number : '1.2-2'}}</td>
+            <td class="text-center" ><b>{{nomina.payRoll.devengado | number : '1.2-2'}}</b></td>
+            <td class="text-center" >{{nomina.payRoll.eps | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.payRoll.afp | number : '1.2-2'}}</td>
+            <td class="text-center" >{{nomina.payRoll.ahorro | number : '1.2-2'}}</td>
+            <td class="text-center" >{{ (nomina.payRoll.prestamo + nomina.payRoll.anticipo) | number : '1.2-2'}}</td>
+            <td class="text-center textBlue" pFrozenColumn alignFrozen="right" [frozen]="true"><b>{{nomina.payRoll.totalPagar | number : '1.2-2'}}</b></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td class="text-center" colspan="5" class="text-right">Totales</td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center" id="total">{{calculateTotal()}} </td>
-            <td class="text-center textBlue" id="total" pFrozenColumn alignFrozen="right" [frozen]="true">{{calculateTotal()}} COP</td>
+            <td class="text-center" colspan="4" class="text-right">Totales</td>
+            <td class="text-center" id="total">{{ calcTotalDaysPay() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalInabilities() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalAditionals() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalAuxTransport() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalRemunerations() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalEps() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalAfp() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalSaving() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total">{{ calcTotalLoan_Advance() | number : '1.2-2' }} </td>
+            <td class="text-center textBlue" id="total" pFrozenColumn alignFrozen="right" [frozen]="true">{{ calcTotalPayRoll() | number : '1.2-2' }} COP</td>
           </tr>
         </ng-template>
       </p-table>

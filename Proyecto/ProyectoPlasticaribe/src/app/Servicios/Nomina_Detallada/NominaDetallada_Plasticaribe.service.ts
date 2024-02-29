@@ -11,5 +11,5 @@ export class NominaDetallada_PlasticaribeService {
 
     constructor(private http : HttpClient) { }
 
-    getPayroll = (date1 : any, date2 : any, route : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/NominaDetallada_Plasticaribe/getPayroll/${date1}/${date2}${route}`);
+    getReportPayroll = (date1 : any, date2 : any, route : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/NominaDetallada_Plasticaribe/getReportPayroll/${date1}/${date2}${route}`);
 }
