@@ -114,6 +114,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   getStockDeliveredNotAvaible() {
     this.stockService.GetStockDelivered_NoAvaible().subscribe(data => {
       this.stockDelivered_NoAvaible = this.fillStockInformation(data);
+      this.fillComparativeStock(data, false);
     });
   }
 

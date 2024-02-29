@@ -21,8 +21,8 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   load : boolean = false;
   modeSelected: boolean;
   movements : any[] = [];
-  form !: FormGroup; 
-  process : any = []; 
+  form !: FormGroup;
+  process : any = [];
   products : any = [];
   storage_Id: number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre: any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -34,12 +34,12 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   date : any | undefined = [new Date(), new Date()] //Variable que guardará la fecha seleccionada en el campo de rango de fechas
 
-  constructor(private AppComponent : AppComponent, 
-    private frmBuild : FormBuilder, 
-    private svcProcess : ProcesosService, 
-    private svcProducts : ProductoService, 
-    private svcPreInProduction : DtPreEntregaRollosService, 
-    private svcMsjs : MensajesAplicacionService, 
+  constructor(private AppComponent : AppComponent,
+    private frmBuild : FormBuilder,
+    private svcProcess : ProcesosService,
+    private svcProducts : ProductoService,
+    private svcPreInProduction : DtPreEntregaRollosService,
+    private svcMsjs : MensajesAplicacionService,
     private cmpPreInProduction : PreIngresoProduccion_DespachoComponent,
     ) {
     this.modeSelected = this.AppComponent.temaSeleccionado;
@@ -49,7 +49,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.getProcess();
-    setTimeout(() => { this.loadProcessByRol(); }, 500); 
+    setTimeout(() => { this.loadProcessByRol(); }, 500);
   }
 
   //. Inicializa el formulario
@@ -62,7 +62,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
       reference : [null,],
     });
   }
-  
+
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage() {
     this.storage_Id = this.AppComponent.storage_Id;
@@ -73,7 +73,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
-  //. Cargar el proceso dependiendo el rol. 
+  //. Cargar el proceso dependiendo el rol.
   loadProcessByRol(){
     if([7,85].includes(this.rol)) this.form.patchValue({ process : 'EXT' });
     else if([8,86].includes(this.rol)) this.form.patchValue({ process : 'SELLA' });
@@ -88,18 +88,18 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     let rank : any = this.form.value.rank;
     let date1 : any = rank == null ? this.today : moment(this.form.value.rank[0]).format('YYYY-MM-DD');
     let date2 : any = ['Fecha inválida', null, undefined, ''].includes(rank == null ? rank : rank[1]) ? this.today : moment(this.form.value.rank[1]).format('YYYY-MM-DD');
-     let root : any = this.validateRoot(); 
+     let root : any = this.validateRoot();
     this.load = true;
 
-    this.svcPreInProduction.GetPreInProduction(date1, date2, root).subscribe(data => { 
+    this.svcPreInProduction.GetPreInProduction(date1, date2, root).subscribe(data => {
       if(data.length > 0){
         this.movements = data;
         this.infoTable = data;
-        this.load = false; 
+        this.load = false;
       } else {
         this.svcMsjs.mensajeAdvertencia(`No se encontraron resultados de búsqueda`);
         this.load = false;
-      } 
+      }
     }, error => {});
   }
 
@@ -111,7 +111,7 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
     let root : any = ``;
 
     if(process != null) root += `process=${process}`;
-    if(ot != null) root.length > 0 ? root += `&ot=${ot}` : root += `ot=${ot}`; 
+    if(ot != null) root.length > 0 ? root += `&ot=${ot}` : root += `ot=${ot}`;
     if(item != null) root.length > 0 ? root += `&item=${item}` : root += `item=${item}`;
 
     if(root.length > 0) root =`?${root}`;
@@ -144,13 +144,17 @@ export class Movimientos_PreIngresoProduccionComponent implements OnInit {
   //. Función para filtrar la tabla. (FILTRO)
   applyFilter($event, campo : any, valorCampo : string) {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt.filteredValue) this.movements = this.dt!.filteredValue; }, 500); 
-    if(!this.dt.filteredValue) this.movements = this.infoTable;  
+    setTimeout(() => { if(this.dt.filteredValue) this.movements = this.dt!.filteredValue; }, 500);
+    if(!this.dt.filteredValue) this.movements = this.infoTable;
   }
 
   //Función para calcular el total de rollos pre ingresados
   calculateTotal = () => this.movements.reduce((a, b) => a + b.cantidad, 0);
 
   //Función que mostrará el formato PDF.
-  viewPDF = (id : number) => this.cmpPreInProduction.createPDF(id);
+  viewPDF(id : number) {
+    this.load = true;
+    this.cmpPreInProduction.createPDF(id);
+    setTimeout(() => this.load = false, 3000);
+  }
 }

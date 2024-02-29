@@ -53,12 +53,12 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.focusInput(true, false);
+    this.focusInput(false);
     this.getStorehouse();
   }
 
   ngOnDestroy(): void {
-    this.focusInput(false, true);
+    this.focusInput(true);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -68,10 +68,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     this.storage_Name = this.appComponent.storage_Nombre;
   }
 
-  focusInput(start: boolean, finish: boolean) {
+  focusInput(destroy: boolean) {
     let time = setInterval(() => {
-      if (start && !finish) document.getElementById('RolloBarsCode').focus();
-      else if (!start && finish) clearInterval(time);
+      let preInBarsCode = document.getElementById('RolloBarsCode');
+      if (!destroy && preInBarsCode) preInBarsCode.focus();
+      else if (destroy) clearInterval(time);
     }, 1000);
   }
 

@@ -1,0 +1,82 @@
+<div class="my-2">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
+</div>
+
+<div class="row my-5 g-4 justify-content-center">
+  <div class="col-sm-12 col-md-2">
+    <span class="p-float-label">
+      <input type="text" id="preInBarsCode" pInputText autocomplete="off" pAutoFocus [autofocus]="true" [(ngModel)]="barCode" (keyup.enter)="validateUbicationSelected()"/>
+      <label for="Rollo"></label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="storehouseSelected" id="bodegas" optionValue="id" [autoDisplayFirst]="false" [options]="storehouse" optionLabel="nombre" (onChange)="getUbicationByStorehouse()"></p-dropdown>
+      <label for="bodegas">Bodega</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="ubicationSelected" id="ubication" optionValue="nombreCompleto" [autoDisplayFirst]="false" [options]="ubicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getSubUbicationByStorehouse()"></p-dropdown>
+      <label for="ubication">Ubicación</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="subUbicationSelected" id="subUbication" optionValue="idSubUbicacion" [autoDisplayFirst]="false" [options]="subUbicationsStorehouse" optionLabel="nombreCompleto" (onChange)="getCubesBySubUbication()"></p-dropdown>
+      <label for="subUbication">Sub Ubicación</label>
+    </span>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+    <span class="p-float-label">
+      <p-dropdown [(ngModel)]="cubeSelected" id="cube" optionValue="idCubo" [autoDisplayFirst]="false" [options]="cubes" optionLabel="idCubo"></p-dropdown>
+      <label for="cube">Cubos</label>
+    </span>
+  </div>
+</div>
+
+<div class="my-5">
+  <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-th-large"></i> Datos Ingresados</h4>
+</div>
+
+<p-table
+  [value]="dataSearched"
+  columnResizeMode="expand"
+  styleClass="p-datatable-sm"
+  responsiveLayout="scroll"
+  [rowHover]="true"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+  [scrollable]="true"
+  scrollHeight="50rem">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>#</th>
+      <th>Entrada</th>
+      <th>Orden Trabajo</th>
+      <th>Rollo/Bulto</th>
+      <th>Item</th>
+      <th>Referencia</th>
+      <th>Cantidad</th>
+      <th>Presentación</th>
+      <th>Proceso</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+    <tr>
+      <td>{{rowIndex + 1}}</td>
+      <td>{{data.pre.pre_Id}}</td>
+      <td>{{data.details.production}}</td>
+      <td>{{data.details.orderProduction}}</td>
+      <td>{{data.details.item}}</td>
+      <td>{{data.details.reference}}</td>
+      <td>{{data.details.quantity | number : '1.2-2'}}</td>
+      <td>{{data.details.presentation}}</td>
+      <td>{{data.details.processName | uppercase}}</td>
+    </tr>
+  </ng-template>
+</p-table>

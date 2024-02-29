@@ -46,6 +46,8 @@ export class Produccion_ProcesosService {
 
   PutDelivered_NoAvaible = (pre: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoEntregado_NoIngresado/${pre}`, pre);
 
+  PutDelivered_Avaible = (pre: number) => this.http.put<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/putEstadoEntregado_Ingresado/${pre}`, pre);
+
   Post = (body: modelProduccionProcesos): Observable<any> => this.http.post(`${this.rutaPlasticaribeAPI}/Produccion_Procesos`, body);
 
   Delete = (id: number|string): Observable<any> => this.http.delete(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/${id}`);

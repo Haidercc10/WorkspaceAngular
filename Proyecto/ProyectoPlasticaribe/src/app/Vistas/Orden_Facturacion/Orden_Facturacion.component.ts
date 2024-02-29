@@ -1,6 +1,7 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 import { modelDt_OrdenFacturacion } from 'src/app/Modelo/modelDt_OrdenFacturacion';
 import { modelOrdenFacturacion } from 'src/app/Modelo/modelOrdenFacturacion';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -35,6 +36,8 @@ export class Orden_FacturacionComponent implements OnInit {
   clients: Array<any> = [];
   products: Array<any> = [];
   selectedProductSaleOrder: any = [];
+  @ViewChild('tableProduction') tableProduction: Table;
+  @ViewChild('tableProductionSelected') tableProductionSelected: Table;
   presentations: Array<string> = [];
   production: Array<production> = [];
   productionSelected: Array<production> = [];
@@ -98,6 +101,10 @@ export class Orden_FacturacionComponent implements OnInit {
       this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
         this.load = true;
         this.production = [];
+        let countProductionAvaible = data.reduce((a, b) => {
+          if (!a.map(x => x.pp.numeroRollo_BagPro).includes(b.pp.numeroRollo_BagPro)) a = [...a, b];
+          return a;
+        }, []);
         data.forEach(dataProduction => {
           if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
             this.production.push({
@@ -106,18 +113,37 @@ export class Orden_FacturacionComponent implements OnInit {
               nameClient: dataProduction.clientes.cli_Nombre,
               item: dataProduction.prod.prod_Id,
               reference: dataProduction.prod.prod_Nombre,
+              orderProduction: dataProduction.pp.ot,
               numberProduction: dataProduction.pp.numeroRollo_BagPro,
               quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
               presentation: dataProduction.pp.presentacion
             });
           }
+          if (countProductionAvaible.length == this.production.length) {
+            this.load = false;
+            this.production = this.changeNameProduct(this.production);
+          }
         });
-        setTimeout(() => this.load = false, 50);
       }, error => this.msj.mensajeError(`¡No se encontró produción disponible del Item ${idProduct}!`, `Error: ${error.error.title} | Status: ${error.status}`));
     } else {
       this.selectedProductSaleOrder = null;
       this.production = [];
     }
+  }
+
+  changeNameProduct(production: Array<production>) {
+    let orderProduction = production.reduce((a, b) => {
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+      return a;
+    }, []);
+    orderProduction.forEach(d => {
+      this.bagproService.GetOrdenDeTrabajo(d.orderProduction).subscribe(dataOrder => {
+        production.filter(x => x.orderProduction == d.orderProduction).forEach(prod => {
+          prod.reference = dataOrder[0].producto;
+        });
+      });
+    });
+    return production;
   }
 
   getPresentation() {
@@ -188,6 +214,10 @@ export class Orden_FacturacionComponent implements OnInit {
     this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
       this.load = true;
       this.production = [];
+      let countProductionAvaible = data.reduce((a, b) => {
+        if (!a.map(x => x.pp.numeroRollo_BagPro).includes(b.pp.numeroRollo_BagPro)) a = [...a, b];
+        return a;
+      }, []);
       data.forEach(dataProduction => {
         if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
           this.production.push({
@@ -196,13 +226,17 @@ export class Orden_FacturacionComponent implements OnInit {
             nameClient: dataProduction.clientes.cli_Nombre,
             item: dataProduction.prod.prod_Id,
             reference: dataProduction.prod.prod_Nombre,
+            orderProduction: dataProduction.pp.ot,
             numberProduction: dataProduction.pp.numeroRollo_BagPro,
             quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
             presentation: dataProduction.pp.presentacion
           });
         }
+        if (countProductionAvaible.length == this.production.length) {
+          this.load = false;
+          this.production = this.changeNameProduct(this.production);
+        }
       });
-      setTimeout(() => this.load = false, 50);
     }, error => this.msj.mensajeError(error));
   }
 
@@ -232,21 +266,54 @@ export class Orden_FacturacionComponent implements OnInit {
     let sumQuantity: number = 0;
     let totalQuantity: number = this.totalProduccionSearched();
     this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
-    if (totalQuantity >= this.qtyToSend) {
-      this.production.forEach(d => {
-        if (sumQuantity < this.qtyToSend) {
-          finalArray.push(d);
-          sumQuantity += d.quantity;
-        }
-      });
-      this.productionSelected = [this.productionSelected, finalArray].reduce((a,b) => a.concat(b));
-      finalArray.forEach(d => {
-        setTimeout(() => this.selectedProduction(d), 500);
-      });
+    if (totalQuantity > 0) {
+      if (totalQuantity >= this.qtyToSend) {
+        this.production.forEach(d => {
+          if (sumQuantity < this.qtyToSend) {
+            finalArray.push(d);
+            sumQuantity += d.quantity;
+          }
+        });
+        this.productionSelected = [this.productionSelected, finalArray].reduce((a,b) => a.concat(b));
+        finalArray.forEach(d => {
+          setTimeout(() => this.selectedProduction(d), 500);
+        });
+      } else {
+        this.load = false;
+        this.msj.mensajeError(`¡La cantidad digitada es superior a la cantidad disponible!`);
+      }
     } else {
       this.load = false;
-      this.msj.mensajeError(`¡La cantidad digitada es superior a la cantidad disponible!`);
+      this.msj.mensajeError(`¡Debe haber seleccionado un item!`);
     }
+  }
+
+  selectByFilters() {
+    this.load = true;
+    let data = this.tableProduction.filteredValue ? this.tableProduction.filteredValue : this.tableProduction.value;
+    this.productionSelected = [this.productionSelected, data].reduce((a,b) => a.concat(b));
+    if (!this.tableProduction.filteredValue) this.production = [];
+    else {
+      data.forEach(d => {
+        let index = this.production.findIndex(x => x.numberProduction == d.numberProduction);
+        this.production.splice(index, 1);
+      });
+    }
+    setTimeout(() => this.load = false, 5);
+  }
+
+  deselectByFilters() {
+    this.load = true;
+    let data = this.tableProductionSelected.filteredValue ? this.tableProductionSelected.filteredValue : this.tableProductionSelected.value;
+    this.production = [this.production, data].reduce((a,b) => a.concat(b));
+    if (!this.tableProductionSelected.filteredValue) this.productionSelected = [];
+    else {
+      data.forEach(d => {
+        let index = this.productionSelected.findIndex(x => x.numberProduction == d.numberProduction);
+        this.productionSelected.splice(index, 1);
+      });
+    }
+    setTimeout(() => this.load = false, 5);
   }
 
   selectedProduction(production: production) {
@@ -370,6 +437,7 @@ export class Orden_FacturacionComponent implements OnInit {
 
   contentPDF(data): any[] {
     let content: any[] = [];
+    data = this.changeNameProductInPDF(data);
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
     let informationProducts: Array<any> = this.getInformationProducts(data);
     content.push(this.informationClientPDF(data[0]));
@@ -377,6 +445,21 @@ export class Orden_FacturacionComponent implements OnInit {
     content.push(this.tableConsolidated(consolidatedInformation));
     content.push(this.tableProducts(informationProducts));
     return content;
+  }
+
+  changeNameProductInPDF(production: Array<any>) {
+    let orderProduction = production.reduce((a, b) => {
+      if (!a.map(x => x.orderProduction).includes(b.orderProduction)) a = [...a, b];
+      return a;
+    }, []);
+    orderProduction.forEach(d => {
+      this.bagproService.GetOrdenDeTrabajo(d.orderProduction).subscribe(dataOrder => {
+        production.filter(x => x.orderProduction == d.orderProduction).forEach(prod => {
+          prod.Referencia = dataOrder[0].producto;
+        });
+      });
+    });
+    return production;
   }
 
   consolidatedInformation(data: any): Array<any> {
@@ -537,6 +620,7 @@ interface production {
   nameClient?: string;
   item: number;
   reference: string;
+  orderProduction?: number;
   numberProduction?: number;
   quantity: number;
   cuontProduction?: number;

@@ -111,6 +111,7 @@
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'fecha_Ingreso', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'hora_Ingreso', 'contains')"></th>
         <th><input pInputText type="text" style="width: 100%;" (input)="applyFilter($event, 'cantidad', 'contains')"></th>
+        <th></th>
       </tr>
       <tr>
         <th class="text-center font-size-16">#</th>
@@ -137,7 +138,7 @@
       <tr>
         <td colspan="9"><h6 class="bold">No hay registros consultados.</h6></td>
       </tr>
-    </ng-template>  
+    </ng-template>
     <ng-template pTemplate="footer" >
       <tr id="totales">
         <td colspan="5" class="text-right">Total Rollos Preingresados</td>

@@ -23,6 +23,8 @@ export class DtPreEntregaRollosService {
 
   GetInformactionAboutPreIn_ById = (id: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetallePreEntrega_RolloDespacho/getInformactionAboutPreIn_ById/${id}`);
 
+  GetInformactionAboutPreInToSendDesp_ById = (id: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/DetallePreEntrega_RolloDespacho/getInformactionAboutPreInToSendDesp_ById/${id}`);
+
   GetRollos_Ingresar(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollos_Ingresar/${fechaInicial}/${fechaFinal}/${proceso}/${ruta}`);
   }

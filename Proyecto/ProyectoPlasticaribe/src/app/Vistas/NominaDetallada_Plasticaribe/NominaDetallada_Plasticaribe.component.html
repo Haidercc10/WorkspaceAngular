@@ -250,11 +250,10 @@
         <ng-template pTemplate="content">
           <div class="row g-4 my-2">
             <!-- DISABILITIES -->
-            <div class="container-fluid my-1">
+            <div class="container-fluid">
               <p-divider align="left">
                 <span class="p-tag cursor"><i class="pi pi-heart-fill"> </i> Incapacidades</span>
               </p-divider>
-              <br>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
@@ -294,11 +293,10 @@
             </div>
 
             <!-- EXTRA HOURS -->
-            <div class="container-fluid my-1">
+            <div class="container-fluid">
               <p-divider align="left">
                 <span class="p-tag cursor"><i class="pi pi-plus-circle"> </i> Horas Extra</span>
               </p-divider>
-              <br>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
@@ -314,7 +312,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="adictionalNightHours" inputId="adictionalNightHours" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="adictionalNightHours" inputId="adictionalNightHours" [required]="true" (onKeyDown)="calculateValueAdictionalNightHours()"></p-inputNumber>
                 <label for="adictionalNightHours">Horas ADC Nocturnas</label>
               </span>
             </div>
@@ -326,7 +324,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="extraHoursDaytimeSunday" inputId="extraHoursDaytimeSunday" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="extraHoursDaytimeSunday" inputId="extraHoursDaytimeSunday" [required]="true" (onKeyDown)="calculateValueExtraHoursDaytimeSunday()"></p-inputNumber>
                 <label for="extraHoursDaytimeSunday">Horas Ext Diurnas Dom</label>
               </span>
             </div>
@@ -338,7 +336,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="surchagedHours035" inputId="surchagedHours035" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="surchagedHours035" inputId="surchagedHours035" [required]="true" (onKeyDown)="calculateValueSurchagedHours035()"></p-inputNumber>
                 <label for="surchagedHours035">Horas Recargo 35%</label>
               </span>
             </div>
@@ -350,7 +348,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="extraHoursNightSunday" inputId="extraHoursNightSunday" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="extraHoursNightSunday" inputId="extraHoursNightSunday" [required]="true" (onKeyDown)="calculateValueExtraHoursNightSunday()"></p-inputNumber>
                 <label for="extraHoursNightSunday">Horas Ext Noct Dom</label>
               </span>
             </div>
@@ -362,7 +360,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="surchagedHours075" inputId="surchagedHours075" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="surchagedHours075" inputId="surchagedHours075" [required]="true" (onKeyDown)="calculateValueSurchagedHours075()"></p-inputNumber>
                 <label for="surchagedHours075">Horas ADC 75%</label>
               </span>
             </div>
@@ -374,7 +372,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="surchagedHours100" inputId="surchagedHours100" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="surchagedHours100" inputId="surchagedHours100" [required]="true" (onKeyDown)="calculateValueSurchagedHours100()"></p-inputNumber>
                 <label for="surchagedHours100">Horas ADC 100%</label>
               </span>
             </div>
@@ -386,7 +384,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="adictionalFee" inputId="adictionalFee" [required]="true"></p-inputNumber>
+                <p-inputNumber formControlName="adictionalFee" inputId="adictionalFee" [required]="true" (onKeyDown)="calculateAdictionalFee()"></p-inputNumber>
                 <label for="adictionalFee">Tarifa ADC</label>
               </span>
             </div>
@@ -420,6 +418,62 @@
           </div>
         </ng-template>
         <ng-template pTemplate="content">
+          <div class="row g-4 my-2">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="eps" inputId="eps" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="eps">EPS</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="afp" inputId="afp" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="afp">AFP</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="saving" inputId="saving" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="saving">Ahorro</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="loan" inputId="loan" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="loan">Prestamo</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="advance" inputId="advance" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="advance">Anticipo</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="totalDiscounts" inputId="totalDiscounts" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="totalDiscounts">Total Dcto</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="PagoPTESemanaAnt" inputId="PagoPTESemanaAnt" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="PagoPTESemanaAnt">Pago PTE Semana Ant</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="discounts" inputId="discounts" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="discounts">Descuentos</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="deductions" inputId="deductions" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="deductions">Deducciones</label>
+              </span>
+            </div>
+          </div>
         </ng-template>
       </p-accordionTab>
 

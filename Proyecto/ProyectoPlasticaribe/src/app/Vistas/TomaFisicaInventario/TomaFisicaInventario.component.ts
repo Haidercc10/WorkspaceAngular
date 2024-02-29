@@ -58,17 +58,18 @@ export class TomaFisicaInventarioComponent implements OnInit {
   ngOnInit(): void {
     this.readStorage();
     this.getStorehouse();
-    this.focusInput(true, false);
+    this.focusInput(false);
   }
 
   ngOnDestroy(): void {
-    this.focusInput(false, true);
+    this.focusInput(true);
   }
 
-  focusInput(start: boolean, finish: boolean) {
+  focusInput(destroy: boolean) {
     let time = setInterval(() => {
-      if (start && !finish) document.getElementById('ReelBarsCode').focus();
-      else if (!start && finish) clearInterval(time);
+      let preInBarsCode = document.getElementById('ReelBarsCode');
+      if (!destroy && preInBarsCode) preInBarsCode.focus();
+      else if (destroy) clearInterval(time);
     }, 1000);
   }
 

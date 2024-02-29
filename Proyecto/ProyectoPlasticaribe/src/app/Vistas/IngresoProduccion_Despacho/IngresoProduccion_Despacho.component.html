@@ -22,7 +22,7 @@
       <div class="my-2">
         <h4 [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
       </div>
-  
+
       <div class="row my-5 g-4 justify-content-center">
         <div class="col-sm-12 col-md-2">
           <span class="p-float-label">
@@ -124,7 +124,7 @@
             <td class="text-center">{{data.turno.turno_Nombre}}</td>
             <td class="text-center">{{data.proceso.proceso_Nombre | uppercase}}</td>
             <!-- <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
-              <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button> 
+              <p-button icon="pi pi-print" [rounded]="true" severity="success" (onClick)="printTag(data)"></p-button>
             </td> -->
             <td class="text-center" alignFrozen="right" pFrozenColumn [frozen]="true">
               <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (onClick)="removeProduction(data)"></p-button>
@@ -132,6 +132,10 @@
           </tr>
         </ng-template>
       </p-table>
+    </p-tabPanel>
+
+    <p-tabPanel header="Subir Entrega de Producción" leftIcon="pi pi-upload">
+      <app-IngresoDespacho_EntregaMercancia></app-IngresoDespacho_EntregaMercancia>
     </p-tabPanel>
 
     <p-tabPanel header="Toma Fisíca de Inventario" leftIcon="pi pi-upload">

@@ -1,7 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import JsBarcode from 'jsbarcode';
 import moment from 'moment';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { modelDtPreEntregaRollos } from 'src/app/Modelo/modelDtPreEntregaRollo';
 import { modelPreentregaRollos } from 'src/app/Modelo/modelPreEntregaRollo';
 import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
@@ -11,6 +13,7 @@ import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespa
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-PreIngresoProduccion_Despacho',
@@ -76,7 +79,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.consolidatedProduction = [];
   }
 
-  getProcess(){
+  getProcess() {
     this.processService.srvObtenerLista().subscribe(data => {
       this.process = data.filter(x => ['EXT', 'EMP', 'SELLA'].includes(x.proceso_Id));
       this.formData.patchValue({ process: this.validateProcess() });
@@ -92,7 +95,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     return process[(this.ValidarRol).toString()];
   }
 
-  searchDataOrderProduction(){
+  searchDataOrderProduction() {
     let orderProduction = this.formData.value.orderProduction;
     let process: string = this.formData.value.process;
     this.productionProcessService.GetInformationAboutProductionByOrderProduction_Process(orderProduction, process).subscribe(data => {
@@ -100,11 +103,11 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     }, error => this.errorMessage(`¡Error al consultar la producción!`, error));
   }
 
-  fillDataOrderProduction(data : any): Array<OrderProduction>{
+  fillDataOrderProduction(data: any): Array<OrderProduction> {
     let orderProduction: Array<OrderProduction> = [];
     data.forEach(dataProduction => {
       orderProduction.push({
-        orderProduction : dataProduction.pp.ot,
+        orderProduction: dataProduction.pp.ot,
         item: dataProduction.producto.prod_Id,
         reference: dataProduction.producto.prod_Nombre,
         numberProduction: dataProduction.pp.numeroRollo_BagPro,
@@ -175,31 +178,31 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     } else this.msg.mensajeAdvertencia(`¡Debe seleccionar el proceso!`);
   }
 
-  savePreIn(){
+  savePreIn() {
     this.load = true;
     let observation: string = this.formData.value.observation;
-    const data : modelPreentregaRollos = {
-      PreEntRollo_Fecha : moment().format('YYYY-MM-DD'),
-      PreEntRollo_Observacion : ![null, undefined].includes(observation) ? observation.toUpperCase() : '',
-      Usua_Id : this.storage_Id,
-      PreEntRollo_Hora : moment().format('H:mm:ss'),
+    const data: modelPreentregaRollos = {
+      PreEntRollo_Fecha: moment().format('YYYY-MM-DD'),
+      PreEntRollo_Observacion: ![null, undefined].includes(observation) ? observation.toUpperCase() : '',
+      Usua_Id: this.storage_Id,
+      PreEntRollo_Hora: moment().format('H:mm:ss'),
     }
     this.preInService.srvGuardar(data).subscribe(data => this.saveDetailsPreIn(data.preEntRollo_Id), error => this.errorMessage(`¡Ocurrió un error al crear el Pre Ingreso!`, error));
   }
 
-  saveDetailsPreIn(idPreIn: number){
+  saveDetailsPreIn(idPreIn: number) {
     let count: number = 0;
     this.productionSelected.forEach(pp => {
       const data: modelDtPreEntregaRollos = {
-        PreEntRollo_Id : idPreIn,
-        Rollo_Id : pp.numberProduction,
-        DtlPreEntRollo_Cantidad : pp.quantity,
-        UndMed_Rollo : pp.presentation,
-        Proceso_Id : pp.process,
+        PreEntRollo_Id: idPreIn,
+        Rollo_Id: pp.numberProduction,
+        DtlPreEntRollo_Cantidad: pp.quantity,
+        UndMed_Rollo: pp.presentation,
+        Proceso_Id: pp.process,
         Cli_Id: 1,
-        DtlPreEntRollo_OT : pp.orderProduction,
-        Prod_Id : pp.item,
-        UndMed_Producto : pp.presentation,
+        DtlPreEntRollo_OT: pp.orderProduction,
+        Prod_Id: pp.item,
+        UndMed_Producto: pp.presentation,
       }
       this.detailsPreInService.srvGuardar(data).subscribe(() => {
         count++;
@@ -216,14 +219,109 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 
   createPDF(idPreIn: number) {
-    console.log(`1: ${1}`)
     this.detailsPreInService.GetInformactionAboutPreIn_ById(idPreIn).subscribe(data => {
       this.load = true;
-      let title: string = `Pre Ingreso N° ${idPreIn}`;
+      let title: string = `Entrega Producción N° ${idPreIn}`;
       let content: any[] = this.contentPDF(data);
-      this.createPDFService.formatoPDF(title, content);
+      const pdfDefinicion: any = {
+        info: { title: title },
+        pageOrientation: 'portrait',
+        pageSize: 'LETTER',
+        watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
+        pageMargins: [25, 120, 25, 35],
+        header: this.headerPDF(title, idPreIn),
+        content: content,
+      }
+      pdfMake.createPdf(pdfDefinicion).open();
       setTimeout(() => this.clearFields(), 3000);
     }, error => this.errorMessage(`¡Se guardó la información del Pre Ingreso pero no se puedo crear el PDF!`, error));
+  }
+
+  headerPDF(titulo: string, pre_Id: number): {} {
+    return (currentPage: any, pageCount: any) => {
+      return [
+        {
+          margin: [20, 8, 20, 0],
+          columns: [
+            this.fillImageBussinessPDF(),
+            this.titlePDfBarCode(titulo, pre_Id),
+            this.paginatorDate(currentPage, pageCount)
+          ]
+        },
+        this.lineHeaderFooter(),
+      ];
+    }
+  }
+
+  fillImageBussinessPDF() {
+    return {
+      width: '25%',
+      alignment: 'center',
+      table: {
+        body: [
+          [{ image: logoParaPdf, width: 150, height: 25 }],
+        ]
+      },
+      layout: 'noBorders',
+      margin: [5, 35, 80, 10]
+    }
+  }
+
+  titlePDfBarCode(titulo: string, pre_Id: number): {} {
+    return {
+      width: '40%',
+      alignment: 'center',
+      table: {
+        body: [
+          [{ text: titulo, bold: true, alignment: 'center', fontSize: 10 }],
+          this.createBarCode(pre_Id)
+        ]
+      },
+      layout: 'noBorders',
+      margin: [70, 15, 0, 10],
+    }
+  }
+
+  createBarCode(pre_Id: number) {
+    const imageBarcode = document.createElement('img');
+    imageBarcode.id = 'barcode';
+    document.body.appendChild(imageBarcode);
+    JsBarcode("#barcode", `ENTRLL #${pre_Id}`, { format: "CODE128A", displayValue: false, width: 80, height: 200 });
+    let imagePDF = { image: imageBarcode.src, width: 160, height: 50, alignment: 'center' };
+    imageBarcode.remove();
+    return [imagePDF];
+  }
+
+  paginatorDate(currentPage: { toString: () => string; }, pageCount: string): {} {
+    let today: any = moment().format('YYYY-MM-DD');
+    let hour: any = moment().format('HH:mm:ss');
+    return {
+      width: '35%',
+      alignment: 'center',
+      margin: [110, 30, 20, 0],
+      table: {
+        body: [
+          [{ text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+          [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+          [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
+        ]
+      },
+      layout: 'noBorders',
+    }
+  }
+
+  lineHeaderFooter(): {} {
+    return {
+      margin: [20, 0],
+      table: {
+        headerRows: 1,
+        widths: ['*'],
+        body: [
+          [{ border: [false, true, false, false], text: '' }],
+        ]
+      },
+      layout: { defaultBorder: false, }
+    }
   }
 
   contentPDF(data): any[] {
@@ -356,8 +454,8 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   }
 }
 
-interface OrderProduction{
-  orderProduction : number;
+interface OrderProduction {
+  orderProduction: number;
   item: number;
   reference: string;
   numberProduction?: number;

@@ -3,20 +3,18 @@ import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { BodegasDespachoService } from 'src/app/Servicios/BodegasDespacho/BodegasDespacho.service';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
-import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { AppComponent } from 'src/app/app.component';
-import { dataDesp, MovimientosIngresosDespachoComponent } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
+import { MovimientosIngresosDespachoComponent, dataDesp } from '../Movimientos-IngresosDespacho/Movimientos-IngresosDespacho.component';
 
 @Component({
   selector: 'app-Ubicaciones_Rollos',
   templateUrl: './Ubicaciones_Rollos.component.html',
   styleUrls: ['./Ubicaciones_Rollos.component.css']
 })
+
 export class Ubicaciones_RollosComponent implements OnInit {
   load: boolean = false;
   selectedMode: boolean = false;
@@ -35,26 +33,22 @@ export class Ubicaciones_RollosComponent implements OnInit {
   sendProductionZeus: any[] = [];
   dataSearched: Array<dataDesp> = [];
   searchIn: any = null;
-  groupedInfo : any = [];
+  groupedInfo: any = [];
   @ViewChild('dtDetailed') dtDetailed: Table | undefined;
-  traslate : boolean = false;
-  descriptionButton : string = '';
-  message : string = '';
-  action : string = '';
-  msgTooltip : string = '';
-  
-  constructor(
-    private appComponent: AppComponent,
+  traslate: boolean = false;
+  descriptionButton: string = '';
+  message: string = '';
+  action: string = '';
+  msgTooltip: string = '';
+
+  constructor(private appComponent: AppComponent,
     private msj: MensajesAplicacionService,
     private productionProcessSerivce: Produccion_ProcesosService,
     private bagproService: BagproService,
-    private createPDFService: CreacionPdfService,
-    private entraceService: EntradaRollosService,
     private dtEntracesService: DetallesEntradaRollosService,
     private storehouseService: BodegasDespachoService,
     private messageService: MessageService,
-    private clients: SedeClienteService,
-    private compMovInDespacho : MovimientosIngresosDespachoComponent,) {
+    private compMovInDespacho: MovimientosIngresosDespachoComponent,) {
     this.selectedMode = this.appComponent.temaSeleccionado;
   }
 
@@ -101,7 +95,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     });
   }
 
-  //Función para preguntar que acción se está realizando. Solo cambiar ubicación 
+  //Función para preguntar que acción se está realizando. Solo cambiar ubicación
   questionAction = () => this.traslate ? this.extractRollsDespacho() : this.validateUbicationSelected();
 
   //.Función para validar que se llenen correctamente las ubicaciones
@@ -145,30 +139,30 @@ export class Ubicaciones_RollosComponent implements OnInit {
     this.consolidateInformation();
   }
 
-  //Función que cargará los rollos a los que se desea actualizar la ubication en la tabla del modal. 
-  loadRolls(){
+  //Función que cargará los rollos a los que se desea actualizar la ubication en la tabla del modal.
+  loadRolls() {
     this.sendProductionZeus = [];
-    console.log(this.compMovInDespacho.dataSelected)
     this.compMovInDespacho.dataSelected.forEach(x => {
       this.sendProductionZeus.push(
-        { pp : 
+        {
+          pp:
           {
-            'numeroRollo_BagPro' : x.production, 
-            'ot' : x.orderProduction,
-            'cantidad' : x.quantity, 
-            'peso_Bruto' : x.quantity,
-            'presentacion' : x.presentation,
-            'fecha' : x.date,
-            'hora' : x.hour,
-            'numero_Rollo' : x.productionPL,
-            'precio' : x.price,
-          }, 
-          producto : {
-            'prod_Id' : x.item,
-            'prod_Nombre' : x.reference,
+            'numeroRollo_BagPro': x.production,
+            'ot': x.orderProduction,
+            'cantidad': x.quantity,
+            'peso_Bruto': x.quantity,
+            'presentacion': x.presentation,
+            'fecha': x.date,
+            'hora': x.hour,
+            'numero_Rollo': x.productionPL,
+            'precio': x.price,
           },
-          proceso : { 
-            'proceso_Nombre' : x.process
+          producto: {
+            'prod_Id': x.item,
+            'prod_Nombre': x.reference,
+          },
+          proceso: {
+            'proceso_Nombre': x.process
           }
         })
     });
@@ -176,31 +170,31 @@ export class Ubicaciones_RollosComponent implements OnInit {
   }
 
   //Función que se encargará de consolidar la información de los rollos que serán reubicados.
-  consolidateInformation(){
+  consolidateInformation() {
     this.groupedInfo = this.sendProductionZeus.reduce((a, b) => {
-      if(!a.map(x => x.pp.ot).includes(b.pp.ot)) a = [...a, b];
+      if (!a.map(x => x.pp.ot).includes(b.pp.ot)) a = [...a, b];
       return a;
     }, [])
-  } 
+  }
 
   //Función que se encargará de enviar los rollos y la nueva ubicación de los mismos al api para que se actualicen desde allí.
-  changeUbication(){
-    let aError : boolean = false;
+  changeUbication() {
+    let aError: boolean = false;
     this.onReject();
     this.load = true;
-    let rolls : any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo); 
-    this.dtEntracesService.PutChangeUbicationRoll(rolls, this.setUbication()).subscribe(data => { aError = false; }, error => {
+    let rolls: any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
+    this.dtEntracesService.PutChangeUbicationRoll(rolls, this.setUbication()).subscribe(() => { aError = false; }, () => {
       aError = true;
       this.msj.mensajeError(`Error`, `No fue posible actualizar la ubicación de rollo(s)!`);
-    }); 
-    setTimeout(() => { 
+    });
+    setTimeout(() => {
       this.load = false;
-      this.confirmationMessage(aError); 
-    }, 1000); 
+      this.confirmationMessage(aError);
+    }, 1000);
   }
 
   //Mensaje de confirmación de la actualización de la ubicación de los rollos.
-  confirmationMessage(aError : boolean) {
+  confirmationMessage(aError: boolean) {
     if (!aError) {
       this.msj.mensajeConfirmacion('OK!', 'Se actualizó con éxito la ubicación de rollo(s)!');
       this.clearFields();
@@ -210,78 +204,73 @@ export class Ubicaciones_RollosComponent implements OnInit {
   }
 
   //.Función que enviará el ajuste de existencias negativo a Zeus .
-  sendNegativeAdjustmentZeus(){
-    if(this.groupedInfo.length > 1) this.msj.mensajeAdvertencia('Solo se puede enviar un ajuste a Zeus por rollo!');
+  sendNegativeAdjustmentZeus() {
+    if (this.groupedInfo.length > 1) this.msj.mensajeAdvertencia('Solo se puede enviar un ajuste a Zeus por rollo!');
     else {
       this.onReject();
       this.load = true
       this.groupedInfo.forEach(x => {
-        let unit : string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
-        let detailAdjustment : string = `Ajuste desde App Plasticaribe para la OT N° ${x.pp.ot}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}`;
+        let unit: string = x.pp.presentacion == 'Kg' ? 'KLS' : x.pp.presentacion == 'Und' ? 'UND' : 'PAQ';
+        let detailAdjustment: string = `Ajuste desde App Plasticaribe para la OT N° ${x.pp.ot}, Item ${x.producto.prod_Id} con cantidad de ${(-(this.totalQuantityByItem(x.producto.prod_Id)))} ${unit}`;
         this.productionProcessSerivce.sendProductionToZeus(
-          detailAdjustment, 
-          x.producto.prod_Id, 
-          unit, 
-          0, 
-          (-(this.totalQuantityByItem(x.producto.prod_Id))).toString(), 
+          detailAdjustment,
+          x.producto.prod_Id,
+          unit,
+          0,
+          (-(this.totalQuantityByItem(x.producto.prod_Id))).toString(),
           x.pp.precio.toString()
-        ).subscribe(data => { this.extractRollsDespacho(); }, error => {
-          this.msj.mensajeError('Error', 'No fue posible enviar el ajuste a Zeus!'); 
+        ).subscribe(() => { this.extractRollsDespacho(); }, () => {
+          this.msj.mensajeError('Error', 'No fue posible enviar el ajuste a Zeus!');
         });
       });
     }
   }
 
   //Sacar rollos de despacho.
-  extractRollsDespacho(){
-    let rollsBagproEmpaque : any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'EMPAQUE').map(x => x.pp.numeroRollo_BagPro); 
-    let rollsBagproSellado : any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'SELLADO').map(x => x.pp.numeroRollo_BagPro);  
-    let rollsPL : any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
+  extractRollsDespacho() {
+    let rollsBagproEmpaque: any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'EMPAQUE').map(x => x.pp.numeroRollo_BagPro);
+    let rollsBagproSellado: any[] = this.sendProductionZeus.filter(x => x.proceso.proceso_Nombre == 'SELLADO').map(x => x.pp.numeroRollo_BagPro);
+    let rollsPL: any[] = this.sendProductionZeus.map(x => x.pp.numero_Rollo);
 
-    this.productionProcessSerivce.putReversionEnvioZeus(rollsPL).subscribe(data => {
-      if(rollsBagproEmpaque.length > 0) this.updateRollsBagproEmpaque(rollsBagproEmpaque);
-      if(rollsBagproSellado.length > 0) this.updateRollsBagproSellado(rollsBagproSellado);
+    this.productionProcessSerivce.putReversionEnvioZeus(rollsPL).subscribe(() => {
+      if (rollsBagproEmpaque.length > 0) this.updateRollsBagproEmpaque(rollsBagproEmpaque);
+      if (rollsBagproSellado.length > 0) this.updateRollsBagproSellado(rollsBagproSellado);
       this.changeStateEntry(rollsPL);
-      console.log(rollsPL.concat(this.sendProductionZeus.map(x => x.pp.numeroRollo_BagPro)));
-    }, error => { this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!'); });
+    }, () => { this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos en Plasticaribe!'); });
   }
 
   //.Función que actualizará el envio zeus de los rollos en procextrusion
-  updateRollsBagproEmpaque(rolls : any){
-    this.bagproService.putReversionEnvioZeus_ProcExtrusion(rolls).subscribe(data => {}, error => {
-      this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Empaque en BagPro!');
-    });
+  updateRollsBagproEmpaque(rolls: any) {
+    this.bagproService.putReversionEnvioZeus_ProcExtrusion(rolls).subscribe(null, () => this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Empaque en BagPro!'));
   }
-  
-  //.Función que actualizará el envio zeus de los rollos en procsellado 
-  updateRollsBagproSellado(rolls : any){
-    this.bagproService.putReversionEnvioZeus_ProcSellado(rolls).subscribe(data => {}, error => {
-      this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Sellado en BagPro!');
-    });
+
+  //.Función que actualizará el envio zeus de los rollos en procsellado
+  updateRollsBagproSellado(rolls: any) {
+    this.bagproService.putReversionEnvioZeus_ProcSellado(rolls).subscribe(null, () => this.msj.mensajeError('Error', 'No fue posible revertir el Envio Zeus de los rollos de Sellado en BagPro!'));
   }
 
   //.Función que colocará como devuelto el estado del rollo
-  changeStateEntry(rolls : any){
-    this.dtEntracesService.putStateReturnedRoll(rolls).subscribe(data => {
+  changeStateEntry(rolls: any) {
+    this.dtEntracesService.putStateReturnedRoll(rolls).subscribe(() => {
       this.load = false;
       this.confirmTraslateDespacho();
-    }, error => { this.msj.mensajeError('Error', 'No fue posible actualizar el estado del rollo en la entrada a despacho!') })
+    }, () => this.msj.mensajeError('Error', 'No fue posible actualizar el estado del rollo en la entrada a despacho!'));
   }
 
-  //.Función que enviará un mensaje de confirmación luego de que se saquen los rollos de despacho. 
-  confirmTraslateDespacho(){
+  //.Función que enviará un mensaje de confirmación luego de que se saquen los rollos de despacho.
+  confirmTraslateDespacho() {
     this.msj.mensajeConfirmacion('OK!', 'Los rollos fueron sacados de despacho exitosamente!');
-    setTimeout(() => { 
+    setTimeout(() => {
       this.compMovInDespacho.modal = false;
       this.compMovInDespacho.searchaDataProductionIncome();
-      this.clearFields(); 
-    }, 500); 
+      this.clearFields();
+    }, 500);
   }
 
-  //Cantidad total consolidada por ot 
+  //Cantidad total consolidada por ot
   totalQuantityByItem = (item: number): number => this.sendProductionZeus.filter(x => x.producto.prod_Id == item).reduce((a, b) => a + b.pp.cantidad, 0);
 
-  //Cantidad de rollos consolidada por ot 
+  //Cantidad de rollos consolidada por ot
   totalRollsByItem = (item: number): number => this.sendProductionZeus.filter(x => x.producto.prod_Id == item).length;
 
   //Cantidad total consolidada de los rollos a eliminar.
@@ -291,7 +280,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
   totalRollsConsolidated = (): number => this.sendProductionZeus.length;
 
   //.Mostrar mensaje de confirmación
-  viewConfirmMessage(data : string){
+  viewConfirmMessage(data: string) {
     this.message = '';
     this.msgTooltip = '';
     this.action = data;
@@ -301,7 +290,7 @@ export class Ubicaciones_RollosComponent implements OnInit {
     } else {
       this.message = `Está seguro que desea reubicar los rollos seleccionados?`;
       this.msgTooltip = `Los rollos serán reubicados a ${this.setUbication()}.`
-    } 
+    }
     setTimeout(() => {
       this.messageService.add({ severity: 'warn', key: this.action, summary: 'Elección', detail: this.message, sticky: true });
     }, 200);
@@ -311,6 +300,6 @@ export class Ubicaciones_RollosComponent implements OnInit {
   onReject = () => this.messageService.clear(this.action);
 
   //Función para filtrar la tabla de rollos a eliminar.
-  applyFilter = ($event, campo : any, valorCampo : string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  applyFilter = ($event, campo: any, valorCampo: string) => this.dtDetailed!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
 }

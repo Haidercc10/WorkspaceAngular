@@ -119,6 +119,12 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     let end: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
     users.forEach(d => {
       let dataDisability: Disability = this.calculateDisabilitiesByWorker(d.disability, d.baseSalary);
+      let _startPayroll: any = moment(this.rangeDates[0]).format('YYYY-MM-DD');
+      let _endPayroll: any = moment(this.rangeDates[1]).format('YYYY-MM-DD');
+      let startPayroll = moment([parseInt(_startPayroll.substring(0, 4)), parseInt(_startPayroll.substring(5, 7)), parseInt(_startPayroll.substring(8, 10))]);
+      let endPayroll = moment([parseInt(_endPayroll.substring(0, 4)), parseInt(_endPayroll.substring(5, 7)), parseInt(_endPayroll.substring(8, 10))]);
+      let daysBetweenPayroll: number = endPayroll.diff(startPayroll, 'days');
+      let daysToPay: number = daysBetweenPayroll - dataDisability.daysDisabilityGeneralIllines - dataDisability.daysDisabilityWorkAccident - dataDisability.daysDisabilityParents
       let data: Payroll = {
         idWorker: d.identification,
         worker: d.name,
@@ -126,9 +132,9 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         startDate: start,
         endDate: end,
         absentDays: 0,
-        daysToPay: 0,
-        hoursToPay: 0,
-        valueDaysToPay: 0,
+        daysToPay: daysToPay,
+        hoursToPay: daysToPay * 8,
+        valueDaysToPay: ((d.baseSalary / 30) / 8) * (daysToPay * 8),
         daysDisabilityGeneralIllines: dataDisability.daysDisabilityGeneralIllines,
         valueDaysDisabilityGeneralIllines: dataDisability.valueDaysDisabilityGeneralIllines,
         daysDisabilityWorkAccident: dataDisability.daysDisabilityWorkAccident,
@@ -322,6 +328,148 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     }, 500);
   }
 
+  calculateValueAdictionalNightHours() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.adictionalNightHours;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 1.75) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueAdictionalNightHours: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].adictionalNightHours = extraHours;
+      this.payroll[i].valueAdictionalNightHours = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateValueExtraHoursDaytimeSunday() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.extraHoursDaytimeSunday;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 2) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueExtraHoursDaytimeSunday: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].extraHoursDaytimeSunday = extraHours;
+      this.payroll[i].valueExtraHoursDaytimeSunday = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateValueSurchagedHours035() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.surchagedHours035;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 0.35) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueSurchagedHours035: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].surchagedHours035 = extraHours;
+      this.payroll[i].valueSurchagedHours035 = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateValueExtraHoursNightSunday() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.extraHoursNightSunday;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 2.5) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueExtraHoursNightSunday: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].extraHoursNightSunday = extraHours;
+      this.payroll[i].valueExtraHoursNightSunday = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateValueSurchagedHours075() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.surchagedHours075;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 2.5) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueSurchagedHours075: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].surchagedHours075 = extraHours;
+      this.payroll[i].valueSurchagedHours075 = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateValueSurchagedHours100() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let extraHours: number = this.formPayrollWorker.value.surchagedHours100;
+      let baseSalary: number = this.formPayrollWorker.value.baseSalary;
+      let valueDay: number = baseSalary / 30;
+      let valueHour: number = valueDay / 8;
+      let total: number = (valueHour * 2.5) * extraHours;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        valueSurchagedHours100: total,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].surchagedHours100 = extraHours;
+      this.payroll[i].valueSurchagedHours100 = total;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
+  calculateAdictionalFee() {
+    setTimeout(() => {
+      let worker: any = this.formPayrollWorker.value.idWorker;
+      let adictionalFee: number = this.formPayrollWorker.value.adictionalFee;
+      let i: number = this.payroll.findIndex(x => x.idWorker == worker);
+      this.formPayrollWorker.patchValue({
+        adictionalFee: adictionalFee,
+        totalValueAdictionalFee: this.totalFee(this.payroll[i]),
+        accrued: this.totalAccrued(this.payroll[i]),
+      });
+      this.payroll[i].adictionalFee = adictionalFee;
+      this.payroll[i].totalValueAdictionalFee = this.totalFee(this.payroll[i]);
+      this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    }, 500);
+  }
+
   totalDisabilityByWorker(data: Payroll): number {
     let total: number = 0;
     total = data.valueDaysDisabilityGeneralIllines + data.valueDaysDisabilityParents + data.valueDaysDisabilityWorkAccident;
@@ -337,13 +485,14 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   totalFee(data: Payroll): number {
     let total: number = 0;
     total = data.valueAdictionalDaytimeHours + data.valueAdictionalNightHours +
-    data.valueExtraHoursDaytimeSunday + data.valueSurchagedHours035 + data.valueExtraHoursNightSunday + data.valueSurchagedHours075 + data.valueSurchagedHours100 + data.adictionalFee;
+      data.valueExtraHoursDaytimeSunday + data.valueSurchagedHours035 + data.valueExtraHoursNightSunday +
+      data.valueSurchagedHours075 + data.valueSurchagedHours100 + data.adictionalFee;
     return total;
   }
 
   totalAccrued(data: Payroll): number {
     let total: number = 0;
-    total = data.totalValueAdictionalFee + data.transpotationAssitance;
+    total = data.valueDaysToPay + data.valueDaysDisabilityGeneralIllines + data.valueDaysDisabilityWorkAccident + data.valueDaysDisabilityParents + data.valueAdictionalDaytimeHours + data.totalValueAdictionalFee + data.transpotationAssitance;
     return total;
   }
 
