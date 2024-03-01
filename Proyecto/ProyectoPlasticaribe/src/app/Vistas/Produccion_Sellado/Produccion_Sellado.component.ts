@@ -228,7 +228,7 @@ export class Produccion_SelladoComponent implements OnInit {
   validarProceso() {
     if(this.ordenesTrabajo.length > 0) {
       let esWicket : boolean = this.ordenesTrabajo[0].wicket == null ? false : true;
-      if(this.formSellado.value.maquina == 50 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' });
+      if(this.formSellado.value.maquina == 9 && esWicket) this.formSellado.patchValue({ proceso: 'WIKE' });
       else this.formSellado.patchValue({ proceso: 'SELLA' });
     }
   }
