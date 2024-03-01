@@ -454,7 +454,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       Tara_Cono: this.formDatosProduccion.value.pesoTara,
       Peso_Bruto: this.formDatosProduccion.value.pesoBruto,
       Peso_Neto: this.formDatosProduccion.value.pesoNeto,
-      Cantidad: presentation == 'Und' ? 1 : 0,
+      Cantidad: presentation == 'Und' && this.validateProcess() == 'EMP' ? !this.formDatosProduccion.value.daipita ? 1 : this.formDatosProduccion.value.daipita : 0,
       Peso_Teorico: 0,
       Desviacion: 0,
       Precio: this.validarPrecio(this.datosOrdenTrabajo[0]),
@@ -473,17 +473,18 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   guardarProduccion() {
     this.cargando = true;
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      // this.createTagProduction(res.numero_Rollo, res.peso_Bruto, res.peso_Neto);
       this.searchDataTagCreated(res.numero_Rollo);
-      this.limpiarCampos();
-      this.formDatosProduccion.patchValue({
-        ordenTrabajo: res.ot,
-        maquina: res.maquina,
-        operario: res.operario1_Id,
-        cono: res.cono_Id,
-      });
-      this.buscraOrdenTrabajo();
-      this.msj.mensajeConfirmacion(`¡Rollo almacenado!`);
+      setTimeout(() => {
+        this.limpiarCampos();
+        this.formDatosProduccion.patchValue({
+          ordenTrabajo: res.ot,
+          maquina: res.maquina,
+          operario: res.operario1_Id,
+          cono: res.cono_Id,
+        });
+        this.buscraOrdenTrabajo();
+        this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
+      }, 1000);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
       this.cargando = false;
@@ -520,11 +521,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           cal: data.calibre,
           orderProduction: data.ot.trim(),
           material: data.material.trim(),
-          quantity: data.extBruto,
-          quantity2: data.extnetokg,
+          quantity: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? data.extBruto : data.extnetokg,
+          quantity2: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? data.extnetokg : this.formDatosProduccion.value.daipita,
           reel: data.item,
-          presentationItem1: 'Kg Bruto',
-          presentationItem2: 'Kg Neto',
+          presentationItem1: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
+          presentationItem2: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
           showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
