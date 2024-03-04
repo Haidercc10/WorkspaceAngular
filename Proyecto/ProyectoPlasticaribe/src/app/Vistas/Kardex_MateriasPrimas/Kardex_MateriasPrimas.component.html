@@ -5,7 +5,7 @@
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
-  
+
 <!--Espacio para el titulo-->
 <div class="contain">
     <div class="container-fluid">
@@ -51,7 +51,7 @@
         </span>
       </div>
 
-      <!-- Producto -->      
+      <!-- Producto -->
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4" id="producto">
         <span class="p-float-label">
           <input formControlName="Producto" id="Producto" type="text" pInputText/>
@@ -68,7 +68,7 @@
         <button pButton label="Exportar Excel" tooltipPosition="bottom" pRipple type="button" icon="pi pi-file-excel" class="p-button-success mr-2" (click)="exportarExcel()"></button>
       </div>
     </div>
-  </form>    
+  </form>
 
   <hr>
   <div class="mb-4">
@@ -76,7 +76,7 @@
   </div>
 
   <!-- TABLA DE COSTOS -->
-  
+
   <p-table
     #dt_costos
     dataKey="fecha"
@@ -150,9 +150,9 @@
   <div class="p-2">
     <p-table
       #dt_kardex
-      rowGroupMode="rowspan" 
-      groupRowsBy="fecha" 
-      sortField="fecha" 
+      rowGroupMode="rowspan"
+      groupRowsBy="fecha"
+      sortField="fecha"
       sortMode="single"
       dataKey="fecha"
       [value]="datosKardex"

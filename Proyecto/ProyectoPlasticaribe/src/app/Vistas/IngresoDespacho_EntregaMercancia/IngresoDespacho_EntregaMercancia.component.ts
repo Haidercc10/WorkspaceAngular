@@ -132,7 +132,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     let count: number = 0;
     consolidateData.forEach(prod => {
       let preIn: number = parseInt(this.barCode.replace('ENTRLL #', ''));
-      let details: string = `ENTRADA DE ROLLOS/BULTOS #${preIn}, DE LA OT ${prod.details.orderProduction}, DESDE PLASTICARIBE.`;
+      let details: string = `ENTRADA DE ROLLOS N° ${preIn} DE LA OT ${prod.details.orderProduction} DESDE PLASTICARIBE`;
       let item: string = prod.details.item;
       let presentation: string = this.validatePresentation(prod.details.presentation);
       let quantity: number = this.calculateTotalQuantityByItem(prod.details.item, data);
@@ -140,7 +140,10 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
       this.produccionProcessService.sendProductionToZeus(details, item, presentation, 0, quantity.toString(), price.toString()).subscribe(() => {
         count++;
         if (count == consolidateData.length) this.saveDataEntrace(data);
-      }, error => this.errorMessage(`¡Error al actualizar el inventario del ${item} en zeus!`, error));
+      }, error => {
+        if (error.status == 1) this.errorMessage(error.message, error);
+        this.errorMessage(`¡Error al actualizar el inventario del ${item} en zeus!`, error);
+      });
     });
   }
 
@@ -184,7 +187,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
     dataPreIn.forEach(data => {
       let info: any = {
         EntRolloProd_Id: id,
-        Rollo_Id: data.details.production,
+        Rollo_Id: data.details.productionPlasticaribe,
         DtEntRolloProd_Cantidad: data.details.quantity,
         UndMed_Rollo: data.details.presentation,
         Estado_Id: 19,
@@ -209,6 +212,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
   PutDelivered_Avaible(idEntrace: number) {
     this.produccionProcessService.PutDelivered_Avaible(idEntrace).subscribe(() => {
       this.barCode = null;
+      this.load = false;
       this.msg.mensajeConfirmacion(`¡Registro Exitoso!`, `¡Se ingresaron exitosamente todos los rollos/bultos!`);
     }, (error: HttpErrorResponse) => this.errorMessage(`¡Ocurrió un error al actualizar el estado de los rollos/bultos!`, error));
   }

@@ -298,6 +298,7 @@ export class Orden_FacturacionComponent implements OnInit {
         let index = this.production.findIndex(x => x.numberProduction == d.numberProduction);
         this.production.splice(index, 1);
       });
+      this.productionSelected.sort((a,b) => Number(b.numberProduction) - Number(a.numberProduction));
     }
     setTimeout(() => this.load = false, 5);
   }
@@ -312,6 +313,7 @@ export class Orden_FacturacionComponent implements OnInit {
         let index = this.productionSelected.findIndex(x => x.numberProduction == d.numberProduction);
         this.productionSelected.splice(index, 1);
       });
+      this.production.sort((a,b) => Number(a.numberProduction) - Number(b.numberProduction));
     }
     setTimeout(() => this.load = false, 5);
   }

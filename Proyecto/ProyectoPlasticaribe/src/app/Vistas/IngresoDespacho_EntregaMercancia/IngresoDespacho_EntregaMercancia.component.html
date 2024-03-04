@@ -1,3 +1,9 @@
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
 <div class="my-2">
   <h4 [ngClass]="{'tituloRojo' : !selectedMode, 'tituloClaro': selectedMode }"><i class="pi pi-wrench"></i> Cargar Datos Producción</h4>
 </div>

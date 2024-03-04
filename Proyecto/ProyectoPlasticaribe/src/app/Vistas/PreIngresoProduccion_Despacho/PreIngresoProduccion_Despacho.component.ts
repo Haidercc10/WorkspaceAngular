@@ -43,8 +43,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     private productionProcessService: Produccion_ProcesosService,
     private preInService: PreEntregaRollosService,
     private detailsPreInService: DtPreEntregaRollosService,
-    private processService: ProcesosService,
-    private createPDFService: CreacionPdfService,) {
+    private processService: ProcesosService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
     this.formData = this.formBuilder.group({
@@ -99,6 +98,8 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     let orderProduction = this.formData.value.orderProduction;
     let process: string = this.formData.value.process;
     this.productionProcessService.GetInformationAboutProductionByOrderProduction_Process(orderProduction, process).subscribe(data => {
+      this.productionSelected = [];
+      this.consolidatedProduction = [];
       this.production = this.fillDataOrderProduction(data);
     }, error => this.errorMessage(`¡Error al consultar la producción!`, error));
   }
@@ -382,7 +383,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
         widths: ['50%', '20%', '30%'],
         body: [
           [
-            { text: `Información General Pre Ingreso`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
+            { text: `Información General Entrega`, colSpan: 3, alignment: 'center', fontSize: 10, bold: true }, {}, {}
           ],
           [
             { text: `Nombre: ${data.pre.user_Name}`, colSpan: 2 },

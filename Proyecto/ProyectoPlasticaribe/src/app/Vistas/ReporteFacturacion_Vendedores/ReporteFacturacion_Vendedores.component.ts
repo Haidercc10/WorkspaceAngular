@@ -131,7 +131,8 @@ export class ReporteFacturacion_VendedoresComponent implements OnInit {
         };
         this.facturasData.datasets.push(info);
         this.datosConsultados.push({Anio : `${this.anioSeleccionado}`, Vendedor : vendedor});
-        this.consultarConsolidado();
+        this.cargando = false;
+        // this.consultarConsolidado();
       }, 1500);
     } else {
       this.msj.mensajeAdvertencia(`Advertencia`, `¡Ya se ha graficado la información del vendedor con el código ${vendedor} en el año ${this.anioSeleccionado}!`);
