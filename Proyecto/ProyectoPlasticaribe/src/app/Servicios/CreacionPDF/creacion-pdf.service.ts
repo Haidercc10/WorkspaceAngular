@@ -114,7 +114,13 @@ export class CreacionPdfService {
       footer: this.footerPDF(dataTag.productionProcess, dataTag.operator),
       content: this.contentPDF(dataTag),
     }
-    pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => window.electron.send('print-pdf', buffer));
+    pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
+      let data: any = {
+        nameTag: `Etiqueta ${dataTag.productionProcess} - N${dataTag.reel}`,
+        buffer: buffer,
+      };
+      window.electron.send('print-pdf', data);
+    });
     if (dataTag.copy) this.createRePrint(dataTag);
   }
 
@@ -312,7 +318,13 @@ export class TagProduction_2 {
       pageMargins: [10, 10, 10, 10],
       content: this.contentPDF(dataTag),
     }
-    pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => window.electron.send('print-pdf', buffer));
+    pdfMake.createPdf(pdfDefinition).getBuffer((buffer) => {
+      let data: any = {
+        nameTag: `Etiqueta ${dataTag.productionProcess} - N${dataTag.reel}`,
+        buffer: buffer,
+      };
+      window.electron.send('print-pdf', data);
+    });
     if (dataTag.copy) this.createRePrint(dataTag);
   }
 

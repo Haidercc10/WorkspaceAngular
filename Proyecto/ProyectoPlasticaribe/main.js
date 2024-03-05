@@ -8,71 +8,83 @@ const log = require('electron-log');
 let appWin;
 
 function createWindow() {
-    appWin = new BrowserWindow({
-        title: "Plasticaribe",
-        resizable: true,
-        icon: '/assets/Plascaribe_Icono.png',
-        webPreferences: {
-            contextIsolation: true,
-            nodeIntegration: true,
-            preload: path.join(__dirname, 'preload.js'),
-            plugins: true,
-        }
+  appWin = new BrowserWindow({
+    title: "Plasticaribe",
+    resizable: true,
+    icon: '/assets/Plascaribe_Icono.png',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+      plugins: true,
+    }
+  });
+
+  ipcMain.on('print-pdf', async (event, data) => {
+    const pdfPath = path.join(Os.tmpdir(), `${data.nameTag}.pdf`);
+    deleteFolderRecursively(Os.tmpdir());
+    fs.writeFile(pdfPath, data.buffer, async (error) => {
+      if (error) {
+        log.error(error);
+        throw error;
+      }
+      let options = {
+        paperSize: 'PLASTICARIBE',
+        orientation: 'landscape'
+      }
+      print.print(pdfPath, options).then(success => {
+        log.info(pdfPath);
+        deleteFolderRecursively(Os.tmpdir());
+      }).catch(error => log.error(error));
     });
+  });
 
-    ipcMain.on('print-pdf', async (event, buffer) => {
-        const pdfPath = path.join(Os.tmpdir(), 'output.pdf');
-        fs.writeFile(pdfPath, buffer, async (error) => {
-            if (error) {
-                log.error(error);
-                throw error;
-            }
-            let options = {
-                paperSize: 'PLASTICARIBE',
-                orientation: 'landscape'
-            }
+  const deleteFolderRecursively = function (directory_path) {
+    if (fs.existsSync(directory_path)) {
+      fs.readdirSync(directory_path).forEach(function (file, index) {
+        var currentPath = path.join(directory_path, file);
+        if(currentPath.endsWith('.pdf')) fs.unlinkSync(currentPath); // delete file
+      });
+    }
+  };
 
-            print.print(pdfPath, options).then(log.info(pdfPath)).catch(error => log.error(error));
-        });
-    });
+  appWin.loadURL(`file://${__dirname}/dist/index.html`);
 
-    appWin.loadURL(`file://${__dirname}/dist/index.html`);
+  appWin.setMenu(null);
 
-    appWin.setMenu(null);
+  appWin.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
+    event.preventDefault()
+    if (portList && portList.length > 0) callback(portList[0].portId);
+    else callback('');
+  });
 
-    appWin.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
-        event.preventDefault()
-        if (portList && portList.length > 0) callback(portList[0].portId);
-        else callback('');
-    });
+  appWin.webContents.session.on('serial-port-added', (event, port) => console.log('serial-port-added FIRED WITH', port));
 
-    appWin.webContents.session.on('serial-port-added', (event, port) => console.log('serial-port-added FIRED WITH', port));
+  appWin.webContents.session.on('serial-port-removed', (event, port) => console.log('serial-port-removed FIRED WITH', port));
 
-    appWin.webContents.session.on('serial-port-removed', (event, port) => console.log('serial-port-removed FIRED WITH', port));
+  appWin.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    if (permission === 'serial' && details.securityOrigin === 'file:///') return true;
+  });
 
-    appWin.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-        if (permission === 'serial' && details.securityOrigin === 'file:///') return true;
-    });
+  appWin.webContents.session.setDevicePermissionHandler((details) => {
+    if (details.deviceType === 'serial' && details.origin === 'file://') return true;
+  });
 
-    appWin.webContents.session.setDevicePermissionHandler((details) => {
-        if (details.deviceType === 'serial' && details.origin === 'file://') return true;
-    });
+  // appWin.webContents.openDevTools();
 
-    // appWin.webContents.openDevTools();
+  appWin.on("closed", () => appWin = null);
 
-    appWin.on("closed", () => appWin = null);
-
-    appWin.maximize();
+  appWin.maximize();
 }
 
 app.whenReady().then(() => {
-    createWindow();
+  createWindow();
 
-    app.on('activate', function () {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
 })
 
 app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') app.quit();
 });
