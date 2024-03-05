@@ -67,6 +67,24 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
   }
 
+  //Función para validar el area del rol del usuario logueado.
+  validateArea(){
+    let area : any = ``;
+    if ([74,85,7].includes(this.ValidarRol)) area = "EXT";
+    else if ([88, 62, 4, 75].includes(this.ValidarRol)) area = "IMP";
+    else if ([89, 76, 63].includes(this.ValidarRol))  area = "ROT";
+    else if (this.ValidarRol == 77) area = "LAM";
+    else if (this.ValidarRol == 78) area = "DBLD";
+    else if ([79,4].includes(this.ValidarRol)) area = "CORTE"
+    else if (([87,9,80,4].includes(this.ValidarRol))) area = "EMP";
+    else if ([81,86,8,82].includes(this.ValidarRol)) area = "SELLA";
+    else if (this.ValidarRol == 82) area = "WIKE";  
+    else if (this.ValidarRol == 84) area = "RECUP";  
+    else area = "N/A";
+
+    return area;
+  }
+
   // Funcion que va a hacer que se inicie el tutorial in-app
   tutorial(){
     this.shepherdService.defaultStepOptions = defaultStepOptions;
@@ -127,6 +145,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, this.rutaAPI()).subscribe(data => {
+        if(this.ValidarRol != 1) data = data.filter((x) => x.id_Proceso == this.validateArea());
         this.arrayDesperdicios = data;
         if (data.length == 0) {
           this.msj.mensajeAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
@@ -191,6 +210,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.otSeleccionada = item.OT;
     this.load = false;
     this.servicioDesperdicios.getDesperdicioxOT(item.OT).subscribe(dataDesperdicios => {
+      if(this.ValidarRol != 1) dataDesperdicios = dataDesperdicios.filter((x) => x.id_Proceso == this.validateArea());
       for (let index = 0; index < dataDesperdicios.length; index++) {
         this.llenarModal(dataDesperdicios[index]);
       }

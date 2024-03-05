@@ -79,7 +79,7 @@
         <!-- NO CONFORMIDAD -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
           <span class="p-float-label">
-              <p-dropdown formControlName="IdTipoNoConformidad" inputId="NoConformidad" [autoDisplayFirst]="false" [options]="fallas" optionLabel="falla_Nombre" optionValue="falla_Id" [required]="true" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+              <p-dropdown formControlName="IdTipoNoConformidad" inputId="NoConformidad" [autoDisplayFirst]="true" [options]="fallas" optionLabel="falla_Nombre" optionValue="falla_Id" [required]="true" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
               <label for="NoConformidad">No Conformidad</label>
           </span>
         </div>
@@ -103,7 +103,7 @@
          <!-- TURNO -->
          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-1" id="turno">
           <span class="p-float-label">
-            <p-dropdown formControlName="Turno" id="turno" [options]="turnos" optionLabel="turno_Id" [readonly]="true" optionValue="turno_Id" [autoDisplayFirst]="false"></p-dropdown>
+            <p-dropdown formControlName="Turno" id="turno" [options]="turnos" optionLabel="turno_Id" optionValue="turno_Id" [autoDisplayFirst]="false"></p-dropdown>
             <label for="turno">Turno</label>
           </span>
         </div>
@@ -171,7 +171,6 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" id="agregar" type="button" label="Añadir Desperdicio" [disabled]="ordenesTrabajo.length == 0" icon="pi pi-send" (click)="generarDesperdicio()"></button>
         <button pButton class="p-button-secondary" id="limpiarCampos" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-        <button pButton class="p-button-success" id="bascula" type="button" label="Conectar Bascula" icon="pi pi-power-off" (click)="getPuertoSerial()"></button>
       </div>
     </div>
   </form>
@@ -211,7 +210,7 @@
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'operario', 'contains')"></th>
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'noConformidad', 'contains')"></th>
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'peso', 'contains')"></th>
-            <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'impreso', 'contains')"></th>
+            <!--<th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'impreso', 'contains')"></th>-->
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'fecha', 'contains')"></th>
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'hora', 'contains')"></th>
             <th><input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'proceso', 'contains')"></th>
@@ -225,7 +224,7 @@
             <th class="text-center" scope="col">Operario</th>
             <th class="text-center" scope="col">No Conformidad</th>
             <th class="text-center" scope="col">Cantidad Kg</th>
-            <th class="text-center" scope="col">Impreso</th>
+            <!--<th class="text-center" scope="col">Impreso</th>-->
             <th class="text-center" scope="col">Fecha</th>
             <th class="text-center" scope="col">Hora</th>
             <th class="text-center" scope="col">Proceso</th>
@@ -241,7 +240,7 @@
             <td class="text-center">{{desperdicio.operario}}</td>
             <td class="text-center">{{desperdicio.noConformidad}}</td>
             <td class="text-center"><b>{{desperdicio.peso | number : '1.2-2' }}</b></td>
-            <td class="text-center">{{desperdicio.impreso}}</td>
+            <!--<td class="text-center">{{desperdicio.impreso}}</td>-->
             <td class="text-center">{{desperdicio.fecha | date : 'yyyy-MM-dd' }}</td>
             <td class="text-center">{{desperdicio.hora}}</td>
             <td class="text-center"><b>{{desperdicio.proceso == 'DESP_CORTADORES' ? 'CORTE' : desperdicio.proceso.replace('DESP_', '')}}</b></td>
@@ -257,7 +256,7 @@
           <tr id="totales">
             <td colspan="6" class="text-right">Totales</td>
             <td class="text-center">{{desperdicios.length > 0 ? calcularPeso().toFixed(2) : 0 | number : '1.2-2'}} Kg</td>
-            <td colspan="5" class="text-center"></td>
+            <td colspan="4" class="text-center"></td>
           </tr>
         </ng-template>  
       </p-table>

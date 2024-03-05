@@ -110,15 +110,15 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que cargará el area del usuario logueado
   filtrarArea(){
-    if (this.ValidarRol == 74) this.area = { id : "EXT", nombre : "Extrusion", };
-    else if (this.ValidarRol == 75) this.area = { id :"IMP", nombre : "Impresion", };
-    else if (this.ValidarRol == 76) this.area = { id :"ROT", nombre : "Rotograbado", };
+    if ([74,85,7].includes(this.ValidarRol)) this.area = { id : "EXT", nombre : "Extrusion", };
+    else if ([88, 62, 4, 75].includes(this.ValidarRol)) this.area = { id :"IMP", nombre : "Impresion", };
+    else if ([89, 76, 63].includes(this.ValidarRol)) this.area = { id :"ROT", nombre : "Rotograbado", };
     else if (this.ValidarRol == 77) this.area = { id :"LAM", nombre : "Laminado", };
     else if (this.ValidarRol == 78) this.area = { id :"DBLD", nombre : "Doblado", };
-    else if (this.ValidarRol == 79) this.area = { id :"CORTE", nombre : "Corte", };
-    else if (this.ValidarRol == 80) this.area = { id :"EMP", nombre : "Empaque", };
-    else if (this.ValidarRol == 81) this.area = { id :"SELLA", nombre : "Sellado", };
-    else if (this.ValidarRol == 82) this.area = { id :"WIKE", nombre : "Wiketiado", };  
+    else if ([79,4].includes(this.ValidarRol)) this.area = { id :"CORTE", nombre : "Corte", };
+    else if (([87,9,80,4].includes(this.ValidarRol))) this.area = { id :"EMP", nombre : "Empaque", };
+    else if ([81,86,8].includes(this.ValidarRol)) this.area = { id :"SELLA", nombre : "Sellado", };
+    else if ([81,86,8,82].includes(this.ValidarRol)) this.area = { id :"WIKE", nombre : "Wiketiado", };  
     else if (this.ValidarRol == 84) this.area = { id :"RECUP", nombre : "Recuperado", };  
     else this.area = { id : "N/A", nombre : "NO APLICA" };
     
@@ -183,8 +183,12 @@ export class DesperdicioComponent implements OnInit {
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
   
-  obtenerFallas = () => this.fallasService.srvObtenerLista().subscribe(datos => this.fallas = datos.filter((item) => item.tipoFalla_Id == 11));
-
+  obtenerFallas(){
+    this.fallasService.srvObtenerLista().subscribe(datos => {
+      this.fallas = datos.filter((item) => [9,11].includes(item.tipoFalla_Id));
+      if([81,86,8,82].includes(this.ValidarRol)) this.fallas.sort((a,b) => Number(b.falla_Id) - Number(a.falla_Id));
+    });  
+  } 
   // Funcion que va a consultar y obtener la informacion de las maquinas
   obtenerMaquinas = () => this.maquinasService.GetTodo().subscribe(datos => this.maquinas = datos.filter((item) => item.tpActv_Id == 4));
 
@@ -224,6 +228,7 @@ export class DesperdicioComponent implements OnInit {
       } else {
         this.cargarTurnoActual();
         for (let i = 0; i < datos_orden.length; i++) {
+          console.log(datos_orden)
           this.getOT(datos_orden[i]);
           this.getOTDesperdicio(orden.toString());
         } 
@@ -237,6 +242,7 @@ export class DesperdicioComponent implements OnInit {
   //Función que cargará la información de la orden en la tabla
   getOT(datos_orden : any){
     let imp : any = datos_orden.impresion.trim();
+    console.log(imp)
     if (imp == "1") imp = "SI";
     else if (imp == "0") imp = "NO";
     let info : any = {
@@ -258,8 +264,9 @@ export class DesperdicioComponent implements OnInit {
       }
     this.ordenesTrabajo.push(info);
     this.FormDesperdicio.patchValue({ 
-      IdTipoMaterial : parseInt(datos_orden.extMaterial.trim()),
-      TipoMaterial : datos_orden.extMaterialNom.trim(), 
+      'IdTipoMaterial' : parseInt(datos_orden.extMaterial.trim()),
+      'TipoMaterial' : datos_orden.extMaterialNom.trim(), 
+      'Impreso' : imp,
     }); 
     this.cargando = false;
   }
@@ -274,9 +281,10 @@ export class DesperdicioComponent implements OnInit {
     else area = ``;
     
     this.bagProService.GetOtProcesoDesperdicio(ot, ruta).subscribe(data => { 
-      if([74, 75, 76, 77, 78, 79, 80, 81, 82].includes(this.ValidarRol)) {
+      if([4, 74, 75, 76, 77, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89].includes(this.ValidarRol)) {
         this.desperdicios = data.filter(x => x.proceso.includes(`DESP_${area}`));
         this.copiaDesperdicios = this.desperdicios;
+        console.log(this.desperdicios)
       } else {
         this.desperdicios = data;
         this.copiaDesperdicios = this.desperdicios;
@@ -290,7 +298,9 @@ export class DesperdicioComponent implements OnInit {
     let area : any = this.area.nombre.toUpperCase();
     if(area == "NO APLICA") area = ``;
     if(area == "EMPAQUE" || area == "CORTE") area = `CORTADORES`;
-    return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => a + b.peso, 0);
+    console.log(this.desperdicios)
+    console.log(area)
+    return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => (a + b.peso), 0);
   } 
 
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD

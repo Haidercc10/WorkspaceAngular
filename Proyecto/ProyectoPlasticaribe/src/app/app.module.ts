@@ -347,6 +347,7 @@ import { IngresoDespacho_EntregaMercanciaComponent } from './Vistas/IngresoDespa
     Reporte_NominaComponent,
     NominaDetallada_PlasticaribeComponent,
     IngresoDespacho_EntregaMercanciaComponent,
+    Prestamos_NominaComponent,
   ],
 
   imports: [

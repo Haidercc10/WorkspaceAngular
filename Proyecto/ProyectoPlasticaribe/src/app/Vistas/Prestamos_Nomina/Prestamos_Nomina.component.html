@@ -1,3 +1,174 @@
-<p>
-  Prestamos_Nomina works!
-</p>
+<!-- Icono de cargando -->
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<!-- Navbar parte superior -->
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 [ngClass]="{'tituloRojo' : !modeSelected, 'tituloClaro': modeSelected }">Prestamos</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<p-card class="font-size-14">
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+    <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="left"></p-button>
+  </div>
+
+  <!--Subtitulo-->
+  <div class="mb-5">
+    <h2 [ngClass]="{'tituloRojo': !modeSelected, 'tituloClaro': modeSelected}"><i class="pi pi-search"></i> Busqueda de empleados</h2>
+  </div>
+
+  <!--Formulario-->
+  <form [formGroup]="form">
+    <div class="mb-3" id="formulario">
+      <div class="row g-4">
+
+        <!--Cedula-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="id" id="id" (keyup.enter)="getEmployee('id')" [useGrouping]="false"></p-inputNumber>
+            <label for="id">Cedula</label>
+          </span>
+        </div>
+
+        <!--Nombre-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-4">
+          <span class="p-float-label">
+            <input formControlName="name" id="emp" list="employees" autocomplete="off" type="text" pInputText (keyup)="getEmployee('name')" (change)="selectEmployee('name')" tooltipPosition="top">
+            <datalist id="employees">
+              <option *ngFor="let item of employees">{{item.usua_Nombre}}</option>
+            </datalist>
+            <label for="emp">Empleado</label>
+          </span>
+        </div>
+
+         <!--Prestamo-->
+         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+            <label for="valueLoan">Valor prestamo</label>
+          </span>
+        </div>
+
+        <!--Cuota-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="valueFee" id="valueFee" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+            <label for="valueFee">Valor cuota</label>
+          </span>
+        </div>
+
+        <!-- Fecha plazo -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label" id="rank-dates">
+            <p-calendar id="dateTerm" inputId="dateTerm" formControlName="dateTerm" [showIcon]="true"></p-calendar>
+            <label for="dateTerm">Fecha Plazo</label>
+          </span>
+        </div>
+
+        <!-- Observacion -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+          <span class="p-float-label">
+            <textarea formControlName="observation" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+
+      </div>  
+    </div>  
+
+    <!--Botones-->
+    <div class="mb-3" id="buttons">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="button" label="Cargar Prestamo" icon="pi pi-search" (click)="searchLoans()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
+      </div>
+    </div>
+      
+  </form>
+
+  <!--Linea-->
+  <div class="mb-3">
+    <hr class="colorLinea">
+  </div>
+
+  <!--Titulo tabla-->
+  <div class="mb-5">
+    <h2 [ngClass]="{'tituloRojo': !modeSelected, 'tituloClaro': modeSelected}"><i class="pi pi-table"></i> Tabla de prestamos de empleados</h2>
+  </div>
+
+  <!-- Tabla registros -->
+  <div class="row g-3" id="tabla">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+      responsiveLayout="scroll"
+      [rowHover]="true"
+      [value]="loans"
+      [scrollable]="true"
+      scrollHeight="50rem">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="font-weight: 800;" class="text-center"></th>
+            <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
+            <th style="font-weight: 800;" class="text-center textGreen" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calculator"></i> Fechas</th>
+          </tr>
+          <tr>
+            <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
+            <th  class="text-center" scope="col" pFrozenColumn alignFrozen="left" [frozen]="true">Cedula</th>
+            <th  class="text-center" scope="col" pFrozenColumn alignFrozen="left" [frozen]="true"> Nombre</th>
+            <th  class="text-center" scope="col">Valor Prestado</th>
+            <th  class="text-center" scope="col">Valor cancelado </th>
+            <th  class="text-center" scope="col">Valor Adeudado</th>
+            <th  class="text-center" scope="col">Valor cuota</th>
+            <th class="text-center" scope="col">Valor % cuota</th>
+            <th class="text-center" scope="col">Fecha Prestamo</th>
+            <th  class="text-center" scope="col">Fecha Plazo</th>
+            <th  class="text-center" scope="col">Dias faltantes</th>
+            <th class="text-center" scope="col">Fecha últ. cuota</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-loans let-rowIndex="rowIndex">
+          <tr>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{loans.user.usua_Id}}</b></td>
+            <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{loans.user.usua_Nombre}}</td>
+            <td class="text-center" ><b>{{loans.loans.ptm_Valor | number : '1.2-2'}}</b></td>
+            <td class="text-center" >{{loans.loans.ptm_ValorCancelado | number : '1.2-2'}}</td>
+            <td class="text-center" >{{loans.loans.ptm_ValorDeuda | number : '1.2-2'}}</td>
+            <td class="text-center" >{{loans.loans.ptm_ValorCuota | number : '1.2-2'}}</td>
+            <td class="text-center" >{{loans.loans.ptm_PctjeCuota}}</td>
+            <td class="text-center" ><b>{{loans.loans.ptm_Fecha | date : 'dd/MM/yyyy'}}</b></td>
+            <td class="text-center" >{{loans.loans.ptm_FechaPlazo | date : 'dd/MM/yyyy'}}</td>
+            <td class="text-center" >{{calculateDiffDias(loans.loans)}}</td>
+            <td class="text-center" >{{loans.loans.ptm_FechaUltCuota | date : 'dd/MM/yyyy'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="text-center" colspan="3" class="text-right">Totales</td>
+            <td class="text-center" id="total">{{ 0 }} </td>
+            <td class="text-center" id="total">{{ 0 }} </td>
+            <td class="text-center" id="total">{{ 0 }} </td>
+            <td class="text-center" colspan="6"></td>
+           
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-card>
