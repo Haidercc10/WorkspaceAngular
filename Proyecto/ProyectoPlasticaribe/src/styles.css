@@ -516,6 +516,18 @@ p-avatar div span {
 
 /* DISEÑO BOTONES */
 
+.textRed {
+  color : palevioletred
+}
+
 .textBlue {
   color: rgb(0, 153, 255);
+}
+
+.textGreen {
+  color: rgb(0, 216, 0);
+}
+
+.textOrange {
+  color: #ffcc16;
 }

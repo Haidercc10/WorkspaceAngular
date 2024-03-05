@@ -228,7 +228,6 @@ export class DesperdicioComponent implements OnInit {
       } else {
         this.cargarTurnoActual();
         for (let i = 0; i < datos_orden.length; i++) {
-          console.log(datos_orden)
           this.getOT(datos_orden[i]);
           this.getOTDesperdicio(orden.toString());
         } 
@@ -241,8 +240,7 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que cargará la información de la orden en la tabla
   getOT(datos_orden : any){
-    let imp : any = datos_orden.impresion.trim();
-    console.log(imp)
+    let imp : any = datos_orden.impresion.trim();    
     if (imp == "1") imp = "SI";
     else if (imp == "0") imp = "NO";
     let info : any = {
@@ -284,7 +282,6 @@ export class DesperdicioComponent implements OnInit {
       if([4, 74, 75, 76, 77, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89].includes(this.ValidarRol)) {
         this.desperdicios = data.filter(x => x.proceso.includes(`DESP_${area}`));
         this.copiaDesperdicios = this.desperdicios;
-        console.log(this.desperdicios)
       } else {
         this.desperdicios = data;
         this.copiaDesperdicios = this.desperdicios;
@@ -298,15 +295,12 @@ export class DesperdicioComponent implements OnInit {
     let area : any = this.area.nombre.toUpperCase();
     if(area == "NO APLICA") area = ``;
     if(area == "EMPAQUE" || area == "CORTE") area = `CORTADORES`;
-    console.log(this.desperdicios)
-    console.log(area)
+    
     return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => (a + b.peso), 0);
   } 
 
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD
   generarDesperdicio(){
-    console.log(this.FormDesperdicio)
-    console.log(this.FormDesperdicio.value)
     if(!this.FormDesperdicio.valid) this.mensajeService.mensajeAdvertencia(`Advertencia`, `Debe completar todos los campos!`);
     else if(this.FormDesperdicio.value.CantidadKg <= 0) this.mensajeService.mensajeAdvertencia(`El peso debe ser mayor a 0!`);
     else if(this.FormDesperdicio.value.Maquina <= 0) this.mensajeService.mensajeAdvertencia(`La maquina no puede ser 0!`);

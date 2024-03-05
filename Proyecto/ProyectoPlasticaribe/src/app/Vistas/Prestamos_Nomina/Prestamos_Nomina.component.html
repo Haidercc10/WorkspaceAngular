@@ -90,7 +90,7 @@
     <!--Botones-->
     <div class="mb-3" id="buttons">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Cargar Prestamo" icon="pi pi-search" (click)="searchLoans()"></button>
+        <button pButton class="p-button-danger" type="button" label="Registrar Prestamo" icon="pi pi-send" (click)="validateLoan()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
       </div>
     </div>
@@ -124,8 +124,8 @@
           <tr>
             <th style="font-weight: 800;" class="text-center"></th>
             <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
-            <th style="font-weight: 800;" class="text-center textGreen" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
-            <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calculator"></i> Fechas</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calendar"></i> Fechas</th>
           </tr>
           <tr>
             <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
@@ -149,26 +149,53 @@
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{loans.user.usua_Nombre}}</td>
             <td class="text-center" ><b>{{loans.loans.ptm_Valor | number : '1.2-2'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_ValorCancelado | number : '1.2-2'}}</td>
-            <td class="text-center" >{{loans.loans.ptm_ValorDeuda | number : '1.2-2'}}</td>
+            <td class="text-center textRed" ><b>{{loans.loans.ptm_ValorDeuda | number : '1.2-2'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_ValorCuota | number : '1.2-2'}}</td>
             <td class="text-center" >{{loans.loans.ptm_PctjeCuota}}</td>
             <td class="text-center" ><b>{{loans.loans.ptm_Fecha | date : 'dd/MM/yyyy'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_FechaPlazo | date : 'dd/MM/yyyy'}}</td>
-            <td class="text-center" >{{calculateDiffDias(loans.loans)}}</td>
+            <td class="text-center" [ngStyle]="{color: calculateDiffDias(loans.loans) > 0 ? '#F6D45D' : 'palevioletred'}"><b>{{calculateDiffDias(loans.loans)}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_FechaUltCuota | date : 'dd/MM/yyyy'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="12">
+              <h6 class="bold">No existen registros de prestamos.</h6>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
             <td class="text-center" colspan="3" class="text-right">Totales</td>
-            <td class="text-center" id="total">{{ 0 }} </td>
-            <td class="text-center" id="total">{{ 0 }} </td>
-            <td class="text-center" id="total">{{ 0 }} </td>
+            <td class="text-center" id="total1">{{ calculateTotalLoan() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total2">{{ calculateTotalCanceled() | number : '1.2-2' }} </td>
+            <td class="text-center" id="total3">{{ calculateTotalDebt() | number : '1.2-2' }} </td>
             <td class="text-center" colspan="6"></td>
-           
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
 </p-card>
+
+<!-- Mensaje de confirmación -->
+<p-toast position="center" key="validation" (onClose)="closeMsgWarning()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="saveLoan()" icon="pi pi-check" label="Sí" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMsgWarning()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
