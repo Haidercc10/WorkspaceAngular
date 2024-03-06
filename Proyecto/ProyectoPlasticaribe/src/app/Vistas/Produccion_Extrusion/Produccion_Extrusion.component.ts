@@ -334,6 +334,8 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscraOrdenTrabajo() {
+    this.obtenerTurnos();
+    this.validarProceso();
     if (this.formDatosProduccion.value.proceso) {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
@@ -385,13 +387,15 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   buscarRollosPesados() {
-    this.rollosPesados = [];
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
       this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
-    }, () => this.cargando = false, () => this.cargando = false);
+    }, () => {
+      this.rollosPesados = [];
+      this.cargando = false;
+    }, () => this.cargando = false);
   }
 
   sumarPesoBruto() {
@@ -407,7 +411,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   validarDatos() {
-    this.obtenerTurnos();
     this.buscraOrdenTrabajo();
     this.cargando = true;
     setTimeout(() => {
@@ -473,17 +476,20 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   guardarProduccion() {
     this.cargando = true;
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo);
+      this.searchDataTagCreated(res.numero_Rollo, res.cantidad);
       setTimeout(() => {
-        this.limpiarCampos();
+        let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
+        this.formDatosProduccion.reset();
         this.formDatosProduccion.patchValue({
           ordenTrabajo: res.ot,
           maquina: res.maquina,
           operario: res.operario1_Id,
           cono: res.cono_Id,
+          mostratDatosProducto: mostratDatosProducto
         });
         this.buscraOrdenTrabajo();
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
+        this.cargando = false;
       }, 1000);
     }, () => {
       this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
@@ -507,8 +513,9 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number) {
+  searchDataTagCreated(reel: number, cantidad: number) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
+      let daipita: any = this.formDatosProduccion.value.daipita;
       res.forEach(data => {
         let dataTagProduction: modelTagProduction = {
           client: data.clienteNombre.trim(),
@@ -521,11 +528,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           cal: data.calibre,
           orderProduction: data.ot.trim(),
           material: data.material.trim(),
-          quantity: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? data.extBruto : data.extnetokg,
-          quantity2: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? data.extnetokg : this.formDatosProduccion.value.daipita,
+          quantity: this.validateProcess() != 'EMP' ? data.extBruto : [0, '', null, undefined].includes(daipita) ? data.extBruto : data.extnetokg,
+          quantity2: this.validateProcess() != 'EMP' ? data.extnetokg : [0, '', null, undefined].includes(daipita) ? data.extnetokg : daipita,
           reel: data.item,
-          presentationItem1: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
-          presentationItem2: !this.formDatosProduccion.value.daipita && this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
+          presentationItem1: [0, '', null, undefined].includes(daipita) ? 'Kg Bruto' : this.validateProcess() != 'EMP' ? 'Kg Bruto' : 'Kg',
+          presentationItem2: [0, '', null, undefined].includes(daipita) ? 'Kg Neto' : this.validateProcess() != 'EMP' ? 'Kg Neto' : 'Und(s)',
           productionProcess: data.nomStatus.trim(),
           showNameBussiness: this.showNameBussiness,
           showDataTagForClient: this.formDatosProduccion.value.mostratDatosProducto,
