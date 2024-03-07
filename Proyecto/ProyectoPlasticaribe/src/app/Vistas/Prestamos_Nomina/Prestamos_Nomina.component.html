@@ -42,7 +42,7 @@
         </div>
 
         <!--Nombre-->
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-4">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-float-label">
             <input formControlName="name" id="emp" list="employees" autocomplete="off" type="text" pInputText (keyup)="getEmployee('name')" (change)="selectEmployee('name')" tooltipPosition="top">
             <datalist id="employees">
@@ -53,10 +53,18 @@
         </div>
 
          <!--Prestamo-->
-         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2" (keyup)="enableFieldQtyFees()"></p-inputNumber>
             <label for="valueLoan">Valor prestamo</label>
+          </span>
+        </div>
+
+        <!--Nro cuotas-->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-1 col-xxl-1">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="qtyFees" id="qtyFees" [useGrouping]="false" (keyup)="calculateValueFee()"></p-inputNumber>
+            <label for="qtyFees">N° cuotas</label>
           </span>
         </div>
 
@@ -65,6 +73,22 @@
           <span class="p-float-label">
             <p-inputNumber formControlName="valueFee" id="valueFee" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
             <label for="valueFee">Valor cuota</label>
+          </span>
+        </div>
+
+        <!-- Fecha Inicio prestamo -->
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label" id="rank-dates">
+            <p-calendar id="initialDate" inputId="initialDate" formControlName="initialDate" [showIcon]="true"></p-calendar>
+            <label for="initialDate">Fecha Inicio</label>
+          </span>
+        </div>
+
+        <!--Lapso de cuota-->
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="lapseFees" inputId="lapseFees" [autoDisplayFirst]="false" [options]="moments" (onChange)="calculateEstimatedDate()"></p-dropdown>
+            <label for="lapseFees">Lapso cuotas</label>
           </span>
         </div>
 
@@ -77,9 +101,9 @@
         </div>
 
         <!-- Observacion -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-8 col-xxl-8">
           <span class="p-float-label">
-            <textarea formControlName="observation" [rows]="1" maxlength="200" pInputTextarea></textarea>
+            <textarea formControlName="observation" [rows]="1" pInputTextarea></textarea>
             <label for="textarea">Observación</label>
           </span>
         </div>
@@ -88,7 +112,7 @@
     </div>  
 
     <!--Botones-->
-    <div class="mb-3" id="buttons">
+    <div  class="d-grid gap-2 mb-3" id="buttons">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Registrar Prestamo" icon="pi pi-send" (click)="validateLoan()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
@@ -125,7 +149,7 @@
             <th style="font-weight: 800;" class="text-center"></th>
             <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
             <th style="font-weight: 800;" class="text-center textRed" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
-            <th style="font-weight: 800;" class="text-center textRed" colspan="4"><i class="pi pi-calendar"></i> Fechas</th>
+            <th style="font-weight: 800;" class="text-center textRed" colspan="5"><i class="pi pi-calendar"></i> Fechas</th>
           </tr>
           <tr>
             <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
@@ -140,10 +164,11 @@
             <th  class="text-center" scope="col">Fecha Plazo</th>
             <th  class="text-center" scope="col">Dias faltantes</th>
             <th class="text-center" scope="col">Fecha últ. cuota</th>
+            <th class="text-center" scope="col">Anular</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-loans let-rowIndex="rowIndex">
-          <tr>
+          <tr (dblclick)="loadModalInfoLoan(loans)" ptooltip="Haz doble click para editar prestamo." tooltipPosition="top">
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{rowIndex + 1}}</td>
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true"><b>{{loans.user.usua_Id}}</b></td>
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{loans.user.usua_Nombre}}</td>
@@ -156,11 +181,12 @@
             <td class="text-center" >{{loans.loans.ptm_FechaPlazo | date : 'dd/MM/yyyy'}}</td>
             <td class="text-center" [ngStyle]="{color: calculateDiffDias(loans.loans) > 0 ? '#F6D45D' : 'palevioletred'}"><b>{{calculateDiffDias(loans.loans)}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_FechaUltCuota | date : 'dd/MM/yyyy'}}</td>
+            <td class="text-center"><p-button icon="pi pi-ban" [rounded]="true" severity="danger" (onClick)="confirmCancelationLoan(loans)"></p-button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="12">
+            <td colspan="13">
               <h6 class="bold">No existen registros de prestamos.</h6>
             </td>
           </tr>
@@ -170,8 +196,8 @@
             <td class="text-center" colspan="3" class="text-right">Totales</td>
             <td class="text-center" id="total1">{{ calculateTotalLoan() | number : '1.2-2' }} </td>
             <td class="text-center" id="total2">{{ calculateTotalCanceled() | number : '1.2-2' }} </td>
-            <td class="text-center" id="total3">{{ calculateTotalDebt() | number : '1.2-2' }} </td>
-            <td class="text-center" colspan="6"></td>
+            <td class="text-center textRed" id="total3">{{ calculateTotalDebt() | number : '1.2-2' }} </td>
+            <td class="text-center" colspan="7"></td>
           </tr>
         </ng-template>
       </p-table>
@@ -179,8 +205,8 @@
   </div>
 </p-card>
 
-<!-- Mensaje de confirmación -->
-<p-toast position="center" key="validation" (onClose)="closeMsgWarning()" [baseZIndex]="5000">
+<!-- Mensaje de confirmación de creación de prestamo-->
+<p-toast position="center" key="validation" (onClose)="closeMsgWarning('validation')" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message">
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
@@ -193,9 +219,37 @@
           <button type="button" pButton (click)="saveLoan()" icon="pi pi-check" label="Sí" class="p-button-warning"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="closeMsgWarning()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="closeMsgWarning('validation')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
         </div>
       </div>
     </div>
   </ng-template>
 </p-toast>
+
+<!-- Mensaje de confirmación de anulación de prestamo -->
+<p-toast position="center" key="cancelation" (onClose)="closeMsgWarning('cancelation')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="cancelLoan(dataLoanTable)" icon="pi pi-check" label="Sí" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMsgWarning('cancelation')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Modal edicion de prestamos -->
+<p-dialog [modal]="true" header="Editar Prestamo"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="visible" [style]="{width: '500px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <app-FormEditarPrestamos></app-FormEditarPrestamos>
+  </ng-template>  
+</p-dialog> 

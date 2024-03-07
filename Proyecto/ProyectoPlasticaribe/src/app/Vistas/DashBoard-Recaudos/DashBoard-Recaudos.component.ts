@@ -21,6 +21,7 @@ import { ReportesConsolidadosComponent } from '../Reportes-Consolidados/Reportes
 export class DashBoardRecaudosComponent implements OnInit {
 
   @ViewChild('dt1') dt1: Table | undefined;
+  @ViewChild('dt2') dt2: Table | undefined;
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga  
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -166,7 +167,7 @@ export class DashBoardRecaudosComponent implements OnInit {
           margin: [5, 0, 5, 5],
           table: {
             headerRows: 1,
-            widths: ['10%', '45%', '15%', '15%', '15%'],
+            widths: ['10%', '35%', '12%', '20%', '11%', '12%'],
             body: this.facturasClientes(clientes[i], informacionPDF)
           }
         });
@@ -183,10 +184,10 @@ export class DashBoardRecaudosComponent implements OnInit {
     data.push([
       {
         // margin: [3, 3, 3, 0],
-        colSpan: 5,
+        colSpan: 6,
         border: [true, false, true, true],
         table: {
-          fontSize: 8,
+          fontSize: 7,
           headerRows: 1,
           dontBreakRows: true,
           widths : ['11%', '11%', '11%', '5%', '12%', '12%', '12%', '14%', '12%',],
@@ -196,7 +197,8 @@ export class DashBoardRecaudosComponent implements OnInit {
       {},
       {},
       {},
-      {}
+      {},
+      {}, 
     ]);
     data.push(this.totalClientePdf(facturas));
     return data;
@@ -207,6 +209,7 @@ export class DashBoardRecaudosComponent implements OnInit {
       { border: [true, true, false, true], text: `${cliente.id_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'left' },
       { border: [false, true, false, true], text: `${cliente.nombre_CLiente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'left' },
       { border: [false, true, false, true], text: `${cliente.ciudad_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'center' },
+      { border: [false, true, false, true], text: `${cliente.direccion_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'center' },
       { border: [false, true, false, true], text: `${cliente.telefono_Cliente}`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'center' },
       { border: [false, true, true, true], text: `Plazo: ${cliente.plazo_De_Pago} Días`, fillColor: '#ccc', bold: true, fontSize: 8, alignment: 'right' },
     ]
@@ -262,7 +265,7 @@ export class DashBoardRecaudosComponent implements OnInit {
     return [
       {
         margin: [5, 5, 5, 0],
-        colSpan: 5,
+        colSpan: 6,
         alignment: 'right',
         fontSize: 10,
         bold: true,
@@ -272,7 +275,8 @@ export class DashBoardRecaudosComponent implements OnInit {
       {},
       {},
       {},
-      {}
+      {},
+
     ]
   }
 

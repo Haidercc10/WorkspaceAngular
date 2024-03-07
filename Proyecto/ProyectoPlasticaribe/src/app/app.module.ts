@@ -213,6 +213,7 @@ import { Reporte_NominaComponent } from './Vistas/Reporte_Nomina/Reporte_Nomina.
 import { NominaDetallada_PlasticaribeComponent } from './Vistas/NominaDetallada_Plasticaribe/NominaDetallada_Plasticaribe.component';
 import { Prestamos_NominaComponent } from './Vistas/Prestamos_Nomina/Prestamos_Nomina.component';
 import { IngresoDespacho_EntregaMercanciaComponent } from './Vistas/IngresoDespacho_EntregaMercancia/IngresoDespacho_EntregaMercancia.component';
+import { FormEditarPrestamosComponent } from './Vistas/FormEditarPrestamos/FormEditarPrestamos.component';
 
 @NgModule({
   declarations: [
@@ -348,6 +349,7 @@ import { IngresoDespacho_EntregaMercanciaComponent } from './Vistas/IngresoDespa
     NominaDetallada_PlasticaribeComponent,
     IngresoDespacho_EntregaMercanciaComponent,
     Prestamos_NominaComponent,
+    FormEditarPrestamosComponent
   ],
 
   imports: [

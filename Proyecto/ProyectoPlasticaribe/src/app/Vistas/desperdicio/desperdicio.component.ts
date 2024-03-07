@@ -100,7 +100,7 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerMaquinas();
     this.obtenerProcesos();
     this.obtenerMateriales();
-    this.cargarPuertosSeriales();
+    //this.cargarPuertosSeriales();
     setTimeout(() => { 
       this.filtrarArea(); 
       this.obtenerOperarios();

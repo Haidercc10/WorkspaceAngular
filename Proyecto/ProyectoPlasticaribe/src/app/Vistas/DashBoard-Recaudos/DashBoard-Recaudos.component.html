@@ -102,6 +102,8 @@
               <th rowspan="2">#</th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'num_Factura')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'nombre_CLiente')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'ciudad_Cliente')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'direccion_Cliente')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'id_Fecha')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'fecha_Vencimiento')"></th>
               <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt1, 'saldo_Cartera')"></th>
@@ -116,6 +118,8 @@
             <tr>
               <th pSortableColumn="num_Factura"><p-sortIcon field="num_Factura"></p-sortIcon> N° Factura</th>
               <th pSortableColumn="nombre_CLiente"><p-sortIcon field="nombre_CLiente"></p-sortIcon> Cliente</th>
+              <th pSortableColumn="ciudad_Cliente"><p-sortIcon field="ciudad_Cliente"></p-sortIcon> Ciudad</th>
+              <th pSortableColumn="direccion_Cliente"><p-sortIcon field="direccion_Cliente"></p-sortIcon> Direccion</th>
               <th pSortableColumn="id_Fecha"><p-sortIcon field="id_Fecha"></p-sortIcon> Fecha</th>
               <th pSortableColumn="fecha_Vencimiento"><p-sortIcon field="fecha_Vencimiento"></p-sortIcon> Vence</th>
               <th pSortableColumn="saldo_Cartera"><p-sortIcon field="saldo_Cartera"></p-sortIcon> Cartera</th>
@@ -127,6 +131,8 @@
               <td>{{rowIndex + 1}}</td>
               <td>{{item.num_Factura}}</td>
               <td>{{item.nombre_CLiente}}</td>
+              <td>{{item.ciudad_Cliente}}</td>
+              <td>{{item.direccion_Cliente}}</td>
               <td>{{item.id_Fecha}}</td>
               <td>{{item.fecha_Vencimiento}}</td>
               <td>{{item.saldo_Cartera | number : '1.2-2'}}</td>
@@ -176,7 +182,7 @@
       <p-card>
         <h2 style="font-weight: 700; text-align: center;" [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i class="pi pi-user"></i> Clientes en Cartera</h2>
         <p-table
-          #dt1
+          #dt2
           [resizableColumns]="true"
           columnResizeMode="expand"
           styleClass="p-datatable-gridlines p-datatable-sm"
@@ -187,6 +193,14 @@
           [value]="carteraAgrupadaClientes">
           <ng-template pTemplate="header">
             <tr>
+              <th></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt2, 'idcliente')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt2, 'razoncial')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt2, 'subTotal')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt2, 'nombvende')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, dt2, 'idvende')"></th>
+            </tr>
+            <tr>  
               <th>#</th>
               <th pSortableColumn="idcliente"><p-sortIcon field="idcliente"></p-sortIcon> Id Cliente</th>
               <th pSortableColumn="razoncial"><p-sortIcon field="razoncial"></p-sortIcon> Cliente</th>

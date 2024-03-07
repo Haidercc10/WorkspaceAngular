@@ -17,4 +17,7 @@ constructor(private http : HttpClient) { }
 
     Post = (data : loan): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Prestamos', data);
 
+    putLoanAnulled = (id : any, data : any[] = []) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/putLoanAnulled/${id}`, data);
+
+    Put = (id : any, data : any) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`, data);
 }
