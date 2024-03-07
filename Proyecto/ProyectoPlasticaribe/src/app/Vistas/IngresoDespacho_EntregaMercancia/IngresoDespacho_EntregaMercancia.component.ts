@@ -121,6 +121,7 @@ export class IngresoDespacho_EntregaMercanciaComponent implements OnInit, OnDest
   getInformactionAboutPreIn_ById() {
     this.load = true;
     let preIn: number = parseInt(this.barCode.replace('ENTRLL #', ''));
+    this.barCode = preIn.toString();
     this.detailsPreInService.GetInformactionAboutPreInToSendDesp_ById(preIn).subscribe(data => this.updateProductionZeus(data), (error: HttpErrorResponse) => {
       let message: string = error.status == 404 ? `¡No se encontró la información del la Pre Entrega!` : `¡Ocurrió un error al buscar la información de la Pre Entrega!`;
       this.errorMessage(message, error);

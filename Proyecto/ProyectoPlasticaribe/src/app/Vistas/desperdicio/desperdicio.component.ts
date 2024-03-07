@@ -47,7 +47,7 @@ export class DesperdicioComponent implements OnInit {
   desperdicios : any = []; //
   area : any = {};
   areas : any [] = [];
-  areaOperarios : any; 
+  areaOperarios : any;
   ordenesTrabajo : any = [];
   turnos : any = [];
   @ViewChild('dt2') dt2: Table | undefined; //Tabla de desperdicios
@@ -64,8 +64,8 @@ export class DesperdicioComponent implements OnInit {
                               private materiaService : MaterialProductoService,
                                 private shepherdService: ShepherdService,
                                   private mensajeService : MensajesAplicacionService,
-                                    private svcAreas : AreaService, 
-                                      private svcTurnos : TurnosService, 
+                                    private svcAreas : AreaService,
+                                      private svcTurnos : TurnosService,
                                         private svcCrearPDF : CreacionPdfService) {
 
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
@@ -100,9 +100,8 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerMaquinas();
     this.obtenerProcesos();
     this.obtenerMateriales();
-    //this.cargarPuertosSeriales();
-    setTimeout(() => { 
-      this.filtrarArea(); 
+    setTimeout(() => {
+      this.filtrarArea();
       this.obtenerOperarios();
     }, 1000);
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
@@ -118,10 +117,10 @@ export class DesperdicioComponent implements OnInit {
     else if ([79,4].includes(this.ValidarRol)) this.area = { id :"CORTE", nombre : "Corte", };
     else if (([87,9,80,4].includes(this.ValidarRol))) this.area = { id :"EMP", nombre : "Empaque", };
     else if ([81,86,8].includes(this.ValidarRol)) this.area = { id :"SELLA", nombre : "Sellado", };
-    else if ([81,86,8,82].includes(this.ValidarRol)) this.area = { id :"WIKE", nombre : "Wiketiado", };  
-    else if (this.ValidarRol == 84) this.area = { id :"RECUP", nombre : "Recuperado", };  
+    else if ([81,86,8,82].includes(this.ValidarRol)) this.area = { id :"WIKE", nombre : "Wiketiado", };
+    else if (this.ValidarRol == 84) this.area = { id :"RECUP", nombre : "Recuperado", };
     else this.area = { id : "N/A", nombre : "NO APLICA" };
-    
+
     this.FormDesperdicio.patchValue({ IdArea : this.area.id, Area : this.area.nombre.toUpperCase(), });
 
     if(this.area.nombre.toUpperCase() == "NO APLICA") this.areaOperarios = [];
@@ -173,22 +172,22 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar los operarios
   obtenerOperarios() {
     this.operariosService.getUsuarios().subscribe(datos => {
-      this.operarios = datos.filter((item) => item.rolUsu_Id == 59 && (this.areaOperarios.length > 0 ? item.area_Id == this.areaOperarios[0].area_Id : true)); 
+      this.operarios = datos.filter((item) => item.rolUsu_Id == 59 && (this.areaOperarios.length > 0 ? item.area_Id == this.areaOperarios[0].area_Id : true));
     });
-  } 
+  }
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
   obtenerProcesos = () => this.procesosService.srvObtenerLista().subscribe(datos => this.procesos = datos.filter(x => [3,4,8,12,7,2,1,9,5,6,10].includes(x.proceso_Codigo)));
 
   //Función que va a obtener todas las areas
   obtenerAreas = () => this.svcAreas.srvObtenerLista().subscribe(datos => this.areas = datos);
-  
+
   obtenerFallas(){
     this.fallasService.srvObtenerLista().subscribe(datos => {
       this.fallas = datos.filter((item) => [9,11].includes(item.tipoFalla_Id));
       if([81,86,8,82].includes(this.ValidarRol)) this.fallas.sort((a,b) => Number(b.falla_Id) - Number(a.falla_Id));
-    });  
-  } 
+    });
+  }
   // Funcion que va a consultar y obtener la informacion de las maquinas
   obtenerMaquinas = () => this.maquinasService.GetTodo().subscribe(datos => this.maquinas = datos.filter((item) => item.tpActv_Id == 4));
 
@@ -230,8 +229,8 @@ export class DesperdicioComponent implements OnInit {
         for (let i = 0; i < datos_orden.length; i++) {
           this.getOT(datos_orden[i]);
           this.getOTDesperdicio(orden.toString());
-        } 
-      }  
+        }
+      }
     }, () => {
       this.mensajeService.mensajeError(`Error`, `No se pudo obtener información de la OT N° ${orden}!`);
       this.cargando = false;
@@ -240,7 +239,7 @@ export class DesperdicioComponent implements OnInit {
 
   //Función que cargará la información de la orden en la tabla
   getOT(datos_orden : any){
-    let imp : any = datos_orden.impresion.trim();    
+    let imp : any = datos_orden.impresion.trim();
     if (imp == "1") imp = "SI";
     else if (imp == "0") imp = "NO";
     let info : any = {
@@ -261,11 +260,11 @@ export class DesperdicioComponent implements OnInit {
       'CantKg' : datos_orden.datoscantKg,
       }
     this.ordenesTrabajo.push(info);
-    this.FormDesperdicio.patchValue({ 
+    this.FormDesperdicio.patchValue({
       'IdTipoMaterial' : parseInt(datos_orden.extMaterial.trim()),
-      'TipoMaterial' : datos_orden.extMaterialNom.trim(), 
+      'TipoMaterial' : datos_orden.extMaterialNom.trim(),
       'Impreso' : imp,
-    }); 
+    });
     this.cargando = false;
   }
 
@@ -277,27 +276,27 @@ export class DesperdicioComponent implements OnInit {
     if(area == "CORTE" || area == "EMPAQUE") area = "CORTADORES";
     if(area != "NO APLICA") ruta += `?${area}`;
     else area = ``;
-    
-    this.bagProService.GetOtProcesoDesperdicio(ot, ruta).subscribe(data => { 
+
+    this.bagProService.GetOtProcesoDesperdicio(ot, ruta).subscribe(data => {
       if([4, 74, 75, 76, 77, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89].includes(this.ValidarRol)) {
         this.desperdicios = data.filter(x => x.proceso.includes(`DESP_${area}`));
         this.copiaDesperdicios = this.desperdicios;
       } else {
         this.desperdicios = data;
         this.copiaDesperdicios = this.desperdicios;
-      } 
+      }
       this.cargando = false;
     }, error => { this.cargando = false; });
   }
 
   //Función que calcula el peso actual
-  calcularPeso() {  
+  calcularPeso() {
     let area : any = this.area.nombre.toUpperCase();
     if(area == "NO APLICA") area = ``;
     if(area == "EMPAQUE" || area == "CORTE") area = `CORTADORES`;
-    
+
     return this.desperdicios.filter(x => x.proceso.includes(`DESP_${area}`)).reduce((a, b) => (a + b.peso), 0);
-  } 
+  }
 
   // Funcion que va a generar un desperdicio nuevo y lo va a agregar a la BD
   generarDesperdicio(){
@@ -375,20 +374,20 @@ export class DesperdicioComponent implements OnInit {
       }
     }
   }
-  
+
   //Función que convierte un buffer a un valor
   ab2str = (buf) => String.fromCharCode.apply(null, new Uint8Array(buf));
 
   //Función que carga el turno actual.
   cargarTurnoActual() {
     let proceso : string = this.area.nombre.toUpperCase();
-    if(proceso == 'EMPAQUE' || proceso == 'CORTE') proceso = 'DESP_CORTADORES' 
-    else if (proceso == 'WIKETIADO') proceso = 'DESP_SELLADO' 
+    if(proceso == 'EMPAQUE' || proceso == 'CORTE') proceso = 'DESP_CORTADORES'
+    else if (proceso == 'WIKETIADO') proceso = 'DESP_SELLADO'
     else if (proceso == 'NO APLICA') proceso = 'DESP_EXTRUSION'
     else if (proceso == 'RECUPERADO') proceso = 'DESP_REBOBINAR'
     else proceso = `DESP_${proceso}`;
-    
-    this.bagProService.GetHorarioProceso(proceso).subscribe(data => { this.FormDesperdicio.patchValue({ Turno: data[0] }); }, 
+
+    this.bagProService.GetHorarioProceso(proceso).subscribe(data => { this.FormDesperdicio.patchValue({ Turno: data[0] }); },
     error => this.mensajeService.mensajeError(`Error`, `No se pudo cargar el turno actual, verifique!`));
   }
 
@@ -416,10 +415,10 @@ export class DesperdicioComponent implements OnInit {
     this.svcCrearPDF.createTagProduction(etiqueta);
   }
 
-  //Función que filtra la info de la tabla 
+  //Función que filtra la info de la tabla
   aplicarfiltro($event, campo: any, valorCampo: string) {
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300); 
+    setTimeout(() => { if(this.dt2.filteredValue) this.desperdicios = this.dt2!.filteredValue; }, 300);
     if(!this.dt2.filteredValue) this.desperdicios = this.copiaDesperdicios;
   }
 }

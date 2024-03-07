@@ -1,25 +1,43 @@
+.badge {
+  color: #000;
+  font-size: calc(var(--font-size) * 15px);
+}
+
 .colorBadgeWorker {
   color: #000;
   background-color: rgb(242, 222, 107);
-  font-size: calc(var(--font-size) * 15px);
 }
 
 .colorBadgeAccrued {
   color: white;
   background-color: Tomato;
-  font-size: calc(var(--font-size) * 15px);
 }
 
 .colorBadgeDeductions {
   color: white;
   background-color: palevioletred;
-  font-size: calc(var(--font-size) * 15px);
 }
 
 .colorBadgeTotalPay {
-  color: black;
   background-color: SpringGreen;
-  font-size: calc(var(--font-size) * 15px);
+}
+
+.colorTotalLoan {
+  color: white;
+  background-color: #F44336;
+}
+
+.colorTotalPayedLoan {
+  background-color: #FFB74D;
+}
+
+.colorTotalPayLoan {
+  background-color: #66BB6A;
+}
+
+.colorTotalQuotaLoan {
+  color: white;
+  background-color: #1976D2;
 }
 
 .no-selected {
@@ -41,4 +59,9 @@ p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p
 p-divider ::ng-deep span {
   color: white !important;
   background-color: var(--rojo);
+}
+
+::ng-deep .p-inputtextarea span {
+  display: flex;
+  width: 100%;
 }

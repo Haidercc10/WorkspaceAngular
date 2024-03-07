@@ -21,7 +21,7 @@
   <div class="row g-4 my-3">
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
       <span class="p-float-label" id="rango-fechas">
-        <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangeDates" selectionMode="range" [selectOtherMonths]="true" [disabledDates]="disabledDates" [maxDate]="today" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
+        <p-calendar id="rango" inputId="FechaInicial" [(ngModel)]="rangeDates" selectionMode="range" [selectOtherMonths]="true" [showButtonBar]="true" [disabledDates]="disabledDates" [maxDate]="today" [showIcon]="true" pTooltip="Selecciona el rango de fechas y presiona el botón consultar"></p-calendar>
         <label for="FechaInicial">Rango de Fechas</label>
       </span>
     </div>
@@ -51,22 +51,21 @@
   <p-table
   #tableWorkers
   [value]="payroll"
-  [resizableColumns]="true"
-  columnResizeMode="expand"
   styleClass="p-datatable-gridlines p-datatable-sm"
-  class="no-selected"
   responsiveLayout="scroll"
-  [paginator]="true"
-  [rows]="payroll.length"
-  [rowsPerPageOptions]="[10,25,50,100,payroll.length]"
-  [rowHover]="true"
-  dataKey="Cedula"
   [scrollable]="true"
+  [rowHover]="true"
   scrollHeight="50rem"
+  dataKey="Cedula"
+  [(selection)]="payrollForAdvance"
+  class="no-selected"
   *ngIf="!load">
     <ng-template pTemplate="header">
       <tr>
-        <th rowspan="2">#</th>
+        <th rowspan="2" alignFrozen="left">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          <span class="mx-4">#</span>
+        </th>
         <th pFrozenColumn colspan="2" class="text-center"><span class="badge colorBadgeWorker">Trabajador</span></th>
         <th colspan="5" class="text-center"><span class="badge colorBadgeAccrued">Devengos</span></th>
         <th colspan="5" class="text-center"><span class="badge colorBadgeDeductions">Deducciones</span></th>
@@ -89,20 +88,23 @@
     </ng-template>
     <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
       <tr (dblclick)="editPayrollByWorker(data)">
-        <td class="text-center">{{rowIndex + 1}}</td>
+        <td pFrozenColumn [frozen]="true" alignFrozen="left" class="text-center">
+          <p-tableCheckbox [value]="data"></p-tableCheckbox>
+          <span class="mx-4">{{rowIndex + 1}}</span>
+        </td>
         <td pFrozenColumn>{{data.idWorker}}</td>
         <td>{{data.worker}}</td>
-        <td class="text-right">{{data.valueDaysToPay | number : '1.2-2'}}</td>
-        <td class="text-right">{{totalDisabilityByWorker(data) | number : '1.2-2'}}</td>
-        <td class="text-right">{{data.totalValueAdictionalFee | number : '1.2-2'}}</td>
-        <td class="text-right">{{data.transpotationAssitance | number : '1.2-2'}}</td>
-        <td class="text-right">{{data.accrued | number: '1.2-2'}}</td>
-        <td class="text-right">{{data.eps | number: '1.2-2'}}</td>
-        <td class="text-right">{{data.afp | number: '1.2-2'}}</td>
-        <td class="text-right">{{data.saving | number: '1.2-2'}}</td>
-        <td class="text-right">{{totalLoanAdvance(data) | number: '1.2-2'}}</td>
-        <td class="text-right">{{data.deductions | number: '1.2-2'}}</td>
-        <td alignFrozen="right" pFrozenColumn class="text-right fw-bold">{{data.subTotalToPay | number: '1.2-2'}}</td>
+        <td class="text-right">{{data.valueDaysToPay | currency: 'USD'}}</td>
+        <td class="text-right">{{totalDisabilityByWorker(data) | currency: 'USD'}}</td>
+        <td class="text-right">{{data.totalValueAdictionalFee | currency: 'USD'}}</td>
+        <td class="text-right">{{data.transpotationAssitance | currency: 'USD'}}</td>
+        <td class="text-right">{{data.accrued | currency: 'USD'}}</td>
+        <td class="text-right">{{data.eps | currency: 'USD'}}</td>
+        <td class="text-right">{{data.afp | currency: 'USD'}}</td>
+        <td class="text-right">{{data.saving | currency: 'USD'}}</td>
+        <td class="text-right">{{totalLoanAdvance(data) | currency: 'USD'}}</td>
+        <td class="text-right">{{data.deductions | currency: 'USD'}}</td>
+        <td alignFrozen="right" pFrozenColumn class="text-right fw-bold">{{data.subTotalToPay | currency: 'USD'}}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="footer">
@@ -259,9 +261,12 @@
               </p-divider>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
-              <span class="p-float-label">
-                <p-inputNumber formControlName="daysDisabilityGeneralIllines" inputId="daysDisabilityGeneralIllines" [required]="true" [readonly]="true"></p-inputNumber>
-                <label for="daysDisabilityGeneralIllines">Días Incap EG</label>
+              <span class="p-inputgroup">
+                <span class="p-float-label">
+                  <p-inputNumber formControlName="daysDisabilityGeneralIllines" inputId="daysDisabilityGeneralIllines" [required]="true" [readonly]="true"></p-inputNumber>
+                  <label for="daysDisabilityGeneralIllines">Días Incap EG</label>
+                </span>
+                <button pButton class="p-button-help" id="pdf" type="button" icon="pi pi-eye" [disabled]="[0, '', null, undefined].includes(formPayrollWorker.value.daysDisabilityGeneralIllines)" (click)="showDetailsDisabilities()"></button>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
@@ -440,7 +445,7 @@
                   <p-inputNumber formControlName="saving" inputId="saving" [required]="true" [readonly]="true"></p-inputNumber>
                   <label for="saving">Ahorro</label>
                 </span>
-                <button pButton class="p-button-warning" id="pdf" type="button" icon="pi pi-eye"></button>
+                <button pButton class="p-button-warning" id="pdf" type="button" icon="pi pi-eye" [disabled]="[0, '', null, undefined].includes(formPayrollWorker.value.saving)" (click)="showDetailsMoneySave()"></button>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
@@ -449,7 +454,7 @@
                   <p-inputNumber formControlName="loan" inputId="loan" [required]="true" [readonly]="true"></p-inputNumber>
                   <label for="loan">Prestamo</label>
                 </span>
-                <button pButton class="p-button-success" id="pdf" type="button" icon="pi pi-eye"></button>
+                <button pButton class="p-button-success" id="pdf" type="button" icon="pi pi-eye" [disabled]="[0, '', null, undefined].includes(formPayrollWorker.value.loan)" (click)="showDetailsLoan()"></button>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
@@ -458,7 +463,7 @@
                   <p-inputNumber formControlName="advance" inputId="advance" [required]="true" [readonly]="true"></p-inputNumber>
                   <label for="advance">Anticipo</label>
                 </span>
-                <button pButton class="p-button-info" id="pdf" type="button" icon="pi pi-eye"></button>
+                <button pButton class="p-button-info" id="pdf" type="button" icon="pi pi-eye" [disabled]="[0, '', null, undefined].includes(formPayrollWorker.value.advance)" (click)="showDetailsAdvance()"></button>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
@@ -469,13 +474,13 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="PagoPTESemanaAnt" inputId="PagoPTESemanaAnt" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="PagoPTESemanaAnt" inputId="PagoPTESemanaAnt" [required]="true" (onKeyDown)="calculatePagoPTESemanaAnt()"></p-inputNumber>
                 <label for="PagoPTESemanaAnt">Pago PTE Semana Ant</label>
               </span>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
               <span class="p-float-label">
-                <p-inputNumber formControlName="discounts" inputId="discounts" [required]="true" [readonly]="true"></p-inputNumber>
+                <p-inputNumber formControlName="discounts" inputId="discounts" [required]="true" (onKeyDown)="calculatediscounts()"></p-inputNumber>
                 <label for="discounts">Descuentos</label>
               </span>
             </div>
@@ -497,8 +502,182 @@
           </div>
         </ng-template>
         <ng-template pTemplate="content">
+          <div class="row g-4 my-2">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-2 col-xxl-2">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="subTotalToPay" inputId="subTotalToPay" [required]="true" [readonly]="true"></p-inputNumber>
+                <label for="subTotalToPay">Total a Pagar</label>
+              </span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-10 col-xxl-10">
+              <span class="p-float-label">
+                <textarea formControlName="news" [rows]="1" maxlength="500" pInputTextarea></textarea>
+                <label for="news">Observación</label>
+              </span>
+            </div>
+          </div>
         </ng-template>
       </p-accordionTab>
     </p-accordion>
   </form>
+</p-dialog>
+
+<p-dialog [(visible)]="modalDataDisanility" [style]="{width: '70%', height: 'auto'}" header="Incapacidades" [modal]="true">
+  <div class="m-5 my-3">
+    <div class="mb-4">
+      <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-heart-fill"></i> Detalles de las incapacidades en la nomina del trabajador.</h2>
+    </div>
+
+    <p-table
+    #tableDisabilities
+    [value]="detailsDisabilities"
+    styleClass="p-datatable-gridlines p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Trabajador</th>
+          <th class="text-center">Tipo Incapacidad</th>
+          <th class="text-center">Inicio</th>
+          <th class="text-center">Fin</th>
+          <th class="text-center">Días Totales</th>
+          <th class="text-center">Pago Nomina Actual</th>
+          <th class="text-center">Pago Nominas Anteriores</th>
+          <th class="text-center">Pago Restante</th>
+          <th class="text-center">Pago Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td>{{rowIndex + 1}}</td>
+          <td class="text-center">{{data.worker}}</td>
+          <td class="text-center">{{data.typeDisability}}</td>
+          <td class="text-center">{{data.startDate | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.endDate | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-right">{{data.totalDays | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalToPayThisPayroll | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalToPayPreviusPayrolls | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalToPayNextPayroll | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalToPay | currency: 'USD'}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalDataLoan" [style]="{width: '70%', height: 'auto'}" header="Prestamos" [modal]="true">
+  <div class="m-5 my-3">
+    <div class="mb-4">
+      <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-credit-card"></i> Detalles de los prestamos realizados por el trabajador.</h2>
+    </div>
+
+    <p-table
+    #tableDisabilities
+    [value]="detailsLoan"
+    styleClass="p-datatable-gridlines p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Trabajador</th>
+          <th class="text-center">Código Prestamo</th>
+          <th class="text-center">Fecha Prestamo</th>
+          <th class="text-center">Valor Prestamo</th>
+          <th class="text-center">Valor Deuda</th>
+          <th class="text-center">Total Pagado</th>
+          <th class="text-center">Valor Cuota</th>
+          <th class="text-center">Fecha Limite</th>
+          <th class="text-center">Fecha Ult. Pago</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td>{{rowIndex + 1}}</td>
+          <td class="text-center">{{data.worker}}</td>
+          <td class="text-center">{{data.idLoan}}</td>
+          <td class="text-center">{{data.date}}</td>
+          <td class="text-right">{{data.totalLoan | currency: 'USD'}}</td>
+          <td class="text-right">{{data.debtValue | currency: 'USD'}}</td>
+          <td class="text-right">{{data.totalPay | currency: 'USD'}}</td>
+          <td class="text-right">{{data.valueQuota | currency: 'USD'}}</td>
+          <td class="text-center">{{data.finalDate | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.lastPay | date: 'yyyy-MM-dd'}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="4"></td>
+          <td class="text-right"><span class="badge colorTotalLoan">{{subTotalLoan() | currency: 'USD'}}</span></td>
+          <td class="text-right"><span class="badge colorTotalPayedLoan">{{subTotalDebtValue() | currency: 'USD'}}</span></td>
+          <td class="text-right"><span class="badge colorTotalPayLoan">{{subTotalTotalPay() | currency: 'USD'}}</span></td>
+          <td class="text-right"><span class="badge colorTotalQuotaLoan">{{subTotalValueQuota() | currency: 'USD'}}</span></td>
+          <td colspan="2"></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalDataAdvance" [style]="{width: '70%', height: 'auto'}" header="Detalles de Anticipos" [modal]="true">
+  <div class="m-5 my-3">
+    <div class="mb-4">
+      <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-dollar"></i> Detalles de los anticipos pendientes del trabajador.</h2>
+    </div>
+
+    <p-table
+    #tableDisabilities
+    [value]="detailsAdvances"
+    styleClass="p-datatable-gridlines p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Trabajador</th>
+          <th class="text-center">Inicio Nomina</th>
+          <th class="text-center">Fin Nomina</th>
+          <th class="text-center">Total Anticipo</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td>{{rowIndex + 1}}</td>
+          <td class="text-center">{{data.worker}}</td>
+          <td class="text-center">{{data.startPayroll | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.endPayroll | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-right">{{data.valueAdvance | currency: 'USD'}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalDataSaving" [style]="{width: '70%', height: 'auto'}" header="Detalles del Plan de Ahorro" [modal]="true">
+  <div class="m-5 my-3">
+    <div class="mb-4">
+      <h2 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-money-bill"></i> Detalles del ahorro del trabajador.</h2>
+    </div>
+
+    <p-table
+    #tableDisabilities
+    [value]="detailsSaving"
+    styleClass="p-datatable-gridlines p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Trabajador</th>
+          <th class="text-center">Inicio Nomina</th>
+          <th class="text-center">Fin Nomina</th>
+          <th class="text-center">Total Ahorrado en Nomina</th>
+          <th class="text-center">Total Ahorrado</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+        <tr>
+          <td>{{rowIndex + 1}}</td>
+          <td class="text-center">{{data.worker}}</td>
+          <td class="text-center">{{data.startPayroll | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.endPayroll | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-right">{{data.totalSaveInPayroll | currency: 'USD'}}</td>
+          <td class="text-right">{{data.subTotalSaveMoney | currency: 'USD'}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </p-dialog>
