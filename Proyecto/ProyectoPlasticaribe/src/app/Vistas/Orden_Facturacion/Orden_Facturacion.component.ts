@@ -100,13 +100,14 @@ export class Orden_FacturacionComponent implements OnInit {
       let idProduct: number = this.selectedProductSaleOrder.id_Producto;
       this.productionProcessService.GetAvaibleProduction(idProduct).subscribe(data => {
         this.load = true;
+        let count: number = 0;
         this.production = [];
         let countProductionAvaible = data.reduce((a, b) => {
           if (!a.map(x => x.pp.numeroRollo_BagPro).includes(b.pp.numeroRollo_BagPro)) a = [...a, b];
           return a;
         }, []);
         data.forEach(dataProduction => {
-          if (!this.productionSelected.map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
+          if (!this.productionSelected.filter(y => y.item == dataProduction.prod.prod_Id).map(x => x.numberProduction).includes(dataProduction.pp.numeroRollo_BagPro)) {
             this.production.push({
               saleOrder: this.formDataOrder.value.saleOrder,
               client: dataProduction.clientes.cli_Id,
@@ -119,10 +120,9 @@ export class Orden_FacturacionComponent implements OnInit {
               presentation: dataProduction.pp.presentacion
             });
           }
-          if (countProductionAvaible.length == this.production.length) {
-            this.load = false;
-            this.production = this.changeNameProduct(this.production);
-          }
+          if (countProductionAvaible.length == this.production.length) this.production = this.changeNameProduct(this.production);
+          count++;
+          if (count == data.length) this.load = false;
         });
       }, error => this.msj.mensajeError(`¡No se encontró produción disponible del Item ${idProduct}!`, `Error: ${error.error.title} | Status: ${error.status}`));
     } else {

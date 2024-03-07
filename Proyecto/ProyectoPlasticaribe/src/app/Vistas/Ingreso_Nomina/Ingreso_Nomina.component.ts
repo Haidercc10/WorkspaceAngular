@@ -140,7 +140,7 @@ export class Ingreso_NominaComponent implements OnInit {
           cantDatos += 1;
           if (cantDatos == this.arrayNomina.length) {
             this.msj.mensajeConfirmacion(`Excelente!`, `Se ha creado el registro de la(s) nomina(s) satisfactoriamente!`);
-            this.load = false; 
+            this.load = false;
             this.limpiarTodo();
           }
         }, () => this.msj.mensajeError(`Error`, `Ocurrió un error al ingresar los registros de la(s) nominas(s). Por favor, verifique!`));
@@ -166,5 +166,5 @@ export class Ingreso_NominaComponent implements OnInit {
   onReject = () => this.message.clear('registro');
 
   //Función que cargará los diferentes tipos de nómina
-  cargarTiposNomina = () => this.servicioTipoNomina.Get().subscribe(datos => this.arrayTipoNomina = datos);
+  cargarTiposNomina = () => this.servicioTipoNomina.Get().subscribe(datos => this.arrayTipoNomina = datos.filter(x => [1,2,3].includes(x.tpNomina_Id)));
 }

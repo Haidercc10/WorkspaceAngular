@@ -5,16 +5,19 @@ import { loan } from 'src/app/Vistas/Prestamos_Nomina/Prestamos_Nomina.component
 import { environment } from 'src/environments/environment';
 
 @Injectable({
-    providedIn : 'root'
+  providedIn: 'root'
 })
+
 export class Prestamos_NominaService {
 
-readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = environment.rutaPlasticaribeAPI;
 
-constructor(private http : HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    GetLoansForCardId = (cardId : any): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/getLoansForCardId/${cardId}`);
+  GetLoansForCardId = (cardId: any): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/getLoansForCardId/${cardId}`);
 
-    Post = (data : loan): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Prestamos', data);
+  GetActiveLoansByWorker = (worker: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/getActiveLoansByWorker/${worker}`);
+
+  Post = (data: loan): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Prestamos', data);
 
 }

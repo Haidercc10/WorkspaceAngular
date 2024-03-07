@@ -316,12 +316,12 @@ export class TagProduction_2 {
       pageMargins: [10, 10, 10, 10],
       content: this.contentPDF(dataTag),
     }
-    // pdfMake.createPdf(pdfDefinition).open();
-    let windoeFeatures = `height=500,width=500`;
-    let win = window.open('', 'Print', windoeFeatures);
-    pdfMake.createPdf(pdfDefinition).print({}, win);
+    pdfMake.createPdf(pdfDefinition).open();
+    // let windoeFeatures = `height=500,width=500`;
+    // let win = window.open('', 'Print', windoeFeatures);
+    // pdfMake.createPdf(pdfDefinition).print({}, win);
     // if (dataTag.copy) this.createRePrint(dataTag);
-    setTimeout(() => win.close(), 8000);
+    // setTimeout(() => win.close(), 8000);
   }
 
   private contentPDF(dataTag: modelTagProduction) {
@@ -358,7 +358,7 @@ export class TagProduction_2 {
     return [
       {
         colSpan: 2,
-        margin: [0, 3],
+        margin: [0, 0],
         table: {
           widths: ['100%'],
           body: [
@@ -373,7 +373,7 @@ export class TagProduction_2 {
 
   private adictionalInformationTag(): any[] {
     return [
-      { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 7, alignment: 'center', colSpan: 2 },
+      { text: `APTO PARA EL CONTACTO CON ALIMENTOS`, bold: true, fontSize: 8, alignment: 'center', colSpan: 2, margin: [-10, 0] },
       {}
     ];
   }
@@ -382,10 +382,10 @@ export class TagProduction_2 {
     return [
       {
         colSpan: 2,
-        margin: [0, 3],
+        margin: [0, 0],
         columns: [
-          { width: '23%', text: 'CLIENTE:', bold: true, fontSize: 8, alignment: 'left' },
-          { width: '77%', text: (dataTag.client).toUpperCase(), fontSize: 10, alignment: 'left' },
+          { width: 'auto', text: 'CLI.:', bold: true, fontSize: 10, alignment: 'left' },
+          { width: '*', text: (dataTag.client).toUpperCase(), fontSize: 10, alignment: 'left' },
         ]
       },
       {}
@@ -395,19 +395,32 @@ export class TagProduction_2 {
   private dataOrderAndItem(dataTag: modelTagProduction): any[] {
     return [
       {
-        margin: [0, 3],
-        columns: [
-          { width: '25%', text: 'OT:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '75%', text: (dataTag.orderProduction), fontSize: 10, alignment: 'left' },
-        ]
+        margin: [-5, -3],
+        colSpan: 2,
+        table: {
+          widths: ['45%', '55%'],
+          margin: [0, 3],
+          body: [
+            [
+              {
+                border: [false, false, true, false],
+                columns: [
+                  { width: '30%', text: 'OT:', bold: true, fontSize: 12, alignment: 'left' },
+                  { width: '70%', text: (dataTag.orderProduction), fontSize: 12, alignment: 'left' },
+                ]
+              },
+              {
+                border: [false, false, false, false],
+                columns: [
+                  { width: '40%', text: 'ITEM:', bold: true, fontSize: 12, alignment: 'left' },
+                  { width: '60%', text: dataTag.item, fontSize: 12, alignment: 'left' },
+                ]
+              }
+            ]
+          ]
+        }
       },
-      {
-        margin: [0, 3],
-        columns: [
-          { width: '35%', text: 'ITEM:', bold: true, fontSize: 10, alignment: 'left' },
-          { width: '65%', text: dataTag.item, fontSize: 10, alignment: 'left' },
-        ]
-      }
+      {}
     ]
   }
 
@@ -415,10 +428,10 @@ export class TagProduction_2 {
     return [
       {
         colSpan: 2,
-        margin: [0, 3],
+        margin: [0, 0],
         columns: [
-          { width: '13%', text: 'REF.:', bold: true, fontSize: 8, alignment: 'left' },
-          { width: '87%', text: (dataTag.reference).toUpperCase(), fontSize: 10, alignment: 'left' },
+          { width: 'auto', text: 'REF.:', bold: true, fontSize: 10, alignment: 'left' },
+          { width: '*', text: (dataTag.reference).toUpperCase(), fontSize: 10, alignment: 'left' },
         ]
       },
       {}
@@ -431,22 +444,22 @@ export class TagProduction_2 {
         margin: [-5, -3],
         colSpan: 2,
         table: {
-          widths: ['59%', '41%'],
+          widths: ['52%', '48%'],
           margin: [0, 3],
           body: [
             [
               {
                 border: [false, false, true, false],
                 columns: [
-                  { width: 'auto', text: 'MATERIAL:', bold: true, fontSize: 7, alignment: 'left' },
-                  { width: 'auto', text: (dataTag.material).toUpperCase(), fontSize: 7, alignment: 'left' },
+                  { width: 'auto', text: 'MAT:', bold: true, fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: (dataTag.material).toUpperCase(), fontSize: 9, alignment: 'left' },
                 ]
               },
               {
                 border: [false, false, false, false],
                 columns: [
-                  { width: 'auto', text: 'BULTO:', bold: true, fontSize: 8, alignment: 'left' },
-                  { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 9, alignment: 'left' },
+                  { width: 'auto', text: 'BULTO:', bold: true, fontSize: 10, alignment: 'left' },
+                  { width: 'auto', text: `${dataTag.reel}${!dataTag.copy ? '' : '.'}`, fontSize: 10, alignment: 'left' },
                 ]
               }
             ]
@@ -464,21 +477,22 @@ export class TagProduction_2 {
       imageBarcode.id = 'barcode';
       document.body.appendChild(imageBarcode);
       JsBarcode("#barcode", (dataTag.reel).toString(), { format: "CODE128A", displayValue: false, width: 50, height: 150 });
-      let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center' };
+      let imagePDF = { image: imageBarcode.src, width: 155, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
       imageBarcode.remove();
       return [imagePDF, {}];
     } else {
-      let imagePDF = { image: referenceWike, width: 170, height: size, colSpan: 2, alignment: 'center' };
+      let imagePDF = { image: referenceWike, width: 170, height: size, colSpan: 2, alignment: 'center', margin: [0, -1] };
       return [imagePDF, {}];
     }
   }
 
   private sizeBarcode(dataTag: modelTagProduction): number {
+    console.clear();
     let sizeClient: number = dataTag.client.length;
     let sizeReference: number = dataTag.reference.length;
-    let size: number = 95;
-    if (sizeClient < 22) size += 13;
-    if (sizeReference < 25) size += 13;
+    let size: number = 90;
+    size += sizeClient < 50 ? sizeClient < 24 ? 30 : 10 : 0;
+    size += sizeReference < 50 ? sizeReference < 24 ? 30 : 10 : 0;
     return size;
   }
 
@@ -493,7 +507,7 @@ export class TagProduction_2 {
     let roundedquantity = Math.round(quantity);
     let finalQuantity: string = quantity == roundedquantity ? `${roundedquantity}` : quantity.toFixed(2);
     let size: number = finalQuantity.length > 6 ? 18 : finalQuantity.length > 8 ? 20 : 22;
-    return { text: `${this.formatNumbers((finalQuantity))}`, bold: true, fontSize: size, alignment: 'center', margin: [0, 5] };
+    return { text: `${this.formatNumbers((finalQuantity))}`, bold: true, fontSize: size, alignment: 'center', margin: [0, -1] };
   }
 
   private presentationsTag(dataTag: modelTagProduction): any[] {
@@ -512,7 +526,7 @@ export class TagProduction_2 {
 
   private opertaros(dataTag): Array<any> {
     return [
-      { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: 9 },
+      { text: dataTag.operator, bold: true, colSpan: 2, alignment: 'center', fontSize: dataTag.operator.length > 28 ? 7 : 9, margin: [-5, 0] },
       {},
     ]
   }
