@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -93,10 +94,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerUnidadMedida();
-    this.obtenerOperarios();
     this.obtenerConos();
     this.getProcess();
     this.validarProceso();
+    this.obtenerOperarios();
     setTimeout(() => this.buscarPuertos(), 1000);
   }
 
@@ -104,6 +105,16 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     this.reader.releaseLock();
     this.reader.cancel();
     await this.port.close();
+  }
+
+  errorMessage(message: string, error: HttpErrorResponse) {
+    this.cargando = false;
+    this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
+  }
+
+  warinigMessage(message: string) {
+    this.cargando = false;
+    this.msj.mensajeAdvertencia(message);
   }
 
   aplicarfiltro = ($event, campo: any, valorCampo: string) => this.dtProduccion!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -114,54 +125,29 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   }
 
   validarProceso() {
-    switch (this.ValidarRol) {
-      case 7:
-        this.proceso = 'Extrusión';
-        break;
-      case 74:
-        this.proceso = 'Extrusión';
-        break;
-      case 62:
-        this.proceso = 'Impresión';
-        break;
-      case 75:
-        this.proceso = 'Impresión';
-        break;
-      case 63:
-        this.proceso = 'Rotograbado';
-        break;
-      case 76:
-        this.proceso = 'Rotograbado';
-        break;
-      case 70:
-        this.proceso = 'Laminado';
-        break;
-      case 77:
-        this.proceso = 'Laminado';
-        break;
-      case 71:
-        this.proceso = 'Doblado';
-        break;
-      case 78:
-        this.proceso = 'Doblado';
-        break;
-      case 72:
-        this.proceso = 'Corte';
-        break;
-      case 79:
-        this.proceso = 'Corte';
-        break;
-      case 9:
-        this.proceso = 'Empaque';
-        break;
-      case 80:
-        this.proceso = 'Empaque';
-        break;
-      default:
-        this.proceso = this.formDatosProduccion.value.proceso;
-        break;
+    const process: any = {
+      7: 'Extrusión',
+      74: 'Extrusión',
+      62: 'Impresión',
+      75: 'Impresión',
+      63: 'Rotograbado',
+      76: 'Rotograbado',
+      70: 'Laminado',
+      77: 'Laminado',
+      71: 'Doblado',
+      78: 'Doblado',
+      72: 'Corte',
+      79: 'Corte',
+      9: 'Empaque',
+      80: 'Empaque',
+    };
+    if (this.ValidarRol != 1) {
+      this.proceso = process[this.ValidarRol];
+      this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
+    } else {
+      this.proceso = this.formDatosProduccion.value.proceso;
+      this.validateProcess();
     }
-    if (this.ValidarRol != 1) this.formDatosProduccion.patchValue({ proceso: this.validateProcess() });
     this.obtenerTurnos();
   }
 
@@ -180,9 +166,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       this.chargeDataFromSerialPort(this.port);
     } catch (ex) {
       if (ex.name === 'NotFoundError') this.msj.mensajeError('¡No hay dispositivos conectados!');
-      else {
-        this.msj.mensajeError(ex);
-      }
+      else this.msj.mensajeError(ex);
     }
   }
 
@@ -209,7 +193,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           }
         }
       } catch (error) {
-        console.log(error);
+        this.msj.mensajeError(error);
       } finally {
         this.reader.releaseLock();
       }
@@ -274,8 +258,26 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
 
   obtenerOperarios() {
     this.operariosService.GetOperariosProduccion().subscribe(data => {
-      this.operarios = data;
-      this.operarios.sort((a, b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
+      if (this.ValidarRol == 1) this.operarios = data;
+      else {
+        const validateAreas: any = {
+          7: 3,
+          74: 3,
+          62: 19,
+          75: 19,
+          63: 20,
+          76: 20,
+          70: 22,
+          77: 22,
+          71: 25,
+          78: 25,
+          72: 21,
+          79: 21,
+          9: 11,
+          80: 11,
+        }
+        this.operarios = data.filter(x => x.area_Id == validateAreas[this.ValidarRol]);
+      }
     });
   }
 
@@ -314,13 +316,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     });
   }
 
-  consultarDatosProducto() {
-    let item = this.formDatosProduccion.get('item').value;
-    let datosItem;
-    this.productoService.srvObtenerListaPorId(item).subscribe(data => datosItem = data);
-    return datosItem.prod_Ancho;
-  }
-
   validarTaraCono(ancho: number): number {
     let tara: number = 0;
     let anchoCono = this.formDatosProduccion.get('anchoCono').value;
@@ -340,12 +335,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
       let ordenTrabajo = this.formDatosProduccion.get('ordenTrabajo').value;
       this.cargando = true;
       this.orderProductionsService.GetOrdenTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
-        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), () => {
-          this.cargando = false;
-          this.msj.mensajeError(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`);
-        }, () => this.cargando = false);
+        this.bagproService.GetOrdenDeTrabajo(ordenTrabajo).subscribe(data => this.putDataOrderProduction(data), error => {
+          this.errorMessage(`La OT ${ordenTrabajo} no fue encontrada en el proceso ${this.proceso}`, error);
+        });
       });
-    } else this.msj.mensajeAdvertencia(`¡Debe haber seleccionado un proceso previamente!`);
+    } else this.warinigMessage(`¡Debe haber seleccionado un proceso previamente!`);
   }
 
   putDataOrderProduction(data) {
@@ -380,7 +374,6 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   validarPrecio(datosOrden: any): number {
     let precio: number = 0;
     let turno: string = this.formDatosProduccion.value.turno;
-
     if (turno == 'DIA') precio = datosOrden.selladoCorte_PrecioSelladoDia;
     else if (turno == 'NOCHE') precio = datosOrden.selladoCorte_PrecioSelladoNoche;
     return precio;
@@ -389,24 +382,20 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   buscarRollosPesados() {
     let proceso: string = this.eliminarDiacriticos(this.proceso).toUpperCase();
     let ordenTrabajo: string = this.formDatosProduccion.value.ordenTrabajo;
+    this.rollosPesados = [];
     this.bagproService.GetDatosRollosPesados(ordenTrabajo, proceso).subscribe(data => {
       this.rollosPesados = data;
-      this.rollosPesados.sort((a, b) => Number(b.item) - Number(a.item));
-    }, () => {
-      this.rollosPesados = [];
       this.cargando = false;
     }, () => this.cargando = false);
   }
 
   sumarPesoBruto() {
-    let total: number = 0;
-    total = this.rollosPesados.reduce((a, b) => a + b.extBruto, 0);
+    let total: number = this.rollosPesados.reduce((a, b) => a + b.extBruto, 0);
     return total;
   }
 
   sumarPesoNeto() {
-    let total: number = 0;
-    total = this.rollosPesados.reduce((a, b) => a + b.extnetokg, 0);
+    let total: number = this.rollosPesados.reduce((a, b) => a + b.extnetokg, 0);
     return total;
   }
 
@@ -418,22 +407,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
         if (this.formDatosProduccion.valid) {
           if (this.formDatosProduccion.value.maquina > 0) {
             if (this.formDatosProduccion.value.pesoNeto > 1) this.guardarProduccion();
-            else {
-              this.msj.mensajeAdvertencia(`¡El peso Neto debe ser superior a uno (1)!`);
-              this.cargando = false;
-            }
-          } else {
-            this.msj.mensajeAdvertencia(`¡La maquina no puede ser cero (0)!`);
-            this.cargando = false;
-          }
-        } else {
-          this.msj.mensajeAdvertencia(`¡Todos los campos deben estar diligenciados!`);
-          this.cargando = false;
-        }
-      } else {
-        this.msj.mensajeAdvertencia(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
-        this.cargando = false;
-      }
+            else this.warinigMessage(`¡El peso Neto debe ser superior a uno (1)!`);
+          } else this.warinigMessage(`¡La maquina no puede ser cero (0)!`);
+        } else this.warinigMessage(`¡Todos los campos deben estar diligenciados!`);
+      } else this.warinigMessage(`¡Debe buscar la Orden de Trabajo a la que se le añadirá el rollo pesado!`);
     }, 500);
   }
 
@@ -476,10 +453,11 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
   guardarProduccion() {
     this.cargando = true;
     this.produccionProcesosService.Post(this.datosProduccion()).subscribe(res => {
-      this.searchDataTagCreated(res.numero_Rollo, res.cantidad);
+      this.searchDataTagCreated(res.numero_Rollo);
       setTimeout(() => {
         let mostratDatosProducto: boolean = this.formDatosProduccion.value.mostratDatosProducto;
         this.formDatosProduccion.reset();
+        this.validarProceso();
         this.formDatosProduccion.patchValue({
           ordenTrabajo: res.ot,
           maquina: res.maquina,
@@ -487,14 +465,10 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
           cono: res.cono_Id,
           mostratDatosProducto: mostratDatosProducto
         });
-        this.buscraOrdenTrabajo();
+        this.buscarRollosPesados();
         this.msj.mensajeConfirmacion(`¡Registro creado con exito!`);
-        this.cargando = false;
       }, 1000);
-    }, () => {
-      this.msj.mensajeError(`¡Ocurrió un error al registrar el rollo!`);
-      this.cargando = false;
-    });
+    }, error => this.errorMessage(`¡Ocurrió un error al registrar el rollo!`, error));
   }
 
   validateProcess(): 'EXT' | 'IMP' | 'ROT' | 'LAM' | 'DBLD' | 'CORTE' | 'EMP' {
@@ -513,7 +487,7 @@ export class Produccion_ExtrusionComponent implements OnInit, OnDestroy {
     return processMapping[proceso] || proceso;
   }
 
-  searchDataTagCreated(reel: number, cantidad: number) {
+  searchDataTagCreated(reel: number) {
     this.bagproService.GetInformactionProductionForTag(reel).subscribe(res => {
       let daipita: any = this.formDatosProduccion.value.daipita;
       res.forEach(data => {
