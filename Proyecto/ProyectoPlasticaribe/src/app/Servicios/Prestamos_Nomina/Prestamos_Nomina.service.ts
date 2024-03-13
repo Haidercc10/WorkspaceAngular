@@ -14,13 +14,15 @@ export class Prestamos_NominaService {
 
   constructor(private http: HttpClient) { }
 
+  GetLoansForId = (id: any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`);
+
   GetLoansForCardId = (cardId: any): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/getLoansForCardId/${cardId}`);
 
   GetActiveLoansByWorker = (worker: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Prestamos/getActiveLoansByWorker/${worker}`);
 
   Post = (data: loan): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Prestamos', data);
 
-    putLoanAnulled = (id : any, data : any[] = []) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/putLoanAnulled/${id}`, data);
+  putLoanAnulled = (id : any, data : any[] = []) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/putLoanAnulled/${id}`, data);
 
-    Put = (id : any, data : any) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`, data);
+  Put = (id : any, data : any) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`, data);
 }

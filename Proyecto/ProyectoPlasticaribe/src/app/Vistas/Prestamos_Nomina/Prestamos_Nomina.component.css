@@ -57,3 +57,7 @@ span{
     width: 30px;
     height: 30px;
   }
+
+  ::ng-deep .row>* {
+    text-align: center;
+  }

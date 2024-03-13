@@ -23,13 +23,18 @@
     <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end" >
       <p-button icon="pi pi-info" styleClass="p-button-rounded p-button-warning" [style]="{width: '25px', height: '25px'}" pTooltip="Ver Tutorial" tooltipPosition="top"></p-button>
     </div>-->
+
+    <!--Crear Falla-->
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+      <button pButton pRipple class="p-button-danger" icon="pi pi-exclamation-triangle" label="Crear Falla" id="botones1" (click)="modalFails = true"></button>
+    </div>
   
     <div class="mb-5">
       <h4 [ngClass]="{'tituloRojo': !selectedMode, 'tituloClaro': selectedMode}"><i class="pi pi-search"></i> Consultar Rollos</h4>
     </div>
   
     <!-- Formulario -->
-    <form [formGroup]="form" (ngSubmit)="searchRolls()">
+    <form [formGroup]="form">
   
       <div class="mb-3" id="formulario">
         <div class="row g-3">
@@ -37,7 +42,7 @@
           <!--Rango fechas-->  
           <div class="col-sm-12 col-md-6 col-xl-3">
               <span class="p-float-label">
-                <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" [required]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
+                <p-calendar formControlName="RangoFechas" inputId="fecha" selectionMode="range" [showIcon]="true" pTooltip="Si no diligencias el rango de fechas todas las consultas que realices estarán basadas en el día de hoy."></p-calendar>
                 <label for="fecha">Rango de Fechas</label>
               </span>
           </div>  
@@ -49,30 +54,38 @@
               <label for="Bodega">Bodega</label>
             </span>
           </div>
+
+          <!-- Motivo -->
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+            <span class="p-float-label">
+                <p-dropdown formControlName="Falla" inputId="Falla" [autoDisplayFirst]="false" [options]="fails" optionLabel="falla_Nombre" optionValue="falla_Id" [filter]="true" filterBy="falla_Nombre"></p-dropdown>
+                <label for="Falla">Motivo*</label>
+            </span>
+          </div>
   
           <!-- OT -->
-          <div class="col-sm-12 col-md-6 col-xl-3">
+          <div class="col-sm-12 col-md-6 col-xl-2">
             <span class="p-float-label">
-              <p-inputNumber formControlName="OT" id="ot" [useGrouping]="false"></p-inputNumber>
+              <p-inputNumber formControlName="OT" id="ot" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="ot">OT</label>
             </span>
           </div>
   
           <!--Rollo -->
-          <div class="col-sm-12 col-md-6 col-xl-3">
+          <div class="col-sm-12 col-md-6 col-xl-2">
             <span class="p-float-label">
-              <p-inputNumber formControlName="Rollo" id="Rollo" [useGrouping]="false"></p-inputNumber>
+              <p-inputNumber formControlName="Rollo" id="Rollo" (keyup.enter)="searchRolls()" [useGrouping]="false"></p-inputNumber>
               <label for="Rollo">N° Rollo</label>
             </span>
           </div>
-  
+
         </div>
       </div>
   
       <!-- Botones -->
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" id="consultarRollos" type="submit" label="Consultar Rollos" icon="pi pi-search" pTooltip="Si no llenas ningún filtro se cargarán todos los bultos pesados hoy."></button>
-        <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos" (click)="clearLabels()" icon="pi pi-eraser"></button>
+        <button pButton class="p-button-danger" [disabled]="!form.valid" (click)="searchRolls()"  id="consultarRollos" type="button" label="Consultar Rollos" icon="pi pi-search" pTooltip="Si no llenas ningún filtro se cargarán todos los bultos pesados hoy."></button>
+        <button pButton class="p-button-secondary" id="limpiarFiltros" type="button" label="Limpiar Campos"  (click)="clearLabels()" icon="pi pi-eraser"></button>
         <button pButton class="p-button-secondary p-button-outlined" id="limpiarTodo" type="button" label="Limpiar Todo" (click)="clearAll()" icon="pi pi-eraser"></button>
       </div>
   
@@ -210,7 +223,7 @@
               <td class="text-center">{{rollsIns.numeroRollo_BagPro}}</td>
               <td class="text-center">{{rollsIns.prod_Id}}</td>
               <td>{{rollsIns.prod_Nombre}}</td>
-              <td class="text-center">{{rollsIns.cantidad | number: '1.2-2'}}</td>
+              <td class="text-center">{{['Paquete', 'Und'].includes(rollsIns.presentacion) ? rollsIns.cantidad : rollsIns.peso_Neto | number: '1.2-2'}}</td>
               <td class="text-center">{{rollsIns.presentacion}}</td>
               <td class="text-center">{{rollsIns.fecha | date : 'dd/MM/yyyy' }}</td>
               <td class="text-center">{{rollsIns.proceso_Nombre}}</td>
@@ -261,7 +274,7 @@
               <td class="text-center">{{info.ot}}</td>
               <td class="text-center">{{info.prod_Id}}</td>
               <td>{{info.prod_Nombre}}</td>
-              <td class="text-center">{{totalQuantityByItem(info.prod_Id) | number : '1.2-2'}}</td>
+              <td class="text-center">{{['Und', 'Paquete'].includes(info.presentacion) ? totalQuantityByItem(info.prod_Id) : totalWeightByItem(info.prod_Id) | number : '1.2-2'}}</td>
               <td class="text-center">{{totalRollsByItems(info.prod_Id)}}</td>
               <td class="text-center">{{info.presentacion}}</td>
             </tr>
@@ -309,4 +322,11 @@
       </div>
     </ng-template>
   </p-toast>
+
+  <!-- Modal fallas tecnicas -->
+<p-dialog [modal]="true" header="Creación de Fallas"  [draggable]="false" [contentStyle]="{'overflow':'visible'}" [(visible)]="modalFails" [style]="{width: '400px', height: 'auto'}">
+  <ng-template pTemplate="content">
+    <app-Crear_Fallas></app-Crear_Fallas>
+  </ng-template>  
+</p-dialog> 
   

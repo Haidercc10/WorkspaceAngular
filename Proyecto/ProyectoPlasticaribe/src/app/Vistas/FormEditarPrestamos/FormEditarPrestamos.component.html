@@ -20,7 +20,7 @@
       <!--Prestamo-->
       <div class="col-md-6">
         <span class="p-float-label">
-          <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+          <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" (onInput)="calculateValueFeesAndDebt()" [minFractionDigits]="2"></p-inputNumber>
           <label for="valueLoan">Valor prestamo</label>
         </span>
       </div>
@@ -28,7 +28,7 @@
       <!--Cancelado-->
       <div class="col-md-6">
         <span class="p-float-label">
-          <p-inputNumber formControlName="valueCancel" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+          <p-inputNumber formControlName="valueCancel" id="valueLoan" [readonly]="true" [useGrouping]="true" [maxFractionDigits]="2" ></p-inputNumber>
           <label for="valueLoan">Valor Cancelado</label>
         </span>
       </div>
@@ -36,7 +36,7 @@
       <!--Deuda-->
       <div class="col-md-6">
         <span class="p-float-label">
-          <p-inputNumber formControlName="valueDebt" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2"></p-inputNumber>
+          <p-inputNumber formControlName="valueDebt" id="valueLoan" [readonly]="true" [useGrouping]="true" [maxFractionDigits]="2"></p-inputNumber>
           <label for="valueLoan">Valor Deuda</label>
         </span>
       </div>
@@ -44,7 +44,7 @@
       <!--Nro cuotas-->
       <div class="col-md-6">
         <span class="p-float-label">
-          <p-inputNumber formControlName="qtyFees" id="qtyFees" [useGrouping]="false"></p-inputNumber>
+          <p-inputNumber formControlName="qtyFees" id="qtyFees" (onInput)="calculateValueFeesAndDebt()" [min]="0" [useGrouping]="false"></p-inputNumber>
           <label for="qtyFees">N° cuotas</label>
         </span>
       </div>
@@ -60,7 +60,7 @@
       <!-- Fecha Inicio Prestamo -->
       <div class="col-md-6">
         <span class="p-float-label" id="rank-dates1">
-          <p-calendar id="initialDate" inputId="initialDate" readonly="true" formControlName="initialDate" [showIcon]="true"></p-calendar>
+          <p-calendar formControlName="initialDate" id="initialDate" inputId="initialDate" (onSelect)="calculateDateTerm()" [showIcon]="true"></p-calendar>
           <label for="initialDate">Fecha Inicio</label>
         </span>
       </div>
@@ -68,7 +68,7 @@
       <!--Lapso de cuota-->
       <div class="col-md-6">
         <span class="p-float-label">
-          <p-dropdown formControlName="lapseFees" inputId="lapseFees" [autoDisplayFirst]="false" [options]="moments"></p-dropdown>
+          <p-dropdown formControlName="lapseFees" inputId="lapseFees" (onChange)="calculateDateTerm()" [autoDisplayFirst]="false" [options]="moments"></p-dropdown>
           <label for="lapseFees">Lapso cuotas</label>
         </span>
       </div>
@@ -107,8 +107,30 @@
 
       <!--Boton actualizar -->
       <div class="col-md-12 mb-3">
-        <p-button icon="pi pi-sync" pRipple severity="danger" label="Actualizar Prestamo" (onClick)="updateLoan()"></p-button>
+        <p-button icon="pi pi-sync" pRipple severity="danger" label="Actualizar Prestamo" (onClick)="validateUpdateLoan()"></p-button>
       </div>
     </div>
   </div>
 </form>
+
+<!-- Mensaje de confirmación de creación de prestamo-->
+<p-toast position="center" key="update" (onClose)="closeMsgWarning('validation')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p innerHtml="{{message.detail}}"></p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="updateLoan()" icon="pi pi-check" label="Sí" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="closeMsgWarning('update')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+

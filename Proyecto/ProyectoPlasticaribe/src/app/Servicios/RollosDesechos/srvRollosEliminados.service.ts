@@ -40,6 +40,8 @@ export class SrvRollosEliminadosService {
   getRollosxFechasxItemxProceso = (fecha1: any, fecha2 : any, item: any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxProceso/${fecha1}/${fecha2}/${item}/${proceso}`);
 
   getRollosxFechasxProceso = (fecha1: any, fecha2 : any, proceso : any):Observable<any[]> => this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxProceso/${fecha1}/${fecha2}/${proceso}`);
+
+  putFailRolls = (roll : number, fail : number) => this.http.put(`${this.rutaPlasticaribeAPI}/Rollo_Desecho/putFailRolls/${roll}/${fail}`, []);
 }
 
 

@@ -36,7 +36,7 @@
         <!--Cedula-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="id" id="id" (keyup.enter)="getEmployee('id')" [useGrouping]="false"></p-inputNumber>
+            <p-inputNumber formControlName="id" id="id" (keyup.enter)="getEmployee('id', 'search')" [useGrouping]="false"></p-inputNumber>
             <label for="id">Cedula</label>
           </span>
         </div>
@@ -44,7 +44,7 @@
         <!--Nombre-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
           <span class="p-float-label">
-            <input formControlName="name" id="emp" list="employees" autocomplete="off" type="text" pInputText (keyup)="getEmployee('name')" (change)="selectEmployee('name')" tooltipPosition="top">
+            <input formControlName="name" id="emp" list="employees" autocomplete="off" type="text" pInputText (keyup)="getEmployee('name', 'search')" (change)="selectEmployee('name', 'search')" tooltipPosition="top">
             <datalist id="employees">
               <option *ngFor="let item of employees">{{item.usua_Nombre}}</option>
             </datalist>
@@ -55,7 +55,7 @@
          <!--Prestamo-->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2" (keyup)="enableFieldQtyFees()"></p-inputNumber>
+            <p-inputNumber formControlName="valueLoan" id="valueLoan" [useGrouping]="true" [minFractionDigits]="2" (keyup)="enableFieldQtyFees()" ></p-inputNumber>
             <label for="valueLoan">Valor prestamo</label>
           </span>
         </div>
@@ -79,7 +79,7 @@
         <!-- Fecha Inicio prestamo -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label" id="rank-dates">
-            <p-calendar id="initialDate" inputId="initialDate" formControlName="initialDate" [showIcon]="true"></p-calendar>
+            <p-calendar id="initialDate" inputId="initialDate" formControlName="initialDate" (onSelect)="calculateLapseEstimatedDate()" [showIcon]="true"></p-calendar>
             <label for="initialDate">Fecha Inicio</label>
           </span>
         </div>
@@ -87,7 +87,7 @@
         <!--Lapso de cuota-->
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label">
-            <p-dropdown formControlName="lapseFees" inputId="lapseFees" [autoDisplayFirst]="false" [options]="moments" (onChange)="calculateEstimatedDate()"></p-dropdown>
+            <p-dropdown formControlName="lapseFees" inputId="lapseFees" [autoDisplayFirst]="false" [options]="moments" (onChange)="calculateLapseEstimatedDate()"></p-dropdown>
             <label for="lapseFees">Lapso cuotas</label>
           </span>
         </div>
@@ -95,7 +95,7 @@
         <!-- Fecha plazo -->
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-2 col-xxl-2">
           <span class="p-float-label" id="rank-dates">
-            <p-calendar id="dateTerm" inputId="dateTerm" formControlName="dateTerm" [showIcon]="true"></p-calendar>
+            <p-calendar id="dateTerm" inputId="dateTerm" formControlName="dateTerm"  [showIcon]="true"></p-calendar>
             <label for="dateTerm">Fecha Plazo</label>
           </span>
         </div>
@@ -112,9 +112,9 @@
     </div>  
 
     <!--Botones-->
-    <div  class="d-grid gap-2 mb-3" id="buttons">
+    <div  class="mb-3" id="buttons">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Registrar Prestamo" icon="pi pi-send" (click)="validateLoan()"></button>
+        <button pButton class="p-button-danger" type="button" label="Registrar Prestamo" [disabled]="!this.form.valid" icon="pi pi-send" (click)="validateLoan()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearFields()"></button>
       </div>
     </div>
@@ -148,8 +148,8 @@
           <tr>
             <th style="font-weight: 800;" class="text-center"></th>
             <th style="font-weight: 800;" class="text-center" colspan="2"><i class="pi pi-users"></i> Información Empleado</th>
-            <th style="font-weight: 800;" class="text-center textRed" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
-            <th style="font-weight: 800;" class="text-center textRed" colspan="5"><i class="pi pi-calendar"></i> Fechas</th>
+            <th style="font-weight: 800;" class="text-center textBlue" colspan="5"><i class="pi pi-dollar"></i> Informacion Prestamo</th>
+            <th style="font-weight: 800;" class="text-center textOrange" colspan="5"><i class="pi pi-calendar"></i> Fechas</th>
           </tr>
           <tr>
             <th pFrozenColumn alignFrozen="left" [frozen]="true">#</th>
@@ -174,13 +174,13 @@
             <td class="text-center" pFrozenColumn alignFrozen="left" [frozen]="true">{{loans.user.usua_Nombre}}</td>
             <td class="text-center" ><b>{{loans.loans.ptm_Valor | number : '1.2-2'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_ValorCancelado | number : '1.2-2'}}</td>
-            <td class="text-center textRed" ><b>{{loans.loans.ptm_ValorDeuda | number : '1.2-2'}}</b></td>
+            <td class="text-center" ><b>{{loans.loans.ptm_ValorDeuda | number : '1.2-2'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_ValorCuota | number : '1.2-2'}}</td>
-            <td class="text-center" >{{loans.loans.ptm_PctjeCuota}}</td>
+            <td class="text-center" >{{loans.loans.ptm_PctjeCuota}}%</td>
             <td class="text-center" ><b>{{loans.loans.ptm_Fecha | date : 'dd/MM/yyyy'}}</b></td>
             <td class="text-center" >{{loans.loans.ptm_FechaPlazo | date : 'dd/MM/yyyy'}}</td>
-            <td class="text-center" [ngStyle]="{color: calculateDiffDias(loans.loans) > 0 ? '#F6D45D' : 'palevioletred'}"><b>{{calculateDiffDias(loans.loans)}}</b></td>
-            <td class="text-center" >{{loans.loans.ptm_FechaUltCuota | date : 'dd/MM/yyyy'}}</td>
+            <td class="text-center" [ngStyle]="{color: calculateDiffDias(loans.loans) > 0 ? '#ff8800' : 'palevioletred'}"><b>{{calculateDiffDias(loans.loans)}}</b></td>
+            <td class="text-center" >{{loans.loans.ptm_FechaUltCuota == null ? '' : loans.loans.ptm_FechaUltCuota | date : 'dd/MM/yyyy'}}</td>
             <td class="text-center"><p-button icon="pi pi-ban" [rounded]="true" severity="danger" (onClick)="confirmCancelationLoan(loans)"></p-button></td>
           </tr>
         </ng-template>
@@ -194,8 +194,8 @@
         <ng-template pTemplate="footer">
           <tr>
             <td class="text-center" colspan="3" class="text-right">Totales</td>
-            <td class="text-center" id="total1">{{ calculateTotalLoan() | number : '1.2-2' }} </td>
-            <td class="text-center" id="total2">{{ calculateTotalCanceled() | number : '1.2-2' }} </td>
+            <td class="text-center textBlue" id="total1">{{ calculateTotalLoan() | number : '1.2-2' }} </td>
+            <td class="text-center" [ngStyle]="{color: calculateTotalCanceled() > 0 ? 'color: rgb(0, 216, 0)' : ''}" id="total2">{{ calculateTotalCanceled() | number : '1.2-2' }} </td>
             <td class="text-center textRed" id="total3">{{ calculateTotalDebt() | number : '1.2-2' }} </td>
             <td class="text-center" colspan="7"></td>
           </tr>

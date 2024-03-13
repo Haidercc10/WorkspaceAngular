@@ -7,6 +7,7 @@ import { Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Pres
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 import { FormEditarPrestamosComponent } from '../FormEditarPrestamos/FormEditarPrestamos.component';
+import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,13 +40,14 @@ export class Prestamos_NominaComponent implements OnInit {
     private msj : MensajesAplicacionService,
     private svLoans : Prestamos_NominaService, 
     private svMessages : MessageService,
-    ) {
+    private svPDF : CreacionPdfService,
+  ) {
       this.loadModeAndForm();
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.visible = true;
+    this.exportToPDF();
   }
 
   //
@@ -71,11 +73,7 @@ export class Prestamos_NominaComponent implements OnInit {
     });
 
     this.form.get('qtyFees')?.disable();
-  }
-
-  //Funcion para habilitar el campo cantidad de cuotas
-  enableFieldQtyFees(){
-    return [0, null, undefined, ''].includes(this.form.value.valueLoan) ? this.form.get('qtyFees')?.disable() : this.form.get('qtyFees')?.enable();
+    this.form.get('dateTerm')?.disable();
   }
 
   //Función para limpiar campos.
@@ -85,19 +83,45 @@ export class Prestamos_NominaComponent implements OnInit {
     this.employees = [];
     this.load = false;
     this.form.get('qtyFees')?.disable();
+    this.form.get('dateTerm')?.disable();
+    this.form.patchValue({ 'initialDate' : new Date() })
+  }
+
+  //.Función para cargar los empleados según el campo de búsqueda.
+  getEmployee(searchFor : string, key? : string){
+    let field : any = this.form.get(searchFor)?.value;
+
+    if(!key) key = `search`;
+    if(field.toString().length > 1) {
+      this.svEmployees.getEmployees(field).subscribe(data => { 
+        if(data.length > 0) {
+          this.employees = data;
+          if(searchFor == 'id') this.selectEmployee('id', key); 
+        } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró un empleado con la cédula ${this.form.value.id}`);
+      }, error => { 
+        if(searchFor == 'id') this.msj.mensajeError(`Error al consultar el empleado.`, `Error: ${error.status}`); 
+      });
+    }
+  }
+
+  //.Función para seleccionar un empleado de la lista de empleados.
+  selectEmployee(searchFor : any, key? : any){
+    let test : any = this.employees.filter((item) => [item.usua_Nombre, item.usua_Id].includes(this.form.get(searchFor)?.value));
+    this.form.patchValue({ 'id' : test[0].usua_Id, 'name' : test[0].usua_Nombre, });
+    this.searchLoans(key);
   }
 
   //Función para buscar prestamos por usuario.
-  searchLoans(){
+  searchLoans(key : string){
     this.loans = [];
     this.load = true;
     let cardId : any = this.form.value.id;
     
     this.svLoans.GetLoansForCardId(cardId).subscribe(data => {
-      if(data.length > 0 ) {
+      if(data.length > 0) {
         this.loans = data;
         this.load = false;  
-        this.msj.mensajeAdvertencia(`Advertencia`, `El empleado ${this.form.value.name} tiene ${data.length} prestamo(s) asignados`);
+        if(key == 'search') this.msj.mensajeAdvertencia(`Advertencia`, `El empleado ${this.form.value.name} tiene ${data.length} prestamo(s) asignados`);
       } else {
         this.load = false;
         this.msj.mensajeConfirmacion(`Confirmación`, `El empleado ${this.form.value.name} no tiene prestamo(s) asignados`);
@@ -108,72 +132,26 @@ export class Prestamos_NominaComponent implements OnInit {
     }); 
   }
 
-  //.Función para cargar los empleados según el campo de búsqueda.
-  getEmployee(searchFor : string){
-    let field : any = this.form.get(searchFor)?.value;
-    
-    if(field.toString().length > 1) {
-      this.svEmployees.getEmployees(field).subscribe(data => { 
-        if(data.length > 0) {
-          this.employees = data;
-          if(searchFor == 'id') this.selectEmployee('id'); 
-        } else this.msj.mensajeAdvertencia(`Advertencia`, `No se encontró un empleado con la cédula ${this.form.value.id}`);
-      }, error => { 
-        if(searchFor == 'id') this.msj.mensajeError(`Error al consultar el empleado.`, `Error: ${error.status}`); 
-      });
-    }
-  }
-
-  //.Función para seleccionar un empleado de la lista de empleados.
-  selectEmployee(searchFor : any){
-    let test : any = this.employees.filter((item) => [item.usua_Nombre, item.usua_Id].includes(this.form.get(searchFor)?.value));
-    this.form.patchValue({ 'id' : test[0].usua_Id, 'name' : test[0].usua_Nombre, });
-    this.searchLoans();
-  }
-
-  //Función para calcular la diferencia de días entre la fecha de plazo y la fecha actual.
-  calculateDiffDias(loans : any){
-    let days : number = 0; 
-    let fecha = moment([moment().year(), moment().month(), moment().date()]); 
-    let fechaPlazo = moment([moment(loans.ptm_FechaPlazo).year(), moment(loans.ptm_FechaPlazo).month(), moment(loans.ptm_FechaPlazo).date()]); 
-   
-    days = fechaPlazo.diff(fecha, 'days'); 
-    return days;
-  }
-
-  //Calcular total prestamos asignados.
-  calculateTotalLoan = () => this.loans.reduce((a, b) => a + b.loans.ptm_Valor, 0);
-
-  //Calcular total cancelado.
-  calculateTotalCanceled = () => this.loans.reduce((a, b) => a + b.loans.ptm_ValorCancelado, 0);
-
-  //Calcular total adeudado.
-  calculateTotalDebt = () => this.loans.reduce((a, b) => a + b.loans.ptm_ValorDeuda, 0);
-
-  //Calcular porcentaje de cuota.
-  calculatePercentageFee = (valueLoan : any, valueFee : any) => (valueFee / valueLoan) * 100;
-  
   //Función para validar la asignación del prestamo
   validateLoan(){
+    this.form.get('dateTerm')?.enable();
     if(this.form.valid) {
       if(this.form.value.valueLoan > this.form.value.valueFee) {
         if(this.form.value.valueFee > 0) {
-          if(moment(this.form.value.dateTerm).format('YYYY-MM-DD') >= moment().format('YYYY-MM-DD')) {
+          if(moment(this.form.value.dateTerm).format('YYYY-MM-DD') > moment(this.form.value.initialDate).format('YYYY-MM-DD')) {
             if(this.loans.length > 0) {
-              let msg : any = `El empleado ${this.form.value.name} ya tiene un prestamo por monto de $${this.calculateTotalDebt().toLocaleString()} pesos, ¿Está seguro que desea continuar?`
+              let msg : any = `El empleado ${this.form.value.name} ya tiene ${this.loans.length} prestamo(s) por monto de $${this.calculateTotalDebt().toLocaleString()} pesos, ¿Está seguro que desea continuar?`
               this.svMessages.add({ severity: 'warn', key: 'validation', summary: 'Advertencia', detail: msg, sticky: true, });
             } else this.saveLoan();
-          } else this.msj.mensajeAdvertencia(`Advertencia`, `La fecha de plazo no puede ser menor a la fecha actual`);
+          } else this.msj.mensajeAdvertencia(`Advertencia`, `La fecha de plazo no puede ser menor a la fecha inicial del prestamo`);
         } else this.msj.mensajeAdvertencia(`Advertencia`, `El valor de la cuota debe ser mayor a 0`);
       } else this.msj.mensajeAdvertencia(`Advertencia`, `El valor del prestamo no puede ser menor al valor de la cuota`);
     } else this.msj.mensajeAdvertencia(`Advertencia`, `Por favor, complete todos los campos requeridos`);
   }
 
-  //Cerrar mensaje de confirmación.
-  closeMsgWarning = (key) => this.svMessages.clear(key);
-
   //Función para guardar prestamos
   saveLoan(){
+    this.form.get('dateTerm')?.enable();
     this.closeMsgWarning('validation');
     this.load = true;
     let loanUser : loan = null;
@@ -189,7 +167,7 @@ export class Prestamos_NominaComponent implements OnInit {
       'Ptm_PctjeCuota' : this.calculatePercentageFee(this.form.value.valueLoan, this.form.value.valueFee),
       'Estado_Id' : 11,
       'Ptm_FechaPlazo' : moment(this.form.value.dateTerm).format('YYYY-MM-DD'),
-      'Ptm_FechaUltCuota' : moment().format('YYYY-MM-DD'),
+      'Ptm_FechaUltCuota' : null,
       'Ptm_Observacion' : observation,
       'Creador_Id' : this.storage_Id,
       'Ptm_Fecha' : moment(this.form.value.initialDate).format('YYYY-MM-DD'),
@@ -199,25 +177,86 @@ export class Prestamos_NominaComponent implements OnInit {
       'Ptm_LapsoCuotas' : this.form.value.lapseFees,
     };
 
-    this.svLoans.Post(loanUser).subscribe(data => { this.confirmMessage(); }, error => {
+    this.svLoans.Post(loanUser).subscribe(data => { this.confirmMessage(data); }, error => {
       this.msj.mensajeError(`Error al guardar el prestamo`, `Error: ${error.status}`);
       this.load = false;
     });
   }
 
-  confirmMessage(){
+  //Función que muestra mensaje de confirmación de la asignación del prestamo.
+  confirmMessage(data : any){
     this.msj.mensajeConfirmacion(`Confirmación`, `Prestamo asignado exitosamente!`);
     this.clearFields();
+    this.form.patchValue({ 'id' : data.usua_Id });
+    this.getEmployee('id', 'creation');
   }
 
-  calculateValueFee() {
-    let initialFee : number = 0; 
+  //Funcion para habilitar el campo cantidad de cuotas
+  enableFieldQtyFees(){
+    if([0, null, undefined, ''].includes(this.form.value.valueLoan)) {
+      this.form.patchValue({ 'qtyFees' : 0, 'valueFee' : 0 })
+      this.form.get('qtyFees')?.disable();
+    } else {
+      this.form.get('qtyFees')?.enable();
+      this.calculateValueFee();
+    }   
+  }
 
-    if(this.form.value.qtyFees) initialFee = this.form.value.valueLoan / this.form.value.qtyFees;
-    else initialFee = 0;
-    this.form.patchValue({ 'valueFee' : initialFee });
+  //Calculos
+  //Función para calcular la diferencia de días entre la fecha de plazo y la fecha actual.
+  calculateDiffDias(loans : any){
+    let days : number = 0; 
+    let fecha = moment([moment(loans.ptm_Fecha).year(), moment(loans.ptm_Fecha).month() + 1, moment(loans.ptm_Fecha).date()]); 
+    let fechaPlazo = moment([moment(loans.ptm_FechaPlazo).year(), moment(loans.ptm_FechaPlazo).month() + 1, moment(loans.ptm_FechaPlazo).date()]); 
+    
+    days = fechaPlazo.diff(fecha, 'days'); 
+    return days;
+  }
+
+  //Calcular total prestamos asignados.
+  calculateTotalLoan = () => this.loans.reduce((a, b) => a + b.loans.ptm_Valor, 0);
+
+  //Calcular total cancelado.
+  calculateTotalCanceled = () => this.loans.reduce((a, b) => a + b.loans.ptm_ValorCancelado, 0);
+
+  //Calcular total adeudado.
+  calculateTotalDebt = () => this.loans.reduce((a, b) => a + b.loans.ptm_ValorDeuda, 0);
+
+  //Calcular porcentaje de cuota.
+  calculatePercentageFee = (valueLoan : any, valueFee : any) => (valueFee / valueLoan) * 100;
+
+  //Función para calcular el valor de la cuota.
+  calculateValueFee() {
+   let initialFee : number = 0; 
+
+   if(this.form.value.qtyFees) initialFee = this.form.value.valueLoan / this.form.value.qtyFees;
+   else initialFee = 0;
+   this.form.patchValue({ 'valueFee' : initialFee });
+   this.calculateLapseEstimatedDate();
   }  
 
+  //Calcular la fecha estimada del pago del prestamo.
+  calculateEstimatedDate(){
+    let res = new Date(this.form.value.initialDate);
+    let lapseFees : any = this.form.value.lapseFees;
+    let qtyFees : number = this.form.value.qtyFees;
+    let qtyDays : number = 0;
+
+    lapseFees == 'SEMANAL' ? qtyDays = (qtyFees * 7) : lapseFees == 'QUINCENAL' ? qtyDays = (qtyFees * 15)  : lapseFees == 'MENSUAL' ? qtyDays = (qtyFees * 30) : qtyDays = 0;
+    res.setDate(res.getDate() + qtyDays);
+    this.form.patchValue({ 'dateTerm' : res });
+  }
+
+  //Función para cambiar fecha estimada de plazo desde la fecha inicial
+  calculateLapseEstimatedDate(){
+    if(this.form.value.lapseFees && this.form.value.qtyFees) this.calculateEstimatedDate();
+    else this.form.patchValue({ 'dateTerm' : null })
+  }
+
+  //Cerrar mensaje de confirmación.
+  closeMsgWarning = (key) => this.svMessages.clear(key);
+
+  //Función para confirmar la anulación del prestamo.
   confirmCancelationLoan(data : any){
     this.dataLoanTable = data;
     let msg : any = `¿Está seguro que desea anular el prestamo N° ${data.loans.ptm_Id} con deuda de $${data.loans.ptm_ValorDeuda.toLocaleString()} pesos?`
@@ -228,32 +267,83 @@ export class Prestamos_NominaComponent implements OnInit {
   cancelLoan(loan : any){
     this.load = true;
     this.closeMsgWarning('cancelation');
-    this.svLoans.putLoanAnulled(loan.ptm_Id).subscribe(data => {
-      this.msj.mensajeConfirmacion(`Confirmación`, `Prestamo N° ${loan.ptm_Id} anulado exitosamente!`);
+    this.svLoans.putLoanAnulled(loan.loans.ptm_Id).subscribe(data => {
+      this.msj.mensajeConfirmacion(`Confirmación`, `Prestamo N° ${loan.loans.ptm_Id} anulado exitosamente!`);
       this.load = false;
-      setTimeout(() => { this.searchLoans(); }, 1000); 
+      setTimeout(() => { this.searchLoans('cancelation'); }, 1000); 
     }, error => {
       this.msj.mensajeError(`Error al cancelar el prestamo`, `Error: ${error.status}`);
       this.load = false;
     });
   }
-
-  calculateEstimatedDate(){
-    let res = new Date();
-    let qtyDays : number = 0;
-    this.form.value.times == 'SEMANAL' ? qtyDays = 7 : this.form.value.times == 'QUINCENAL' ? qtyDays = 15 : this.form.value.times == 'MENSUAL' ? qtyDays = 30 : qtyDays = 0;
-    res.setDate(res.getDate() + qtyDays);
-    this.form.patchValue({ 'dateTerm' : res});
-  }
  
+  //Cargar información del prestamo.
   loadModalInfoLoan(data : any) {
     this.visible = true;
     this.dataLoanTable = data;
-  } 
+  }
 
-  updateLoan(){}
+  exportToPDF(){
+    let title : string = `Prestamo N° ${0}`;
+    let content: any[] = this.contentPDF([]) ;
+    this.svPDF.formatoPDF(title, content);
+  }
 
-  exportToExcel(){}
+  contentPDF(data : any) : any {
+    let content : any[] = [];
+    let information : any = ``;
+
+    content.push(this.headerTableLoan());
+    content.push(this.observationPDF());
+    return content;
+  }
+
+  //Encabezado de tabla consolidada del PDF
+  headerTableLoan(data : any = []) {
+    let columns : any[] = ['N°', 'Cedula', 'Empleado', 'Valor', 'Valor cuotas', 'Lapso cuotas', 'Fecha Inicio', 'Fecha Plazo'];
+    let widths: Array<string> = ['5%', '10%', '30%', '10%', '10%', '15%', '10%', '10%'];
+    return {
+      margin: [0, 0, 0, 0],
+      borders : 'noBorders',
+      table : {
+        headerRows : 2,
+        widths : widths, 
+        body : this.builderTableBody(data, columns, 'Información detallada del prestamo'),
+      },
+      fontSize : 8,
+      layout : {
+        fillColor : function(rowIndex) {
+          return ([0, 1].includes(rowIndex)) ? '#DDDDDD' : null; 
+        },
+      }
+    }
+  }
+
+  //Constructor tabla 1 (Consolidada)
+  builderTableBody(data, columns, tittle) {
+    var body = [];
+    body.push([{ colSpan: 8, text: tittle, bold: true, alignment: 'center', fontSize: 10 }, {}, {}, {}, {}, {}, {}, {}]);
+    body.push(columns);
+    data.forEach(function (row) {
+      var dataRow = [];
+      columns.forEach((column) => dataRow.push(row[column].toString()));
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  observationPDF(){
+    return {
+			style: 'tableExample',
+			table: {
+				heights: [50],
+				body: [
+					['Observación: '],
+				]
+			}
+		}
+  }
+  
 }
 
 export interface loan {

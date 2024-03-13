@@ -1,0 +1,41 @@
+<br>
+<form [formGroup]="form" (ngSubmit)="createFail()">
+
+  <div class="mb-3">
+    <div class="row g-4">
+
+      <!-- Nombre Tercero -->
+      <div class="col-xs-12">
+        <span class="p-float-label">
+          <input formControlName="fail" id="fail" type="text" (keyup)="loadDescription()" pInputText required />
+          <label for="fail">Nombre</label>
+        </span>
+      </div>
+
+      <!-- Nombre Tercero -->
+      <div class="col-xs-12">
+        <span class="p-float-label">
+          <input formControlName="description" id="description" type="text" pInputText required/>
+          <label for="description">Descripción</label>
+        </span>
+      </div>
+
+      <!-- Tipos fallas -->
+      <div class="col-xs-12">
+        <span class="p-float-label">
+          <p-dropdown formControlName="typeFail" inputId="typeFail" [autoDisplayFirst]="true" [options]="typeFails" optionLabel="tipoFalla_Nombre" optionValue="tipoFalla_Id" autocomplete="off"></p-dropdown>
+          <label for="typeFail">Tipo Falla</label>
+        </span>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="mb-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="submit" label="Crear Falla" icon="pi pi-check"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="clearLabels()"></button>
+    </div>
+  </div>
+</form>
