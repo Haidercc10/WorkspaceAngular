@@ -56,12 +56,12 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   //Función para inicializar el formulario
   initForm(){
     this.form = this.frmBld.group({
-      RangoFechas : [new Date(), new Date()],
+      RangoFechas : [null],
       Bodega : [null],
       Rollo : [null],
       OT : [null], 
       Falla : [null, Validators.required],
-      Observacion : []
+      Observacion : ['']
     });
   }
 
@@ -189,6 +189,8 @@ export class EliminarRollos_ProduccionComponent implements OnInit {
   deleteRolls(){
     let count : number = 0;
     let isError : boolean = false;
+    let observation : any = this.form.value.Observacion;
+    !observation ? '' : observation;
     this.onReject('delete');
     this.load = true;
     this.rollsInsert.forEach(x => {

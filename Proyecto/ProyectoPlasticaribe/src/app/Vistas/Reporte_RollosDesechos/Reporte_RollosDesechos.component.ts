@@ -80,7 +80,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   ngOnInit() {
     this.obtenerProcesos();
     this.lecturaStorage();
+    this.loadRankDates();
     setInterval(() => this.modoSeleccionado = this.AppComponent.temaSeleccionado, 1000);
+  }
+
+  //Función para cargar fechas en el rango. 
+  loadRankDates(){
+    let initialDate = new Date(moment().subtract(30, 'days').format('YYYY-MM-DD'));
+    this.formConsultaRollos.patchValue({ 'fecha' : initialDate, 'fechaFinal' : new Date() });
   }
 
   tutorial(){
@@ -122,6 +129,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this.load = true;
     this.cantidadOTs = 0;
     this.ArrayDocumento = [];
+    this.loadRankDates();
   }
 
   /** Cargar los procesos de donde puede venir el rollo. */
@@ -129,8 +137,11 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => { this.arrayProcesos = dataProcesos; });
   }
 
+  validarConsulta(){}
+
+
   /** Filtros de consulta que cargarán información en la tabla. */
-  validarConsulta() {
+  validarConsulta2() {
     this.load = false;
     this.cantidadOTs = 0;
     this.ArrayDocumento = [];
@@ -803,7 +814,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   exportarExcel(){
     this.load = false;
     setTimeout(() => {
-      const title = `Reporte de rollos eliminados (Extrusión)`;
+      const title = `Reporte de rollos eliminados`;
       const header = ["OT", "Rollo", "Cliente", "Nro. Item", "Nombre Item", "Peso", "Presentación", "Ancho", "Largo", "Fuelle", "Medida", "Material", "Calibre", "Operario", "Fecha", "Turno"]
       let datos : any =[];
       for (const item of this.ArrayDocumento) {
