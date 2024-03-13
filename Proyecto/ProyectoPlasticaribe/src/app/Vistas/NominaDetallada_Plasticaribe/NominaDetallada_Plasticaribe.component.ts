@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ex } from '@fullcalendar/core/internal-common';
 import moment from 'moment';
 import { Table } from 'primeng/table';
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { IncapacidadesService } from 'src/app/Servicios/Incapacidades/Incapacidades.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
-import { Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Prestamos_Nomina.service';
+import { NominaDetallada_PlasticaribeService, Payroll as DataPayroll } from 'src/app/Servicios/Nomina_Detallada/NominaDetallada_Plasticaribe.service';
+import { PaymentLoan, Prestamos_NominaService } from 'src/app/Servicios/Prestamos_Nomina/Prestamos_Nomina.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { AppComponent } from 'src/app/app.component';
 
@@ -48,7 +48,10 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
     private appComponent: AppComponent,
     private userService: UsuarioService,
     private areaService: AreaService,
-    private msj: MensajesAplicacionService,) {
+    private msj: MensajesAplicacionService,
+    private payrollService: NominaDetallada_PlasticaribeService,
+    private loanService: Prestamos_NominaService,
+    private disabilityService: IncapacidadesService,) {
   }
 
   ngOnInit() {
@@ -190,7 +193,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
         valueSurchagedHours100: 0,
         adictionalFee: 0,
         totalValueAdictionalFee: 0,
-        transpotationAssitance: (d.transportAsistance / 30) * daysToPay,
+        transpotationAssitance: d.transportAsistance,
         productivitySella: 0,
         productivityExt: 0,
         productivityMntj: 0,
@@ -326,41 +329,47 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
       let daysBetweenPayroll: number = endPayroll.diff(startPayroll, 'days');
       let daysToPay: number = daysBetweenPayroll - this.payroll[i].daysDisabilityGeneralIllines - this.payroll[i].daysDisabilityWorkAccident - this.payroll[i].daysDisabilityParents;
       let totalDaysToPay: number = (daysToPay - absentDays);
-      if (totalDaysToPay >= 0 && absentDays != null) {
-        let total: number = valueHour * (totalDaysToPay * 8);
-        this.payroll[i].absentDays = absentDays;
-        this.payroll[i].daysToPay = totalDaysToPay;
-        this.payroll[i].hoursToPay = totalDaysToPay * 8;
-        this.payroll[i].valueDaysToPay = total;
-        this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
-        this.payroll[i].subTotalToPay = this.totalAccrued(this.payroll[i]) - this.totalDiscounts(this.payroll[i]);
-        this.formPayrollWorker.patchValue({
-          daysToPay: totalDaysToPay,
-          hoursToPay: totalDaysToPay * 8,
-          valueDaysToPay: total,
-          // transpotationAssitance: totalDaysToPay,
-          accrued: this.totalAccrued(this.payroll[i]),
-          subTotalToPay: this.payroll[i].subTotalToPay,
-        });
-      } else {
-        if (!absentDays) this.msj.mensajeAdvertencia(`¡La cantidad de días ausente no es valida!`);
-        if (totalDaysToPay < 0) this.msj.mensajeAdvertencia(`¡La cantidad de días ausente no debe ser mayor a la cantidad de días a pagar!`);
-        let total: number = valueHour * (daysToPay * 8);
-        this.payroll[i].absentDays = 0;
-        this.payroll[i].daysToPay = daysToPay;
-        this.payroll[i].hoursToPay = daysToPay * 8;
-        this.payroll[i].valueDaysToPay = total;
-        this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
-        this.payroll[i].subTotalToPay = this.totalAccrued(this.payroll[i]) - this.totalDiscounts(this.payroll[i]);
-        this.formPayrollWorker.patchValue({
-          absentDays: 0,
-          daysToPay: daysToPay,
-          hoursToPay: daysToPay * 8,
-          valueDaysToPay: total,
-          subTotalToPay: this.payroll[i].subTotalToPay,
-        });
-      }
+      if (totalDaysToPay >= 0 && absentDays > 0) this.validAbsentDays(absentDays, totalDaysToPay, valueHour, i);
+      else this.invalidAbsentDays(absentDays, totalDaysToPay, valueHour, daysToPay, i);
     }, 500);
+  }
+
+  validAbsentDays(absentDays: number, totalDaysToPay: number, valueHour: number, i: number) {
+    let total: number = valueHour * (totalDaysToPay * 8);
+    this.payroll[i].absentDays = absentDays;
+    this.payroll[i].daysToPay = totalDaysToPay;
+    this.payroll[i].hoursToPay = totalDaysToPay * 8;
+    this.payroll[i].valueDaysToPay = total;
+    this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    this.payroll[i].subTotalToPay = this.totalAccrued(this.payroll[i]) - this.totalDiscounts(this.payroll[i]);
+    this.formPayrollWorker.patchValue({
+      daysToPay: totalDaysToPay,
+      hoursToPay: totalDaysToPay * 8,
+      valueDaysToPay: total,
+      transpotationAssitance: ((this.payroll[i].transpotationAssitance / 30) * this.payroll[i].daysToPay),
+      accrued: this.totalAccrued(this.payroll[i]),
+      subTotalToPay: this.payroll[i].subTotalToPay,
+    });
+  }
+
+  invalidAbsentDays(absentDays: number, totalDaysToPay: number, valueHour: number, daysToPay: number, i: number) {
+    if (!absentDays) this.msj.mensajeAdvertencia(`¡La cantidad de días ausente no es valida!`);
+    if (totalDaysToPay < 0) this.msj.mensajeAdvertencia(`¡La cantidad de días ausente no debe ser mayor a la cantidad de días a pagar!`);
+    let total: number = valueHour * (daysToPay * 8);
+    this.payroll[i].absentDays = 0;
+    this.payroll[i].daysToPay = daysToPay;
+    this.payroll[i].hoursToPay = daysToPay * 8;
+    this.payroll[i].valueDaysToPay = total;
+    this.payroll[i].accrued = this.totalAccrued(this.payroll[i]);
+    this.payroll[i].subTotalToPay = this.totalAccrued(this.payroll[i]) - this.totalDiscounts(this.payroll[i]);
+    this.formPayrollWorker.patchValue({
+      absentDays: 0,
+      daysToPay: daysToPay,
+      hoursToPay: daysToPay * 8,
+      valueDaysToPay: total,
+      transpotationAssitance: ((this.payroll[i].transpotationAssitance / 30) * this.payroll[i].daysToPay),
+      subTotalToPay: this.payroll[i].subTotalToPay,
+    });
   }
 
   calculateValueAdictionalDaytimeHours() {
@@ -611,7 +620,10 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   totalAccrued(data: Payroll): number {
     let total: number = 0;
-    total = data.valueDaysToPay + data.valueDaysDisabilityGeneralIllines + data.valueDaysDisabilityWorkAccident + data.valueDaysDisabilityParents + data.valueAdictionalDaytimeHours + data.totalValueAdictionalFee + data.transpotationAssitance;
+    total = data.valueDaysToPay + data.valueDaysDisabilityGeneralIllines +
+    data.valueDaysDisabilityWorkAccident + data.valueDaysDisabilityParents +
+    data.valueAdictionalDaytimeHours + data.totalValueAdictionalFee +
+    ((data.transpotationAssitance / 30) * data.daysToPay);
     return total;
   }
 
@@ -624,6 +636,7 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
   editPayrollByWorker(data: Payroll) {
     this.modalPayroll = true;
     this.formPayrollWorker.patchValue(data);
+    this.formPayrollWorker.patchValue({ transpotationAssitance: ((data.transpotationAssitance / 30) * data.daysToPay) });
   }
 
   showDetailsDisabilities() {
@@ -666,8 +679,106 @@ export class NominaDetallada_PlasticaribeComponent implements OnInit {
 
   showDetailsAdvance() {
     let worker: number = this.formPayrollWorker.value.idWorker;
-    this.detailsSaving = this.payroll.find(x => x.idWorker == worker).detailsMoneySave;
-    this.modalDataSaving = true;
+    this.detailsAdvances = this.payroll.find(x => x.idWorker == worker).detailsAdvance;
+    this.modalDataAdvance = true;
+  }
+
+  validatePayroll() {
+
+  }
+
+  savePayroll(){
+    this.payroll.filter(x => !this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
+      let payroll: DataPayroll = this.fillDataPayroll(d.idWorker, 1);
+      this.payrollService.Post(payroll).subscribe(null, error => {
+        this.load = false;
+        this.msj.errorHttp(`¡Ocurrió un error al procesar la nómina del trabajador ${d.worker}!`, error);
+      });
+    });
+  }
+
+  savePayrollForAdvance(){
+    this.payroll.filter(x => this.payrollForAdvance.map(y => y.idWorker).includes(x.idWorker)).forEach(d => {
+      let payroll: DataPayroll = this.fillDataPayroll(d.idWorker, 4);
+      this.payrollService.Post(payroll).subscribe(null, error => {
+        this.load = false;
+        this.msj.errorHttp(`¡Ocurrió un error al procesar la nómina del trabajador ${d.worker}!`, error);
+      });
+    });
+  }
+
+  fillDataPayroll(worker: number, typePayroll: 1 | 2 | 3 | 4): DataPayroll {
+    let data = this.payroll.find(x => x.idWorker == worker);
+    let payroll: DataPayroll = {
+      id_Trabajador: data.idWorker,
+      salarioBase: data.baseSalary,
+      periodoInicio: data.startDate,
+      periodoFin: data.endDate,
+      diasAusente: data.absentDays,
+      diasPagar: data.daysToPay,
+      horasPagar: data.hoursToPay,
+      valorDiasPagar: data.valueDaysToPay,
+      diasIncapEG: data.daysDisabilityGeneralIllines,
+      valorIncapEG: data.valueDaysDisabilityGeneralIllines,
+      diasIncapAT: data.daysDisabilityWorkAccident,
+      valorIncapAT: data.valueDaysDisabilityWorkAccident,
+      diasIncapPATMAT: data.daysDisabilityParents,
+      valorIncapPATMAT: data.valueDaysDisabilityParents,
+      horasADCDiurnas: data.adictionalDaytimeHours,
+      valorADCDiurnas: data.valueAdictionalDaytimeHours,
+      horasNoctDom: data.adictionalNightHours,
+      valorNoctDom: data.valueAdictionalNightHours,
+      horasExtDiurnasDom: data.extraHoursDaytimeSunday,
+      valorExtDiurnasDom: data.valueExtraHoursDaytimeSunday,
+      horasRecargo035: data.surchagedHours035,
+      valorRecargo035: data.valueSurchagedHours035,
+      horasExtNocturnasDom: data.extraHoursNightSunday,
+      valorExtNocturnasDom: data.valueExtraHoursNightSunday,
+      horasRecargo075: data.surchagedHours075,
+      valorRecargo075: data.valueSurchagedHours075,
+      horasRecargo100: data.surchagedHours100,
+      valorRecargo100: data.valueSurchagedHours100,
+      tarifaADC: data.adictionalFee,
+      valorTotalADCComp: data.totalValueAdictionalFee,
+      auxTransporte: data.transpotationAssitance,
+      productividadSella: 0,
+      productividadExt: 0,
+      productividadMontaje: 0,
+      devengado: data.accrued,
+      eps: data.eps,
+      afp: data.afp,
+      ahorro: data.saving,
+      prestamo: data.loan,
+      anticipo: data.advance,
+      totalDcto: data.totalDiscounts,
+      pagoPTESemanaAnt: data.PagoPTESemanaAnt,
+      dctos: data.discounts,
+      deducciones: data.deductions,
+      totalPagar: data.subTotalToPay,
+      novedades: data.news,
+      tipoNomina: typePayroll,
+      estado_Nomina: typePayroll == 4 ? 11 : 13,
+      creador_Id: this.storage_Id,
+      fecha: new Date(),
+      hora: moment().format('HH:mm:ss')
+    };
+    return payroll;
+  }
+
+  changeStatePayroll() {
+  }
+
+  changeStateLoan() {
+    let payment: Array<PaymentLoan> = this.selectAllPayments();
+    this.loanService.AddPaymentLoan(payment).subscribe(null, error => {
+      this.load = false;
+      this.msj.errorHttp(`¡Ocurrió un error al procesar los pagos de los prestamos!`, error);
+    });
+  }
+
+  selectAllPayments(): Array<PaymentLoan> {
+    let payment: Array<PaymentLoan> = [];
+    return payment;
   }
 }
 

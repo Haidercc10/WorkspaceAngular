@@ -1,9 +1,13 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ProyectoPlasticaribe",
-    "\\ProyectoPlasticaribe\\src"
+    "\\Proyecto",
+    "\\Proyecto\\ProyectoPlasticaribe",
+    "\\Proyecto\\ProyectoPlasticaribe\\src",
+    "\\Proyecto\\ProyectoPlasticaribe\\src\\app",
+    "\\Proyecto\\ProyectoPlasticaribe\\src\\app\\Vistas",
+    "\\Proyecto\\ProyectoPlasticaribe\\src\\app\\Vistas\\NominaDetallada_Plasticaribe"
   ],
-  "SelectedNode": "\\ProyectoPlasticaribe",
+  "SelectedNode": "\\Proyecto\\ProyectoPlasticaribe\\src\\app\\Vistas\\NominaDetallada_Plasticaribe\\NominaDetallada_Plasticaribe.component.ts",
   "PreviewInSolutionExplorer": false
 }

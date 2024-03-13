@@ -28,7 +28,7 @@ export class Produccion_ProcesosService {
 
   GetAvaibleProduction = (item: number): Observable<any> => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getAvaibleProduction/${item}`);
 
-  GetInformationAboutProductionByOrderProduction_Process = (order: number, process: string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionByOrderProduction_Process/${order}/${process}`);
+  GetInformationAboutProductionByOrderProduction_Process = (process: string, turn: string, start: any, end: any) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInformationAboutProductionByOrderProduction_Process/${process}/${turn}/${start}/${end}`);
 
   GetInfoProduction = (date1 : any, date2 : any, url? : string) => this.http.get<any>(`${this.rutaPlasticaribeAPI}/Produccion_Procesos/getInfoProduction/${date1}/${date2}${url}`);
 

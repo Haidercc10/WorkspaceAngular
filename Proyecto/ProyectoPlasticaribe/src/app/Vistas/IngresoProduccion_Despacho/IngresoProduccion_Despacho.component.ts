@@ -150,7 +150,8 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
             this.sendProductionZeus.sort((a,b) => Number(b.position) - Number(a.position));
           });
         } else this.msj.mensajeAdvertencia(`¡No puede Ingresar Rollos/Bultos provenientes del procesos 'WIKETIADO'!`);
-      }, () => this.lookingForDataInBagpro(production));
+      // }, () => this.lookingForDataInBagpro(production));
+      }, () => this.warningNotFound(production));
     }
   }
 
@@ -305,11 +306,11 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
 
   errorMessageWhenTryUpdateReel(message: string, error: HttpErrorResponse) {
     this.load = false;
-    this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`);
+    this.msj.mensajeError(message, `Error: ${error.statusText} | Status: ${error.status}`, 1200000);
   }
 
   warningNotFound(production: number){
-    this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`);
+    this.msj.mensajeAdvertencia(`No se encontró un Rollo/Bulto con el número ${production}`, '', 1200000);
     this.load = false;
   }
 
@@ -340,7 +341,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }
     this.entraceService.srvGuardar(info).subscribe(res => this.saveDataDetalleEntrance(res.entRolloProd_Id, data), () => {
       this.load = false;
-      this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`);
+      this.msj.mensajeError(`¡Ha ocurrido un error al crear el ingreso!`, '', 1200000);
     });
   }
 
@@ -363,7 +364,7 @@ export class IngresoProduccion_DespachoComponent implements OnInit {
     }
     this.dtEntracesService.srvGuardar(info).subscribe(() => this.messageConfirmationUpdateStore(), () => {
       this.load = false;
-      this.msj.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
+      this.msj.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`, 1200000);
     });
   }
 

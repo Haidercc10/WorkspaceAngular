@@ -6,12 +6,12 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { modelDtPreEntregaRollos } from 'src/app/Modelo/modelDtPreEntregaRollo';
 import { modelPreentregaRollos } from 'src/app/Modelo/modelPreEntregaRollo';
-import { CreacionPdfService } from 'src/app/Servicios/CreacionPDF/creacion-pdf.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { Produccion_ProcesosService } from 'src/app/Servicios/Produccion_Procesos/Produccion_Procesos.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { AppComponent } from 'src/app/app.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
@@ -33,6 +33,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   modoSeleccionado: boolean;
   formData: FormGroup;
   process: Array<any> = [];
+  turns: Array<any> = [];
   production: Array<OrderProduction> = [];
   productionSelected: Array<OrderProduction> = [];
   consolidatedProduction: Array<OrderProduction> = [];
@@ -43,12 +44,15 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     private productionProcessService: Produccion_ProcesosService,
     private preInService: PreEntregaRollosService,
     private detailsPreInService: DtPreEntregaRollosService,
-    private processService: ProcesosService,) {
+    private processService: ProcesosService,
+    private turnService: TurnosService,) {
 
     this.modoSeleccionado = appComponent.temaSeleccionado;
     this.formData = this.formBuilder.group({
       orderProduction: [null],
       process: [null, Validators.required],
+      dates: [null, Validators.required],
+      turn: [null, Validators.required],
       observation: [null],
     });
   }
@@ -56,6 +60,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
   ngOnInit() {
     this.readStorage();
     this.getProcess();
+    this.getTurns();
   }
 
   readStorage() {
@@ -78,6 +83,10 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.consolidatedProduction = [];
   }
 
+  getTurns() {
+    this.turnService.srvObtenerLista().subscribe(data => this.turns = data.filter(x => ['DIA', 'NOCHE'].includes(x.turno_Id)));
+  }
+
   getProcess() {
     this.processService.srvObtenerLista().subscribe(data => {
       this.process = data.filter(x => ['EXT', 'EMP', 'SELLA'].includes(x.proceso_Id));
@@ -94,31 +103,25 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     return process[(this.ValidarRol).toString()];
   }
 
-  searchDataOrderProduction() {
-    let orderProduction = this.formData.value.orderProduction;
-    let process: string = this.formData.value.process;
-    this.productionProcessService.GetInformationAboutProductionByOrderProduction_Process(orderProduction, process).subscribe(data => {
-      this.productionSelected = [];
-      this.consolidatedProduction = [];
-      this.production = this.fillDataOrderProduction(data);
-    }, error => this.errorMessage(`¡Error al consultar la producción!`, error));
+  validateSearch() {
+    if (this.formData.value.process != null) {
+      if (this.formData.value.dates != null && this.formData.value.dates.length == 2) {
+        if (this.formData.value.turn != null) this.searchDataOrderProduction();
+        else this.msg.mensajeAdvertencia(`¡Debe seleccionar un turno!`);
+      } else this.msg.mensajeAdvertencia(`¡Debes seleccionar un rango de fechas!`);
+    } else this.msg.mensajeAdvertencia(`¡Debe seleccionar un proceso!`);
   }
 
-  fillDataOrderProduction(data: any): Array<OrderProduction> {
-    let orderProduction: Array<OrderProduction> = [];
-    data.forEach(dataProduction => {
-      orderProduction.push({
-        orderProduction: dataProduction.pp.ot,
-        item: dataProduction.producto.prod_Id,
-        reference: dataProduction.producto.prod_Nombre,
-        numberProduction: dataProduction.pp.numeroRollo_BagPro,
-        quantity: dataProduction.pp.presentacion == 'Kg' ? dataProduction.pp.peso_Neto : dataProduction.pp.cantidad,
-        presentation: dataProduction.pp.presentacion,
-        date: dataProduction.pp.fecha,
-        process: dataProduction.proceso.proceso_Id
-      });
-    });
-    return orderProduction;
+  searchDataOrderProduction() {
+    this.load = true;
+    this.production = [];
+    let process: string = this.formData.value.process;
+    let turn: string = this.formData.value.turn;
+    let start: any = moment(this.formData.value.dates[0]).format('YYYY-MM-DD');
+    let end: any = moment(this.formData.value.dates[1]).format('YYYY-MM-DD');
+    this.productionProcessService.GetInformationAboutProductionByOrderProduction_Process(process, turn, start, end).subscribe(data => {
+      this.production = data.filter(x => !this.productionSelected.map(y => y.numberProduction).includes(x.numberProduction));
+    }, error => this.errorMessage(`¡Error al consultar la producción!`, error), () => this.load = false);
   }
 
   selectedProduction(production: OrderProduction) {
@@ -223,14 +226,14 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     this.detailsPreInService.GetInformactionAboutPreIn_ById(idPreIn).subscribe(data => {
       this.load = true;
       let title: string = `Entrega Producción N° ${idPreIn}`;
-      let content: any[] = this.contentPDF(data);
+      let content: any[] = this.contentPDF(data, title, idPreIn);
       const pdfDefinicion: any = {
         info: { title: title },
         pageOrientation: 'portrait',
         pageSize: 'LETTER',
         watermark: { text: 'PLASTICARIBE SAS', color: 'red', opacity: 0.02, bold: true, italics: false },
-        pageMargins: [25, 120, 25, 35],
-        header: this.headerPDF(title, idPreIn),
+        pageMargins: [25, 25, 25, 25],
+        footer: this.footerPDF(),
         content: content,
       }
       pdfMake.createPdf(pdfDefinicion).open();
@@ -238,100 +241,18 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     }, error => this.errorMessage(`¡Se guardó la información del Pre Ingreso pero no se puedo crear el PDF!`, error));
   }
 
-  headerPDF(titulo: string, pre_Id: number): {} {
-    return (currentPage: any, pageCount: any) => {
-      return [
-        {
-          margin: [20, 8, 20, 0],
-          columns: [
-            this.fillImageBussinessPDF(),
-            this.titlePDfBarCode(titulo, pre_Id),
-            this.paginatorDate(currentPage, pageCount)
-          ]
-        },
-        this.lineHeaderFooter(),
-      ];
-    }
-  }
-
-  fillImageBussinessPDF() {
-    return {
-      width: '25%',
-      alignment: 'center',
-      table: {
-        body: [
-          [{ image: logoParaPdf, width: 150, height: 25 }],
-        ]
-      },
-      layout: 'noBorders',
-      margin: [5, 35, 80, 10]
-    }
-  }
-
-  titlePDfBarCode(titulo: string, pre_Id: number): {} {
-    return {
-      width: '40%',
-      alignment: 'center',
-      table: {
-        body: [
-          [{ text: titulo, bold: true, alignment: 'center', fontSize: 10 }],
-          this.createBarCode(pre_Id)
-        ]
-      },
-      layout: 'noBorders',
-      margin: [70, 15, 0, 10],
-    }
-  }
-
-  createBarCode(pre_Id: number) {
-    const imageBarcode = document.createElement('img');
-    imageBarcode.id = 'barcode';
-    document.body.appendChild(imageBarcode);
-    JsBarcode("#barcode", `ENTRLL #${pre_Id}`, { format: "CODE128A", displayValue: false, width: 80, height: 200 });
-    let imagePDF = { image: imageBarcode.src, width: 160, height: 50, alignment: 'center' };
-    imageBarcode.remove();
-    return [imagePDF];
-  }
-
-  paginatorDate(currentPage: { toString: () => string; }, pageCount: string): {} {
-    let today: any = moment().format('YYYY-MM-DD');
-    let hour: any = moment().format('HH:mm:ss');
-    return {
-      width: '35%',
-      alignment: 'center',
-      margin: [110, 30, 20, 0],
-      table: {
-        body: [
-          [{ text: `Pagina: `, alignment: 'left', fontSize: 8, bold: true }, { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Fecha: `, alignment: 'left', fontSize: 8, bold: true }, { text: today, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-          [{ text: `Hora: `, alignment: 'left', fontSize: 8, bold: true }, { text: hour, alignment: 'left', fontSize: 8, margin: [0, 0, 30, 0] }],
-        ]
-      },
-      layout: 'noBorders',
-    }
-  }
-
-  lineHeaderFooter(): {} {
-    return {
-      margin: [20, 0],
-      table: {
-        headerRows: 1,
-        widths: ['*'],
-        body: [
-          [{ border: [false, true, false, false], text: '' }],
-        ]
-      },
-      layout: { defaultBorder: false, }
-    }
-  }
-
-  contentPDF(data): any[] {
-    let content: any[] = [];
+  contentPDF(data: any, title: string, idPreIn: number): Array<any> {
+    let content: Array<any> = [];
     let consolidatedInformation: Array<any> = this.consolidatedInformation(data);
-    let informationProducts: Array<any> = this.getInformationProducts(data);
-    content.push(this.tableInformationPreIn(data[0]));
-    content.push(this.tableConsolidated(consolidatedInformation));
-    content.push(this.tableProducts(informationProducts));
+    let count: number = 0;
+    consolidatedInformation.forEach(prod => {
+      let informationProducts: Array<any> = this.getInformationProducts(data, prod.Item);
+      content.push(this.headerPDF_Barcode(title, idPreIn, prod.Item, count == 0));
+      content.push(this.tableInformationPreIn(data[0]));
+      content.push(this.tableConsolidated(consolidatedInformation.filter(x => x.Item == prod.Item)));
+      content.push(this.tableProducts(informationProducts));
+      count++;
+    });
     return content;
   }
 
@@ -349,7 +270,7 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
           "OT": prod.details.orderProduction,
           "Item": prod.details.item,
           "Referencia": prod.details.reference,
-          "Cant. Rollos": this.formatNumbers((cuontProduction).toFixed(2)),
+          "Cant. Rollos": this.formatNumbers((cuontProduction)),
           "Cantidad": this.formatNumbers((totalQuantity).toFixed(2)),
           "Presentación": prod.details.presentation
         });
@@ -358,10 +279,10 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
     return consolidatedInformation;
   }
 
-  getInformationProducts(data: any): Array<any> {
+  getInformationProducts(data: any, item: number): Array<any> {
     let informationProducts: Array<any> = [];
     let count: number = 0;
-    data.forEach(prod => {
+    data.filter(pp => pp.details.item == item).forEach(prod => {
       count++;
       informationProducts.push({
         "#": count,
@@ -374,6 +295,84 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
       });
     });
     return informationProducts;
+  }
+
+  headerPDF_Barcode(title: string, pre_Id: number, item: number, pageBreak: boolean) {
+    return [
+      {
+        pageBreak: (!pageBreak) ? 'before' : '',
+        table: {
+          widths: ['*'],
+          margin: [0, -150, 0, 0],
+          body: [
+            [
+              {
+                columns: [
+                  this.fillImageBussinessPDF(),
+                  this.titlePDfBarCode(title),
+                  this.createBarCode(pre_Id, item)
+                ]
+              }
+            ]
+          ]
+        },
+        fontSize: 9,
+        layout: { defaultBorder: false }
+      },
+      this.lineHeaderFooter(),
+    ];
+  }
+
+  fillImageBussinessPDF() {
+    return {
+      width: '25%',
+      alignment: 'center',
+      table: {
+        body: [
+          [{ image: logoParaPdf, width: 150, height: 25 }],
+        ]
+      },
+      layout: 'noBorders',
+      margin: [5, 10, 80, 10]
+    }
+  }
+
+  titlePDfBarCode(titulo: string): {} {
+    return {
+      width: '40%',
+      alignment: 'center',
+      table: {
+        body: [
+          [{ text: titulo, bold: true, alignment: 'center', fontSize: 10 }],
+        ]
+      },
+      layout: 'noBorders',
+      margin: [70, 15, 0, 10],
+    }
+  }
+
+  createBarCode(pre_Id: number, item: number) {
+    const imageBarcode = document.createElement('img');
+    imageBarcode.id = 'barcode';
+    document.body.appendChild(imageBarcode);
+    JsBarcode("#barcode", `ENTRLL#${pre_Id}-ITEM#${item}`, { format: "CODE128A", displayValue: false, width: 80, height: 200 });
+    let imagePDF = { image: imageBarcode.src, width: 160, height: 50, alignment: 'center' };
+    imageBarcode.remove();
+    return [imagePDF];
+  }
+
+  lineHeaderFooter(): {} {
+    return {
+      margin: [0, 0],
+      table: {
+        headerRows: 1,
+        widths: ['*'],
+        body: [
+          [{ border: [false, true, false, false], text: '' }],
+        ]
+      },
+      layout: { defaultBorder: false, }
+    }
   }
 
   tableInformationPreIn(data: any): {} {
@@ -452,6 +451,19 @@ export class PreIngresoProduccion_DespachoComponent implements OnInit {
       body.push(dataRow);
     });
     return body;
+  }
+
+  footerPDF() {
+    return function (currentPage: any, pageCount: any) {
+      return [
+        {
+          columns: [
+            { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('HH:mm:ss')}`, alignment: 'left', fontSize: 8, margin: [30, 0, 0, 0] },
+            { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+          ]
+        }
+      ]
+    }
   }
 }
 

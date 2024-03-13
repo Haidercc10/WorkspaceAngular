@@ -22,7 +22,14 @@ export class Prestamos_NominaService {
 
   Post = (data: loan): Observable<any> => this.http.post(this.rutaPlasticaribeAPI + '/Prestamos', data);
 
-  putLoanAnulled = (id : any, data : any[] = []) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/putLoanAnulled/${id}`, data);
+  putLoanAnulled = (id: any, data: any[] = []) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/putLoanAnulled/${id}`, data);
 
-  Put = (id : any, data : any) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`, data);
+  Put = (id: any, data: loan) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/${id}`, data);
+
+  AddPaymentLoan = (payment: Array<PaymentLoan>) => this.http.put(`${this.rutaPlasticaribeAPI}/Prestamos/paymentLoan`, payment);
+}
+
+export interface PaymentLoan {
+  idLoan: number;
+  valuePay: number;
 }

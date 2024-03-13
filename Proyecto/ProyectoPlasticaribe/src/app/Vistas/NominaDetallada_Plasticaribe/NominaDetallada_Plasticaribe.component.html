@@ -97,7 +97,7 @@
         <td class="text-right">{{data.valueDaysToPay | currency: 'USD'}}</td>
         <td class="text-right">{{totalDisabilityByWorker(data) | currency: 'USD'}}</td>
         <td class="text-right">{{data.totalValueAdictionalFee | currency: 'USD'}}</td>
-        <td class="text-right">{{data.transpotationAssitance | currency: 'USD'}}</td>
+        <td class="text-right">{{((data.transpotationAssitance / 30) * data.daysToPay) | currency: 'USD'}}</td>
         <td class="text-right">{{data.accrued | currency: 'USD'}}</td>
         <td class="text-right">{{data.eps | currency: 'USD'}}</td>
         <td class="text-right">{{data.afp | currency: 'USD'}}</td>
@@ -639,8 +639,8 @@
         <tr>
           <td>{{rowIndex + 1}}</td>
           <td class="text-center">{{data.worker}}</td>
-          <td class="text-center">{{data.startPayroll | date: 'yyyy-MM-dd'}}</td>
-          <td class="text-center">{{data.endPayroll | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.startDate | date: 'yyyy-MM-dd'}}</td>
+          <td class="text-center">{{data.endDate | date: 'yyyy-MM-dd'}}</td>
           <td class="text-right">{{data.valueAdvance | currency: 'USD'}}</td>
         </tr>
       </ng-template>
